@@ -7,6 +7,7 @@ import type { ReasoningTrace } from "@/lib/intelligence/trace.types";
 import type { TrustAssessment } from "@/lib/intelligence/trust.types";
 import { IntelligenceValidationError } from "@/lib/intelligence/engine/errors";
 import { defaultEvidenceCollector } from "@/lib/intelligence/evidence";
+import { defaultConfidenceAssessor } from "@/lib/intelligence/confidence";
 import {
   PIPELINE_STAGE_LABELS,
   PIPELINE_STAGE_ORDER,
@@ -87,63 +88,20 @@ export async function stageEvidenceCollection(
 }
 
 /**
- * Stage 3 — Confidence assessment.
+ * Stage 3 — Confidence assessment via the Confidence Assessment Layer.
  *
- * Extension point: weighted factor computation per Intelligence Specification §4.2.
+ * Delegates to {@link DefaultConfidenceAssessor}. Extension point: graph and
+ * entity signal factors when those layers are connected in future builds.
  *
- * @param _request - Validated intelligence request
- * @param _evidence - Collected evidence from stage 2
- * @param _graphContext - Optional graph context when graph stage ran
- * @returns Typed placeholder — zero score, insufficient band, skeleton degradation note
+ * @param request - Validated intelligence request
+ * @param evidence - Collected evidence from stage 2
+ * @returns Conservative confidence assessment from evidence state
  */
-export function stageConfidenceAssessment(
+export async function stageConfidenceAssessment(
   request: IntelligenceRequest,
   evidence: EvidenceCollection,
-  graphContext?: GraphContext,
-): ConfidenceAssessment {
-  void request;
-  void evidence;
-  void graphContext;
-
-  const skeletonDetail = "Skeleton placeholder — not computed";
-
-  return {
-    score: 0,
-    band: "insufficient",
-    factors: [
-      {
-        id: "evidence-volume",
-        label: "Evidence Volume",
-        weight: 0.25,
-        score: 0,
-        detail: skeletonDetail,
-      },
-      {
-        id: "source-relevance",
-        label: "Source Relevance",
-        weight: 0.25,
-        score: 0,
-        detail: skeletonDetail,
-      },
-      {
-        id: "graph-connectivity",
-        label: "Graph Connectivity",
-        weight: 0.25,
-        score: 0,
-        detail: skeletonDetail,
-      },
-      {
-        id: "entity-signal-quality",
-        label: "Entity Signal Quality",
-        weight: 0.25,
-        score: 0,
-        detail: skeletonDetail,
-      },
-    ],
-    degraded: true,
-    degradationReason:
-      "Intelligence engine skeleton — confidence assessment not yet implemented",
-  };
+): Promise<ConfidenceAssessment> {
+  return defaultConfidenceAssessor.assess(request, evidence);
 }
 
 /**

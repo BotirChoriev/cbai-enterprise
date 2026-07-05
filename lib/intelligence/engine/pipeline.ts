@@ -72,18 +72,18 @@ export async function executePipeline(
     stageEvidenceCollection(validatedRequest),
   );
 
-  const graphContext =
-    validatedRequest.includeGraph === true
-      ? await runStage("graph-context", () => stageGraphContext(validatedRequest))
-      : undefined;
-
   const confidence = await runStage("confidence-assessment", () =>
-    stageConfidenceAssessment(validatedRequest, evidence, graphContext),
+    stageConfidenceAssessment(validatedRequest, evidence),
   );
 
   const trust = await runStage("trust-assessment", () =>
     stageTrustAssessment(validatedRequest, evidence, confidence),
   );
+
+  const graphContext =
+    validatedRequest.includeGraph === true
+      ? await runStage("graph-context", () => stageGraphContext(validatedRequest))
+      : undefined;
 
   const memoryContext =
     validatedRequest.includeMemory === true

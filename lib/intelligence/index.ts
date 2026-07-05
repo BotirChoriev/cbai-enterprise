@@ -125,3 +125,24 @@ export {
   type EvidenceCollector,
   type EvidenceSourceAdapter,
 } from "@/lib/intelligence/evidence";
+
+export {
+  CONFIDENCE_ASSESSOR_VERSION,
+  CONFIDENCE_BAND_HIGH_MIN,
+  CONFIDENCE_BAND_LABELS,
+  CONFIDENCE_BAND_LOW_MIN,
+  CONFIDENCE_BAND_MEDIUM_MIN,
+  CONFIDENCE_BAND_VERIFIED_MIN,
+  CONFIDENCE_BAND_VERY_LOW_MIN,
+  CONFIDENCE_BANDS_DESCENDING,
+  CONFIDENCE_FACTOR_WEIGHTS,
+  DEFAULT_CONFIDENCE_ASSESSOR_ID,
+  DefaultConfidenceAssessor,
+  defaultConfidenceAssessor,
+  clampConfidenceScore,
+  computeCompositeConfidenceScore,
+  isEvidenceConfidenceInsufficient,
+  isInsufficientConfidenceBand,
+  resolveConfidenceBand,
+  type ConfidenceAssessor,
+} from "@/lib/intelligence/confidence";

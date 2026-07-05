@@ -1,14 +1,18 @@
 /**
- * Confidence band labels per CBAI Intelligence Specification §4.4.
+ * Confidence band labels for the Confidence Assessment Layer (BUILD-024).
  *
  * Confidence measures evidence quality — not predictive certainty.
+ * Bands map composite scores to human-readable justification levels.
+ *
+ * @see docs/CBAI-Intelligence-Specification-v1.md §4.4
  */
 export type ConfidenceBand =
   | "insufficient"
-  | "moderate"
-  | "strong"
-  | "very-strong"
-  | "near-complete";
+  | "very-low"
+  | "low"
+  | "medium"
+  | "high"
+  | "verified";
 
 /**
  * Canonical confidence factor identifiers aligned with
