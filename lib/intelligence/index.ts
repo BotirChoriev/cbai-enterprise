@@ -77,6 +77,7 @@ export type {
   ReasoningTrace,
   StageVerificationResult,
   TraceVerificationResult,
+  TraceVerificationSummary,
 } from "@/lib/intelligence/trace.types";
 
 export type {
@@ -198,3 +199,18 @@ export {
   type MemoryStoreProvider,
   type MemoryStoreWriter,
 } from "@/lib/intelligence/memory";
+
+export {
+  createTimelineEntry,
+  DEFAULT_REASONING_TRACE_BUILDER_ID,
+  DefaultReasoningTraceBuilder,
+  defaultReasoningTraceBuilder,
+  REASONING_TRACE_BUILDER_VERSION,
+  sortTimelineEntries,
+  TRACE_TIMELINE_STAGE_ORDER,
+  verifyPipelineTrace,
+  type PipelineTraceInput,
+  type PipelineTraceVerificationInput,
+  type ReasoningTraceBuilder,
+  type StageTimelineEntry,
+} from "@/lib/intelligence/trace";

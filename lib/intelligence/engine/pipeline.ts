@@ -11,6 +11,7 @@ import {
   stageTrustAssessment,
   type PipelineContext,
 } from "@/lib/intelligence/engine/stages";
+import { createTimelineEntry, type StageTimelineEntry } from "@/lib/intelligence/trace";
 import type { IntelligenceRequest } from "@/lib/intelligence/request.types";
 import type { IntelligenceResult } from "@/lib/intelligence/result.types";
 
@@ -25,18 +26,25 @@ function createRunId(request: IntelligenceRequest): string {
 }
 
 /**
- * Execute a single pipeline stage with governed error wrapping.
- *
- * Extension point: stage timing, partial trace emission, and
- * streaming progress callbacks will hook in here.
+ * Execute a single pipeline stage with governed error wrapping and timeline capture.
  */
 async function runStage<T>(
   stageId: IntelligencePipelineStageId,
+  timeline: StageTimelineEntry[],
   execute: () => T | Promise<T>,
 ): Promise<T> {
+  const startedAt = new Date().toISOString();
+
   try {
-    return await execute();
+    const result = await execute();
+    timeline.push(
+      createTimelineEntry(stageId, startedAt, new Date().toISOString(), "complete"),
+    );
+    return result;
   } catch (error) {
+    timeline.push(
+      createTimelineEntry(stageId, startedAt, new Date().toISOString(), "failed"),
+    );
     const message =
       error instanceof Error
         ? error.message
@@ -48,50 +56,57 @@ async function runStage<T>(
 /**
  * Execute the full Intelligence Engine pipeline in canonical order.
  *
- * Pipeline sequence (BUILD-022):
- * Request → Evidence Collection → Confidence Assessment → Trust Assessment
- * → Graph Context → Memory Context → Reasoning Trace → Intelligence Result
+ * Pipeline sequence:
+ * Request → Evidence → Confidence → Trust → Graph → Memory → Reasoning Trace → Result
  *
- * Each stage is a separate function returning typed placeholders.
- * No intelligence logic, scoring, graph traversal, or memory reads occur.
+ * Stage timing is captured in a timeline passed to the Reasoning Trace Layer.
  *
  * @param request - Intelligence request envelope
- * @returns Assembled {@link IntelligenceResult} with skeleton placeholders
- * @throws {@link IntelligenceValidationError} when request validation fails
- * @throws {@link IntelligencePipelineError} when a stage throws unexpectedly
+ * @returns Assembled {@link IntelligenceResult}
  */
 export async function executePipeline(
   request: IntelligenceRequest,
 ): Promise<IntelligenceResult> {
   const runId = createRunId(request);
   const startedAt = new Date().toISOString();
+  const timeline: StageTimelineEntry[] = [];
 
-  const validatedRequest = await runStage("request", () => stageRequest(request));
+  const validatedRequest = await runStage("request", timeline, () =>
+    stageRequest(request),
+  );
 
-  const evidence = await runStage("evidence-collection", () =>
+  const evidence = await runStage("evidence-collection", timeline, () =>
     stageEvidenceCollection(validatedRequest),
   );
 
-  const confidence = await runStage("confidence-assessment", () =>
+  const confidence = await runStage("confidence-assessment", timeline, () =>
     stageConfidenceAssessment(validatedRequest, evidence),
   );
 
-  const trust = await runStage("trust-assessment", () =>
+  const trust = await runStage("trust-assessment", timeline, () =>
     stageTrustAssessment(validatedRequest, evidence, confidence),
   );
 
-  const graphContext = await runStage("graph-context", () =>
+  const graphContext = await runStage("graph-context", timeline, () =>
     stageGraphContext(validatedRequest, evidence),
   );
 
-  const memoryContext = await runStage("memory-context", () =>
+  const memoryContext = await runStage("memory-context", timeline, () =>
     stageMemoryContext(validatedRequest, evidence),
   );
 
-  const completedAt = new Date().toISOString();
-
-  const reasoningTrace = await runStage("reasoning-trace", () =>
-    stageReasoningTrace(runId, startedAt, completedAt),
+  const reasoningTrace = await runStage("reasoning-trace", timeline, () =>
+    stageReasoningTrace({
+      runId,
+      pipelineStartedAt: startedAt,
+      timeline: [...timeline],
+      request: validatedRequest,
+      evidence,
+      confidence,
+      trust,
+      graphContext,
+      memoryContext,
+    }),
   );
 
   const context: PipelineContext = {
@@ -107,7 +122,7 @@ export async function executePipeline(
     result: {} as IntelligenceResult,
   };
 
-  const result = await runStage("intelligence-result", () =>
+  const result = await runStage("intelligence-result", timeline, () =>
     stageIntelligenceResult(context),
   );
 

@@ -14,9 +14,9 @@ import type { GraphContextBuildResult } from "@/lib/intelligence/graph";
 import { defaultMemoryContextBuilder } from "@/lib/intelligence/memory";
 import type { MemoryContextBuildResult } from "@/lib/intelligence/memory";
 import {
-  PIPELINE_STAGE_LABELS,
-  PIPELINE_STAGE_ORDER,
-} from "@/lib/intelligence/pipeline-stage.types";
+  defaultReasoningTraceBuilder,
+  type PipelineTraceInput,
+} from "@/lib/intelligence/trace";
 
 /** Semantic version of the skeleton engine — embedded in traces and trust producer metadata. */
 export const ENGINE_SKELETON_VERSION = "0.1.0-skeleton";
@@ -163,46 +163,18 @@ export async function stageMemoryContext(
 }
 
 /**
- * Stage 7 — Reasoning trace assembly.
+ * Stage 7 — Reasoning trace assembly via the Reasoning Trace Layer.
  *
- * Extension point: per-stage timing, verification results,
- * and agent decision records per Specification §8.5.
+ * Delegates to {@link DefaultReasoningTraceBuilder}. Records only observed
+ * pipeline execution — no AI reasoning or fabricated explanations.
  *
- * @param runId - Pipeline run identifier
- * @param startedAt - Pipeline start timestamp
- * @param completedAt - Pipeline completion timestamp
- * @returns Typed placeholder trace marking skeleton execution as degraded
+ * @param input - Pipeline artifacts and observed stage timeline
+ * @returns Audit trace with verification summary
  */
-export function stageReasoningTrace(
-  runId: string,
-  startedAt: string,
-  completedAt: string,
-): ReasoningTrace {
-  const startedMs = Date.parse(startedAt);
-  const completedMs = Date.parse(completedAt);
-  const totalDurationMs =
-    Number.isFinite(startedMs) && Number.isFinite(completedMs)
-      ? Math.max(0, completedMs - startedMs)
-      : undefined;
-
-  return {
-    runId,
-    stages: PIPELINE_STAGE_ORDER.map((stageId) => ({
-      stageId,
-      label: PIPELINE_STAGE_LABELS[stageId],
-      status: "complete" as const,
-      startedAt,
-      completedAt,
-      output: "Skeleton placeholder — stage executed without intelligence logic",
-      verificationResult: "degraded" as const,
-    })),
-    agentDecisions: [],
-    verificationResult: "degraded",
-    producerVersion: ENGINE_SKELETON_VERSION,
-    startedAt,
-    completedAt,
-    totalDurationMs,
-  };
+export async function stageReasoningTrace(
+  input: PipelineTraceInput,
+): Promise<ReasoningTrace> {
+  return defaultReasoningTraceBuilder.build(input);
 }
 
 /**

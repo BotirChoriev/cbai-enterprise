@@ -102,6 +102,26 @@ export interface AgentDecision {
 export type TraceVerificationResult = "pass" | "fail" | "degraded";
 
 /**
+ * Structural verification summary for a pipeline execution trace (BUILD-028).
+ *
+ * Records audit checks only — no AI reasoning or conclusions.
+ */
+export interface TraceVerificationSummary {
+  /** Overall verification outcome. */
+  result: TraceVerificationResult;
+  /** Whether all required pipeline stages executed successfully. */
+  requiredStagesExecuted: boolean;
+  /** Whether stage order and timeline integrity checks passed. */
+  pipelineIntegrity: boolean;
+  /** Context layers requested but not connected. */
+  missingContext: string[];
+  /** Whether execution ran in degraded mode. */
+  degradedExecution: boolean;
+  /** Non-fatal audit warnings collected during verification. */
+  warnings: string[];
+}
+
+/**
  * Complete audit trace for an intelligence pipeline execution.
  *
  * Enables reproducibility, explainability, and post-hoc verification.
@@ -118,6 +138,10 @@ export interface ReasoningTrace {
   agentDecisions: AgentDecision[];
   /** Overall structural verification outcome. */
   verificationResult: TraceVerificationResult;
+  /** Structural verification summary from BUILD-028 verification helper. */
+  verificationSummary?: TraceVerificationSummary;
+  /** Non-fatal audit warnings observed during pipeline execution. */
+  warnings: string[];
   /** Engine or orchestrator version string for reproducibility. */
   producerVersion?: string;
   /** Model identifier when model backends participated (Phase 2+). */
