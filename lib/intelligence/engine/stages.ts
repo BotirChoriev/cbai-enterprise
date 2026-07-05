@@ -6,6 +6,7 @@ import type { IntelligenceResult } from "@/lib/intelligence/result.types";
 import type { ReasoningTrace } from "@/lib/intelligence/trace.types";
 import type { TrustAssessment } from "@/lib/intelligence/trust.types";
 import { IntelligenceValidationError } from "@/lib/intelligence/engine/errors";
+import { defaultEvidenceCollector } from "@/lib/intelligence/evidence";
 import {
   PIPELINE_STAGE_LABELS,
   PIPELINE_STAGE_ORDER,
@@ -71,27 +72,18 @@ export function stageRequest(request: IntelligenceRequest): IntelligenceRequest 
 }
 
 /**
- * Stage 2 — Evidence collection.
+ * Stage 2 — Evidence collection via the Evidence Layer.
  *
- * Extension point: Global Search, entity profiles, document RAG,
- * and graph-path evidence will populate {@link EvidenceCollection.items}.
+ * Delegates to {@link DefaultEvidenceCollector}. Extension point: enable
+ * source adapters in the registry to populate {@link EvidenceCollection.items}.
  *
- * @param _request - Validated intelligence request
- * @returns Typed placeholder — empty collection, insufficient status
+ * @param request - Validated intelligence request
+ * @returns Evidence collection from the default collector
  */
-export function stageEvidenceCollection(
+export async function stageEvidenceCollection(
   request: IntelligenceRequest,
-): EvidenceCollection {
-  void request;
-
-  return {
-    items: [],
-    claimType: "descriptive",
-    sufficiencyStatus: "insufficient",
-    contradictionState: "none",
-    meanRelevance: 0,
-    sourceClassCount: 0,
-  };
+): Promise<EvidenceCollection> {
+  return defaultEvidenceCollector.collect(request);
 }
 
 /**

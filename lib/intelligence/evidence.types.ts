@@ -129,4 +129,38 @@ export interface EvidenceCollection {
   meanRelevance: number;
   /** Count of distinct {@link EvidenceSourceClass} values present. */
   sourceClassCount: number;
+  /** Optional collector metadata describing provenance of the collection itself. */
+  metadata?: EvidenceCollectionMetadata;
+}
+
+/**
+ * Status of an evidence collection run from the Evidence Layer.
+ */
+export type EvidenceCollectionStatus =
+  | "no-sources-connected"
+  | "collected"
+  | "partial"
+  | "failed";
+
+/**
+ * Metadata describing how an {@link EvidenceCollection} was produced.
+ *
+ * Distinguishes an intentionally empty collection (no sources connected)
+ * from a future collection with real evidence items.
+ */
+export interface EvidenceCollectionMetadata {
+  /** Stable collector identifier. */
+  collectorId: string;
+  /** Collector semantic version. */
+  collectorVersion: string;
+  /** Overall collection run status. */
+  status: EvidenceCollectionStatus;
+  /** Human-readable explanation of the collection outcome. */
+  message: string;
+  /** All source adapter IDs registered at collection time. */
+  registeredSourceIds: readonly string[];
+  /** Source adapter IDs attempted during this collection run. */
+  attemptedSourceIds: readonly string[];
+  /** ISO-8601 timestamp when collection completed. */
+  collectedAt: string;
 }

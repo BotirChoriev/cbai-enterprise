@@ -30,12 +30,12 @@ function createRunId(request: IntelligenceRequest): string {
  * Extension point: stage timing, partial trace emission, and
  * streaming progress callbacks will hook in here.
  */
-function runStage<T>(
+async function runStage<T>(
   stageId: IntelligencePipelineStageId,
-  execute: () => T,
-): T {
+  execute: () => T | Promise<T>,
+): Promise<T> {
   try {
-    return execute();
+    return await execute();
   } catch (error) {
     const message =
       error instanceof Error
@@ -66,33 +66,33 @@ export async function executePipeline(
   const runId = createRunId(request);
   const startedAt = new Date().toISOString();
 
-  const validatedRequest = runStage("request", () => stageRequest(request));
+  const validatedRequest = await runStage("request", () => stageRequest(request));
 
-  const evidence = runStage("evidence-collection", () =>
+  const evidence = await runStage("evidence-collection", () =>
     stageEvidenceCollection(validatedRequest),
   );
 
   const graphContext =
     validatedRequest.includeGraph === true
-      ? runStage("graph-context", () => stageGraphContext(validatedRequest))
+      ? await runStage("graph-context", () => stageGraphContext(validatedRequest))
       : undefined;
 
-  const confidence = runStage("confidence-assessment", () =>
+  const confidence = await runStage("confidence-assessment", () =>
     stageConfidenceAssessment(validatedRequest, evidence, graphContext),
   );
 
-  const trust = runStage("trust-assessment", () =>
+  const trust = await runStage("trust-assessment", () =>
     stageTrustAssessment(validatedRequest, evidence, confidence),
   );
 
   const memoryContext =
     validatedRequest.includeMemory === true
-      ? runStage("memory-context", () => stageMemoryContext(validatedRequest))
+      ? await runStage("memory-context", () => stageMemoryContext(validatedRequest))
       : undefined;
 
   const completedAt = new Date().toISOString();
 
-  const reasoningTrace = runStage("reasoning-trace", () =>
+  const reasoningTrace = await runStage("reasoning-trace", () =>
     stageReasoningTrace(runId, startedAt, completedAt),
   );
 
@@ -109,7 +109,7 @@ export async function executePipeline(
     result: {} as IntelligenceResult,
   };
 
-  const result = runStage("intelligence-result", () =>
+  const result = await runStage("intelligence-result", () =>
     stageIntelligenceResult(context),
   );
 

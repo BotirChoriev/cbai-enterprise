@@ -39,6 +39,8 @@ export type {
   Evidence,
   EvidenceClaimType,
   EvidenceCollection,
+  EvidenceCollectionMetadata,
+  EvidenceCollectionStatus,
   EvidenceSource,
   EvidenceSourceClass,
   EvidenceStaleness,
@@ -102,3 +104,24 @@ export {
   type IntelligencePipelineStageId,
   type PipelineContext,
 } from "@/lib/intelligence/engine";
+
+export {
+  DEFAULT_EVIDENCE_COLLECTOR_ID,
+  DefaultEvidenceCollector,
+  defaultEvidenceCollector,
+  defaultEvidenceSourceRegistry,
+  EVIDENCE_COLLECTOR_VERSION,
+  EVIDENCE_RELEVANCE_MAX,
+  EVIDENCE_RELEVANCE_MIN,
+  EvidenceSourceRegistry,
+  EvidenceValidationError,
+  createDefaultEvidenceSourceRegistry,
+  isEvidenceShape,
+  isEvidenceSourceClass,
+  isValidRelevanceScore,
+  summarizeEvidenceItems,
+  validateEvidenceCollectionShape,
+  validateEvidenceShape,
+  type EvidenceCollector,
+  type EvidenceSourceAdapter,
+} from "@/lib/intelligence/evidence";
