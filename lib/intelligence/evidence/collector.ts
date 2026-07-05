@@ -14,7 +14,7 @@ import {
 } from "@/lib/intelligence/evidence/validation";
 
 /** Semantic version of the default evidence collector. */
-export const EVIDENCE_COLLECTOR_VERSION = "0.2.0-entity-profile";
+export const EVIDENCE_COLLECTOR_VERSION = "0.3.0-graph-evidence";
 
 /** Stable identifier recorded in collection metadata. */
 export const DEFAULT_EVIDENCE_COLLECTOR_ID = "default-evidence-collector";
@@ -80,10 +80,16 @@ export function deduplicateEvidenceItems(items: Evidence[]): Evidence[] {
 }
 
 /**
- * Sort evidence by relevance descending for spec EV6 ordering (BUILD-030 scope).
+ * Sort evidence deterministically: relevance descending, then id ascending.
  */
 export function sortEvidenceByRelevance(items: Evidence[]): Evidence[] {
-  return [...items].sort((a, b) => b.relevance - a.relevance);
+  return [...items].sort((a, b) => {
+    if (b.relevance !== a.relevance) {
+      return b.relevance - a.relevance;
+    }
+
+    return a.id.localeCompare(b.id);
+  });
 }
 
 /**
@@ -198,14 +204,14 @@ function buildCollectionMessage(
   }
 
   if (itemCount === 0 && !hasSubjectEntities) {
-    return "Evidence collection completed — no subjectEntities provided; entity-profile adapter returned zero items.";
+    return "Evidence collection completed — no subjectEntities provided; enabled adapters returned zero items.";
   }
 
   if (itemCount === 0) {
     return "Evidence collection completed — enabled adapters returned zero items. See metadata warnings for resolution details.";
   }
 
-  return `Evidence collected from ${enabledCount} enabled source adapter(s) — ${itemCount} item(s) with entity-profile provenance (inferred).`;
+  return `Evidence collected from ${enabledCount} enabled source adapter(s) — ${itemCount} item(s) from entity-profile and graph sources (inferred provenance).`;
 }
 
 /** Shared default collector singleton used by the intelligence engine pipeline. */

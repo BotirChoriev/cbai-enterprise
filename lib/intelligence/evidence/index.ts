@@ -47,6 +47,21 @@ export {
 } from "@/lib/intelligence/evidence/adapters/entity";
 
 export {
+  computeGraphDistance,
+  createGraphEvidenceAdapter,
+  defaultGraphContextResolver,
+  defaultGraphEvidenceMapper,
+  GraphContextResolver,
+  GraphEvidenceAdapter,
+  GraphEvidenceMapper,
+  GRAPH_EDGE_CATEGORY_MAP,
+  GRAPH_EVIDENCE_ADAPTER_ID,
+  GRAPH_EVIDENCE_ADAPTER_VERSION,
+  GRAPH_EVIDENCE_CATEGORY_LABELS,
+  GRAPH_EVIDENCE_SOURCE_CLASS,
+} from "@/lib/intelligence/evidence/adapters/graph";
+
+export {
   EVIDENCE_RELEVANCE_MAX,
   EVIDENCE_RELEVANCE_MIN,
   EvidenceValidationError,
