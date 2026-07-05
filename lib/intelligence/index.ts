@@ -21,6 +21,8 @@ export type {
 
 export type {
   GraphContext,
+  GraphContextMetadata,
+  GraphContextStatus,
   IntelligenceGraphEdgeType,
   IntelligenceGraphPath,
   MemoryContext,
@@ -162,3 +164,18 @@ export {
   resolveTrustPermissions,
   type TrustAssessor,
 } from "@/lib/intelligence/trust";
+
+export {
+  DEFAULT_GRAPH_CONTEXT_BUILDER_ID,
+  DefaultGraphContextBuilder,
+  GRAPH_CONTEXT_BUILDER_VERSION,
+  GRAPH_SIGNAL_DEFINITIONS,
+  defaultGraphContextBuilder,
+  traverseGraphSkeleton,
+  type GraphContextBuildResult,
+  type GraphContextBuilder,
+  type GraphSignal,
+  type GraphSignalName,
+  type GraphTraversalOptions,
+  type GraphTraversalResult,
+} from "@/lib/intelligence/graph";

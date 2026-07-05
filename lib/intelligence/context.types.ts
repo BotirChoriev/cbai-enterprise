@@ -44,6 +44,8 @@ export interface IntelligenceGraphPath {
  * @see docs/CBAI-Intelligence-Specification-v1.md §10
  */
 export interface GraphContext {
+  /** Whether graph context was requested and active for this run. */
+  enabled: boolean;
   /** Graph node IDs used as traversal seeds (typically search matches). */
   seedNodeIds: string[];
   /** Validated paths discovered during bounded graph traversal. */
@@ -58,6 +60,32 @@ export interface GraphContext {
   edgeCount: number;
   /** ISO-8601 timestamp of the graph snapshot used, if snapshotted. */
   snapshotAt?: string;
+  /** Builder metadata describing graph context production status. */
+  metadata?: GraphContextMetadata;
+}
+
+/**
+ * Production status for graph context assembly (BUILD-026).
+ */
+export type GraphContextStatus =
+  | "disabled"
+  | "graph-context-not-connected"
+  | "connected";
+
+/**
+ * Metadata describing how {@link GraphContext} was produced.
+ */
+export interface GraphContextMetadata {
+  /** Stable builder identifier. */
+  builderId: string;
+  /** Builder semantic version. */
+  builderVersion: string;
+  /** Overall graph context status. */
+  status: GraphContextStatus;
+  /** Human-readable explanation of the graph context outcome. */
+  message: string;
+  /** ISO-8601 timestamp when context was built. */
+  builtAt: string;
 }
 
 /**

@@ -80,10 +80,9 @@ export async function executePipeline(
     stageTrustAssessment(validatedRequest, evidence, confidence),
   );
 
-  const graphContext =
-    validatedRequest.includeGraph === true
-      ? await runStage("graph-context", () => stageGraphContext(validatedRequest))
-      : undefined;
+  const graphContext = await runStage("graph-context", () =>
+    stageGraphContext(validatedRequest, evidence),
+  );
 
   const memoryContext =
     validatedRequest.includeMemory === true

@@ -9,6 +9,8 @@ import { IntelligenceValidationError } from "@/lib/intelligence/engine/errors";
 import { defaultEvidenceCollector } from "@/lib/intelligence/evidence";
 import { defaultConfidenceAssessor } from "@/lib/intelligence/confidence";
 import { defaultTrustAssessor } from "@/lib/intelligence/trust";
+import { defaultGraphContextBuilder } from "@/lib/intelligence/graph";
+import type { GraphContextBuildResult } from "@/lib/intelligence/graph";
 import {
   PIPELINE_STAGE_LABELS,
   PIPELINE_STAGE_ORDER,
@@ -125,25 +127,20 @@ export async function stageTrustAssessment(
 }
 
 /**
- * Stage 5 — Graph context assembly.
+ * Stage 5 — Graph context assembly via the Graph Context Layer.
  *
- * Extension point: seed from search matches, bounded traversal,
- * connectivity score for confidence factor per Specification §10.
+ * Delegates to {@link DefaultGraphContextBuilder}. Returns disabled context
+ * when `includeGraph` is false; not-connected empty context when true.
  *
- * @param _request - Validated intelligence request
- * @returns Typed placeholder — empty subgraph, zero connectivity, no stalemate
+ * @param request - Validated intelligence request
+ * @param evidence - Collected evidence from stage 2
+ * @returns Graph context with explicit production status
  */
-export function stageGraphContext(request: IntelligenceRequest): GraphContext {
-  void request;
-
-  return {
-    seedNodeIds: [],
-    traversedPaths: [],
-    connectivityScore: 0,
-    stalemate: false,
-    nodeCount: 0,
-    edgeCount: 0,
-  };
+export async function stageGraphContext(
+  request: IntelligenceRequest,
+  evidence: EvidenceCollection,
+): Promise<GraphContextBuildResult> {
+  return defaultGraphContextBuilder.build(request, evidence);
 }
 
 /**
