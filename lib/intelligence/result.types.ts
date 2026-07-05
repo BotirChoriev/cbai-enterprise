@@ -60,6 +60,7 @@ export interface IntelligenceSummary {
  * grounded, supported, scored, explainable, governed, and actionable or informational.
  *
  * @see docs/CBAI-Intelligence-Specification-v1.md §1.4
+ * @see docs/build-029-report.md
  */
 export interface IntelligenceResult {
   /** Unique identifier for this intelligence product. */
@@ -72,8 +73,12 @@ export interface IntelligenceResult {
   claim: string;
   /** Full synthesized answer text for delivery surfaces. */
   finalAnswer: string;
+  /** Executive-facing summary — factual, never fabricated (BUILD-029). */
+  executiveSummary: string;
   /** Entities the intelligence is about — grounding requirement. */
   subjectEntities: IntelligenceSubjectEntity[];
+  /** Related entities from request scope (BUILD-029 enterprise contract). */
+  relatedEntities: IntelligenceSubjectEntity[];
   /** Aggregated supporting evidence with sufficiency and contradiction state. */
   evidence: EvidenceCollection;
   /** Evidence-quality confidence assessment. */
@@ -82,12 +87,16 @@ export interface IntelligenceResult {
   trust: TrustAssessment;
   /** Complete pipeline audit trace for explainability and verification. */
   reasoningTrace: ReasoningTrace;
-  /** Graph context used during inference, when graph traversal was enabled. */
+  /** Graph context used during inference. */
   graphContext?: GraphContext;
-  /** Memory context injected during inference, when memory was enabled. */
+  /** Memory context injected during inference. */
   memoryContext?: MemoryContext;
   /** Structured summary for delivery and executive surfaces. */
   summary: IntelligenceSummary;
+  /** Recommended actions — empty when evidence is insufficient (BUILD-029). */
+  recommendations: string[];
+  /** Pipeline warnings propagated from the reasoning trace. */
+  warnings: string[];
   /** ISO-8601 timestamp when the intelligence was produced. */
   producedAt: string;
   /** Optional ISO-8601 freshness horizon after which intelligence should be regenerated. */

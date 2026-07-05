@@ -214,3 +214,27 @@ export {
   type ReasoningTraceBuilder,
   type StageTimelineEntry,
 } from "@/lib/intelligence/trace";
+
+export {
+  DEFAULT_RESULT_ASSEMBLER_ID,
+  DefaultResultAssembler,
+  defaultResultAssembler,
+  defaultResultFormatter,
+  defaultSummaryBuilder,
+  EMPTY_EVIDENCE_EXECUTIVE_SUMMARY,
+  RESULT_ASSEMBLER_VERSION,
+  ResultFormatter,
+  SummaryBuilder,
+  buildFactualCaveats,
+  buildFactualKeyFindings,
+  buildIntelligenceSummary,
+  isResultEvidenceInsufficient,
+  resolveLifecycleState,
+  resolveRelatedEntities,
+} from "@/lib/intelligence/result";
+
+export type {
+  FormattedIntelligenceResultSections,
+  ResultAssembler,
+  ResultAssemblerInput,
+} from "@/lib/intelligence/result";

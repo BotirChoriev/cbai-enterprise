@@ -2,6 +2,9 @@ import type { ConfidenceAssessment } from "@/lib/intelligence/confidence.types";
 import type { GraphContext, MemoryContext } from "@/lib/intelligence/context.types";
 import type { EvidenceCollection } from "@/lib/intelligence/evidence.types";
 import type { IntelligenceRequest } from "@/lib/intelligence/request.types";
+import {
+  defaultResultAssembler,
+} from "@/lib/intelligence/result";
 import type { IntelligenceResult } from "@/lib/intelligence/result.types";
 import type { ReasoningTrace } from "@/lib/intelligence/trace.types";
 import type { TrustAssessment } from "@/lib/intelligence/trust.types";
@@ -178,50 +181,41 @@ export async function stageReasoningTrace(
 }
 
 /**
- * Stage 8 — Intelligence result assembly.
+ * Stage 8 — Intelligence result assembly (BUILD-029).
  *
- * Extension point: claim synthesis, subject entity resolution,
- * summary generation, and lifecycle state assignment.
+ * Delegates to the Result Layer for deterministic product assembly.
  *
  * @param context - Fully populated pipeline context from prior stages
- * @returns Typed placeholder result wiring all stage outputs together
+ * @returns Assembled {@link IntelligenceResult}
  */
-export function stageIntelligenceResult(context: PipelineContext): IntelligenceResult {
-  const { request, runId, evidence, confidence, trust, reasoningTrace } = context;
-  const producedAt = reasoningTrace.completedAt ?? new Date().toISOString();
-
-  const skeletonNotice =
-    "Intelligence engine skeleton — pipeline executed; intelligence logic not yet implemented.";
-
-  return {
-    id: runId,
-    requestId: request.id,
-    type: request.type ?? "entity",
-    claim: skeletonNotice,
-    finalAnswer: skeletonNotice,
-    subjectEntities: (request.subjectEntities ?? []).map((entity) => ({
-      type: entity.type,
-      id: entity.id,
-      name: entity.name ?? entity.id,
-    })),
+export async function stageIntelligenceResult(
+  context: PipelineContext,
+): Promise<IntelligenceResult> {
+  const {
+    request,
+    runId,
     evidence,
     confidence,
     trust,
+    graphContext,
+    memoryContext,
     reasoningTrace,
-    graphContext: context.graphContext,
-    memoryContext: context.memoryContext,
-    summary: {
-      headline: skeletonNotice,
-      keyFindings: [],
-      caveats: [
-        "This result was produced by the BUILD-022 execution skeleton.",
-        "No evidence was collected, scored, or synthesized.",
-      ],
-      recommendedActions: [],
-    },
-    producedAt,
-    lifecycleState: "draft",
-    overrideStatus: "none",
-    isStale: false,
-  };
+  } = context;
+
+  if (!graphContext || !memoryContext) {
+    throw new IntelligenceValidationError(
+      "Pipeline context missing graph or memory context required for result assembly.",
+    );
+  }
+
+  return defaultResultAssembler.assemble({
+    runId,
+    request,
+    evidence,
+    confidence,
+    trust,
+    graphContext,
+    memoryContext,
+    reasoningTrace,
+  });
 }
