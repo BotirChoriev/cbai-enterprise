@@ -1,0 +1,82 @@
+/**
+ * CBAI Intelligence Engine — type foundation (BUILD-021).
+ *
+ * Framework-agnostic interfaces defining the epistemic layer of CBAI:
+ * evidence, confidence, trust, context, traces, requests, results, and
+ * the engine contract.
+ *
+ * No implementation, mock data, or UI bindings — types only.
+ *
+ * @see docs/CBAI-Intelligence-Specification-v1.md
+ * @see docs/CBAI-Domain-Model-v1.md
+ * @see docs/build-021-report.md
+ */
+
+export type {
+  ConfidenceAssessment,
+  ConfidenceBand,
+  ConfidenceFactor,
+  ConfidenceFactorId,
+} from "@/lib/intelligence/confidence.types";
+
+export type {
+  GraphContext,
+  IntelligenceGraphEdgeType,
+  IntelligenceGraphPath,
+  MemoryContext,
+  MemoryEntryCategory,
+  MemoryEntryRef,
+} from "@/lib/intelligence/context.types";
+
+export type {
+  IntelligenceEngine,
+  IntelligenceRun,
+  IntelligenceRunStatus,
+} from "@/lib/intelligence/engine.types";
+
+export type {
+  ContradictionState,
+  Evidence,
+  EvidenceClaimType,
+  EvidenceCollection,
+  EvidenceSource,
+  EvidenceSourceClass,
+  EvidenceStaleness,
+  EvidenceSufficiencyStatus,
+  ProvenanceStrength,
+} from "@/lib/intelligence/evidence.types";
+
+export type {
+  EntityRef,
+  IntelligenceRequest,
+  IntelligenceType,
+  QueryIntent,
+} from "@/lib/intelligence/request.types";
+
+export type {
+  IntelligenceLifecycleState,
+  IntelligenceResult,
+  IntelligenceSubjectEntity,
+  IntelligenceSummary,
+  OverrideStatus,
+} from "@/lib/intelligence/result.types";
+
+export type {
+  AgentDecision,
+  CorePipelineStageId,
+  PipelineStageId,
+  ReasoningStageId,
+  ReasoningStageStatus,
+  ReasoningStageTrace,
+  ReasoningTrace,
+  StageVerificationResult,
+  TraceVerificationResult,
+} from "@/lib/intelligence/trace.types";
+
+export type {
+  IntelligenceProducer,
+  IntelligenceProducerType,
+  SourceTrustLevel,
+  TrustAssessment,
+  TrustTier,
+} from "@/lib/intelligence/trust.types";
