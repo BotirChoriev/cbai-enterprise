@@ -46,7 +46,7 @@ export default function GraphPage() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-sky-500/80">
-              BUILD-013 · Relationship Engine
+              Relationship Engine
             </p>
             <h1 className="mt-1 text-2xl font-bold tracking-tight text-zinc-50">
               CBAI Knowledge Graph

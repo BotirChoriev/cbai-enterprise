@@ -14,7 +14,6 @@ import { getEntityTypeLabel } from "@/lib/entity/entity.helpers";
 import type { Entity } from "@/lib/entity/entity.types";
 import {
   REASONING_PIPELINE_STAGES,
-  REASONING_STAGE_DELAYS,
   ANSWER_TEMPLATES,
   DEFAULT_ANSWER_TEMPLATE,
   type AnswerTemplate,
@@ -29,8 +28,6 @@ import type {
   ReasoningSummary,
   GraphConnectionRef,
 } from "@/lib/reasoning/reasoning.types";
-import { REASONING_STAGE_ORDER } from "@/lib/reasoning/reasoning.types";
-
 function truncate(text: string, max: number): string {
   return text.length <= max ? text : `${text.slice(0, max)}…`;
 }
@@ -495,12 +492,4 @@ export function getStagesWithStatus(
     }
     return { ...stage, status };
   });
-}
-
-/** Total simulated duration in milliseconds */
-export function getTotalReasoningDuration(): number {
-  return REASONING_STAGE_ORDER.reduce(
-    (sum, id) => sum + REASONING_STAGE_DELAYS[id],
-    0,
-  );
 }

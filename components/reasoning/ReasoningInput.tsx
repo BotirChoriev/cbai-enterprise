@@ -25,7 +25,7 @@ export default function ReasoningInput({
     <div className="rounded-xl border border-zinc-800 bg-gradient-to-br from-zinc-950 via-zinc-950 to-violet-950/20 p-6">
       <div className="mb-4">
         <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-violet-500/80">
-          BUILD-014 · Cognitive Engine
+          Cognitive Engine
         </p>
         <h1 className="mt-1 text-2xl font-bold tracking-tight text-zinc-50">
           CBAI Reasoning Engine
