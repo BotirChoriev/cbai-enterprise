@@ -66,6 +66,7 @@ export function buildEvidenceVolumeFactor(
     number
   > = {
     minimum: 40,
+    partial: 52,
     adequate: 65,
     strong: 85,
   };

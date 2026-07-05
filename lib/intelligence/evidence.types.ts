@@ -52,6 +52,7 @@ export type EvidenceClaimType =
 export type EvidenceSufficiencyStatus =
   | "insufficient"
   | "minimum"
+  | "partial"
   | "adequate"
   | "strong";
 
@@ -163,4 +164,6 @@ export interface EvidenceCollectionMetadata {
   attemptedSourceIds: readonly string[];
   /** ISO-8601 timestamp when collection completed. */
   collectedAt: string;
+  /** Non-fatal warnings from source adapters during collection (BUILD-030). */
+  warnings?: string[];
 }

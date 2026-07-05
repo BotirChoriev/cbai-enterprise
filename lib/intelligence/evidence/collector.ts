@@ -1,11 +1,12 @@
 import type { EvidenceClaimType } from "@/lib/intelligence/evidence.types";
 import type { IntelligenceRequest } from "@/lib/intelligence/request.types";
-import type { EvidenceCollection } from "@/lib/intelligence/evidence.types";
+import type { Evidence, EvidenceCollection } from "@/lib/intelligence/evidence.types";
 import {
   defaultEvidenceSourceRegistry,
   type EvidenceSourceAdapter,
   type EvidenceSourceRegistry,
 } from "@/lib/intelligence/evidence/sources";
+import { evaluateEvidenceSufficiency } from "@/lib/intelligence/evidence/sufficiency";
 import {
   summarizeEvidenceItems,
   validateEvidenceCollectionShape,
@@ -13,7 +14,7 @@ import {
 } from "@/lib/intelligence/evidence/validation";
 
 /** Semantic version of the default evidence collector. */
-export const EVIDENCE_COLLECTOR_VERSION = "0.1.0-foundation";
+export const EVIDENCE_COLLECTOR_VERSION = "0.2.0-entity-profile";
 
 /** Stable identifier recorded in collection metadata. */
 export const DEFAULT_EVIDENCE_COLLECTOR_ID = "default-evidence-collector";
@@ -60,14 +61,36 @@ function inferClaimType(request: IntelligenceRequest): EvidenceClaimType {
 }
 
 /**
- * Default evidence collector for the CBAI Intelligence Engine (BUILD-023).
+ * Deduplicate evidence items by stable evidence id — first occurrence wins.
+ */
+export function deduplicateEvidenceItems(items: Evidence[]): Evidence[] {
+  const seen = new Set<string>();
+  const deduped: Evidence[] = [];
+
+  for (const item of items) {
+    if (seen.has(item.id)) {
+      continue;
+    }
+
+    seen.add(item.id);
+    deduped.push(item);
+  }
+
+  return deduped;
+}
+
+/**
+ * Sort evidence by relevance descending for spec EV6 ordering (BUILD-030 scope).
+ */
+export function sortEvidenceByRelevance(items: Evidence[]): Evidence[] {
+  return [...items].sort((a, b) => b.relevance - a.relevance);
+}
+
+/**
+ * Default evidence collector for the CBAI Intelligence Engine.
  *
  * Orchestrates registered source adapters, validates merged evidence shape,
- * and returns an empty collection with explicit metadata when no sources
- * are connected.
- *
- * Behavior is equivalent to BUILD-022 hardcoded empty evidence — items remain
- * empty — but collection now flows through the Evidence Layer framework.
+ * evaluates conservative sufficiency, and records adapter warnings.
  */
 export class DefaultEvidenceCollector implements EvidenceCollector {
   private readonly registry: EvidenceSourceRegistry;
@@ -78,36 +101,58 @@ export class DefaultEvidenceCollector implements EvidenceCollector {
 
   /**
    * Collect evidence by querying enabled adapters in the registry.
-   *
-   * BUILD-023: all skeleton adapters are disabled — returns empty items with
-   * `no-sources-connected` metadata. Future builds enable adapters individually.
    */
   async collect(request: IntelligenceRequest): Promise<EvidenceCollection> {
     const registeredSourceIds = this.registry.getRegisteredIds();
     const enabledAdapters = this.registry.getEnabled();
     const collectedAt = new Date().toISOString();
 
-    const items = this.mergeAdapterResults(request, enabledAdapters);
+    const { items: rawItems, warnings } = this.mergeAdapterResults(
+      request,
+      enabledAdapters,
+    );
+    const items = sortEvidenceByRelevance(deduplicateEvidenceItems(rawItems));
     const { meanRelevance, sourceClassCount } = summarizeEvidenceItems(items);
+    const claimType = inferClaimType(request);
+    const sufficiencyStatus = evaluateEvidenceSufficiency(
+      items,
+      claimType,
+      request.subjectEntities,
+    );
+
+    const hasSubjectEntities =
+      request.subjectEntities !== undefined && request.subjectEntities.length > 0;
+    const collectionStatus =
+      enabledAdapters.length === 0
+        ? "no-sources-connected"
+        : items.length === 0 && hasSubjectEntities
+          ? "partial"
+          : items.length === 0
+            ? "collected"
+            : warnings.length > 0
+              ? "partial"
+              : "collected";
 
     const collection: EvidenceCollection = {
       items,
-      claimType: inferClaimType(request),
-      sufficiencyStatus: items.length === 0 ? "insufficient" : "minimum",
+      claimType,
+      sufficiencyStatus,
       contradictionState: "none",
       meanRelevance,
       sourceClassCount,
       metadata: {
         collectorId: DEFAULT_EVIDENCE_COLLECTOR_ID,
         collectorVersion: EVIDENCE_COLLECTOR_VERSION,
-        status: enabledAdapters.length === 0 ? "no-sources-connected" : "collected",
-        message:
-          enabledAdapters.length === 0
-            ? "Evidence Layer foundation — no source adapters are enabled. Registered adapters exist as skeletons awaiting subsystem connection in future builds."
-            : "Evidence collected from enabled source adapters.",
+        status: collectionStatus,
+        message: buildCollectionMessage(
+          enabledAdapters.length,
+          items.length,
+          hasSubjectEntities,
+        ),
         registeredSourceIds,
         attemptedSourceIds: enabledAdapters.map((adapter) => adapter.id),
         collectedAt,
+        warnings: warnings.length > 0 ? warnings : undefined,
       },
     };
 
@@ -122,20 +167,45 @@ export class DefaultEvidenceCollector implements EvidenceCollector {
   private mergeAdapterResults(
     request: IntelligenceRequest,
     adapters: EvidenceSourceAdapter[],
-  ) {
-    const merged = [];
+  ): { items: Evidence[]; warnings: string[] } {
+    const merged: Evidence[] = [];
+    const warnings: string[] = [];
 
     for (const adapter of adapters) {
-      const adapterItems = adapter.collect(request);
+      const result = adapter.collect(request);
 
-      for (const item of adapterItems) {
+      if (result.warnings) {
+        warnings.push(...result.warnings);
+      }
+
+      for (const item of result.items) {
         validateEvidenceShape(item);
         merged.push(item);
       }
     }
 
-    return merged;
+    return { items: merged, warnings };
   }
+}
+
+function buildCollectionMessage(
+  enabledCount: number,
+  itemCount: number,
+  hasSubjectEntities: boolean,
+): string {
+  if (enabledCount === 0) {
+    return "Evidence Layer foundation — no source adapters are enabled. Registered adapters exist as skeletons awaiting subsystem connection in future builds.";
+  }
+
+  if (itemCount === 0 && !hasSubjectEntities) {
+    return "Evidence collection completed — no subjectEntities provided; entity-profile adapter returned zero items.";
+  }
+
+  if (itemCount === 0) {
+    return "Evidence collection completed — enabled adapters returned zero items. See metadata warnings for resolution details.";
+  }
+
+  return `Evidence collected from ${enabledCount} enabled source adapter(s) — ${itemCount} item(s) with entity-profile provenance (inferred).`;
 }
 
 /** Shared default collector singleton used by the intelligence engine pipeline. */

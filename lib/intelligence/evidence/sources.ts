@@ -1,5 +1,14 @@
 import type { IntelligenceRequest } from "@/lib/intelligence/request.types";
 import type { Evidence, EvidenceSourceClass } from "@/lib/intelligence/evidence.types";
+import { createEntityProfileEvidenceAdapter } from "@/lib/intelligence/evidence/adapters/entity";
+
+/**
+ * Result returned by an evidence source adapter collection run.
+ */
+export interface EvidenceSourceAdapterCollectResult {
+  items: Evidence[];
+  warnings?: string[];
+}
 
 /**
  * Contract for a pluggable evidence source adapter.
@@ -27,10 +36,9 @@ export interface EvidenceSourceAdapter {
   /**
    * Collect evidence items for the given request.
    *
-   * Skeleton adapters return an empty array. Future implementations
-   * perform subsystem reads without mutating domain data.
+   * Returns items and optional warnings. Skeleton adapters return empty items.
    */
-  collect(request: IntelligenceRequest): Evidence[];
+  collect(request: IntelligenceRequest): EvidenceSourceAdapterCollectResult;
 }
 
 /**
@@ -104,9 +112,9 @@ function createSkeletonAdapter(definition: EvidenceSourceDefinition): EvidenceSo
     label: definition.label,
     description: definition.description,
     enabled: false,
-    collect(request: IntelligenceRequest): Evidence[] {
+    collect(request: IntelligenceRequest): EvidenceSourceAdapterCollectResult {
       void request;
-      return [];
+      return { items: [] };
     },
   };
 }
@@ -164,13 +172,18 @@ export class EvidenceSourceRegistry {
 }
 
 /**
- * Default registry pre-loaded with disabled skeleton adapters
- * for every specification-defined evidence source class.
+ * Default registry pre-loaded with skeleton adapters for future source classes
+ * and the enabled entity-profile adapter (BUILD-030).
  */
 export function createDefaultEvidenceSourceRegistry(): EvidenceSourceRegistry {
   const registry = new EvidenceSourceRegistry();
 
   for (const definition of EVIDENCE_SOURCE_DEFINITIONS) {
+    if (definition.id === "entity-profile") {
+      registry.register(createEntityProfileEvidenceAdapter());
+      continue;
+    }
+
     registry.register(createSkeletonAdapter(definition));
   }
 

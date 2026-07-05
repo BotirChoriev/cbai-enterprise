@@ -50,6 +50,7 @@ export function computeTrustScoreFromEvidence(
     number
   > = {
     minimum: 20,
+    partial: 32,
     adequate: 45,
     strong: 70,
   };
