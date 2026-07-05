@@ -80,3 +80,25 @@ export type {
   TrustAssessment,
   TrustTier,
 } from "@/lib/intelligence/trust.types";
+
+export {
+  DefaultIntelligenceEngine,
+  defaultIntelligenceEngine,
+  ENGINE_SKELETON_VERSION,
+  executePipeline,
+  IntelligenceEngineError,
+  IntelligencePipelineError,
+  IntelligenceValidationError,
+  PIPELINE_STAGE_LABELS,
+  PIPELINE_STAGE_ORDER,
+  stageConfidenceAssessment,
+  stageEvidenceCollection,
+  stageGraphContext,
+  stageIntelligenceResult,
+  stageMemoryContext,
+  stageReasoningTrace,
+  stageRequest,
+  stageTrustAssessment,
+  type IntelligencePipelineStageId,
+  type PipelineContext,
+} from "@/lib/intelligence/engine";

@@ -1,4 +1,5 @@
 import type { TrustTier } from "@/lib/intelligence/trust.types";
+import type { IntelligencePipelineStageId } from "@/lib/intelligence/pipeline-stage.types";
 
 /**
  * Pipeline stage execution status for audit traces.
@@ -44,7 +45,10 @@ export type CorePipelineStageId =
 /**
  * Union of all stage identifiers that may appear in a reasoning trace.
  */
-export type PipelineStageId = ReasoningStageId | CorePipelineStageId;
+export type PipelineStageId =
+  | ReasoningStageId
+  | CorePipelineStageId
+  | IntelligencePipelineStageId;
 
 /**
  * Audit record for a single pipeline stage execution.
