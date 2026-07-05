@@ -8,6 +8,7 @@ import type { TrustAssessment } from "@/lib/intelligence/trust.types";
 import { IntelligenceValidationError } from "@/lib/intelligence/engine/errors";
 import { defaultEvidenceCollector } from "@/lib/intelligence/evidence";
 import { defaultConfidenceAssessor } from "@/lib/intelligence/confidence";
+import { defaultTrustAssessor } from "@/lib/intelligence/trust";
 import {
   PIPELINE_STAGE_LABELS,
   PIPELINE_STAGE_ORDER,
@@ -105,36 +106,22 @@ export async function stageConfidenceAssessment(
 }
 
 /**
- * Stage 4 — Trust assessment.
+ * Stage 4 — Trust assessment via the Trust Assessment Layer.
  *
- * Extension point: producer trust matrix, source trust inheritance,
- * and contradiction caps per Intelligence Specification §5.
+ * Delegates to {@link DefaultTrustAssessor}. Trust is evidence-grounded and
+ * never copied from confidence score magnitude.
  *
- * @param _request - Validated intelligence request
- * @param _evidence - Collected evidence
- * @param _confidence - Confidence assessment from stage 3
- * @returns Typed placeholder — unverified tier with skeleton cap applied
+ * @param request - Validated intelligence request
+ * @param evidence - Collected evidence from stage 2
+ * @param confidence - Confidence assessment from stage 3 (caps only)
+ * @returns Conservative trust assessment with governance permissions
  */
-export function stageTrustAssessment(
+export async function stageTrustAssessment(
   request: IntelligenceRequest,
   evidence: EvidenceCollection,
   confidence: ConfidenceAssessment,
-): TrustAssessment {
-  void request;
-  void evidence;
-  void confidence;
-
-  return {
-    tier: "unverified",
-    producer: {
-      type: "reasoning-engine",
-      id: "default-intelligence-engine",
-      name: "Default Intelligence Engine",
-      version: ENGINE_SKELETON_VERSION,
-    },
-    capsApplied: ["skeleton-mode"],
-    humanVerified: false,
-  };
+): Promise<TrustAssessment> {
+  return defaultTrustAssessor.assess(request, evidence, confidence);
 }
 
 /**

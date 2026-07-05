@@ -45,9 +45,9 @@ export class DefaultIntelligenceEngine implements IntelligenceEngine {
    * @returns Promise resolving to result with updated verification metadata
    */
   async verify(result: IntelligenceResult): Promise<IntelligenceResult> {
-    const capsApplied = result.trust.capsApplied.includes("skeleton-mode")
+    const capsApplied = result.trust.capsApplied.includes("post-verify-review")
       ? result.trust.capsApplied
-      : [...result.trust.capsApplied, "skeleton-mode"];
+      : [...result.trust.capsApplied, "post-verify-review"];
 
     return {
       ...result,

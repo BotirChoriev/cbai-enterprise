@@ -80,6 +80,7 @@ export type {
   IntelligenceProducerType,
   SourceTrustLevel,
   TrustAssessment,
+  TrustLevel,
   TrustTier,
 } from "@/lib/intelligence/trust.types";
 
@@ -146,3 +147,18 @@ export {
   resolveConfidenceBand,
   type ConfidenceAssessor,
 } from "@/lib/intelligence/confidence";
+
+export {
+  DEFAULT_TRUST_ASSESSOR_ID,
+  DefaultTrustAssessor,
+  TRUST_ASSESSOR_VERSION,
+  TRUST_CAP_CONFIDENCE_DEGRADED,
+  TRUST_CAP_NO_EVIDENCE,
+  TRUST_CAP_NO_SOURCES_CONNECTED,
+  TRUST_LEVEL_LABELS,
+  TRUST_LEVEL_PERMISSIONS,
+  defaultTrustAssessor,
+  resolveTrustLevel,
+  resolveTrustPermissions,
+  type TrustAssessor,
+} from "@/lib/intelligence/trust";

@@ -1,8 +1,21 @@
 /**
- * Organizational trust tier per CBAI Intelligence Specification §5.2.
+ * Organizational trust level for the Trust Assessment Layer (BUILD-025).
  *
- * Trust governs whether intelligence may drive automated action,
- * agent dispatch, or executive decisions — distinct from confidence.
+ * Trust governs whether an organization may rely on an intelligence result
+ * for recommendations, automation, or execution — distinct from confidence.
+ */
+export type TrustLevel =
+  | "unverified"
+  | "low"
+  | "moderate"
+  | "high"
+  | "verified";
+
+/**
+ * Legacy trust tier used by agent trace records and memory entries.
+ *
+ * Separate from {@link TrustLevel} — agent contributions retain the
+ * specification §5.2 tier taxonomy until unified in a future build.
  */
 export type TrustTier =
   | "unverified"
@@ -50,19 +63,30 @@ export interface IntelligenceProducer {
 /**
  * Organizational willingness to rely on an intelligence product.
  *
- * Derived from producer trust, source provenance, confidence band,
- * audit history, and human verification status.
+ * Answers: "Should the organization rely on this result?" — not
+ * "How certain is the reasoning?" (see {@link ConfidenceAssessment}).
  *
  * @see docs/CBAI-Intelligence-Specification-v1.md §5
+ * @see docs/build-025-report.md
  */
 export interface TrustAssessment {
-  /** Derived organizational trust tier. */
-  tier: TrustTier;
-  /** Identity of the intelligence producer. */
+  /** Derived organizational trust level. */
+  trustLevel: TrustLevel;
+  /** Evidence-grounded trust score, 0–100 inclusive — not copied from confidence. */
+  trustScore: number;
+  /** Whether automated agent dispatch is permitted. */
+  allowAutomation: boolean;
+  /** Whether the result may be shown as a recommendation. */
+  allowRecommendation: boolean;
+  /** Whether workflow or action execution is permitted. */
+  allowExecution: boolean;
+  /** Human-readable explanation of the trust decision. */
+  reason: string;
+  /** Identity of the trust assessor producer. */
   producer: IntelligenceProducer;
   /** Highest source trust level among cited document/feed evidence. */
   sourceTrustLevel?: SourceTrustLevel;
-  /** Trust caps applied (e.g. open contradiction, stale intelligence). */
+  /** Trust caps applied (e.g. no-evidence, contradiction-open). */
   capsApplied: string[];
   /** Whether human verification elevated or authored this intelligence. */
   humanVerified: boolean;
