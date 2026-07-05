@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
-
 export default function Home() {
-  redirect("/dashboard");
+  return (
+    <meta httpEquiv="refresh" content="0; url=/dashboard" />
+  );
 }
