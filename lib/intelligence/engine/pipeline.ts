@@ -84,10 +84,9 @@ export async function executePipeline(
     stageGraphContext(validatedRequest, evidence),
   );
 
-  const memoryContext =
-    validatedRequest.includeMemory === true
-      ? await runStage("memory-context", () => stageMemoryContext(validatedRequest))
-      : undefined;
+  const memoryContext = await runStage("memory-context", () =>
+    stageMemoryContext(validatedRequest, evidence),
+  );
 
   const completedAt = new Date().toISOString();
 

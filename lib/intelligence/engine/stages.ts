@@ -11,6 +11,8 @@ import { defaultConfidenceAssessor } from "@/lib/intelligence/confidence";
 import { defaultTrustAssessor } from "@/lib/intelligence/trust";
 import { defaultGraphContextBuilder } from "@/lib/intelligence/graph";
 import type { GraphContextBuildResult } from "@/lib/intelligence/graph";
+import { defaultMemoryContextBuilder } from "@/lib/intelligence/memory";
+import type { MemoryContextBuildResult } from "@/lib/intelligence/memory";
 import {
   PIPELINE_STAGE_LABELS,
   PIPELINE_STAGE_ORDER,
@@ -144,19 +146,20 @@ export async function stageGraphContext(
 }
 
 /**
- * Stage 6 — Memory context assembly.
+ * Stage 6 — Memory context assembly via the Memory Context Layer.
  *
- * Extension point: pinned knowledge, conversations, watchlists
- * per Intelligence Specification §9.
+ * Delegates to {@link DefaultMemoryContextBuilder}. Returns disabled context
+ * when `includeMemory` is false; not-connected empty context when true.
  *
  * @param request - Validated intelligence request
- * @returns Typed placeholder — empty entries, tenant passthrough
+ * @param evidence - Collected evidence from stage 2
+ * @returns Memory context with explicit production status
  */
-export function stageMemoryContext(request: IntelligenceRequest): MemoryContext {
-  return {
-    entries: [],
-    tenantId: request.tenantId,
-  };
+export async function stageMemoryContext(
+  request: IntelligenceRequest,
+  evidence: EvidenceCollection,
+): Promise<MemoryContextBuildResult> {
+  return defaultMemoryContextBuilder.build(request, evidence);
 }
 
 /**

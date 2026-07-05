@@ -26,6 +26,8 @@ export type {
   IntelligenceGraphEdgeType,
   IntelligenceGraphPath,
   MemoryContext,
+  MemoryContextMetadata,
+  MemoryContextStatus,
   MemoryEntryCategory,
   MemoryEntryRef,
 } from "@/lib/intelligence/context.types";
@@ -179,3 +181,20 @@ export {
   type GraphTraversalOptions,
   type GraphTraversalResult,
 } from "@/lib/intelligence/graph";
+
+export {
+  DEFAULT_MEMORY_CONTEXT_BUILDER_ID,
+  DefaultMemoryContextBuilder,
+  MEMORY_CATEGORY_DEFINITIONS,
+  MEMORY_CONTEXT_BUILDER_VERSION,
+  defaultMemoryContextBuilder,
+  getMemoryCategoryIds,
+  type MemoryCategory,
+  type MemoryContextBuildResult,
+  type MemoryContextBuilder,
+  type MemoryQuery,
+  type MemoryRecord,
+  type MemoryStore,
+  type MemoryStoreProvider,
+  type MemoryStoreWriter,
+} from "@/lib/intelligence/memory";

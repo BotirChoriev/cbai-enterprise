@@ -128,10 +128,38 @@ export interface MemoryEntryRef {
  * @see docs/CBAI-Intelligence-Specification-v1.md §9
  */
 export interface MemoryContext {
+  /** Whether memory context was requested and active for this run. */
+  enabled: boolean;
   /** Memory entries available for the active tenant and request scope. */
   entries: MemoryEntryRef[];
   /** Optional tenant scope identifier for production multi-tenancy. */
   tenantId?: string;
   /** Entity types explicitly in scope for this request. */
   subjectEntityTypes?: EntityType[];
+  /** Builder metadata describing memory context production status. */
+  metadata?: MemoryContextMetadata;
+}
+
+/**
+ * Production status for memory context assembly (BUILD-027).
+ */
+export type MemoryContextStatus =
+  | "disabled"
+  | "memory-not-connected"
+  | "connected";
+
+/**
+ * Metadata describing how {@link MemoryContext} was produced.
+ */
+export interface MemoryContextMetadata {
+  /** Stable builder identifier. */
+  builderId: string;
+  /** Builder semantic version. */
+  builderVersion: string;
+  /** Overall memory context status. */
+  status: MemoryContextStatus;
+  /** Human-readable explanation of the memory context outcome. */
+  message: string;
+  /** ISO-8601 timestamp when context was built. */
+  builtAt: string;
 }
