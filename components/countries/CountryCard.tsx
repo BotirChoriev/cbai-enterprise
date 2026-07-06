@@ -1,8 +1,10 @@
 import type { Country } from "@/lib/countries";
 import {
-  getScoreColor,
-  getScoreBarColor,
-} from "@/lib/entity/entity.helpers";
+  buildCountryIntelligenceProfile,
+  resolveCountryListEvidenceLabel,
+  countryEvidenceStatusClass,
+} from "@/lib/countries.intelligence";
+import { getCountryRelationships } from "@/lib/countries.adapter";
 
 type CountryCardProps = {
   country: Country;
@@ -15,6 +17,15 @@ export default function CountryCard({
   isSelected,
   onSelect,
 }: CountryCardProps) {
+  const profile = buildCountryIntelligenceProfile(
+    country,
+    getCountryRelationships(country),
+  );
+  const evidenceLabel = resolveCountryListEvidenceLabel(profile);
+  const evidenceClass = countryEvidenceStatusClass(
+    profile.entityProfileConnected ? "connected" : "insufficient",
+  );
+
   return (
     <button
       type="button"
@@ -39,51 +50,18 @@ export default function CountryCard({
         </div>
         {isSelected && (
           <span className="rounded-full bg-sky-500/10 px-2 py-0.5 text-[10px] font-medium text-sky-400">
-            Active
+            Selected
           </span>
         )}
       </div>
 
-      <div className="mt-4 grid grid-cols-3 gap-3">
-        <div>
-          <p className="text-[10px] uppercase tracking-wider text-zinc-600">
-            AI Ready
-          </p>
-          <p
-            className={`mt-0.5 text-sm font-semibold ${getScoreColor(country.aiReadiness)}`}
-          >
-            {country.aiReadiness}
-          </p>
-        </div>
-        <div>
-          <p className="text-[10px] uppercase tracking-wider text-zinc-600">
-            Invest
-          </p>
-          <p
-            className={`mt-0.5 text-sm font-semibold ${getScoreColor(country.investmentScore)}`}
-          >
-            {country.investmentScore}
-          </p>
-        </div>
-        <div>
-          <p className="text-[10px] uppercase tracking-wider text-zinc-600">
-            Risk
-          </p>
-          <p
-            className={`mt-0.5 text-sm font-semibold ${getScoreColor(country.riskScore, true)}`}
-          >
-            {country.riskScore}
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-3">
-        <div className="h-1 overflow-hidden rounded-full bg-zinc-800">
-          <div
-            className={`h-full rounded-full ${getScoreBarColor(country.aiReadiness)}`}
-            style={{ width: `${country.aiReadiness}%` }}
-          />
-        </div>
+      <div className="mt-4 space-y-2">
+        <p className="text-xs text-zinc-500">Capital: {country.capital}</p>
+        <span
+          className={`inline-flex rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${evidenceClass}`}
+        >
+          {evidenceLabel}
+        </span>
       </div>
     </button>
   );

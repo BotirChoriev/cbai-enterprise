@@ -282,25 +282,20 @@ function buildEdges(nodes: GraphNode[]): GraphEdge[] {
       }
     }
 
-    // Industry: company industry matches country top industries
     for (const company of companies) {
       const companyNode = nodes.find(
         (n) => n.type === "company" && n.entityId === company.id,
       );
       if (!companyNode) continue;
-      if (
-        country.topIndustries.some((ind) =>
-          namesMatch(ind, company.industry),
-        ) &&
-        namesMatch(company.country, country.name)
-      ) {
+
+      if (namesMatch(company.country, country.name)) {
         addEdge(
           edges,
           seen,
           companyNode.id,
           countryNode.id,
           "industry",
-          "Industry",
+          "Headquarters",
         );
       }
     }

@@ -25,7 +25,7 @@ export class EntityProfileEvidenceAdapter implements EvidenceSourceAdapter {
   readonly sourceClass = "entity-profile" as const;
   readonly label = "Entity Profile";
   readonly description =
-    "Entity overview, aiSummary, scores, relationships, and platform signals from domain adapters.";
+    "Entity registry facts and relationship summaries from local domain adapters. Country records exclude unverified scores and narratives.";
   readonly enabled = true;
   readonly version = ENTITY_PROFILE_ADAPTER_VERSION;
 

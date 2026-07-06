@@ -3,15 +3,12 @@
 import { useMemo, useState } from "react";
 import type { CountryRegion } from "@/lib/countries";
 import { countries } from "@/lib/countries";
-import {
-  toCountryEntity,
-  getCountryRelationships,
-  COUNTRY_METADATA_FIELDS,
-} from "@/lib/countries.adapter";
-import EntityLayout from "@/components/entity/EntityLayout";
+import { getCountryRelationships } from "@/lib/countries.adapter";
+import { buildCountryIntelligenceProfile } from "@/lib/countries.intelligence";
 import CountryFilters from "@/components/countries/CountryFilters";
 import CountryCard from "@/components/countries/CountryCard";
 import CountryRelationships from "@/components/countries/CountryRelationships";
+import { CountryIntelligencePanel } from "@/components/countries/CountryIntelligencePanel";
 
 export default function CountriesPage() {
   const [search, setSearch] = useState("");
@@ -32,8 +29,11 @@ export default function CountriesPage() {
   const selectedCountry =
     countries.find((c) => c.id === selectedId) ?? filtered[0] ?? countries[0];
 
-  const selectedEntity = toCountryEntity(selectedCountry);
   const relationships = getCountryRelationships(selectedCountry);
+  const intelligenceProfile = buildCountryIntelligenceProfile(
+    selectedCountry,
+    relationships,
+  );
 
   return (
     <div className="space-y-6">
@@ -44,14 +44,14 @@ export default function CountriesPage() {
         />
         <div className="relative">
           <p className="text-[10px] font-medium uppercase tracking-widest text-cyan-400">
-            Global AI Operating System
+            CBAI Country Intelligence
           </p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-50">
             Countries Intelligence
           </h1>
           <p className="mt-1 text-sm text-zinc-500">
-            Real-time geopolitical, economic, and AI readiness analysis across
-            global markets.
+            Evidence-based country registry profiles. Scores and narratives are
+            withheld unless backed by connected local evidence sources.
           </p>
         </div>
       </div>
@@ -86,17 +86,15 @@ export default function CountriesPage() {
         </div>
 
         <div className="space-y-6 xl:col-span-8">
-          <EntityLayout
-            entity={selectedEntity}
-            metadataFields={COUNTRY_METADATA_FIELDS}
-            showScoreCards
-            aiConfidence={94.2}
-          >
-            <CountryRelationships
-              relationships={relationships}
-              businessOpportunities={selectedCountry.businessOpportunities}
-            />
-          </EntityLayout>
+          <CountryIntelligencePanel
+            profile={intelligenceProfile}
+            countryName={selectedCountry.name}
+            countryCode={selectedCountry.code}
+            capital={selectedCountry.capital}
+            region={selectedCountry.region}
+            government={selectedCountry.government}
+          />
+          <CountryRelationships relationships={relationships} />
         </div>
       </div>
     </div>

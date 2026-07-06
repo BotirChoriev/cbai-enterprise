@@ -1,11 +1,13 @@
+import { companies } from "@/lib/companies";
+import { universities } from "@/lib/universities";
 import type { Country } from "@/lib/countries";
-import type {
-  Entity,
-  EntityMetadataField,
-  EntityTimelineEvent,
-} from "@/lib/entity/entity.types";
+import {
+  INSUFFICIENT_EVIDENCE_LABEL,
+  NOT_AVAILABLE_SOURCE_LABEL,
+} from "@/lib/countries.intelligence";
+import type { Entity } from "@/lib/entity/entity.types";
 
-/** Cross-entity relationship graph for a country */
+/** Cross-entity links derived from local registries only. */
 export type CountryRelationships = {
   relatedCompanies: string[];
   universities: string[];
@@ -13,65 +15,52 @@ export type CountryRelationships = {
   industries: string[];
 };
 
-/** Ordered metadata fields for country entity overview grid */
-export const COUNTRY_METADATA_FIELDS: EntityMetadataField[] = [
+/** Ordered metadata fields for country factual overview grid. */
+export const COUNTRY_METADATA_FIELDS = [
   { key: "region", label: "Region" },
   { key: "capital", label: "Capital" },
-  { key: "gdp", label: "GDP" },
-  { key: "population", label: "Population" },
-  { key: "government", label: "Government" },
-  { key: "technologyLevel", label: "Technology Level" },
-];
+  { key: "government", label: "Government Form" },
+  { key: "code", label: "Country Code" },
+] as const;
 
-/** Related companies keyed by country id — aligns with Companies module */
-const relatedCompaniesByCountry: Record<string, string[]> = {
-  usa: ["Apple", "Microsoft", "Google", "NVIDIA", "Amazon", "OpenAI"],
-  china: ["Google", "Samsung", "Tesla", "Amazon", "Microsoft"],
-  uzbekistan: ["Samsung", "Microsoft", "Google"],
-  germany: ["Tesla", "Amazon", "Microsoft", "Apple", "NVIDIA"],
-  uae: ["Amazon", "Google", "Microsoft", "OpenAI", "Apple"],
-  japan: ["Tesla", "Samsung", "NVIDIA", "Amazon", "Apple"],
-};
-
-/** Build relationship graph from existing country domain fields */
-export function getCountryRelationships(country: Country): CountryRelationships {
-  return {
-    relatedCompanies: relatedCompaniesByCountry[country.id] ?? [],
-    universities: country.universities,
-    government: [country.government],
-    industries: country.topIndustries,
-  };
+function normalizeName(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
-function buildCountryTimeline(country: Country): EntityTimelineEvent[] {
-  return [
-    {
-      id: `${country.id}-economy`,
-      title: "Economic Profile",
-      description: `GDP ${country.gdp} · Population ${country.population}`,
-      date: "2026",
-      type: "update",
-    },
-    {
-      id: `${country.id}-ai`,
-      title: "AI Readiness Assessment",
-      description: `Score: ${country.aiReadiness}/100 · ${country.technologyLevel}`,
-      date: "2026",
-      type: "analysis",
-    },
-    {
-      id: `${country.id}-region`,
-      title: "Regional Classification",
-      description: `${country.region} · Capital: ${country.capital}`,
-      date: "Active",
-      type: "milestone",
-    },
-  ];
+function namesMatch(a: string, b: string): boolean {
+  const na = normalizeName(a);
+  const nb = normalizeName(b);
+  return na === nb || na.includes(nb) || nb.includes(na);
 }
 
 /**
- * Adapter: maps Country domain model → universal Entity interface.
- * All country presentation flows through this function.
+ * Derive country relationships from local company and university registries.
+ * No hardcoded or fabricated relationship lists.
+ */
+export function getCountryRelationships(country: Country): CountryRelationships {
+  const relatedCompanies = companies
+    .filter((company) => namesMatch(company.country, country.name))
+    .map((company) => company.name);
+
+  const linkedUniversities = universities
+    .filter((university) => namesMatch(university.country, country.name))
+    .map((university) => university.name);
+
+  return {
+    relatedCompanies,
+    universities: linkedUniversities,
+    government: [country.government],
+    industries: [],
+  };
+}
+
+function buildFactualOverview(country: Country): string {
+  return `${country.name} (${country.code}) — capital ${country.capital}, region ${country.region}. Government form recorded in local registry: ${country.government}.`;
+}
+
+/**
+ * Adapter: maps Country registry record → universal Entity interface.
+ * Factual fields only — no fabricated scores or narratives.
  */
 export function toCountryEntity(country: Country): Entity {
   return {
@@ -81,71 +70,53 @@ export function toCountryEntity(country: Country): Entity {
     icon: country.code,
     category: country.region,
     subtitle: `${country.capital} · ${country.region}`,
-    overview: country.economy,
+    overview: buildFactualOverview(country),
     status: "active",
     scores: {
-      aiScore: country.aiReadiness,
-      investmentScore: country.investmentScore,
-      riskScore: country.riskScore,
+      aiScore: 0,
+      investmentScore: 0,
+      riskScore: 0,
     },
-    tags: country.topIndustries.map((industry, i) => ({
-      id: `${country.id}-industry-${i}`,
-      label: industry,
-      variant: i === 0 ? "accent" : "default",
-    })),
-    timeline: buildCountryTimeline(country),
-    aiSummary: country.aiSummary,
+    tags: [],
+    timeline: [],
+    aiSummary: INSUFFICIENT_EVIDENCE_LABEL,
     metadata: {
       region: country.region,
       capital: country.capital,
-      gdp: country.gdp,
-      population: country.population,
       government: country.government,
-      technologyLevel: country.technologyLevel,
+      code: country.code,
     },
     metrics: [
       {
-        id: "gdp",
-        label: "GDP",
-        value: country.gdp,
+        id: "registry-status",
+        label: "Registry Status",
+        value: "Local reference profile",
         highlight: true,
       },
       {
-        id: "population",
-        label: "Population",
-        value: country.population,
+        id: "linked-companies",
+        label: "Linked Companies (local registry)",
+        value: getCountryRelationships(country).relatedCompanies.length,
+        unit: "records",
       },
       {
-        id: "aiReadiness",
-        label: "AI Readiness",
-        value: country.aiReadiness,
-        unit: "/100",
-        change: "CBAI assessed",
-        changeType: "positive",
-      },
-      {
-        id: "investmentScore",
-        label: "Investment Score",
-        value: country.investmentScore,
-        unit: "/100",
-      },
-      {
-        id: "opportunities",
-        label: "Business Opportunities",
-        value: country.businessOpportunities.length,
-        unit: "identified",
-      },
-      {
-        id: "universities",
-        label: "Leading Universities",
-        value: country.universities.length,
-        unit: "tracked",
+        id: "linked-universities",
+        label: "Linked Universities (local registry)",
+        value: getCountryRelationships(country).universities.length,
+        unit: "records",
       },
     ],
   };
 }
 
-/** Batch adapter for list operations and cross-entity queries */
-export function toCountryEntities(countries: Country[]): Entity[] {
-  return countries.map(toCountryEntity);
+/** Batch adapter for list operations and cross-entity queries. */
+export function toCountryEntities(countriesList: Country[]): Entity[] {
+  return countriesList.map(toCountryEntity);
+}
+
+/** Human-readable unavailable label for relationship sections. */
+export function formatRelationshipAvailability(count: number): string {
+  return count > 0
+    ? `${count} record(s) from local registry`
+    : NOT_AVAILABLE_SOURCE_LABEL;
 }

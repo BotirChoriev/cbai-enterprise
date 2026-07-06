@@ -36,42 +36,10 @@ export class EntityEvidenceMapper {
       retrievedAt: options.retrievedAt,
     };
 
-    const drafts: EvidenceDraft[] = [
-      {
-        id: `${baseId}:overview`,
-        relevance: 75,
-        excerpt: entity.overview,
-      },
-      {
-        id: `${baseId}:ai-summary`,
-        relevance: 70,
-        excerpt: `Platform assessment: ${entity.aiSummary}`,
-      },
-      {
-        id: `${baseId}:scores`,
-        relevance: 65,
-        excerpt: formatScoresExcerpt(entity),
-      },
-      {
-        id: `${baseId}:classification`,
-        relevance: 55,
-        excerpt: formatClassificationExcerpt(entity),
-      },
-    ];
-
-    if (relationshipsSummary) {
-      drafts.push({
-        id: `${baseId}:relationships`,
-        relevance: 50,
-        excerpt: relationshipsSummary,
-      });
-    }
-
-    drafts.push({
-      id: `${baseId}:signals`,
-      relevance: 50,
-      excerpt: formatRiskOpportunitySignals(entity),
-    });
+    const drafts: EvidenceDraft[] =
+      entity.type === "country"
+        ? buildCountryEvidenceDrafts(entity, relationshipsSummary)
+        : buildDefaultEvidenceDrafts(entity, relationshipsSummary);
 
     return drafts.slice(0, MAX_EVIDENCE_ITEMS_PER_ENTITY).map((draft) => ({
       id: draft.id,
@@ -84,6 +52,87 @@ export class EntityEvidenceMapper {
       staleness: "fresh" as const,
     }));
   }
+}
+
+function buildDefaultEvidenceDrafts(
+  entity: Entity,
+  relationshipsSummary?: string,
+): EvidenceDraft[] {
+  const baseId = `${entity.type}:${entity.id}`;
+  const drafts: EvidenceDraft[] = [
+    {
+      id: `${baseId}:overview`,
+      relevance: 75,
+      excerpt: entity.overview,
+    },
+    {
+      id: `${baseId}:ai-summary`,
+      relevance: 70,
+      excerpt: `Platform assessment: ${entity.aiSummary}`,
+    },
+    {
+      id: `${baseId}:scores`,
+      relevance: 65,
+      excerpt: formatScoresExcerpt(entity),
+    },
+    {
+      id: `${baseId}:classification`,
+      relevance: 55,
+      excerpt: formatClassificationExcerpt(entity),
+    },
+  ];
+
+  if (relationshipsSummary) {
+    drafts.push({
+      id: `${baseId}:relationships`,
+      relevance: 50,
+      excerpt: relationshipsSummary,
+    });
+  }
+
+  drafts.push({
+    id: `${baseId}:signals`,
+    relevance: 50,
+    excerpt: formatRiskOpportunitySignals(entity),
+  });
+
+  return drafts;
+}
+
+function buildCountryEvidenceDrafts(
+  entity: Entity,
+  relationshipsSummary?: string,
+): EvidenceDraft[] {
+  const baseId = `${entity.type}:${entity.id}`;
+  const drafts: EvidenceDraft[] = [
+    {
+      id: `${baseId}:overview`,
+      relevance: 70,
+      excerpt: entity.overview,
+    },
+    {
+      id: `${baseId}:classification`,
+      relevance: 60,
+      excerpt: formatClassificationExcerpt(entity),
+    },
+  ];
+
+  if (relationshipsSummary) {
+    drafts.push({
+      id: `${baseId}:relationships`,
+      relevance: 50,
+      excerpt: relationshipsSummary,
+    });
+  }
+
+  drafts.push({
+    id: `${baseId}:evidence-status`,
+    relevance: 45,
+    excerpt:
+      "Country registry evidence only. AI, investment, and risk scores withheld — assessment sources not connected.",
+  });
+
+  return drafts;
 }
 
 function formatScoresExcerpt(entity: Entity): string {
