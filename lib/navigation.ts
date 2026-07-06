@@ -53,16 +53,16 @@ export const platformNavSections: NavSection[] = [
         description: "Central intelligence engine command center.",
       },
       {
-        label: "Reasoning Engine",
+        label: "Reasoning Explorer",
         href: "/reasoning",
         icon: "reasoning",
-        description: "Interactive reasoning pipeline and evidence review.",
+        description: "Evidence-to-judgment pipeline architecture — no hidden AI.",
       },
       {
-        label: "AI Control",
+        label: "Governance Control",
         href: "/ai-control",
         icon: "ai-control",
-        description: "Command routing, agent dispatch, and system context.",
+        description: "Constitutional rules, standards, and compliance status.",
       },
     ],
   },
@@ -128,10 +128,10 @@ export const platformNavSections: NavSection[] = [
         description: "Workflow automation builder (coming soon).",
       },
       {
-        label: "Analytics",
+        label: "Reports Center",
         href: "/analytics",
         icon: "analytics",
-        description: "Platform analytics and usage reporting (coming soon).",
+        description: "Evidence-based report readiness — not fake analytics.",
       },
       {
         label: "Settings",
