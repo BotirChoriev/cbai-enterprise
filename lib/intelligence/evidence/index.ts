@@ -32,6 +32,32 @@ export {
 } from "@/lib/intelligence/evidence/sufficiency";
 
 export {
+  DEFAULT_EVIDENCE_QUALITY_ASSESSOR_ID,
+  DefaultEvidenceQualityAssessor,
+  defaultEvidenceQualityAssessor,
+  EVIDENCE_QUALITY_ASSESSOR_VERSION,
+  QUALITY_BAND_THRESHOLDS,
+  QUALITY_DIMENSION_WEIGHT,
+  QUALITY_WARNING_DUPLICATE_CONTENT,
+  QUALITY_WARNING_LOW,
+  QUALITY_WARNING_MISSING_FRESHNESS,
+  QUALITY_WARNING_WEAK_PROVENANCE,
+  computeMeanOverallScore,
+  computeOverallQualityScore,
+  resolveQualityBand,
+  type EvidenceQualityAssessor,
+} from "@/lib/intelligence/evidence/quality";
+
+export type {
+  EvidenceCollectionQualitySummary,
+  EvidenceQualityAssessment,
+  EvidenceQualityBand,
+  EvidenceQualityDimensionId,
+  EvidenceQualityDimensionScore,
+  EvidenceQualityDimensionStatus,
+} from "@/lib/intelligence/evidence/quality/quality.types";
+
+export {
   createEntityProfileEvidenceAdapter,
   defaultEntityEvidenceMapper,
   defaultEntityResolver,

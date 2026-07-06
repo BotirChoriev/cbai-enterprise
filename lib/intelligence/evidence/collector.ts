@@ -8,13 +8,17 @@ import {
 } from "@/lib/intelligence/evidence/sources";
 import { evaluateEvidenceSufficiency } from "@/lib/intelligence/evidence/sufficiency";
 import {
+  defaultEvidenceQualityAssessor,
+  type EvidenceQualityAssessor,
+} from "@/lib/intelligence/evidence/quality";
+import {
   summarizeEvidenceItems,
   validateEvidenceCollectionShape,
   validateEvidenceShape,
 } from "@/lib/intelligence/evidence/validation";
 
 /** Semantic version of the default evidence collector. */
-export const EVIDENCE_COLLECTOR_VERSION = "0.4.0-search-evidence";
+export const EVIDENCE_COLLECTOR_VERSION = "0.5.0-quality-assessment";
 
 /** Stable identifier recorded in collection metadata. */
 export const DEFAULT_EVIDENCE_COLLECTOR_ID = "default-evidence-collector";
@@ -100,9 +104,14 @@ export function sortEvidenceByRelevance(items: Evidence[]): Evidence[] {
  */
 export class DefaultEvidenceCollector implements EvidenceCollector {
   private readonly registry: EvidenceSourceRegistry;
+  private readonly qualityAssessor: EvidenceQualityAssessor;
 
-  constructor(registry: EvidenceSourceRegistry = defaultEvidenceSourceRegistry) {
+  constructor(
+    registry: EvidenceSourceRegistry = defaultEvidenceSourceRegistry,
+    qualityAssessor: EvidenceQualityAssessor = defaultEvidenceQualityAssessor,
+  ) {
     this.registry = registry;
+    this.qualityAssessor = qualityAssessor;
   }
 
   /**
@@ -118,47 +127,52 @@ export class DefaultEvidenceCollector implements EvidenceCollector {
       enabledAdapters,
     );
     const items = sortEvidenceByRelevance(deduplicateEvidenceItems(rawItems));
-    const { meanRelevance, sourceClassCount } = summarizeEvidenceItems(items);
+    const qualityResult = this.qualityAssessor.assessCollection(items);
+    const assessedItems = qualityResult.items;
+    const { meanRelevance, sourceClassCount } = summarizeEvidenceItems(assessedItems);
     const claimType = inferClaimType(request);
     const sufficiencyStatus = evaluateEvidenceSufficiency(
-      items,
+      assessedItems,
       claimType,
       request.subjectEntities,
     );
+
+    const mergedWarnings = [...warnings, ...qualityResult.summary.warnings];
 
     const hasSubjectEntities =
       request.subjectEntities !== undefined && request.subjectEntities.length > 0;
     const collectionStatus =
       enabledAdapters.length === 0
         ? "no-sources-connected"
-        : items.length === 0 && hasSubjectEntities
+        : assessedItems.length === 0 && hasSubjectEntities
           ? "partial"
-          : items.length === 0
+          : assessedItems.length === 0
             ? "collected"
-            : warnings.length > 0
+            : mergedWarnings.length > 0
               ? "partial"
               : "collected";
 
     const collection: EvidenceCollection = {
-      items,
+      items: assessedItems,
       claimType,
       sufficiencyStatus,
       contradictionState: "none",
       meanRelevance,
       sourceClassCount,
+      quality: qualityResult.summary,
       metadata: {
         collectorId: DEFAULT_EVIDENCE_COLLECTOR_ID,
         collectorVersion: EVIDENCE_COLLECTOR_VERSION,
         status: collectionStatus,
         message: buildCollectionMessage(
           enabledAdapters.length,
-          items.length,
+          assessedItems.length,
           hasSubjectEntities,
         ),
         registeredSourceIds,
         attemptedSourceIds: enabledAdapters.map((adapter) => adapter.id),
         collectedAt,
-        warnings: warnings.length > 0 ? warnings : undefined,
+        warnings: mergedWarnings.length > 0 ? mergedWarnings : undefined,
       },
     };
 
@@ -211,7 +225,7 @@ function buildCollectionMessage(
     return "Evidence collection completed — enabled adapters returned zero items. See metadata warnings for resolution details.";
   }
 
-  return `Evidence collected from ${enabledCount} enabled source adapter(s) — ${itemCount} item(s) from entity-profile, graph, and search sources (inferred provenance).`;
+  return `Evidence collected from ${enabledCount} enabled source adapter(s) — ${itemCount} item(s) assessed for quality from entity-profile, graph, and search sources.`;
 }
 
 /** Shared default collector singleton used by the intelligence engine pipeline. */

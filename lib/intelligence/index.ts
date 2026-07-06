@@ -53,6 +53,15 @@ export type {
 } from "@/lib/intelligence/evidence.types";
 
 export type {
+  EvidenceCollectionQualitySummary,
+  EvidenceQualityAssessment,
+  EvidenceQualityBand,
+  EvidenceQualityDimensionId,
+  EvidenceQualityDimensionScore,
+  EvidenceQualityDimensionStatus,
+} from "@/lib/intelligence/evidence/quality/quality.types";
+
+export type {
   EntityRef,
   IntelligenceRequest,
   IntelligenceType,
@@ -115,6 +124,10 @@ export {
   DEFAULT_EVIDENCE_COLLECTOR_ID,
   DefaultEvidenceCollector,
   defaultEvidenceCollector,
+  defaultEvidenceQualityAssessor,
+  DefaultEvidenceQualityAssessor,
+  DEFAULT_EVIDENCE_QUALITY_ASSESSOR_ID,
+  EVIDENCE_QUALITY_ASSESSOR_VERSION,
   defaultEvidenceSourceRegistry,
   defaultEntityEvidenceMapper,
   defaultEntityResolver,

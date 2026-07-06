@@ -87,6 +87,7 @@ export interface EvidenceSource {
  * intelligence layer decoupled from adapter payloads.
  *
  * @see docs/CBAI-Intelligence-Specification-v1.md §3.1–§3.2
+ * @see docs/build-034-report.md
  */
 export interface Evidence {
   /** Unique identifier for this evidence item within a reasoning run. */
@@ -107,6 +108,8 @@ export interface Evidence {
   relationshipLabel?: string;
   /** Freshness indicator relative to the intelligence validity horizon. */
   staleness?: EvidenceStaleness;
+  /** Per-item quality assessment — attached after collection (BUILD-034). */
+  quality?: import("@/lib/intelligence/evidence/quality/quality.types").EvidenceQualityAssessment;
 }
 
 /**
@@ -132,6 +135,8 @@ export interface EvidenceCollection {
   sourceClassCount: number;
   /** Optional collector metadata describing provenance of the collection itself. */
   metadata?: EvidenceCollectionMetadata;
+  /** Collection-level quality summary (BUILD-034). */
+  quality?: import("@/lib/intelligence/evidence/quality/quality.types").EvidenceCollectionQualitySummary;
 }
 
 /**
