@@ -11,6 +11,7 @@ import {
   type TaskPriority,
 } from "@/lib/intelligence/agents/tasks/task-priority";
 import { AGENT_TASK_MODEL_VERSION } from "@/lib/intelligence/agents/tasks/types";
+import type { AgentTaskDispatchMetadata } from "@/lib/intelligence/agents/tasks/types";
 
 /**
  * Agent task — one unit of work assigned to an agent (BUILD-048).
@@ -48,6 +49,8 @@ export interface AgentTask {
   timeoutAt?: string;
   /** Task model semantic version. */
   taskVersion: string;
+  /** Optional dispatch preparation metadata — attached by integration (BUILD-053). */
+  dispatchMetadata?: AgentTaskDispatchMetadata;
 }
 
 /** Task id sequence for deterministic generation within a process. */
@@ -205,6 +208,12 @@ export function withAgentTaskStatus(
 export function copyAgentTask(task: AgentTask): AgentTask {
   return {
     ...task,
+    dispatchMetadata: task.dispatchMetadata
+      ? {
+          ...task.dispatchMetadata,
+          warnings: [...task.dispatchMetadata.warnings],
+        }
+      : undefined,
     taskRequest: {
       intent: task.taskRequest.intent,
       requestedCapabilities: [...task.taskRequest.requestedCapabilities],

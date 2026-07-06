@@ -109,6 +109,7 @@ export {
   type AgentTask,
   type AgentTaskStore,
   type AgentTaskStoreSnapshot,
+  type AgentTaskDispatchMetadata,
   type TaskPriority,
   type TaskRequest,
   type TaskResult,
@@ -130,3 +131,18 @@ export {
   type DispatchPolicy,
   type DispatchResult,
 } from "@/lib/intelligence/agents/dispatch";
+
+export {
+  AGENT_DISPATCH_INTEGRATION_VERSION,
+  DEFAULT_AGENT_DISPATCH_INTEGRATION_ID,
+  DefaultAgentDispatchIntegration,
+  defaultAgentDispatchIntegration,
+  prepareAgentDispatch,
+  buildAgentDispatchDiagnostics,
+  isAgentDispatchReady,
+  type AgentDispatchIntegration,
+  type AgentDispatchDiagnostics,
+  type AgentDispatchPreparationInput,
+  type AgentDispatchPreparationResult,
+  type AgentDispatchValidationResult,
+} from "@/lib/intelligence/agents/integration";

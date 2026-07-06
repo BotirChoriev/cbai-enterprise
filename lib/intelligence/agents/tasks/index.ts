@@ -65,6 +65,7 @@ export {
 } from "@/lib/intelligence/agents/tasks/task-priority";
 
 export type {
+  AgentTaskDispatchMetadata,
   TaskConstraints,
   TaskDiagnosticsReference,
   TaskRequestContext,

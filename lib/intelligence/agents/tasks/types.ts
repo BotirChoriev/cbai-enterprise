@@ -1,3 +1,5 @@
+import type { DispatchDecision } from "@/lib/intelligence/agents/dispatch/types";
+
 /** Semantic version of the agent task model foundation. */
 export const AGENT_TASK_MODEL_VERSION = "0.1.0-agent-task-model";
 
@@ -48,4 +50,22 @@ export interface TaskResultReference {
   id?: string;
   /** Optional result kind label (e.g. envelope, trace). */
   kind?: string;
+}
+
+/** Dispatch preparation metadata attached after integration (BUILD-053). */
+export interface AgentTaskDispatchMetadata {
+  /** Selected agent id when dispatch succeeded. */
+  selectedAgentId: string | null;
+  /** Dispatch decision outcome. */
+  decision: DispatchDecision;
+  /** Deterministic dispatch reason. */
+  reason: string;
+  /** Non-blocking dispatch warnings. */
+  warnings: readonly string[];
+  /** ISO-8601 timestamp when dispatch was evaluated. */
+  evaluatedAt: string;
+  /** Whether the task is ready for future agent execution. */
+  dispatchReady: boolean;
+  /** Dispatch foundation semantic version. */
+  dispatchVersion: string;
 }

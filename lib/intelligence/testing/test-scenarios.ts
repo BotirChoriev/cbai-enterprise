@@ -1,4 +1,20 @@
 import { ISSUE_BLOCKING_EXECUTION_DENIED } from "@/lib/intelligence/diagnostics/issues";
+import {
+  DefaultAgentDispatchIntegration,
+} from "@/lib/intelligence/agents/integration/agent-dispatch-integration";
+import {
+  AGENT_CAPABILITY_RESEARCH,
+  AGENT_CAPABILITY_SEARCH,
+} from "@/lib/intelligence/agents/registry/agent-capabilities";
+import { createAgentDefinition } from "@/lib/intelligence/agents/registry/agent-definition";
+import {
+  createAgentTask,
+  resetAgentTaskSequence,
+} from "@/lib/intelligence/agents/tasks/task";
+import { createTaskRequest } from "@/lib/intelligence/agents/tasks/task-request";
+import {
+  DefaultAgentTaskStore,
+} from "@/lib/intelligence/agents/tasks/store/task-store";
 import { TEST_RUNTIME_CANCEL_REQUEST_PREFIX } from "@/lib/intelligence/runtime/integration/runtime-policy-diagnostics";
 import {
   queryByRequestId,
@@ -547,6 +563,180 @@ export const INTELLIGENCE_TEST_SCENARIOS: IntelligenceTestScenario[] = [
       }
 
       return failures.length > 0 ? fail(...failures) : pass();
+    },
+  },
+  {
+    id: "agent-dispatch-no-agents",
+    name: "Agent dispatch with no agents",
+    description:
+      "Dispatch integration rejects when no agent definitions are available.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Agent dispatch no agents check.",
+      }),
+    validate: (context) => {
+      resetAgentTaskSequence();
+      const store = new DefaultAgentTaskStore();
+      const integration = new DefaultAgentDispatchIntegration(store);
+      const task = createAgentTask({
+        agentId: "unassigned",
+        requestId: context.request.id,
+        title: "No agents dispatch test",
+        taskRequest: createTaskRequest({
+          intent: "general",
+          requestedCapabilities: [AGENT_CAPABILITY_RESEARCH],
+        }),
+      });
+
+      const preparation = integration.prepareDispatch({ task, availableAgents: [] });
+
+      if (preparation.diagnostics.decision !== "rejected") {
+        return fail(
+          `Expected rejected dispatch decision, received ${preparation.diagnostics.decision}.`,
+        );
+      }
+
+      if (preparation.diagnostics.dispatchReady) {
+        return fail("Expected dispatchReady false when no agents are available.");
+      }
+
+      if (preparation.task.status !== "created") {
+        return fail(
+          `Expected task status created after rejected dispatch, received ${preparation.task.status}.`,
+        );
+      }
+
+      if (!store.get(task.id)) {
+        return fail("Expected task to remain in store after rejected dispatch.");
+      }
+
+      return pass();
+    },
+  },
+  {
+    id: "agent-dispatch-capability-match",
+    name: "Agent dispatch capability match",
+    description:
+      "Dispatch integration selects an enabled agent when requested capabilities match.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Agent dispatch capability match check.",
+      }),
+    validate: (context) => {
+      resetAgentTaskSequence();
+      const store = new DefaultAgentTaskStore();
+      const integration = new DefaultAgentDispatchIntegration(store);
+      const agent = createAgentDefinition({
+        id: "harness-research-agent",
+        name: "Harness Research Agent",
+        version: "1.0.0",
+        description: "Research capability test agent.",
+        category: "test",
+        status: "enabled",
+        capabilities: [AGENT_CAPABILITY_RESEARCH],
+      });
+      const task = createAgentTask({
+        agentId: "unassigned",
+        requestId: context.request.id,
+        title: "Capability match dispatch test",
+        taskRequest: createTaskRequest({
+          intent: "general",
+          requestedCapabilities: [AGENT_CAPABILITY_RESEARCH],
+        }),
+      });
+
+      const preparation = integration.prepareDispatch({ task, availableAgents: [agent] });
+      const validation = integration.validateDispatch(
+        preparation.task,
+        preparation.dispatchResult,
+      );
+
+      if (preparation.diagnostics.decision !== "selected") {
+        return fail(
+          `Expected selected dispatch decision, received ${preparation.diagnostics.decision}.`,
+        );
+      }
+
+      if (!preparation.diagnostics.dispatchReady) {
+        return fail("Expected dispatchReady true for capability match.");
+      }
+
+      if (preparation.task.status !== "queued") {
+        return fail(
+          `Expected task status queued after successful dispatch, received ${preparation.task.status}.`,
+        );
+      }
+
+      if (preparation.task.agentId !== agent.id) {
+        return fail("Expected task agentId to match selected agent.");
+      }
+
+      if (!validation.valid) {
+        return fail(`Expected valid dispatch validation, received: ${validation.reason}`);
+      }
+
+      if (!preparation.task.dispatchMetadata?.dispatchReady) {
+        return fail("Expected dispatchMetadata.dispatchReady true on stored task.");
+      }
+
+      return pass();
+    },
+  },
+  {
+    id: "agent-dispatch-capability-mismatch",
+    name: "Agent dispatch capability mismatch",
+    description:
+      "Dispatch integration rejects when no agent satisfies requested capabilities.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Agent dispatch capability mismatch check.",
+      }),
+    validate: (context) => {
+      resetAgentTaskSequence();
+      const store = new DefaultAgentTaskStore();
+      const integration = new DefaultAgentDispatchIntegration(store);
+      const agent = createAgentDefinition({
+        id: "harness-search-agent",
+        name: "Harness Search Agent",
+        version: "1.0.0",
+        description: "Search-only test agent.",
+        category: "test",
+        status: "enabled",
+        capabilities: [AGENT_CAPABILITY_SEARCH],
+      });
+      const task = createAgentTask({
+        agentId: "unassigned",
+        requestId: context.request.id,
+        title: "Capability mismatch dispatch test",
+        taskRequest: createTaskRequest({
+          intent: "general",
+          requestedCapabilities: [AGENT_CAPABILITY_RESEARCH],
+        }),
+      });
+
+      const preparation = integration.prepareDispatch({ task, availableAgents: [agent] });
+
+      if (preparation.diagnostics.decision !== "rejected") {
+        return fail(
+          `Expected rejected dispatch decision, received ${preparation.diagnostics.decision}.`,
+        );
+      }
+
+      if (preparation.diagnostics.dispatchReady) {
+        return fail("Expected dispatchReady false for capability mismatch.");
+      }
+
+      if (preparation.task.status !== "created") {
+        return fail(
+          `Expected task status created after capability mismatch, received ${preparation.task.status}.`,
+        );
+      }
+
+      if (preparation.task.dispatchMetadata?.selectedAgentId) {
+        return fail("Expected no selectedAgentId in dispatch metadata after rejection.");
+      }
+
+      return pass();
     },
   },
 ];
