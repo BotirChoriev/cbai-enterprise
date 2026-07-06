@@ -95,6 +95,15 @@ export type {
 } from "@/lib/intelligence/trace.types";
 
 export type {
+  TrustGovernanceGate,
+} from "@/lib/intelligence/trust/governance-rules";
+
+export type {
+  TrustQualityGate,
+  TrustQualityIntegrationContext,
+} from "@/lib/intelligence/trust/quality-integration";
+
+export type {
   IntelligenceProducer,
   IntelligenceProducerType,
   SourceTrustLevel,
@@ -223,9 +232,20 @@ export {
   DEFAULT_TRUST_ASSESSOR_ID,
   DefaultTrustAssessor,
   TRUST_ASSESSOR_VERSION,
+  applyGovernanceGates,
+  applyQualityTrustAdjustments,
+  buildGovernanceTrustReason,
+  buildTrustQualityGate,
+  extractTrustQualityContext,
+  GOVERNANCE_MIN_EXECUTION_LEVEL,
+  GOVERNANCE_MIN_RECOMMENDATION_LEVEL,
   TRUST_CAP_CONFIDENCE_DEGRADED,
+  TRUST_CAP_LOW_QUALITY,
+  TRUST_CAP_MISSING_FRESHNESS,
   TRUST_CAP_NO_EVIDENCE,
   TRUST_CAP_NO_SOURCES_CONNECTED,
+  TRUST_CAP_QUALITY_UNKNOWN,
+  TRUST_CAP_WEAK_PROVENANCE,
   TRUST_LEVEL_LABELS,
   TRUST_LEVEL_PERMISSIONS,
   defaultTrustAssessor,

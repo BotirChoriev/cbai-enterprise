@@ -30,6 +30,36 @@ export {
 } from "@/lib/intelligence/trust/levels";
 
 export {
+  applyGovernanceGates,
+  buildGovernanceTrustReason,
+  GOVERNANCE_MIN_EXECUTION_LEVEL,
+  GOVERNANCE_MIN_RECOMMENDATION_LEVEL,
+  trustLevelMeetsMinimum,
+  type TrustGovernanceGate,
+} from "@/lib/intelligence/trust/governance-rules";
+
+export {
+  applyQualityBandTrustCap,
+  applyQualityTrustAdjustments,
+  buildQualityTrustCaps,
+  buildTrustQualityGate,
+  buildTrustQualityWarnings,
+  computeTrustQualityPenalty,
+  extractTrustQualityContext,
+  MAX_TRUST_QUALITY_PENALTY,
+  QUALITY_BAND_TRUST_CAPS,
+  TRUST_CAP_DUPLICATE_CONTENT,
+  TRUST_CAP_LOW_QUALITY,
+  TRUST_CAP_MISSING_FRESHNESS,
+  TRUST_CAP_QUALITY_UNKNOWN,
+  TRUST_CAP_WEAK_PROVENANCE,
+  TRUST_LOW_QUALITY_MEAN_THRESHOLD,
+  TRUST_QUALITY_UNKNOWN_SCORE_CAP,
+  type TrustQualityGate,
+  type TrustQualityIntegrationContext,
+} from "@/lib/intelligence/trust/quality-integration";
+
+export {
   applyTrustScoreCaps,
   buildTrustCaps,
   buildTrustReason,

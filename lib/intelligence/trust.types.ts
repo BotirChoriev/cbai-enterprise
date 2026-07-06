@@ -67,7 +67,7 @@ export interface IntelligenceProducer {
  * "How certain is the reasoning?" (see {@link ConfidenceAssessment}).
  *
  * @see docs/CBAI-Intelligence-Specification-v1.md §5
- * @see docs/build-025-report.md
+ * @see docs/build-036-report.md
  */
 export interface TrustAssessment {
   /** Derived organizational trust level. */
@@ -90,4 +90,10 @@ export interface TrustAssessment {
   capsApplied: string[];
   /** Whether human verification elevated or authored this intelligence. */
   humanVerified: boolean;
+  /** Evidence quality gate outcome (BUILD-036). */
+  qualityGate?: import("@/lib/intelligence/trust/quality-integration").TrustQualityGate;
+  /** Governance permission gate outcome (BUILD-036). */
+  governanceGate?: import("@/lib/intelligence/trust/governance-rules").TrustGovernanceGate;
+  /** Trust-specific warnings from quality integration (BUILD-036). */
+  trustWarnings?: string[];
 }

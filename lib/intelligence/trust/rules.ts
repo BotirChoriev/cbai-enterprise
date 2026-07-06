@@ -3,6 +3,14 @@ import type { EvidenceCollection } from "@/lib/intelligence/evidence.types";
 import type { IntelligenceRequest } from "@/lib/intelligence/request.types";
 import type { SourceTrustLevel } from "@/lib/intelligence/trust.types";
 import { clampTrustScore } from "@/lib/intelligence/trust/levels";
+import {
+  TRUST_CAP_DUPLICATE_CONTENT,
+  TRUST_CAP_LOW_QUALITY,
+  TRUST_CAP_MISSING_FRESHNESS,
+  TRUST_CAP_QUALITY_UNKNOWN,
+  TRUST_CAP_WEAK_PROVENANCE,
+  TRUST_QUALITY_UNKNOWN_SCORE_CAP,
+} from "@/lib/intelligence/trust/quality-integration";
 
 /** Cap applied when no evidence items are available. */
 export const TRUST_CAP_NO_EVIDENCE = "no-evidence";
@@ -18,6 +26,14 @@ export const TRUST_CAP_CONFIDENCE_DEGRADED = "confidence-degraded";
 
 /** Cap applied when evidence contradiction is unresolved. */
 export const TRUST_CAP_CONTRADICTION_OPEN = "contradiction-open";
+
+export {
+  TRUST_CAP_DUPLICATE_CONTENT,
+  TRUST_CAP_LOW_QUALITY,
+  TRUST_CAP_MISSING_FRESHNESS,
+  TRUST_CAP_QUALITY_UNKNOWN,
+  TRUST_CAP_WEAK_PROVENANCE,
+} from "@/lib/intelligence/trust/quality-integration";
 
 /**
  * Returns true when evidence cannot support any non-zero trust score.
@@ -176,15 +192,37 @@ export function applyTrustScoreCaps(
     return 0;
   }
 
+  let capped = score;
+
+  if (capsApplied.includes(TRUST_CAP_QUALITY_UNKNOWN)) {
+    capped = Math.min(capped, TRUST_QUALITY_UNKNOWN_SCORE_CAP);
+  }
+
+  if (capsApplied.includes(TRUST_CAP_LOW_QUALITY)) {
+    capped = Math.min(capped, 35);
+  }
+
+  if (capsApplied.includes(TRUST_CAP_WEAK_PROVENANCE)) {
+    capped = Math.min(capped, 45);
+  }
+
+  if (capsApplied.includes(TRUST_CAP_MISSING_FRESHNESS)) {
+    capped = Math.min(capped, 50);
+  }
+
+  if (capsApplied.includes(TRUST_CAP_DUPLICATE_CONTENT)) {
+    capped = Math.min(capped, 40);
+  }
+
   if (capsApplied.includes(TRUST_CAP_CONTRADICTION_OPEN)) {
-    return Math.min(score, 25);
+    capped = Math.min(capped, 25);
   }
 
   if (capsApplied.includes(TRUST_CAP_CONFIDENCE_DEGRADED)) {
-    return Math.min(score, 50);
+    capped = Math.min(capped, 50);
   }
 
-  return clampTrustScore(score);
+  return clampTrustScore(capped);
 }
 
 /**
