@@ -41,6 +41,8 @@ import {
 } from "@/lib/intelligence/agents/tasks/store/task-store";
 import { DefaultRuntimeQueue } from "@/lib/intelligence/runtime/queue/queue";
 import { resetQueueItemSequence } from "@/lib/intelligence/runtime/queue/queue-item";
+import { DefaultSessionRegistry } from "@/lib/intelligence/runtime/registry/session-registry";
+import { DefaultObservabilityService } from "@/lib/intelligence/observability/observability-service";
 import { TEST_RUNTIME_CANCEL_REQUEST_PREFIX } from "@/lib/intelligence/runtime/integration/runtime-policy-diagnostics";
 import {
   queryByRequestId,
@@ -1365,6 +1367,211 @@ export const INTELLIGENCE_TEST_SCENARIOS: IntelligenceTestScenario[] = [
 
       if (cancel.diagnostics?.queued) {
         return fail("Expected diagnostics queued false after cancel.");
+      }
+
+      return pass();
+    },
+  },
+  {
+    id: "observability-empty-state",
+    name: "Observability empty state",
+    description:
+      "Observability collect returns healthy snapshot when runtime and agent stores are empty.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Observability empty state check.",
+      }),
+    validate: () => {
+      resetAgentTaskSequence();
+      resetQueueItemSequence();
+      resetScheduleItemSequence();
+      const store = new DefaultAgentTaskStore();
+      const queue = new DefaultRuntimeQueue();
+      const scheduler = new DefaultRuntimeScheduler();
+      const sessionRegistry = new DefaultSessionRegistry();
+      const observability = new DefaultObservabilityService({
+        sessionRegistry,
+        queue,
+        scheduler,
+        taskStore: store,
+        localAdapter: localRuntimeAdapter,
+      });
+
+      const snapshot = observability.collect({
+        evaluatedAt: "2026-07-06T00:00:00.000Z",
+      });
+
+      if (snapshot.health.status !== "healthy") {
+        return fail(`Expected healthy status, received ${snapshot.health.status}.`);
+      }
+
+      if (snapshot.runtime.sessionRegistry.total !== 0) {
+        return fail("Expected empty session registry snapshot.");
+      }
+
+      if (snapshot.runtime.queue.total !== 0) {
+        return fail("Expected empty queue snapshot.");
+      }
+
+      if (snapshot.runtime.scheduler.total !== 0) {
+        return fail("Expected empty scheduler snapshot.");
+      }
+
+      if (snapshot.agent.taskStore.total !== 0) {
+        return fail("Expected empty task store snapshot.");
+      }
+
+      if (!snapshot.agent.localAdapterAvailable) {
+        return fail("Expected local runtime adapter available.");
+      }
+
+      if (!snapshot.health.recommendedNextAction.includes("No runtime activity")) {
+        return fail("Expected empty-state recommended next action.");
+      }
+
+      return pass();
+    },
+  },
+  {
+    id: "observability-with-queued-task",
+    name: "Observability with queued task",
+    description:
+      "Observability collect reflects pending queue items and degraded health after enqueue.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Observability queued task check.",
+      }),
+    validate: (context) => {
+      resetAgentTaskSequence();
+      resetQueueItemSequence();
+      resetScheduleItemSequence();
+      const store = new DefaultAgentTaskStore();
+      const queue = new DefaultRuntimeQueue();
+      const scheduler = new DefaultRuntimeScheduler();
+      const sessionRegistry = new DefaultSessionRegistry();
+      const queueIntegration = new DefaultAgentQueueIntegration(store, queue);
+      const observability = new DefaultObservabilityService({
+        sessionRegistry,
+        queue,
+        scheduler,
+        taskStore: store,
+        localAdapter: localRuntimeAdapter,
+      });
+      const task = createAgentTask({
+        agentId: "observability-agent",
+        requestId: context.request.id,
+        title: "Observability queued task test",
+        taskRequest: createTaskRequest({
+          intent: "general",
+          requestedCapabilities: [AGENT_CAPABILITY_RESEARCH],
+        }),
+      });
+
+      const enqueue = queueIntegration.enqueueTask(task);
+
+      if (!enqueue.accepted) {
+        return fail(`Expected enqueue accepted: ${enqueue.reason}`);
+      }
+
+      const snapshot = observability.collect({
+        evaluatedAt: "2026-07-06T00:00:00.000Z",
+      });
+
+      if (snapshot.health.status !== "degraded") {
+        return fail(`Expected degraded status, received ${snapshot.health.status}.`);
+      }
+
+      if (snapshot.runtime.queue.pending !== 1) {
+        return fail(`Expected one pending queue item, received ${snapshot.runtime.queue.pending}.`);
+      }
+
+      if (snapshot.agent.taskStore.total !== 1) {
+        return fail("Expected one task in task store snapshot.");
+      }
+
+      if (!snapshot.health.warnings.some((warning) => warning.includes("pending dispatch preparation"))) {
+        return fail("Expected queue pending warning in health summary.");
+      }
+
+      if (!snapshot.health.recommendedNextAction.includes("Dequeue pending tasks")) {
+        return fail("Expected dequeue recommended next action.");
+      }
+
+      return pass();
+    },
+  },
+  {
+    id: "observability-with-scheduled-task",
+    name: "Observability with scheduled task",
+    description:
+      "Observability collect reflects scheduled items and degraded health before evaluation.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Observability scheduled task check.",
+      }),
+    validate: (context) => {
+      resetAgentTaskSequence();
+      resetQueueItemSequence();
+      resetScheduleItemSequence();
+      const store = new DefaultAgentTaskStore();
+      const queue = new DefaultRuntimeQueue();
+      const scheduler = new DefaultRuntimeScheduler();
+      const sessionRegistry = new DefaultSessionRegistry();
+      const queueIntegration = new DefaultAgentQueueIntegration(store, queue);
+      const bridge = new DefaultAgentSchedulerBridge(store, scheduler, queueIntegration);
+      const observability = new DefaultObservabilityService({
+        sessionRegistry,
+        queue,
+        scheduler,
+        taskStore: store,
+        localAdapter: localRuntimeAdapter,
+      });
+      const task = createAgentTask({
+        agentId: "observability-agent",
+        requestId: context.request.id,
+        title: "Observability scheduled task test",
+        taskRequest: createTaskRequest({
+          intent: "general",
+          requestedCapabilities: [AGENT_CAPABILITY_RESEARCH],
+        }),
+      });
+
+      const schedule = bridge.scheduleTask(task, "2026-07-10T00:00:00.000Z", {
+        referenceAt: "2026-07-05T00:00:00.000Z",
+      });
+
+      if (!schedule.accepted) {
+        return fail(`Expected schedule accepted: ${schedule.reason}`);
+      }
+
+      const snapshot = observability.collect({
+        evaluatedAt: "2026-07-06T00:00:00.000Z",
+      });
+
+      if (snapshot.health.status !== "degraded") {
+        return fail(`Expected degraded status, received ${snapshot.health.status}.`);
+      }
+
+      if (snapshot.runtime.scheduler.scheduled !== 1) {
+        return fail(
+          `Expected one scheduled item, received ${snapshot.runtime.scheduler.scheduled}.`,
+        );
+      }
+
+      if (snapshot.runtime.queue.total !== 0) {
+        return fail("Expected queue empty before ready evaluation.");
+      }
+
+      if (snapshot.agent.taskStore.total !== 1) {
+        return fail("Expected one task in task store snapshot.");
+      }
+
+      if (!snapshot.health.warnings.some((warning) => warning.includes("scheduled item(s) awaiting evaluation"))) {
+        return fail("Expected scheduler warning in health summary.");
+      }
+
+      if (!snapshot.health.recommendedNextAction.includes("evaluateReadyTasks")) {
+        return fail("Expected evaluateReadyTasks recommended next action when ready items exist.");
       }
 
       return pass();

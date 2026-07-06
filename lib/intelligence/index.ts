@@ -485,6 +485,38 @@ export type {
   SessionUpdateResult,
 } from "@/lib/intelligence/runtime/registry";
 
+export {
+  RUNTIME_OBSERVABILITY_VERSION,
+  DEFAULT_OBSERVABILITY_SERVICE_ID,
+  DefaultObservabilityService,
+  defaultObservabilityService,
+  collectObservabilitySnapshot,
+  collectRuntimeMetrics,
+  collectAgentMetrics,
+  collectHealthSummary,
+  buildPolicyDecisionSummary,
+  buildDispatchReadinessSummary,
+  buildExecutionReadinessSummary,
+  isLocalAdapterAvailable,
+  deriveRuntimeComponentHealth,
+  deriveObservabilityHealthStatus,
+  buildObservabilityWarnings,
+  buildObservabilityBlockingIssues,
+  resolveRecommendedNextAction,
+  type ObservabilityService,
+  type ObservabilityDependencies,
+  type ObservabilitySnapshot,
+  type ObservabilityCollectInput,
+  type ObservabilityHealthStatus,
+  type RuntimeMetrics,
+  type AgentMetrics,
+  type HealthSummary,
+  type PolicyDecisionSummary,
+  type DispatchReadinessSummary,
+  type ExecutionReadinessSummary,
+  type RuntimeComponentHealth,
+} from "@/lib/intelligence/observability";
+
 export type {
   RuntimeFailure,
   RuntimeLifecycleStatus,
