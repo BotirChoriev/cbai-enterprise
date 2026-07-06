@@ -4,6 +4,8 @@ import { getCompanyPipelineReadiness } from "@/lib/pipeline-readiness";
 import CompanyCoveragePanel from "@/components/companies/CompanyCoveragePanel";
 import EvidenceGapPanel from "@/components/evidence-gap/EvidenceGapPanel";
 import { getCompanyEvidenceGaps } from "@/lib/evidence-gap";
+import EvidenceComparisonPanel from "@/components/evidence-comparison/EvidenceComparisonPanel";
+import { getCompanyEvidenceComparison } from "@/lib/evidence-comparison";
 import CompanyIndicatorCoverage from "@/components/companies/CompanyIndicatorCoverage";
 import CompanySourceCoverage from "@/components/companies/CompanySourceCoverage";
 import CompanyMethodology from "@/components/companies/CompanyMethodology";
@@ -20,6 +22,7 @@ export function CompanyIntelligencePanel({ profile, company }: CompanyIntelligen
   const { registryFacts, coverage } = profile;
   const pipelineReadiness = getCompanyPipelineReadiness(company);
   const evidenceGaps = getCompanyEvidenceGaps(company);
+  const evidenceComparison = getCompanyEvidenceComparison(company);
   const sourceConnectedCount = coverage.sources.filter(
     (s) => s.statusLabel === "Connected",
   ).length;
@@ -67,6 +70,12 @@ export function CompanyIntelligencePanel({ profile, company }: CompanyIntelligen
       />
 
       <EvidenceGapPanel profile={evidenceGaps} />
+
+      <EvidenceComparisonPanel
+        entityType="company"
+        leftLegacyId={company.id}
+        initialModel={evidenceComparison}
+      />
 
       <CompanyIndicatorCoverage indicatorsByDomain={coverage.indicatorsByDomain} />
 

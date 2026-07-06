@@ -5,6 +5,7 @@ import { buildReportsCenterModel } from "@/lib/reports-center";
 import { getReportPipelineReadiness } from "@/lib/pipeline-readiness";
 import ReportReadinessSection from "@/components/reports/ReportReadinessSection";
 import ReportPipelineReadinessSection from "@/components/pipeline/ReportPipelineReadinessSection";
+import ReportsIndicatorExplorerSection from "@/components/indicator-explorer/ReportsIndicatorExplorerSection";
 import {
   ReportExportFuture,
   ReportNoFakeNotice,
@@ -77,6 +78,7 @@ export default function ReportsCenter() {
       </div>
 
       <ReportReadinessSection reportTypes={model.reportTypes} />
+      <ReportsIndicatorExplorerSection />
       <ReportPipelineReadinessSection model={reportPipelineReadiness} />
       <ReportExportFuture items={model.exportFuture} />
       <ReportNoFakeNotice />

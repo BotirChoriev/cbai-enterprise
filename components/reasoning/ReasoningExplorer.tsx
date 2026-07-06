@@ -12,6 +12,7 @@ import {
   ReasoningPersonasSection,
   ReasoningTrustLimits,
 } from "@/components/reasoning/ReasoningPersonasSection";
+import DecisionIntelligenceIndicatorSection from "@/components/indicator-explorer/DecisionIntelligenceIndicatorSection";
 
 export default function ReasoningExplorer() {
   const model = useMemo(() => buildReasoningExplorerModel(), []);
@@ -83,6 +84,7 @@ export default function ReasoningExplorer() {
       <ReasoningTracePrinciples principles={model.tracePrinciples} />
       <ReasoningPersonasSection personas={model.personas} />
       <ReasoningTrustLimits limits={model.trustLimits} />
+      <DecisionIntelligenceIndicatorSection />
 
       <footer className="border-t border-zinc-800 pt-6 text-xs text-zinc-600">
         Global Indicator Framework v{model.frameworkVersion} · Evidence Infrastructure v

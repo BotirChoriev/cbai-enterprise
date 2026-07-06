@@ -1,8 +1,10 @@
 import type { EvidenceExplorerModel } from "@/lib/evidence-explorer";
 import { explorerStatusClass } from "@/lib/evidence-explorer";
+import { IndicatorExploreLink } from "@/components/indicator-explorer/IndicatorExplorerPanel";
 
 type EvidenceIndicatorMapProps = {
   indicatorsByDomain: EvidenceExplorerModel["indicatorsByDomain"];
+  onExploreIndicator?: (indicatorId: string) => void;
 };
 
 function formatEntityList(entities: readonly string[]): string {
@@ -13,6 +15,7 @@ function formatEntityList(entities: readonly string[]): string {
 
 export default function EvidenceIndicatorMap({
   indicatorsByDomain,
+  onExploreIndicator,
 }: EvidenceIndicatorMapProps) {
   return (
     <section className="space-y-4" aria-labelledby="evidence-indicator-map-heading">
@@ -71,6 +74,15 @@ export default function EvidenceIndicatorMap({
                           {formatEntityList(indicator.applicableEntities)}
                         </p>
                       </div>
+                      {onExploreIndicator && (
+                        <div className="mt-3">
+                          <IndicatorExploreLink
+                            indicatorId={indicator.id}
+                            indicatorName={indicator.title}
+                            onExplore={onExploreIndicator}
+                          />
+                        </div>
+                      )}
                     </div>
                     <span
                       className={`shrink-0 rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${explorerStatusClass(indicator.evidenceStatusLabel)}`}

@@ -4,6 +4,8 @@ import { getCountryPipelineReadiness } from "@/lib/pipeline-readiness";
 import CountryCoveragePanel from "@/components/countries/CountryCoveragePanel";
 import EvidenceGapPanel from "@/components/evidence-gap/EvidenceGapPanel";
 import { getCountryEvidenceGaps } from "@/lib/evidence-gap";
+import EvidenceComparisonPanel from "@/components/evidence-comparison/EvidenceComparisonPanel";
+import { getCountryEvidenceComparison } from "@/lib/evidence-comparison";
 import CountryTimelineSection from "@/components/countries/CountryTimelineSection";
 import CountryIndicatorCoverage from "@/components/countries/CountryIndicatorCoverage";
 import CountrySourceCoverage from "@/components/countries/CountrySourceCoverage";
@@ -21,6 +23,7 @@ export function CountryIntelligencePanel({ profile, country }: CountryIntelligen
   const { registryFacts, coverage } = profile;
   const pipelineReadiness = getCountryPipelineReadiness(country);
   const evidenceGaps = getCountryEvidenceGaps(country);
+  const evidenceComparison = getCountryEvidenceComparison(country);
   const sourceConnectedCount = coverage.sources.filter(
     (s) => s.statusLabel === "Connected",
   ).length;
@@ -72,6 +75,12 @@ export function CountryIntelligencePanel({ profile, country }: CountryIntelligen
       />
 
       <EvidenceGapPanel profile={evidenceGaps} />
+
+      <EvidenceComparisonPanel
+        entityType="country"
+        leftLegacyId={country.id}
+        initialModel={evidenceComparison}
+      />
 
       <CountryTimelineSection country={country} />
 

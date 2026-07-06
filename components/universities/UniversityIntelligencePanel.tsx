@@ -4,6 +4,8 @@ import { getUniversityPipelineReadiness } from "@/lib/pipeline-readiness";
 import UniversityCoveragePanel from "@/components/universities/UniversityCoveragePanel";
 import EvidenceGapPanel from "@/components/evidence-gap/EvidenceGapPanel";
 import { getUniversityEvidenceGaps } from "@/lib/evidence-gap";
+import EvidenceComparisonPanel from "@/components/evidence-comparison/EvidenceComparisonPanel";
+import { getUniversityEvidenceComparison } from "@/lib/evidence-comparison";
 import UniversityIndicatorCoverage from "@/components/universities/UniversityIndicatorCoverage";
 import UniversitySourceCoverage from "@/components/universities/UniversitySourceCoverage";
 import UniversityMethodology from "@/components/universities/UniversityMethodology";
@@ -23,6 +25,7 @@ export function UniversityIntelligencePanel({
   const { registryFacts, coverage } = profile;
   const pipelineReadiness = getUniversityPipelineReadiness(university);
   const evidenceGaps = getUniversityEvidenceGaps(university);
+  const evidenceComparison = getUniversityEvidenceComparison(university);
   const sourceConnectedCount = coverage.sources.filter(
     (s) => s.statusLabel === "Connected",
   ).length;
@@ -86,6 +89,12 @@ export function UniversityIntelligencePanel({
       />
 
       <EvidenceGapPanel profile={evidenceGaps} />
+
+      <EvidenceComparisonPanel
+        entityType="university"
+        leftLegacyId={university.id}
+        initialModel={evidenceComparison}
+      />
 
       <UniversityIndicatorCoverage indicatorsByDomain={coverage.indicatorsByDomain} />
 

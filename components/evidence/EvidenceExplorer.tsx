@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { buildEvidenceExplorerModel } from "@/lib/evidence-explorer";
 import { getPlatformPipelineReadiness } from "@/lib/pipeline-readiness";
 import EvidenceSourceCoverage from "@/components/evidence/EvidenceSourceCoverage";
@@ -11,10 +11,12 @@ import EvidenceMethodology from "@/components/evidence/EvidenceMethodology";
 import EvidencePersonas from "@/components/evidence/EvidencePersonas";
 import EvidenceTrust from "@/components/evidence/EvidenceTrust";
 import PipelineReadinessPanel from "@/components/pipeline/PipelineReadinessPanel";
+import IndicatorExplorerPanel from "@/components/indicator-explorer/IndicatorExplorerPanel";
 
 export default function EvidenceExplorer() {
   const model = useMemo(() => buildEvidenceExplorerModel(), []);
   const pipelineReadiness = useMemo(() => getPlatformPipelineReadiness(), []);
+  const [exploreIndicatorId, setExploreIndicatorId] = useState<string | null>(null);
 
   return (
     <div className="space-y-10">
@@ -87,7 +89,11 @@ export default function EvidenceExplorer() {
 
       <EvidenceSourceCoverage sources={model.sources} />
       <PipelineReadinessPanel model={pipelineReadiness} />
-      <EvidenceIndicatorMap indicatorsByDomain={model.indicatorsByDomain} />
+      <EvidenceIndicatorMap
+        indicatorsByDomain={model.indicatorsByDomain}
+        onExploreIndicator={setExploreIndicatorId}
+      />
+      <IndicatorExplorerPanel initialIndicatorId={exploreIndicatorId} />
       <EntityEvidenceCoverage entityModules={model.entityModules} />
       <EvidenceLifecycle stages={model.lifecycleStages} />
       <EvidenceMethodology points={model.methodology} />
