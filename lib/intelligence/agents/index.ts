@@ -1,10 +1,11 @@
 /**
- * CBAI Intelligence — Agents Layer (BUILD-046).
+ * CBAI Intelligence — Agents Layer (BUILD-046+).
  *
- * Agent catalog and registry foundations.
+ * Agent catalog, registry, and runtime contract foundations.
  * No agent execution in this build phase.
  *
  * @see docs/build-046-report.md
+ * @see docs/build-047-report.md
  */
 
 export {
@@ -48,3 +49,31 @@ export type {
   AgentUpdateInput,
   AgentUpdateResult,
 } from "@/lib/intelligence/agents/registry";
+
+export {
+  AGENT_RUNTIME_CONTRACT_ID_PREFIX,
+  AGENT_RUNTIME_CONTRACT_VERSION,
+  ALL_PROVIDER_KINDS,
+  PROVIDER_KIND_ANTHROPIC,
+  PROVIDER_KIND_DESCRIPTIONS,
+  PROVIDER_KIND_GEMINI,
+  PROVIDER_KIND_LABELS,
+  PROVIDER_KIND_LOCAL,
+  PROVIDER_KIND_OPENAI,
+  STUB_AGENT_RUNTIME_CONTRACTS,
+  StubAnthropicAgentBackend,
+  StubGeminiAgentBackend,
+  StubLocalAgentBackend,
+  StubOpenAIAgentBackend,
+  createAgentContext,
+  createAgentRequest,
+  createAgentResponse,
+  listAgentRuntimeContracts,
+  resolveAgentRuntimeContract,
+  validateAgentRequestEnvelope,
+  type AgentContext,
+  type AgentRequest,
+  type AgentResponse,
+  type AgentRuntimeContract,
+  type ProviderKind,
+} from "@/lib/intelligence/agents/runtime";

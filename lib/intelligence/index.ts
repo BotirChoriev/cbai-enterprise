@@ -499,6 +499,7 @@ export type {
 
 export {
   AGENT_REGISTRY_VERSION,
+  AGENT_RUNTIME_CONTRACT_VERSION,
   DEFAULT_AGENT_REGISTRY_ID,
   DefaultAgentRegistry,
   defaultAgentRegistry,
@@ -506,17 +507,31 @@ export {
   queryByCategory,
   queryByStatus,
   ALL_AGENT_CAPABILITIES,
+  ALL_PROVIDER_KINDS,
+  STUB_AGENT_RUNTIME_CONTRACTS,
+  StubAnthropicAgentBackend,
+  StubGeminiAgentBackend,
+  StubLocalAgentBackend,
+  StubOpenAIAgentBackend,
+  createAgentRequest,
+  listAgentRuntimeContracts,
+  resolveAgentRuntimeContract,
   type AgentRegistry,
+  type AgentRuntimeContract,
 } from "@/lib/intelligence/agents";
 
 export type {
   AgentCapability,
+  AgentContext,
   AgentDefinition,
   AgentRegisterInput,
   AgentRegisterResult,
   AgentRegistrySnapshot,
+  AgentRequest,
+  AgentResponse,
   AgentStatus,
   AgentUpdateInput,
   AgentUpdateResult,
+  ProviderKind,
 } from "@/lib/intelligence/agents";
 
