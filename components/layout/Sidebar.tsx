@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { mainNav, platformNavSections } from "@/lib/navigation";
+import { platformNavSections } from "@/lib/navigation";
 import NavIcon from "@/components/layout/NavIcon";
 
 function isNavItemActive(pathname: string, href: string): boolean {
@@ -67,15 +67,15 @@ export default function Sidebar() {
 
       <div className="border-t border-zinc-800 p-4">
         <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-3">
-          <p className="text-xs font-medium text-zinc-300">Platform Modules</p>
+          <p className="text-xs font-medium text-zinc-300">Start with Search</p>
           <p className="mt-1 text-xs text-zinc-500">
-            {mainNav.length} routes active in this deployment
+            Find a country and follow evidence through decision package to reports.
           </p>
           <Link
-            href="/dashboard"
+            href="/search"
             className="mt-3 inline-flex text-xs font-medium text-sky-400 hover:text-sky-300"
           >
-            Open Runtime Dashboard →
+            Open Search →
           </Link>
         </div>
       </div>

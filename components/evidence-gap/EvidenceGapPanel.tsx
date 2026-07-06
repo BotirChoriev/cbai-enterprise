@@ -10,6 +10,7 @@ type EvidenceGapPanelProps = {
   showSummary?: boolean;
   showSources?: boolean;
   showMethodology?: boolean;
+  heading?: string;
 };
 
 export default function EvidenceGapPanel({
@@ -17,6 +18,7 @@ export default function EvidenceGapPanel({
   showSummary = true,
   showSources = true,
   showMethodology = true,
+  heading = "Evidence Gaps",
 }: EvidenceGapPanelProps) {
   const nonAvailable = getNonAvailableGaps(profile);
 
@@ -27,12 +29,14 @@ export default function EvidenceGapPanel({
           id="evidence-gaps-heading"
           className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
         >
-          Evidence Gaps
+          {heading}
         </h3>
-        <p className="mt-1 text-sm text-zinc-500">
-          What evidence exists, what is missing, and why — derived from official source and
-          connector registries only.
-        </p>
+        {!showSummary && !showSources && !showMethodology ? null : (
+          <p className="mt-1 text-sm text-zinc-500">
+            What evidence exists, what is missing, and why — derived from official source and
+            connector registries only.
+          </p>
+        )}
       </div>
 
       {showSummary && <EvidenceGapSummary profile={profile} />}

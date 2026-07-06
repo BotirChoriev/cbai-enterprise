@@ -1,13 +1,14 @@
 import Link from "next/link";
 import HomeModuleIcon from "@/components/platform/home/HomeModuleIcon";
-import StatusBadge from "@/components/platform/home/StatusBadge";
 import { Card, CardContent } from "@/components/ui/Card";
 import { HOME_MODULES } from "@/lib/platform-home";
 
 export default function HomeModules() {
+  const availableModules = HOME_MODULES.filter((module) => module.status === "available");
+
   return (
     <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
-      {HOME_MODULES.map((module) => (
+      {availableModules.map((module) => (
         <Link
           key={module.id}
           href={module.href}
@@ -15,58 +16,13 @@ export default function HomeModules() {
         >
           <Card className="h-full transition-colors group-hover:border-zinc-700">
             <CardContent className="space-y-4 p-6">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900 text-zinc-300">
-                    <HomeModuleIcon name={module.icon} />
-                  </div>
-                  <h3 className="text-base font-semibold text-zinc-100">
-                    {module.label}
-                  </h3>
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900 text-zinc-300">
+                  <HomeModuleIcon name={module.icon} />
                 </div>
-                <StatusBadge status={module.status} />
+                <h3 className="text-base font-semibold text-zinc-100">{module.label}</h3>
               </div>
-
-              <dl className="space-y-3 text-sm">
-                <div>
-                  <dt className="text-xs font-medium uppercase tracking-wider text-zinc-600">
-                    Purpose
-                  </dt>
-                  <dd className="mt-1 leading-relaxed text-zinc-400">
-                    {module.purpose}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-medium uppercase tracking-wider text-zinc-600">
-                    Evidence status
-                  </dt>
-                  <dd className="mt-1 text-zinc-300">{module.evidenceStatus}</dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-medium uppercase tracking-wider text-zinc-600">
-                    Available today
-                  </dt>
-                  <dd className="mt-1 leading-relaxed text-zinc-500">
-                    {module.currentCapability}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-medium uppercase tracking-wider text-zinc-600">
-                    Planned expansion
-                  </dt>
-                  <dd className="mt-1 leading-relaxed text-zinc-600">
-                    {module.futureCapability}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-medium uppercase tracking-wider text-zinc-600">
-                    Dependencies
-                  </dt>
-                  <dd className="mt-1 leading-relaxed text-zinc-600">
-                    {module.dependencies}
-                  </dd>
-                </div>
-              </dl>
+              <p className="text-sm leading-relaxed text-zinc-400">{module.currentCapability}</p>
             </CardContent>
           </Card>
         </Link>

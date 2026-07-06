@@ -2,42 +2,22 @@
 
 import { useMemo } from "react";
 import { buildReasoningExplorerModel } from "@/lib/reasoning-explorer";
-import { collectLegacyBuildIntegrationModel } from "@/lib/legacy-build-integration";
-import ReasoningDiagnosticsSection from "@/components/legacy-integration/ReasoningDiagnosticsSection";
 import ReasoningPipelineOverview from "@/components/reasoning/ReasoningPipelineOverview";
 import ReasoningEvidenceIndicatorMap from "@/components/reasoning/ReasoningEvidenceIndicatorMap";
-import {
-  ReasoningMethodologySection,
-  ReasoningTracePrinciples,
-} from "@/components/reasoning/ReasoningMethodologySection";
-import {
-  ReasoningPersonasSection,
-  ReasoningTrustLimits,
-} from "@/components/reasoning/ReasoningPersonasSection";
-import DecisionIntelligenceIndicatorSection from "@/components/indicator-explorer/DecisionIntelligenceIndicatorSection";
 
 export default function ReasoningExplorer() {
   const model = useMemo(() => buildReasoningExplorerModel(), []);
-  const integration = useMemo(() => collectLegacyBuildIntegrationModel(), []);
 
   return (
     <div className="space-y-10">
       <div className="relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 px-6 py-5">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-sky-500/5 to-violet-500/5"
-        />
         <div className="relative">
-          <p className="text-[10px] font-medium uppercase tracking-widest text-cyan-400">
-            CBAI Reasoning Explorer v{model.version}
-          </p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-50">
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-50">
             Reasoning Explorer
           </h1>
           <p className="mt-1 max-w-3xl text-sm text-zinc-500">
-            Reasoning Explorer shows how evidence can support transparent decision
-            intelligence. It does not produce hidden AI conclusions — no fake reasoning chains,
-            confidence meters, or agent narratives.
+            How evidence supports transparent decision intelligence — pipeline stages and indicator
+            domains only.
           </p>
         </div>
       </div>
@@ -83,17 +63,6 @@ export default function ReasoningExplorer() {
 
       <ReasoningPipelineOverview stages={model.pipeline} />
       <ReasoningEvidenceIndicatorMap domains={model.domainEvidenceMap} />
-      <ReasoningMethodologySection methodology={model.methodology} />
-      <ReasoningTracePrinciples principles={model.tracePrinciples} />
-      <ReasoningPersonasSection personas={model.personas} />
-      <ReasoningTrustLimits limits={model.trustLimits} />
-      <ReasoningDiagnosticsSection diagnostics={integration.diagnostics} />
-      <DecisionIntelligenceIndicatorSection />
-
-      <footer className="border-t border-zinc-800 pt-6 text-xs text-zinc-600">
-        Global Indicator Framework v{model.frameworkVersion} · Evidence Infrastructure v
-        {model.infrastructureVersion} · Governance v{model.governanceVersion}
-      </footer>
     </div>
   );
 }

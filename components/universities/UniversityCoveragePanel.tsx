@@ -43,7 +43,7 @@ export default function UniversityCoveragePanel({
           id="university-evidence-coverage-heading"
           className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
         >
-          Evidence Coverage
+          Evidence
         </h3>
         <p className="mt-1 text-sm text-zinc-500">
           Indicator and source connectivity across official evidence infrastructure — no

@@ -1,6 +1,5 @@
 import { SEARCH_GATEWAY, SEARCHABLE_CATEGORIES } from "@/lib/search-gateway";
 import { getEntityCounts } from "@/lib/global-search";
-import { EVIDENCE_NOT_CONNECTED_LABEL } from "@/lib/platform-home";
 
 type SearchGatewayHeroProps = {
   query: string;
@@ -70,31 +69,15 @@ export default function SearchGatewayHero({ query }: SearchGatewayHeroProps) {
           className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
           aria-label="Searchable categories"
         >
-          {SEARCHABLE_CATEGORIES.map((category) => (
+          {SEARCHABLE_CATEGORIES.filter((category) => category.connected).map((category) => (
             <li
               key={category.id}
               className="rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-3"
             >
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-sm font-medium text-zinc-100">
-                  {category.label}
-                </span>
-                <span
-                  className={`shrink-0 text-[10px] font-semibold uppercase tracking-wider ${
-                    category.connected ? "text-emerald-500/90" : "text-zinc-600"
-                  }`}
-                >
-                  {category.connected ? "Available" : "Planned"}
-                </span>
-              </div>
+              <span className="text-sm font-medium text-zinc-100">{category.label}</span>
               <p className="mt-1.5 text-xs leading-relaxed text-zinc-500">
                 {category.description}
               </p>
-              {!category.connected ? (
-                <p className="mt-1 text-[10px] text-zinc-600">
-                  {EVIDENCE_NOT_CONNECTED_LABEL}
-                </p>
-              ) : null}
             </li>
           ))}
         </ul>

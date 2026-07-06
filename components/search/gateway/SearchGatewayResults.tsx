@@ -84,12 +84,10 @@ export default function SearchGatewayResults({
   return (
     <div className="space-y-10">
       <p className="text-sm text-zinc-500">
-        Results for{" "}
-        <span className="font-medium text-zinc-300">
-          &quot;{response.query}&quot;
-        </span>
-        {" · "}
-        Select a country to open the integrated intelligence review.
+        {response.groups.reduce((n, g) => n + g.entities.length, 0)} matches for{" "}
+        <span className="font-medium text-zinc-300">&quot;{response.query}&quot;</span>
+        {" — "}
+        open a profile to review evidence, decision package, and reports.
       </p>
 
       {response.groups.map((group) => (
@@ -120,8 +118,12 @@ export default function SearchGatewayResults({
                       <CountryResultContent entry={entry} />
                     </Link>
                   ) : (
-                    <Link href={entry.href} className="block">
+                    <Link
+                      href={entry.href}
+                      className="group block rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 transition-colors hover:border-cyan-500/30 hover:bg-zinc-900/70"
+                    >
                       <SearchResultCardStatic entry={entry} />
+                      <p className="mt-3 text-xs text-cyan-500/80">Open profile →</p>
                     </Link>
                   )}
                 </li>
@@ -154,7 +156,7 @@ function CountryResultContent({
       </p>
       <p className="mt-1 text-xs text-zinc-500">{entry.type}</p>
       <p className="mt-2 text-sm text-zinc-400">{entry.availableInformation}</p>
-      <p className="mt-3 text-xs text-cyan-500/80">Open integrated country review →</p>
+      <p className="mt-3 text-xs text-cyan-500/80">Open profile →</p>
     </>
   );
 }

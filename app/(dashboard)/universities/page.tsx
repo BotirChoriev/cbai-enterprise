@@ -7,7 +7,7 @@ import {
   getUniversityTypes,
 } from "@/lib/universities";
 import { getUniversityLinkedEntities } from "@/lib/universities.adapter";
-import { buildUniversityIntelligenceProfile } from "@/lib/universities.intelligence";
+import { buildUniversityUserJourney } from "@/lib/university-user-journey";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import UniversityFilters from "@/components/universities/UniversityFilters";
 import UniversityList from "@/components/universities/UniversityList";
@@ -46,9 +46,13 @@ export default function UniversitiesPage() {
     filtered[0] ??
     universities[0];
 
-  const intelligenceProfile = buildUniversityIntelligenceProfile(
-    selectedUniversity,
-    getUniversityLinkedEntities(selectedUniversity),
+  const journey = useMemo(
+    () =>
+      buildUniversityUserJourney(
+        selectedUniversity,
+        getUniversityLinkedEntities(selectedUniversity),
+      ),
+    [selectedUniversity],
   );
 
   function handleSelectUniversity(universityId: string) {
@@ -78,12 +82,10 @@ export default function UniversitiesPage() {
             CBAI University Intelligence 2.0
           </p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-50">
-            Universities Intelligence
+            Universities
           </h1>
           <p className="mt-1 max-w-3xl text-sm text-zinc-500">
-            Professional university profiles built from the Global Indicator Framework and
-            Evidence Infrastructure. Registry facts and coverage status only — no rankings,
-            research scores, AI summaries, or external API data.
+            Overview, evidence, missing evidence, decision package, and reports for each university.
           </p>
         </div>
       </div>
@@ -109,11 +111,8 @@ export default function UniversitiesPage() {
         </div>
 
         <div className="space-y-8 xl:col-span-8">
-          <UniversityIntelligencePanel
-            profile={intelligenceProfile}
-            university={selectedUniversity}
-          />
-          <UniversityRelationships profile={intelligenceProfile} />
+          <UniversityIntelligencePanel journey={journey} university={selectedUniversity} />
+          <UniversityRelationships profile={journey.profile} />
         </div>
       </div>
     </div>

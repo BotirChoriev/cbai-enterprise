@@ -5,10 +5,6 @@ import { buildCitizenWorkspace } from "@/lib/workspaces/citizen";
 import WorkspaceHero from "@/components/workspaces/WorkspaceHero";
 import WorkspaceCoverageGrid from "@/components/workspaces/WorkspaceCoverageGrid";
 import WorkspaceSourceCoverage from "@/components/workspaces/WorkspaceSourceCoverage";
-import WorkspaceFeedbackNotice from "@/components/workspaces/WorkspaceFeedbackNotice";
-import WorkspaceMethodology from "@/components/workspaces/WorkspaceMethodology";
-import WorkspacePersonas from "@/components/workspaces/WorkspacePersonas";
-import WorkspaceTrust from "@/components/workspaces/WorkspaceTrust";
 
 export default function CitizenWorkspace() {
   const model = useMemo(() => buildCitizenWorkspace(), []);
@@ -16,7 +12,7 @@ export default function CitizenWorkspace() {
   return (
     <div className="space-y-10">
       <WorkspaceHero
-        versionLabel={`CBAI Citizen Workspace v${model.workspaceVersion}`}
+        versionLabel="Citizen Workspace"
         title={model.hero.title}
         subtitle={model.hero.subtitle}
         description={model.hero.description}
@@ -46,11 +42,9 @@ export default function CitizenWorkspace() {
       <WorkspaceCoverageGrid
         headingId="citizen-topics"
         heading="Citizen Topics"
-        description="Public topics in plain language — what official evidence is connected or missing."
+        description="Public topics and what official evidence is connected."
         items={model.topics}
       />
-
-      <WorkspaceFeedbackNotice notice={model.feedbackNotice} />
 
       <WorkspaceCoverageGrid
         headingId="citizen-evidence-coverage"
@@ -61,26 +55,10 @@ export default function CitizenWorkspace() {
 
       <WorkspaceSourceCoverage
         heading="Official Sources"
-        description="Registered sources and honest connection status."
+        description="Registered sources and connection status."
         sources={model.sources}
         headingId="citizen-source-coverage"
       />
-
-      <WorkspaceMethodology
-        points={model.methodology}
-        heading="Methodology"
-        description="How CBAI presents public information without judging institutions."
-      />
-      <WorkspacePersonas
-        personas={model.personas}
-        question="What can I learn here?"
-      />
-      <WorkspaceTrust pillars={model.trustPillars} />
-
-      <footer className="border-t border-zinc-800 pt-6 text-xs text-zinc-600">
-        Global Indicator Framework v{model.frameworkVersion} · Evidence Infrastructure v
-        {model.infrastructureVersion} · Governance v{model.governanceVersion}
-      </footer>
     </div>
   );
 }

@@ -1,67 +1,61 @@
 import type { Company } from "@/lib/companies";
-import type { CompanyIntelligenceProfile } from "@/lib/companies.intelligence";
-import { getCompanyPipelineReadiness } from "@/lib/pipeline-readiness";
+import type { CompanyUserJourney } from "@/lib/company-user-journey";
+import { COMPANY_JOURNEY_DECISION_TEMPLATE } from "@/lib/company-user-journey";
 import CompanyCoveragePanel from "@/components/companies/CompanyCoveragePanel";
 import EvidenceGapPanel from "@/components/evidence-gap/EvidenceGapPanel";
-import { getCompanyEvidenceGaps } from "@/lib/evidence-gap";
 import EvidenceComparisonPanel from "@/components/evidence-comparison/EvidenceComparisonPanel";
-import { getCompanyEvidenceComparison } from "@/lib/evidence-comparison";
-import CompanyIndicatorCoverage from "@/components/companies/CompanyIndicatorCoverage";
-import CompanySourceCoverage from "@/components/companies/CompanySourceCoverage";
-import CompanyMethodology from "@/components/companies/CompanyMethodology";
-import CompanyTrustSection from "@/components/companies/CompanyTrustSection";
+import EntityProfileFlow from "@/components/shared/EntityProfileFlow";
+import EntitySupportingDetails from "@/components/shared/EntitySupportingDetails";
+import EntityDecisionPackagePreview, {
+  EntityReportsAvailable,
+} from "@/components/shared/EntityDecisionPackagePreview";
+import IndicatorExplorerPanel from "@/components/indicator-explorer/IndicatorExplorerPanel";
 import { EntityPipelineReadinessSection } from "@/components/pipeline/PipelineReadinessPanel";
-import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 
 type CompanyIntelligencePanelProps = {
-  profile: CompanyIntelligenceProfile;
+  journey: CompanyUserJourney;
   company: Company;
 };
 
-export function CompanyIntelligencePanel({ profile, company }: CompanyIntelligencePanelProps) {
+export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligencePanelProps) {
+  const { profile, evidenceGaps, pipelineReadiness, evidenceComparison } = journey;
   const { registryFacts, coverage } = profile;
-  const pipelineReadiness = getCompanyPipelineReadiness(company);
-  const evidenceGaps = getCompanyEvidenceGaps(company);
-  const evidenceComparison = getCompanyEvidenceComparison(company);
   const sourceConnectedCount = coverage.sources.filter(
     (s) => s.statusLabel === "Connected",
   ).length;
 
   return (
     <div className="space-y-8">
-      <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-6 py-5">
-        <p className="text-[10px] font-medium uppercase tracking-widest text-cyan-400">
-          Company Intelligence 2.0
-        </p>
-        <h2 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-50">
-          {registryFacts.name}
-        </h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          {registryFacts.icon} · {registryFacts.industry} · {registryFacts.country}
-        </p>
-        <dl className="mt-5 grid gap-4 text-sm sm:grid-cols-2">
-          <div>
-            <dt className="text-xs uppercase tracking-wider text-zinc-600">Founded</dt>
-            <dd className="mt-1 font-mono text-zinc-300">{registryFacts.founded}</dd>
-          </div>
-          <div>
-            <dt className="text-xs uppercase tracking-wider text-zinc-600">
-              Available information
-            </dt>
-            <dd className="mt-1 text-zinc-300">{registryFacts.sourceLabel}</dd>
-          </div>
-          <div>
-            <dt className="text-xs uppercase tracking-wider text-zinc-600">Industry</dt>
-            <dd className="mt-1 text-zinc-300">{registryFacts.industry}</dd>
-          </div>
-          <div>
-            <dt className="text-xs uppercase tracking-wider text-zinc-600">
-              Evidence source
-            </dt>
-            <dd className="mt-1 text-zinc-300">CBAI Local Registry</dd>
-          </div>
-        </dl>
-      </div>
+      <EntityProfileFlow entityName={company.name} />
+
+      <section aria-labelledby="company-overview-heading">
+        <h3
+          id="company-overview-heading"
+          className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
+        >
+          Overview
+        </h3>
+        <div className="mt-4 rounded-xl border border-zinc-800 bg-zinc-950 px-6 py-5">
+          <h2 className="text-2xl font-semibold tracking-tight text-zinc-50">
+            {registryFacts.name}
+          </h2>
+          <p className="mt-1 text-sm text-zinc-500">
+            {registryFacts.icon} · {registryFacts.industry} · {registryFacts.country}
+          </p>
+          <dl className="mt-5 grid gap-4 text-sm sm:grid-cols-2">
+            <div>
+              <dt className="text-xs uppercase tracking-wider text-zinc-600">Founded</dt>
+              <dd className="mt-1 font-mono text-zinc-300">{registryFacts.founded}</dd>
+            </div>
+            <div>
+              <dt className="text-xs uppercase tracking-wider text-zinc-600">
+                Available information
+              </dt>
+              <dd className="mt-1 text-zinc-300">{registryFacts.sourceLabel}</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
 
       <CompanyCoveragePanel
         summary={coverage.evidenceCoverage}
@@ -69,61 +63,30 @@ export function CompanyIntelligencePanel({ profile, company }: CompanyIntelligen
         totalSources={coverage.sources.length}
       />
 
-      <EvidenceGapPanel profile={evidenceGaps} />
-
-      <EvidenceComparisonPanel
-        entityType="company"
-        leftLegacyId={company.id}
-        initialModel={evidenceComparison}
+      <EvidenceGapPanel
+        profile={evidenceGaps}
+        showSummary={false}
+        showSources={false}
+        showMethodology={false}
+        heading="Missing Evidence"
       />
 
-      <CompanyIndicatorCoverage indicatorsByDomain={coverage.indicatorsByDomain} />
-
-      <CompanySourceCoverage sources={coverage.sources} />
-
-      <EntityPipelineReadinessSection model={pipelineReadiness} />
-
-      <CompanyMethodology />
-
-      <section className="space-y-4" aria-labelledby="company-persona-heading">
-        <div>
-          <h3
-            id="company-persona-heading"
-            className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
-          >
-            Persona Views
-          </h3>
-          <p className="mt-1 text-sm text-zinc-500">
-            What each audience can use today — and what connects when evidence sources go live.
-          </p>
-        </div>
-        <div className="grid gap-4 lg:grid-cols-2">
-          {profile.personas.map((persona) => (
-            <Card key={persona.id}>
-              <CardHeader title={persona.title} />
-              <CardContent className="space-y-3">
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-                    Available today
-                  </p>
-                  <p className="mt-1 text-sm text-zinc-300">{persona.currentValue}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-                    After sources connect
-                  </p>
-                  <p className="mt-1 text-sm text-zinc-500">{persona.futureCapability}</p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      <CompanyTrustSection
-        pillars={profile.trustPillars}
-        neutralityNotice={profile.neutralityNotice}
+      <EntityDecisionPackagePreview
+        summary={journey.decisionSummary}
+        templateSlug={COMPANY_JOURNEY_DECISION_TEMPLATE}
       />
+
+      <EntityReportsAvailable reports={journey.reports} />
+
+      <EntitySupportingDetails>
+        <EntityPipelineReadinessSection model={pipelineReadiness} />
+        <IndicatorExplorerPanel variant="embedded" />
+        <EvidenceComparisonPanel
+          entityType="company"
+          leftLegacyId={company.id}
+          initialModel={evidenceComparison}
+        />
+      </EntitySupportingDetails>
     </div>
   );
 }

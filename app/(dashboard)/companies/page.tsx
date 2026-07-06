@@ -6,10 +6,8 @@ import {
   getCompanyCountries,
   getCompanyIndustries,
 } from "@/lib/companies";
-import {
-  getCompanyLinkedEntities,
-} from "@/lib/companies.adapter";
-import { buildCompanyIntelligenceProfile } from "@/lib/companies.intelligence";
+import { getCompanyLinkedEntities } from "@/lib/companies.adapter";
+import { buildCompanyUserJourney } from "@/lib/company-user-journey";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import CompanyFilters from "@/components/companies/CompanyFilters";
 import CompanyList from "@/components/companies/CompanyList";
@@ -43,9 +41,9 @@ export default function CompaniesPage() {
   const selectedCompany =
     companies.find((c) => c.id === selectedId) ?? filtered[0] ?? companies[0];
 
-  const intelligenceProfile = buildCompanyIntelligenceProfile(
-    selectedCompany,
-    getCompanyLinkedEntities(selectedCompany),
+  const journey = useMemo(
+    () => buildCompanyUserJourney(selectedCompany, getCompanyLinkedEntities(selectedCompany)),
+    [selectedCompany],
   );
 
   function handleSelectCompany(companyId: string) {
@@ -75,12 +73,10 @@ export default function CompaniesPage() {
             CBAI Company Intelligence 2.0
           </p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-50">
-            Companies Intelligence
+            Companies
           </h1>
           <p className="mt-1 max-w-3xl text-sm text-zinc-500">
-            Professional company profiles built from the Global Indicator Framework and
-            Evidence Infrastructure. Registry facts and coverage status only — no revenue,
-            market cap, AI summaries, or external API data.
+            Overview, evidence, missing evidence, decision package, and reports for each company.
           </p>
         </div>
       </div>
@@ -106,11 +102,8 @@ export default function CompaniesPage() {
         </div>
 
         <div className="space-y-8 xl:col-span-8">
-          <CompanyIntelligencePanel
-            profile={intelligenceProfile}
-            company={selectedCompany}
-          />
-          <CompanyRelationships profile={intelligenceProfile} />
+          <CompanyIntelligencePanel journey={journey} company={selectedCompany} />
+          <CompanyRelationships profile={journey.profile} />
         </div>
       </div>
     </div>

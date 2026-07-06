@@ -6,9 +6,6 @@ import WorkspaceHero from "@/components/workspaces/WorkspaceHero";
 import WorkspaceCoverageGrid from "@/components/workspaces/WorkspaceCoverageGrid";
 import WorkspaceSourceCoverage from "@/components/workspaces/WorkspaceSourceCoverage";
 import WorkspaceEntityLinks from "@/components/workspaces/WorkspaceEntityLinks";
-import WorkspaceMethodology from "@/components/workspaces/WorkspaceMethodology";
-import WorkspacePersonas from "@/components/workspaces/WorkspacePersonas";
-import WorkspaceTrust from "@/components/workspaces/WorkspaceTrust";
 
 export default function InvestorWorkspace() {
   const model = useMemo(() => buildInvestorWorkspace(), []);
@@ -16,7 +13,7 @@ export default function InvestorWorkspace() {
   return (
     <div className="space-y-10">
       <WorkspaceHero
-        versionLabel={`CBAI Investor Workspace v${model.workspaceVersion}`}
+        versionLabel="Investor Workspace"
         title={model.hero.title}
         subtitle={model.hero.subtitle}
         description={model.hero.description}
@@ -39,8 +36,8 @@ export default function InvestorWorkspace() {
 
       <WorkspaceCoverageGrid
         headingId="investor-evidence-map"
-        heading="Investment Evidence Map"
-        description="Macro, trade, procurement, and infrastructure domains — readiness only."
+        heading="Investment Evidence"
+        description="Macro, trade, procurement, and infrastructure domains."
         items={model.investmentEvidenceMap}
       />
 
@@ -48,7 +45,7 @@ export default function InvestorWorkspace() {
 
       <WorkspaceSourceCoverage
         heading="Source Coverage"
-        description="Key official sources for investment due diligence scoping — status only."
+        description="Official sources for investment due diligence scoping."
         sources={model.sources}
         headingId="investor-source-coverage"
       />
@@ -56,18 +53,9 @@ export default function InvestorWorkspace() {
       <WorkspaceCoverageGrid
         headingId="investor-opportunity-readiness"
         heading="Opportunity Readiness"
-        description="Readiness labels only — no investment recommendations or opportunity scores."
+        description="Readiness labels by domain — no recommendations."
         items={model.opportunityReadiness}
       />
-
-      <WorkspaceMethodology points={model.methodology} />
-      <WorkspacePersonas personas={model.personas} />
-      <WorkspaceTrust pillars={model.trustPillars} />
-
-      <footer className="border-t border-zinc-800 pt-6 text-xs text-zinc-600">
-        Global Indicator Framework v{model.frameworkVersion} · Evidence Infrastructure v
-        {model.infrastructureVersion} · Governance v{model.governanceVersion}
-      </footer>
     </div>
   );
 }

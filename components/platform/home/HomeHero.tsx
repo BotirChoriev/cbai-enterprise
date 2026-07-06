@@ -1,7 +1,7 @@
 import Link from "next/link";
 import HomeHeroIllustration from "@/components/platform/home/HomeHeroIllustration";
 import HomeHeroSearch from "@/components/platform/home/HomeHeroSearch";
-import { HERO_TOPIC_CARDS, HOME_HERO, EVIDENCE_NOT_CONNECTED_LABEL } from "@/lib/platform-home";
+import { HERO_TOPIC_CARDS, HOME_HERO } from "@/lib/platform-home";
 
 const ctaPrimary =
   "inline-flex min-h-11 items-center justify-center rounded-lg bg-zinc-100 px-6 py-2.5 text-sm font-semibold text-zinc-900 transition-colors hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400";
@@ -11,9 +11,6 @@ const ctaSecondary =
 
 const topicLink =
   "flex min-h-[4.5rem] flex-col justify-center rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-3 text-left transition-colors hover:border-zinc-600 hover:bg-zinc-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400";
-
-const topicDisabled =
-  "flex min-h-[4.5rem] flex-col justify-center rounded-xl border border-dashed border-zinc-800 bg-zinc-950/50 px-4 py-3 text-left opacity-90";
 
 export default function HomeHero() {
   return (
@@ -73,25 +70,12 @@ export default function HomeHero() {
           {HOME_HERO.understandPrompt}
         </h2>
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {HERO_TOPIC_CARDS.map((topic) =>
-            topic.connected && topic.href ? (
-              <Link key={topic.id} href={topic.href} className={topicLink}>
-                <span className="text-sm font-semibold text-zinc-100">
-                  {topic.label}
-                </span>
-                <span className="mt-1 text-xs text-sky-400/90">Open module →</span>
-              </Link>
-            ) : (
-              <div key={topic.id} className={topicDisabled} aria-disabled="true">
-                <span className="text-sm font-semibold text-zinc-400">
-                  {topic.label}
-                </span>
-                <span className="mt-1 text-xs text-zinc-600">
-                  {EVIDENCE_NOT_CONNECTED_LABEL}
-                </span>
-              </div>
-            ),
-          )}
+          {HERO_TOPIC_CARDS.filter((topic) => topic.connected && topic.href).map((topic) => (
+            <Link key={topic.id} href={topic.href!} className={topicLink}>
+              <span className="text-sm font-semibold text-zinc-100">{topic.label}</span>
+              <span className="mt-1 text-xs text-sky-400/90">Open →</span>
+            </Link>
+          ))}
         </div>
       </div>
     </header>

@@ -1,11 +1,6 @@
 import SearchGatewayHero from "@/components/search/gateway/SearchGatewayHero";
 import SearchGatewayResults from "@/components/search/gateway/SearchGatewayResults";
 import SearchExploreByCategory from "@/components/search/gateway/SearchExploreByCategory";
-import SearchPersonas from "@/components/search/gateway/SearchPersonas";
-import SearchPipeline from "@/components/search/gateway/SearchPipeline";
-import SearchFutureReady from "@/components/search/gateway/SearchFutureReady";
-import SearchEvidenceWatchSection from "@/components/evidence-watch/SearchEvidenceWatchSection";
-import SearchRuntimeStatusPanel from "@/components/legacy-integration/SearchRuntimeStatusPanel";
 import HomeSection from "@/components/platform/home/HomeSection";
 import type { GatewaySearchResponse } from "@/lib/search-gateway";
 
@@ -15,61 +10,33 @@ type SearchGatewayProps = {
 };
 
 export default function SearchGateway({ query, response }: SearchGatewayProps) {
+  const hasQuery = Boolean(response.query);
+
   return (
     <div className="home-page mx-auto max-w-6xl pb-16">
       <SearchGatewayHero query={query} />
 
       <HomeSection
         id="search-results"
-        title="Search Results"
-        description="Grouped by registry type and platform layer. Select a result to open the navigation hub — no scores, confidence values, or AI summaries."
+        title={hasQuery ? "Results" : "Start here"}
+        description={
+          hasQuery
+            ? "Select a country to open the full evidence and decision review."
+            : "Search countries, companies, or universities by name."
+        }
       >
         <SearchGatewayResults response={response} query={query} />
       </HomeSection>
 
-      <HomeSection
-        id="search-runtime-status"
-        title="Runtime Integration"
-        description="Legacy BUILD-021–061 intelligence foundation status — not live search execution."
-      >
-        <SearchRuntimeStatusPanel />
-      </HomeSection>
-
-      <HomeSection
-        id="search-evidence-watch"
-        title="Evidence Watch"
-        description="Official evidence change records from platform registries — not notifications or live monitoring."
-      >
-        <SearchEvidenceWatchSection />
-      </HomeSection>
-
-      <HomeSection
-        id="explore-by-category"
-        title="Explore by Category"
-        description="Browse platform areas directly. Unconnected categories remain honestly labeled."
-      >
-        <SearchExploreByCategory />
-      </HomeSection>
-
-      <HomeSection
-        id="search-personas"
-        title="Search by Role"
-        description="Each persona has one example query — select to run a supported search."
-      >
-        <SearchPersonas />
-      </HomeSection>
-
-      <HomeSection id="search-pipeline" title="Search Pipeline">
-        <SearchPipeline />
-      </HomeSection>
-
-      <HomeSection
-        id="search-future"
-        title="Future-Ready Architecture"
-        description="Declared capabilities prepared in schema — not implemented on this build."
-      >
-        <SearchFutureReady />
-      </HomeSection>
+      {!hasQuery ? (
+        <HomeSection
+          id="explore-by-category"
+          title="Browse"
+          description="Open a registry directly."
+        >
+          <SearchExploreByCategory />
+        </HomeSection>
+      ) : null}
     </div>
   );
 }

@@ -64,11 +64,10 @@ export default function CountriesPage() {
             CBAI Country Intelligence 2.0
           </p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-50">
-            Countries Intelligence
+            Countries
           </h1>
           <p className="mt-1 max-w-3xl text-sm text-zinc-500">
-            Integrated country review from search through decision package — registry facts,
-            evidence posture, and decision readiness only.
+            Overview, evidence, missing evidence, decision package, and reports for each country.
           </p>
         </div>
       </div>

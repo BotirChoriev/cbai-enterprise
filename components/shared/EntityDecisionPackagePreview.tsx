@@ -1,6 +1,5 @@
 import type { DecisionSummary, DecisionSummarySection } from "@/lib/decision-intelligence";
 import type { ReportTypeDefinition } from "@/lib/reports-center";
-import { COUNTRY_JOURNEY_DECISION_TEMPLATE } from "@/lib/country-user-journey";
 
 const PREVIEW_SECTION_IDS = new Set([
   "evidence-available",
@@ -11,46 +10,33 @@ const PREVIEW_SECTION_IDS = new Set([
   "human-review",
 ]);
 
-type CountryDecisionPackagePreviewProps = {
+type EntityDecisionPackagePreviewProps = {
   summary: DecisionSummary | null;
   templateSlug?: string;
 };
 
-export default function CountryDecisionPackagePreview({
+export default function EntityDecisionPackagePreview({
   summary,
-  templateSlug = COUNTRY_JOURNEY_DECISION_TEMPLATE,
-}: CountryDecisionPackagePreviewProps) {
-  if (!summary) {
-    return (
-      <section className="space-y-4" aria-labelledby="country-decision-package-heading">
-        <div>
-          <h3
-            id="country-decision-package-heading"
-            className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
-          >
-            Decision Package Preview
-          </h3>
-          <p className="mt-1 text-sm text-zinc-500">Not connected</p>
-        </div>
-      </section>
-    );
-  }
+  templateSlug,
+}: EntityDecisionPackagePreviewProps) {
+  if (!summary) return null;
 
   const sections = summary.sections.filter((section) =>
     PREVIEW_SECTION_IDS.has(section.id),
   );
 
   return (
-    <section className="space-y-6" aria-labelledby="country-decision-package-heading">
+    <section className="space-y-6" aria-labelledby="entity-decision-package-heading">
       <div>
         <h3
-          id="country-decision-package-heading"
+          id="entity-decision-package-heading"
           className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
         >
-          Decision Package Preview
+          Decision Package
         </h3>
         <p className="mt-1 text-sm text-zinc-500">
-          {summary.title} · {summary.readinessLabel} · template {templateSlug}
+          {summary.title} · {summary.readinessLabel}
+          {templateSlug ? ` · ${templateSlug}` : null}
         </p>
       </div>
 
@@ -80,22 +66,24 @@ function DecisionSection({ section }: { section: DecisionSummarySection }) {
   );
 }
 
-type CountryReportsAvailableProps = {
+type EntityReportsAvailableProps = {
   reports: readonly ReportTypeDefinition[];
 };
 
-export function CountryReportsAvailable({ reports }: CountryReportsAvailableProps) {
+export function EntityReportsAvailable({ reports }: EntityReportsAvailableProps) {
+  if (reports.length === 0) return null;
+
   return (
-    <section className="space-y-4" aria-labelledby="country-reports-available-heading">
+    <section className="space-y-4" aria-labelledby="entity-reports-available-heading">
       <div>
         <h3
-          id="country-reports-available-heading"
+          id="entity-reports-available-heading"
           className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
         >
-          Reports Available
+          Reports
         </h3>
         <p className="mt-1 text-sm text-zinc-500">
-          Report types from Reports Center for country scope — export not available yet.
+          Report types available for this scope. Open Reports Center to browse all types.
         </p>
       </div>
 
@@ -104,9 +92,7 @@ export function CountryReportsAvailable({ reports }: CountryReportsAvailableProp
           <li key={report.id} className="px-5 py-4">
             <p className="text-sm font-medium text-zinc-200">{report.title}</p>
             <p className="mt-1 text-xs text-zinc-500">{report.description}</p>
-            <p className="mt-2 text-xs text-zinc-600">
-              {report.availableToday} · Export: {report.exportStatus}
-            </p>
+            <p className="mt-2 text-xs text-zinc-600">{report.availableToday}</p>
           </li>
         ))}
       </ul>
