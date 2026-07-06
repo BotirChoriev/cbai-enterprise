@@ -102,7 +102,10 @@ export default function CountriesPage() {
         </div>
 
         <div className="space-y-8 xl:col-span-8">
-          <CountryIntelligencePanel profile={intelligenceProfile} />
+          <CountryIntelligencePanel
+            profile={intelligenceProfile}
+            country={selectedCountry}
+          />
           <CountryRelationships profile={intelligenceProfile} />
         </div>
       </div>

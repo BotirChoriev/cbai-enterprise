@@ -109,7 +109,10 @@ export default function UniversitiesPage() {
         </div>
 
         <div className="space-y-8 xl:col-span-8">
-          <UniversityIntelligencePanel profile={intelligenceProfile} />
+          <UniversityIntelligencePanel
+            profile={intelligenceProfile}
+            university={selectedUniversity}
+          />
           <UniversityRelationships profile={intelligenceProfile} />
         </div>
       </div>

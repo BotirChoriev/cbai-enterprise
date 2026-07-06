@@ -1,17 +1,25 @@
+import type { University } from "@/lib/universities";
 import type { UniversityIntelligenceProfile } from "@/lib/universities.intelligence";
+import { getUniversityPipelineReadiness } from "@/lib/pipeline-readiness";
 import UniversityCoveragePanel from "@/components/universities/UniversityCoveragePanel";
 import UniversityIndicatorCoverage from "@/components/universities/UniversityIndicatorCoverage";
 import UniversitySourceCoverage from "@/components/universities/UniversitySourceCoverage";
 import UniversityMethodology from "@/components/universities/UniversityMethodology";
 import UniversityTrustSection from "@/components/universities/UniversityTrustSection";
+import { EntityPipelineReadinessSection } from "@/components/pipeline/PipelineReadinessPanel";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 
 type UniversityIntelligencePanelProps = {
   profile: UniversityIntelligenceProfile;
+  university: University;
 };
 
-export function UniversityIntelligencePanel({ profile }: UniversityIntelligencePanelProps) {
+export function UniversityIntelligencePanel({
+  profile,
+  university,
+}: UniversityIntelligencePanelProps) {
   const { registryFacts, coverage } = profile;
+  const pipelineReadiness = getUniversityPipelineReadiness(university);
   const sourceConnectedCount = coverage.sources.filter(
     (s) => s.statusLabel === "Connected",
   ).length;
@@ -77,6 +85,8 @@ export function UniversityIntelligencePanel({ profile }: UniversityIntelligenceP
       <UniversityIndicatorCoverage indicatorsByDomain={coverage.indicatorsByDomain} />
 
       <UniversitySourceCoverage sources={coverage.sources} />
+
+      <EntityPipelineReadinessSection model={pipelineReadiness} />
 
       <UniversityMethodology />
 

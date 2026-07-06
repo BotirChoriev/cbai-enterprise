@@ -1,17 +1,22 @@
+import type { Company } from "@/lib/companies";
 import type { CompanyIntelligenceProfile } from "@/lib/companies.intelligence";
+import { getCompanyPipelineReadiness } from "@/lib/pipeline-readiness";
 import CompanyCoveragePanel from "@/components/companies/CompanyCoveragePanel";
 import CompanyIndicatorCoverage from "@/components/companies/CompanyIndicatorCoverage";
 import CompanySourceCoverage from "@/components/companies/CompanySourceCoverage";
 import CompanyMethodology from "@/components/companies/CompanyMethodology";
 import CompanyTrustSection from "@/components/companies/CompanyTrustSection";
+import { EntityPipelineReadinessSection } from "@/components/pipeline/PipelineReadinessPanel";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 
 type CompanyIntelligencePanelProps = {
   profile: CompanyIntelligenceProfile;
+  company: Company;
 };
 
-export function CompanyIntelligencePanel({ profile }: CompanyIntelligencePanelProps) {
+export function CompanyIntelligencePanel({ profile, company }: CompanyIntelligencePanelProps) {
   const { registryFacts, coverage } = profile;
+  const pipelineReadiness = getCompanyPipelineReadiness(company);
   const sourceConnectedCount = coverage.sources.filter(
     (s) => s.statusLabel === "Connected",
   ).length;
@@ -61,6 +66,8 @@ export function CompanyIntelligencePanel({ profile }: CompanyIntelligencePanelPr
       <CompanyIndicatorCoverage indicatorsByDomain={coverage.indicatorsByDomain} />
 
       <CompanySourceCoverage sources={coverage.sources} />
+
+      <EntityPipelineReadinessSection model={pipelineReadiness} />
 
       <CompanyMethodology />
 

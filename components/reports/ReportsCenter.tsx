@@ -2,7 +2,9 @@
 
 import { useMemo } from "react";
 import { buildReportsCenterModel } from "@/lib/reports-center";
+import { getReportPipelineReadiness } from "@/lib/pipeline-readiness";
 import ReportReadinessSection from "@/components/reports/ReportReadinessSection";
+import ReportPipelineReadinessSection from "@/components/pipeline/ReportPipelineReadinessSection";
 import {
   ReportExportFuture,
   ReportNoFakeNotice,
@@ -12,6 +14,7 @@ import {
 
 export default function ReportsCenter() {
   const model = useMemo(() => buildReportsCenterModel(), []);
+  const reportPipelineReadiness = useMemo(() => getReportPipelineReadiness(), []);
 
   return (
     <div className="space-y-10">
@@ -74,6 +77,7 @@ export default function ReportsCenter() {
       </div>
 
       <ReportReadinessSection reportTypes={model.reportTypes} />
+      <ReportPipelineReadinessSection model={reportPipelineReadiness} />
       <ReportExportFuture items={model.exportFuture} />
       <ReportNoFakeNotice />
       <ReportPersonasSection personas={model.personas} />

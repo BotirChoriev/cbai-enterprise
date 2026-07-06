@@ -106,7 +106,10 @@ export default function CompaniesPage() {
         </div>
 
         <div className="space-y-8 xl:col-span-8">
-          <CompanyIntelligencePanel profile={intelligenceProfile} />
+          <CompanyIntelligencePanel
+            profile={intelligenceProfile}
+            company={selectedCompany}
+          />
           <CompanyRelationships profile={intelligenceProfile} />
         </div>
       </div>

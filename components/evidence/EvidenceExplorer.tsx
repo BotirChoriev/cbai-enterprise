@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { buildEvidenceExplorerModel } from "@/lib/evidence-explorer";
+import { getPlatformPipelineReadiness } from "@/lib/pipeline-readiness";
 import EvidenceSourceCoverage from "@/components/evidence/EvidenceSourceCoverage";
 import EvidenceIndicatorMap from "@/components/evidence/EvidenceIndicatorMap";
 import EntityEvidenceCoverage from "@/components/evidence/EntityEvidenceCoverage";
@@ -9,9 +10,11 @@ import EvidenceLifecycle from "@/components/evidence/EvidenceLifecycle";
 import EvidenceMethodology from "@/components/evidence/EvidenceMethodology";
 import EvidencePersonas from "@/components/evidence/EvidencePersonas";
 import EvidenceTrust from "@/components/evidence/EvidenceTrust";
+import PipelineReadinessPanel from "@/components/pipeline/PipelineReadinessPanel";
 
 export default function EvidenceExplorer() {
   const model = useMemo(() => buildEvidenceExplorerModel(), []);
+  const pipelineReadiness = useMemo(() => getPlatformPipelineReadiness(), []);
 
   return (
     <div className="space-y-10">
@@ -83,6 +86,7 @@ export default function EvidenceExplorer() {
       </div>
 
       <EvidenceSourceCoverage sources={model.sources} />
+      <PipelineReadinessPanel model={pipelineReadiness} />
       <EvidenceIndicatorMap indicatorsByDomain={model.indicatorsByDomain} />
       <EntityEvidenceCoverage entityModules={model.entityModules} />
       <EvidenceLifecycle stages={model.lifecycleStages} />

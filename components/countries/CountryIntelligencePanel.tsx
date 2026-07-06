@@ -1,17 +1,22 @@
+import type { Country } from "@/lib/countries";
 import type { CountryIntelligenceProfile } from "@/lib/countries.intelligence";
+import { getCountryPipelineReadiness } from "@/lib/pipeline-readiness";
 import CountryCoveragePanel from "@/components/countries/CountryCoveragePanel";
 import CountryIndicatorCoverage from "@/components/countries/CountryIndicatorCoverage";
 import CountrySourceCoverage from "@/components/countries/CountrySourceCoverage";
 import CountryMethodology from "@/components/countries/CountryMethodology";
 import CountryTrustSection from "@/components/countries/CountryTrustSection";
+import { EntityPipelineReadinessSection } from "@/components/pipeline/PipelineReadinessPanel";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 
 type CountryIntelligencePanelProps = {
   profile: CountryIntelligenceProfile;
+  country: Country;
 };
 
-export function CountryIntelligencePanel({ profile }: CountryIntelligencePanelProps) {
+export function CountryIntelligencePanel({ profile, country }: CountryIntelligencePanelProps) {
   const { registryFacts, coverage } = profile;
+  const pipelineReadiness = getCountryPipelineReadiness(country);
   const sourceConnectedCount = coverage.sources.filter(
     (s) => s.statusLabel === "Connected",
   ).length;
@@ -65,6 +70,8 @@ export function CountryIntelligencePanel({ profile }: CountryIntelligencePanelPr
       <CountryIndicatorCoverage indicatorsByDomain={coverage.indicatorsByDomain} />
 
       <CountrySourceCoverage sources={coverage.sources} />
+
+      <EntityPipelineReadinessSection model={pipelineReadiness} />
 
       <CountryMethodology />
 
