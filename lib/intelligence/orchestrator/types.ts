@@ -77,6 +77,12 @@ export interface OrchestrationSummary {
   policies: OrchestratorPolicies;
   /** Orchestrator semantic version. */
   orchestratorVersion: string;
+  /** Last authoritative runtime policy decision (BUILD-051). */
+  policyDecision?: import("@/lib/intelligence/runtime/policy/types").PolicyDecisionType;
+  /** Policy rule name that produced the last decision. */
+  policyName?: string;
+  /** Human-readable reason for the last policy decision. */
+  decisionReason?: string;
 }
 
 /**

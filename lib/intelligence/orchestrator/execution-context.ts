@@ -62,6 +62,8 @@ export interface OrchestratorExecutionContext {
   result?: IntelligenceResult;
   /** Run diagnostics output. */
   diagnostics?: IntelligenceRunDiagnostics;
+  /** Last runtime policy decision applied during orchestration (BUILD-051). */
+  lastPolicyDecision?: import("@/lib/intelligence/runtime/policy/types").PolicyDecision;
 }
 
 /**

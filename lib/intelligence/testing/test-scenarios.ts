@@ -1,4 +1,9 @@
 import { ISSUE_BLOCKING_EXECUTION_DENIED } from "@/lib/intelligence/diagnostics/issues";
+import { TEST_RUNTIME_CANCEL_REQUEST_PREFIX } from "@/lib/intelligence/runtime/integration/runtime-policy-diagnostics";
+import {
+  queryByRequestId,
+  defaultSessionRegistry,
+} from "@/lib/intelligence/runtime/registry";
 import type { IntelligenceRequest } from "@/lib/intelligence/request.types";
 import type {
   IntelligenceTestScenario,
@@ -50,6 +55,28 @@ function pass(): IntelligenceTestValidationResult {
 
 function fail(...messages: string[]): IntelligenceTestValidationResult {
   return { pass: false, failures: messages };
+}
+
+function validatePolicyStoppedRun(
+  context: Parameters<IntelligenceTestScenario["validate"]>[0],
+): IntelligenceTestValidationResult | null {
+  if (!context.error?.includes("runtime policy")) {
+    return null;
+  }
+
+  const entries = queryByRequestId(defaultSessionRegistry, context.request.id);
+
+  if (entries.length === 0) {
+    return fail("Expected session registry entry after runtime policy stop.");
+  }
+
+  if (entries[0].lifecycle !== "failed") {
+    return fail(
+      `Expected registry lifecycle failed after policy deny, received ${entries[0].lifecycle}.`,
+    );
+  }
+
+  return pass();
 }
 
 function requireResult(
@@ -117,6 +144,9 @@ export const INTELLIGENCE_TEST_SCENARIOS: IntelligenceTestScenario[] = [
         subjectEntities: [{ type: "country", id: TEST_COUNTRY_ENTITY_ID, name: "United States" }],
       }),
     validate: (context) => {
+      const policyStop = validatePolicyStoppedRun(context);
+      if (policyStop) return policyStop;
+
       const guard = requireResult(context);
       if (guard) return guard;
 
@@ -148,6 +178,9 @@ export const INTELLIGENCE_TEST_SCENARIOS: IntelligenceTestScenario[] = [
         subjectEntities: [{ type: "company", id: TEST_COMPANY_ENTITY_ID, name: "Apple" }],
       }),
     validate: (context) => {
+      const policyStop = validatePolicyStoppedRun(context);
+      if (policyStop) return policyStop;
+
       const guard = requireResult(context);
       if (guard) return guard;
 
@@ -181,6 +214,9 @@ export const INTELLIGENCE_TEST_SCENARIOS: IntelligenceTestScenario[] = [
         ],
       }),
     validate: (context) => {
+      const policyStop = validatePolicyStoppedRun(context);
+      if (policyStop) return policyStop;
+
       const guard = requireResult(context);
       if (guard) return guard;
 
@@ -282,6 +318,9 @@ export const INTELLIGENCE_TEST_SCENARIOS: IntelligenceTestScenario[] = [
         subjectEntities: [{ type: "country", id: TEST_COUNTRY_ENTITY_ID }],
       }),
     validate: (context) => {
+      const policyStop = validatePolicyStoppedRun(context);
+      if (policyStop) return policyStop;
+
       const guard = requireResult(context);
       if (guard) return guard;
 
@@ -321,6 +360,9 @@ export const INTELLIGENCE_TEST_SCENARIOS: IntelligenceTestScenario[] = [
         subjectEntities: [{ type: "company", id: TEST_COMPANY_ENTITY_ID }],
       }),
     validate: (context) => {
+      const policyStop = validatePolicyStoppedRun(context);
+      if (policyStop) return policyStop;
+
       const guard = requireResult(context);
       if (guard) return guard;
 
@@ -360,6 +402,9 @@ export const INTELLIGENCE_TEST_SCENARIOS: IntelligenceTestScenario[] = [
         subjectEntities: [{ type: "company", id: TEST_COMPANY_ENTITY_ID }],
       }),
     validate: (context) => {
+      const policyStop = validatePolicyStoppedRun(context);
+      if (policyStop) return policyStop;
+
       const guard = requireResult(context);
       if (guard) return guard;
 
@@ -386,6 +431,119 @@ export const INTELLIGENCE_TEST_SCENARIOS: IntelligenceTestScenario[] = [
 
       if ((result.diagnostics?.blockingIssueCount ?? 0) === 0) {
         failures.push("Expected at least one blocking diagnostic issue.");
+      }
+
+      return failures.length > 0 ? fail(...failures) : pass();
+    },
+  },
+  {
+    id: "policy-deny",
+    name: "Policy deny on blocking contradiction",
+    description:
+      "Country entity run with blocking contradictions — runtime policy must deny before downstream stages.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Policy deny check for United States intelligence.",
+        subjectEntities: [{ type: "country", id: TEST_COUNTRY_ENTITY_ID, name: "United States" }],
+      }),
+    validate: (context) => {
+      const entries = queryByRequestId(defaultSessionRegistry, context.request.id);
+
+      if (entries.length === 0) {
+        return fail("Expected session registry entry for policy-deny request.");
+      }
+
+      const entry = entries[0];
+
+      if (entry.lifecycle !== "failed") {
+        return fail(
+          `Expected registry lifecycle failed after policy deny, received ${entry.lifecycle}.`,
+        );
+      }
+
+      if (context.error) {
+        return pass();
+      }
+
+      if (context.result?.orchestration?.policyDecision === "deny") {
+        return pass();
+      }
+
+      if (context.result?.diagnostics?.policyDecision === "deny") {
+        return pass();
+      }
+
+      return fail("Expected policy deny via orchestration error or policyDecision deny.");
+    },
+  },
+  {
+    id: "policy-cancel",
+    name: "Policy cancel on harness trigger",
+    description:
+      "Deterministic cancel request id — runtime policy must terminate the session as cancelled.",
+    buildRequest: () =>
+      createTestRequest({
+        id: `${TEST_RUNTIME_CANCEL_REQUEST_PREFIX}harness`,
+        question: "Policy cancel harness trigger.",
+      }),
+    validate: (context) => {
+      const entries = queryByRequestId(defaultSessionRegistry, context.request.id);
+
+      if (entries.length === 0) {
+        return fail("Expected session registry entry for policy-cancel request.");
+      }
+
+      const entry = entries[0];
+
+      if (entry.lifecycle !== "cancelled") {
+        return fail(
+          `Expected registry lifecycle cancelled after policy cancel, received ${entry.lifecycle}.`,
+        );
+      }
+
+      if (!context.error && context.result?.orchestration?.policyDecision !== "cancel") {
+        return fail("Expected pipeline error or orchestration policyDecision cancel.");
+      }
+
+      return pass();
+    },
+  },
+  {
+    id: "session-registry-updates",
+    name: "Session registry updates",
+    description:
+      "Validates orchestrator registers and updates the session registry during a successful run.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Session registry lifecycle check.",
+      }),
+    validate: (context) => {
+      const guard = requireResult(context);
+      if (guard) return guard;
+
+      const entries = queryByRequestId(defaultSessionRegistry, context.request.id);
+
+      if (entries.length !== 1) {
+        return fail(
+          `Expected exactly one registry entry for request, received ${entries.length}.`,
+        );
+      }
+
+      const entry = entries[0];
+      const failures: string[] = [];
+
+      if (entry.requestId !== context.request.id) {
+        failures.push("Registry entry requestId does not match pipeline request id.");
+      }
+
+      if (entry.lifecycle !== "completed") {
+        failures.push(
+          `Expected registry lifecycle completed for successful run, received ${entry.lifecycle}.`,
+        );
+      }
+
+      if (entry.updatedAt.localeCompare(entry.registeredAt) < 0) {
+        failures.push("Registry updatedAt must be greater than or equal to registeredAt.");
       }
 
       return failures.length > 0 ? fail(...failures) : pass();

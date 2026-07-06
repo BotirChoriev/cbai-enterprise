@@ -121,3 +121,11 @@ export type {
   SessionRegistrySnapshot,
   SessionUpdateResult,
 } from "@/lib/intelligence/runtime/registry";
+
+export {
+  evaluateAndEnforceRuntimePolicy,
+  enforceRuntimePolicyDecision,
+  registerRuntimeSession,
+  updateRuntimeSessionRegistry,
+  TEST_RUNTIME_CANCEL_REQUEST_PREFIX,
+} from "@/lib/intelligence/runtime/integration";

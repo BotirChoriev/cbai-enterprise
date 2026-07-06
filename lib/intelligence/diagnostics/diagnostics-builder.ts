@@ -15,6 +15,7 @@ import {
   resolveEvidenceStatusLabel,
 } from "@/lib/intelligence/diagnostics/issues";
 import type { IntelligenceRunDiagnostics } from "@/lib/intelligence/diagnostics/types";
+import type { PolicyDecisionType } from "@/lib/intelligence/runtime/policy/types";
 import type { IntelligenceRequest } from "@/lib/intelligence/request.types";
 import type { IntelligenceResult } from "@/lib/intelligence/result.types";
 import type { ReasoningTrace } from "@/lib/intelligence/trace.types";
@@ -38,6 +39,10 @@ export interface DiagnosticsBuilderInput {
   memoryContext: MemoryContext;
   reasoningTrace: ReasoningTrace;
   result: IntelligenceResult;
+  /** Last runtime policy decision (BUILD-051). */
+  policyDecision?: PolicyDecisionType;
+  policyName?: string;
+  decisionReason?: string;
 }
 
 /**
@@ -99,6 +104,9 @@ export class DefaultDiagnosticsBuilder implements DiagnosticsBuilder {
         issues,
         runHealth,
       ),
+      policyDecision: input.policyDecision,
+      policyName: input.policyName,
+      decisionReason: input.decisionReason,
       metadata: {
         builderId: DEFAULT_DIAGNOSTICS_BUILDER_ID,
         builderVersion: DIAGNOSTICS_BUILDER_VERSION,

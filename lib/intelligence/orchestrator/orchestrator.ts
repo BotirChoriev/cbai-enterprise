@@ -16,6 +16,13 @@ import {
   attachDiagnosticsToResult,
   defaultDiagnosticsBuilder,
 } from "@/lib/intelligence/diagnostics";
+import { extractRuntimePolicyDiagnostics } from "@/lib/intelligence/runtime/integration/runtime-policy-diagnostics";
+import {
+  evaluateAndEnforceRuntimePolicy,
+  registerRuntimeSession,
+  updateRuntimeSessionRegistry,
+} from "@/lib/intelligence/runtime/integration/runtime-integration";
+import { isTestRuntimeCancelRequest } from "@/lib/intelligence/runtime/integration/runtime-policy-diagnostics";
 import {
   appendContextBlockingIssues,
   appendContextWarnings,
@@ -43,11 +50,13 @@ import type {
 } from "@/lib/intelligence/orchestrator/types";
 import type { IntelligenceRequest } from "@/lib/intelligence/request.types";
 import type { IntelligenceResult } from "@/lib/intelligence/result.types";
+import type { PolicyDecision } from "@/lib/intelligence/runtime/policy/types";
 import { createTimelineEntry } from "@/lib/intelligence/trace";
 import { defaultIntelligenceRuntime } from "@/lib/intelligence/runtime";
+import { defaultSessionRegistry } from "@/lib/intelligence/runtime/registry";
 
 /** Semantic version of the default intelligence orchestrator. */
-export const INTELLIGENCE_ORCHESTRATOR_VERSION = "0.1.0-orchestrator";
+export const INTELLIGENCE_ORCHESTRATOR_VERSION = "0.1.1-runtime-integration";
 
 /** Stable identifier for audit metadata. */
 export const DEFAULT_INTELLIGENCE_ORCHESTRATOR_ID = "default-intelligence-orchestrator";
@@ -126,9 +135,32 @@ export class DefaultIntelligenceOrchestrator implements IntelligenceOrchestrator
     });
 
     const runtimeSession = defaultIntelligenceRuntime.createSession(request, policies);
+    registerRuntimeSession(runtimeSession, defaultSessionRegistry, startedAt);
     runtimeSession.start(startedAt);
+    updateRuntimeSessionRegistry(runtimeSession, defaultSessionRegistry, startedAt);
+
+    if (isTestRuntimeCancelRequest(request.id)) {
+      runtimeSession.cancel("Deterministic harness cancel trigger.", startedAt);
+      updateRuntimeSessionRegistry(runtimeSession, defaultSessionRegistry, startedAt);
+    }
 
     let stoppedEarly = false;
+    let lastPolicyDecision: PolicyDecision | undefined;
+
+    const policyOutcome = evaluateAndEnforceRuntimePolicy({
+      session: runtimeSession,
+      context,
+      plan,
+      registry: defaultSessionRegistry,
+      evaluatedAt: startedAt,
+    });
+
+    lastPolicyDecision = policyOutcome.decision;
+
+    if (!policyOutcome.continueExecution) {
+      stoppedEarly = true;
+      markStagesSkipped(context, plan.stages.find((stage) => stage.enabled)?.id ?? "request");
+    }
 
     try {
       for (const stage of plan.stages) {
@@ -142,21 +174,60 @@ export class DefaultIntelligenceOrchestrator implements IntelligenceOrchestrator
           continue;
         }
 
+        const preStagePolicy = evaluateAndEnforceRuntimePolicy({
+          session: runtimeSession,
+          context,
+          plan,
+          registry: defaultSessionRegistry,
+        });
+
+        lastPolicyDecision = preStagePolicy.decision;
+
+        if (!preStagePolicy.continueExecution) {
+          stoppedEarly = true;
+          stage.status = "skipped";
+          context.skippedStages.push(stage.id);
+          markStagesSkipped(context, stage.id);
+          updateRuntimeSessionRegistry(runtimeSession, defaultSessionRegistry);
+          break;
+        }
+
         markStageRunning(context, stage.id);
         runtimeSession.onStageStarted(stage.id);
+        updateRuntimeSessionRegistry(runtimeSession, defaultSessionRegistry);
 
         try {
           await this.executeStage(context, stage.id, policies, request);
           markStageComplete(context, stage.id);
           runtimeSession.onStageCompleted(stage.id);
+          updateRuntimeSessionRegistry(runtimeSession, defaultSessionRegistry);
 
           if (stage.id === "contradictions") {
-            stoppedEarly = this.applyBlockingConflictPolicy(context, policies);
+            const postContradictionPolicy = evaluateAndEnforceRuntimePolicy({
+              session: runtimeSession,
+              context,
+              plan,
+              registry: defaultSessionRegistry,
+            });
+
+            lastPolicyDecision = postContradictionPolicy.decision;
+
+            if (!postContradictionPolicy.continueExecution) {
+              stoppedEarly = true;
+              markStagesSkipped(context, "confidence");
+            } else {
+              stoppedEarly = this.applyBlockingConflictPolicy(context, policies);
+            }
           }
 
-          if (shouldStopOnWarning(policies, context.warnings.length > 0) && stage.id !== "diagnostics") {
+          if (
+            shouldStopOnWarning(policies, context.warnings.length > 0) &&
+            stage.id !== "diagnostics"
+          ) {
             stoppedEarly = true;
-            context.stoppedReason = "Stopped due to warnings — ContinueOnWarning is false.";
+            context.stoppedReason =
+              context.stoppedReason ??
+              "Stopped due to warnings — ContinueOnWarning is false.";
           }
         } catch (error) {
           const message =
@@ -164,12 +235,14 @@ export class DefaultIntelligenceOrchestrator implements IntelligenceOrchestrator
 
           markStageFailed(context, stage.id, message);
           runtimeSession.onStageFailed(stage.id, message);
+          updateRuntimeSessionRegistry(runtimeSession, defaultSessionRegistry);
 
           if (shouldStopOnCriticalFailure(policies, stage.required)) {
             context.stoppedReason = `Critical failure at stage ${stage.id}: ${message}`;
             const failedAt = new Date().toISOString();
             finalizeExecutionContext(context, "failed", failedAt);
             runtimeSession.fail(context.stoppedReason, failedAt);
+            updateRuntimeSessionRegistry(runtimeSession, defaultSessionRegistry);
 
             throw new IntelligencePipelineError(
               message,
@@ -178,26 +251,60 @@ export class DefaultIntelligenceOrchestrator implements IntelligenceOrchestrator
           }
 
           stoppedEarly = true;
-          context.stoppedReason = `Non-critical failure at stage ${stage.id}: ${message}`;
+          context.stoppedReason =
+            context.stoppedReason ?? `Non-critical failure at stage ${stage.id}: ${message}`;
         }
       }
 
       const finishedAt = new Date().toISOString();
+      const postRunPolicy = evaluateAndEnforceRuntimePolicy({
+        session: runtimeSession,
+        context,
+        plan,
+        registry: defaultSessionRegistry,
+        evaluatedAt: finishedAt,
+      });
+
+      lastPolicyDecision = postRunPolicy.decision;
+
       const outcome = resolveOrchestratorOutcome(context, stoppedEarly);
       finalizeExecutionContext(context, outcome, finishedAt);
 
-      if (outcome === "failed") {
+      if (runtimeSession.status === "cancelled") {
+        updateRuntimeSessionRegistry(runtimeSession, defaultSessionRegistry, finishedAt);
+      } else if (outcome === "failed") {
         runtimeSession.fail(context.stoppedReason ?? "Orchestrator run failed.", finishedAt);
+        updateRuntimeSessionRegistry(runtimeSession, defaultSessionRegistry, finishedAt);
+      } else if (outcome === "stopped" && lastPolicyDecision?.decision === "deny") {
+        runtimeSession.fail(
+          context.stoppedReason ?? lastPolicyDecision.reason,
+          finishedAt,
+        );
+        updateRuntimeSessionRegistry(runtimeSession, defaultSessionRegistry, finishedAt);
+      } else if (outcome === "stopped") {
+        runtimeSession.appendWarning(context.stoppedReason ?? "Orchestrator run stopped early.");
+        updateRuntimeSessionRegistry(runtimeSession, defaultSessionRegistry, finishedAt);
       } else {
         runtimeSession.complete(finishedAt);
+        updateRuntimeSessionRegistry(runtimeSession, defaultSessionRegistry, finishedAt);
       }
 
       runtimeSession.appendWarnings(context.warnings);
+      updateRuntimeSessionRegistry(runtimeSession, defaultSessionRegistry, finishedAt);
+
+      context.lastPolicyDecision = lastPolicyDecision;
 
       return {
         result: context.result ?? null,
         context,
-        summary: buildOrchestrationSummary(context, outcome, policies, startedAt, finishedAt),
+        summary: buildOrchestrationSummary(
+          context,
+          outcome,
+          policies,
+          startedAt,
+          finishedAt,
+          lastPolicyDecision,
+        ),
         runtime: runtimeSession.snapshot(),
       };
     } catch (error) {
@@ -208,6 +315,8 @@ export class DefaultIntelligenceOrchestrator implements IntelligenceOrchestrator
         const message = error instanceof Error ? error.message : "Unknown orchestrator failure";
         runtimeSession.fail(message, finishedAt);
       }
+
+      updateRuntimeSessionRegistry(runtimeSession, defaultSessionRegistry, finishedAt);
 
       if (policies.runDiagnosticsAlways && context.result) {
         await this.runDiagnosticsStage(context);
@@ -345,6 +454,8 @@ export class DefaultIntelligenceOrchestrator implements IntelligenceOrchestrator
       return;
     }
 
+    const policyFields = extractRuntimePolicyDiagnostics(context.lastPolicyDecision);
+
     context.diagnostics = await defaultDiagnosticsBuilder.build({
       request: context.request,
       evidence: context.evidence,
@@ -354,6 +465,7 @@ export class DefaultIntelligenceOrchestrator implements IntelligenceOrchestrator
       memoryContext: context.memoryContext,
       reasoningTrace: context.reasoningTrace,
       result: context.result,
+      ...policyFields,
     });
 
     context.result = attachDiagnosticsToResult(context.result, context.diagnostics);
@@ -415,7 +527,9 @@ export class DefaultIntelligenceOrchestrator implements IntelligenceOrchestrator
       return false;
     }
 
-    context.stoppedReason = "Stopped after contradictions — StopOnBlockingConflict policy active.";
+    context.stoppedReason =
+      context.stoppedReason ??
+      "Stopped after contradictions — StopOnBlockingConflict policy active.";
     markStagesSkipped(context, "confidence");
     return true;
   }
@@ -493,9 +607,11 @@ function buildOrchestrationSummary(
   policies: OrchestratorPolicies,
   startedAt: string,
   finishedAt: string,
+  lastPolicyDecision?: PolicyDecision,
 ): OrchestrationSummary {
   const startedMs = Date.parse(startedAt);
   const finishedMs = Date.parse(finishedAt);
+  const policyFields = extractRuntimePolicyDiagnostics(lastPolicyDecision);
 
   return {
     runId: context.runId,
@@ -510,5 +626,6 @@ function buildOrchestrationSummary(
         : 0,
     policies: { ...policies },
     orchestratorVersion: INTELLIGENCE_ORCHESTRATOR_VERSION,
+    ...policyFields,
   };
 }

@@ -97,4 +97,10 @@ export interface IntelligenceRunDiagnostics {
   recommendedNextEngineeringAction: string;
   /** Diagnostics builder metadata. */
   metadata: DiagnosticsMetadata;
+  /** Last authoritative runtime policy decision (BUILD-051). */
+  policyDecision?: import("@/lib/intelligence/runtime/policy/types").PolicyDecisionType;
+  /** Policy rule name that produced the last decision. */
+  policyName?: string;
+  /** Human-readable reason for the last policy decision. */
+  decisionReason?: string;
 }
