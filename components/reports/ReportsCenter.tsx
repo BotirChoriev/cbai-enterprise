@@ -6,6 +6,7 @@ import { getReportPipelineReadiness } from "@/lib/pipeline-readiness";
 import ReportReadinessSection from "@/components/reports/ReportReadinessSection";
 import ReportPipelineReadinessSection from "@/components/pipeline/ReportPipelineReadinessSection";
 import ReportsIndicatorExplorerSection from "@/components/indicator-explorer/ReportsIndicatorExplorerSection";
+import ReportsEvidenceWatchSection from "@/components/evidence-watch/ReportsEvidenceWatchSection";
 import {
   ReportExportFuture,
   ReportNoFakeNotice,
@@ -79,6 +80,7 @@ export default function ReportsCenter() {
 
       <ReportReadinessSection reportTypes={model.reportTypes} />
       <ReportsIndicatorExplorerSection />
+      <ReportsEvidenceWatchSection />
       <ReportPipelineReadinessSection model={reportPipelineReadiness} />
       <ReportExportFuture items={model.exportFuture} />
       <ReportNoFakeNotice />

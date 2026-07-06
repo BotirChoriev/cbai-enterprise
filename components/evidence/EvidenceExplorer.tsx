@@ -12,6 +12,7 @@ import EvidencePersonas from "@/components/evidence/EvidencePersonas";
 import EvidenceTrust from "@/components/evidence/EvidenceTrust";
 import PipelineReadinessPanel from "@/components/pipeline/PipelineReadinessPanel";
 import IndicatorExplorerPanel from "@/components/indicator-explorer/IndicatorExplorerPanel";
+import EvidenceWatchPanel from "@/components/evidence-watch/EvidenceWatchPanel";
 
 export default function EvidenceExplorer() {
   const model = useMemo(() => buildEvidenceExplorerModel(), []);
@@ -99,6 +100,7 @@ export default function EvidenceExplorer() {
       <EvidenceMethodology points={model.methodology} />
       <EvidencePersonas personas={model.personas} />
       <EvidenceTrust pillars={model.trustPillars} />
+      <EvidenceWatchPanel />
 
       <footer className="border-t border-zinc-800 pt-6 text-xs text-zinc-600">
         Evidence Infrastructure v{model.infrastructureVersion} · Global Indicator Framework

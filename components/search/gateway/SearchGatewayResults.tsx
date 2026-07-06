@@ -1,3 +1,6 @@
+"use client";
+
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import type { GatewaySearchResponse } from "@/lib/search-gateway";
 import {
@@ -8,15 +11,27 @@ import {
   buildEntityResultEntry,
   buildTopicResultEntry,
 } from "@/lib/search-intelligence-entry";
+import { executeSearchIntelligence } from "@/lib/search-intelligence";
 import SearchResultCard from "@/components/search/gateway/SearchResultCard";
+import SearchIntelligenceDetail from "@/components/search/intelligence/SearchIntelligenceDetail";
 
 type SearchGatewayResultsProps = {
   response: GatewaySearchResponse;
+  query: string;
 };
 
 export default function SearchGatewayResults({
   response,
+  query,
 }: SearchGatewayResultsProps) {
+  const intelligenceResponse = useMemo(() => executeSearchIntelligence(query), [query]);
+  const [selectedEntityId, setSelectedEntityId] = useState<string | null>(null);
+
+  const selectedRecord =
+    intelligenceResponse.matches.find(
+      (match) => match.record.entityId === selectedEntityId,
+    )?.record ?? null;
+
   if (!response.query) {
     return (
       <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 px-6 py-8">
@@ -55,6 +70,8 @@ export default function SearchGatewayResults({
         <span className="font-medium text-zinc-300">
           &quot;{response.query}&quot;
         </span>
+        {" · "}
+        Alphabetical registry order — no relevance ranking displayed.
       </p>
 
       {response.groups.map((group) => (
@@ -73,9 +90,29 @@ export default function SearchGatewayResults({
           <ul className="grid gap-4 lg:grid-cols-2">
             {group.entities.map((result) => {
               const entry = buildEntityResultEntry(result.entity);
+              const intelligenceMatch = intelligenceResponse.matches.find(
+                (match) => match.record.displayName === result.entity.name,
+              );
+              const entityId = intelligenceMatch?.record.entityId;
+
               return (
-                <li key={`${result.entity.type}-${result.entity.id}`}>
+                <li key={`${result.entity.type}-${result.entity.id}`} className="space-y-2">
                   <SearchResultCard entry={entry} />
+                  {entityId && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedEntityId(entityId)}
+                      className={`text-xs underline-offset-2 hover:underline ${
+                        selectedEntityId === entityId
+                          ? "text-cyan-300"
+                          : "text-cyan-400"
+                      }`}
+                      aria-pressed={selectedEntityId === entityId}
+                      aria-label={`Open navigation hub for ${result.entity.name}`}
+                    >
+                      Open navigation hub
+                    </button>
+                  )}
                 </li>
               );
             })}
@@ -90,6 +127,12 @@ export default function SearchGatewayResults({
           </ul>
         </section>
       ))}
+
+      {selectedRecord && (
+        <div id="search-intelligence-detail">
+          <SearchIntelligenceDetail record={selectedRecord} />
+        </div>
+      )}
     </div>
   );
 }

@@ -4,6 +4,7 @@ import SearchExploreByCategory from "@/components/search/gateway/SearchExploreBy
 import SearchPersonas from "@/components/search/gateway/SearchPersonas";
 import SearchPipeline from "@/components/search/gateway/SearchPipeline";
 import SearchFutureReady from "@/components/search/gateway/SearchFutureReady";
+import SearchEvidenceWatchSection from "@/components/evidence-watch/SearchEvidenceWatchSection";
 import HomeSection from "@/components/platform/home/HomeSection";
 import type { GatewaySearchResponse } from "@/lib/search-gateway";
 
@@ -20,9 +21,17 @@ export default function SearchGateway({ query, response }: SearchGatewayProps) {
       <HomeSection
         id="search-results"
         title="Search Results"
-        description="Grouped by registry type and platform layer. No scores, confidence values, or AI summaries."
+        description="Grouped by registry type and platform layer. Select a result to open the navigation hub — no scores, confidence values, or AI summaries."
       >
-        <SearchGatewayResults response={response} />
+        <SearchGatewayResults response={response} query={query} />
+      </HomeSection>
+
+      <HomeSection
+        id="search-evidence-watch"
+        title="Evidence Watch"
+        description="Official evidence change records from platform registries — not notifications or live monitoring."
+      >
+        <SearchEvidenceWatchSection />
       </HomeSection>
 
       <HomeSection
