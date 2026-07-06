@@ -45,7 +45,7 @@ export default function UniversityFilters({
           type="search"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Search universities..."
+          placeholder="Search by country, university name, institution type..."
           className="w-full rounded-lg border border-zinc-800 bg-zinc-900/60 py-2 pl-10 pr-4 text-sm text-zinc-300 placeholder:text-zinc-600 outline-none transition-colors focus:border-violet-500/40 focus:ring-1 focus:ring-violet-500/20"
         />
       </div>

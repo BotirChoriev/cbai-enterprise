@@ -85,7 +85,7 @@ export const platformNavSections: NavSection[] = [
         label: "Universities",
         href: "/universities",
         icon: "universities",
-        description: "University intelligence profiles and research ties.",
+        description: "Evidence-based university profiles from the local registry.",
       },
     ],
   },
@@ -102,7 +102,7 @@ export const platformNavSections: NavSection[] = [
         label: "Knowledge Graph",
         href: "/graph",
         icon: "graph",
-        description: "Relationship graph across platform entities.",
+        description: "Evidence relationship navigation across platform entities.",
       },
       {
         label: "Knowledge",

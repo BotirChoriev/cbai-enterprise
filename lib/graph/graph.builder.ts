@@ -9,6 +9,7 @@ import type {
   GraphNode,
   GraphEdge,
   GraphEdgeType,
+  GraphEdgeEvidenceStatus,
   KnowledgeGraph,
   GraphNodeType,
   GraphStats,
@@ -45,48 +46,48 @@ function buildNodes(): GraphNode[] {
   const { centerX, centerY, countryRadius, companyRadius, universityRadius } =
     GRAPH_LAYOUT;
 
-  const countryNodes: GraphNode[] = countries.map((c, i) => {
-    const entity = toCountryEntity(c);
-    const pos = placeOnRing(i, countries.length, countryRadius, centerX, centerY);
+  const countryNodes: GraphNode[] = countries.map((country, index) => {
+    const entity = toCountryEntity(country);
+    const pos = placeOnRing(index, countries.length, countryRadius, centerX, centerY);
     return {
-      id: graphNodeId("country", c.id),
-      entityId: c.id,
+      id: graphNodeId("country", country.id),
+      entityId: country.id,
       type: "country",
-      label: c.name,
+      label: country.name,
       entity,
       x: pos.x,
       y: pos.y,
     };
   });
 
-  const companyNodes: GraphNode[] = companies.map((c, i) => {
-    const entity = toCompanyEntity(c);
-    const pos = placeOnRing(i, companies.length, companyRadius, centerX, centerY);
+  const companyNodes: GraphNode[] = companies.map((company, index) => {
+    const entity = toCompanyEntity(company);
+    const pos = placeOnRing(index, companies.length, companyRadius, centerX, centerY);
     return {
-      id: graphNodeId("company", c.id),
-      entityId: c.id,
+      id: graphNodeId("company", company.id),
+      entityId: company.id,
       type: "company",
-      label: c.name,
+      label: company.name,
       entity,
       x: pos.x,
       y: pos.y,
     };
   });
 
-  const universityNodes: GraphNode[] = universities.map((u, i) => {
-    const entity = toUniversityEntity(u);
+  const universityNodes: GraphNode[] = universities.map((university, index) => {
+    const entity = toUniversityEntity(university);
     const pos = placeOnRing(
-      i,
+      index,
       universities.length,
       universityRadius,
       centerX,
       centerY,
     );
     return {
-      id: graphNodeId("university", u.id),
-      entityId: u.id,
+      id: graphNodeId("university", university.id),
+      entityId: university.id,
       type: "university",
-      label: u.name,
+      label: university.name,
       entity,
       x: pos.x,
       y: pos.y,
@@ -102,9 +103,9 @@ function findNode(
   nodes: GraphNode[],
 ): GraphNode | undefined {
   return nodes.find(
-    (n) =>
-      n.type === type &&
-      (namesMatch(n.label, name) || namesMatch(n.entity.name, name)),
+    (node) =>
+      node.type === type &&
+      (namesMatch(node.label, name) || namesMatch(node.entity.name, name)),
   );
 }
 
@@ -119,6 +120,7 @@ function addEdge(
   target: string,
   type: GraphEdgeType,
   label: string,
+  evidenceStatus: GraphEdgeEvidenceStatus = "evidence_available",
 ) {
   if (source === target) return;
   const key = [source, target, type].sort().join("|");
@@ -130,6 +132,7 @@ function addEdge(
     target,
     type,
     label,
+    evidenceStatus,
   });
 }
 
@@ -137,10 +140,9 @@ function buildEdges(nodes: GraphNode[]): GraphEdge[] {
   const edges: GraphEdge[] = [];
   const seen = new Set<string>();
 
-  // Company → Country: located-in
   for (const company of companies) {
     const companyNode = nodes.find(
-      (n) => n.type === "company" && n.entityId === company.id,
+      (node) => node.type === "company" && node.entityId === company.id,
     );
     const countryNode = findCountryByName(company.country, nodes);
     if (companyNode && countryNode) {
@@ -155,17 +157,16 @@ function buildEdges(nodes: GraphNode[]): GraphEdge[] {
     }
   }
 
-  // University → Country: located-in
-  for (const uni of universities) {
-    const uniNode = nodes.find(
-      (n) => n.type === "university" && n.entityId === uni.id,
+  for (const university of universities) {
+    const universityNode = nodes.find(
+      (node) => node.type === "university" && node.entityId === university.id,
     );
-    const countryNode = findCountryByName(uni.country, nodes);
-    if (uniNode && countryNode) {
+    const countryNode = findCountryByName(university.country, nodes);
+    if (universityNode && countryNode) {
       addEdge(
         edges,
         seen,
-        uniNode.id,
+        universityNode.id,
         countryNode.id,
         "located-in",
         "Located In",
@@ -173,117 +174,61 @@ function buildEdges(nodes: GraphNode[]): GraphEdge[] {
     }
   }
 
-  // Company → University: same-country catalog links only
-  for (const company of companies) {
-    const sourceNode = nodes.find(
-      (n) => n.type === "company" && n.entityId === company.id,
-    );
-    if (!sourceNode) continue;
-
-    const relationships = getCompanyRelationships(company);
-
-    for (const uniName of relationships.universities) {
-      const target = findNode(uniName, "university", nodes);
-      if (target) {
-        addEdge(
-          edges,
-          seen,
-          sourceNode.id,
-          target.id,
-          "research-partner",
-          "Same Country Catalog",
-        );
-      }
-    }
-  }
-
-  // University ↔ Company: research-partner
-  for (const uni of universities) {
-    const sourceNode = nodes.find(
-      (n) => n.type === "university" && n.entityId === uni.id,
-    );
-    if (!sourceNode) continue;
-
-    for (const partner of uni.relationships.industryPartners) {
-      const target = findNode(partner, "company", nodes);
-      if (target) {
-        addEdge(
-          edges,
-          seen,
-          sourceNode.id,
-          target.id,
-          "research-partner",
-          "Research Partner",
-        );
-      }
-    }
-
-    for (const companyName of uni.relationships.relatedCompanies) {
-      const target = findNode(companyName, "company", nodes);
-      if (target) {
-        addEdge(
-          edges,
-          seen,
-          sourceNode.id,
-          target.id,
-          "research-partner",
-          "Research Partner",
-        );
-      }
-    }
-  }
-
-  // Country → Company: investment (from country adapter)
   for (const country of countries) {
     const countryNode = nodes.find(
-      (n) => n.type === "country" && n.entityId === country.id,
+      (node) => node.type === "country" && node.entityId === country.id,
     );
     if (!countryNode) continue;
 
-    const rels = getCountryRelationships(country);
+    const countryRelationships = getCountryRelationships(country);
 
-    for (const companyName of rels.relatedCompanies) {
-      const target = findNode(companyName, "company", nodes);
-      if (target) {
-        addEdge(
-          edges,
-          seen,
-          countryNode.id,
-          target.id,
-          "investment",
-          "Investment",
-        );
-      }
-    }
-
-    for (const uniName of rels.universities) {
-      const target = findNode(uniName, "university", nodes);
-      if (target) {
-        addEdge(
-          edges,
-          seen,
-          countryNode.id,
-          target.id,
-          "research-partner",
-          "Research Partner",
-        );
-      }
-    }
-
-    for (const company of companies) {
-      const companyNode = nodes.find(
-        (n) => n.type === "company" && n.entityId === company.id,
-      );
-      if (!companyNode) continue;
-
-      if (namesMatch(company.country, country.name)) {
+    for (const companyName of countryRelationships.relatedCompanies) {
+      const companyNode = findNode(companyName, "company", nodes);
+      if (companyNode) {
         addEdge(
           edges,
           seen,
           companyNode.id,
           countryNode.id,
           "industry",
-          "Headquarters",
+          "Registered In",
+        );
+      }
+    }
+
+    for (const universityName of countryRelationships.universities) {
+      const universityNode = findNode(universityName, "university", nodes);
+      if (universityNode) {
+        addEdge(
+          edges,
+          seen,
+          universityNode.id,
+          countryNode.id,
+          "industry",
+          "Registered In",
+        );
+      }
+    }
+  }
+
+  for (const company of companies) {
+    const companyNode = nodes.find(
+      (node) => node.type === "company" && node.entityId === company.id,
+    );
+    if (!companyNode) continue;
+
+    const relationships = getCompanyRelationships(company);
+
+    for (const universityName of relationships.universities) {
+      const universityNode = findNode(universityName, "university", nodes);
+      if (universityNode) {
+        addEdge(
+          edges,
+          seen,
+          companyNode.id,
+          universityNode.id,
+          "research-partner",
+          "Belongs To",
         );
       }
     }
@@ -292,16 +237,14 @@ function buildEdges(nodes: GraphNode[]): GraphEdge[] {
   return edges;
 }
 
-/** Build the complete knowledge graph from entity adapters */
 export function buildKnowledgeGraph(): KnowledgeGraph {
   const nodes = buildNodes();
   const edges = buildEdges(nodes);
   return { nodes, edges };
 }
 
-/** Compute graph-level statistics */
 export function computeGraphStats(graph: KnowledgeGraph): GraphStats {
-  const edgeTypeCounts = {} as Record<GraphEdgeType, number>;
+  const edgeTypeCounts: Partial<Record<GraphEdgeType, number>> = {};
   for (const edge of graph.edges) {
     edgeTypeCounts[edge.type] = (edgeTypeCounts[edge.type] ?? 0) + 1;
   }
@@ -309,14 +252,16 @@ export function computeGraphStats(graph: KnowledgeGraph): GraphStats {
   return {
     totalNodes: graph.nodes.length,
     totalEdges: graph.edges.length,
-    countryCount: graph.nodes.filter((n) => n.type === "country").length,
-    companyCount: graph.nodes.filter((n) => n.type === "company").length,
-    universityCount: graph.nodes.filter((n) => n.type === "university").length,
+    countryCount: graph.nodes.filter((node) => node.type === "country").length,
+    companyCount: graph.nodes.filter((node) => node.type === "company").length,
+    universityCount: graph.nodes.filter((node) => node.type === "university").length,
+    verifiedEdgeCount: graph.edges.filter(
+      (edge) => edge.evidenceStatus === "evidence_available",
+    ).length,
     edgeTypeCounts,
   };
 }
 
-/** Resolve connected nodes and edges for selection highlighting */
 export function computeGraphSelection(
   graph: KnowledgeGraph,
   nodeId: string | null,
@@ -343,31 +288,29 @@ export function computeGraphSelection(
   return { nodeId, connectedNodeIds, connectedEdgeIds };
 }
 
-/** Get entity for inspector from selected node */
 export function getNodeEntity(
   graph: KnowledgeGraph,
   nodeId: string,
 ): Entity | undefined {
-  return graph.nodes.find((n) => n.id === nodeId)?.entity;
+  return graph.nodes.find((node) => node.id === nodeId)?.entity;
 }
 
-/** Filter nodes by search query */
 export function filterNodesBySearch(
   nodes: GraphNode[],
   query: string,
 ): Set<string> {
-  if (!query.trim()) return new Set(nodes.map((n) => n.id));
+  if (!query.trim()) return new Set(nodes.map((node) => node.id));
   const tokens = query.toLowerCase().trim().split(/\s+/);
-  const matching = nodes.filter((n) => {
+  const matching = nodes.filter((node) => {
     const text = [
-      n.label,
-      n.entity.category,
-      n.entity.subtitle ?? "",
-      ...n.entity.tags.map((t) => t.label),
+      node.label,
+      node.entity.category,
+      node.entity.subtitle ?? "",
+      String(node.entity.metadata.country ?? ""),
     ]
       .join(" ")
       .toLowerCase();
-    return tokens.every((t) => text.includes(t));
+    return tokens.every((token) => text.includes(token));
   });
-  return new Set(matching.map((n) => n.id));
+  return new Set(matching.map((node) => node.id));
 }

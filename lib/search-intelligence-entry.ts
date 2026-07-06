@@ -5,7 +5,7 @@
 
 import type { Entity } from "@/lib/entity/entity.types";
 import { getEntityTypeLabel } from "@/lib/entity/entity.helpers";
-import { getEntityDetailHref, getEntityHref } from "@/lib/global-search";
+import { getEntityDetailHref } from "@/lib/global-search";
 import type { EvidenceDisplayStatus } from "@/lib/search-gateway";
 import { EVIDENCE_NOT_CONNECTED_LABEL } from "@/lib/platform-home";
 
@@ -22,7 +22,6 @@ export type SearchResultEntry = {
 export function buildEntityResultEntry(entity: Entity): SearchResultEntry {
   const typeLabel = getEntityTypeLabel(entity.type);
   const href = getEntityDetailHref(entity);
-  const moduleRoute = getEntityHref(entity);
 
   if (entity.type === "country" || entity.type === "company") {
     return {
@@ -40,18 +39,15 @@ export function buildEntityResultEntry(entity: Entity): SearchResultEntry {
   }
 
   if (entity.type === "university") {
-    const hasRegistry = entity.metrics.length > 0;
-
     return {
       name: entity.name,
       type: typeLabel,
-      evidenceStatus: hasRegistry ? "Registry available" : "Evidence unavailable",
-      availableInformation: hasRegistry
-        ? "University catalog profile and registry metadata."
-        : "No local registry profile available.",
-      route: hasRegistry ? href : moduleRoute,
-      href: hasRegistry ? href : moduleRoute,
-      linked: hasRegistry,
+      evidenceStatus: "Registry available",
+      availableInformation:
+        "University catalog profile: name, location, institution type, founding year, website when recorded.",
+      route: href,
+      href,
+      linked: true,
     };
   }
 

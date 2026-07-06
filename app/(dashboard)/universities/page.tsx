@@ -7,13 +7,14 @@ import {
   getUniversityTypes,
 } from "@/lib/universities";
 import {
-  toUniversityEntity,
-  UNIVERSITY_METADATA_FIELDS,
+  getUniversityRelationships,
+  getUniversityLinkedEntities,
 } from "@/lib/universities.adapter";
-import EntityLayout from "@/components/entity/EntityLayout";
+import { buildUniversityIntelligenceProfile } from "@/lib/universities.intelligence";
 import UniversityFilters from "@/components/universities/UniversityFilters";
 import UniversityList from "@/components/universities/UniversityList";
 import UniversityRelationships from "@/components/universities/UniversityRelationships";
+import { UniversityIntelligencePanel } from "@/components/universities/UniversityIntelligencePanel";
 
 export default function UniversitiesPage() {
   const [search, setSearch] = useState("");
@@ -25,24 +26,31 @@ export default function UniversitiesPage() {
   const types = useMemo(() => getUniversityTypes(), []);
 
   const filtered = useMemo(() => {
-    return universities.filter((u) => {
+    return universities.filter((university) => {
+      const normalizedSearch = search.toLowerCase();
       const matchesSearch =
         search === "" ||
-        u.name.toLowerCase().includes(search.toLowerCase()) ||
-        u.icon.toLowerCase().includes(search.toLowerCase()) ||
-        u.city.toLowerCase().includes(search.toLowerCase());
-      const matchesCountry = country === "All" || u.country === country;
-      const matchesType = type === "All" || u.type === type;
+        university.name.toLowerCase().includes(normalizedSearch) ||
+        university.icon.toLowerCase().includes(normalizedSearch) ||
+        university.city.toLowerCase().includes(normalizedSearch) ||
+        university.country.toLowerCase().includes(normalizedSearch) ||
+        university.type.toLowerCase().includes(normalizedSearch);
+      const matchesCountry = country === "All" || university.country === country;
+      const matchesType = type === "All" || university.type === type;
       return matchesSearch && matchesCountry && matchesType;
     });
   }, [search, country, type]);
 
   const selectedUniversity =
-    universities.find((u) => u.id === selectedId) ??
+    universities.find((university) => university.id === selectedId) ??
     filtered[0] ??
     universities[0];
 
-  const selectedEntity = toUniversityEntity(selectedUniversity);
+  const relationships = getUniversityRelationships(selectedUniversity);
+  const intelligenceProfile = buildUniversityIntelligenceProfile(
+    selectedUniversity,
+    getUniversityLinkedEntities(selectedUniversity),
+  );
 
   return (
     <div className="space-y-6">
@@ -53,14 +61,15 @@ export default function UniversitiesPage() {
         />
         <div className="relative">
           <p className="text-[10px] font-medium uppercase tracking-widest text-violet-400">
-            Global AI Operating System
+            CBAI University Intelligence
           </p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-50">
             Universities Intelligence
           </h1>
           <p className="mt-1 text-sm text-zinc-500">
-            Academic research profiles, AI readiness, and institutional
-            relationships across global universities.
+            Evidence-based university profiles from the local registry. Rankings,
+            scores, and research narratives are withheld unless backed by
+            connected evidence sources.
           </p>
         </div>
       </div>
@@ -86,17 +95,17 @@ export default function UniversitiesPage() {
         </div>
 
         <div className="space-y-6 xl:col-span-8">
-          <EntityLayout
-            entity={selectedEntity}
-            metadataFields={UNIVERSITY_METADATA_FIELDS}
-            showScoreCards
-            aiConfidence={95.4}
-          >
-            <UniversityRelationships
-              relationships={selectedUniversity.relationships}
-              researchAreas={selectedUniversity.researchAreas}
-            />
-          </EntityLayout>
+          <UniversityIntelligencePanel
+            profile={intelligenceProfile}
+            name={selectedUniversity.name}
+            icon={selectedUniversity.icon}
+            country={selectedUniversity.country}
+            city={selectedUniversity.city}
+            type={selectedUniversity.type}
+            founded={selectedUniversity.founded}
+            website={selectedUniversity.website}
+          />
+          <UniversityRelationships relationships={relationships} />
         </div>
       </div>
     </div>

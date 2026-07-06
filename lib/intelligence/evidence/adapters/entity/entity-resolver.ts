@@ -3,7 +3,7 @@ import { toCountryEntity, getCountryRelationships } from "@/lib/countries.adapte
 import { companies } from "@/lib/companies";
 import { toCompanyEntity, getCompanyRelationships } from "@/lib/companies.adapter";
 import { universities } from "@/lib/universities";
-import { toUniversityEntity } from "@/lib/universities.adapter";
+import { toUniversityEntity, getUniversityRelationships } from "@/lib/universities.adapter";
 import type { EntityRef } from "@/lib/intelligence/request.types";
 import {
   entityRefKey,
@@ -119,9 +119,10 @@ export class EntityResolver {
       case "university": {
         const university = universities.find((u) => u.id === id);
         if (!university) return null;
+        const rels = getUniversityRelationships(university);
         return {
           entity: toUniversityEntity(university),
-          relationshipsSummary: formatUniversityRelationships(university.relationships),
+          relationshipsSummary: formatUniversityRelationships(rels),
         };
       }
       default:
@@ -148,15 +149,14 @@ function formatCompanyRelationships(rels: ReturnType<typeof getCompanyRelationsh
   ].join(" ");
 }
 
-function formatUniversityRelationships(rels: {
-  industryPartners: string[];
-  relatedCompanies: string[];
-  relatedCountries: string[];
-}): string {
+function formatUniversityRelationships(
+  rels: ReturnType<typeof getUniversityRelationships>,
+): string {
   return [
-    `Industry partners: ${joinOrNone(rels.industryPartners)}.`,
-    `Related companies: ${joinOrNone(rels.relatedCompanies)}.`,
-    `Related countries: ${joinOrNone(rels.relatedCountries)}.`,
+    `Country: ${rels.country ?? "none linked"}.`,
+    `Companies (same country catalog): ${joinOrNone(rels.companies)}.`,
+    `Research centers: ${joinOrNone(rels.researchCenters)}.`,
+    `Government: ${joinOrNone(rels.government)}.`,
   ].join(" ");
 }
 

@@ -7,10 +7,14 @@ import {
   computeGraphSelection,
 } from "@/lib/graph/graph.builder";
 import type { GraphNodeFilter } from "@/lib/graph/graph.types";
+import { GRAPH_PLATFORM, GRAPH_TRUST_PILLARS } from "@/lib/graph/graph-platform";
 import GraphCanvas from "@/components/graph/GraphCanvas";
-import GraphFilters from "@/components/graph/GraphFilters";
-import GraphInspector from "@/components/graph/GraphInspector";
+import GraphEntityPanel from "@/components/graph/GraphEntityPanel";
+import GraphConnectionsPanel from "@/components/graph/GraphConnectionsPanel";
 import GraphLegend from "@/components/graph/GraphLegend";
+import GraphPipeline from "@/components/graph/GraphPipeline";
+import GraphPersonas from "@/components/graph/GraphPersonas";
+import HomeSection from "@/components/platform/home/HomeSection";
 
 export default function GraphPage() {
   const graph = useMemo(() => buildKnowledgeGraph(), []);
@@ -26,58 +30,45 @@ export default function GraphPage() {
   );
 
   const selectedNode = useMemo(
-    () => graph.nodes.find((n) => n.id === selectedNodeId) ?? null,
+    () => graph.nodes.find((node) => node.id === selectedNodeId) ?? null,
     [graph.nodes, selectedNodeId],
   );
 
   const connectedEdges = useMemo(
-    () => graph.edges.filter((e) => selection.connectedEdgeIds.has(e.id)),
+    () => graph.edges.filter((edge) => selection.connectedEdgeIds.has(edge.id)),
     [graph.edges, selection.connectedEdgeIds],
   );
 
   const connectedNodes = useMemo(
-    () => graph.nodes.filter((n) => selection.connectedNodeIds.has(n.id)),
+    () => graph.nodes.filter((node) => selection.connectedNodeIds.has(node.id)),
     [graph.nodes, selection.connectedNodeIds],
   );
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-xl border border-zinc-800 bg-gradient-to-br from-zinc-950 via-zinc-950 to-sky-950/20 p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-sky-500/80">
-              Relationship Engine
-            </p>
-            <h1 className="mt-1 text-2xl font-bold tracking-tight text-zinc-50">
-              CBAI Knowledge Graph
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm text-zinc-400">
-              Central relationship engine connecting countries, companies, and
-              universities across the platform. Select nodes to explore
-              partnerships, investments, and research links.
-            </p>
-          </div>
-          <div className="hidden shrink-0 rounded-lg border border-zinc-800 bg-zinc-900/60 px-4 py-3 text-right sm:block">
-            <p className="font-mono text-2xl font-bold text-sky-400">
-              {stats.totalNodes}
-            </p>
-            <p className="text-[10px] uppercase tracking-wider text-zinc-600">
-              Connected Entities
-            </p>
-          </div>
-        </div>
-      </div>
+    <div className="home-page mx-auto max-w-[90rem] pb-16">
+      <header className="home-surface rounded-2xl border border-zinc-800 px-8 py-8 sm:px-10">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-400/90">
+          {GRAPH_PLATFORM.eyebrow}
+        </p>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl">
+          {GRAPH_PLATFORM.headline}
+        </h1>
+        <p className="mt-3 max-w-3xl text-base leading-relaxed text-zinc-400">
+          {GRAPH_PLATFORM.explanation}
+        </p>
+      </header>
 
       <div className="grid gap-6 xl:grid-cols-12">
         <div className="space-y-4 xl:col-span-3">
-          <GraphFilters
+          <GraphEntityPanel
+            selectedNode={selectedNode}
+            connectedEdges={connectedEdges}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             typeFilter={typeFilter}
             onTypeFilterChange={setTypeFilter}
             stats={stats}
             onClearSelection={() => setSelectedNodeId(null)}
-            hasSelection={selectedNodeId !== null}
           />
           <GraphLegend />
         </div>
@@ -94,14 +85,37 @@ export default function GraphPage() {
         </div>
 
         <div className="xl:col-span-3">
-          <GraphInspector
-            graph={graph}
+          <GraphConnectionsPanel
             selectedNode={selectedNode}
             connectedEdges={connectedEdges}
             connectedNodes={connectedNodes}
           />
         </div>
       </div>
+
+      <HomeSection id="graph-personas" title="Graph by Role">
+        <GraphPersonas />
+      </HomeSection>
+
+      <HomeSection id="graph-pipeline" title="Graph Pipeline">
+        <GraphPipeline />
+      </HomeSection>
+
+      <HomeSection id="graph-trust" title="Trust">
+        <ul className="grid gap-3 sm:grid-cols-2">
+          {GRAPH_TRUST_PILLARS.map((pillar) => (
+            <li
+              key={pillar.id}
+              className="rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-4"
+            >
+              <h3 className="text-sm font-semibold text-zinc-100">{pillar.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-zinc-400">
+                {pillar.description}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </HomeSection>
     </div>
   );
 }

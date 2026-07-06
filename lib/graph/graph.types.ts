@@ -25,12 +25,15 @@ export type GraphNode = {
   y: number;
 };
 
+export type GraphEdgeEvidenceStatus = "evidence_available" | "evidence_missing";
+
 export type GraphEdge = {
   id: string;
   source: string;
   target: string;
   type: GraphEdgeType;
   label: string;
+  evidenceStatus: GraphEdgeEvidenceStatus;
 };
 
 export type KnowledgeGraph = {
@@ -46,7 +49,8 @@ export type GraphStats = {
   countryCount: number;
   companyCount: number;
   universityCount: number;
-  edgeTypeCounts: Record<GraphEdgeType, number>;
+  verifiedEdgeCount: number;
+  edgeTypeCounts: Partial<Record<GraphEdgeType, number>>;
 };
 
 export type GraphSelection = {

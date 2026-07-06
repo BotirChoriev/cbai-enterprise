@@ -1,55 +1,82 @@
+import { companies } from "@/lib/companies";
+import { countries } from "@/lib/countries";
 import type { University } from "@/lib/universities";
-import type {
-  Entity,
-  EntityMetadataField,
-  EntityTimelineEvent,
-} from "@/lib/entity/entity.types";
+import type { Entity, EntityMetadataField } from "@/lib/entity/entity.types";
 
-/** Ordered metadata fields for university entity overview grid */
+const INSUFFICIENT_EVIDENCE_LABEL = "Insufficient Evidence";
+const NOT_CONNECTED_SOURCE_LABEL = "Evidence Source Not Connected";
+
+/** Cross-entity links derived from local registries only. */
+export type UniversityRelationships = {
+  country: string | null;
+  companies: string[];
+  researchCenters: string[];
+  government: string[];
+};
+
+/** Ordered metadata fields for university factual overview grid. */
 export const UNIVERSITY_METADATA_FIELDS: EntityMetadataField[] = [
   { key: "country", label: "Country" },
   { key: "city", label: "City" },
-  { key: "founded", label: "Founded" },
-  { key: "students", label: "Students" },
-  { key: "faculty", label: "Faculty" },
-  { key: "type", label: "Type" },
-  { key: "ranking", label: "Global Ranking" },
-  { key: "technologyLevel", label: "Technology Level" },
+  { key: "type", label: "Institution Type" },
+  { key: "founded", label: "Founded Year" },
+  { key: "website", label: "Official Website" },
+  { key: "registryStatus", label: "Registry Status" },
 ];
 
-function buildUniversityTimeline(
-  university: University,
-): EntityTimelineEvent[] {
-  return [
-    {
-      id: `${university.id}-founded`,
-      title: "University Founded",
-      description: `${university.name} established in ${university.founded}`,
-      date: String(university.founded),
-      type: "milestone",
-    },
-    {
-      id: `${university.id}-ranking`,
-      title: "Global Ranking",
-      description: `Ranked #${university.ranking} globally`,
-      date: "2026",
-      type: "update",
-    },
-    {
-      id: `${university.id}-ai`,
-      title: "AI Research Active",
-      description: `AI Readiness: ${university.aiReadiness}/100 · Research Strength: ${university.researchStrength}/100`,
-      date: "2026",
-      type: "analysis",
-    },
-  ];
+function normalizeName(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function namesMatch(a: string, b: string): boolean {
+  const na = normalizeName(a);
+  const nb = normalizeName(b);
+  return na === nb || na.includes(nb) || nb.includes(na);
+}
+
+function resolveCountryRecord(university: University) {
+  return countries.find((country) => namesMatch(country.name, university.country));
+}
+
+function buildFactualOverview(university: University): string {
+  const websiteLine = university.website
+    ? `Website recorded in registry: ${university.website}.`
+    : "Official website not recorded in local registry.";
+  return `${university.name} (${university.icon}) — ${university.type} institution in ${university.city}, ${university.country}, founded ${university.founded}. ${websiteLine} Information from local platform catalog only.`;
 }
 
 /**
- * Adapter: maps University domain model → universal Entity interface.
- * All university presentation flows through this function.
+ * Derive university relationships from local country and company registries.
+ * No fabricated partner, research center, or partnership lists.
+ */
+export function getUniversityRelationships(
+  university: University,
+): UniversityRelationships {
+  const countryRecord = resolveCountryRecord(university);
+
+  const companiesInCountry = companies
+    .filter((company) => namesMatch(company.country, university.country))
+    .map((company) => company.name);
+
+  return {
+    country: university.country,
+    companies: companiesInCountry,
+    researchCenters: [],
+    government: countryRecord ? [countryRecord.government] : [],
+  };
+}
+
+export function getUniversityLinkedEntities(university: University): UniversityRelationships {
+  return getUniversityRelationships(university);
+}
+
+/**
+ * Adapter: maps University catalog record → universal Entity interface.
+ * Factual fields only — no fabricated scores or narratives.
  */
 export function toUniversityEntity(university: University): Entity {
+  const relationships = getUniversityRelationships(university);
+
   return {
     id: university.id,
     type: "university",
@@ -57,76 +84,59 @@ export function toUniversityEntity(university: University): Entity {
     icon: university.icon,
     category: university.type,
     subtitle: `${university.city}, ${university.country}`,
-    overview: university.overview,
+    overview: buildFactualOverview(university),
     status: "active",
     scores: {
-      aiScore: university.aiReadiness,
-      investmentScore: university.investmentScore,
-      riskScore: university.riskScore,
+      aiScore: 0,
+      investmentScore: 0,
+      riskScore: 0,
     },
-    tags: university.topPrograms.map((program, i) => ({
-      id: `${university.id}-program-${i}`,
-      label: program,
-      variant: i === 0 ? "accent" : "default",
-    })),
-    timeline: buildUniversityTimeline(university),
-    aiSummary: university.aiSummary,
+    tags: [],
+    timeline: [],
+    aiSummary: INSUFFICIENT_EVIDENCE_LABEL,
     metadata: {
       country: university.country,
       city: university.city,
-      founded: university.founded,
-      students: university.students.toLocaleString(),
-      faculty: university.faculty.toLocaleString(),
       type: university.type,
-      ranking: `#${university.ranking}`,
-      technologyLevel: university.technologyLevel,
-      researchStrength: university.researchStrength,
-      innovationScore: university.innovationScore,
+      founded: university.founded,
+      website: university.website ?? "Not recorded in local registry",
+      registryStatus: "Local reference profile",
+      linkedCompanies: relationships.companies.length,
     },
     metrics: [
       {
-        id: "ranking",
-        label: "Global Ranking",
-        value: `#${university.ranking}`,
+        id: "registry-status",
+        label: "Registry Status",
+        value: "Local reference profile",
         highlight: true,
       },
       {
-        id: "students",
-        label: "Students",
-        value: university.students.toLocaleString(),
+        id: "linked-companies",
+        label: "Linked Companies (local catalog)",
+        value: relationships.companies.length,
+        unit: "records",
       },
       {
-        id: "faculty",
-        label: "Faculty",
-        value: university.faculty.toLocaleString(),
-      },
-      {
-        id: "researchStrength",
-        label: "Research Strength",
-        value: university.researchStrength,
-        unit: "/100",
-        change: "Peer reviewed",
-        changeType: "positive",
-      },
-      {
-        id: "innovation",
-        label: "Innovation Score",
-        value: university.innovationScore,
-        unit: "/100",
-      },
-      {
-        id: "aiReadiness",
-        label: "AI Readiness",
-        value: university.aiReadiness,
-        unit: "/100",
+        id: "linked-country",
+        label: "Country (local catalog)",
+        value: relationships.country ?? "Not linked",
       },
     ],
   };
 }
 
-/** Batch adapter for list operations and cross-entity queries */
-export function toUniversityEntities(
-  universities: University[],
-): Entity[] {
-  return universities.map(toUniversityEntity);
+/** Batch adapter for list operations and cross-entity queries. */
+export function toUniversityEntities(universitiesList: University[]): Entity[] {
+  return universitiesList.map(toUniversityEntity);
+}
+
+/** Human-readable unavailable label for relationship sections. */
+export function formatRelationshipAvailability(count: number): string {
+  return count > 0
+    ? `${count} record(s) from local registry`
+    : NOT_CONNECTED_SOURCE_LABEL;
+}
+
+export function formatWebsiteDisplay(website: string | null): string {
+  return website ?? "Not recorded in local registry";
 }
