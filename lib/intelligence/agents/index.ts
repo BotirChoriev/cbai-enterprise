@@ -6,6 +6,7 @@
  *
  * @see docs/build-046-report.md
  * @see docs/build-047-report.md
+ * @see docs/build-048-report.md
  */
 
 export {
@@ -77,3 +78,23 @@ export {
   type AgentRuntimeContract,
   type ProviderKind,
 } from "@/lib/intelligence/agents/runtime";
+
+export {
+  AGENT_TASK_MODEL_VERSION,
+  ALL_TASK_PRIORITIES,
+  createAgentTask,
+  createPendingTaskResult,
+  createTaskRequest,
+  createTaskResultFromStatus,
+  sortAgentTasks,
+  validateAgentTask,
+  validateTaskLifecycleTransition,
+  validateTaskRequest,
+  validateTaskResult,
+  withAgentTaskStatus,
+  type AgentTask,
+  type TaskPriority,
+  type TaskRequest,
+  type TaskResult,
+  type TaskStatus,
+} from "@/lib/intelligence/agents/tasks";
