@@ -7,6 +7,7 @@
  * @see docs/build-046-report.md
  * @see docs/build-047-report.md
  * @see docs/build-048-report.md
+ * @see docs/build-049-report.md
  */
 
 export {
@@ -98,3 +99,17 @@ export {
   type TaskResult,
   type TaskStatus,
 } from "@/lib/intelligence/agents/tasks";
+
+export {
+  AGENT_DISPATCH_VERSION,
+  DEFAULT_AGENT_DISPATCHER_ID,
+  DEFAULT_DISPATCH_POLICY,
+  DefaultAgentDispatcher,
+  defaultAgentDispatcher,
+  evaluateAgentEligibility,
+  explainAgentSelection,
+  selectAgentByPolicy,
+  type AgentDispatcher,
+  type DispatchPolicy,
+  type DispatchResult,
+} from "@/lib/intelligence/agents/dispatch";
