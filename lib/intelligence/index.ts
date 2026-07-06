@@ -537,6 +537,13 @@ export {
   type RuntimeComponentHealth,
 } from "@/lib/intelligence/observability";
 
+export {
+  collectRuntimeDashboardData,
+  buildRuntimeActivityFeed,
+  type RuntimeDashboardData,
+  type RuntimeActivityItem,
+} from "@/lib/intelligence/dashboard";
+
 export type {
   RuntimeFailure,
   RuntimeLifecycleStatus,

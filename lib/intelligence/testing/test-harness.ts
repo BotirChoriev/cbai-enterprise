@@ -10,6 +10,7 @@ import {
   INTELLIGENCE_TEST_SCENARIOS,
   resetTestRequestSequence,
 } from "@/lib/intelligence/testing/test-scenarios";
+import { INTELLIGENCE_TEST_SCENARIO_COUNT } from "@/lib/intelligence/testing/scenario-meta";
 import {
   buildIntelligenceTestReport,
   buildScenarioReport,
@@ -102,6 +103,12 @@ export class DefaultIntelligenceTestHarness implements IntelligenceTestHarness {
   async runAll(
     scenarios: IntelligenceTestScenario[] = INTELLIGENCE_TEST_SCENARIOS,
   ): Promise<IntelligenceTestReport> {
+    if (scenarios === INTELLIGENCE_TEST_SCENARIOS && scenarios.length !== INTELLIGENCE_TEST_SCENARIO_COUNT) {
+      throw new Error(
+        `Harness scenario count mismatch: catalog has ${scenarios.length}, meta expects ${INTELLIGENCE_TEST_SCENARIO_COUNT}.`,
+      );
+    }
+
     resetTestRequestSequence();
     defaultSessionRegistry.clear();
     defaultAgentTaskStore.clear();
