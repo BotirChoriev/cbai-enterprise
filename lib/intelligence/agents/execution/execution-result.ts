@@ -28,6 +28,10 @@ export function createAgentExecutionResult(
     executionReady,
     state: executionReady ? "ready" : context.state,
     description: context.description,
+    executed: context.executed ?? false,
+    executionType: context.localExecution?.executionType,
+    executionDurationMs: context.localExecution?.executionDurationMs,
+    executionSummary: context.localExecution?.executionSummary,
   };
 }
 
@@ -64,6 +68,16 @@ export function formatAgentExecutionSummary(result: AgentExecutionResult): strin
 
   if (result.errors.length > 0) {
     lines.push(`Errors: ${result.errors.join("; ")}.`);
+  }
+
+  if (result.executed) {
+    lines.push(
+      `Executed: yes. Type: ${result.executionType ?? "unknown"}. Duration: ${result.executionDurationMs ?? 0}ms.`,
+    );
+
+    if (result.executionSummary) {
+      lines.push(`Execution summary: ${result.executionSummary}.`);
+    }
   }
 
   return lines.join(" ");

@@ -7,6 +7,8 @@ import type {
 import type { ProviderKind } from "@/lib/intelligence/agents/runtime/provider-kinds";
 import type { AgentDefinition } from "@/lib/intelligence/agents/registry/types";
 import type { AgentTask } from "@/lib/intelligence/agents/tasks/task";
+import type { AgentResponse } from "@/lib/intelligence/agents/runtime/agent-response";
+import type { LocalRuntimeExecutionResult } from "@/lib/intelligence/agents/providers/local/types";
 import type { ExecutionState } from "@/lib/intelligence/agents/execution/types";
 import { AGENT_EXECUTION_FOUNDATION_VERSION } from "@/lib/intelligence/agents/execution/types";
 
@@ -52,6 +54,12 @@ export interface AgentExecutionContext {
   describeResult?: AgentOperationResult;
   /** Cached health check result. */
   healthResult?: AgentHealthResult;
+  /** Whether contract execute() was invoked — local provider only (BUILD-055). */
+  executed?: boolean;
+  /** Cached execute() agent response when invoked. */
+  executeResponse?: AgentResponse;
+  /** Cached local runtime execution result when invoked. */
+  localExecution?: LocalRuntimeExecutionResult;
 }
 
 /**

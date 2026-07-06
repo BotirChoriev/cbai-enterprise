@@ -153,6 +153,7 @@ export {
   DefaultAgentExecutionCoordinator,
   defaultAgentExecutionCoordinator,
   runAgentExecutionFoundation,
+  runAgentExecutionPipeline,
   formatAgentExecutionSummary,
   isTaskExecutionEligible,
   wrapUnhealthyAgentRuntimeContract,
@@ -163,3 +164,15 @@ export {
   type AgentExecutionResult,
   type ExecutionState,
 } from "@/lib/intelligence/agents/execution";
+
+export {
+  LOCAL_RUNTIME_ADAPTER_VERSION,
+  LOCAL_RUNTIME_EXECUTION_SUMMARY,
+  LocalRuntimeAdapter,
+  localRuntimeAdapter,
+  isLocalRuntimeExecutionEnabled,
+  buildLocalRuntimeExecutionDiagnostics,
+  type LocalExecutionType,
+  type LocalRuntimeExecutionDiagnostics,
+  type LocalRuntimeExecutionResult,
+} from "@/lib/intelligence/agents/providers/local";

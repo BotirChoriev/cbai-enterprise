@@ -44,7 +44,11 @@ export interface IntelligenceTestScenario {
   /** Build the intelligence request for this scenario. */
   buildRequest: () => IntelligenceRequest;
   /** Validate pipeline output against expected structural signals. */
-  validate: IntelligenceTestValidator;
+  validate?: IntelligenceTestValidator;
+  /** Async validator — used when validation requires await (e.g. execution pipeline). */
+  validateAsync?: (
+    context: IntelligenceTestValidationContext,
+  ) => Promise<IntelligenceTestValidationResult>;
 }
 
 /**

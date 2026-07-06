@@ -46,6 +46,7 @@ export {
   isTaskExecutionEligible,
   resolveExecutionProviderKind,
   runAgentExecutionFoundation,
+  runAgentExecutionPipeline,
   wrapUnhealthyAgentRuntimeContract,
   wrapFailingValidateAgentRuntimeContract,
   type AgentExecutionCoordinator,

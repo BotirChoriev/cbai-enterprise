@@ -9,6 +9,11 @@ import {
   type ProviderKind,
 } from "@/lib/intelligence/agents/runtime/provider-kinds";
 import { resolveAgentRuntimeContract } from "@/lib/intelligence/agents/runtime/agent-contract";
+import {
+  buildCompletedLocalExecutionResult,
+  buildFailedLocalExecutionResult,
+} from "@/lib/intelligence/agents/providers/local/local-runtime-state";
+import { isLocalRuntimeExecutionEnabled } from "@/lib/intelligence/agents/providers/local/local-runtime-adapter";
 import type { AgentTaskStore } from "@/lib/intelligence/agents/tasks/store/task-store";
 import { defaultAgentTaskStore } from "@/lib/intelligence/agents/tasks/store/task-store";
 import type { AgentTask } from "@/lib/intelligence/agents/tasks/task";
@@ -27,6 +32,7 @@ import {
   resolveStateAfterHealth,
   resolveStateAfterPrepare,
   resolveStateAfterValidate,
+  resolveExecutionReady,
 } from "@/lib/intelligence/agents/execution/execution-state";
 import type {
   AgentExecutionInput,
@@ -44,10 +50,10 @@ export type AgentRuntimeContractResolver = (
 ) => AgentRuntimeContract;
 
 /**
- * Contract for agent execution foundation coordination (BUILD-054).
+ * Contract for agent execution foundation coordination (BUILD-054+).
  *
  * Prepares dispatch-ready tasks through runtime contract operations.
- * Never invokes execute() or provider SDKs.
+ * Invokes execute() only for the local provider (BUILD-055).
  */
 export interface AgentExecutionCoordinator {
   /** Initialize execution context and run contract prepare(). */
@@ -61,6 +67,9 @@ export interface AgentExecutionCoordinator {
 
   /** Run contract health() and resolve readiness state. */
   healthCheck(context: AgentExecutionContext): AgentExecutionContext;
+
+  /** Invoke contract execute() when providerKind is local and foundation checks passed. */
+  executeIfEligible(context: AgentExecutionContext): Promise<AgentExecutionContext>;
 
   /** Build the final execution foundation result summary. */
   createExecutionSummary(context: AgentExecutionContext): AgentExecutionResult;
@@ -318,6 +327,51 @@ export class DefaultAgentExecutionCoordinator implements AgentExecutionCoordinat
     return updated;
   }
 
+  async executeIfEligible(context: AgentExecutionContext): Promise<AgentExecutionContext> {
+    if (context.state === "blocked") {
+      return context;
+    }
+
+    const foundationReady = resolveExecutionReady({
+      prepared: context.prepared,
+      validated: context.validated,
+      healthy: context.healthy,
+      state: context.state,
+    });
+
+    if (!foundationReady || !isLocalRuntimeExecutionEnabled(context.providerKind)) {
+      return context;
+    }
+
+    const startedAtMs = Date.now();
+    const response = await context.contract.execute(context.request);
+    const executionDurationMs = Math.max(0, Date.now() - startedAtMs);
+
+    const localExecution =
+      response.lifecycle === "completed"
+        ? buildCompletedLocalExecutionResult({
+            executionDurationMs,
+            executionSummary: response.reason,
+          })
+        : buildFailedLocalExecutionResult({
+            reason: response.reason,
+            executionDurationMs,
+          });
+
+    let updated: AgentExecutionContext = {
+      ...copyAgentExecutionContext(context),
+      executed: response.lifecycle === "completed",
+      executeResponse: response,
+      localExecution,
+    };
+
+    if (response.lifecycle === "failed" || response.blocking) {
+      updated = appendExecutionErrors(updated, [response.reason]);
+    }
+
+    return updated;
+  }
+
   createExecutionSummary(context: AgentExecutionContext): AgentExecutionResult {
     return createAgentExecutionResult(context);
   }
@@ -347,6 +401,32 @@ export function runAgentExecutionFoundation(input: {
   context = coordinator.validateExecution(context);
   context = coordinator.describeExecution(context);
   context = coordinator.healthCheck(context);
+
+  return coordinator.createExecutionSummary(context);
+}
+
+/**
+ * Run the full execution pipeline including local execute() when eligible (BUILD-055).
+ */
+export async function runAgentExecutionPipeline(input: {
+  task: AgentTask;
+  agentDefinition: AgentDefinition;
+  providerKind?: ProviderKind;
+  evaluatedAt?: string;
+  coordinator?: AgentExecutionCoordinator;
+}): Promise<AgentExecutionResult> {
+  const coordinator = input.coordinator ?? defaultAgentExecutionCoordinator;
+  let context = coordinator.prepareExecution({
+    task: input.task,
+    agentDefinition: input.agentDefinition,
+    providerKind: input.providerKind,
+    evaluatedAt: input.evaluatedAt,
+  });
+
+  context = coordinator.validateExecution(context);
+  context = coordinator.describeExecution(context);
+  context = coordinator.healthCheck(context);
+  context = await coordinator.executeIfEligible(context);
 
   return coordinator.createExecutionSummary(context);
 }

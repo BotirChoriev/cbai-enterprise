@@ -5,12 +5,18 @@ import {
 import {
   DefaultAgentExecutionCoordinator,
   runAgentExecutionFoundation,
+  runAgentExecutionPipeline,
   wrapFailingValidateAgentRuntimeContract,
   wrapUnhealthyAgentRuntimeContract,
 } from "@/lib/intelligence/agents/execution/execution-coordinator";
 import { resolveAgentRuntimeContract } from "@/lib/intelligence/agents/runtime/agent-contract";
 import { PROVIDER_KIND_LOCAL } from "@/lib/intelligence/agents/runtime/provider-kinds";
 import { resetAgentRequestSequence } from "@/lib/intelligence/agents/runtime/agent-request";
+import {
+  LOCAL_RUNTIME_EXECUTION_SUMMARY,
+  localRuntimeAdapter,
+  buildLocalRuntimeExecutionDiagnostics,
+} from "@/lib/intelligence/agents/providers/local";
 import {
   AGENT_CAPABILITY_RESEARCH,
   AGENT_CAPABILITY_SEARCH,
@@ -32,6 +38,7 @@ import {
 import type { IntelligenceRequest } from "@/lib/intelligence/request.types";
 import type {
   IntelligenceTestScenario,
+  IntelligenceTestValidationContext,
   IntelligenceTestValidationResult,
 } from "@/lib/intelligence/testing/types";
 
@@ -83,7 +90,7 @@ function fail(...messages: string[]): IntelligenceTestValidationResult {
 }
 
 function validatePolicyStoppedRun(
-  context: Parameters<IntelligenceTestScenario["validate"]>[0],
+  context: IntelligenceTestValidationContext,
 ): IntelligenceTestValidationResult | null {
   if (!context.error?.includes("runtime policy")) {
     return null;
@@ -105,7 +112,7 @@ function validatePolicyStoppedRun(
 }
 
 function requireResult(
-  context: Parameters<IntelligenceTestScenario["validate"]>[0],
+  context: IntelligenceTestValidationContext,
 ): IntelligenceTestValidationResult | null {
   if (context.error) {
     return fail(`Pipeline threw unexpectedly: ${context.error}`);
@@ -898,6 +905,126 @@ export const INTELLIGENCE_TEST_SCENARIOS: IntelligenceTestScenario[] = [
 
       if (result.errors.length === 0) {
         return fail("Expected execution errors when validation fails.");
+      }
+
+      return pass();
+    },
+  },
+  {
+    id: "local-runtime-execution",
+    name: "Local runtime execution",
+    description:
+      "Local adapter execute() produces deterministic completed execution after foundation checks.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Local runtime execution check.",
+      }),
+    validateAsync: async (context) => {
+      const { store, agent, preparation } = prepareDispatchReadyHarnessTask(context);
+      const result = await runAgentExecutionPipeline({
+        task: preparation.task,
+        agentDefinition: agent,
+        providerKind: PROVIDER_KIND_LOCAL,
+        coordinator: new DefaultAgentExecutionCoordinator(store),
+      });
+
+      if (!result.executed) {
+        return fail("Expected executed true for local runtime pipeline.");
+      }
+
+      if (result.executionType !== "deterministic") {
+        return fail(`Expected executionType deterministic, received ${result.executionType ?? "unknown"}.`);
+      }
+
+      if (result.executionSummary !== LOCAL_RUNTIME_EXECUTION_SUMMARY) {
+        return fail("Expected deterministic local execution summary.");
+      }
+
+      if (result.providerKind !== PROVIDER_KIND_LOCAL) {
+        return fail("Expected providerKind local.");
+      }
+
+      if ((result.executionDurationMs ?? -1) < 0) {
+        return fail("Expected non-negative executionDurationMs.");
+      }
+
+      return pass();
+    },
+  },
+  {
+    id: "local-runtime-health",
+    name: "Local runtime health",
+    description:
+      "Local runtime adapter reports healthy available status.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Local runtime health check.",
+      }),
+    validate: (context) => {
+      void context;
+      const health = localRuntimeAdapter.health();
+
+      if (!health.healthy) {
+        return fail("Expected local runtime adapter health.healthy true.");
+      }
+
+      if (health.providerKind !== PROVIDER_KIND_LOCAL) {
+        return fail("Expected local runtime health providerKind local.");
+      }
+
+      if (health.status !== "available") {
+        return fail(`Expected health status available, received ${health.status}.`);
+      }
+
+      return pass();
+    },
+  },
+  {
+    id: "local-runtime-summary",
+    name: "Local runtime execution summary",
+    description:
+      "Local execution diagnostics include providerKind, executionType, and executionDuration.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Local runtime summary check.",
+      }),
+    validateAsync: async (context) => {
+      const { store, agent, preparation } = prepareDispatchReadyHarnessTask(context);
+      const result = await runAgentExecutionPipeline({
+        task: preparation.task,
+        agentDefinition: agent,
+        providerKind: PROVIDER_KIND_LOCAL,
+        coordinator: new DefaultAgentExecutionCoordinator(store),
+      });
+
+      if (!result.executed) {
+        return fail("Expected local execution to complete.");
+      }
+
+      const diagnostics = buildLocalRuntimeExecutionDiagnostics({
+        status: "completed",
+        providerKind: PROVIDER_KIND_LOCAL,
+        executionType: "deterministic",
+        warnings: [],
+        errors: [],
+        executionSummary: result.executionSummary ?? "",
+        executionDurationMs: result.executionDurationMs ?? 0,
+      });
+
+      if (diagnostics.providerKind !== PROVIDER_KIND_LOCAL) {
+        return fail("Expected diagnostics providerKind local.");
+      }
+
+      if (diagnostics.executionType !== "deterministic") {
+        return fail("Expected diagnostics executionType deterministic.");
+      }
+
+      if (diagnostics.executionDurationMs !== result.executionDurationMs) {
+        return fail("Expected diagnostics executionDurationMs to match result.");
+      }
+
+      if (!result.executionReady) {
+        return fail("Expected executionReady true after successful local execution foundation.");
       }
 
       return pass();

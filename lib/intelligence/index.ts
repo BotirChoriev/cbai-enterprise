@@ -505,6 +505,8 @@ export {
   AGENT_DISPATCH_INTEGRATION_VERSION,
   AGENT_DISPATCH_VERSION,
   AGENT_EXECUTION_FOUNDATION_VERSION,
+  LOCAL_RUNTIME_ADAPTER_VERSION,
+  LOCAL_RUNTIME_EXECUTION_SUMMARY,
   DEFAULT_AGENT_REGISTRY_ID,
   DEFAULT_AGENT_DISPATCH_INTEGRATION_ID,
   DEFAULT_AGENT_DISPATCHER_ID,
@@ -524,6 +526,9 @@ export {
   buildAgentDispatchDiagnostics,
   isAgentDispatchReady,
   runAgentExecutionFoundation,
+  runAgentExecutionPipeline,
+  localRuntimeAdapter,
+  isLocalRuntimeExecutionEnabled,
   formatAgentExecutionSummary,
   isTaskExecutionEligible,
   buildAgentTaskStoreSnapshot,
@@ -589,5 +594,8 @@ export type {
   TaskStoreAddResult,
   TaskStoreUpdateResult,
   ExecutionState,
+  LocalExecutionType,
+  LocalRuntimeExecutionDiagnostics,
+  LocalRuntimeExecutionResult,
 } from "@/lib/intelligence/agents";
 

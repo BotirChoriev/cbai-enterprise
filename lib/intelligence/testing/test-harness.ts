@@ -61,7 +61,11 @@ export class DefaultIntelligenceTestHarness implements IntelligenceTestHarness {
 
     try {
       const result = await this.engine.run(request);
-      const validation = scenario.validate({ request, result });
+      const validation = scenario.validateAsync
+        ? await scenario.validateAsync({ request, result })
+        : scenario.validate
+          ? scenario.validate({ request, result })
+          : { pass: false, failures: ["Scenario has no validate or validateAsync handler."] };
 
       return buildScenarioReport({
         scenarioId: scenario.id,
@@ -72,7 +76,11 @@ export class DefaultIntelligenceTestHarness implements IntelligenceTestHarness {
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown harness error";
-      const validation = scenario.validate({ request, result: null, error: message });
+      const validation = scenario.validateAsync
+        ? await scenario.validateAsync({ request, result: null, error: message })
+        : scenario.validate
+          ? scenario.validate({ request, result: null, error: message })
+          : { pass: false, failures: ["Scenario has no validate or validateAsync handler."] };
 
       return buildScenarioReport({
         scenarioId: scenario.id,

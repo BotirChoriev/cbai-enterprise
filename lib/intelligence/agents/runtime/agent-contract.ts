@@ -20,6 +20,7 @@ import {
   PROVIDER_KIND_LABELS,
   type ProviderKind,
 } from "@/lib/intelligence/agents/runtime/provider-kinds";
+import { localRuntimeAdapter } from "@/lib/intelligence/agents/providers/local";
 import type {
   AgentHealthResult,
   AgentOperationResult,
@@ -254,7 +255,7 @@ export const STUB_AGENT_RUNTIME_CONTRACTS: Readonly<Record<ProviderKind, AgentRu
   openai: new StubOpenAIAgentBackend(),
   anthropic: new StubAnthropicAgentBackend(),
   gemini: new StubGeminiAgentBackend(),
-  local: new StubLocalAgentBackend(),
+  local: localRuntimeAdapter,
 };
 
 /**
