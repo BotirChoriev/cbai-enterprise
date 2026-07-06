@@ -1,0 +1,194 @@
+"use client";
+
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import {
+  buildPlatformContext,
+  parseContextParams,
+  loadRecentEntities,
+  recordRecentEntity,
+  resolveEntityRef,
+  serializeContextToParams,
+  workspaceIdFromPath,
+  type ContextEntityRef,
+  type EntityKind,
+  type PlatformContextSnapshot,
+  type WorkspaceId,
+} from "@/lib/context";
+
+type PlatformContextValue = {
+  context: PlatformContextSnapshot;
+  setCountry: (id: string | null) => void;
+  setCompany: (id: string | null) => void;
+  setUniversity: (id: string | null) => void;
+  setWorkspace: (workspace: WorkspaceId | null) => void;
+  setSearchQuery: (query: string) => void;
+  recordEntityView: (entity: ContextEntityRef) => void;
+  navigateWithContext: (path: string, overrides?: Partial<PlatformContextSnapshot>) => void;
+};
+
+const PlatformContext = createContext<PlatformContextValue | null>(null);
+
+function buildQueryString(
+  snapshot: Pick<
+    PlatformContextSnapshot,
+    "country" | "company" | "university" | "workspace" | "searchQuery"
+  >,
+): string {
+  const params = new URLSearchParams(serializeContextToParams(snapshot));
+  return params.toString();
+}
+
+export function PlatformContextProvider({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [recentEntities, setRecentEntities] = useState<ContextEntityRef[]>(() =>
+    loadRecentEntities(),
+  );
+
+  const params = useMemo(
+    () => parseContextParams(searchParams),
+    [searchParams],
+  );
+
+  const context = useMemo(() => {
+    const workspaceFromRoute = workspaceIdFromPath(pathname);
+    return {
+      ...buildPlatformContext(
+        {
+          ...params,
+          workspace: params.workspace ?? workspaceFromRoute,
+        },
+        pathname,
+      ),
+      recentEntities,
+    };
+  }, [params, pathname, recentEntities]);
+
+  const pushContext = useCallback(
+    (
+      next: Pick<
+        PlatformContextSnapshot,
+        "country" | "company" | "university" | "workspace" | "searchQuery"
+      >,
+    ) => {
+      const query = buildQueryString(next);
+      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    },
+    [pathname, router],
+  );
+
+  const setEntity = useCallback(
+    (kind: EntityKind, id: string | null) => {
+      const next = {
+        country: kind === "country" ? (id ? resolveEntityRef("country", id) : null) : context.country,
+        company: kind === "company" ? (id ? resolveEntityRef("company", id) : null) : context.company,
+        university:
+          kind === "university"
+            ? id
+              ? resolveEntityRef("university", id)
+              : null
+            : context.university,
+        workspace: context.workspace,
+        searchQuery: context.searchQuery,
+      };
+      pushContext(next);
+    },
+    [context, pushContext],
+  );
+
+  const setCountry = useCallback((id: string | null) => setEntity("country", id), [setEntity]);
+  const setCompany = useCallback((id: string | null) => setEntity("company", id), [setEntity]);
+  const setUniversity = useCallback(
+    (id: string | null) => setEntity("university", id),
+    [setEntity],
+  );
+
+  const setWorkspace = useCallback(
+    (workspace: WorkspaceId | null) => {
+      pushContext({
+        country: context.country,
+        company: context.company,
+        university: context.university,
+        workspace,
+        searchQuery: context.searchQuery,
+      });
+    },
+    [context, pushContext],
+  );
+
+  const setSearchQuery = useCallback(
+    (query: string) => {
+      pushContext({
+        country: context.country,
+        company: context.company,
+        university: context.university,
+        workspace: context.workspace,
+        searchQuery: query,
+      });
+    },
+    [context, pushContext],
+  );
+
+  const recordEntityView = useCallback((entity: ContextEntityRef) => {
+    setRecentEntities(recordRecentEntity(entity));
+  }, []);
+
+  const navigateWithContext = useCallback(
+    (path: string, overrides?: Partial<PlatformContextSnapshot>) => {
+      const merged = {
+        country: overrides?.country ?? context.country,
+        company: overrides?.company ?? context.company,
+        university: overrides?.university ?? context.university,
+        workspace: overrides?.workspace ?? context.workspace,
+        searchQuery: overrides?.searchQuery ?? context.searchQuery,
+      };
+      const query = buildQueryString(merged);
+      router.push(query ? `${path}?${query}` : path);
+    },
+    [context, router],
+  );
+
+  const value = useMemo<PlatformContextValue>(
+    () => ({
+      context,
+      setCountry,
+      setCompany,
+      setUniversity,
+      setWorkspace,
+      setSearchQuery,
+      recordEntityView,
+      navigateWithContext,
+    }),
+    [
+      context,
+      setCountry,
+      setCompany,
+      setUniversity,
+      setWorkspace,
+      setSearchQuery,
+      recordEntityView,
+      navigateWithContext,
+    ],
+  );
+
+  return (
+    <PlatformContext.Provider value={value}>{children}</PlatformContext.Provider>
+  );
+}
+
+export function usePlatformContext(): PlatformContextValue {
+  const value = useContext(PlatformContext);
+  if (!value) {
+    throw new Error("usePlatformContext must be used within PlatformContextProvider");
+  }
+  return value;
+}

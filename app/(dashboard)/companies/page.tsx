@@ -10,16 +10,19 @@ import {
   getCompanyLinkedEntities,
 } from "@/lib/companies.adapter";
 import { buildCompanyIntelligenceProfile } from "@/lib/companies.intelligence";
+import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import CompanyFilters from "@/components/companies/CompanyFilters";
 import CompanyList from "@/components/companies/CompanyList";
 import CompanyRelationships from "@/components/companies/CompanyRelationships";
 import { CompanyIntelligencePanel } from "@/components/companies/CompanyIntelligencePanel";
 
 export default function CompaniesPage() {
+  const { context, setCompany, recordEntityView } = usePlatformContext();
   const [search, setSearch] = useState("");
   const [industry, setIndustry] = useState("All");
   const [country, setCountry] = useState("All");
-  const [selectedId, setSelectedId] = useState(companies[0].id);
+  const [fallbackId, setFallbackId] = useState(companies[0].id);
+  const selectedId = context.company?.id ?? fallbackId;
 
   const industries = useMemo(() => getCompanyIndustries(), []);
   const countries = useMemo(() => getCompanyCountries(), []);
@@ -44,6 +47,21 @@ export default function CompaniesPage() {
     selectedCompany,
     getCompanyLinkedEntities(selectedCompany),
   );
+
+  function handleSelectCompany(companyId: string) {
+    const company = companies.find((c) => c.id === companyId);
+    if (!company) return;
+
+    setFallbackId(company.id);
+    setCompany(company.id);
+    recordEntityView({
+      kind: "company",
+      id: company.id,
+      name: company.name,
+      code: company.icon,
+      countryName: company.country,
+    });
+  }
 
   return (
     <div className="space-y-6">
@@ -83,7 +101,7 @@ export default function CompaniesPage() {
           <CompanyList
             companies={filtered}
             selectedId={selectedCompany.id}
-            onSelect={setSelectedId}
+            onSelect={handleSelectCompany}
           />
         </div>
 

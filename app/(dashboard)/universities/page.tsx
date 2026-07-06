@@ -8,16 +8,19 @@ import {
 } from "@/lib/universities";
 import { getUniversityLinkedEntities } from "@/lib/universities.adapter";
 import { buildUniversityIntelligenceProfile } from "@/lib/universities.intelligence";
+import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import UniversityFilters from "@/components/universities/UniversityFilters";
 import UniversityList from "@/components/universities/UniversityList";
 import UniversityRelationships from "@/components/universities/UniversityRelationships";
 import { UniversityIntelligencePanel } from "@/components/universities/UniversityIntelligencePanel";
 
 export default function UniversitiesPage() {
+  const { context, setUniversity, recordEntityView } = usePlatformContext();
   const [search, setSearch] = useState("");
   const [country, setCountry] = useState("All");
   const [type, setType] = useState("All");
-  const [selectedId, setSelectedId] = useState(universities[0].id);
+  const [fallbackId, setFallbackId] = useState(universities[0].id);
+  const selectedId = context.university?.id ?? fallbackId;
 
   const countries = useMemo(() => getUniversityCountries(), []);
   const types = useMemo(() => getUniversityTypes(), []);
@@ -47,6 +50,21 @@ export default function UniversitiesPage() {
     selectedUniversity,
     getUniversityLinkedEntities(selectedUniversity),
   );
+
+  function handleSelectUniversity(universityId: string) {
+    const university = universities.find((u) => u.id === universityId);
+    if (!university) return;
+
+    setFallbackId(university.id);
+    setUniversity(university.id);
+    recordEntityView({
+      kind: "university",
+      id: university.id,
+      name: university.name,
+      code: university.icon,
+      countryName: university.country,
+    });
+  }
 
   return (
     <div className="space-y-6">
@@ -86,7 +104,7 @@ export default function UniversitiesPage() {
           <UniversityList
             universities={filtered}
             selectedId={selectedUniversity.id}
-            onSelect={setSelectedId}
+            onSelect={handleSelectUniversity}
           />
         </div>
 

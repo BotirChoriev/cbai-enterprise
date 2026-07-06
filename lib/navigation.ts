@@ -30,47 +30,42 @@ export type NavSection = {
 
 export const platformNavSections: NavSection[] = [
   {
-    title: "Overview",
+    title: "Platform",
     items: [
       {
-        label: "Platform Home",
+        label: "Home",
         href: "/",
         icon: "home",
         description: "Platform entry point and module directory.",
       },
       {
-        label: "Runtime Dashboard",
-        href: "/dashboard",
-        icon: "dashboard",
-        description: "Live runtime health, queue, scheduler, and agent state.",
+        label: "Search",
+        href: "/search",
+        icon: "search",
+        description: "Search countries, companies, and universities.",
+      },
+      {
+        label: "Evidence Explorer",
+        href: "/knowledge",
+        icon: "knowledge",
+        description: "Platform evidence architecture, source status, and coverage gaps.",
+      },
+      {
+        label: "Reports",
+        href: "/analytics",
+        icon: "analytics",
+        description: "Evidence-based report readiness — not fake analytics.",
+      },
+      {
+        label: "Reasoning",
+        href: "/reasoning",
+        icon: "reasoning",
+        description: "Evidence-to-judgment pipeline architecture — no hidden AI.",
       },
     ],
   },
   {
     title: "Intelligence",
-    items: [
-      {
-        label: "CBAI Core",
-        href: "/core",
-        icon: "core",
-        description: "Central intelligence engine command center.",
-      },
-      {
-        label: "Reasoning Explorer",
-        href: "/reasoning",
-        icon: "reasoning",
-        description: "Evidence-to-judgment pipeline architecture — no hidden AI.",
-      },
-      {
-        label: "Governance Control",
-        href: "/ai-control",
-        icon: "ai-control",
-        description: "Constitutional rules, standards, and compliance status.",
-      },
-    ],
-  },
-  {
-    title: "Entities",
     items: [
       {
         label: "Countries",
@@ -90,34 +85,6 @@ export const platformNavSections: NavSection[] = [
         icon: "universities",
         description: "Evidence-based university profiles from the local registry.",
       },
-    ],
-  },
-  {
-    title: "Discovery",
-    items: [
-      {
-        label: "Global Search",
-        href: "/search",
-        icon: "search",
-        description: "Search countries, companies, and universities.",
-      },
-      {
-        label: "Knowledge Graph",
-        href: "/graph",
-        icon: "graph",
-        description: "Evidence relationship navigation across platform entities.",
-      },
-      {
-        label: "Evidence Explorer",
-        href: "/knowledge",
-        icon: "knowledge",
-        description: "Platform evidence architecture, source status, and coverage gaps.",
-      },
-    ],
-  },
-  {
-    title: "Intelligence Workspaces",
-    items: [
       {
         label: "Government",
         href: "/government",
@@ -139,8 +106,43 @@ export const platformNavSections: NavSection[] = [
     ],
   },
   {
-    title: "Operations",
+    title: "Platform",
     items: [
+      {
+        label: "Governance",
+        href: "/ai-control",
+        icon: "ai-control",
+        description: "Constitutional rules, standards, and compliance status.",
+      },
+      {
+        label: "System Monitor",
+        href: "/dashboard",
+        icon: "dashboard",
+        description: "Live runtime health, queue, scheduler, and agent state.",
+      },
+      {
+        label: "Settings",
+        href: "/settings",
+        icon: "settings",
+        description: "Organization and platform configuration (coming soon).",
+      },
+    ],
+  },
+  {
+    title: "Extended",
+    items: [
+      {
+        label: "CBAI Core",
+        href: "/core",
+        icon: "core",
+        description: "Central intelligence engine command center.",
+      },
+      {
+        label: "Knowledge Graph",
+        href: "/graph",
+        icon: "graph",
+        description: "Evidence relationship navigation across platform entities.",
+      },
       {
         label: "AI Agents",
         href: "/agents",
@@ -152,18 +154,6 @@ export const platformNavSections: NavSection[] = [
         href: "/workflows",
         icon: "workflows",
         description: "Workflow automation builder (coming soon).",
-      },
-      {
-        label: "Reports Center",
-        href: "/analytics",
-        icon: "analytics",
-        description: "Evidence-based report readiness — not fake analytics.",
-      },
-      {
-        label: "Settings",
-        href: "/settings",
-        icon: "settings",
-        description: "Organization and platform configuration (coming soon).",
       },
     ],
   },

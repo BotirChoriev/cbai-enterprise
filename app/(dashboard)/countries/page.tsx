@@ -5,15 +5,18 @@ import type { CountryRegion } from "@/lib/countries";
 import { countries } from "@/lib/countries";
 import { getCountryRelationships } from "@/lib/countries.adapter";
 import { buildCountryIntelligenceProfile } from "@/lib/countries.intelligence";
+import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import CountryFilters from "@/components/countries/CountryFilters";
 import CountryCard from "@/components/countries/CountryCard";
 import CountryRelationships from "@/components/countries/CountryRelationships";
 import { CountryIntelligencePanel } from "@/components/countries/CountryIntelligencePanel";
 
 export default function CountriesPage() {
+  const { context, setCountry, recordEntityView } = usePlatformContext();
   const [search, setSearch] = useState("");
   const [region, setRegion] = useState<CountryRegion | "All">("All");
-  const [selectedId, setSelectedId] = useState(countries[0].id);
+  const [fallbackId, setFallbackId] = useState(countries[0].id);
+  const selectedId = context.country?.id ?? fallbackId;
 
   const filtered = useMemo(() => {
     return countries.filter((c) => {
@@ -34,6 +37,20 @@ export default function CountriesPage() {
     selectedCountry,
     relationships,
   );
+
+  function handleSelectCountry(countryId: string) {
+    const country = countries.find((c) => c.id === countryId);
+    if (!country) return;
+
+    setFallbackId(country.id);
+    setCountry(country.id);
+    recordEntityView({
+      kind: "country",
+      id: country.id,
+      name: country.name,
+      code: country.code,
+    });
+  }
 
   return (
     <div className="space-y-6">
@@ -73,7 +90,7 @@ export default function CountriesPage() {
                   key={country.id}
                   country={country}
                   isSelected={selectedCountry.id === country.id}
-                  onSelect={() => setSelectedId(country.id)}
+                  onSelect={() => handleSelectCountry(country.id)}
                 />
               ))
             ) : (
