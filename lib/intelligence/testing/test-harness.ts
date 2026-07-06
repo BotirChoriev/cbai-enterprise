@@ -2,6 +2,8 @@ import type { IntelligenceEngine } from "@/lib/intelligence/engine.types";
 import { defaultIntelligenceEngine } from "@/lib/intelligence/engine/engine";
 import { defaultSessionRegistry } from "@/lib/intelligence/runtime/registry";
 import { defaultAgentTaskStore } from "@/lib/intelligence/agents/tasks/store";
+import { defaultRuntimeQueue } from "@/lib/intelligence/runtime/queue";
+import { resetQueueItemSequence } from "@/lib/intelligence/runtime/queue/queue-item";
 import {
   INTELLIGENCE_TEST_SCENARIOS,
   resetTestRequestSequence,
@@ -101,6 +103,8 @@ export class DefaultIntelligenceTestHarness implements IntelligenceTestHarness {
     resetTestRequestSequence();
     defaultSessionRegistry.clear();
     defaultAgentTaskStore.clear();
+    defaultRuntimeQueue.clear();
+    resetQueueItemSequence();
 
     const startedAt = new Date().toISOString();
     const reports: IntelligenceTestScenarioReport[] = [];

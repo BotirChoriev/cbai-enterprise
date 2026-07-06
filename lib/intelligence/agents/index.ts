@@ -176,3 +176,19 @@ export {
   type LocalRuntimeExecutionDiagnostics,
   type LocalRuntimeExecutionResult,
 } from "@/lib/intelligence/agents/providers/local";
+
+export {
+  AGENT_QUEUE_INTEGRATION_VERSION,
+  DEFAULT_AGENT_QUEUE_INTEGRATION_ID,
+  DEFAULT_AGENT_QUEUE_POLICY,
+  DefaultAgentQueueIntegration,
+  defaultAgentQueueIntegration,
+  enqueueAgentTask,
+  dequeueAgentTask,
+  resolveReadyForDispatch,
+  type AgentQueueIntegration,
+  type AgentQueueDiagnostics,
+  type AgentQueueEnqueueResult,
+  type AgentQueueDequeueResult,
+  type AgentQueuePolicy,
+} from "@/lib/intelligence/agents/queue";

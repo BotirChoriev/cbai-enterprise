@@ -23,13 +23,19 @@ import {
 } from "@/lib/intelligence/agents/registry/agent-capabilities";
 import { createAgentDefinition } from "@/lib/intelligence/agents/registry/agent-definition";
 import {
+  DefaultAgentQueueIntegration,
+} from "@/lib/intelligence/agents/queue/agent-queue-integration";
+import {
   createAgentTask,
   resetAgentTaskSequence,
+  withAgentTaskStatus,
 } from "@/lib/intelligence/agents/tasks/task";
 import { createTaskRequest } from "@/lib/intelligence/agents/tasks/task-request";
 import {
   DefaultAgentTaskStore,
 } from "@/lib/intelligence/agents/tasks/store/task-store";
+import { DefaultRuntimeQueue } from "@/lib/intelligence/runtime/queue/queue";
+import { resetQueueItemSequence } from "@/lib/intelligence/runtime/queue/queue-item";
 import { TEST_RUNTIME_CANCEL_REQUEST_PREFIX } from "@/lib/intelligence/runtime/integration/runtime-policy-diagnostics";
 import {
   queryByRequestId,
@@ -1025,6 +1031,159 @@ export const INTELLIGENCE_TEST_SCENARIOS: IntelligenceTestScenario[] = [
 
       if (!result.executionReady) {
         return fail("Expected executionReady true after successful local execution foundation.");
+      }
+
+      return pass();
+    },
+  },
+  {
+    id: "agent-queue-enqueue",
+    name: "Agent queue enqueue",
+    description:
+      "Enqueue adds task to store with queued status and creates a pending runtime queue item.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Agent queue enqueue check.",
+      }),
+    validate: (context) => {
+      resetAgentTaskSequence();
+      resetQueueItemSequence();
+      const store = new DefaultAgentTaskStore();
+      const queue = new DefaultRuntimeQueue();
+      const integration = new DefaultAgentQueueIntegration(store, queue);
+      const task = createAgentTask({
+        agentId: "queue-agent",
+        requestId: context.request.id,
+        title: "Queue enqueue test task",
+        taskRequest: createTaskRequest({
+          intent: "general",
+          requestedCapabilities: [AGENT_CAPABILITY_RESEARCH],
+        }),
+      });
+
+      const result = integration.enqueueTask(task);
+
+      if (!result.accepted) {
+        return fail(`Expected enqueue accepted, received: ${result.reason}`);
+      }
+
+      if (result.task?.status !== "queued") {
+        return fail(`Expected task status queued, received ${result.task?.status ?? "unknown"}.`);
+      }
+
+      if (result.queueItem?.status !== "pending") {
+        return fail(`Expected queue item pending, received ${result.queueItem?.status ?? "unknown"}.`);
+      }
+
+      if (!result.diagnostics?.queueItemId) {
+        return fail("Expected diagnostics queueItemId after enqueue.");
+      }
+
+      if (result.diagnostics.readyForDispatch) {
+        return fail("Expected readyForDispatch false while queue item is pending.");
+      }
+
+      if (!store.get(task.id)) {
+        return fail("Expected task in store after enqueue.");
+      }
+
+      return pass();
+    },
+  },
+  {
+    id: "agent-queue-dequeue",
+    name: "Agent queue dequeue",
+    description:
+      "Dequeue resolves task from store and marks queue item running — no agent execution.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Agent queue dequeue check.",
+      }),
+    validate: (context) => {
+      resetAgentTaskSequence();
+      resetQueueItemSequence();
+      const store = new DefaultAgentTaskStore();
+      const queue = new DefaultRuntimeQueue();
+      const integration = new DefaultAgentQueueIntegration(store, queue);
+      const task = createAgentTask({
+        agentId: "queue-agent",
+        requestId: context.request.id,
+        title: "Queue dequeue test task",
+        taskRequest: createTaskRequest({
+          intent: "general",
+          requestedCapabilities: [AGENT_CAPABILITY_RESEARCH],
+        }),
+      });
+
+      const enqueue = integration.enqueueTask(task);
+
+      if (!enqueue.accepted) {
+        return fail(`Expected enqueue to succeed before dequeue: ${enqueue.reason}`);
+      }
+
+      const dequeue = integration.dequeueTask();
+
+      if (!dequeue.dequeued) {
+        return fail(`Expected dequeue success, received: ${dequeue.reason}`);
+      }
+
+      if (dequeue.queueItem?.status !== "running") {
+        return fail(`Expected queue item running after dequeue, received ${dequeue.queueItem?.status ?? "unknown"}.`);
+      }
+
+      if (dequeue.task?.id !== task.id) {
+        return fail("Expected dequeued task id to match enqueued task.");
+      }
+
+      if (!dequeue.diagnostics?.readyForDispatch) {
+        return fail("Expected readyForDispatch true after dequeue for queued task.");
+      }
+
+      if (dequeue.diagnostics.taskStatus !== "queued") {
+        return fail(`Expected diagnostics taskStatus queued, received ${dequeue.diagnostics.taskStatus}.`);
+      }
+
+      return pass();
+    },
+  },
+  {
+    id: "agent-queue-reject-terminal-task",
+    name: "Agent queue reject terminal task",
+    description:
+      "Terminal agent tasks are rejected by queue integration policy.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Agent queue reject terminal task check.",
+      }),
+    validate: (context) => {
+      resetAgentTaskSequence();
+      resetQueueItemSequence();
+      const store = new DefaultAgentTaskStore();
+      const queue = new DefaultRuntimeQueue();
+      const integration = new DefaultAgentQueueIntegration(store, queue);
+      const task = createAgentTask({
+        agentId: "queue-agent",
+        requestId: context.request.id,
+        title: "Terminal queue reject test task",
+        taskRequest: createTaskRequest({
+          intent: "general",
+          requestedCapabilities: [AGENT_CAPABILITY_RESEARCH],
+        }),
+      });
+      const terminalTask = withAgentTaskStatus(task, "failed");
+
+      const result = integration.enqueueTask(terminalTask);
+
+      if (result.accepted) {
+        return fail("Expected enqueue rejected for terminal task.");
+      }
+
+      if (!result.reason?.includes("terminal")) {
+        return fail("Expected rejection reason to mention terminal task status.");
+      }
+
+      if (queue.size() !== 0) {
+        return fail("Expected runtime queue to remain empty after terminal task rejection.");
       }
 
       return pass();
