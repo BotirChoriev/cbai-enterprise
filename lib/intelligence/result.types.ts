@@ -97,6 +97,8 @@ export interface IntelligenceResult {
   recommendations: string[];
   /** Pipeline warnings propagated from the reasoning trace. */
   warnings: string[];
+  /** Optional deterministic run diagnostics (BUILD-038). */
+  diagnostics?: import("@/lib/intelligence/diagnostics/types").IntelligenceRunDiagnostics;
   /** ISO-8601 timestamp when the intelligence was produced. */
   producedAt: string;
   /** Optional ISO-8601 freshness horizon after which intelligence should be regenerated. */

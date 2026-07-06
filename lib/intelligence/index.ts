@@ -83,6 +83,17 @@ export type {
 } from "@/lib/intelligence/request.types";
 
 export type {
+  DiagnosticIssue,
+  DiagnosticIssueSeverity,
+  DiagnosticsLayerSnapshot,
+  DiagnosticsMetadata,
+  IntelligenceRunDiagnostics,
+  RunHealth,
+  StageHealth,
+  StageHealthStatus,
+} from "@/lib/intelligence/diagnostics/types";
+
+export type {
   IntelligenceLifecycleState,
   IntelligenceResult,
   IntelligenceSubjectEntity,
@@ -325,6 +336,17 @@ export {
   type ReasoningTraceBuilder,
   type StageTimelineEntry,
 } from "@/lib/intelligence/trace";
+
+export {
+  DEFAULT_DIAGNOSTICS_BUILDER_ID,
+  DIAGNOSTICS_BUILDER_VERSION,
+  DefaultDiagnosticsBuilder,
+  attachDiagnosticsToResult,
+  defaultDiagnosticsBuilder,
+  resolveRunHealth,
+  type DiagnosticsBuilder,
+  type DiagnosticsBuilderInput,
+} from "@/lib/intelligence/diagnostics";
 
 export {
   DEFAULT_RESULT_ASSEMBLER_ID,

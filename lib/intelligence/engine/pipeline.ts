@@ -13,6 +13,10 @@ import {
   type PipelineContext,
 } from "@/lib/intelligence/engine/stages";
 import { createTimelineEntry, type StageTimelineEntry } from "@/lib/intelligence/trace";
+import {
+  attachDiagnosticsToResult,
+  defaultDiagnosticsBuilder,
+} from "@/lib/intelligence/diagnostics";
 import type { IntelligenceRequest } from "@/lib/intelligence/request.types";
 import type { IntelligenceResult } from "@/lib/intelligence/result.types";
 
@@ -133,5 +137,16 @@ export async function executePipeline(
     stageIntelligenceResult(context),
   );
 
-  return result;
+  const diagnostics = await defaultDiagnosticsBuilder.build({
+    request: validatedRequest,
+    evidence: evidenceWithContradictions,
+    confidence,
+    trust,
+    graphContext,
+    memoryContext,
+    reasoningTrace,
+    result,
+  });
+
+  return attachDiagnosticsToResult(result, diagnostics);
 }
