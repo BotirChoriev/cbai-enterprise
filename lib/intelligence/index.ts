@@ -497,3 +497,26 @@ export type {
   ResultAssemblerInput,
 } from "@/lib/intelligence/result";
 
+export {
+  AGENT_REGISTRY_VERSION,
+  DEFAULT_AGENT_REGISTRY_ID,
+  DefaultAgentRegistry,
+  defaultAgentRegistry,
+  queryByCapability,
+  queryByCategory,
+  queryByStatus,
+  ALL_AGENT_CAPABILITIES,
+  type AgentRegistry,
+} from "@/lib/intelligence/agents";
+
+export type {
+  AgentCapability,
+  AgentDefinition,
+  AgentRegisterInput,
+  AgentRegisterResult,
+  AgentRegistrySnapshot,
+  AgentStatus,
+  AgentUpdateInput,
+  AgentUpdateResult,
+} from "@/lib/intelligence/agents";
+
