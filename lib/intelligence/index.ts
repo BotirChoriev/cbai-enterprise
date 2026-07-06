@@ -447,6 +447,23 @@ export type {
   ScheduleResult,
 } from "@/lib/intelligence/runtime/scheduler";
 
+export {
+  DEFAULT_RUNTIME_POLICY_ENGINE_ID,
+  DefaultPolicyEngine,
+  RUNTIME_POLICY_ENGINE_VERSION,
+  defaultPolicyEngine,
+  evaluateRuntimePolicy,
+  type PolicyEngine,
+} from "@/lib/intelligence/runtime/policy";
+
+export type {
+  PolicyDecision,
+  PolicyDecisionType,
+  PolicyExecutionContext,
+  PolicySeverity,
+  RuntimePolicyEvaluationInput,
+} from "@/lib/intelligence/runtime/policy";
+
 export type {
   RuntimeFailure,
   RuntimeLifecycleStatus,
