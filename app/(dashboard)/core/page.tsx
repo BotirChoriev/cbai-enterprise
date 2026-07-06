@@ -1,42 +1,11 @@
-"use client";
-
-import { useCallback, useEffect, useState } from "react";
 import MissionControl from "@/components/core/MissionControl";
 import CommandCenter from "@/components/core/CommandCenter";
 import ThinkingPipeline from "@/components/core/ThinkingPipeline";
 import ModuleStatusPanel from "@/components/core/ModuleStatus";
 import MemoryPanel from "@/components/core/MemoryPanel";
-import { platformModules, pipelineStages } from "@/lib/core";
+import { platformModules } from "@/lib/core";
 
 export default function CorePage() {
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [activeStage, setActiveStage] = useState<string | null>(null);
-
-  const handleCommandSubmit = useCallback((command: string) => {
-    void command;
-    setIsProcessing(true);
-    setActiveStage(pipelineStages[0].id);
-  }, []);
-
-  useEffect(() => {
-    if (!isProcessing || !activeStage) return;
-
-    const currentIndex = pipelineStages.findIndex((s) => s.id === activeStage);
-    if (currentIndex >= pipelineStages.length - 1) {
-      const timeout = setTimeout(() => {
-        setIsProcessing(false);
-        setActiveStage(null);
-      }, 1500);
-      return () => clearTimeout(timeout);
-    }
-
-    const timeout = setTimeout(() => {
-      setActiveStage(pipelineStages[currentIndex + 1].id);
-    }, 800);
-
-    return () => clearTimeout(timeout);
-  }, [isProcessing, activeStage]);
-
   return (
     <div className="space-y-6">
       <div className="relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 px-6 py-5">
@@ -56,6 +25,7 @@ export default function CorePage() {
               viewBox="0 0 24 24"
               stroke="currentColor"
               strokeWidth={1.5}
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -69,17 +39,14 @@ export default function CorePage() {
               CBAI Core
             </h1>
             <p className="text-sm text-zinc-500">
-              Central intelligence engine — the brain of CBAI Enterprise
+              Extended route shell — pipeline structure only, not live inference
             </p>
           </div>
           <div className="ml-auto hidden items-center gap-2 sm:flex">
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-zinc-600" />
             </span>
-            <span className="font-mono text-xs text-emerald-400">
-              NEURAL LINK ACTIVE
-            </span>
+            <span className="font-mono text-xs text-zinc-500">NOT CONNECTED</span>
           </div>
         </div>
       </div>
@@ -88,13 +55,10 @@ export default function CorePage() {
 
       <div className="grid gap-6 xl:grid-cols-5">
         <div className="xl:col-span-3">
-          <CommandCenter onSubmit={handleCommandSubmit} />
+          <CommandCenter />
         </div>
         <div className="xl:col-span-2">
-          <ThinkingPipeline
-            activeStage={activeStage}
-            isProcessing={isProcessing}
-          />
+          <ThinkingPipeline />
         </div>
       </div>
 

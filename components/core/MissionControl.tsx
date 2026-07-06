@@ -2,11 +2,11 @@ import { missionControl } from "@/lib/core";
 
 const metrics = [
   {
-    label: "Global AI Status",
+    label: "Route status",
     value: missionControl.globalStatus,
-    sub: "All systems nominal",
-    accent: "text-emerald-400",
-    glow: "shadow-emerald-500/10",
+    sub: "Extended route — no live runtime",
+    accent: "text-zinc-400",
+    glow: "shadow-zinc-500/5",
     icon: (
       <path
         strokeLinecap="round"
@@ -16,11 +16,11 @@ const metrics = [
     ),
   },
   {
-    label: "Active AI Model",
+    label: "Inference engine",
     value: missionControl.activeModel,
-    sub: "Primary inference engine",
-    accent: "text-sky-400",
-    glow: "shadow-sky-500/10",
+    sub: "No model bound to this route",
+    accent: "text-zinc-400",
+    glow: "shadow-zinc-500/5",
     icon: (
       <path
         strokeLinecap="round"
@@ -30,11 +30,11 @@ const metrics = [
     ),
   },
   {
-    label: "Running Agents",
+    label: "Running agents",
     value: String(missionControl.runningAgents),
-    sub: "2 idle · 1 paused",
-    accent: "text-violet-400",
-    glow: "shadow-violet-500/10",
+    sub: "Agent runtime not connected",
+    accent: "text-zinc-400",
+    glow: "shadow-zinc-500/5",
     icon: (
       <path
         strokeLinecap="round"
@@ -44,9 +44,9 @@ const metrics = [
     ),
   },
   {
-    label: "Connected Modules",
+    label: "Static modules",
     value: String(missionControl.connectedModules),
-    sub: "7/7 online",
+    sub: "Routes available in static export",
     accent: "text-cyan-400",
     glow: "shadow-cyan-500/10",
     icon: (

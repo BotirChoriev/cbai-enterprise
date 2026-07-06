@@ -4,6 +4,14 @@ import {
   savedCommands,
 } from "@/lib/core";
 
+function EmptyNotice({ message }: { message: string }) {
+  return (
+    <p className="rounded-lg border border-dashed border-zinc-800 px-3 py-4 text-xs text-zinc-500">
+      {message}
+    </p>
+  );
+}
+
 export default function MemoryPanel() {
   return (
     <div className="rounded-xl border border-zinc-800 bg-zinc-950">
@@ -24,10 +32,10 @@ export default function MemoryPanel() {
           </svg>
           <div>
             <h2 className="text-sm font-semibold tracking-wide text-zinc-50">
-              AI Memory
+              Context Memory
             </h2>
             <p className="text-xs text-zinc-500">
-              Persistent context & recall
+              Extended route shell — no persistent memory connected
             </p>
           </div>
         </div>
@@ -38,61 +46,73 @@ export default function MemoryPanel() {
           <h3 className="mb-3 text-[10px] font-medium uppercase tracking-widest text-zinc-500">
             Recent Conversations
           </h3>
-          <ul className="space-y-2">
-            {recentConversations.map((item) => (
-              <li
-                key={item.id}
-                className="group flex items-center justify-between rounded-lg border border-transparent px-3 py-2 transition-colors hover:border-zinc-800 hover:bg-zinc-900/50"
-              >
-                <p className="truncate text-xs text-zinc-400 group-hover:text-zinc-200">
-                  {item.title}
-                </p>
-                <span className="ml-3 shrink-0 text-[10px] text-zinc-600">
-                  {item.time}
-                </span>
-              </li>
-            ))}
-          </ul>
+          {recentConversations.length === 0 ? (
+            <EmptyNotice message="No conversation history — command interface not connected." />
+          ) : (
+            <ul className="space-y-2">
+              {recentConversations.map((item) => (
+                <li
+                  key={item.id}
+                  className="group flex items-center justify-between rounded-lg border border-transparent px-3 py-2 transition-colors hover:border-zinc-800 hover:bg-zinc-900/50"
+                >
+                  <p className="truncate text-xs text-zinc-400 group-hover:text-zinc-200">
+                    {item.title}
+                  </p>
+                  <span className="ml-3 shrink-0 text-[10px] text-zinc-600">
+                    {item.time}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
         <section className="p-5">
           <h3 className="mb-3 text-[10px] font-medium uppercase tracking-widest text-zinc-500">
             Pinned Knowledge
           </h3>
-          <ul className="space-y-2">
-            {pinnedKnowledge.map((item) => (
-              <li
-                key={item.id}
-                className="group rounded-lg border border-transparent px-3 py-2 transition-colors hover:border-zinc-800 hover:bg-zinc-900/50"
-              >
-                <p className="truncate text-xs text-zinc-400 group-hover:text-zinc-200">
-                  {item.title}
-                </p>
-                <p className="mt-0.5 text-[10px] text-zinc-600">{item.source}</p>
-              </li>
-            ))}
-          </ul>
+          {pinnedKnowledge.length === 0 ? (
+            <EmptyNotice message="No pinned knowledge — evidence must be connected first." />
+          ) : (
+            <ul className="space-y-2">
+              {pinnedKnowledge.map((item) => (
+                <li
+                  key={item.id}
+                  className="group rounded-lg border border-transparent px-3 py-2 transition-colors hover:border-zinc-800 hover:bg-zinc-900/50"
+                >
+                  <p className="truncate text-xs text-zinc-400 group-hover:text-zinc-200">
+                    {item.title}
+                  </p>
+                  <p className="mt-0.5 text-[10px] text-zinc-600">{item.source}</p>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
         <section className="p-5">
           <h3 className="mb-3 text-[10px] font-medium uppercase tracking-widest text-zinc-500">
             Saved Commands
           </h3>
-          <ul className="space-y-2">
-            {savedCommands.map((item) => (
-              <li
-                key={item.id}
-                className="group flex items-center justify-between rounded-lg border border-transparent px-3 py-2 transition-colors hover:border-zinc-800 hover:bg-zinc-900/50"
-              >
-                <p className="truncate font-mono text-xs text-zinc-400 group-hover:text-sky-300">
-                  {item.command}
-                </p>
-                <span className="ml-3 shrink-0 rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-[10px] text-zinc-500">
-                  ×{item.usedCount}
-                </span>
-              </li>
-            ))}
-          </ul>
+          {savedCommands.length === 0 ? (
+            <EmptyNotice message="No saved commands — interface not connected." />
+          ) : (
+            <ul className="space-y-2">
+              {savedCommands.map((item) => (
+                <li
+                  key={item.id}
+                  className="group flex items-center justify-between rounded-lg border border-transparent px-3 py-2 transition-colors hover:border-zinc-800 hover:bg-zinc-900/50"
+                >
+                  <p className="truncate font-mono text-xs text-zinc-400 group-hover:text-sky-300">
+                    {item.command}
+                  </p>
+                  <span className="ml-3 shrink-0 rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-[10px] text-zinc-500">
+                    ×{item.usedCount}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
       </div>
     </div>

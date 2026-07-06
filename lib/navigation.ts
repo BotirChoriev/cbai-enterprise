@@ -106,7 +106,7 @@ export const platformNavSections: NavSection[] = [
     ],
   },
   {
-    title: "Platform",
+    title: "System",
     items: [
       {
         label: "Governance",
@@ -118,7 +118,7 @@ export const platformNavSections: NavSection[] = [
         label: "System Monitor",
         href: "/dashboard",
         icon: "dashboard",
-        description: "Live runtime health, queue, scheduler, and agent state.",
+        description: "Runtime observability from local intelligence harness — static export.",
       },
       {
         label: "Settings",
@@ -135,7 +135,7 @@ export const platformNavSections: NavSection[] = [
         label: "CBAI Core",
         href: "/core",
         icon: "core",
-        description: "Central intelligence engine command center.",
+        description: "Extended route — pipeline shell only, not live inference.",
       },
       {
         label: "Knowledge Graph",

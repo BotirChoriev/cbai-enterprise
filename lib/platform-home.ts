@@ -165,7 +165,7 @@ export const PLATFORM_PERSONAS: PlatformPersona[] = [
     primaryAction: "Open country intelligence",
     supportedModules: ["Countries", "Global Search"],
     currentCapability: "Registry facts and evidence-status blocks.",
-    futureCapability: "Tender transparency and civic sentiment (non-official).",
+    futureCapability: "Tender transparency and civic feedback (non-official, when connected).",
   },
   {
     id: "investor",
@@ -204,7 +204,7 @@ export const PLATFORM_PERSONAS: PlatformPersona[] = [
     href: "/graph",
     primaryAction: "Open knowledge graph",
     supportedModules: ["Knowledge Graph", "Evidence Reasoning", "Global Search"],
-    currentCapability: "Catalog-derived graph and pipeline structure demo.",
+    currentCapability: "Catalog-derived graph and pipeline structure reference.",
     futureCapability: "Dataset exports and cross-domain correlation tools.",
   },
   {
@@ -286,11 +286,11 @@ export const HOME_MODULES: HomeModule[] = [
     href: "/reasoning",
     icon: "reasoning",
     status: "available",
-    purpose: "Demonstrate evidence-to-decision pipeline structure.",
-    evidenceStatus: "Simulation disclosed",
-    currentCapability: "Interactive pipeline demo — no live inference.",
+    purpose: "Evidence-to-decision pipeline structure reference.",
+    evidenceStatus: "Structure disclosed — no live inference",
+    currentCapability: "Pipeline stages with stated limits — no live inference.",
     futureCapability: "Governed reasoning with full audit trace.",
-    dependencies: "Evidence engine (backend); UI simulation only today.",
+    dependencies: "Evidence engine (backend); UI structure only today.",
   },
   {
     id: "governance",
@@ -449,7 +449,7 @@ export const PLATFORM_CAPABILITIES: PlatformCapability[] = [
     id: "graph-reasoning",
     label: "Knowledge graph and evidence reasoning",
     status: "available",
-    detail: "Visualization and pipeline demo with stated limits.",
+    detail: "Visualization and pipeline structure with stated limits.",
   },
   {
     id: "universities",
@@ -524,7 +524,7 @@ export const ROADMAP_TIMELINE: RoadmapTimelineItem[] = [
     id: "citizen-intelligence",
     title: "Citizen Intelligence",
     status: "planned",
-    note: "Plain-language layer and public sentiment schema.",
+    note: "Plain-language layer and public feedback schema (non-sentiment).",
   },
   {
     id: "mobile",

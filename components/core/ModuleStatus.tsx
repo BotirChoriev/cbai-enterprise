@@ -36,7 +36,7 @@ export default function ModuleStatusPanel({ modules }: ModuleStatusProps) {
             <h2 className="text-sm font-semibold tracking-wide text-zinc-50">
               Module Status
             </h2>
-            <p className="text-xs text-zinc-500">Platform subsystem health</p>
+            <p className="text-xs text-zinc-500">Static route availability — not live health probes</p>
           </div>
           <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-[10px] font-medium text-emerald-400">
             {onlineCount}/{modules.length} ONLINE
