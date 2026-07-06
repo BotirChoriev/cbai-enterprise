@@ -105,10 +105,10 @@ export const platformNavSections: NavSection[] = [
         description: "Evidence relationship navigation across platform entities.",
       },
       {
-        label: "Knowledge",
+        label: "Evidence Explorer",
         href: "/knowledge",
         icon: "knowledge",
-        description: "Document collections and knowledge base management.",
+        description: "Platform evidence architecture, source status, and coverage gaps.",
       },
     ],
   },
