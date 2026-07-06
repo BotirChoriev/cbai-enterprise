@@ -192,3 +192,17 @@ export {
   type AgentQueueDequeueResult,
   type AgentQueuePolicy,
 } from "@/lib/intelligence/agents/queue";
+
+export {
+  AGENT_SCHEDULER_BRIDGE_VERSION,
+  DEFAULT_AGENT_SCHEDULER_BRIDGE_ID,
+  DEFAULT_AGENT_SCHEDULER_BRIDGE_POLICY,
+  DefaultAgentSchedulerBridge,
+  defaultAgentSchedulerBridge,
+  type AgentSchedulerBridge,
+  type AgentSchedulerDiagnostics,
+  type AgentSchedulerEvaluateResult,
+  type AgentSchedulerScheduleResult,
+  type AgentSchedulerCancelResult,
+  type AgentSchedulerBridgePolicy,
+} from "@/lib/intelligence/agents/scheduler";

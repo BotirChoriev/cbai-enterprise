@@ -26,6 +26,11 @@ import {
   DefaultAgentQueueIntegration,
 } from "@/lib/intelligence/agents/queue/agent-queue-integration";
 import {
+  DefaultAgentSchedulerBridge,
+} from "@/lib/intelligence/agents/scheduler/agent-scheduler-bridge";
+import { DefaultRuntimeScheduler } from "@/lib/intelligence/runtime/scheduler/scheduler";
+import { resetScheduleItemSequence } from "@/lib/intelligence/runtime/scheduler/schedule-item";
+import {
   createAgentTask,
   resetAgentTaskSequence,
   withAgentTaskStatus,
@@ -1184,6 +1189,182 @@ export const INTELLIGENCE_TEST_SCENARIOS: IntelligenceTestScenario[] = [
 
       if (queue.size() !== 0) {
         return fail("Expected runtime queue to remain empty after terminal task rejection.");
+      }
+
+      return pass();
+    },
+  },
+  {
+    id: "agent-scheduler-schedule",
+    name: "Agent scheduler schedule",
+    description:
+      "Schedule stores task and creates schedule item without immediate queue enqueue.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Agent scheduler schedule check.",
+      }),
+    validate: (context) => {
+      resetAgentTaskSequence();
+      resetQueueItemSequence();
+      resetScheduleItemSequence();
+      const store = new DefaultAgentTaskStore();
+      const queue = new DefaultRuntimeQueue();
+      const scheduler = new DefaultRuntimeScheduler();
+      const queueIntegration = new DefaultAgentQueueIntegration(store, queue);
+      const bridge = new DefaultAgentSchedulerBridge(store, scheduler, queueIntegration);
+      const task = createAgentTask({
+        agentId: "scheduler-agent",
+        requestId: context.request.id,
+        title: "Scheduler schedule test task",
+        taskRequest: createTaskRequest({
+          intent: "general",
+          requestedCapabilities: [AGENT_CAPABILITY_RESEARCH],
+        }),
+      });
+
+      const result = bridge.scheduleTask(task, "2026-07-10T00:00:00.000Z", {
+        referenceAt: "2026-07-05T00:00:00.000Z",
+      });
+
+      if (!result.accepted) {
+        return fail(`Expected schedule accepted, received: ${result.reason}`);
+      }
+
+      if (result.scheduleItem?.status !== "scheduled") {
+        return fail(`Expected schedule item scheduled, received ${result.scheduleItem?.status ?? "unknown"}.`);
+      }
+
+      if (result.diagnostics?.queued) {
+        return fail("Expected queued false immediately after schedule.");
+      }
+
+      if (queue.size() !== 0) {
+        return fail("Expected runtime queue empty before ready evaluation.");
+      }
+
+      if (!store.get(task.id)) {
+        return fail("Expected task in store after schedule.");
+      }
+
+      return pass();
+    },
+  },
+  {
+    id: "agent-scheduler-ready-to-queue",
+    name: "Agent scheduler ready to queue",
+    description:
+      "Caller-driven evaluateReadyTasks promotes due scheduled tasks to the runtime queue.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Agent scheduler ready to queue check.",
+      }),
+    validate: (context) => {
+      resetAgentTaskSequence();
+      resetQueueItemSequence();
+      resetScheduleItemSequence();
+      const store = new DefaultAgentTaskStore();
+      const queue = new DefaultRuntimeQueue();
+      const scheduler = new DefaultRuntimeScheduler();
+      const queueIntegration = new DefaultAgentQueueIntegration(store, queue);
+      const bridge = new DefaultAgentSchedulerBridge(store, scheduler, queueIntegration);
+      const task = createAgentTask({
+        agentId: "scheduler-agent",
+        requestId: context.request.id,
+        title: "Scheduler ready to queue test task",
+        taskRequest: createTaskRequest({
+          intent: "general",
+          requestedCapabilities: [AGENT_CAPABILITY_RESEARCH],
+        }),
+      });
+
+      const scheduledFor = "2026-07-06T00:00:00.000Z";
+      const schedule = bridge.scheduleTask(task, scheduledFor, {
+        referenceAt: "2026-07-05T00:00:00.000Z",
+      });
+
+      if (!schedule.accepted) {
+        return fail(`Expected schedule accepted before evaluation: ${schedule.reason}`);
+      }
+
+      const evaluation = bridge.evaluateReadyTasks(scheduledFor);
+
+      if (evaluation.enqueuedCount !== 1) {
+        return fail(`Expected one enqueued task, received ${evaluation.enqueuedCount}.`);
+      }
+
+      const entry = evaluation.entries[0];
+
+      if (!entry?.queued) {
+        return fail(`Expected queued entry, received: ${entry?.reason ?? "unknown"}`);
+      }
+
+      if (!entry.diagnostics.queued) {
+        return fail("Expected diagnostics queued true after promotion.");
+      }
+
+      if (entry.diagnostics.taskStatus !== "queued") {
+        return fail(`Expected task status queued after promotion, received ${entry.diagnostics.taskStatus}.`);
+      }
+
+      if (queue.size() !== 1) {
+        return fail("Expected one item in runtime queue after promotion.");
+      }
+
+      return pass();
+    },
+  },
+  {
+    id: "agent-scheduler-cancel",
+    name: "Agent scheduler cancel",
+    description:
+      "Cancel removes schedule item and updates task lifecycle when allowed.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Agent scheduler cancel check.",
+      }),
+    validate: (context) => {
+      resetAgentTaskSequence();
+      resetQueueItemSequence();
+      resetScheduleItemSequence();
+      const store = new DefaultAgentTaskStore();
+      const queue = new DefaultRuntimeQueue();
+      const scheduler = new DefaultRuntimeScheduler();
+      const queueIntegration = new DefaultAgentQueueIntegration(store, queue);
+      const bridge = new DefaultAgentSchedulerBridge(store, scheduler, queueIntegration);
+      const task = createAgentTask({
+        agentId: "scheduler-agent",
+        requestId: context.request.id,
+        title: "Scheduler cancel test task",
+        taskRequest: createTaskRequest({
+          intent: "general",
+          requestedCapabilities: [AGENT_CAPABILITY_RESEARCH],
+        }),
+      });
+
+      const schedule = bridge.scheduleTask(task, "2026-07-10T00:00:00.000Z", {
+        referenceAt: "2026-07-05T00:00:00.000Z",
+      });
+
+      if (!schedule.accepted) {
+        return fail(`Expected schedule accepted before cancel: ${schedule.reason}`);
+      }
+
+      const cancel = bridge.cancelScheduledTask(task.id);
+
+      if (!cancel.cancelled) {
+        return fail(`Expected cancel success, received: ${cancel.reason}`);
+      }
+
+      if (cancel.scheduleItem?.status !== "cancelled") {
+        return fail(`Expected schedule item cancelled, received ${cancel.scheduleItem?.status ?? "unknown"}.`);
+      }
+
+      if (cancel.task?.status !== "cancelled") {
+        return fail(`Expected task status cancelled, received ${cancel.task?.status ?? "unknown"}.`);
+      }
+
+      if (cancel.diagnostics?.queued) {
+        return fail("Expected diagnostics queued false after cancel.");
       }
 
       return pass();
