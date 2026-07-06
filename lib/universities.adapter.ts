@@ -7,12 +7,14 @@ const INSUFFICIENT_EVIDENCE_LABEL = "Insufficient Evidence";
 const NOT_CONNECTED_SOURCE_LABEL = "Evidence Source Not Connected";
 
 /** Cross-entity links derived from local registries only. */
-export type UniversityRelationships = {
+export type UniversityLinkedEntities = {
   country: string | null;
   companies: string[];
   researchCenters: string[];
   government: string[];
 };
+
+export type UniversityRelationships = UniversityLinkedEntities;
 
 /** Ordered metadata fields for university factual overview grid. */
 export const UNIVERSITY_METADATA_FIELDS: EntityMetadataField[] = [

@@ -1,33 +1,35 @@
 import type { University } from "@/lib/universities";
+import type { UniversityLinkedEntities } from "@/lib/universities.adapter";
+import { buildUniversityCoverageProfile } from "@/lib/universities.coverage";
 import { defaultEntityResolver } from "@/lib/intelligence/evidence/adapters/entity/entity-resolver";
 
 export type UniversityEvidenceStatus = "connected" | "insufficient" | "not_connected";
 
 export type UniversityPersonaId =
   | "citizen"
+  | "investor"
+  | "government"
   | "student"
   | "researcher"
-  | "academic"
-  | "investor"
-  | "government";
+  | "academic";
 
 export const INSUFFICIENT_EVIDENCE_LABEL = "Insufficient Evidence";
 
-export const NOT_CONNECTED_SOURCE_LABEL = "Evidence Source Not Connected";
-
-export const RELATIONSHIP_NOT_CONNECTED_LABEL = "Relationship data not connected.";
+export const NOT_CONNECTED_SOURCE_LABEL = "Evidence source not connected";
 
 export const INSTITUTIONAL_NEUTRALITY_NOTICE =
   "CBAI provides evidence-based, politically neutral university intelligence. It does not endorse, rank, or promote any institution.";
 
-export type UniversityIntelligenceBlock = {
-  id: string;
-  title: string;
-  meaning: string;
-  evidenceStatus: UniversityEvidenceStatus;
-  detail: string;
-  sourceConnected: boolean;
-  displayValue: string;
+export type UniversityRegistryFacts = {
+  name: string;
+  icon: string;
+  country: string;
+  city: string;
+  type: string;
+  founded: number;
+  website: string | null;
+  websiteLabel: string;
+  sourceLabel: string;
 };
 
 export type UniversityPersonaSection = {
@@ -43,41 +45,18 @@ export type UniversityTrustPillar = {
   description: string;
 };
 
-export type UniversityLinkedEntities = {
-  country: string | null;
-  companies: string[];
-  researchCenters: string[];
-  government: string[];
-};
-
 export type UniversityIntelligenceProfile = {
   universityId: string;
   referenceConnected: boolean;
-  registryFieldCount: number;
-  blocks: UniversityIntelligenceBlock[];
+  registryFacts: UniversityRegistryFacts;
   personas: UniversityPersonaSection[];
   linkedEntities: UniversityLinkedEntities;
   trustPillars: UniversityTrustPillar[];
+  coverage: ReturnType<typeof buildUniversityCoverageProfile>;
   neutralityNotice: string;
 };
 
-const REGISTRY_FIELD_COUNT = 7;
-
-function block(
-  input: Omit<UniversityIntelligenceBlock, "displayValue"> & {
-    displayValue?: string;
-  },
-): UniversityIntelligenceBlock {
-  const displayValue =
-    input.displayValue ??
-    (input.sourceConnected
-      ? input.detail
-      : input.evidenceStatus === "insufficient"
-        ? INSUFFICIENT_EVIDENCE_LABEL
-        : NOT_CONNECTED_SOURCE_LABEL);
-
-  return { ...input, displayValue };
-}
+const REGISTRY_SOURCE_LABEL = "Available — CBAI Local Registry";
 
 function buildTrustPillars(): UniversityTrustPillar[] {
   return [
@@ -85,25 +64,31 @@ function buildTrustPillars(): UniversityTrustPillar[] {
       id: "evidence",
       title: "Evidence",
       description:
-        "University profiles display registry facts and block-level evidence status. Extended intelligence is withheld until sources connect.",
-    },
-    {
-      id: "methodology",
-      title: "Methodology",
-      description:
-        "Relationships are derived from local country and company catalogs only. No inferred partnerships or rankings.",
-    },
-    {
-      id: "neutrality",
-      title: "Neutrality",
-      description:
-        "CBAI does not endorse institutions, publish league tables, or substitute marketing narratives for verified evidence.",
+        "University profiles display registry facts and coverage status. Rankings, enrollment, and research scores are withheld until official sources connect.",
     },
     {
       id: "transparency",
       title: "Transparency",
       description:
-        "Unavailable sections state Evidence Source Not Connected or Insufficient Evidence — never hidden behind synthetic data.",
+        "Every indicator and source shows connection status. Required evidence sources are named — never hidden.",
+    },
+    {
+      id: "methodology",
+      title: "Methodology",
+      description:
+        "CBAI does not publish league tables or global ranks. Future evaluations require methodology and connected sources.",
+    },
+    {
+      id: "political-neutrality",
+      title: "Political Neutrality",
+      description:
+        "CBAI does not endorse institutions, publish rankings, or substitute marketing narratives for verified evidence.",
+    },
+    {
+      id: "no-fake-data",
+      title: "No Fake Data",
+      description:
+        "Unavailable sections state Not connected or Planned — never hidden behind synthetic student counts, faculty metrics, or AI summaries.",
     },
   ];
 }
@@ -113,160 +98,50 @@ function buildPersonaSections(universityName: string): UniversityPersonaSection[
     {
       id: "citizen",
       title: "Citizen",
-      currentValue: `Review ${universityName} registry facts and evidence status blocks before relying on any institutional claim.`,
+      currentValue: `Review ${universityName} registry facts and indicator coverage before relying on any institutional claim. No public rankings shown.`,
       futureCapability:
-        "Scholarship transparency, public procurement links, and civic accountability indicators when evidence sources connect.",
-    },
-    {
-      id: "student",
-      title: "Student",
-      currentValue:
-        "Institution name, location, type, founding year, and website (when recorded) from the local catalog.",
-      futureCapability:
-        "Accreditation verification, program catalogs, and enrollment statistics when education evidence sources connect.",
-    },
-    {
-      id: "researcher",
-      title: "Researcher",
-      currentValue:
-        "Export block-level evidence status and registry metadata for reproducible scoping.",
-      futureCapability:
-        "Research output, collaboration networks, and grant data when research evidence adapters connect.",
-    },
-    {
-      id: "academic",
-      title: "Academic",
-      currentValue:
-        "CBAI separates reference catalog data from assessed intelligence. Cite evidence status in downstream academic use.",
-      futureCapability:
-        "Peer-verified research metrics and international cooperation datasets when academic sources connect.",
+        "Public transparency and scholarship evidence when ministry and open data sources connect.",
     },
     {
       id: "investor",
       title: "Investor",
       currentValue:
-        "Identify platform registry records and linked companies in the same country from local catalogs only.",
+        "Identify registry scope and linked companies in the same country from local catalogs — no innovation or investment scores today.",
       futureCapability:
-        "Innovation program outcomes, industry collaboration verification, and sector comparisons when investor evidence connects.",
+        "Industry collaboration and innovation indicators when research databases and procurement sources connect.",
     },
     {
       id: "government",
       title: "Government",
       currentValue:
-        "Government form label from linked country registry when available. No political recommendations.",
+        "Use coverage maps to prioritize official education data publication. No institutional endorsements or league tables.",
       futureCapability:
-        "Government recognition filings, public transparency metrics, and policy-linked education data when sources connect.",
+        "Government recognition and accreditation indicators when ministry and accreditation agency sources connect.",
     },
-  ];
-}
-
-function buildIntelligenceBlocks(
-  university: University,
-  referenceConnected: boolean,
-): UniversityIntelligenceBlock[] {
-  const registrySummary = referenceConnected
-    ? `${university.name} — ${university.type}, ${university.city}, ${university.country}, founded ${university.founded}.`
-    : INSUFFICIENT_EVIDENCE_LABEL;
-
-  return [
-    block({
-      id: "registry-profile",
-      title: "Registry Profile",
-      meaning:
-        "Official identity from the local platform catalog — name, country, city, institution type, founding year, and website when recorded.",
-      evidenceStatus: referenceConnected ? "connected" : "insufficient",
-      detail: registrySummary,
-      sourceConnected: referenceConnected,
-      displayValue: referenceConnected
-        ? "University reference profile available"
-        : INSUFFICIENT_EVIDENCE_LABEL,
-    }),
-    block({
-      id: "evidence-status",
-      title: "Evidence Status",
-      meaning:
-        "Shows whether this university record is available and how much verified information is on file today.",
-      evidenceStatus: referenceConnected ? "connected" : "insufficient",
-      detail: referenceConnected
-        ? `${REGISTRY_FIELD_COUNT} catalog fields available — assessed intelligence withheld until sources connect.`
-        : INSUFFICIENT_EVIDENCE_LABEL,
-      sourceConnected: referenceConnected,
-      displayValue: referenceConnected
-        ? "Reference data available — extended evidence not yet connected"
-        : INSUFFICIENT_EVIDENCE_LABEL,
-    }),
-    block({
-      id: "accreditation-status",
-      title: "Accreditation Status",
-      meaning:
-        "Official accreditation records require connected education authority and quality assurance sources.",
-      evidenceStatus: "not_connected",
-      detail: NOT_CONNECTED_SOURCE_LABEL,
-      sourceConnected: false,
-    }),
-    block({
-      id: "research-capability",
-      title: "Research Capability",
-      meaning:
-        "Research output, faculty metrics, and laboratory capacity require connected research evidence sources.",
-      evidenceStatus: "not_connected",
-      detail: NOT_CONNECTED_SOURCE_LABEL,
-      sourceConnected: false,
-    }),
-    block({
-      id: "international-cooperation",
-      title: "International Cooperation",
-      meaning:
-        "Exchange programs, bilateral agreements, and international partnerships require connected cooperation datasets.",
-      evidenceStatus: "not_connected",
-      detail: NOT_CONNECTED_SOURCE_LABEL,
-      sourceConnected: false,
-    }),
-    block({
-      id: "scholarship-information",
-      title: "Scholarship Information",
-      meaning:
-        "Scholarship programs, eligibility, and funding transparency require connected education finance sources.",
-      evidenceStatus: "not_connected",
-      detail: NOT_CONNECTED_SOURCE_LABEL,
-      sourceConnected: false,
-    }),
-    block({
-      id: "industry-collaboration",
-      title: "Industry Collaboration",
-      meaning:
-        "Verified industry partnership records require connected collaboration and contract evidence sources.",
-      evidenceStatus: "not_connected",
-      detail: NOT_CONNECTED_SOURCE_LABEL,
-      sourceConnected: false,
-    }),
-    block({
-      id: "government-recognition",
-      title: "Government Recognition",
-      meaning:
-        "Official recognition, charter status, and regulatory filings require connected government education registries.",
-      evidenceStatus: "not_connected",
-      detail: NOT_CONNECTED_SOURCE_LABEL,
-      sourceConnected: false,
-    }),
-    block({
-      id: "innovation-programs",
-      title: "Innovation Programs",
-      meaning:
-        "Innovation incubators, technology transfer, and startup program data require connected innovation evidence sources.",
-      evidenceStatus: "not_connected",
-      detail: NOT_CONNECTED_SOURCE_LABEL,
-      sourceConnected: false,
-    }),
-    block({
-      id: "public-transparency",
-      title: "Public Transparency",
-      meaning:
-        "Financial disclosures, governance reports, and public accountability metrics require connected transparency sources.",
-      evidenceStatus: "not_connected",
-      detail: NOT_CONNECTED_SOURCE_LABEL,
-      sourceConnected: false,
-    }),
+    {
+      id: "student",
+      title: "Student",
+      currentValue:
+        "Institution name, location, type, founding year, and website (when recorded) from local registry only.",
+      futureCapability:
+        "Accreditation, program catalogs, and employment outcomes when UNESCO and ministry sources connect.",
+    },
+    {
+      id: "researcher",
+      title: "Researcher",
+      currentValue:
+        "Export indicator coverage, source status, and Knowledge Graph relationship counts for reproducible scoping.",
+      futureCapability:
+        "Research output and international cooperation data when bibliometric and UNESCO sources connect.",
+    },
+    {
+      id: "academic",
+      title: "Academic",
+      currentValue:
+        "CBAI separates reference catalog data from assessed intelligence. Cite source status and methodology in scholarly work.",
+      futureCapability:
+        "Field-normalized research metrics and cooperation datasets when verified academic sources publish.",
+    },
   ];
 }
 
@@ -284,11 +159,23 @@ export function buildUniversityIntelligenceProfile(
   return {
     universityId: university.id,
     referenceConnected,
-    registryFieldCount: REGISTRY_FIELD_COUNT,
-    blocks: buildIntelligenceBlocks(university, referenceConnected),
+    registryFacts: {
+      name: university.name,
+      icon: university.icon,
+      country: university.country,
+      city: university.city,
+      type: university.type,
+      founded: university.founded,
+      website: university.website,
+      websiteLabel: university.website ?? "Not recorded in local registry",
+      sourceLabel: referenceConnected
+        ? REGISTRY_SOURCE_LABEL
+        : INSUFFICIENT_EVIDENCE_LABEL,
+    },
     personas: buildPersonaSections(university.name),
     linkedEntities,
     trustPillars: buildTrustPillars(),
+    coverage: buildUniversityCoverageProfile(university),
     neutralityNotice: INSTITUTIONAL_NEUTRALITY_NOTICE,
   };
 }
@@ -296,22 +183,47 @@ export function buildUniversityIntelligenceProfile(
 export function resolveUniversityListEvidenceLabel(
   profile: UniversityIntelligenceProfile,
 ): string {
+  const { evidenceCoverage } = profile.coverage;
+  if (evidenceCoverage.connected > 0) {
+    return `${evidenceCoverage.connected} indicator connected`;
+  }
   if (profile.referenceConnected) {
     return "Registry available";
   }
-
   return INSUFFICIENT_EVIDENCE_LABEL;
 }
 
-export function universityEvidenceStatusClass(
-  status: UniversityEvidenceStatus,
-): string {
-  switch (status) {
-    case "connected":
-      return "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
-    case "insufficient":
-      return "text-amber-400 bg-amber-500/10 border-amber-500/20";
-    case "not_connected":
-      return "text-zinc-400 bg-zinc-800/50 border-zinc-700/50";
-  }
-}
+export { universityEvidenceStatusClass } from "@/lib/universities.coverage";
+
+export const UNIVERSITY_METHODOLOGY_POINTS = [
+  {
+    id: "no-rankings-without-evidence",
+    title: "No rankings without evidence",
+    description:
+      "CBAI does not display global ranks, league tables, or education scores until verified official sources and methodology connect.",
+  },
+  {
+    id: "evidence-before-judgment",
+    title: "Evidence before judgment",
+    description:
+      "Registry facts and connected evidence items are shown first. Evaluative conclusions require a documented evidence chain.",
+  },
+  {
+    id: "indicators-require-sources",
+    title: "Indicators require official sources",
+    description:
+      "Each indicator in the Global Indicator Framework declares required sources. Status reflects real connectivity — not UI decoration.",
+  },
+  {
+    id: "rankings-require-methodology",
+    title: "Rankings and scores require methodology",
+    description:
+      "When evaluation becomes available, every metric will cite indicator ID, methodology version, and source provenance before display.",
+  },
+  {
+    id: "no-inferred-partnerships",
+    title: "No inferred partnerships",
+    description:
+      "Research centers, scholarships, and industry partnerships are not invented. Knowledge Graph shows verified local catalog relationships only.",
+  },
+] as const;
