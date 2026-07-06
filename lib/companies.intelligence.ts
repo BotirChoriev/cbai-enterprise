@@ -1,187 +1,144 @@
 import type { Company } from "@/lib/companies";
+import type { CompanyLinkedEntities } from "@/lib/companies.adapter";
+import { buildCompanyCoverageProfile } from "@/lib/companies.coverage";
 import { defaultEntityResolver } from "@/lib/intelligence/evidence/adapters/entity/entity-resolver";
 
 export type CompanyEvidenceStatus = "connected" | "insufficient" | "not_connected";
 
 export type CompanyPersonaId =
-  | "general"
   | "citizen"
   | "investor"
-  | "public_institution"
+  | "government"
+  | "student"
   | "researcher"
   | "academic";
 
 export const INSUFFICIENT_EVIDENCE_LABEL = "Insufficient Evidence";
 
-export const NOT_CONNECTED_SOURCE_LABEL = "Evidence Source Not Connected";
+export const NOT_CONNECTED_SOURCE_LABEL = "Evidence source not connected";
 
 export const COMMERCIAL_NEUTRALITY_NOTICE =
   "CBAI provides evidence-based, neutral company intelligence. It does not endorse, attack, or commercially promote any company.";
 
-export type CompanyIntelligenceBlock = {
-  id: string;
-  title: string;
-  meaning: string;
-  evidenceStatus: CompanyEvidenceStatus;
-  detail: string;
-  sourceConnected: boolean;
-  displayValue: string;
+export type CompanyRegistryFacts = {
+  name: string;
+  icon: string;
+  country: string;
+  industry: string;
+  founded: number;
+  sourceLabel: string;
 };
 
 export type CompanyPersonaSection = {
   id: CompanyPersonaId;
   title: string;
-  guidance: string;
-  evidenceNote: string;
+  currentValue: string;
+  futureCapability: string;
 };
 
-export type CompanyLinkedEntities = {
-  relatedCountry: string | null;
-  universities: string[];
+export type CompanyTrustPillar = {
+  id: string;
+  title: string;
+  description: string;
 };
 
 export type CompanyIntelligenceProfile = {
   companyId: string;
   referenceConnected: boolean;
-  blocks: CompanyIntelligenceBlock[];
+  registryFacts: CompanyRegistryFacts;
   personas: CompanyPersonaSection[];
   linkedEntities: CompanyLinkedEntities;
+  trustPillars: CompanyTrustPillar[];
+  coverage: ReturnType<typeof buildCompanyCoverageProfile>;
   neutralityNotice: string;
 };
 
-const REFERENCE_FIELD_COUNT = 5;
+const REGISTRY_SOURCE_LABEL = "Available — CBAI Local Registry";
 
-function block(
-  input: Omit<CompanyIntelligenceBlock, "displayValue"> & {
-    displayValue?: string;
-  },
-): CompanyIntelligenceBlock {
-  const displayValue =
-    input.displayValue ??
-    (input.sourceConnected
-      ? input.detail
-      : input.evidenceStatus === "insufficient"
-        ? INSUFFICIENT_EVIDENCE_LABEL
-        : NOT_CONNECTED_SOURCE_LABEL);
-
-  return { ...input, displayValue };
+function buildTrustPillars(): CompanyTrustPillar[] {
+  return [
+    {
+      id: "evidence",
+      title: "Evidence",
+      description:
+        "Company profiles display registry facts and coverage status. Financial, market, and ESG intelligence is withheld until official sources connect.",
+    },
+    {
+      id: "transparency",
+      title: "Transparency",
+      description:
+        "Every indicator and source shows connection status. Required evidence sources are named — never hidden behind UI polish.",
+    },
+    {
+      id: "methodology",
+      title: "Methodology",
+      description:
+        "CBAI does not score without evidence. Future evaluations require methodology, indicator IDs, and source provenance.",
+    },
+    {
+      id: "political-neutrality",
+      title: "Political Neutrality",
+      description:
+        "CBAI does not endorse companies, publish buy/sell recommendations, or substitute marketing narratives for verified evidence.",
+    },
+    {
+      id: "no-fake-data",
+      title: "No Fake Data",
+      description:
+        "Unavailable sections state Not connected or Planned — never hidden behind synthetic revenue, market cap, or AI summaries.",
+    },
+  ];
 }
 
 function buildPersonaSections(companyName: string): CompanyPersonaSection[] {
   return [
     {
-      id: "general",
-      title: "General Citizen",
-      guidance: `Review factual catalog information for ${companyName} and check each section's evidence status before drawing conclusions. CBAI does not present opinion polls or popularity scores as official ratings.`,
-      evidenceNote: "Reference catalog only — no automated commercial or political recommendations.",
+      id: "citizen",
+      title: "Citizen",
+      currentValue: `Review ${companyName} registry facts and procurement indicator status. No public responsibility scores or ESG ratings are shown today.`,
+      futureCapability:
+        "Procurement participation and corporate governance indicators when government registry and procurement sources connect.",
     },
     {
       id: "investor",
-      title: "Investor View",
-      guidance:
-        "Investment analysis, sector comparisons, and tender participation require connected financial, market, and procurement evidence sources. Catalog entries help identify platform records only.",
-      evidenceNote: NOT_CONNECTED_SOURCE_LABEL,
+      title: "Investor",
+      currentValue:
+        "Identify registry scope and which financial, trade, and investment indicators remain not connected — no valuation or confidence scores today.",
+      futureCapability:
+        "Financial reporting, ownership transparency, and stock exchange data when annual report and securities sources connect.",
     },
     {
-      id: "citizen",
-      title: "Citizen View",
-      guidance:
-        "Public procurement participation, local economic presence, and corporate responsibility indicators require connected civic transparency sources.",
-      evidenceNote: NOT_CONNECTED_SOURCE_LABEL,
+      id: "government",
+      title: "Government",
+      currentValue:
+        "Use coverage maps to see which compliance and procurement indicators require official sources. No regulatory recommendations.",
+      futureCapability:
+        "Procurement registry participation and compliance indicators when government and open data sources connect.",
     },
     {
-      id: "public_institution",
-      title: "Government / Public Institution View",
-      guidance:
-        "Governance, procurement openness, and regulatory compliance views require dedicated public-sector evidence sources. Catalog facts help scope requests but do not replace official filings.",
-      evidenceNote: NOT_CONNECTED_SOURCE_LABEL,
+      id: "student",
+      title: "Student",
+      currentValue:
+        "Company name, industry, headquarters country, and founding year from local registry. Linked universities from verified catalog relationships.",
+      futureCapability:
+        "Research activity and innovation evidence when bibliometric and patent sources connect.",
     },
     {
       id: "researcher",
-      title: "Researcher View",
-      guidance:
-        "Export section-level evidence status and catalog metadata for reproducible scoping. Trend, correlation, and market analyses require connected research-grade sources.",
-      evidenceNote: NOT_CONNECTED_SOURCE_LABEL,
+      title: "Researcher",
+      currentValue:
+        "Export indicator coverage, source status, and Knowledge Graph relationship counts for reproducible research scoping.",
+      futureCapability:
+        "Supply chain, environmental, and employment indicators when official statistical and regulatory sources connect.",
     },
     {
       id: "academic",
-      title: "Academic View",
-      guidance:
-        "CBAI separates reference catalog data from assessed intelligence. Cite evidence status and source connectivity in any downstream academic use.",
-      evidenceNote: COMMERCIAL_NEUTRALITY_NOTICE,
+      title: "Academic",
+      currentValue:
+        "CBAI separates reference catalog data from assessed intelligence. Cite source status and methodology in scholarly work.",
+      futureCapability:
+        "Field-normalized corporate indicators and cross-company comparisons when verified datasets publish.",
     },
-  ];
-}
-
-function buildIntelligenceBlocks(
-  company: Company,
-  referenceConnected: boolean,
-): CompanyIntelligenceBlock[] {
-  return [
-    block({
-      id: "company-registry-profile",
-      title: "Company Registry Profile",
-      meaning:
-        "Basic company identity from the local platform catalog — name, symbol, country, industry, and founding year.",
-      evidenceStatus: referenceConnected ? "connected" : "insufficient",
-      detail: referenceConnected
-        ? `${company.name} (${company.icon}) — ${company.industry}, ${company.country}, founded ${company.founded}.`
-        : INSUFFICIENT_EVIDENCE_LABEL,
-      sourceConnected: referenceConnected,
-      displayValue: referenceConnected
-        ? "Company reference profile available"
-        : INSUFFICIENT_EVIDENCE_LABEL,
-    }),
-    block({
-      id: "evidence-status",
-      title: "Evidence Status",
-      meaning:
-        "Shows whether this company record is available and how much verified information is on file today.",
-      evidenceStatus: referenceConnected ? "connected" : "insufficient",
-      detail: referenceConnected
-        ? `${REFERENCE_FIELD_COUNT} catalog fields available — assessed intelligence withheld until sources connect.`
-        : INSUFFICIENT_EVIDENCE_LABEL,
-      sourceConnected: referenceConnected,
-      displayValue: referenceConnected
-        ? "Reference data available — extended evidence not yet connected"
-        : INSUFFICIENT_EVIDENCE_LABEL,
-    }),
-    block({
-      id: "ownership-governance",
-      title: "Ownership & Governance Status",
-      meaning:
-        "Ownership structure, board composition, and governance filings require connected corporate registry sources.",
-      evidenceStatus: "not_connected",
-      detail: NOT_CONNECTED_SOURCE_LABEL,
-      sourceConnected: false,
-    }),
-    block({
-      id: "financial-transparency",
-      title: "Financial Transparency Status",
-      meaning:
-        "Revenue, filings, and market metrics require connected financial disclosure sources.",
-      evidenceStatus: "not_connected",
-      detail: NOT_CONNECTED_SOURCE_LABEL,
-      sourceConnected: false,
-    }),
-    block({
-      id: "tender-procurement",
-      title: "Tender / Procurement Participation Status",
-      meaning:
-        "Public tender and procurement participation requires connected procurement transparency sources.",
-      evidenceStatus: "not_connected",
-      detail: NOT_CONNECTED_SOURCE_LABEL,
-      sourceConnected: false,
-    }),
-    block({
-      id: "esg-responsibility",
-      title: "ESG / Responsibility Status",
-      meaning:
-        "Environmental, social, and governance indicators require connected ESG evidence sources.",
-      evidenceStatus: "not_connected",
-      detail: NOT_CONNECTED_SOURCE_LABEL,
-      sourceConnected: false,
-    }),
   ];
 }
 
@@ -199,9 +156,20 @@ export function buildCompanyIntelligenceProfile(
   return {
     companyId: company.id,
     referenceConnected,
-    blocks: buildIntelligenceBlocks(company, referenceConnected),
+    registryFacts: {
+      name: company.name,
+      icon: company.icon,
+      country: company.country,
+      industry: company.industry,
+      founded: company.founded,
+      sourceLabel: referenceConnected
+        ? REGISTRY_SOURCE_LABEL
+        : INSUFFICIENT_EVIDENCE_LABEL,
+    },
     personas: buildPersonaSections(company.name),
     linkedEntities,
+    trustPillars: buildTrustPillars(),
+    coverage: buildCompanyCoverageProfile(company),
     neutralityNotice: COMMERCIAL_NEUTRALITY_NOTICE,
   };
 }
@@ -209,22 +177,47 @@ export function buildCompanyIntelligenceProfile(
 export function resolveCompanyListEvidenceLabel(
   profile: CompanyIntelligenceProfile,
 ): string {
-  if (profile.referenceConnected) {
-    return "Reference available";
+  const { evidenceCoverage } = profile.coverage;
+  if (evidenceCoverage.connected > 0) {
+    return `${evidenceCoverage.connected} indicator connected`;
   }
-
+  if (profile.referenceConnected) {
+    return "Registry available";
+  }
   return INSUFFICIENT_EVIDENCE_LABEL;
 }
 
-export function companyEvidenceStatusClass(
-  status: CompanyEvidenceStatus,
-): string {
-  switch (status) {
-    case "connected":
-      return "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
-    case "insufficient":
-      return "text-amber-400 bg-amber-500/10 border-amber-500/20";
-    case "not_connected":
-      return "text-zinc-400 bg-zinc-800/50 border-zinc-700/50";
-  }
-}
+export { companyEvidenceStatusClass } from "@/lib/companies.coverage";
+
+export const COMPANY_METHODOLOGY_POINTS = [
+  {
+    id: "no-score-without-evidence",
+    title: "No scores without evidence",
+    description:
+      "CBAI does not display revenue, market cap, innovation, investment, ESG, or AI scores until verified official sources and methodology connect.",
+  },
+  {
+    id: "evidence-before-judgment",
+    title: "Evidence before judgment",
+    description:
+      "Registry facts and connected evidence items are shown first. Evaluative conclusions require a documented evidence chain.",
+  },
+  {
+    id: "indicators-require-sources",
+    title: "Indicators require official sources",
+    description:
+      "Each indicator in the Global Indicator Framework declares required sources. Status reflects real connectivity — not UI decoration.",
+  },
+  {
+    id: "no-partner-competitor-claims",
+    title: "No unverified relationship claims",
+    description:
+      "Partner and competitor lists are not inferred. Knowledge Graph shows verified local catalog relationships only.",
+  },
+  {
+    id: "evidence-judgment-separation",
+    title: "Evidence and judgment are separated",
+    description:
+      "Catalog facts are distinct from any future evaluative metrics or commercial recommendations.",
+  },
+] as const;

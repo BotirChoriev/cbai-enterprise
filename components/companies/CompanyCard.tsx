@@ -32,7 +32,7 @@ export default function CompanyCard({
       onClick={onSelect}
       className={`w-full rounded-xl border p-4 text-left transition-all ${
         isSelected
-          ? "border-sky-500/40 bg-sky-500/5 ring-1 ring-sky-500/20"
+          ? "border-cyan-500/40 bg-cyan-500/5 ring-1 ring-cyan-500/20"
           : "border-zinc-800 bg-zinc-900/40 hover:border-zinc-700 hover:bg-zinc-900/70"
       }`}
     >
@@ -49,7 +49,7 @@ export default function CompanyCard({
           </div>
         </div>
         {isSelected ? (
-          <span className="rounded-full bg-sky-500/10 px-2 py-0.5 text-[10px] font-medium text-sky-400">
+          <span className="rounded-full bg-cyan-500/10 px-2 py-0.5 text-[10px] font-medium text-cyan-400">
             Selected
           </span>
         ) : null}

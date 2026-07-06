@@ -5,10 +5,14 @@ import {
   INSUFFICIENT_EVIDENCE_LABEL,
   NOT_CONNECTED_SOURCE_LABEL,
 } from "@/lib/companies.intelligence";
-import type { CompanyLinkedEntities } from "@/lib/companies.intelligence";
 import type { Entity } from "@/lib/entity/entity.types";
 
 /** Links derived from local country and university catalogs only. */
+export type CompanyLinkedEntities = {
+  relatedCountry: string | null;
+  universities: string[];
+};
+
 export type CompanyRelationships = {
   headquartersCountry: string | null;
   universities: string[];
