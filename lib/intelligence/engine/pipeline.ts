@@ -2,6 +2,7 @@ import { IntelligencePipelineError } from "@/lib/intelligence/engine/errors";
 import type { IntelligencePipelineStageId } from "@/lib/intelligence/pipeline-stage.types";
 import {
   stageConfidenceAssessment,
+  stageContradictionDetection,
   stageEvidenceCollection,
   stageGraphContext,
   stageIntelligenceResult,
@@ -57,7 +58,7 @@ async function runStage<T>(
  * Execute the full Intelligence Engine pipeline in canonical order.
  *
  * Pipeline sequence:
- * Request → Evidence → Confidence → Trust → Graph → Memory → Reasoning Trace → Result
+ * Request → Evidence → Contradiction → Confidence → Trust → Graph → Memory → Reasoning Trace → Result
  *
  * Stage timing is captured in a timeline passed to the Reasoning Trace Layer.
  *
@@ -79,20 +80,26 @@ export async function executePipeline(
     stageEvidenceCollection(validatedRequest),
   );
 
+  const evidenceWithContradictions = await runStage(
+    "contradiction-detection",
+    timeline,
+    () => stageContradictionDetection(validatedRequest, evidence),
+  );
+
   const confidence = await runStage("confidence-assessment", timeline, () =>
-    stageConfidenceAssessment(validatedRequest, evidence),
+    stageConfidenceAssessment(validatedRequest, evidenceWithContradictions),
   );
 
   const trust = await runStage("trust-assessment", timeline, () =>
-    stageTrustAssessment(validatedRequest, evidence, confidence),
+    stageTrustAssessment(validatedRequest, evidenceWithContradictions, confidence),
   );
 
   const graphContext = await runStage("graph-context", timeline, () =>
-    stageGraphContext(validatedRequest, evidence),
+    stageGraphContext(validatedRequest, evidenceWithContradictions),
   );
 
   const memoryContext = await runStage("memory-context", timeline, () =>
-    stageMemoryContext(validatedRequest, evidence),
+    stageMemoryContext(validatedRequest, evidenceWithContradictions),
   );
 
   const reasoningTrace = await runStage("reasoning-trace", timeline, () =>
@@ -101,7 +108,7 @@ export async function executePipeline(
       pipelineStartedAt: startedAt,
       timeline: [...timeline],
       request: validatedRequest,
-      evidence,
+      evidence: evidenceWithContradictions,
       confidence,
       trust,
       graphContext,
@@ -113,7 +120,7 @@ export async function executePipeline(
     request: validatedRequest,
     runId,
     startedAt,
-    evidence,
+    evidence: evidenceWithContradictions,
     confidence,
     trust,
     graphContext,

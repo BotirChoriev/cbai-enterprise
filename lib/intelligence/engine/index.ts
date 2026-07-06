@@ -29,6 +29,7 @@ export {
 export {
   ENGINE_SKELETON_VERSION,
   stageConfidenceAssessment,
+  stageContradictionDetection,
   stageEvidenceCollection,
   stageGraphContext,
   stageIntelligenceResult,

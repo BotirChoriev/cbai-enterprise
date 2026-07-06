@@ -7,6 +7,7 @@
 export type IntelligencePipelineStageId =
   | "request"
   | "evidence-collection"
+  | "contradiction-detection"
   | "confidence-assessment"
   | "trust-assessment"
   | "graph-context"
@@ -19,6 +20,7 @@ export const PIPELINE_STAGE_LABELS: Record<IntelligencePipelineStageId, string> 
   {
     request: "Request",
     "evidence-collection": "Evidence Collection",
+    "contradiction-detection": "Contradiction Detection",
     "confidence-assessment": "Confidence Assessment",
     "trust-assessment": "Trust Assessment",
     "graph-context": "Graph Context",
@@ -31,6 +33,7 @@ export const PIPELINE_STAGE_LABELS: Record<IntelligencePipelineStageId, string> 
 export const PIPELINE_STAGE_ORDER: IntelligencePipelineStageId[] = [
   "request",
   "evidence-collection",
+  "contradiction-detection",
   "confidence-assessment",
   "trust-assessment",
   "graph-context",

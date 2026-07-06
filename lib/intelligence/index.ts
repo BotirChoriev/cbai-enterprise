@@ -44,6 +44,15 @@ export type {
 } from "@/lib/intelligence/engine.types";
 
 export type {
+  ContradictionDetectionMetadata,
+  ContradictionDetectionResult,
+  ContradictionSeverity,
+  ContradictionSummary,
+  EvidenceContradiction,
+} from "@/lib/intelligence/contradictions/types";
+
+export type {
+  EvidenceConflictMetadata,
   ContradictionState,
   Evidence,
   EvidenceClaimType,
@@ -227,6 +236,22 @@ export {
   weightQualityForConfidence,
   type ConfidenceAssessor,
 } from "@/lib/intelligence/confidence";
+
+export {
+  CONTRADICTION_DETECTOR_VERSION,
+  DEFAULT_CONTRADICTION_DETECTOR_ID,
+  DefaultContradictionDetector,
+  applyContradictionDetectionToEvidence,
+  defaultContradictionDetector,
+  resolveContradictionState,
+  runContradictionRules,
+  type ContradictionDetector,
+} from "@/lib/intelligence/contradictions";
+
+export {
+  CONTRADICTION_DETECTION_STAGE_ID,
+  type ContradictionDetectionStageId,
+} from "@/lib/intelligence/trace.types";
 
 export {
   DEFAULT_TRUST_ASSESSOR_ID,

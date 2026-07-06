@@ -30,6 +30,7 @@ export interface StageTimelineEntry {
 export const TRACE_TIMELINE_STAGE_ORDER: IntelligencePipelineStageId[] = [
   "request",
   "evidence-collection",
+  "contradiction-detection",
   "confidence-assessment",
   "trust-assessment",
   "graph-context",

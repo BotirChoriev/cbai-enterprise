@@ -66,6 +66,8 @@ function buildStageOutputSummary(
       return `Request validated: id=${input.request.id}.`;
     case "evidence-collection":
       return `Evidence collection status=${input.evidence.metadata?.status ?? "unknown"}; items=${input.evidence.items.length}; sufficiency=${input.evidence.sufficiencyStatus}.`;
+    case "contradiction-detection":
+      return `Contradiction detection state=${input.evidence.contradictionState}; total=${input.evidence.contradictionSummary?.totalContradictions ?? 0}; blocking=${input.evidence.contradictionSummary?.hasBlockingConflict ?? false}.`;
     case "confidence-assessment":
       return `Confidence score=${input.confidence.score}; band=${input.confidence.band}; degraded=${input.confidence.degraded}.`;
     case "trust-assessment":

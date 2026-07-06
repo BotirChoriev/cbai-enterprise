@@ -11,6 +11,10 @@ import type { TrustAssessment } from "@/lib/intelligence/trust.types";
 import { IntelligenceValidationError } from "@/lib/intelligence/engine/errors";
 import { defaultEvidenceCollector } from "@/lib/intelligence/evidence";
 import { defaultConfidenceAssessor } from "@/lib/intelligence/confidence";
+import {
+  applyContradictionDetectionToEvidence,
+  defaultContradictionDetector,
+} from "@/lib/intelligence/contradictions";
 import { defaultTrustAssessor } from "@/lib/intelligence/trust";
 import { defaultGraphContextBuilder } from "@/lib/intelligence/graph";
 import type { GraphContextBuildResult } from "@/lib/intelligence/graph";
@@ -96,13 +100,31 @@ export async function stageEvidenceCollection(
 }
 
 /**
- * Stage 3 — Confidence assessment via the Confidence Assessment Layer.
+ * Stage 3 — Contradiction detection via the Contradiction Detection Layer.
+ *
+ * Delegates to {@link DefaultContradictionDetector}. Analyzes collected evidence
+ * for objective conflicts and enriches the collection with contradiction metadata.
+ *
+ * @param request - Validated intelligence request
+ * @param evidence - Collected evidence from stage 2 (includes quality assessment)
+ * @returns Evidence collection with contradiction state and detection metadata
+ */
+export async function stageContradictionDetection(
+  request: IntelligenceRequest,
+  evidence: EvidenceCollection,
+): Promise<EvidenceCollection> {
+  const result = await defaultContradictionDetector.detect(request, evidence);
+  return applyContradictionDetectionToEvidence(evidence, result);
+}
+
+/**
+ * Stage 4 — Confidence assessment via the Confidence Assessment Layer.
  *
  * Delegates to {@link DefaultConfidenceAssessor}. Extension point: graph and
  * entity signal factors when those layers are connected in future builds.
  *
  * @param request - Validated intelligence request
- * @param evidence - Collected evidence from stage 2
+ * @param evidence - Collected evidence from stage 2 (with contradiction metadata)
  * @returns Conservative confidence assessment from evidence state
  */
 export async function stageConfidenceAssessment(
@@ -113,14 +135,14 @@ export async function stageConfidenceAssessment(
 }
 
 /**
- * Stage 4 — Trust assessment via the Trust Assessment Layer.
+ * Stage 5 — Trust assessment via the Trust Assessment Layer.
  *
  * Delegates to {@link DefaultTrustAssessor}. Trust is evidence-grounded and
  * never copied from confidence score magnitude.
  *
  * @param request - Validated intelligence request
- * @param evidence - Collected evidence from stage 2
- * @param confidence - Confidence assessment from stage 3 (caps only)
+ * @param evidence - Collected evidence with contradiction metadata
+ * @param confidence - Confidence assessment from stage 4 (caps only)
  * @returns Conservative trust assessment with governance permissions
  */
 export async function stageTrustAssessment(
@@ -132,7 +154,7 @@ export async function stageTrustAssessment(
 }
 
 /**
- * Stage 5 — Graph context assembly via the Graph Context Layer.
+ * Stage 6 — Graph context assembly via the Graph Context Layer.
  *
  * Delegates to {@link DefaultGraphContextBuilder}. Returns disabled context
  * when `includeGraph` is false; not-connected empty context when true.
@@ -149,7 +171,7 @@ export async function stageGraphContext(
 }
 
 /**
- * Stage 6 — Memory context assembly via the Memory Context Layer.
+ * Stage 7 — Memory context assembly via the Memory Context Layer.
  *
  * Delegates to {@link DefaultMemoryContextBuilder}. Returns disabled context
  * when `includeMemory` is false; not-connected empty context when true.
@@ -166,7 +188,7 @@ export async function stageMemoryContext(
 }
 
 /**
- * Stage 7 — Reasoning trace assembly via the Reasoning Trace Layer.
+ * Stage 8 — Reasoning trace assembly via the Reasoning Trace Layer.
  *
  * Delegates to {@link DefaultReasoningTraceBuilder}. Records only observed
  * pipeline execution — no AI reasoning or fabricated explanations.
@@ -181,7 +203,7 @@ export async function stageReasoningTrace(
 }
 
 /**
- * Stage 8 — Intelligence result assembly (BUILD-029).
+ * Stage 9 — Intelligence result assembly (BUILD-029).
  *
  * Delegates to the Result Layer for deterministic product assembly.
  *

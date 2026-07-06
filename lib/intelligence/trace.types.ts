@@ -2,6 +2,16 @@ import type { TrustTier } from "@/lib/intelligence/trust.types";
 import type { IntelligencePipelineStageId } from "@/lib/intelligence/pipeline-stage.types";
 
 /**
+ * Contradiction detection pipeline stage identifier (BUILD-037).
+ *
+ * Canonical member of {@link IntelligencePipelineStageId}.
+ */
+export const CONTRADICTION_DETECTION_STAGE_ID = "contradiction-detection" as const;
+
+/** Stage identifier type for the Contradiction Detection Layer. */
+export type ContradictionDetectionStageId = typeof CONTRADICTION_DETECTION_STAGE_ID;
+
+/**
  * Pipeline stage execution status for audit traces.
  */
 export type ReasoningStageStatus =

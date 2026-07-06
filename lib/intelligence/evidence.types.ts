@@ -110,6 +110,22 @@ export interface Evidence {
   staleness?: EvidenceStaleness;
   /** Per-item quality assessment — attached after collection (BUILD-034). */
   quality?: import("@/lib/intelligence/evidence/quality/quality.types").EvidenceQualityAssessment;
+  /** Optional explicit conflict metadata declared by source adapters (BUILD-037). */
+  conflict?: EvidenceConflictMetadata;
+}
+
+/**
+ * Explicit conflict metadata on an evidence item (BUILD-037).
+ *
+ * Adapters may declare objective conflicts without semantic inference.
+ */
+export interface EvidenceConflictMetadata {
+  /** When true, this item explicitly declares a conflict. */
+  flagged?: boolean;
+  /** Property or facet the conflict concerns. */
+  property?: string;
+  /** Evidence item IDs this item conflicts with. */
+  relatedEvidenceIds?: string[];
 }
 
 /**
@@ -137,6 +153,12 @@ export interface EvidenceCollection {
   metadata?: EvidenceCollectionMetadata;
   /** Collection-level quality summary (BUILD-034). */
   quality?: import("@/lib/intelligence/evidence/quality/quality.types").EvidenceCollectionQualitySummary;
+  /** Detected contradictions from BUILD-037 — attached after detection stage. */
+  contradictions?: import("@/lib/intelligence/contradictions/types").EvidenceContradiction[];
+  /** Aggregated contradiction counts (BUILD-037). */
+  contradictionSummary?: import("@/lib/intelligence/contradictions/types").ContradictionSummary;
+  /** Contradiction detection run metadata (BUILD-037). */
+  contradictionDetection?: import("@/lib/intelligence/contradictions/types").ContradictionDetectionMetadata;
 }
 
 /**

@@ -41,6 +41,12 @@ export function collectPipelineWarnings(
     warnings.push("Evidence source adapters are not connected.");
   }
 
+  if (input.evidence.contradictionState === "detected") {
+    warnings.push(
+      `Evidence contradictions detected: ${input.evidence.contradictionSummary?.totalContradictions ?? 0} conflict(s).`,
+    );
+  }
+
   if (input.confidence.degraded) {
     warnings.push(
       input.confidence.degradationReason ??
