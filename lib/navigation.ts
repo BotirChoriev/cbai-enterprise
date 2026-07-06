@@ -17,7 +17,10 @@ export type NavItem = {
     | "knowledge"
     | "workflows"
     | "analytics"
-    | "settings";
+    | "settings"
+    | "government"
+    | "investor"
+    | "citizen";
 };
 
 export type NavSection = {
@@ -109,6 +112,29 @@ export const platformNavSections: NavSection[] = [
         href: "/knowledge",
         icon: "knowledge",
         description: "Platform evidence architecture, source status, and coverage gaps.",
+      },
+    ],
+  },
+  {
+    title: "Intelligence Workspaces",
+    items: [
+      {
+        label: "Government",
+        href: "/government",
+        icon: "government",
+        description: "Governance evidence coverage for public institutions.",
+      },
+      {
+        label: "Investor",
+        href: "/investor",
+        icon: "investor",
+        description: "Investment evidence readiness — no recommendations.",
+      },
+      {
+        label: "Citizen",
+        href: "/citizen",
+        icon: "citizen",
+        description: "Public information topics in clear, honest language.",
       },
     ],
   },
