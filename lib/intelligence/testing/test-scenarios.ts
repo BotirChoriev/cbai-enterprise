@@ -1801,6 +1801,86 @@ export const INTELLIGENCE_TEST_SCENARIOS: IntelligenceTestScenario[] = [
       return pass();
     },
   },
+  {
+    id: "worker-process-next",
+    name: "Worker process next",
+    description:
+      "Runtime worker processNext performs exactly one dequeue step for pending queue work.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Worker process next check.",
+      }),
+    validate: (context) => {
+      resetAgentTaskSequence();
+      resetQueueItemSequence();
+      resetScheduleItemSequence();
+      const store = new DefaultAgentTaskStore();
+      const queue = new DefaultRuntimeQueue();
+      const scheduler = new DefaultRuntimeScheduler();
+      const queueIntegration = new DefaultAgentQueueIntegration(store, queue);
+      const bridge = new DefaultAgentSchedulerBridge(store, scheduler, queueIntegration);
+      const worker = new DefaultRuntimeWorker({
+        taskStore: store,
+        queueIntegration,
+        schedulerBridge: bridge,
+        scheduler,
+        queue,
+      });
+      const task = createAgentTask({
+        agentId: "worker-agent",
+        requestId: context.request.id,
+        title: "Worker process next test task",
+        taskRequest: createTaskRequest({
+          intent: "general",
+          requestedCapabilities: [AGENT_CAPABILITY_RESEARCH],
+        }),
+      });
+
+      const enqueue = queueIntegration.enqueueTask(task);
+
+      if (!enqueue.accepted) {
+        return fail(`Expected enqueue accepted: ${enqueue.reason}`);
+      }
+
+      const initResult = worker.initialize();
+
+      if (!initResult.accepted) {
+        return fail(`Expected initialize accepted: ${initResult.reason}`);
+      }
+
+      const startResult = worker.start();
+
+      if (!startResult.accepted) {
+        return fail(`Expected start accepted: ${startResult.reason}`);
+      }
+
+      const stepResult = worker.processNext({ evaluatedAt: "2026-07-06T00:00:00.000Z" });
+
+      if (!stepResult.accepted) {
+        return fail(`Expected processNext accepted: ${stepResult.reason}`);
+      }
+
+      if (stepResult.step !== "dequeue") {
+        return fail(`Expected dequeue step, received ${stepResult.step}.`);
+      }
+
+      if (!stepResult.dequeued) {
+        return fail("Expected processNext to dequeue one task.");
+      }
+
+      if (stepResult.dequeuedTaskId !== task.id) {
+        return fail(`Expected dequeued task id ${task.id}, received ${stepResult.dequeuedTaskId ?? "null"}.`);
+      }
+
+      const snapshot = worker.snapshot();
+
+      if (snapshot.processedItems !== 1) {
+        return fail(`Expected one processed item, received ${snapshot.processedItems}.`);
+      }
+
+      return pass();
+    },
+  },
 ];
 
 /**

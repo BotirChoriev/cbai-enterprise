@@ -1,13 +1,15 @@
 /**
  * CBAI Intelligence — Agents Layer (BUILD-046+).
  *
- * Agent catalog, registry, and runtime contract foundations.
- * No agent execution in this build phase.
+ * Agent catalog, registry, dispatch, queue, scheduler, execution,
+ * and local runtime adapter foundations (through BUILD-059).
  *
  * @see docs/build-046-report.md
  * @see docs/build-047-report.md
  * @see docs/build-048-report.md
  * @see docs/build-049-report.md
+ * @see docs/build-055-report.md
+ * @see docs/build-059-report.md
  */
 
 export {

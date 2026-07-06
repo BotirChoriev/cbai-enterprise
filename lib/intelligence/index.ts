@@ -112,6 +112,7 @@ export type {
   StageVerificationResult,
   TraceVerificationResult,
   TraceVerificationSummary,
+  ContradictionDetectionStageId,
 } from "@/lib/intelligence/trace.types";
 
 export type {
@@ -261,7 +262,6 @@ export {
 
 export {
   CONTRADICTION_DETECTION_STAGE_ID,
-  type ContradictionDetectionStageId,
 } from "@/lib/intelligence/trace.types";
 
 export {
@@ -379,11 +379,16 @@ export type {
 export {
   DefaultIntelligenceTestHarness,
   INTELLIGENCE_TEST_HARNESS_VERSION,
+  INTELLIGENCE_TEST_SCENARIOS,
   defaultIntelligenceTestHarness,
   runIntelligenceTestSuite,
   runIntelligenceTestSuiteSummary,
   type IntelligenceTestHarness,
 } from "@/lib/intelligence/testing";
+
+export {
+  ISSUE_BLOCKING_EXECUTION_DENIED,
+} from "@/lib/intelligence/diagnostics/issues";
 
 export type {
   OrchestrationSummary,

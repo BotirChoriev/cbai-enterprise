@@ -44,8 +44,8 @@ export const PROVIDER_KIND_LABELS: Record<ProviderKind, string> = {
  * Factual stub descriptions for provider backends — no execution claims.
  */
 export const PROVIDER_KIND_DESCRIPTIONS: Record<ProviderKind, string> = {
-  openai: "Reserved OpenAI agent backend contract — not connected in BUILD-047.",
-  anthropic: "Reserved Anthropic agent backend contract — not connected in BUILD-047.",
-  gemini: "Reserved Gemini agent backend contract — not connected in BUILD-047.",
-  local: "Reserved local agent backend contract — not connected in BUILD-047.",
+  openai: "Reserved OpenAI agent backend contract — not connected in Enterprise Alpha.",
+  anthropic: "Reserved Anthropic agent backend contract — not connected in Enterprise Alpha.",
+  gemini: "Reserved Gemini agent backend contract — not connected in Enterprise Alpha.",
+  local: "Local deterministic runtime adapter — connected via BUILD-055.",
 };
