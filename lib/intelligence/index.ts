@@ -406,20 +406,36 @@ export {
   type IntelligenceOrchestrator,
 } from "@/lib/intelligence/orchestrator";
 
-export type {
-  RuntimeFailure,
-  RuntimeLifecycleStatus,
-  RuntimeState,
-} from "@/lib/intelligence/runtime/runtime.types";
-
 export {
   DEFAULT_INTELLIGENCE_RUNTIME_ID,
   DefaultIntelligenceRuntime,
   INTELLIGENCE_RUNTIME_VERSION,
   RuntimeSession,
   defaultIntelligenceRuntime,
+  DEFAULT_RUNTIME_QUEUE_ID,
+  DefaultRuntimeQueue,
+  RUNTIME_QUEUE_VERSION,
+  defaultRuntimeQueue,
+  DEFAULT_RUNTIME_QUEUE_POLICY,
   type IntelligenceRuntime,
+  type RuntimeQueue,
 } from "@/lib/intelligence/runtime";
+
+export type {
+  QueueDispatchMode,
+  QueueEnqueueInput,
+  QueueEnqueueResult,
+  QueueItem,
+  QueueItemStatus,
+  RuntimeQueuePolicy,
+  RuntimeQueueSnapshot,
+} from "@/lib/intelligence/runtime/queue";
+
+export type {
+  RuntimeFailure,
+  RuntimeLifecycleStatus,
+  RuntimeState,
+} from "@/lib/intelligence/runtime/runtime.types";
 
 export type {
   FormattedIntelligenceResultSections,

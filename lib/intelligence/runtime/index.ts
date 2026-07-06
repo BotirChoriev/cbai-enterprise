@@ -45,3 +45,22 @@ export type {
   RuntimeLifecycleStatus,
   RuntimeState,
 } from "@/lib/intelligence/runtime/runtime.types";
+
+export {
+  DEFAULT_RUNTIME_QUEUE_ID,
+  DefaultRuntimeQueue,
+  RUNTIME_QUEUE_VERSION,
+  defaultRuntimeQueue,
+  DEFAULT_RUNTIME_QUEUE_POLICY,
+  type RuntimeQueue,
+} from "@/lib/intelligence/runtime/queue";
+
+export type {
+  QueueDispatchMode,
+  QueueEnqueueInput,
+  QueueEnqueueResult,
+  QueueItem,
+  QueueItemStatus,
+  RuntimeQueuePolicy,
+  RuntimeQueueSnapshot,
+} from "@/lib/intelligence/runtime/queue";
