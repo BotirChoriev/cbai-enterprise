@@ -1,7 +1,9 @@
 export type NavItem = {
   label: string;
   href: string;
+  description: string;
   icon:
+    | "home"
     | "dashboard"
     | "core"
     | "countries"
@@ -18,19 +20,135 @@ export type NavItem = {
     | "settings";
 };
 
-export const mainNav: NavItem[] = [
-  { label: "Dashboard", href: "/dashboard", icon: "dashboard" },
-  { label: "CBAI Core", href: "/core", icon: "core" },
-  { label: "Countries", href: "/countries", icon: "countries" },
-  { label: "Companies", href: "/companies", icon: "companies" },
-  { label: "Universities", href: "/universities", icon: "universities" },
-  { label: "Global Search", href: "/search", icon: "search" },
-  { label: "Knowledge Graph", href: "/graph", icon: "graph" },
-  { label: "Reasoning Engine", href: "/reasoning", icon: "reasoning" },
-  { label: "AI Control", href: "/ai-control", icon: "ai-control" },
-  { label: "AI Agents", href: "/agents", icon: "agents" },
-  { label: "Knowledge", href: "/knowledge", icon: "knowledge" },
-  { label: "Workflows", href: "/workflows", icon: "workflows" },
-  { label: "Analytics", href: "/analytics", icon: "analytics" },
-  { label: "Settings", href: "/settings", icon: "settings" },
+export type NavSection = {
+  title: string;
+  items: NavItem[];
+};
+
+export const platformNavSections: NavSection[] = [
+  {
+    title: "Overview",
+    items: [
+      {
+        label: "Platform Home",
+        href: "/",
+        icon: "home",
+        description: "Platform entry point and module directory.",
+      },
+      {
+        label: "Runtime Dashboard",
+        href: "/dashboard",
+        icon: "dashboard",
+        description: "Live runtime health, queue, scheduler, and agent state.",
+      },
+    ],
+  },
+  {
+    title: "Intelligence",
+    items: [
+      {
+        label: "CBAI Core",
+        href: "/core",
+        icon: "core",
+        description: "Central intelligence engine command center.",
+      },
+      {
+        label: "Reasoning Engine",
+        href: "/reasoning",
+        icon: "reasoning",
+        description: "Interactive reasoning pipeline and evidence review.",
+      },
+      {
+        label: "AI Control",
+        href: "/ai-control",
+        icon: "ai-control",
+        description: "Command routing, agent dispatch, and system context.",
+      },
+    ],
+  },
+  {
+    title: "Entities",
+    items: [
+      {
+        label: "Countries",
+        href: "/countries",
+        icon: "countries",
+        description: "Country intelligence profiles and relationships.",
+      },
+      {
+        label: "Companies",
+        href: "/companies",
+        icon: "companies",
+        description: "Company intelligence profiles and market links.",
+      },
+      {
+        label: "Universities",
+        href: "/universities",
+        icon: "universities",
+        description: "University intelligence profiles and research ties.",
+      },
+    ],
+  },
+  {
+    title: "Discovery",
+    items: [
+      {
+        label: "Global Search",
+        href: "/search",
+        icon: "search",
+        description: "Search countries, companies, and universities.",
+      },
+      {
+        label: "Knowledge Graph",
+        href: "/graph",
+        icon: "graph",
+        description: "Relationship graph across platform entities.",
+      },
+      {
+        label: "Knowledge",
+        href: "/knowledge",
+        icon: "knowledge",
+        description: "Document collections and knowledge base management.",
+      },
+    ],
+  },
+  {
+    title: "Operations",
+    items: [
+      {
+        label: "AI Agents",
+        href: "/agents",
+        icon: "agents",
+        description: "Agent catalog, deployment status, and activity.",
+      },
+      {
+        label: "Workflows",
+        href: "/workflows",
+        icon: "workflows",
+        description: "Workflow automation builder (coming soon).",
+      },
+      {
+        label: "Analytics",
+        href: "/analytics",
+        icon: "analytics",
+        description: "Platform analytics and usage reporting (coming soon).",
+      },
+      {
+        label: "Settings",
+        href: "/settings",
+        icon: "settings",
+        description: "Organization and platform configuration (coming soon).",
+      },
+    ],
+  },
 ];
+
+/** Flat navigation list for module grids and legacy consumers. */
+export const mainNav: NavItem[] = platformNavSections.flatMap(
+  (section) => section.items,
+);
+
+/** Platform modules excluding the home route. */
+export const platformModules: NavItem[] = mainNav.filter(
+  (item) => item.href !== "/",
+);
