@@ -129,3 +129,23 @@ export {
   updateRuntimeSessionRegistry,
   TEST_RUNTIME_CANCEL_REQUEST_PREFIX,
 } from "@/lib/intelligence/runtime/integration";
+
+export {
+  RUNTIME_WORKER_VERSION,
+  DEFAULT_RUNTIME_WORKER_ID,
+  DEFAULT_RUNTIME_WORKER_POLICY,
+  DefaultRuntimeWorker,
+  defaultRuntimeWorker,
+  initializeRuntimeWorker,
+  tickRuntimeWorker,
+  buildRuntimeWorkerContext,
+  buildRuntimeWorkerSnapshot,
+  type RuntimeWorker,
+  type RuntimeWorkerDependencies,
+  type RuntimeWorkerState,
+  type RuntimeWorkerSnapshot,
+  type RuntimeWorkerDiagnostics,
+  type RuntimeWorkerTickResult,
+  type RuntimeWorkerProcessNextResult,
+  type RuntimeWorkerLifecycleResult,
+} from "@/lib/intelligence/runtime/worker";

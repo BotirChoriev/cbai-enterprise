@@ -43,6 +43,7 @@ import { DefaultRuntimeQueue } from "@/lib/intelligence/runtime/queue/queue";
 import { resetQueueItemSequence } from "@/lib/intelligence/runtime/queue/queue-item";
 import { DefaultSessionRegistry } from "@/lib/intelligence/runtime/registry/session-registry";
 import { DefaultObservabilityService } from "@/lib/intelligence/observability/observability-service";
+import { DefaultRuntimeWorker } from "@/lib/intelligence/runtime/worker/worker";
 import { TEST_RUNTIME_CANCEL_REQUEST_PREFIX } from "@/lib/intelligence/runtime/integration/runtime-policy-diagnostics";
 import {
   queryByRequestId,
@@ -1572,6 +1573,229 @@ export const INTELLIGENCE_TEST_SCENARIOS: IntelligenceTestScenario[] = [
 
       if (!snapshot.health.recommendedNextAction.includes("evaluateReadyTasks")) {
         return fail("Expected evaluateReadyTasks recommended next action when ready items exist.");
+      }
+
+      return pass();
+    },
+  },
+  {
+    id: "worker-initialize",
+    name: "Worker initialize",
+    description:
+      "Runtime worker initialize moves lifecycle from created to initialized.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Worker initialize check.",
+      }),
+    validate: () => {
+      resetAgentTaskSequence();
+      resetQueueItemSequence();
+      resetScheduleItemSequence();
+      const store = new DefaultAgentTaskStore();
+      const queue = new DefaultRuntimeQueue();
+      const scheduler = new DefaultRuntimeScheduler();
+      const queueIntegration = new DefaultAgentQueueIntegration(store, queue);
+      const bridge = new DefaultAgentSchedulerBridge(store, scheduler, queueIntegration);
+      const worker = new DefaultRuntimeWorker({
+        taskStore: store,
+        queueIntegration,
+        schedulerBridge: bridge,
+        scheduler,
+        queue,
+      });
+
+      const initial = worker.snapshot();
+
+      if (initial.workerState !== "created") {
+        return fail(`Expected initial worker state created, received ${initial.workerState}.`);
+      }
+
+      const initResult = worker.initialize();
+
+      if (!initResult.accepted) {
+        return fail(`Expected initialize accepted: ${initResult.reason}`);
+      }
+
+      if (initResult.workerState !== "initialized") {
+        return fail(`Expected initialized state, received ${initResult.workerState}.`);
+      }
+
+      const snapshot = worker.snapshot();
+
+      if (snapshot.workerState !== "initialized") {
+        return fail(`Expected snapshot state initialized, received ${snapshot.workerState}.`);
+      }
+
+      if (snapshot.processedItems !== 0) {
+        return fail("Expected zero processed items after initialize.");
+      }
+
+      const duplicateInit = worker.initialize();
+
+      if (duplicateInit.accepted) {
+        return fail("Expected duplicate initialize rejected.");
+      }
+
+      return pass();
+    },
+  },
+  {
+    id: "worker-tick",
+    name: "Worker tick",
+    description:
+      "Runtime worker tick evaluates scheduler and dequeues one task without agent execution.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Worker tick check.",
+      }),
+    validate: (context) => {
+      resetAgentTaskSequence();
+      resetQueueItemSequence();
+      resetScheduleItemSequence();
+      const store = new DefaultAgentTaskStore();
+      const queue = new DefaultRuntimeQueue();
+      const scheduler = new DefaultRuntimeScheduler();
+      const queueIntegration = new DefaultAgentQueueIntegration(store, queue);
+      const bridge = new DefaultAgentSchedulerBridge(store, scheduler, queueIntegration);
+      const worker = new DefaultRuntimeWorker({
+        taskStore: store,
+        queueIntegration,
+        schedulerBridge: bridge,
+        scheduler,
+        queue,
+      });
+      const task = createAgentTask({
+        agentId: "worker-agent",
+        requestId: context.request.id,
+        title: "Worker tick test task",
+        taskRequest: createTaskRequest({
+          intent: "general",
+          requestedCapabilities: [AGENT_CAPABILITY_RESEARCH],
+        }),
+      });
+
+      const scheduledFor = "2026-07-06T00:00:00.000Z";
+      const schedule = bridge.scheduleTask(task, scheduledFor, {
+        referenceAt: "2026-07-05T00:00:00.000Z",
+      });
+
+      if (!schedule.accepted) {
+        return fail(`Expected schedule accepted before tick: ${schedule.reason}`);
+      }
+
+      const initResult = worker.initialize();
+
+      if (!initResult.accepted) {
+        return fail(`Expected initialize accepted: ${initResult.reason}`);
+      }
+
+      const startResult = worker.start();
+
+      if (!startResult.accepted) {
+        return fail(`Expected start accepted: ${startResult.reason}`);
+      }
+
+      const tickResult = worker.tick({ evaluatedAt: scheduledFor });
+
+      if (!tickResult.accepted) {
+        return fail(`Expected tick accepted: ${tickResult.reason}`);
+      }
+
+      if (tickResult.schedulerEnqueuedCount !== 1) {
+        return fail(
+          `Expected one scheduler enqueue during tick, received ${tickResult.schedulerEnqueuedCount}.`,
+        );
+      }
+
+      if (!tickResult.dequeued) {
+        return fail("Expected tick to dequeue one task after scheduler promotion.");
+      }
+
+      if (!tickResult.dequeuedTaskId) {
+        return fail("Expected dequeued task id after tick.");
+      }
+
+      const snapshot = worker.snapshot();
+
+      if (snapshot.processedItems < 2) {
+        return fail(`Expected at least two processed items, received ${snapshot.processedItems}.`);
+      }
+
+      if (snapshot.lastTick !== scheduledFor) {
+        return fail(`Expected lastTick ${scheduledFor}, received ${snapshot.lastTick ?? "null"}.`);
+      }
+
+      return pass();
+    },
+  },
+  {
+    id: "worker-stop",
+    name: "Worker stop",
+    description:
+      "Runtime worker stop moves lifecycle to stopped and rejects further tick calls.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Worker stop check.",
+      }),
+    validate: () => {
+      resetAgentTaskSequence();
+      resetQueueItemSequence();
+      resetScheduleItemSequence();
+      const store = new DefaultAgentTaskStore();
+      const queue = new DefaultRuntimeQueue();
+      const scheduler = new DefaultRuntimeScheduler();
+      const queueIntegration = new DefaultAgentQueueIntegration(store, queue);
+      const bridge = new DefaultAgentSchedulerBridge(store, scheduler, queueIntegration);
+      const worker = new DefaultRuntimeWorker({
+        taskStore: store,
+        queueIntegration,
+        schedulerBridge: bridge,
+        scheduler,
+        queue,
+      });
+
+      const initResult = worker.initialize();
+
+      if (!initResult.accepted) {
+        return fail(`Expected initialize accepted: ${initResult.reason}`);
+      }
+
+      const startResult = worker.start();
+
+      if (!startResult.accepted) {
+        return fail(`Expected start accepted: ${startResult.reason}`);
+      }
+
+      const stopResult = worker.stop();
+
+      if (!stopResult.accepted) {
+        return fail(`Expected stop accepted: ${stopResult.reason}`);
+      }
+
+      if (stopResult.workerState !== "stopped") {
+        return fail(`Expected stopped state, received ${stopResult.workerState}.`);
+      }
+
+      const snapshot = worker.snapshot();
+
+      if (snapshot.workerState !== "stopped") {
+        return fail(`Expected snapshot state stopped, received ${snapshot.workerState}.`);
+      }
+
+      const tickResult = worker.tick({ evaluatedAt: "2026-07-06T00:00:00.000Z" });
+
+      if (tickResult.accepted) {
+        return fail("Expected tick rejected after stop.");
+      }
+
+      if (!tickResult.reason?.includes("running")) {
+        return fail("Expected tick rejection reason to mention running state requirement.");
+      }
+
+      const duplicateStop = worker.stop();
+
+      if (duplicateStop.accepted) {
+        return fail("Expected duplicate stop rejected.");
       }
 
       return pass();
