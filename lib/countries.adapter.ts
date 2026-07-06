@@ -6,6 +6,7 @@ import {
   NOT_CONNECTED_SOURCE_LABEL,
 } from "@/lib/countries.intelligence";
 import type { Entity } from "@/lib/entity/entity.types";
+import { namesMatch } from "@/lib/name-match";
 
 /** Cross-entity links derived from local registries only. */
 export type CountryRelationships = {
@@ -22,16 +23,6 @@ export const COUNTRY_METADATA_FIELDS = [
   { key: "government", label: "Government Form" },
   { key: "code", label: "Country Code" },
 ] as const;
-
-function normalizeName(name: string): string {
-  return name.toLowerCase().replace(/[^a-z0-9]/g, "");
-}
-
-function namesMatch(a: string, b: string): boolean {
-  const na = normalizeName(a);
-  const nb = normalizeName(b);
-  return na === nb || na.includes(nb) || nb.includes(na);
-}
 
 /**
  * Derive country relationships from local company and university registries.

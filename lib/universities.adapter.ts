@@ -2,6 +2,7 @@ import { companies } from "@/lib/companies";
 import { countries } from "@/lib/countries";
 import type { University } from "@/lib/universities";
 import type { Entity, EntityMetadataField } from "@/lib/entity/entity.types";
+import { namesMatch } from "@/lib/name-match";
 
 const INSUFFICIENT_EVIDENCE_LABEL = "Insufficient Evidence";
 const NOT_CONNECTED_SOURCE_LABEL = "Evidence Source Not Connected";
@@ -25,16 +26,6 @@ export const UNIVERSITY_METADATA_FIELDS: EntityMetadataField[] = [
   { key: "website", label: "Official Website" },
   { key: "registryStatus", label: "Registry Status" },
 ];
-
-function normalizeName(name: string): string {
-  return name.toLowerCase().replace(/[^a-z0-9]/g, "");
-}
-
-function namesMatch(a: string, b: string): boolean {
-  const na = normalizeName(a);
-  const nb = normalizeName(b);
-  return na === nb || na.includes(nb) || nb.includes(na);
-}
 
 function resolveCountryRecord(university: University) {
   return countries.find((country) => namesMatch(country.name, university.country));

@@ -17,16 +17,7 @@ import type {
 } from "@/lib/graph/graph.types";
 import { graphNodeId } from "@/lib/graph/graph.types";
 import { GRAPH_LAYOUT } from "@/lib/graph/graph.mock";
-
-function normalizeName(name: string): string {
-  return name.toLowerCase().replace(/[^a-z0-9]/g, "");
-}
-
-function namesMatch(a: string, b: string): boolean {
-  const na = normalizeName(a);
-  const nb = normalizeName(b);
-  return na === nb || na.includes(nb) || nb.includes(na);
-}
+import { namesMatch } from "@/lib/name-match";
 
 function placeOnRing(
   index: number,

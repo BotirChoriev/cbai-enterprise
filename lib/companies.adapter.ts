@@ -6,6 +6,7 @@ import {
   NOT_CONNECTED_SOURCE_LABEL,
 } from "@/lib/companies.intelligence";
 import type { Entity } from "@/lib/entity/entity.types";
+import { namesMatch } from "@/lib/name-match";
 
 /** Links derived from local country and university catalogs only. */
 export type CompanyLinkedEntities = {
@@ -27,16 +28,6 @@ export const COMPANY_METADATA_FIELDS = [
   { key: "founded", label: "Founded" },
   { key: "icon", label: "Catalog Symbol" },
 ] as const;
-
-function normalizeName(name: string): string {
-  return name.toLowerCase().replace(/[^a-z0-9]/g, "");
-}
-
-function namesMatch(a: string, b: string): boolean {
-  const na = normalizeName(a);
-  const nb = normalizeName(b);
-  return na === nb || na.includes(nb) || nb.includes(na);
-}
 
 function resolveHeadquartersCountry(company: Company): string | null {
   const match = countries.find((country) =>
