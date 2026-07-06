@@ -2,6 +2,9 @@ import type { Country } from "@/lib/countries";
 import type { CountryIntelligenceProfile } from "@/lib/countries.intelligence";
 import { getCountryPipelineReadiness } from "@/lib/pipeline-readiness";
 import CountryCoveragePanel from "@/components/countries/CountryCoveragePanel";
+import EvidenceGapPanel from "@/components/evidence-gap/EvidenceGapPanel";
+import { getCountryEvidenceGaps } from "@/lib/evidence-gap";
+import CountryTimelineSection from "@/components/countries/CountryTimelineSection";
 import CountryIndicatorCoverage from "@/components/countries/CountryIndicatorCoverage";
 import CountrySourceCoverage from "@/components/countries/CountrySourceCoverage";
 import CountryMethodology from "@/components/countries/CountryMethodology";
@@ -17,6 +20,7 @@ type CountryIntelligencePanelProps = {
 export function CountryIntelligencePanel({ profile, country }: CountryIntelligencePanelProps) {
   const { registryFacts, coverage } = profile;
   const pipelineReadiness = getCountryPipelineReadiness(country);
+  const evidenceGaps = getCountryEvidenceGaps(country);
   const sourceConnectedCount = coverage.sources.filter(
     (s) => s.statusLabel === "Connected",
   ).length;
@@ -66,6 +70,10 @@ export function CountryIntelligencePanel({ profile, country }: CountryIntelligen
         sourceConnectedCount={sourceConnectedCount}
         totalSources={coverage.sources.length}
       />
+
+      <EvidenceGapPanel profile={evidenceGaps} />
+
+      <CountryTimelineSection country={country} />
 
       <CountryIndicatorCoverage indicatorsByDomain={coverage.indicatorsByDomain} />
 

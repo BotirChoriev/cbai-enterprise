@@ -2,6 +2,8 @@ import type { Company } from "@/lib/companies";
 import type { CompanyIntelligenceProfile } from "@/lib/companies.intelligence";
 import { getCompanyPipelineReadiness } from "@/lib/pipeline-readiness";
 import CompanyCoveragePanel from "@/components/companies/CompanyCoveragePanel";
+import EvidenceGapPanel from "@/components/evidence-gap/EvidenceGapPanel";
+import { getCompanyEvidenceGaps } from "@/lib/evidence-gap";
 import CompanyIndicatorCoverage from "@/components/companies/CompanyIndicatorCoverage";
 import CompanySourceCoverage from "@/components/companies/CompanySourceCoverage";
 import CompanyMethodology from "@/components/companies/CompanyMethodology";
@@ -17,6 +19,7 @@ type CompanyIntelligencePanelProps = {
 export function CompanyIntelligencePanel({ profile, company }: CompanyIntelligencePanelProps) {
   const { registryFacts, coverage } = profile;
   const pipelineReadiness = getCompanyPipelineReadiness(company);
+  const evidenceGaps = getCompanyEvidenceGaps(company);
   const sourceConnectedCount = coverage.sources.filter(
     (s) => s.statusLabel === "Connected",
   ).length;
@@ -62,6 +65,8 @@ export function CompanyIntelligencePanel({ profile, company }: CompanyIntelligen
         sourceConnectedCount={sourceConnectedCount}
         totalSources={coverage.sources.length}
       />
+
+      <EvidenceGapPanel profile={evidenceGaps} />
 
       <CompanyIndicatorCoverage indicatorsByDomain={coverage.indicatorsByDomain} />
 
