@@ -23,7 +23,7 @@ export default function CountryCard({
   );
   const evidenceLabel = resolveCountryListEvidenceLabel(profile);
   const evidenceClass = countryEvidenceStatusClass(
-    profile.entityProfileConnected ? "connected" : "insufficient",
+    profile.referenceConnected ? "connected" : "insufficient",
   );
 
   return (

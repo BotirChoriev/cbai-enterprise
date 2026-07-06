@@ -1,247 +1,159 @@
 import type { Country } from "@/lib/countries";
+import type { CountryRelationships } from "@/lib/countries.adapter";
+import { buildCountryCoverageProfile } from "@/lib/countries.coverage";
 import { defaultEntityResolver } from "@/lib/intelligence/evidence/adapters/entity/entity-resolver";
 
-/** Evidence connection classification for country intelligence blocks. */
+/** Evidence connection classification for country views. */
 export type CountryEvidenceStatus = "connected" | "insufficient" | "not_connected";
 
-/** Persona identifiers for country intelligence views. */
+/** Persona identifiers aligned with CBAI governance standard. */
 export type CountryPersonaId =
-  | "general"
+  | "citizen"
   | "investor"
-  | "public_institution"
+  | "government"
   | "student"
   | "researcher"
   | "academic";
 
-/** Standard unavailable messages (CBAI Golden Rule). */
 export const INSUFFICIENT_EVIDENCE_LABEL = "Insufficient Evidence";
 
-export const NOT_AVAILABLE_SOURCE_LABEL =
-  "Not Available — evidence source not connected yet";
+export const NOT_CONNECTED_SOURCE_LABEL = "Evidence source not connected";
 
 export const POLITICAL_NEUTRALITY_NOTICE =
   "CBAI provides evidence-based, politically neutral intelligence. It does not interfere in domestic politics or endorse political actors.";
 
-/** Single constitution-compliant intelligence block. */
-export type CountryIntelligenceBlock = {
-  id: string;
-  title: string;
-  meaning: string;
-  evidenceStatus: CountryEvidenceStatus;
-  confidenceStatus: string;
-  sourceConnected: boolean;
-  displayValue: string;
+export type CountryRegistryFacts = {
+  name: string;
+  code: string;
+  capital: string;
+  region: string;
+  government: string;
+  sourceLabel: string;
 };
 
-/** Persona-specific guidance without fabricated claims. */
 export type CountryPersonaSection = {
   id: CountryPersonaId;
   title: string;
-  guidance: string;
-  evidenceNote: string;
+  currentValue: string;
+  futureCapability: string;
 };
 
-/** Linked entities derived from local company and university registries. */
-export type CountryLinkedEntities = {
-  relatedCompanies: string[];
-  universities: string[];
+export type CountryTrustPillar = {
+  id: string;
+  title: string;
+  description: string;
 };
 
-/** Full country intelligence profile for UI rendering. */
+export type CountryLinkedEntities = CountryRelationships;
+
 export type CountryIntelligenceProfile = {
   countryId: string;
-  entityProfileConnected: boolean;
-  registryFieldCount: number;
-  evidenceItemEstimate: number;
-  blocks: CountryIntelligenceBlock[];
+  referenceConnected: boolean;
+  registryFacts: CountryRegistryFacts;
   personas: CountryPersonaSection[];
   linkedEntities: CountryLinkedEntities;
+  trustPillars: CountryTrustPillar[];
+  coverage: ReturnType<typeof buildCountryCoverageProfile>;
   neutralityNotice: string;
 };
 
-const REGISTRY_FIELD_COUNT = 6;
+const REGISTRY_SOURCE_LABEL = "Available — CBAI Local Registry";
 
-function block(
-  input: Omit<CountryIntelligenceBlock, "displayValue"> & {
-    displayValue?: string;
-  },
-): CountryIntelligenceBlock {
-  const displayValue =
-    input.displayValue ??
-    (input.sourceConnected
-      ? input.confidenceStatus
-      : input.evidenceStatus === "insufficient"
-        ? INSUFFICIENT_EVIDENCE_LABEL
-        : NOT_AVAILABLE_SOURCE_LABEL);
-
-  return {
-    ...input,
-    displayValue,
-  };
+function buildTrustPillars(): CountryTrustPillar[] {
+  return [
+    {
+      id: "evidence-first",
+      title: "Evidence First",
+      description:
+        "Country profiles display registry facts and coverage status. Extended intelligence is withheld until official sources connect.",
+    },
+    {
+      id: "political-neutrality",
+      title: "Political Neutrality",
+      description:
+        "CBAI does not endorse governments, publish geopolitical rankings, or substitute narratives for verified evidence.",
+    },
+    {
+      id: "source-attribution",
+      title: "Source Attribution",
+      description:
+        "Every indicator and source shows connection status. Required evidence sources are named — never hidden.",
+    },
+    {
+      id: "methodology-before-metrics",
+      title: "Methodology Before Metrics",
+      description:
+        "CBAI does not score without evidence. Future evaluations require methodology and connected sources.",
+    },
+    {
+      id: "no-fake-data",
+      title: "No Fake Data",
+      description:
+        "Unavailable sections state Not connected or Planned — never hidden behind synthetic scores or AI summaries.",
+    },
+    {
+      id: "reproducibility",
+      title: "Reproducibility",
+      description:
+        "Indicator IDs, source slugs, and coverage status export cleanly for researchers and academic citation.",
+    },
+  ];
 }
 
 function buildPersonaSections(countryName: string): CountryPersonaSection[] {
   return [
     {
-      id: "general",
-      title: "General User",
-      guidance: `Review verified registry facts for ${countryName} and check each block's evidence status before drawing conclusions. CBAI withholds narrative scores until sources connect.`,
-      evidenceNote: "Registry facts only — no automated political or economic recommendations.",
+      id: "citizen",
+      title: "Citizen",
+      currentValue: `Review ${countryName} registry facts, evidence coverage, and indicator status before relying on any public claim on this platform.`,
+      futureCapability:
+        "Governance, public services, and budget transparency indicators when national open data sources connect.",
     },
     {
       id: "investor",
       title: "Investor",
-      guidance:
-        "Investment scores, procurement signals, and opportunity lists require connected financial, tender, and budget transparency sources. Use linked local entities to identify platform records only.",
-      evidenceNote: NOT_AVAILABLE_SOURCE_LABEL,
+      currentValue:
+        "Identify registry scope and which fiscal, trade, and investment indicators remain not connected — no due diligence scores today.",
+      futureCapability:
+        "National accounts, FDI statistics, and procurement disclosure when World Bank, IMF, and procurement sources connect.",
     },
     {
-      id: "public_institution",
-      title: "Public Institution / State Leader",
-      guidance:
-        "Governance, procurement openness, and budget transparency blocks require dedicated public-sector evidence adapters. Registry facts help scope requests but do not substitute for official datasets.",
-      evidenceNote: NOT_AVAILABLE_SOURCE_LABEL,
+      id: "government",
+      title: "Government",
+      currentValue:
+        "Use coverage maps to prioritize official data publication. CBAI provides no political ratings or policy recommendations.",
+      futureCapability:
+        "Open budget, procurement, and public service indicators when national portals and NSO feeds connect.",
     },
     {
       id: "student",
       title: "Student",
-      guidance: `Use ${countryName} registry facts and linked universities from the local platform catalog. Academic program or ranking analysis is not available without connected education evidence sources.`,
-      evidenceNote: "University names listed only when present in the local registry.",
+      currentValue:
+        "Country name, capital, region, and government form from local registry. Linked universities from verified catalog relationships.",
+      futureCapability:
+        "Education enrollment and research indicators when UNESCO and national ministry sources connect.",
     },
     {
       id: "researcher",
       title: "Researcher",
-      guidance:
-        "Export block-level evidence status and registry metadata for reproducible scoping. Trend, scenario, and governance analyses require connected research-grade sources.",
-      evidenceNote: NOT_AVAILABLE_SOURCE_LABEL,
+      currentValue:
+        "Export indicator coverage, source status, and Knowledge Graph relationship counts for reproducible research scoping.",
+      futureCapability:
+        "Time-series macro, climate, and human rights treaty data when UN and NSO evidence sources connect.",
     },
     {
       id: "academic",
       title: "Academic",
-      guidance:
-        "CBAI separates reference registry data from assessed intelligence. Cite evidence status and source connectivity in any downstream academic use.",
-      evidenceNote: POLITICAL_NEUTRALITY_NOTICE,
+      currentValue:
+        "CBAI separates reference registry data from assessed intelligence. Cite source status and methodology in scholarly work.",
+      futureCapability:
+        "Field-normalized indicators and cross-country comparisons when verified datasets and methodology versions publish.",
     },
   ];
 }
 
-function buildConstitutionBlocks(
-  country: Country,
-  entityProfileConnected: boolean,
-): CountryIntelligenceBlock[] {
-  const registryConnected = entityProfileConnected;
-
-  return [
-    block({
-      id: "evidence-status",
-      title: "Evidence Status",
-      meaning:
-        "Shows whether the entity-profile adapter can resolve this country and how many registry fields are available as factual evidence.",
-      evidenceStatus: registryConnected ? "connected" : "insufficient",
-      confidenceStatus: registryConnected
-        ? `Local registry connected — ${REGISTRY_FIELD_COUNT} factual fields`
-        : INSUFFICIENT_EVIDENCE_LABEL,
-      sourceConnected: registryConnected,
-      displayValue: registryConnected
-        ? `Entity profile connected — ${REGISTRY_FIELD_COUNT} registry fields available`
-        : INSUFFICIENT_EVIDENCE_LABEL,
-    }),
-    block({
-      id: "ai-score",
-      title: "AI Score",
-      meaning:
-        "Would measure AI readiness and capability when a verified assessment source is connected.",
-      evidenceStatus: "not_connected",
-      confidenceStatus: INSUFFICIENT_EVIDENCE_LABEL,
-      sourceConnected: false,
-    }),
-    block({
-      id: "investment-score",
-      title: "Investment Score",
-      meaning:
-        "Would measure investment attractiveness when financial and market evidence sources connect.",
-      evidenceStatus: "not_connected",
-      confidenceStatus: INSUFFICIENT_EVIDENCE_LABEL,
-      sourceConnected: false,
-    }),
-    block({
-      id: "risk-score",
-      title: "Risk Score",
-      meaning:
-        "Would measure risk exposure when governance and market risk evidence sources connect.",
-      evidenceStatus: "not_connected",
-      confidenceStatus: INSUFFICIENT_EVIDENCE_LABEL,
-      sourceConnected: false,
-    }),
-    block({
-      id: "human-rights-governance",
-      title: "Human Rights & Governance",
-      meaning:
-        "Governance and human-rights indicators require a dedicated evidence adapter.",
-      evidenceStatus: "not_connected",
-      confidenceStatus: INSUFFICIENT_EVIDENCE_LABEL,
-      sourceConnected: false,
-    }),
-    block({
-      id: "tender-transparency",
-      title: "Tender Transparency",
-      meaning:
-        "Public tender transparency metrics require procurement evidence sources.",
-      evidenceStatus: "not_connected",
-      confidenceStatus: INSUFFICIENT_EVIDENCE_LABEL,
-      sourceConnected: false,
-    }),
-    block({
-      id: "procurement-openness",
-      title: "Procurement Openness",
-      meaning:
-        "Procurement openness assessments require connected procurement datasets.",
-      evidenceStatus: "not_connected",
-      confidenceStatus: INSUFFICIENT_EVIDENCE_LABEL,
-      sourceConnected: false,
-    }),
-    block({
-      id: "budget-transparency",
-      title: "Budget Transparency",
-      meaning:
-        "Budget transparency indicators require connected fiscal evidence sources.",
-      evidenceStatus: "not_connected",
-      confidenceStatus: INSUFFICIENT_EVIDENCE_LABEL,
-      sourceConnected: false,
-    }),
-    block({
-      id: "five-year-trend",
-      title: "5-Year Trend",
-      meaning:
-        "Historical trend analysis requires time-series evidence sources.",
-      evidenceStatus: "not_connected",
-      confidenceStatus: INSUFFICIENT_EVIDENCE_LABEL,
-      sourceConnected: false,
-    }),
-    block({
-      id: "future-scenarios",
-      title: "Future Scenarios",
-      meaning:
-        "Scenario modeling requires connected forecasting evidence — not generated without sources.",
-      evidenceStatus: "not_connected",
-      confidenceStatus: INSUFFICIENT_EVIDENCE_LABEL,
-      sourceConnected: false,
-    }),
-    block({
-      id: "persona-intelligence",
-      title: "Persona Intelligence",
-      meaning:
-        "Persona views explain how to use available evidence responsibly for different audiences.",
-      evidenceStatus: registryConnected ? "connected" : "insufficient",
-      confidenceStatus: "Guidance available — assessed intelligence withheld",
-      sourceConnected: true,
-      displayValue: "Persona guidance available below",
-    }),
-  ];
-}
-
 /**
- * Build constitution-compliant country intelligence profile.
+ * Build Countries Intelligence 2.0 profile — constitution-compliant, foundation-integrated.
  */
 export function buildCountryIntelligenceProfile(
   country: Country,
@@ -252,16 +164,25 @@ export function buildCountryIntelligenceProfile(
     id: country.id,
     name: country.name,
   });
-  const entityProfileConnected = resolution.entity !== undefined;
+  const referenceConnected = resolution.entity !== undefined;
 
   return {
     countryId: country.id,
-    entityProfileConnected,
-    registryFieldCount: REGISTRY_FIELD_COUNT,
-    evidenceItemEstimate: entityProfileConnected ? 2 : 0,
-    blocks: buildConstitutionBlocks(country, entityProfileConnected),
+    referenceConnected,
+    registryFacts: {
+      name: country.name,
+      code: country.code,
+      capital: country.capital,
+      region: country.region,
+      government: country.government,
+      sourceLabel: referenceConnected
+        ? REGISTRY_SOURCE_LABEL
+        : INSUFFICIENT_EVIDENCE_LABEL,
+    },
     personas: buildPersonaSections(country.name),
     linkedEntities,
+    trustPillars: buildTrustPillars(),
+    coverage: buildCountryCoverageProfile(country),
     neutralityNotice: POLITICAL_NEUTRALITY_NOTICE,
   };
 }
@@ -270,10 +191,13 @@ export function buildCountryIntelligenceProfile(
 export function resolveCountryListEvidenceLabel(
   profile: CountryIntelligenceProfile,
 ): string {
-  if (profile.entityProfileConnected) {
-    return "Registry connected";
+  const { evidenceCoverage } = profile.coverage;
+  if (evidenceCoverage.connected > 0) {
+    return `${evidenceCoverage.connected} indicator connected`;
   }
-
+  if (profile.referenceConnected) {
+    return "Registry available";
+  }
   return INSUFFICIENT_EVIDENCE_LABEL;
 }
 
@@ -283,10 +207,43 @@ export function countryEvidenceStatusClass(
 ): string {
   switch (status) {
     case "connected":
-      return "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
+      return "text-cyan-400 bg-cyan-500/10 border-cyan-500/20";
     case "insufficient":
       return "text-amber-400 bg-amber-500/10 border-amber-500/20";
     case "not_connected":
       return "text-zinc-400 bg-zinc-800/50 border-zinc-700/50";
   }
 }
+
+export const COUNTRY_METHODOLOGY_POINTS = [
+  {
+    id: "no-score-without-evidence",
+    title: "No scores without evidence",
+    description:
+      "CBAI does not display investment, risk, AI, or composite scores until verified evidence sources and methodology are connected.",
+  },
+  {
+    id: "indicators-require-sources",
+    title: "Indicators require sources",
+    description:
+      "Each indicator in the Global Indicator Framework declares required evidence sources. Status reflects real connectivity — not UI decoration.",
+  },
+  {
+    id: "future-scores-require-methodology",
+    title: "Future scores require methodology",
+    description:
+      "When evaluation becomes available, every metric will cite indicator ID, methodology version, and source provenance before display.",
+  },
+  {
+    id: "no-social-sentiment",
+    title: "No social sentiment scoring",
+    description:
+      "Social media sentiment, popularity indices, and viral metrics are excluded from CBAI country intelligence by constitutional standard.",
+  },
+  {
+    id: "evidence-judgment-separation",
+    title: "Evidence and judgment are separated",
+    description:
+      "Registry facts and connected evidence items are distinct from any future evaluative conclusions or recommendations.",
+  },
+] as const;

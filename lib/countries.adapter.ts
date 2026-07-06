@@ -3,7 +3,7 @@ import { universities } from "@/lib/universities";
 import type { Country } from "@/lib/countries";
 import {
   INSUFFICIENT_EVIDENCE_LABEL,
-  NOT_AVAILABLE_SOURCE_LABEL,
+  NOT_CONNECTED_SOURCE_LABEL,
 } from "@/lib/countries.intelligence";
 import type { Entity } from "@/lib/entity/entity.types";
 
@@ -118,5 +118,5 @@ export function toCountryEntities(countriesList: Country[]): Entity[] {
 export function formatRelationshipAvailability(count: number): string {
   return count > 0
     ? `${count} record(s) from local registry`
-    : NOT_AVAILABLE_SOURCE_LABEL;
+    : NOT_CONNECTED_SOURCE_LABEL;
 }

@@ -44,14 +44,15 @@ export default function CountriesPage() {
         />
         <div className="relative">
           <p className="text-[10px] font-medium uppercase tracking-widest text-cyan-400">
-            CBAI Country Intelligence
+            CBAI Country Intelligence 2.0
           </p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-50">
             Countries Intelligence
           </h1>
-          <p className="mt-1 text-sm text-zinc-500">
-            Evidence-based country registry profiles. Scores and narratives are
-            withheld unless backed by connected local evidence sources.
+          <p className="mt-1 max-w-3xl text-sm text-zinc-500">
+            Professional country profiles built from the Global Indicator Framework and
+            Evidence Infrastructure. Registry facts and coverage status only — no scores,
+            AI summaries, or external API data.
           </p>
         </div>
       </div>
@@ -77,24 +78,15 @@ export default function CountriesPage() {
               ))
             ) : (
               <div className="rounded-xl border border-dashed border-zinc-800 px-5 py-12 text-center">
-                <p className="text-sm text-zinc-500">
-                  No countries match your filters.
-                </p>
+                <p className="text-sm text-zinc-500">No countries match your filters.</p>
               </div>
             )}
           </div>
         </div>
 
-        <div className="space-y-6 xl:col-span-8">
-          <CountryIntelligencePanel
-            profile={intelligenceProfile}
-            countryName={selectedCountry.name}
-            countryCode={selectedCountry.code}
-            capital={selectedCountry.capital}
-            region={selectedCountry.region}
-            government={selectedCountry.government}
-          />
-          <CountryRelationships relationships={relationships} />
+        <div className="space-y-8 xl:col-span-8">
+          <CountryIntelligencePanel profile={intelligenceProfile} />
+          <CountryRelationships profile={intelligenceProfile} />
         </div>
       </div>
     </div>
