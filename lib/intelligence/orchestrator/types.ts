@@ -1,5 +1,6 @@
 import type { OrchestratorExecutionContext } from "@/lib/intelligence/orchestrator/execution-context";
 import type { OrchestratorPolicies } from "@/lib/intelligence/orchestrator/policies";
+import type { RuntimeState } from "@/lib/intelligence/runtime/runtime.types";
 import type { IntelligenceResult } from "@/lib/intelligence/result.types";
 
 /** Orchestrator stage identifiers (BUILD-040). */
@@ -88,4 +89,6 @@ export interface OrchestratorRunResult {
   context: OrchestratorExecutionContext;
   /** Orchestration summary without business conclusions. */
   summary: OrchestrationSummary;
+  /** Runtime state snapshot for this execution (BUILD-041). */
+  runtime: RuntimeState;
 }

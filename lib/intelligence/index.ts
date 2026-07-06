@@ -407,6 +407,21 @@ export {
 } from "@/lib/intelligence/orchestrator";
 
 export type {
+  RuntimeFailure,
+  RuntimeLifecycleStatus,
+  RuntimeState,
+} from "@/lib/intelligence/runtime/runtime.types";
+
+export {
+  DEFAULT_INTELLIGENCE_RUNTIME_ID,
+  DefaultIntelligenceRuntime,
+  INTELLIGENCE_RUNTIME_VERSION,
+  RuntimeSession,
+  defaultIntelligenceRuntime,
+  type IntelligenceRuntime,
+} from "@/lib/intelligence/runtime";
+
+export type {
   FormattedIntelligenceResultSections,
   ResultAssembler,
   ResultAssemblerInput,

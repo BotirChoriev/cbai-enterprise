@@ -101,6 +101,8 @@ export interface IntelligenceResult {
   diagnostics?: import("@/lib/intelligence/diagnostics/types").IntelligenceRunDiagnostics;
   /** Optional orchestration summary (BUILD-040). */
   orchestration?: import("@/lib/intelligence/orchestrator/types").OrchestrationSummary;
+  /** Optional runtime state snapshot (BUILD-041). */
+  runtime?: import("@/lib/intelligence/runtime/runtime.types").RuntimeState;
   /** ISO-8601 timestamp when the intelligence was produced. */
   producedAt: string;
   /** Optional ISO-8601 freshness horizon after which intelligence should be regenerated. */

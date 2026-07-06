@@ -44,6 +44,7 @@ import type {
 import type { IntelligenceRequest } from "@/lib/intelligence/request.types";
 import type { IntelligenceResult } from "@/lib/intelligence/result.types";
 import { createTimelineEntry } from "@/lib/intelligence/trace";
+import { defaultIntelligenceRuntime } from "@/lib/intelligence/runtime";
 
 /** Semantic version of the default intelligence orchestrator. */
 export const INTELLIGENCE_ORCHESTRATOR_VERSION = "0.1.0-orchestrator";
@@ -124,6 +125,9 @@ export class DefaultIntelligenceOrchestrator implements IntelligenceOrchestrator
       plan,
     });
 
+    const runtimeSession = defaultIntelligenceRuntime.createSession(request, policies);
+    runtimeSession.start(startedAt);
+
     let stoppedEarly = false;
 
     try {
@@ -139,10 +143,12 @@ export class DefaultIntelligenceOrchestrator implements IntelligenceOrchestrator
         }
 
         markStageRunning(context, stage.id);
+        runtimeSession.onStageStarted(stage.id);
 
         try {
           await this.executeStage(context, stage.id, policies, request);
           markStageComplete(context, stage.id);
+          runtimeSession.onStageCompleted(stage.id);
 
           if (stage.id === "contradictions") {
             stoppedEarly = this.applyBlockingConflictPolicy(context, policies);
@@ -157,10 +163,13 @@ export class DefaultIntelligenceOrchestrator implements IntelligenceOrchestrator
             error instanceof Error ? error.message : "Unknown orchestrator stage failure";
 
           markStageFailed(context, stage.id, message);
+          runtimeSession.onStageFailed(stage.id, message);
 
           if (shouldStopOnCriticalFailure(policies, stage.required)) {
             context.stoppedReason = `Critical failure at stage ${stage.id}: ${message}`;
-            finalizeExecutionContext(context, "failed", new Date().toISOString());
+            const failedAt = new Date().toISOString();
+            finalizeExecutionContext(context, "failed", failedAt);
+            runtimeSession.fail(context.stoppedReason, failedAt);
 
             throw new IntelligencePipelineError(
               message,
@@ -177,14 +186,28 @@ export class DefaultIntelligenceOrchestrator implements IntelligenceOrchestrator
       const outcome = resolveOrchestratorOutcome(context, stoppedEarly);
       finalizeExecutionContext(context, outcome, finishedAt);
 
+      if (outcome === "failed") {
+        runtimeSession.fail(context.stoppedReason ?? "Orchestrator run failed.", finishedAt);
+      } else {
+        runtimeSession.complete(finishedAt);
+      }
+
+      runtimeSession.appendWarnings(context.warnings);
+
       return {
         result: context.result ?? null,
         context,
         summary: buildOrchestrationSummary(context, outcome, policies, startedAt, finishedAt),
+        runtime: runtimeSession.snapshot(),
       };
     } catch (error) {
       const finishedAt = new Date().toISOString();
       finalizeExecutionContext(context, "failed", finishedAt);
+
+      if (runtimeSession.status !== "failed" && runtimeSession.status !== "cancelled") {
+        const message = error instanceof Error ? error.message : "Unknown orchestrator failure";
+        runtimeSession.fail(message, finishedAt);
+      }
 
       if (policies.runDiagnosticsAlways && context.result) {
         await this.runDiagnosticsStage(context);
@@ -445,6 +468,7 @@ export async function executeOrchestratedRun(
   return {
     ...run.result,
     orchestration: run.summary,
+    runtime: run.runtime,
   };
 }
 
