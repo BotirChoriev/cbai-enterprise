@@ -7,6 +7,8 @@ import ReportReadinessSection from "@/components/reports/ReportReadinessSection"
 import ReportPipelineReadinessSection from "@/components/pipeline/ReportPipelineReadinessSection";
 import ReportsIndicatorExplorerSection from "@/components/indicator-explorer/ReportsIndicatorExplorerSection";
 import ReportsEvidenceWatchSection from "@/components/evidence-watch/ReportsEvidenceWatchSection";
+import ReportsDiagnosticsSection from "@/components/legacy-integration/ReportsDiagnosticsSection";
+import { collectLegacyBuildIntegrationModel } from "@/lib/legacy-build-integration";
 import {
   ReportExportFuture,
   ReportNoFakeNotice,
@@ -17,6 +19,7 @@ import {
 export default function ReportsCenter() {
   const model = useMemo(() => buildReportsCenterModel(), []);
   const reportPipelineReadiness = useMemo(() => getReportPipelineReadiness(), []);
+  const integration = useMemo(() => collectLegacyBuildIntegrationModel(), []);
 
   return (
     <div className="space-y-10">
@@ -81,6 +84,7 @@ export default function ReportsCenter() {
       <ReportReadinessSection reportTypes={model.reportTypes} />
       <ReportsIndicatorExplorerSection />
       <ReportsEvidenceWatchSection />
+      <ReportsDiagnosticsSection diagnostics={integration.diagnostics} />
       <ReportPipelineReadinessSection model={reportPipelineReadiness} />
       <ReportExportFuture items={model.exportFuture} />
       <ReportNoFakeNotice />

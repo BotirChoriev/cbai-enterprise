@@ -2,6 +2,9 @@
 
 import { useMemo } from "react";
 import { buildGovernanceControlModel } from "@/lib/governance-control-center";
+import { collectLegacyBuildIntegrationModel } from "@/lib/legacy-build-integration";
+import GovernanceRuntimePolicySection from "@/components/legacy-integration/GovernanceRuntimePolicySection";
+import GovernanceTestHarnessSection from "@/components/legacy-integration/GovernanceTestHarnessSection";
 import {
   GovernanceRuleRegistry,
   GovernancePrinciplesSection,
@@ -15,6 +18,7 @@ import {
 
 export default function GovernanceControlCenter() {
   const model = useMemo(() => buildGovernanceControlModel(), []);
+  const integration = useMemo(() => collectLegacyBuildIntegrationModel(), []);
 
   return (
     <div className="space-y-10">
@@ -75,6 +79,8 @@ export default function GovernanceControlCenter() {
       <GovernanceRuleRegistry categories={model.ruleCategories} />
       <GovernancePrinciplesSection principles={model.principles} />
       <GovernanceValidationFlow steps={model.validationPipeline} />
+      <GovernanceRuntimePolicySection policy={integration.policy} />
+      <GovernanceTestHarnessSection harness={integration.testHarness} />
       <GovernanceComplianceModel template={model.complianceReportTemplate} />
       <GovernancePersonasSection personas={model.personas} />
       <GovernanceLimitsSection limits={model.limits} />

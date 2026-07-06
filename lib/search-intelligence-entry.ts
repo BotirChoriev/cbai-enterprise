@@ -5,7 +5,7 @@
 
 import type { Entity } from "@/lib/entity/entity.types";
 import { getEntityTypeLabel } from "@/lib/entity/entity.helpers";
-import { getEntityDetailHref } from "@/lib/global-search";
+import { buildPlatformEntityHref } from "@/lib/global-search";
 import type { EvidenceDisplayStatus } from "@/lib/search-gateway";
 import { EVIDENCE_NOT_CONNECTED_LABEL } from "@/lib/platform-home";
 
@@ -19,9 +19,12 @@ export type SearchResultEntry = {
   linked: boolean;
 };
 
-export function buildEntityResultEntry(entity: Entity): SearchResultEntry {
+export function buildEntityResultEntry(
+  entity: Entity,
+  searchQuery?: string,
+): SearchResultEntry {
   const typeLabel = getEntityTypeLabel(entity.type);
-  const href = getEntityDetailHref(entity);
+  const href = buildPlatformEntityHref(entity, { searchQuery });
 
   if (entity.type === "country" || entity.type === "company") {
     return {

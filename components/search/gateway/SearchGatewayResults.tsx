@@ -1,36 +1,46 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { GatewaySearchResponse } from "@/lib/search-gateway";
 import {
   SEARCH_GATEWAY,
   SEARCH_SUPPORTED_SUGGESTIONS,
 } from "@/lib/search-gateway";
-import {
-  buildEntityResultEntry,
-  buildTopicResultEntry,
-} from "@/lib/search-intelligence-entry";
-import { executeSearchIntelligence } from "@/lib/search-intelligence";
-import SearchResultCard from "@/components/search/gateway/SearchResultCard";
-import SearchIntelligenceDetail from "@/components/search/intelligence/SearchIntelligenceDetail";
+import { buildEntityResultEntry, buildTopicResultEntry } from "@/lib/search-intelligence-entry";
+import { buildPlatformEntityHref } from "@/lib/global-search";
+import type { Entity } from "@/lib/entity/entity.types";
 
 type SearchGatewayResultsProps = {
   response: GatewaySearchResponse;
   query: string;
 };
 
+function resolveSingleCountryMatch(response: GatewaySearchResponse): Entity | null {
+  const countryGroup = response.groups.find((group) => group.id === "countries");
+  if (!countryGroup || countryGroup.entities.length !== 1) return null;
+
+  const hasOtherEntities = response.groups.some(
+    (group) =>
+      (group.id === "companies" || group.id === "universities") && group.entities.length > 0,
+  );
+  if (hasOtherEntities) return null;
+
+  return countryGroup.entities[0]?.entity ?? null;
+}
+
 export default function SearchGatewayResults({
   response,
   query,
 }: SearchGatewayResultsProps) {
-  const intelligenceResponse = useMemo(() => executeSearchIntelligence(query), [query]);
-  const [selectedEntityId, setSelectedEntityId] = useState<string | null>(null);
+  const router = useRouter();
+  const singleCountry = useMemo(() => resolveSingleCountryMatch(response), [response]);
 
-  const selectedRecord =
-    intelligenceResponse.matches.find(
-      (match) => match.record.entityId === selectedEntityId,
-    )?.record ?? null;
+  useEffect(() => {
+    if (!singleCountry) return;
+    router.replace(buildPlatformEntityHref(singleCountry, { searchQuery: query }));
+  }, [singleCountry, query, router]);
 
   if (!response.query) {
     return (
@@ -63,6 +73,14 @@ export default function SearchGatewayResults({
     );
   }
 
+  if (singleCountry) {
+    return (
+      <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 px-6 py-8">
+        <p className="text-sm text-zinc-400">Opening country intelligence for {singleCountry.name}…</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-10">
       <p className="text-sm text-zinc-500">
@@ -71,7 +89,7 @@ export default function SearchGatewayResults({
           &quot;{response.query}&quot;
         </span>
         {" · "}
-        Alphabetical registry order — no relevance ranking displayed.
+        Select a country to open the integrated intelligence review.
       </p>
 
       {response.groups.map((group) => (
@@ -89,29 +107,22 @@ export default function SearchGatewayResults({
 
           <ul className="grid gap-4 lg:grid-cols-2">
             {group.entities.map((result) => {
-              const entry = buildEntityResultEntry(result.entity);
-              const intelligenceMatch = intelligenceResponse.matches.find(
-                (match) => match.record.displayName === result.entity.name,
-              );
-              const entityId = intelligenceMatch?.record.entityId;
+              const entry = buildEntityResultEntry(result.entity, query);
+              const isCountry = result.entity.type === "country";
 
               return (
-                <li key={`${result.entity.type}-${result.entity.id}`} className="space-y-2">
-                  <SearchResultCard entry={entry} />
-                  {entityId && (
-                    <button
-                      type="button"
-                      onClick={() => setSelectedEntityId(entityId)}
-                      className={`text-xs underline-offset-2 hover:underline ${
-                        selectedEntityId === entityId
-                          ? "text-cyan-300"
-                          : "text-cyan-400"
-                      }`}
-                      aria-pressed={selectedEntityId === entityId}
-                      aria-label={`Open navigation hub for ${result.entity.name}`}
+                <li key={`${result.entity.type}-${result.entity.id}`}>
+                  {isCountry ? (
+                    <Link
+                      href={entry.href}
+                      className="group block rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 transition-colors hover:border-cyan-500/30 hover:bg-zinc-900/70"
                     >
-                      Open navigation hub
-                    </button>
+                      <CountryResultContent entry={entry} />
+                    </Link>
+                  ) : (
+                    <Link href={entry.href} className="block">
+                      <SearchResultCardStatic entry={entry} />
+                    </Link>
                   )}
                 </li>
               );
@@ -120,19 +131,44 @@ export default function SearchGatewayResults({
               const entry = buildTopicResultEntry(topic);
               return (
                 <li key={topic.id}>
-                  <SearchResultCard entry={entry} />
+                  <SearchResultCardStatic entry={entry} />
                 </li>
               );
             })}
           </ul>
         </section>
       ))}
+    </div>
+  );
+}
 
-      {selectedRecord && (
-        <div id="search-intelligence-detail">
-          <SearchIntelligenceDetail record={selectedRecord} />
-        </div>
-      )}
+function CountryResultContent({
+  entry,
+}: {
+  entry: ReturnType<typeof buildEntityResultEntry>;
+}) {
+  return (
+    <>
+      <p className="text-sm font-semibold text-cyan-400 group-hover:text-cyan-300">
+        {entry.name}
+      </p>
+      <p className="mt-1 text-xs text-zinc-500">{entry.type}</p>
+      <p className="mt-2 text-sm text-zinc-400">{entry.availableInformation}</p>
+      <p className="mt-3 text-xs text-cyan-500/80">Open integrated country review →</p>
+    </>
+  );
+}
+
+function SearchResultCardStatic({
+  entry,
+}: {
+  entry: ReturnType<typeof buildEntityResultEntry>;
+}) {
+  return (
+    <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
+      <p className="text-sm font-semibold text-zinc-100">{entry.name}</p>
+      <p className="mt-1 text-xs text-zinc-500">{entry.type}</p>
+      <p className="mt-2 text-sm text-zinc-400">{entry.availableInformation}</p>
     </div>
   );
 }

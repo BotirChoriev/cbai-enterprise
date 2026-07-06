@@ -5,6 +5,7 @@ import SearchPersonas from "@/components/search/gateway/SearchPersonas";
 import SearchPipeline from "@/components/search/gateway/SearchPipeline";
 import SearchFutureReady from "@/components/search/gateway/SearchFutureReady";
 import SearchEvidenceWatchSection from "@/components/evidence-watch/SearchEvidenceWatchSection";
+import SearchRuntimeStatusPanel from "@/components/legacy-integration/SearchRuntimeStatusPanel";
 import HomeSection from "@/components/platform/home/HomeSection";
 import type { GatewaySearchResponse } from "@/lib/search-gateway";
 
@@ -24,6 +25,14 @@ export default function SearchGateway({ query, response }: SearchGatewayProps) {
         description="Grouped by registry type and platform layer. Select a result to open the navigation hub — no scores, confidence values, or AI summaries."
       >
         <SearchGatewayResults response={response} query={query} />
+      </HomeSection>
+
+      <HomeSection
+        id="search-runtime-status"
+        title="Runtime Integration"
+        description="Legacy BUILD-021–061 intelligence foundation status — not live search execution."
+      >
+        <SearchRuntimeStatusPanel />
       </HomeSection>
 
       <HomeSection

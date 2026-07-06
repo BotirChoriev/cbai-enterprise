@@ -1,3 +1,5 @@
+import CoreLegacyIntegrationPanel from "@/components/legacy-integration/CoreLegacyIntegrationPanel";
+import { collectLegacyBuildIntegrationModel } from "@/lib/legacy-build-integration";
 import MissionControl from "@/components/core/MissionControl";
 import CommandCenter from "@/components/core/CommandCenter";
 import ThinkingPipeline from "@/components/core/ThinkingPipeline";
@@ -6,6 +8,8 @@ import MemoryPanel from "@/components/core/MemoryPanel";
 import { platformModules } from "@/lib/core";
 
 export default function CorePage() {
+  const integration = collectLegacyBuildIntegrationModel();
+
   return (
     <div className="space-y-6">
       <div className="relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 px-6 py-5">
@@ -52,6 +56,8 @@ export default function CorePage() {
       </div>
 
       <MissionControl />
+
+      <CoreLegacyIntegrationPanel model={integration} />
 
       <div className="grid gap-6 xl:grid-cols-5">
         <div className="xl:col-span-3">

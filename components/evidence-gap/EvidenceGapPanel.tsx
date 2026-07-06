@@ -7,9 +7,17 @@ import EvidenceGapMethodology from "@/components/evidence-gap/EvidenceGapMethodo
 
 type EvidenceGapPanelProps = {
   profile: EntityEvidenceGapProfile;
+  showSummary?: boolean;
+  showSources?: boolean;
+  showMethodology?: boolean;
 };
 
-export default function EvidenceGapPanel({ profile }: EvidenceGapPanelProps) {
+export default function EvidenceGapPanel({
+  profile,
+  showSummary = true,
+  showSources = true,
+  showMethodology = true,
+}: EvidenceGapPanelProps) {
   const nonAvailable = getNonAvailableGaps(profile);
 
   return (
@@ -27,7 +35,7 @@ export default function EvidenceGapPanel({ profile }: EvidenceGapPanelProps) {
         </p>
       </div>
 
-      <EvidenceGapSummary profile={profile} />
+      {showSummary && <EvidenceGapSummary profile={profile} />}
 
       {nonAvailable.length === 0 ? (
         <div className="rounded-xl border border-dashed border-zinc-800 bg-zinc-950 px-5 py-6 text-center">
@@ -43,8 +51,8 @@ export default function EvidenceGapPanel({ profile }: EvidenceGapPanelProps) {
         </ul>
       )}
 
-      <EvidenceGapSources profile={profile} />
-      <EvidenceGapMethodology profile={profile} />
+      {showSources && <EvidenceGapSources profile={profile} />}
+      {showMethodology && <EvidenceGapMethodology profile={profile} />}
     </section>
   );
 }

@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import type { CountryRegion } from "@/lib/countries";
 import { countries } from "@/lib/countries";
 import { getCountryRelationships } from "@/lib/countries.adapter";
-import { buildCountryIntelligenceProfile } from "@/lib/countries.intelligence";
+import { buildCountryUserJourney } from "@/lib/country-user-journey";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import CountryFilters from "@/components/countries/CountryFilters";
 import CountryCard from "@/components/countries/CountryCard";
@@ -17,29 +17,29 @@ export default function CountriesPage() {
   const [region, setRegion] = useState<CountryRegion | "All">("All");
   const [fallbackId, setFallbackId] = useState(countries[0].id);
   const selectedId = context.country?.id ?? fallbackId;
+  const searchQuery = context.searchQuery;
 
   const filtered = useMemo(() => {
-    return countries.filter((c) => {
+    return countries.filter((country) => {
       const matchesSearch =
         search === "" ||
-        c.name.toLowerCase().includes(search.toLowerCase()) ||
-        c.code.toLowerCase().includes(search.toLowerCase());
-      const matchesRegion = region === "All" || c.region === region;
+        country.name.toLowerCase().includes(search.toLowerCase()) ||
+        country.code.toLowerCase().includes(search.toLowerCase());
+      const matchesRegion = region === "All" || country.region === region;
       return matchesSearch && matchesRegion;
     });
   }, [search, region]);
 
   const selectedCountry =
-    countries.find((c) => c.id === selectedId) ?? filtered[0] ?? countries[0];
+    countries.find((country) => country.id === selectedId) ?? filtered[0] ?? countries[0];
 
-  const relationships = getCountryRelationships(selectedCountry);
-  const intelligenceProfile = buildCountryIntelligenceProfile(
-    selectedCountry,
-    relationships,
-  );
+  const journey = useMemo(() => {
+    const relationships = getCountryRelationships(selectedCountry);
+    return buildCountryUserJourney(selectedCountry, relationships);
+  }, [selectedCountry]);
 
   function handleSelectCountry(countryId: string) {
-    const country = countries.find((c) => c.id === countryId);
+    const country = countries.find((item) => item.id === countryId);
     if (!country) return;
 
     setFallbackId(country.id);
@@ -67,9 +67,8 @@ export default function CountriesPage() {
             Countries Intelligence
           </h1>
           <p className="mt-1 max-w-3xl text-sm text-zinc-500">
-            Professional country profiles built from the Global Indicator Framework and
-            Evidence Infrastructure. Registry facts and coverage status only — no scores,
-            AI summaries, or external API data.
+            Integrated country review from search through decision package — registry facts,
+            evidence posture, and decision readiness only.
           </p>
         </div>
       </div>
@@ -103,10 +102,11 @@ export default function CountriesPage() {
 
         <div className="space-y-8 xl:col-span-8">
           <CountryIntelligencePanel
-            profile={intelligenceProfile}
+            journey={journey}
             country={selectedCountry}
+            searchQuery={searchQuery || undefined}
           />
-          <CountryRelationships profile={intelligenceProfile} />
+          <CountryRelationships profile={journey.profile} />
         </div>
       </div>
     </div>

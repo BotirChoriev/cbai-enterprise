@@ -19,35 +19,34 @@ export default function SystemSummaryCard({
         description="Live runtime foundation overview"
       />
       <CardContent>
-        {!hasActivity ? (
-          <div className="flex h-64 items-center justify-center rounded-lg border border-dashed border-zinc-800 bg-zinc-950/50">
-            <p className="text-sm text-zinc-500">No runtime activity yet</p>
-          </div>
-        ) : (
-          <dl className="grid gap-4 sm:grid-cols-2">
-            <SummaryRow
-              label="Observability Version"
-              value={summary.observabilityVersion}
-            />
-            <SummaryRow label="Worker State" value={summary.workerState} />
-            <SummaryRow
-              label="Local Runtime Adapter"
-              value={summary.localAdapterStatus}
-            />
-            <SummaryRow
-              label="Dispatch Ready Tasks"
-              value={String(summary.dispatchReadyCount)}
-            />
-            <SummaryRow
-              label="Queued Tasks"
-              value={String(summary.queuedTaskCount)}
-            />
-            <SummaryRow
-              label="Test Harness Scenarios"
-              value={`${summary.harnessScenarioCount} (${harnessVersion})`}
-            />
-          </dl>
+        {!hasActivity && (
+          <p className="mb-4 rounded-lg border border-dashed border-zinc-800 bg-zinc-950/50 px-4 py-3 text-sm text-zinc-500">
+            No runtime activity recorded
+          </p>
         )}
+        <dl className="grid gap-4 sm:grid-cols-2">
+          <SummaryRow
+            label="Observability Version"
+            value={summary.observabilityVersion}
+          />
+          <SummaryRow label="Worker State" value={summary.workerState} />
+          <SummaryRow
+            label="Local Runtime Adapter"
+            value={summary.localAdapterStatus}
+          />
+          <SummaryRow
+            label="Dispatch Ready Tasks"
+            value={String(summary.dispatchReadyCount)}
+          />
+          <SummaryRow
+            label="Queued Tasks"
+            value={String(summary.queuedTaskCount)}
+          />
+          <SummaryRow
+            label="Test Harness Scenarios"
+            value={`${summary.harnessScenarioCount} (${harnessVersion})`}
+          />
+        </dl>
       </CardContent>
     </Card>
   );

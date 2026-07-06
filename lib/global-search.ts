@@ -74,9 +74,36 @@ export function getEntityHref(entity: Entity): string {
   return routes[entity.type as SearchableEntityType] ?? "/search";
 }
 
-/** Deep link to entity within module (platform routing). */
-export function getEntityDetailHref(entity: Entity): string {
-  return `${getEntityHref(entity)}?id=${encodeURIComponent(entity.id)}`;
+/** Deep link to entity within module using Platform Context params. */
+export function getEntityDetailHref(entity: Entity, searchQuery?: string): string {
+  return buildPlatformEntityHref(entity, { searchQuery });
+}
+
+/** Platform Context–compatible entity href (country, company, university params). */
+export function buildPlatformEntityHref(
+  entity: Entity,
+  options?: { searchQuery?: string },
+): string {
+  const params = new URLSearchParams();
+
+  switch (entity.type) {
+    case "country":
+      params.set("country", entity.id);
+      break;
+    case "company":
+      params.set("company", entity.id);
+      break;
+    case "university":
+      params.set("university", entity.id);
+      break;
+  }
+
+  if (options?.searchQuery?.trim()) {
+    params.set("q", options.searchQuery.trim());
+  }
+
+  const query = params.toString();
+  return query ? `${getEntityHref(entity)}?${query}` : getEntityHref(entity);
 }
 
 function tokenize(query: string): string[] {

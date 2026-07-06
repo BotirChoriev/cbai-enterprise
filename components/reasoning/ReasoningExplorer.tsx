@@ -2,6 +2,8 @@
 
 import { useMemo } from "react";
 import { buildReasoningExplorerModel } from "@/lib/reasoning-explorer";
+import { collectLegacyBuildIntegrationModel } from "@/lib/legacy-build-integration";
+import ReasoningDiagnosticsSection from "@/components/legacy-integration/ReasoningDiagnosticsSection";
 import ReasoningPipelineOverview from "@/components/reasoning/ReasoningPipelineOverview";
 import ReasoningEvidenceIndicatorMap from "@/components/reasoning/ReasoningEvidenceIndicatorMap";
 import {
@@ -16,6 +18,7 @@ import DecisionIntelligenceIndicatorSection from "@/components/indicator-explore
 
 export default function ReasoningExplorer() {
   const model = useMemo(() => buildReasoningExplorerModel(), []);
+  const integration = useMemo(() => collectLegacyBuildIntegrationModel(), []);
 
   return (
     <div className="space-y-10">
@@ -84,6 +87,7 @@ export default function ReasoningExplorer() {
       <ReasoningTracePrinciples principles={model.tracePrinciples} />
       <ReasoningPersonasSection personas={model.personas} />
       <ReasoningTrustLimits limits={model.trustLimits} />
+      <ReasoningDiagnosticsSection diagnostics={integration.diagnostics} />
       <DecisionIntelligenceIndicatorSection />
 
       <footer className="border-t border-zinc-800 pt-6 text-xs text-zinc-600">
