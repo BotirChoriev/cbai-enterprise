@@ -7,13 +7,14 @@ import {
   getCompanyIndustries,
 } from "@/lib/companies";
 import {
-  toCompanyEntity,
-  COMPANY_METADATA_FIELDS,
+  getCompanyRelationships,
+  getCompanyLinkedEntities,
 } from "@/lib/companies.adapter";
-import EntityLayout from "@/components/entity/EntityLayout";
+import { buildCompanyIntelligenceProfile } from "@/lib/companies.intelligence";
 import CompanyFilters from "@/components/companies/CompanyFilters";
 import CompanyList from "@/components/companies/CompanyList";
 import CompanyRelationships from "@/components/companies/CompanyRelationships";
+import { CompanyIntelligencePanel } from "@/components/companies/CompanyIntelligencePanel";
 
 export default function CompaniesPage() {
   const [search, setSearch] = useState("");
@@ -40,7 +41,11 @@ export default function CompaniesPage() {
   const selectedCompany =
     companies.find((c) => c.id === selectedId) ?? filtered[0] ?? companies[0];
 
-  const selectedEntity = toCompanyEntity(selectedCompany);
+  const relationships = getCompanyRelationships(selectedCompany);
+  const intelligenceProfile = buildCompanyIntelligenceProfile(
+    selectedCompany,
+    getCompanyLinkedEntities(selectedCompany),
+  );
 
   return (
     <div className="space-y-6">
@@ -51,14 +56,15 @@ export default function CompaniesPage() {
         />
         <div className="relative">
           <p className="text-[10px] font-medium uppercase tracking-widest text-sky-400">
-            Global AI Operating System
+            CBAI Company Intelligence
           </p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-50">
             Companies Intelligence
           </h1>
           <p className="mt-1 text-sm text-zinc-500">
-            Enterprise profiles, AI readiness, and cross-entity relationships
-            for global corporations.
+            Evidence-based company profiles from the local catalog. Scores,
+            financials, and market narratives are withheld unless backed by
+            connected evidence sources.
           </p>
         </div>
       </div>
@@ -84,16 +90,15 @@ export default function CompaniesPage() {
         </div>
 
         <div className="space-y-6 xl:col-span-8">
-          <EntityLayout
-            entity={selectedEntity}
-            metadataFields={COMPANY_METADATA_FIELDS}
-            showScoreCards
-            aiConfidence={96.1}
-          >
-            <CompanyRelationships
-              relationships={selectedCompany.relationships}
-            />
-          </EntityLayout>
+          <CompanyIntelligencePanel
+            profile={intelligenceProfile}
+            name={selectedCompany.name}
+            icon={selectedCompany.icon}
+            country={selectedCompany.country}
+            industry={selectedCompany.industry}
+            founded={selectedCompany.founded}
+          />
+          <CompanyRelationships relationships={relationships} />
         </div>
       </div>
     </div>

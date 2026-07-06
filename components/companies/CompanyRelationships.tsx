@@ -1,4 +1,8 @@
-import type { CompanyRelationships } from "@/lib/companies";
+import type { CompanyRelationships } from "@/lib/companies.adapter";
+import {
+  formatRelationshipAvailability,
+} from "@/lib/companies.adapter";
+import { NOT_CONNECTED_SOURCE_LABEL } from "@/lib/companies.intelligence";
 
 type CompanyRelationshipsProps = {
   relationships: CompanyRelationships;
@@ -9,36 +13,13 @@ type RelationshipSection = {
   title: string;
   icon: React.ReactNode;
   accent: string;
+  unavailableWhenEmpty?: boolean;
 };
 
 const sections: RelationshipSection[] = [
   {
-    key: "competitors",
-    title: "Competitors",
-    accent: "text-red-400 bg-red-500/10 border-red-500/20",
-    icon: (
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"
-      />
-    ),
-  },
-  {
-    key: "partners",
-    title: "Partners",
-    accent: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
-    icon: (
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
-      />
-    ),
-  },
-  {
-    key: "relatedCountries",
-    title: "Related Countries",
+    key: "headquartersCountry",
+    title: "Headquarters Country",
     accent: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20",
     icon: (
       <path
@@ -49,8 +30,8 @@ const sections: RelationshipSection[] = [
     ),
   },
   {
-    key: "relatedUniversities",
-    title: "Related Universities",
+    key: "universities",
+    title: "Universities (same country)",
     accent: "text-violet-400 bg-violet-500/10 border-violet-500/20",
     icon: (
       <path
@@ -60,7 +41,44 @@ const sections: RelationshipSection[] = [
       />
     ),
   },
+  {
+    key: "partnerCompanies",
+    title: "Partner Companies",
+    accent: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+    unavailableWhenEmpty: true,
+    icon: (
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
+      />
+    ),
+  },
+  {
+    key: "competitorCompanies",
+    title: "Competitor Companies",
+    accent: "text-red-400 bg-red-500/10 border-red-500/20",
+    unavailableWhenEmpty: true,
+    icon: (
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"
+      />
+    ),
+  },
 ];
+
+function renderSectionValue(
+  key: keyof CompanyRelationships,
+  relationships: CompanyRelationships,
+): string[] {
+  const value = relationships[key];
+  if (key === "headquartersCountry") {
+    return value ? [value as string] : [];
+  }
+  return value as string[];
+}
 
 export default function CompanyRelationships({
   relationships,
@@ -68,17 +86,18 @@ export default function CompanyRelationships({
   return (
     <div className="rounded-xl border border-zinc-800 bg-zinc-950">
       <div className="border-b border-zinc-800 px-6 py-4">
-        <h3 className="text-sm font-semibold text-zinc-50">
-          Company Relationships
-        </h3>
+        <h3 className="text-sm font-semibold text-zinc-50">Linked Records</h3>
         <p className="text-xs text-zinc-500">
-          Cross-entity intelligence graph
+          Links derived from local country and university catalogs only
         </p>
       </div>
 
       <div className="grid gap-px bg-zinc-800 sm:grid-cols-2">
         {sections.map((section) => {
-          const items = relationships[section.key];
+          const items = renderSectionValue(section.key, relationships);
+          const showUnavailable =
+            section.unavailableWhenEmpty || items.length === 0;
+
           return (
             <div key={section.key} className="bg-zinc-950 p-5">
               <div className="mb-3 flex items-center gap-2">
@@ -99,20 +118,31 @@ export default function CompanyRelationships({
                   {section.title}
                 </h4>
                 <span className="ml-auto font-mono text-[10px] text-zinc-600">
-                  {items.length}
+                  {section.unavailableWhenEmpty
+                    ? "N/A"
+                    : formatRelationshipAvailability(items.length)}
                 </span>
               </div>
-              <ul className="space-y-1.5">
-                {items.map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-center gap-2 rounded-lg border border-transparent px-2 py-1.5 text-sm text-zinc-400 transition-colors hover:border-zinc-800 hover:bg-zinc-900/50 hover:text-zinc-200"
-                  >
-                    <span className="h-1 w-1 shrink-0 rounded-full bg-zinc-600" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
+
+              {showUnavailable ? (
+                <p className="text-sm text-zinc-500">
+                  {section.unavailableWhenEmpty
+                    ? NOT_CONNECTED_SOURCE_LABEL
+                    : NOT_CONNECTED_SOURCE_LABEL}
+                </p>
+              ) : (
+                <ul className="space-y-1.5">
+                  {items.map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-center gap-2 rounded-lg border border-transparent px-2 py-1.5 text-sm text-zinc-400"
+                    >
+                      <span className="h-1 w-1 shrink-0 rounded-full bg-zinc-600" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           );
         })}

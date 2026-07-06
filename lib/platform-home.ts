@@ -150,9 +150,9 @@ export const HOME_MODULES: HomeModule[] = [
     label: "Companies",
     href: "/companies",
     icon: "companies",
-    status: "in_progress",
+    status: "available",
     todayDescription:
-      "Local company registry browser. Constitution remediation is in progress — fabricated scores and AI summaries are being replaced with evidence-status labels.",
+      "Factual company catalog with constitution-compliant intelligence sections. Scores and financials are withheld until evidence sources connect.",
   },
   {
     id: "universities",

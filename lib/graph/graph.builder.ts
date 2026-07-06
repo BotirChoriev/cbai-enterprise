@@ -2,7 +2,7 @@ import { countries } from "@/lib/countries";
 import { companies } from "@/lib/companies";
 import { universities } from "@/lib/universities";
 import { toCountryEntity, getCountryRelationships } from "@/lib/countries.adapter";
-import { toCompanyEntity } from "@/lib/companies.adapter";
+import { toCompanyEntity, getCompanyRelationships } from "@/lib/companies.adapter";
 import { toUniversityEntity } from "@/lib/universities.adapter";
 import type { Entity } from "@/lib/entity/entity.types";
 import type {
@@ -173,28 +173,16 @@ function buildEdges(nodes: GraphNode[]): GraphEdge[] {
     }
   }
 
-  // Company ↔ Company: partner & competitor
+  // Company → University: same-country catalog links only
   for (const company of companies) {
     const sourceNode = nodes.find(
       (n) => n.type === "company" && n.entityId === company.id,
     );
     if (!sourceNode) continue;
 
-    for (const partner of company.relationships.partners) {
-      const target = findNode(partner, "company", nodes);
-      if (target) {
-        addEdge(edges, seen, sourceNode.id, target.id, "partner", "Partner");
-      }
-    }
+    const relationships = getCompanyRelationships(company);
 
-    for (const competitor of company.relationships.competitors) {
-      const target = findNode(competitor, "company", nodes);
-      if (target) {
-        addEdge(edges, seen, sourceNode.id, target.id, "competitor", "Competitor");
-      }
-    }
-
-    for (const uniName of company.relationships.relatedUniversities) {
+    for (const uniName of relationships.universities) {
       const target = findNode(uniName, "university", nodes);
       if (target) {
         addEdge(
@@ -203,7 +191,7 @@ function buildEdges(nodes: GraphNode[]): GraphEdge[] {
           sourceNode.id,
           target.id,
           "research-partner",
-          "Research Partner",
+          "Same Country Catalog",
         );
       }
     }

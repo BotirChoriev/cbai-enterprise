@@ -1,54 +1,84 @@
+import { countries } from "@/lib/countries";
+import { universities } from "@/lib/universities";
 import type { Company } from "@/lib/companies";
-import type {
-  Entity,
-  EntityMetadataField,
-  EntityTimelineEvent,
-} from "@/lib/entity/entity.types";
+import {
+  INSUFFICIENT_EVIDENCE_LABEL,
+  NOT_CONNECTED_SOURCE_LABEL,
+} from "@/lib/companies.intelligence";
+import type { CompanyLinkedEntities } from "@/lib/companies.intelligence";
+import type { Entity } from "@/lib/entity/entity.types";
 
-/** Ordered metadata fields for company entity overview grid */
-export const COMPANY_METADATA_FIELDS: EntityMetadataField[] = [
-  { key: "country", label: "Country" },
-  { key: "ceo", label: "CEO" },
-  { key: "founded", label: "Founded" },
-  { key: "employees", label: "Employees" },
-  { key: "revenue", label: "Revenue" },
-  { key: "marketCap", label: "Market Cap" },
+/** Links derived from local country and university catalogs only. */
+export type CompanyRelationships = {
+  headquartersCountry: string | null;
+  universities: string[];
+  partnerCompanies: string[];
+  competitorCompanies: string[];
+};
+
+/** Ordered metadata fields for company factual overview grid. */
+export const COMPANY_METADATA_FIELDS = [
+  { key: "country", label: "Headquarters Country" },
   { key: "industry", label: "Industry" },
-  { key: "technologyLevel", label: "Technology Level" },
-];
+  { key: "founded", label: "Founded" },
+  { key: "icon", label: "Catalog Symbol" },
+] as const;
 
-/** Generate timeline events from company domain data */
-function buildCompanyTimeline(company: Company): EntityTimelineEvent[] {
-  return [
-    {
-      id: `${company.id}-founded`,
-      title: "Company Founded",
-      description: `${company.name} established in ${company.founded}`,
-      date: String(company.founded),
-      type: "milestone",
-    },
-    {
-      id: `${company.id}-leadership`,
-      title: "Current Leadership",
-      description: `${company.ceo} serving as CEO`,
-      date: "Present",
-      type: "update",
-    },
-    {
-      id: `${company.id}-ai`,
-      title: "AI Strategy Active",
-      description: `AI Readiness score: ${company.aiReadiness}/100`,
-      date: "2026",
-      type: "analysis",
-    },
-  ];
+function normalizeName(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function namesMatch(a: string, b: string): boolean {
+  const na = normalizeName(a);
+  const nb = normalizeName(b);
+  return na === nb || na.includes(nb) || nb.includes(na);
+}
+
+function resolveHeadquartersCountry(company: Company): string | null {
+  const match = countries.find((country) =>
+    namesMatch(country.name, company.country),
+  );
+  return match?.name ?? (company.country || null);
 }
 
 /**
- * Adapter: maps Company domain model → universal Entity interface.
- * All company presentation flows through this function.
+ * Derive company relationships from local country and university catalogs.
+ * No fabricated partner, competitor, or market relationship lists.
+ */
+export function getCompanyRelationships(company: Company): CompanyRelationships {
+  const headquartersCountry = resolveHeadquartersCountry(company);
+
+  const linkedUniversities = universities
+    .filter((university) => namesMatch(university.country, company.country))
+    .map((university) => university.name);
+
+  return {
+    headquartersCountry,
+    universities: linkedUniversities,
+    partnerCompanies: [],
+    competitorCompanies: [],
+  };
+}
+
+export function getCompanyLinkedEntities(company: Company): CompanyLinkedEntities {
+  const relationships = getCompanyRelationships(company);
+  return {
+    relatedCountry: relationships.headquartersCountry,
+    universities: relationships.universities,
+  };
+}
+
+function buildFactualOverview(company: Company): string {
+  return `${company.name} (${company.icon}) — ${company.industry}, headquartered in ${company.country}, founded ${company.founded}. Information from local platform catalog only.`;
+}
+
+/**
+ * Adapter: maps Company catalog record → universal Entity interface.
+ * Factual fields only — no fabricated scores or narratives.
  */
 export function toCompanyEntity(company: Company): Entity {
+  const relationships = getCompanyRelationships(company);
+
   return {
     id: company.id,
     type: "company",
@@ -56,74 +86,52 @@ export function toCompanyEntity(company: Company): Entity {
     icon: company.icon,
     category: company.industry,
     subtitle: `${company.country} · Est. ${company.founded}`,
-    overview: company.overview,
+    overview: buildFactualOverview(company),
     status: "active",
     scores: {
-      aiScore: company.aiReadiness,
-      investmentScore: company.investmentScore,
-      riskScore: company.riskScore,
+      aiScore: 0,
+      investmentScore: 0,
+      riskScore: 0,
     },
-    tags: company.products.map((product, i) => ({
-      id: `${company.id}-product-${i}`,
-      label: product,
-      variant: i === 0 ? "accent" : "default",
-    })),
-    timeline: buildCompanyTimeline(company),
-    aiSummary: company.aiSummary,
+    tags: [],
+    timeline: [],
+    aiSummary: INSUFFICIENT_EVIDENCE_LABEL,
     metadata: {
       country: company.country,
-      ceo: company.ceo,
-      founded: company.founded,
-      employees: company.employees.toLocaleString(),
-      revenue: company.revenue,
-      marketCap: company.marketCap,
       industry: company.industry,
-      technologyLevel: company.technologyLevel,
-      innovationScore: company.innovationScore,
+      founded: company.founded,
+      icon: company.icon,
     },
     metrics: [
       {
-        id: "revenue",
-        label: "Revenue",
-        value: company.revenue,
+        id: "reference-status",
+        label: "Reference Status",
+        value: "Local catalog profile",
         highlight: true,
       },
       {
-        id: "marketCap",
-        label: "Market Cap",
-        value: company.marketCap,
-        change: "↑ YoY",
-        changeType: "positive",
+        id: "linked-country",
+        label: "Linked Country (local catalog)",
+        value: relationships.headquartersCountry ?? "Not linked",
       },
       {
-        id: "employees",
-        label: "Employees",
-        value: company.employees.toLocaleString(),
-      },
-      {
-        id: "innovation",
-        label: "Innovation Score",
-        value: company.innovationScore,
-        unit: "/100",
-        change: "Industry leading",
-        changeType: "positive",
-      },
-      {
-        id: "aiReadiness",
-        label: "AI Readiness",
-        value: company.aiReadiness,
-        unit: "/100",
-      },
-      {
-        id: "founded",
-        label: "Founded",
-        value: company.founded,
+        id: "linked-universities",
+        label: "Universities in same country (local catalog)",
+        value: relationships.universities.length,
+        unit: "records",
       },
     ],
   };
 }
 
-/** Batch adapter for list operations and cross-entity queries */
-export function toCompanyEntities(companies: Company[]): Entity[] {
-  return companies.map(toCompanyEntity);
+/** Batch adapter for list operations and cross-entity queries. */
+export function toCompanyEntities(companiesList: Company[]): Entity[] {
+  return companiesList.map(toCompanyEntity);
+}
+
+/** Human-readable unavailable label for relationship sections. */
+export function formatRelationshipAvailability(count: number): string {
+  return count > 0
+    ? `${count} linked record(s)`
+    : NOT_CONNECTED_SOURCE_LABEL;
 }
