@@ -3,6 +3,17 @@
 :root {
   --background: #09090b;
   --foreground: #fafafa;
+  --surface: #18181b;
+  --border: #27272a;
+  --muted: #a1a1aa;
+}
+
+html.theme-light {
+  --background: #fafafa;
+  --foreground: #18181b;
+  --surface: #ffffff;
+  --border: #e4e4e7;
+  --muted: #71717a;
 }
 
 @theme inline {
