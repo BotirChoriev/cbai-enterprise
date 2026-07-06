@@ -146,3 +146,20 @@ export {
   type AgentDispatchPreparationResult,
   type AgentDispatchValidationResult,
 } from "@/lib/intelligence/agents/integration";
+
+export {
+  AGENT_EXECUTION_FOUNDATION_VERSION,
+  DEFAULT_AGENT_EXECUTION_COORDINATOR_ID,
+  DefaultAgentExecutionCoordinator,
+  defaultAgentExecutionCoordinator,
+  runAgentExecutionFoundation,
+  formatAgentExecutionSummary,
+  isTaskExecutionEligible,
+  wrapUnhealthyAgentRuntimeContract,
+  wrapFailingValidateAgentRuntimeContract,
+  type AgentExecutionCoordinator,
+  type AgentExecutionContext,
+  type AgentExecutionInput,
+  type AgentExecutionResult,
+  type ExecutionState,
+} from "@/lib/intelligence/agents/execution";

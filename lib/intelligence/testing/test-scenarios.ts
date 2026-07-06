@@ -3,6 +3,15 @@ import {
   DefaultAgentDispatchIntegration,
 } from "@/lib/intelligence/agents/integration/agent-dispatch-integration";
 import {
+  DefaultAgentExecutionCoordinator,
+  runAgentExecutionFoundation,
+  wrapFailingValidateAgentRuntimeContract,
+  wrapUnhealthyAgentRuntimeContract,
+} from "@/lib/intelligence/agents/execution/execution-coordinator";
+import { resolveAgentRuntimeContract } from "@/lib/intelligence/agents/runtime/agent-contract";
+import { PROVIDER_KIND_LOCAL } from "@/lib/intelligence/agents/runtime/provider-kinds";
+import { resetAgentRequestSequence } from "@/lib/intelligence/agents/runtime/agent-request";
+import {
   AGENT_CAPABILITY_RESEARCH,
   AGENT_CAPABILITY_SEARCH,
 } from "@/lib/intelligence/agents/registry/agent-capabilities";
@@ -107,6 +116,37 @@ function requireResult(
   }
 
   return null;
+}
+
+function prepareDispatchReadyHarnessTask(context: {
+  request: IntelligenceRequest;
+  agentId?: string;
+}) {
+  resetAgentTaskSequence();
+  resetAgentRequestSequence();
+  const store = new DefaultAgentTaskStore();
+  const integration = new DefaultAgentDispatchIntegration(store);
+  const agent = createAgentDefinition({
+    id: context.agentId ?? "harness-research-agent",
+    name: "Harness Research Agent",
+    version: "1.0.0",
+    description: "Research capability test agent.",
+    category: "test",
+    status: "enabled",
+    capabilities: [AGENT_CAPABILITY_RESEARCH],
+  });
+  const task = createAgentTask({
+    agentId: "unassigned",
+    requestId: context.request.id,
+    title: "Execution foundation harness task",
+    taskRequest: createTaskRequest({
+      intent: "general",
+      requestedCapabilities: [AGENT_CAPABILITY_RESEARCH],
+    }),
+  });
+  const preparation = integration.prepareDispatch({ task, availableAgents: [agent] });
+
+  return { store, agent, preparation };
 }
 
 /**
@@ -734,6 +774,130 @@ export const INTELLIGENCE_TEST_SCENARIOS: IntelligenceTestScenario[] = [
 
       if (preparation.task.dispatchMetadata?.selectedAgentId) {
         return fail("Expected no selectedAgentId in dispatch metadata after rejection.");
+      }
+
+      return pass();
+    },
+  },
+  {
+    id: "execution-ready",
+    name: "Execution foundation ready",
+    description:
+      "Dispatch-ready task passes contract prepare, validate, describe, and health — executionReady true.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Execution foundation ready check.",
+      }),
+    validate: (context) => {
+      const { store, agent, preparation } = prepareDispatchReadyHarnessTask(context);
+
+      if (!preparation.diagnostics.dispatchReady) {
+        return fail("Expected dispatch-ready task before execution foundation.");
+      }
+
+      const result = runAgentExecutionFoundation({
+        task: preparation.task,
+        agentDefinition: agent,
+        providerKind: PROVIDER_KIND_LOCAL,
+        coordinator: new DefaultAgentExecutionCoordinator(store),
+      });
+
+      if (!result.executionReady) {
+        return fail("Expected executionReady true for healthy contract foundation.");
+      }
+
+      if (!result.prepared || !result.validated || !result.healthy) {
+        return fail("Expected prepared, validated, and healthy execution foundation checks.");
+      }
+
+      if (result.state !== "ready") {
+        return fail(`Expected execution state ready, received ${result.state}.`);
+      }
+
+      if (result.agentId !== agent.id) {
+        return fail("Expected execution result agentId to match dispatched agent.");
+      }
+
+      return pass();
+    },
+  },
+  {
+    id: "execution-unhealthy-provider",
+    name: "Execution foundation unhealthy provider",
+    description:
+      "Unhealthy runtime contract health check blocks execution readiness.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Execution unhealthy provider check.",
+      }),
+    validate: (context) => {
+      const { store, agent, preparation } = prepareDispatchReadyHarnessTask(context);
+      const unhealthyCoordinator = new DefaultAgentExecutionCoordinator(store, (providerKind) =>
+        wrapUnhealthyAgentRuntimeContract(resolveAgentRuntimeContract(providerKind)),
+      );
+
+      const result = runAgentExecutionFoundation({
+        task: preparation.task,
+        agentDefinition: agent,
+        providerKind: PROVIDER_KIND_LOCAL,
+        coordinator: unhealthyCoordinator,
+      });
+
+      if (result.executionReady) {
+        return fail("Expected executionReady false for unhealthy provider.");
+      }
+
+      if (result.healthy) {
+        return fail("Expected healthy false for unhealthy provider wrapper.");
+      }
+
+      if (result.state !== "blocked") {
+        return fail(`Expected blocked execution state, received ${result.state}.`);
+      }
+
+      if (result.errors.length === 0) {
+        return fail("Expected execution errors when provider health fails.");
+      }
+
+      return pass();
+    },
+  },
+  {
+    id: "execution-validation-failure",
+    name: "Execution foundation validation failure",
+    description:
+      "Contract validate() failure blocks execution readiness.",
+    buildRequest: () =>
+      createTestRequest({
+        question: "Execution validation failure check.",
+      }),
+    validate: (context) => {
+      const { store, agent, preparation } = prepareDispatchReadyHarnessTask(context);
+      const failingValidateCoordinator = new DefaultAgentExecutionCoordinator(store, (providerKind) =>
+        wrapFailingValidateAgentRuntimeContract(resolveAgentRuntimeContract(providerKind)),
+      );
+
+      const result = runAgentExecutionFoundation({
+        task: preparation.task,
+        agentDefinition: agent,
+        providerKind: PROVIDER_KIND_LOCAL,
+        coordinator: failingValidateCoordinator,
+      });
+
+      if (result.executionReady) {
+        return fail("Expected executionReady false when contract validate() fails.");
+      }
+
+      if (result.validated) {
+        return fail("Expected validated false when contract validate() fails.");
+      }
+
+      if (result.state !== "blocked") {
+        return fail(`Expected blocked execution state, received ${result.state}.`);
+      }
+
+      if (result.errors.length === 0) {
+        return fail("Expected execution errors when validation fails.");
       }
 
       return pass();
