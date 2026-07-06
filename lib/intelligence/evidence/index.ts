@@ -62,6 +62,19 @@ export {
 } from "@/lib/intelligence/evidence/adapters/graph";
 
 export {
+  createSearchEvidenceAdapter,
+  defaultSearchEvidenceMapper,
+  defaultSearchResolver,
+  MAX_SEARCH_QUERY_MATCHES,
+  SearchEvidenceAdapter,
+  SearchEvidenceMapper,
+  SearchResolver,
+  SEARCH_EVIDENCE_ADAPTER_ID,
+  SEARCH_EVIDENCE_ADAPTER_VERSION,
+  SEARCH_EVIDENCE_SOURCE_CLASS,
+} from "@/lib/intelligence/evidence/adapters/search";
+
+export {
   EVIDENCE_RELEVANCE_MAX,
   EVIDENCE_RELEVANCE_MIN,
   EvidenceValidationError,

@@ -14,7 +14,7 @@ import {
 } from "@/lib/intelligence/evidence/validation";
 
 /** Semantic version of the default evidence collector. */
-export const EVIDENCE_COLLECTOR_VERSION = "0.3.0-graph-evidence";
+export const EVIDENCE_COLLECTOR_VERSION = "0.4.0-search-evidence";
 
 /** Stable identifier recorded in collection metadata. */
 export const DEFAULT_EVIDENCE_COLLECTOR_ID = "default-evidence-collector";
@@ -211,7 +211,7 @@ function buildCollectionMessage(
     return "Evidence collection completed — enabled adapters returned zero items. See metadata warnings for resolution details.";
   }
 
-  return `Evidence collected from ${enabledCount} enabled source adapter(s) — ${itemCount} item(s) from entity-profile and graph sources (inferred provenance).`;
+  return `Evidence collected from ${enabledCount} enabled source adapter(s) — ${itemCount} item(s) from entity-profile, graph, and search sources (inferred provenance).`;
 }
 
 /** Shared default collector singleton used by the intelligence engine pipeline. */
