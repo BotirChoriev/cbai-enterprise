@@ -386,6 +386,27 @@ export {
 } from "@/lib/intelligence/testing";
 
 export type {
+  OrchestrationSummary,
+  OrchestratorRunOutcome,
+  OrchestratorRunResult,
+  OrchestratorStageId,
+  OrchestratorStageStatus,
+  ExecutionPlan,
+  ExecutionPlanStage,
+} from "@/lib/intelligence/orchestrator/types";
+
+export {
+  DEFAULT_INTELLIGENCE_ORCHESTRATOR_ID,
+  DefaultIntelligenceOrchestrator,
+  INTELLIGENCE_ORCHESTRATOR_VERSION,
+  defaultIntelligenceOrchestrator,
+  executeOrchestratedRun,
+  buildExecutionPlan,
+  DEFAULT_ORCHESTRATOR_POLICIES,
+  type IntelligenceOrchestrator,
+} from "@/lib/intelligence/orchestrator";
+
+export type {
   FormattedIntelligenceResultSections,
   ResultAssembler,
   ResultAssemblerInput,

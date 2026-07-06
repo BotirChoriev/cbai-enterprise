@@ -99,6 +99,8 @@ export interface IntelligenceResult {
   warnings: string[];
   /** Optional deterministic run diagnostics (BUILD-038). */
   diagnostics?: import("@/lib/intelligence/diagnostics/types").IntelligenceRunDiagnostics;
+  /** Optional orchestration summary (BUILD-040). */
+  orchestration?: import("@/lib/intelligence/orchestrator/types").OrchestrationSummary;
   /** ISO-8601 timestamp when the intelligence was produced. */
   producedAt: string;
   /** Optional ISO-8601 freshness horizon after which intelligence should be regenerated. */
