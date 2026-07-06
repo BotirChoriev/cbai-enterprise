@@ -75,6 +75,21 @@ export {
 } from "@/lib/intelligence/evidence/adapters/search";
 
 export {
+  createDocumentEvidenceAdapter,
+  defaultDocumentEvidenceMapper,
+  defaultDocumentResolver,
+  DocumentEvidenceAdapter,
+  DocumentEvidenceMapper,
+  DocumentResolver,
+  DOCUMENT_EVIDENCE_ADAPTER_ID,
+  DOCUMENT_EVIDENCE_ADAPTER_VERSION,
+  DOCUMENT_EVIDENCE_SOURCE_CLASS,
+  DOCUMENT_INGESTION_NOT_CONNECTED_MESSAGE,
+  DOCUMENT_INGESTION_NOT_CONNECTED_WARNING,
+  FUTURE_SUPPORTED_DOCUMENT_FORMATS,
+} from "@/lib/intelligence/evidence/adapters/document";
+
+export {
   EVIDENCE_RELEVANCE_MAX,
   EVIDENCE_RELEVANCE_MIN,
   EvidenceValidationError,

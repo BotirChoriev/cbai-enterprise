@@ -3,6 +3,7 @@ import type { Evidence, EvidenceSourceClass } from "@/lib/intelligence/evidence.
 import { createEntityProfileEvidenceAdapter } from "@/lib/intelligence/evidence/adapters/entity";
 import { createGraphEvidenceAdapter } from "@/lib/intelligence/evidence/adapters/graph";
 import { createSearchEvidenceAdapter } from "@/lib/intelligence/evidence/adapters/search";
+import { createDocumentEvidenceAdapter } from "@/lib/intelligence/evidence/adapters/document";
 
 /**
  * Result returned by an evidence source adapter collection run.
@@ -174,8 +175,9 @@ export class EvidenceSourceRegistry {
 }
 
 /**
- * Default registry pre-loaded with skeleton adapters for future source classes
- * and enabled entity-profile, graph, and search adapters.
+ * Default registry pre-loaded with skeleton adapters for future source classes,
+ * enabled entity-profile, graph, and search adapters, and the disabled
+ * document adapter foundation (BUILD-033).
  */
 export function createDefaultEvidenceSourceRegistry(): EvidenceSourceRegistry {
   const registry = new EvidenceSourceRegistry();
@@ -193,6 +195,11 @@ export function createDefaultEvidenceSourceRegistry(): EvidenceSourceRegistry {
 
     if (definition.id === "knowledge-graph") {
       registry.register(createGraphEvidenceAdapter());
+      continue;
+    }
+
+    if (definition.id === "document") {
+      registry.register(createDocumentEvidenceAdapter());
       continue;
     }
 
