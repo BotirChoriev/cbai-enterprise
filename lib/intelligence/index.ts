@@ -417,8 +417,15 @@ export {
   RUNTIME_QUEUE_VERSION,
   defaultRuntimeQueue,
   DEFAULT_RUNTIME_QUEUE_POLICY,
+  DEFAULT_RUNTIME_SCHEDULER_ID,
+  DefaultRuntimeScheduler,
+  RUNTIME_SCHEDULER_VERSION,
+  defaultRuntimeScheduler,
+  DEFAULT_RUNTIME_SCHEDULER_POLICY,
+  listReadyAt,
   type IntelligenceRuntime,
   type RuntimeQueue,
+  type RuntimeScheduler,
 } from "@/lib/intelligence/runtime";
 
 export type {
@@ -430,6 +437,15 @@ export type {
   RuntimeQueuePolicy,
   RuntimeQueueSnapshot,
 } from "@/lib/intelligence/runtime/queue";
+
+export type {
+  RuntimeSchedulerPolicy,
+  RuntimeSchedulerSnapshot,
+  ScheduleInput,
+  ScheduleItem,
+  ScheduleItemStatus,
+  ScheduleResult,
+} from "@/lib/intelligence/runtime/scheduler";
 
 export type {
   RuntimeFailure,

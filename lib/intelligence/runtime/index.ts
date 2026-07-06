@@ -64,3 +64,22 @@ export type {
   RuntimeQueuePolicy,
   RuntimeQueueSnapshot,
 } from "@/lib/intelligence/runtime/queue";
+
+export {
+  DEFAULT_RUNTIME_SCHEDULER_ID,
+  DefaultRuntimeScheduler,
+  RUNTIME_SCHEDULER_VERSION,
+  defaultRuntimeScheduler,
+  DEFAULT_RUNTIME_SCHEDULER_POLICY,
+  listReadyAt,
+  type RuntimeScheduler,
+} from "@/lib/intelligence/runtime/scheduler";
+
+export type {
+  RuntimeSchedulerPolicy,
+  RuntimeSchedulerSnapshot,
+  ScheduleInput,
+  ScheduleItem,
+  ScheduleItemStatus,
+  ScheduleResult,
+} from "@/lib/intelligence/runtime/scheduler";
