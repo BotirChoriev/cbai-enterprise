@@ -73,3 +73,23 @@ export type {
 } from "@/lib/intelligence/agents/tasks/types";
 
 export { AGENT_TASK_MODEL_VERSION } from "@/lib/intelligence/agents/tasks/types";
+
+export {
+  AGENT_TASK_STORE_VERSION,
+  DEFAULT_AGENT_TASK_STORE_ID,
+  DefaultAgentTaskStore,
+  defaultAgentTaskStore,
+  buildAgentTaskStoreSnapshot,
+  queryActiveTasks,
+  queryByAgentId,
+  queryByPriority,
+  queryByRequestId,
+  queryByRuntimeSessionId,
+  queryByStatus,
+  queryByTaskId,
+  queryTerminalTasks,
+  type AgentTaskStore,
+  type AgentTaskStoreSnapshot,
+  type TaskStoreAddResult,
+  type TaskStoreUpdateResult,
+} from "@/lib/intelligence/agents/tasks/store";
