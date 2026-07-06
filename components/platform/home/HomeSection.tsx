@@ -1,7 +1,7 @@
 type HomeSectionProps = {
   id: string;
   title: string;
-  description?: string;
+  description?: string | readonly string[];
   children: React.ReactNode;
 };
 
@@ -11,24 +11,27 @@ export default function HomeSection({
   description,
   children,
 }: HomeSectionProps) {
+  const descriptions = description
+    ? Array.isArray(description)
+      ? description
+      : [description]
+    : [];
+
   return (
     <section
       id={id}
       aria-labelledby={`${id}-heading`}
-      className="scroll-mt-6 space-y-5"
+      className="home-section scroll-mt-10"
     >
-      <div className="space-y-1">
-        <h2
-          id={`${id}-heading`}
-          className="text-lg font-semibold tracking-tight text-zinc-50"
-        >
+      <div className="home-section-header">
+        <h2 id={`${id}-heading`} className="home-section-title">
           {title}
         </h2>
-        {description ? (
-          <p className="max-w-3xl text-sm leading-relaxed text-zinc-400">
-            {description}
+        {descriptions.map((paragraph) => (
+          <p key={paragraph.slice(0, 32)} className="home-section-description">
+            {paragraph}
           </p>
-        ) : null}
+        ))}
       </div>
       {children}
     </section>

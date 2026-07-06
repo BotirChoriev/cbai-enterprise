@@ -1,77 +1,57 @@
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/Card";
-import type { PlatformPersona } from "@/lib/platform-home";
 import { PLATFORM_PERSONAS } from "@/lib/platform-home";
 
-type HomePersonasProps = {
-  title?: string;
-  description?: string;
-  showLinks?: boolean;
-};
-
-function PersonaCard({
-  persona,
-  showLinks,
-}: {
-  persona: PlatformPersona;
-  showLinks: boolean;
-}) {
+export default function HomePersonas() {
   return (
-    <Card className="h-full">
-      <CardContent className="flex h-full flex-col">
-        <h3 className="text-sm font-semibold text-zinc-100">{persona.title}</h3>
-        <p className="mt-2 flex-1 text-sm leading-relaxed text-zinc-400">
-          {persona.value}
-        </p>
-        {showLinks ? (
-          <Link
-            href={persona.href}
-            className="mt-4 inline-flex min-h-10 items-center text-sm font-medium text-sky-400 transition-colors hover:text-sky-300"
-          >
-            {persona.entryLabel} →
-          </Link>
-        ) : null}
-      </CardContent>
-    </Card>
-  );
-}
-
-export default function HomePersonas({ showLinks = false }: HomePersonasProps) {
-  return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
       {PLATFORM_PERSONAS.map((persona) => (
-        <PersonaCard key={persona.id} persona={persona} showLinks={showLinks} />
+        <Link
+          key={persona.id}
+          href={persona.href}
+          className="group block h-full rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+        >
+          <Card className="h-full transition-colors group-hover:border-zinc-700">
+            <CardContent className="flex h-full flex-col gap-4 p-6">
+              <h3 className="text-base font-semibold text-zinc-100">
+                {persona.title}
+              </h3>
+              <p className="text-sm leading-relaxed text-zinc-300">
+                {persona.sentence}
+              </p>
+              <p className="text-sm font-medium text-sky-400 group-hover:text-sky-300">
+                {persona.primaryAction} →
+              </p>
+              <div className="mt-auto space-y-3 border-t border-zinc-800 pt-4 text-xs">
+                <div>
+                  <p className="font-medium uppercase tracking-wider text-zinc-600">
+                    Supported modules
+                  </p>
+                  <p className="mt-1 text-zinc-400">
+                    {persona.supportedModules.join(" · ")}
+                  </p>
+                </div>
+                <div>
+                  <p className="font-medium uppercase tracking-wider text-zinc-600">
+                    Available today
+                  </p>
+                  <p className="mt-1 leading-relaxed text-zinc-500">
+                    {persona.currentCapability}
+                  </p>
+                </div>
+                <div>
+                  <p className="font-medium uppercase tracking-wider text-zinc-600">
+                    Planned expansion
+                  </p>
+                  <p className="mt-1 leading-relaxed text-zinc-600">
+                    {persona.futureCapability}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
       ))}
     </div>
-  );
-}
-
-export function HomePersonasSection({
-  id,
-  title,
-  description,
-  showLinks = false,
-}: HomePersonasProps & { id: string }) {
-  return (
-    <section
-      id={id}
-      aria-labelledby={`${id}-heading`}
-      className="scroll-mt-6 space-y-5"
-    >
-      <div className="space-y-1">
-        <h2
-          id={`${id}-heading`}
-          className="text-lg font-semibold tracking-tight text-zinc-50"
-        >
-          {title}
-        </h2>
-        {description ? (
-          <p className="max-w-3xl text-sm leading-relaxed text-zinc-400">
-            {description}
-          </p>
-        ) : null}
-      </div>
-      <HomePersonas showLinks={showLinks} />
-    </section>
   );
 }

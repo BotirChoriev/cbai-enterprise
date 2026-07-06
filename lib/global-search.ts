@@ -53,6 +53,8 @@ export const SEARCHABLE_ENTITY_TYPES: SearchableEntityType[] = [
   "university",
 ];
 
+const INSUFFICIENT_EVIDENCE = "insufficient evidence";
+
 /** Unified entity index — all modules normalized via adapters */
 export function getAllEntities(): Entity[] {
   return [
@@ -72,6 +74,11 @@ export function getEntityHref(entity: Entity): string {
   return routes[entity.type as SearchableEntityType] ?? "/search";
 }
 
+/** Deep link to entity within module (platform routing). */
+export function getEntityDetailHref(entity: Entity): string {
+  return `${getEntityHref(entity)}?id=${encodeURIComponent(entity.id)}`;
+}
+
 function tokenize(query: string): string[] {
   return query
     .toLowerCase()
@@ -86,7 +93,6 @@ function searchableText(entity: Entity): string {
     entity.category,
     entity.subtitle ?? "",
     entity.overview,
-    entity.aiSummary,
     entity.icon ?? "",
     ...entity.tags.map((t) => t.label),
     ...Object.values(entity.metadata).map(String),
@@ -96,11 +102,7 @@ function searchableText(entity: Entity): string {
 
 function scoreEntity(entity: Entity, tokens: string[]): SearchResult | null {
   if (tokens.length === 0) {
-    return {
-      entity,
-      relevanceScore: entity.scores.aiScore,
-      matchReasons: [{ field: "AI Score", snippet: `Ranked by AI score (${entity.scores.aiScore})` }],
-    };
+    return null;
   }
 
   const nameLower = entity.name.toLowerCase();
@@ -138,24 +140,29 @@ function scoreEntity(entity: Entity, tokens: string[]): SearchResult | null {
       reasons.push({ field: "Overview", snippet: truncate(entity.overview, 80) });
     }
 
-    if (entity.aiSummary.toLowerCase().includes(token)) {
+    const summarySearchable =
+      entity.aiSummary &&
+      !entity.aiSummary.toLowerCase().includes(INSUFFICIENT_EVIDENCE);
+
+    if (summarySearchable && entity.aiSummary.toLowerCase().includes(token)) {
       score += 15;
-      reasons.push({ field: "AI Summary", snippet: truncate(entity.aiSummary, 80) });
+      reasons.push({
+        field: "Summary",
+        snippet: truncate(entity.aiSummary, 80),
+      });
     }
 
     if (text.includes(token) && score === 0) {
       score += 10;
-      reasons.push({ field: "Metadata", snippet: `Matched "${token}" in profile` });
+      reasons.push({ field: "Registry", snippet: `Matched "${token}" in profile` });
     }
   }
 
   if (score === 0) return null;
 
-  // Boost high-performing entities slightly
-  score += entity.scores.aiScore * 0.05;
-
   const uniqueReasons = reasons.filter(
-    (r, i, arr) => arr.findIndex((x) => x.field === r.field && x.snippet === r.snippet) === i,
+    (r, i, arr) =>
+      arr.findIndex((x) => x.field === r.field && x.snippet === r.snippet) === i,
   );
 
   return {
@@ -173,30 +180,29 @@ function passesFilters(entity: Entity, filters: SearchFilters): boolean {
   if (filters.entityType !== "all" && entity.type !== filters.entityType) {
     return false;
   }
-  if (entity.scores.aiScore < filters.minAiScore) return false;
-  if (entity.scores.investmentScore < filters.minInvestmentScore) return false;
-  if (entity.scores.riskScore > filters.maxRiskScore) return false;
   return true;
 }
 
-/** Core search function — mock frontend intelligence */
+/** Core search — local registries only, no score boosting or empty-query browsing. */
 export function searchEntities(
   query: string,
   filters: SearchFilters = DEFAULT_SEARCH_FILTERS,
 ): SearchResult[] {
   const tokens = tokenize(query);
+  if (tokens.length === 0) {
+    return [];
+  }
+
   const all = getAllEntities();
 
-  const results = all
+  return all
     .filter((entity) => passesFilters(entity, filters))
     .map((entity) => scoreEntity(entity, tokens))
     .filter((r): r is SearchResult => r !== null)
     .sort((a, b) => b.relevanceScore - a.relevanceScore);
-
-  return results;
 }
 
-/** Generate AI insight panel content from search results */
+/** Honest insight summary for downstream modules (no fabricated patterns). */
 export function generateSearchInsight(
   query: string,
   results: SearchResult[],
@@ -205,18 +211,23 @@ export function generateSearchInsight(
   const tokens = tokenize(query);
   const hasQuery = tokens.length > 0;
 
+  if (!hasQuery) {
+    return {
+      summary: "Enter a query to search verified local entity registries.",
+      topMatches: [],
+      patterns: [],
+      suggestedActions: [],
+    };
+  }
+
   if (results.length === 0) {
     return {
-      summary: hasQuery
-        ? `No entities matched "${query}" with current filters.`
-        : "Enter a query or adjust filters to explore the intelligence index.",
+      summary: `No verified local entity matched "${query}".`,
       topMatches: [],
       patterns: [],
       suggestedActions: [
-        "Broaden your search terms",
-        "Lower AI score threshold",
-        "Increase max risk tolerance",
-        "Switch entity type filter to All",
+        "Try a country, company, or university name from local catalogs",
+        "Check topic areas for planned evidence modules",
       ],
     };
   }
@@ -230,50 +241,27 @@ export function generateSearchInsight(
     {} as Record<string, number>,
   );
 
-  const avgAi =
-    results.reduce((s, r) => s + r.entity.scores.aiScore, 0) / results.length;
-  const avgRisk =
-    results.reduce((s, r) => s + r.entity.scores.riskScore, 0) / results.length;
-
   const patterns: string[] = [];
   const dominantType = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])[0];
   if (dominantType) {
     patterns.push(
-      `${dominantType[1]} of ${results.length} results are ${getEntityTypeLabel(dominantType[0] as EntityType)} entities`,
+      `${dominantType[1]} of ${results.length} matches are ${getEntityTypeLabel(dominantType[0] as EntityType)} records from local registries`,
     );
-  }
-  if (avgAi >= 85) {
-    patterns.push(`High AI readiness cluster — average score ${avgAi.toFixed(0)}/100`);
-  }
-  if (avgRisk <= 25) {
-    patterns.push(`Low risk profile across results — average risk ${avgRisk.toFixed(0)}/100`);
   }
   if (filters.entityType !== "all") {
     patterns.push(`Filtered to ${getEntityTypeLabel(filters.entityType)} entities only`);
   }
 
-  const suggestedActions: string[] = [];
-  if (topThree[0]?.entity.type === "country") {
-    suggestedActions.push(`Analyze ${topThree[0].entity.name} in Countries module`);
-  }
-  if (topThree.some((r) => r.entity.type === "company")) {
-    suggestedActions.push("Compare top company AI readiness scores");
-  }
-  if (topThree.some((r) => r.entity.type === "university")) {
-    suggestedActions.push("Review university research partnerships");
-  }
-  suggestedActions.push("Run analysis in CBAI Core");
-  suggestedActions.push("Export results for briefing");
-
   return {
-    summary: hasQuery
-      ? `Found ${results.length} entities matching "${query}" across the CBAI intelligence index.`
-      : `Showing ${results.length} entities ranked by AI score across all modules.`,
+    summary: `${results.length} verified local ${results.length === 1 ? "entity" : "entities"} matched "${query}".`,
     topMatches: topThree.map(
-      (r) => `${r.entity.name} (${getEntityTypeLabel(r.entity.type)}, score ${r.relevanceScore})`,
+      (r) =>
+        `${r.entity.name} (${getEntityTypeLabel(r.entity.type)})`,
     ),
     patterns,
-    suggestedActions: suggestedActions.slice(0, 4),
+    suggestedActions: topThree.map(
+      (r) => `Open ${r.entity.name} in ${getEntityTypeLabel(r.entity.type)} module`,
+    ),
   };
 }
 

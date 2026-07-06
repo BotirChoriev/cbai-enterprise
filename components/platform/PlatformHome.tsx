@@ -1,71 +1,67 @@
-import HomeFlow from "@/components/platform/home/HomeFlow";
 import HomeFooter from "@/components/platform/home/HomeFooter";
+import HomeGlobalImpact from "@/components/platform/home/HomeGlobalImpact";
 import HomeHero from "@/components/platform/home/HomeHero";
-import {
-  HomeLanguages,
-  HomeRoadmap,
-} from "@/components/platform/home/HomeLanguagesRoadmap";
+import { HomeLanguages } from "@/components/platform/home/HomeLanguages";
 import HomeModules from "@/components/platform/home/HomeModules";
-import { HomePersonasSection } from "@/components/platform/home/HomePersonas";
+import HomePersonas from "@/components/platform/home/HomePersonas";
+import HomePlatformMap from "@/components/platform/home/HomePlatformMap";
 import HomePlatformStatus from "@/components/platform/home/HomePlatformStatus";
-import HomePrinciples from "@/components/platform/home/HomePrinciples";
+import HomeRoadmapTimeline from "@/components/platform/home/HomeRoadmapTimeline";
 import HomeSection from "@/components/platform/home/HomeSection";
-import { PLATFORM_ROADMAP } from "@/lib/platform-home";
+import HomeTrust from "@/components/platform/home/HomeTrust";
 
 export default function PlatformHome() {
   return (
-    <div className="space-y-12 pb-8 sm:space-y-14">
+    <div className="home-page mx-auto max-w-6xl pb-16">
       <HomeHero />
 
-      <HomePersonasSection
+      <HomeSection
         id="who-uses-cbai"
         title="Who Uses CBAI"
-        description="Each audience receives evidence-oriented intelligence — not generic AI answers."
-      />
+        description="Each role has a clear entry path. Select a persona to see supported modules and honest capability limits."
+      >
+        <HomePersonas />
+      </HomeSection>
 
       <HomeSection
         id="platform-modules"
         title="Platform Modules"
-        description="What each module does today. Status reflects current implementation — not roadmap promises."
+        description="Purpose, evidence status, capabilities, and dependencies — no unavailable features promised."
       >
         <HomeModules />
       </HomeSection>
 
-      <HomeSection
-        id="how-cbai-works"
-        title="How CBAI Works"
-        description="Intelligence flows from verified inputs to explained decisions. Stages without connected evidence stop at transparency labels."
-      >
-        <HomeFlow />
+      <HomeSection id="platform-map" title="Platform Map">
+        <HomePlatformMap />
       </HomeSection>
 
+      <section id="trust-center" aria-labelledby="trust-center-heading">
+        <h2 id="trust-center-heading" className="sr-only">
+          Trust Center
+        </h2>
+        <HomeTrust />
+      </section>
+
       <HomeSection
-        id="platform-principles"
-        title="Platform Principles"
-        description="Constitutional rules governing every page and module."
+        id="global-impact"
+        title="Global Impact"
+        description="Who benefits from evidence-based intelligence — today and on the verified roadmap."
       >
-        <HomePrinciples />
+        <HomeGlobalImpact />
       </HomeSection>
 
       <HomeSection
         id="platform-status"
-        title="Current Platform Status"
-        description="Real capabilities only. No inflated metrics or simulated activity feeds."
+        title="Live Platform Status"
+        description="Available, in progress, or evidence not connected — never fabricated percentages."
       >
         <HomePlatformStatus />
       </HomeSection>
 
-      <HomePersonasSection
-        id="supported-personas"
-        title="Supported Personas"
-        description="Enter the platform by role. Links lead to the best current entry point for each persona."
-        showLinks
-      />
-
       <HomeSection
         id="languages"
         title="Languages"
-        description="Multilingual architecture is prepared. Unavailable languages are marked honestly."
+        description="Multilingual architecture prepared. Unavailable languages marked Planned."
       >
         <HomeLanguages />
       </HomeSection>
@@ -73,9 +69,9 @@ export default function PlatformHome() {
       <HomeSection
         id="roadmap"
         title="Platform Roadmap"
-        description="Verified phases from the Platform Transformation Master Plan. No marketing timelines."
+        description="Verified phases only — no marketing timelines."
       >
-        <HomeRoadmap phases={PLATFORM_ROADMAP} />
+        <HomeRoadmapTimeline />
       </HomeSection>
 
       <HomeFooter />
