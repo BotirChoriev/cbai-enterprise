@@ -100,3 +100,24 @@ export type {
   PolicySeverity,
   RuntimePolicyEvaluationInput,
 } from "@/lib/intelligence/runtime/policy";
+
+export {
+  DEFAULT_SESSION_REGISTRY_ID,
+  DefaultSessionRegistry,
+  RUNTIME_SESSION_REGISTRY_VERSION,
+  defaultSessionRegistry,
+  queryActiveSessions,
+  queryByLifecycleStatus,
+  queryByRequestId,
+  queryBySessionId,
+  queryCompletedSessions,
+  queryFailedSessions,
+  type SessionRegistry,
+} from "@/lib/intelligence/runtime/registry";
+
+export type {
+  SessionRegisterResult,
+  SessionRegistryEntry,
+  SessionRegistrySnapshot,
+  SessionUpdateResult,
+} from "@/lib/intelligence/runtime/registry";
