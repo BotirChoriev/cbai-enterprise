@@ -367,7 +367,27 @@ export {
 } from "@/lib/intelligence/result";
 
 export type {
+  IntelligenceTestOutcome,
+  IntelligenceTestReport,
+  IntelligenceTestScenario,
+  IntelligenceTestScenarioReport,
+  IntelligenceTestValidationContext,
+  IntelligenceTestValidationResult,
+  IntelligenceTestValidator,
+} from "@/lib/intelligence/testing/types";
+
+export {
+  DefaultIntelligenceTestHarness,
+  INTELLIGENCE_TEST_HARNESS_VERSION,
+  defaultIntelligenceTestHarness,
+  runIntelligenceTestSuite,
+  runIntelligenceTestSuiteSummary,
+  type IntelligenceTestHarness,
+} from "@/lib/intelligence/testing";
+
+export type {
   FormattedIntelligenceResultSections,
   ResultAssembler,
   ResultAssemblerInput,
 } from "@/lib/intelligence/result";
+
