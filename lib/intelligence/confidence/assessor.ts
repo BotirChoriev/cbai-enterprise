@@ -7,11 +7,16 @@ import {
   computeCompositeConfidenceScore,
   isEvidenceConfidenceInsufficient,
 } from "@/lib/intelligence/confidence/factors";
+import {
+  applyQualityIntegrationAdjustments,
+  buildQualityDegradationReason,
+  extractQualityIntegrationContext,
+} from "@/lib/intelligence/confidence/quality-integration";
 import type { EvidenceCollection } from "@/lib/intelligence/evidence.types";
 import type { IntelligenceRequest } from "@/lib/intelligence/request.types";
 
 /** Semantic version of the default confidence assessor. */
-export const CONFIDENCE_ASSESSOR_VERSION = "0.1.0-foundation";
+export const CONFIDENCE_ASSESSOR_VERSION = "0.2.0-quality-integration";
 
 /** Stable identifier for audit traces and future metadata. */
 export const DEFAULT_CONFIDENCE_ASSESSOR_ID = "default-confidence-assessor";
@@ -39,17 +44,15 @@ export interface ConfidenceAssessor {
 }
 
 /**
- * Default confidence assessor for the CBAI Intelligence Engine (BUILD-024).
+ * Default confidence assessor for the CBAI Intelligence Engine.
  *
- * Computes conservative confidence from evidence collection state only.
- * Graph connectivity, entity signals, memory, and AI scoring are deferred.
+ * BUILD-035 integrates {@link EvidenceCollection.quality} into confidence
+ * scoring conservatively. Trust assessment is unchanged.
  */
 export class DefaultConfidenceAssessor implements ConfidenceAssessor {
   /**
-   * Assess confidence using evidence collection state only.
-   *
-   * When evidence is empty or insufficient, returns score 0 and band
-   * `insufficient` with factors explaining the missing support.
+   * Assess confidence using evidence volume, relevance, quality, and
+   * deferred graph/entity factors.
    */
   async assess(
     request: IntelligenceRequest,
@@ -59,6 +62,7 @@ export class DefaultConfidenceAssessor implements ConfidenceAssessor {
 
     const factors = buildConfidenceFactors(evidence);
     const insufficient = isEvidenceConfidenceInsufficient(evidence);
+    const qualityContext = extractQualityIntegrationContext(evidence);
 
     if (insufficient) {
       return {
@@ -70,11 +74,25 @@ export class DefaultConfidenceAssessor implements ConfidenceAssessor {
           evidence.items.length === 0
             ? "Conservative confidence cap — no evidence items available to justify a non-zero score."
             : "Conservative confidence cap — evidence sufficiency status is insufficient.",
+        qualityIntegration: {
+          meanOverallScore: qualityContext.meanOverallScore,
+          qualityBand: qualityContext.qualityBand,
+          qualityWarnings: qualityContext.qualityWarnings,
+          meanProvenanceScore: qualityContext.meanProvenanceScore,
+          warningPenaltyApplied: 0,
+          qualityBandCapApplied: null,
+          qualityUnknown: !qualityContext.isKnown,
+        },
       };
     }
 
-    const score = computeCompositeConfidenceScore(factors);
+    const rawScore = computeCompositeConfidenceScore(factors);
+    const { score, summary } = applyQualityIntegrationAdjustments(
+      rawScore,
+      qualityContext,
+    );
     const band = resolveConfidenceBand(score);
+
     const deferredFactorsActive = factors.some(
       (factor) =>
         (factor.id === "graph-connectivity" ||
@@ -82,14 +100,24 @@ export class DefaultConfidenceAssessor implements ConfidenceAssessor {
         factor.score === 0,
     );
 
+    const qualityDegraded =
+      !qualityContext.isKnown ||
+      summary.warningPenaltyApplied > 0 ||
+      summary.qualityBandCapApplied !== null;
+
+    const degraded = deferredFactorsActive || qualityDegraded;
+
     return {
       score,
       band,
       factors,
-      degraded: deferredFactorsActive,
-      degradationReason: deferredFactorsActive
-        ? "Confidence computed from evidence factors only — graph and entity signal factors are not yet implemented."
-        : undefined,
+      degraded,
+      degradationReason: buildQualityDegradationReason(
+        qualityContext,
+        summary,
+        deferredFactorsActive,
+      ),
+      qualityIntegration: summary,
     };
   }
 }

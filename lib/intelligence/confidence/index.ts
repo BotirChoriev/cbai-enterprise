@@ -38,3 +38,25 @@ export {
   CONFIDENCE_FACTOR_WEIGHTS,
   isEvidenceConfidenceInsufficient,
 } from "@/lib/intelligence/confidence/factors";
+
+export {
+  applyQualityBandCap,
+  applyQualityWarningDegradation,
+  computeQualityWarningPenalty,
+  MAX_QUALITY_WARNING_PENALTY,
+  QUALITY_BAND_CONFIDENCE_CAPS,
+  QUALITY_UNKNOWN_FACTOR_SCORE,
+  QUALITY_WARNING_PENALTIES,
+  resolveWarningPenalty,
+  weightQualityForConfidence,
+} from "@/lib/intelligence/confidence/quality-weighting";
+
+export {
+  applyQualityIntegrationAdjustments,
+  buildEvidenceQualityFactor,
+  buildQualityDegradationReason,
+  computeMeanProvenanceScore,
+  extractQualityIntegrationContext,
+  type ConfidenceQualityIntegrationContext,
+  type ConfidenceQualityIntegrationSummary,
+} from "@/lib/intelligence/confidence/quality-integration";

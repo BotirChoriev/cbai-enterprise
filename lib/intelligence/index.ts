@@ -20,6 +20,11 @@ export type {
 } from "@/lib/intelligence/confidence.types";
 
 export type {
+  ConfidenceQualityIntegrationContext,
+  ConfidenceQualityIntegrationSummary,
+} from "@/lib/intelligence/confidence/quality-integration";
+
+export type {
   GraphContext,
   GraphContextMetadata,
   GraphContextStatus,
@@ -198,12 +203,19 @@ export {
   CONFIDENCE_FACTOR_WEIGHTS,
   DEFAULT_CONFIDENCE_ASSESSOR_ID,
   DefaultConfidenceAssessor,
+  applyQualityIntegrationAdjustments,
+  buildEvidenceQualityFactor,
+  computeMeanProvenanceScore,
   defaultConfidenceAssessor,
+  extractQualityIntegrationContext,
+  MAX_QUALITY_WARNING_PENALTY,
+  QUALITY_UNKNOWN_FACTOR_SCORE,
   clampConfidenceScore,
   computeCompositeConfidenceScore,
   isEvidenceConfidenceInsufficient,
   isInsufficientConfidenceBand,
   resolveConfidenceBand,
+  weightQualityForConfidence,
   type ConfidenceAssessor,
 } from "@/lib/intelligence/confidence";
 

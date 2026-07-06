@@ -21,6 +21,7 @@ export type ConfidenceBand =
 export type ConfidenceFactorId =
   | "evidence-volume"
   | "source-relevance"
+  | "evidence-quality"
   | "graph-connectivity"
   | "entity-signal-quality";
 
@@ -50,6 +51,7 @@ export interface ConfidenceFactor {
  * Does not represent probability of future outcomes.
  *
  * @see docs/CBAI-Intelligence-Specification-v1.md §4
+ * @see docs/build-035-report.md
  */
 export interface ConfidenceAssessment {
   /** Composite confidence score, 0–100 inclusive. */
@@ -62,4 +64,6 @@ export interface ConfidenceAssessment {
   degraded: boolean;
   /** Human-readable reason when {@link degraded} is true. */
   degradationReason?: string;
+  /** Quality integration summary when BUILD-034 quality data is present (BUILD-035). */
+  qualityIntegration?: import("@/lib/intelligence/confidence/quality-integration").ConfidenceQualityIntegrationSummary;
 }

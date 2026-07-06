@@ -3,13 +3,15 @@ import type {
   ConfidenceFactorId,
 } from "@/lib/intelligence/confidence.types";
 import type { EvidenceCollection } from "@/lib/intelligence/evidence.types";
+import { buildEvidenceQualityFactor } from "@/lib/intelligence/confidence/quality-integration";
 
-/** Canonical factor weights per Intelligence Specification §4.2. */
+/** Canonical factor weights per Intelligence Specification §4.2 (BUILD-035). */
 export const CONFIDENCE_FACTOR_WEIGHTS: Record<ConfidenceFactorId, number> = {
-  "evidence-volume": 0.25,
-  "source-relevance": 0.25,
-  "graph-connectivity": 0.25,
-  "entity-signal-quality": 0.25,
+  "evidence-volume": 0.2,
+  "source-relevance": 0.2,
+  "evidence-quality": 0.2,
+  "graph-connectivity": 0.2,
+  "entity-signal-quality": 0.2,
 };
 
 /**
@@ -142,7 +144,7 @@ export function buildEntitySignalQualityFactor(): ConfidenceFactor {
 }
 
 /**
- * Build all four canonical confidence factors for the current build scope.
+ * Build all canonical confidence factors including evidence quality (BUILD-035).
  */
 export function buildConfidenceFactors(
   evidence: EvidenceCollection,
@@ -150,6 +152,7 @@ export function buildConfidenceFactors(
   return [
     buildEvidenceVolumeFactor(evidence),
     buildSourceRelevanceFactor(evidence),
+    buildEvidenceQualityFactor(evidence),
     buildGraphConnectivityFactor(),
     buildEntitySignalQualityFactor(),
   ];
