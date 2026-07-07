@@ -21,9 +21,9 @@ export default function EvidenceGapPanel({
   showSummary = true,
   showSources = true,
   showMethodology = true,
-  heading = "Missing evidence",
+  heading = "Missing information",
   sectionId = "missing-evidence",
-  nextStep = { label: "Decision package →", href: "#decision-package" },
+  nextStep = { label: "Reports →", href: "#reports" },
 }: EvidenceGapPanelProps) {
   const nonAvailable = getNonAvailableGaps(profile);
   const compact = !showSummary && !showSources && !showMethodology;
@@ -42,7 +42,7 @@ export default function EvidenceGapPanel({
 
       {nonAvailable.length === 0 ? (
         <p className="rounded-lg bg-zinc-900/50 px-4 py-4 text-sm text-zinc-400">
-          No missing evidence for applicable items.
+          No missing information is recorded for this profile.
         </p>
       ) : (
         <ul className="space-y-2">

@@ -1,5 +1,8 @@
 import type { EvidenceComparisonRecord } from "@/lib/evidence-comparison";
-import { comparisonReadinessLabel, comparisonReadinessStatusClass } from "@/lib/evidence-comparison";
+import {
+  comparisonReadinessStatusClass,
+} from "@/lib/evidence-comparison";
+import { userComparisonReadinessLabel } from "@/components/shared/user-facing-copy";
 
 type EvidenceComparisonSummaryProps = {
   comparison: EvidenceComparisonRecord;
@@ -17,14 +20,14 @@ export default function EvidenceComparisonSummary({ comparison }: EvidenceCompar
         <span
           className={`rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${comparisonReadinessStatusClass(comparison.readinessStatus)}`}
         >
-          {comparisonReadinessLabel(comparison.readinessStatus)}
+          {userComparisonReadinessLabel(comparison.readinessStatus)}
         </span>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-4">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-            Left connected
+            First profile
           </p>
           <p className="mt-2 font-mono text-2xl font-semibold text-zinc-100">
             {comparison.leftAvailableEvidence.length}
@@ -32,7 +35,7 @@ export default function EvidenceComparisonSummary({ comparison }: EvidenceCompar
         </div>
         <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-4">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-            Right connected
+            Second profile
           </p>
           <p className="mt-2 font-mono text-2xl font-semibold text-zinc-100">
             {comparison.rightAvailableEvidence.length}
@@ -40,7 +43,7 @@ export default function EvidenceComparisonSummary({ comparison }: EvidenceCompar
         </div>
         <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-4">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-            Shared indicators
+            Shared topics
           </p>
           <p className="mt-2 font-mono text-2xl font-semibold text-zinc-100">
             {comparison.sharedIndicators.length}

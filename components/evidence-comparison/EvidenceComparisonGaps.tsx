@@ -22,22 +22,22 @@ export default function EvidenceComparisonGaps({ comparison }: EvidenceCompariso
           id="comparison-gaps-heading"
           className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
         >
-          Evidence Gap Differences
+          Missing information differences
         </h4>
         <p className="mt-1 text-sm text-zinc-500">
-          Where evidence gaps differ between entities — descriptive only.
+          Where missing information differs between profiles — descriptive only.
         </p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-5 py-4">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-            Shared gaps ({sharedGaps.length})
+            Both profiles ({sharedGaps.length})
           </p>
           <p className="mt-2 text-xs text-zinc-500">
             {sharedGaps.length === 0
-              ? "No shared gap indicators."
-              : `${sharedGaps.length} indicator(s) with evidence gap on both entities.`}
+              ? "No shared missing information."
+              : `${sharedGaps.length} topic(s) missing on both profiles.`}
           </p>
         </div>
         <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-5 py-4">
@@ -46,8 +46,8 @@ export default function EvidenceComparisonGaps({ comparison }: EvidenceCompariso
           </p>
           <p className="mt-2 text-xs text-zinc-500">
             {leftOnlyGaps.length === 0
-              ? "No gaps unique to left entity."
-              : `${leftOnlyGaps.length} indicator(s) with gap on left only.`}
+              ? "Nothing missing on this profile only."
+              : `${leftOnlyGaps.length} topic(s) missing on this profile only.`}
           </p>
         </div>
         <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-5 py-4">
@@ -56,8 +56,8 @@ export default function EvidenceComparisonGaps({ comparison }: EvidenceCompariso
           </p>
           <p className="mt-2 text-xs text-zinc-500">
             {rightOnlyGaps.length === 0
-              ? "No gaps unique to right entity."
-              : `${rightOnlyGaps.length} indicator(s) with gap on right only.`}
+              ? "Nothing missing on this profile only."
+              : `${rightOnlyGaps.length} topic(s) missing on this profile only.`}
           </p>
         </div>
       </div>

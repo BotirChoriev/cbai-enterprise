@@ -4,10 +4,13 @@ import EvidenceComparisonPanel from "@/components/evidence-comparison/EvidenceCo
 import EntityOverviewSection from "@/components/shared/EntityOverviewSection";
 import EntityEvidenceSection from "@/components/shared/EntityEvidenceSection";
 import EntityCompareSection from "@/components/shared/EntityCompareSection";
+import EntityOptionalExploration from "@/components/shared/EntityOptionalExploration";
 import EvidenceGapPanel from "@/components/evidence-gap/EvidenceGapPanel";
-import EntityDecisionPackagePreview, {
-  EntityReportsAvailable,
-} from "@/components/shared/EntityDecisionPackagePreview";
+import { EntityReportsAvailable } from "@/components/shared/EntityDecisionPackagePreview";
+import {
+  countConnectedSources,
+  getConnectedAvailableItems,
+} from "@/components/shared/entity-profile-copy";
 
 type CountryIntelligencePanelProps = {
   journey: CountryUserJourney;
@@ -22,9 +25,7 @@ export function CountryIntelligencePanel({
 }: CountryIntelligencePanelProps) {
   const { profile, evidenceGaps, evidenceComparison } = journey;
   const { registryFacts, coverage } = profile;
-  const sourceConnectedCount = coverage.sources.filter(
-    (source) => source.statusLabel === "Connected",
-  ).length;
+  const sourceConnectedCount = countConnectedSources(coverage);
 
   return (
     <div className="space-y-6">
@@ -37,7 +38,8 @@ export function CountryIntelligencePanel({
       <EntityOverviewSection
         name={registryFacts.name}
         entityType="Country"
-        country={registryFacts.region}
+        country={registryFacts.name}
+        region={registryFacts.region}
         subtitle={`${registryFacts.code} · ${registryFacts.capital}`}
         availableInformation={registryFacts.sourceLabel}
         facts={[{ label: "Government", value: registryFacts.government }]}
@@ -47,6 +49,7 @@ export function CountryIntelligencePanel({
         connectedCount={coverage.evidenceCoverage.connected}
         sourceConnectedCount={sourceConnectedCount}
         totalSources={coverage.sources.length}
+        availableItems={getConnectedAvailableItems(coverage)}
       />
 
       <EvidenceGapPanel
@@ -56,17 +59,17 @@ export function CountryIntelligencePanel({
         showMethodology={false}
       />
 
-      <EntityDecisionPackagePreview summary={journey.decisionSummary} />
+      <EntityReportsAvailable reports={journey.reports} entityLabel="country" />
 
-      <EntityReportsAvailable reports={journey.reports} />
-
-      <EntityCompareSection>
-        <EvidenceComparisonPanel
-          entityType="country"
-          leftLegacyId={country.id}
-          initialModel={evidenceComparison}
-        />
-      </EntityCompareSection>
+      <EntityOptionalExploration>
+        <EntityCompareSection>
+          <EvidenceComparisonPanel
+            entityType="country"
+            leftLegacyId={country.id}
+            initialModel={evidenceComparison}
+          />
+        </EntityCompareSection>
+      </EntityOptionalExploration>
     </div>
   );
 }

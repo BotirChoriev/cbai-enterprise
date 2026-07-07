@@ -28,21 +28,16 @@ export type NavSection = {
   items: NavItem[];
 };
 
+/** Public investor-facing navigation — production journey only. */
 export const platformNavSections: NavSection[] = [
   {
-    title: "Start",
+    title: "Platform",
     items: [
       {
         label: "Home",
         href: "/",
         icon: "home",
-        description: "Search and browse the platform.",
-      },
-      {
-        label: "Dashboard",
-        href: "/dashboard",
-        icon: "dashboard",
-        description: "What is available today and what you can do now.",
+        description: "Official evidence intelligence for countries, companies, and universities.",
       },
       {
         label: "Search",
@@ -50,52 +45,57 @@ export const platformNavSections: NavSection[] = [
         icon: "search",
         description: "Search countries, companies, and universities.",
       },
-    ],
-  },
-  {
-    title: "Intelligence",
-    items: [
       {
         label: "Countries",
         href: "/countries",
         icon: "countries",
-        description: "Country profiles — evidence, gaps, decision package, reports.",
+        description: "Country profiles — available information, gaps, and reports.",
       },
       {
         label: "Companies",
         href: "/companies",
         icon: "companies",
-        description: "Company profiles from the local registry.",
+        description: "Company profiles with official information and reports.",
       },
       {
         label: "Universities",
         href: "/universities",
         icon: "universities",
-        description: "University profiles from the local registry.",
+        description: "University profiles with official information and reports.",
       },
       {
-        label: "Evidence Explorer",
+        label: "Evidence",
         href: "/knowledge",
         icon: "knowledge",
-        description: "Platform-wide source and indicator coverage.",
+        description: "Official source status across profiles.",
       },
       {
         label: "Reports",
         href: "/analytics",
         icon: "analytics",
-        description: "Available report types by entity scope.",
+        description: "Available report types by profile scope.",
+      },
+    ],
+  },
+];
+
+/** Internal routes — not shown in public sidebar. */
+export const internalNavSections: NavSection[] = [
+  {
+    title: "Internal",
+    items: [
+      {
+        label: "Dashboard",
+        href: "/dashboard",
+        icon: "dashboard",
+        description: "What is available today and what you can do now.",
       },
       {
         label: "Reasoning",
         href: "/reasoning",
         icon: "reasoning",
-        description: "Evidence-to-judgment pipeline architecture.",
+        description: "How official information supports review before decisions.",
       },
-    ],
-  },
-  {
-    title: "Workspaces",
-    items: [
       {
         label: "Government",
         href: "/government",
@@ -114,27 +114,39 @@ export const platformNavSections: NavSection[] = [
         icon: "citizen",
         description: "Public information topics in clear language.",
       },
-    ],
-  },
-  {
-    title: "Governance",
-    items: [
       {
         label: "Governance",
         href: "/ai-control",
         icon: "ai-control",
-        description: "Platform rules, standards, and compliance status.",
+        description: "Platform rules, standards, and review process.",
       },
     ],
   },
 ];
 
 /** Flat navigation list for module grids and legacy consumers. */
-export const mainNav: NavItem[] = platformNavSections.flatMap(
-  (section) => section.items,
-);
+export const mainNav: NavItem[] = [
+  ...platformNavSections.flatMap((section) => section.items),
+  ...internalNavSections.flatMap((section) => section.items),
+];
 
 /** Platform modules excluding the home route. */
 export const platformModules: NavItem[] = mainNav.filter(
   (item) => item.href !== "/",
 );
+
+/** Public journey routes — hide internal context chrome. */
+export const PUBLIC_JOURNEY_ROUTES = new Set([
+  "/",
+  "/search",
+  "/countries",
+  "/companies",
+  "/universities",
+  "/knowledge",
+  "/analytics",
+  "/dashboard",
+]);
+
+export function isPublicJourneyRoute(pathname: string): boolean {
+  return PUBLIC_JOURNEY_ROUTES.has(pathname);
+}

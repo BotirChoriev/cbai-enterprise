@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 import Link from "next/link";
 import type { GatewaySearchResponse } from "@/lib/search-gateway";
-import { buildEntityResultEntry } from "@/lib/search-intelligence-entry";
-import { buildPlatformEntityHref } from "@/lib/global-search";
+import {
+  buildEntityResultEntry,
+  type SearchResultEntry,
+} from "@/lib/search-intelligence-entry";
 import { profileSectionHref } from "@/components/shared/entity-profile-path";
 import type { Entity } from "@/lib/entity/entity.types";
 
@@ -40,13 +41,7 @@ export default function SearchGatewayResults({
   response,
   query,
 }: SearchGatewayResultsProps) {
-  const router = useRouter();
   const singleEntity = useMemo(() => resolveSingleEntityMatch(response), [response]);
-
-  useEffect(() => {
-    if (!singleEntity) return;
-    router.replace(buildPlatformEntityHref(singleEntity, { searchQuery: query }));
-  }, [singleEntity, query, router]);
 
   if (!response.query) {
     return <SearchExamples />;
@@ -64,7 +59,8 @@ export default function SearchGatewayResults({
   }
 
   if (singleEntity) {
-    return <p className="text-sm text-zinc-500">Opening {singleEntity.name}…</p>;
+    const entry = buildEntityResultEntry(singleEntity, query);
+    return <SearchResultCard entry={entry} matchedLabel={`Matched: ${entry.name}`} />;
   }
 
   const results = collectEntityResults(response);
@@ -79,46 +75,75 @@ export default function SearchGatewayResults({
           const entry = buildEntityResultEntry(result.entity, query);
           return (
             <li key={`${result.entity.type}-${result.entity.id}`}>
-              <article className="rounded-lg bg-zinc-900/50 px-4 py-3">
-                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                  <h2 className="text-sm font-semibold text-zinc-100">{entry.name}</h2>
-                  <span className="text-xs text-zinc-500">{entry.type}</span>
-                  {entry.countryLabel ? (
-                    <span className="text-xs text-zinc-600">· {entry.countryLabel}</span>
-                  ) : null}
-                </div>
-                <p className="mt-1 text-xs text-zinc-400">{entry.shortDescription}</p>
-                <p className="mt-1 text-xs text-zinc-600">{entry.nextStep}</p>
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <Link
-                    href={entry.href}
-                    className="inline-flex min-h-9 items-center rounded-lg bg-zinc-100 px-3.5 text-xs font-semibold text-zinc-900 transition-colors hover:bg-white"
-                  >
-                    Open profile →
-                  </Link>
-                  {entry.showCompare ? (
-                    <Link
-                      href={profileSectionHref(entry.href, "compare")}
-                      className="text-xs text-cyan-400/90 hover:text-cyan-300"
-                    >
-                      Compare evidence
-                    </Link>
-                  ) : null}
-                  {entry.showReports ? (
-                    <Link
-                      href={profileSectionHref(entry.href, "reports")}
-                      className="text-xs text-cyan-400/90 hover:text-cyan-300"
-                    >
-                      Reports
-                    </Link>
-                  ) : null}
-                </div>
-              </article>
+              <SearchResultCard entry={entry} />
             </li>
           );
         })}
       </ul>
     </div>
+  );
+}
+
+type SearchResultCardProps = {
+  entry: SearchResultEntry;
+  matchedLabel?: string;
+};
+
+function SearchResultCard({ entry, matchedLabel }: SearchResultCardProps) {
+  const showCountryInHeader = entry.type !== "Country" && entry.countryLabel;
+
+  return (
+    <article className="rounded-lg bg-zinc-900/50 px-4 py-3">
+      {matchedLabel ? (
+        <p className="text-sm font-medium text-zinc-200">{matchedLabel}</p>
+      ) : (
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+          <h2 className="text-sm font-semibold text-zinc-100">{entry.name}</h2>
+          <span className="text-xs text-zinc-500">{entry.type}</span>
+          {showCountryInHeader ? (
+            <span className="text-xs text-zinc-600">· {entry.countryLabel}</span>
+          ) : null}
+        </div>
+      )}
+
+      {matchedLabel ? (
+        <p className="mt-1 text-xs text-zinc-500">
+          {entry.type}
+          {showCountryInHeader ? ` · ${entry.countryLabel}` : ""}
+        </p>
+      ) : null}
+
+      {entry.distinguishingFact ? (
+        <p className="mt-1 text-xs text-zinc-400">{entry.distinguishingFact}</p>
+      ) : null}
+
+      <p className="mt-1 text-xs text-zinc-600">{entry.nextStep}</p>
+
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <Link
+          href={entry.href}
+          className="inline-flex min-h-9 items-center rounded-lg bg-zinc-100 px-3.5 text-xs font-semibold text-zinc-900 transition-colors hover:bg-white"
+        >
+          Open profile →
+        </Link>
+        {!matchedLabel && entry.showCompare ? (
+          <Link
+            href={profileSectionHref(entry.href, "compare")}
+            className="inline-flex min-h-9 items-center rounded-lg border border-zinc-700 bg-zinc-900 px-3.5 text-xs font-medium text-cyan-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
+          >
+            Compare →
+          </Link>
+        ) : null}
+        {!matchedLabel && entry.showReports ? (
+          <Link
+            href={profileSectionHref(entry.href, "reports")}
+            className="inline-flex min-h-9 items-center rounded-lg border border-zinc-700 bg-zinc-900 px-3.5 text-xs font-medium text-cyan-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
+          >
+            Open reports →
+          </Link>
+        ) : null}
+      </div>
+    </article>
   );
 }
 

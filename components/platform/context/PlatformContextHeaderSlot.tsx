@@ -2,13 +2,14 @@
 
 import { usePathname } from "next/navigation";
 import { shouldShowContextHeader } from "@/lib/context";
+import { isPublicJourneyRoute } from "@/lib/navigation";
 import PlatformContextHeader from "@/components/platform/context/PlatformContextHeader";
 import { moduleIdFromPath, PLATFORM_MODULES } from "@/lib/context";
 
 const MODULE_LABEL_OVERRIDES: Record<string, string> = {
-  "/knowledge": "Evidence Explorer",
-  "/analytics": "Reports Center",
-  "/ai-control": "Governance Control",
+  "/knowledge": "Evidence",
+  "/analytics": "Reports",
+  "/ai-control": "Governance",
 };
 
 function resolveModuleLabel(pathname: string): string {
@@ -21,13 +22,13 @@ function resolveModuleLabel(pathname: string): string {
     return PLATFORM_MODULES[moduleId].label;
   }
 
-  return "Platform";
+  return "CBAI";
 }
 
 export default function PlatformContextHeaderSlot() {
   const pathname = usePathname();
 
-  if (!shouldShowContextHeader(pathname)) {
+  if (!shouldShowContextHeader(pathname) || isPublicJourneyRoute(pathname)) {
     return null;
   }
 

@@ -6,7 +6,7 @@ export default function DashboardPage() {
     <div className="space-y-8">
       <PageHeader
         title="Dashboard"
-        description="What is available today and what you can do now on CBAI."
+        description="Public Intelligence — what is available today on CBAI."
       />
       <ProductDashboard />
     </div>

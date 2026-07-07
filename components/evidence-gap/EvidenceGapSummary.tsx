@@ -17,17 +17,17 @@ export default function EvidenceGapSummary({ profile }: EvidenceGapSummaryProps)
   return (
     <div className="space-y-4">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <CountStat label="Available" value={profile.availableCount} />
-        <CountStat label="Planned" value={profile.plannedCount} />
+        <CountStat label="Available now" value={profile.availableCount} />
+        <CountStat label="Not yet available" value={profile.plannedCount} />
         <CountStat label="Missing" value={profile.missingCount} />
-        <CountStat label="Blocked" value={profile.blockedCount} />
+        <CountStat label="Unavailable" value={profile.blockedCount} />
       </div>
 
       <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-5 py-4">
         <dl className="grid gap-3 text-sm sm:grid-cols-2">
           <div>
             <dt className="text-xs uppercase tracking-wider text-zinc-600">
-              Total applicable indicators
+              Total applicable topics
             </dt>
             <dd className="mt-1 font-mono text-zinc-200">{profile.totalIndicators}</dd>
           </div>

@@ -10,22 +10,17 @@ export default function ReasoningExplorer() {
 
   return (
     <div className="space-y-10">
-      <div className="relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 px-6 py-5">
-        <div className="relative">
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-50">
-            Reasoning Explorer
-          </h1>
-          <p className="mt-1 max-w-3xl text-sm text-zinc-500">
-            How evidence supports transparent decision intelligence — pipeline stages and indicator
-            domains only.
-          </p>
-        </div>
+      <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-6 py-5">
+        <h1 className="text-2xl font-semibold tracking-tight text-zinc-50">Reasoning</h1>
+        <p className="mt-1 max-w-3xl text-sm text-zinc-500">
+          How evidence is reviewed before decisions — clear steps and related information by topic.
+        </p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3">
           <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
-            Pipeline stages
+            Review steps
           </p>
           <p className="mt-1 text-xl font-semibold text-zinc-100">
             {model.summary.pipelineStages}
@@ -33,7 +28,7 @@ export default function ReasoningExplorer() {
         </div>
         <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3">
           <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
-            Indicator domains
+            Topic areas
           </p>
           <p className="mt-1 text-xl font-semibold text-zinc-100">
             {model.summary.indicatorDomains}
@@ -41,7 +36,7 @@ export default function ReasoningExplorer() {
         </div>
         <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3">
           <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
-            Indicators connected
+            Information connected
           </p>
           <p className="mt-1 text-xl font-semibold text-zinc-100">
             {model.summary.connectedIndicators}

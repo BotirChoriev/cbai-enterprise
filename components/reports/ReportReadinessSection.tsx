@@ -22,7 +22,7 @@ export default function ReportReadinessSection({
   return (
     <section className="space-y-4" aria-labelledby="report-readiness-heading">
       <h2 id="report-readiness-heading" className="text-base font-semibold text-zinc-200">
-        Report types
+        What can I open today?
       </h2>
 
       <div className="space-y-4">

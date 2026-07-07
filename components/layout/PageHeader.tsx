@@ -1,3 +1,5 @@
+import { cbaiPageHeader } from "@/components/brand/brand-classes";
+
 type PageHeaderProps = {
   title: string;
   description?: string;
@@ -10,7 +12,7 @@ export default function PageHeader({
   action,
 }: PageHeaderProps) {
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className={`${cbaiPageHeader} flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between`}>
       <div>
         <h1 className="text-xl font-semibold tracking-tight text-zinc-50 sm:text-2xl">
           {title}

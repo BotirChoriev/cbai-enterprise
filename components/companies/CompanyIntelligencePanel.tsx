@@ -4,10 +4,13 @@ import EvidenceComparisonPanel from "@/components/evidence-comparison/EvidenceCo
 import EntityOverviewSection from "@/components/shared/EntityOverviewSection";
 import EntityEvidenceSection from "@/components/shared/EntityEvidenceSection";
 import EntityCompareSection from "@/components/shared/EntityCompareSection";
+import EntityOptionalExploration from "@/components/shared/EntityOptionalExploration";
 import EvidenceGapPanel from "@/components/evidence-gap/EvidenceGapPanel";
-import EntityDecisionPackagePreview, {
-  EntityReportsAvailable,
-} from "@/components/shared/EntityDecisionPackagePreview";
+import { EntityReportsAvailable } from "@/components/shared/EntityDecisionPackagePreview";
+import {
+  countConnectedSources,
+  getConnectedAvailableItems,
+} from "@/components/shared/entity-profile-copy";
 
 type CompanyIntelligencePanelProps = {
   journey: CompanyUserJourney;
@@ -17,9 +20,7 @@ type CompanyIntelligencePanelProps = {
 export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligencePanelProps) {
   const { profile, evidenceGaps, evidenceComparison } = journey;
   const { registryFacts, coverage } = profile;
-  const sourceConnectedCount = coverage.sources.filter(
-    (s) => s.statusLabel === "Connected",
-  ).length;
+  const sourceConnectedCount = countConnectedSources(coverage);
 
   return (
     <div className="space-y-6">
@@ -36,6 +37,7 @@ export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligen
         connectedCount={coverage.evidenceCoverage.connected}
         sourceConnectedCount={sourceConnectedCount}
         totalSources={coverage.sources.length}
+        availableItems={getConnectedAvailableItems(coverage)}
       />
 
       <EvidenceGapPanel
@@ -45,17 +47,17 @@ export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligen
         showMethodology={false}
       />
 
-      <EntityDecisionPackagePreview summary={journey.decisionSummary} />
+      <EntityReportsAvailable reports={journey.reports} entityLabel="company" />
 
-      <EntityReportsAvailable reports={journey.reports} />
-
-      <EntityCompareSection>
-        <EvidenceComparisonPanel
-          entityType="company"
-          leftLegacyId={company.id}
-          initialModel={evidenceComparison}
-        />
-      </EntityCompareSection>
+      <EntityOptionalExploration>
+        <EntityCompareSection>
+          <EvidenceComparisonPanel
+            entityType="company"
+            leftLegacyId={company.id}
+            initialModel={evidenceComparison}
+          />
+        </EntityCompareSection>
+      </EntityOptionalExploration>
     </div>
   );
 }

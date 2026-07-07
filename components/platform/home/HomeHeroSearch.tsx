@@ -1,3 +1,4 @@
+import { cbaiBtnPrimary } from "@/components/brand/brand-classes";
 import { HOME_SEARCH } from "@/lib/platform-home";
 
 export default function HomeHeroSearch() {
@@ -7,7 +8,7 @@ export default function HomeHeroSearch() {
       method="get"
       role="search"
       aria-label="Search country, company, or university"
-      className="flex flex-col gap-3 sm:relative sm:block"
+      className="cbai-glass flex flex-col gap-3 rounded-xl p-2 sm:relative sm:block"
     >
       <label htmlFor="home-global-search" className="sr-only">
         Search country, company, or university
@@ -18,12 +19,9 @@ export default function HomeHeroSearch() {
         type="search"
         placeholder="Japan, Apple, Harvard University"
         autoComplete="off"
-        className="home-search-input w-full rounded-2xl border border-zinc-600 bg-zinc-900 px-5 py-5 text-lg text-zinc-100 placeholder:text-zinc-500 shadow-lg shadow-black/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 sm:py-6 sm:pr-32 sm:text-xl"
+        className="home-search-input w-full rounded-lg border border-zinc-800/80 bg-slate-950/60 px-5 py-4 text-lg text-zinc-100 placeholder:text-zinc-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400 sm:py-5 sm:pr-32 sm:text-xl"
       />
-      <button
-        type="submit"
-        className="min-h-12 w-full rounded-xl bg-zinc-100 px-5 py-3 text-base font-semibold text-zinc-900 transition-colors hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 sm:absolute sm:right-3 sm:top-1/2 sm:w-auto sm:-translate-y-1/2 sm:rounded-lg sm:py-2.5 sm:text-sm"
-      >
+      <button type="submit" className={`${cbaiBtnPrimary} min-h-12 w-full sm:absolute sm:right-4 sm:top-1/2 sm:w-auto sm:-translate-y-1/2`}>
         Search
       </button>
     </form>

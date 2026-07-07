@@ -17,7 +17,7 @@ export type SearchResultGroupId =
   | "future_modules";
 
 export type EvidenceDisplayStatus =
-  | "Registry available"
+  | "Available now"
   | "Evidence connected"
   | "Evidence unavailable";
 
@@ -366,7 +366,7 @@ export const SEARCH_TOPICS: SearchTopicDefinition[] = [
     resultGroup: "knowledge",
     connected: true,
     href: "/countries",
-    evidenceStatus: "Registry available",
+    evidenceStatus: "Available now",
     availableInformation:
       "Country registry government forms; university public institution records where listed.",
     route: "/countries",
@@ -379,7 +379,7 @@ export const SEARCH_TOPICS: SearchTopicDefinition[] = [
     resultGroup: "knowledge",
     connected: true,
     href: "/companies",
-    evidenceStatus: "Registry available",
+    evidenceStatus: "Available now",
     availableInformation: "Company catalog industry classifications only.",
     route: "/companies",
   },

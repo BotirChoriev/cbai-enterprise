@@ -8,6 +8,7 @@ import EvidenceComparisonSummary from "@/components/evidence-comparison/Evidence
 import EvidenceComparisonMatrix from "@/components/evidence-comparison/EvidenceComparisonMatrix";
 import EvidenceComparisonGaps from "@/components/evidence-comparison/EvidenceComparisonGaps";
 import EvidenceComparisonLimitations from "@/components/evidence-comparison/EvidenceComparisonLimitations";
+import { sanitizeUserMessage } from "@/components/shared/user-facing-copy";
 
 type EvidenceComparisonPanelProps = {
   entityType: ComparisonEntityType;
@@ -29,29 +30,17 @@ export default function EvidenceComparisonPanel({
   );
 
   const { context, comparison, unsupportedMessage } = model;
+  const userUnsupportedMessage = sanitizeUserMessage(unsupportedMessage);
 
   return (
-    <section className="space-y-6" aria-labelledby="evidence-comparison-heading">
-      <div>
-        <h3
-          id="evidence-comparison-heading"
-          className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
-        >
-          Evidence Comparison
-        </h3>
-        <p className="mt-1 text-sm text-zinc-500">
-          Compare evidence readiness between two {entityType} entities — not scoring, ranking, or
-          investment advice.
-        </p>
-      </div>
-
+    <section className="space-y-6" aria-label="Evidence comparison">
       {!context.comparisonAvailable ? (
         <EvidenceComparisonLimitations
           comparison={null}
           limitations={[
-            "Comparison requires at least two entities of the same type in the Global Registry.",
+            "Comparison requires at least two profiles of the same type.",
           ]}
-          unsupportedMessage={context.unavailableReason}
+          unsupportedMessage={sanitizeUserMessage(context.unavailableReason)}
         />
       ) : (
         <>
@@ -69,15 +58,19 @@ export default function EvidenceComparisonPanel({
               <EvidenceComparisonGaps comparison={comparison} />
               <EvidenceComparisonLimitations
                 comparison={comparison}
-                limitations={comparison.limitations}
-                unsupportedMessage={unsupportedMessage}
+                limitations={comparison.limitations.map((item) =>
+                  sanitizeUserMessage(item) ?? item,
+                )}
+                unsupportedMessage={userUnsupportedMessage}
               />
             </>
           ) : (
             <EvidenceComparisonLimitations
               comparison={null}
               limitations={[]}
-              unsupportedMessage={unsupportedMessage ?? "Comparison could not be built."}
+              unsupportedMessage={
+                userUnsupportedMessage ?? "Comparison is not available for these profiles."
+              }
             />
           )}
         </>

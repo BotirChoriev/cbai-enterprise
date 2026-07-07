@@ -19,11 +19,10 @@ export function GovernanceRuleRegistry({ categories }: GovernanceRuleRegistryPro
           id="governance-rules-heading"
           className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
         >
-          Rule Registry
+          Review standards
         </h2>
         <p className="mt-1 text-sm text-zinc-500">
-          Governance Framework rule categories — declarative definitions, not runtime
-          enforcement.
+          Platform rules grouped by topic — definitions for manual review.
         </p>
       </div>
 
@@ -101,10 +100,10 @@ export function GovernanceValidationFlow({ steps }: GovernanceValidationFlowProp
           id="governance-validation-heading"
           className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
         >
-          Validation Flow
+          Review process
         </h2>
         <p className="mt-1 text-sm text-zinc-500">
-          Future release validation pipeline — declared, not automated.
+          Steps for validating releases before they reach users.
         </p>
       </div>
 
@@ -120,7 +119,7 @@ export function GovernanceValidationFlow({ steps }: GovernanceValidationFlowProp
               <p className="mt-1 text-sm text-zinc-400">{step.description}</p>
               {step.ruleCategories.length > 0 && (
                 <p className="mt-2 text-xs text-zinc-600">
-                  Rule categories: {step.ruleCategories.join(", ")}
+                  Related topics: {step.ruleCategories.join(", ")}
                 </p>
               )}
             </div>

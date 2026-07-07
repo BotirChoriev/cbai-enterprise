@@ -1,4 +1,5 @@
 import EntityProfileSection from "@/components/shared/EntityProfileSection";
+import { plainAvailableInformation } from "@/components/shared/entity-profile-copy";
 
 export type EntityOverviewFacts = {
   label: string;
@@ -9,6 +10,7 @@ type EntityOverviewSectionProps = {
   name: string;
   entityType: string;
   country: string | null;
+  region?: string | null;
   subtitle?: string;
   availableInformation: string;
   facts?: readonly EntityOverviewFacts[];
@@ -18,6 +20,7 @@ export default function EntityOverviewSection({
   name,
   entityType,
   country,
+  region = null,
   subtitle,
   availableInformation,
   facts = [],
@@ -26,7 +29,7 @@ export default function EntityOverviewSection({
     <EntityProfileSection
       id="overview"
       title="Overview"
-      nextStep={{ label: "Evidence →", href: "#evidence" }}
+      nextStep={{ label: "Available information →", href: "#evidence" }}
     >
       <div className="rounded-lg bg-zinc-900/50 px-4 py-4 sm:px-5">
         <h2 className="text-xl font-semibold text-zinc-50 sm:text-2xl">{name}</h2>
@@ -42,9 +45,15 @@ export default function EntityOverviewSection({
               <dd className="mt-0.5 text-zinc-300">{country}</dd>
             </div>
           ) : null}
-          <div className={country ? "sm:col-span-2" : ""}>
+          {region ? (
+            <div>
+              <dt className="text-xs text-zinc-600">Region</dt>
+              <dd className="mt-0.5 text-zinc-300">{region}</dd>
+            </div>
+          ) : null}
+          <div className={country || region ? "sm:col-span-2" : ""}>
             <dt className="text-xs text-zinc-600">Available information</dt>
-            <dd className="mt-0.5 text-zinc-300">{availableInformation}</dd>
+            <dd className="mt-0.5 text-zinc-300">{plainAvailableInformation(availableInformation)}</dd>
           </div>
           {facts.map((fact) => (
             <div key={fact.label}>
@@ -53,9 +62,6 @@ export default function EntityOverviewSection({
             </div>
           ))}
         </dl>
-        <p className="mt-4 text-sm text-cyan-400/90">
-          Next: review evidence below.
-        </p>
       </div>
     </EntityProfileSection>
   );

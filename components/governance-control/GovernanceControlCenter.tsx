@@ -17,7 +17,7 @@ export default function GovernanceControlCenter() {
         <div className="relative">
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-50">Governance</h1>
           <p className="mt-1 max-w-3xl text-sm text-zinc-500">
-            Platform rules, standards, and validation flow for evidence-based intelligence.
+            Platform rules, standards, and review process for evidence-based decisions.
           </p>
         </div>
       </div>

@@ -42,8 +42,8 @@ export default function WorkspaceCoverageGrid({
             </div>
             <p className="mt-2 text-xs text-zinc-500">{item.description}</p>
             <p className="mt-3 text-xs text-zinc-600">
-              {item.connectedCount} / {item.indicatorCount} indicator
-              {item.indicatorCount === 1 ? "" : "s"} connected
+              {item.connectedCount} / {item.indicatorCount} topic
+              {item.indicatorCount === 1 ? "" : "s"} with evidence
             </p>
           </div>
         ))}

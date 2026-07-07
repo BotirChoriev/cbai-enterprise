@@ -9,10 +9,13 @@ import { buildPlatformEntityHref } from "@/lib/global-search";
 import type { EvidenceDisplayStatus } from "@/lib/search-gateway";
 import { EVIDENCE_NOT_CONNECTED_LABEL } from "@/lib/platform-home";
 
+const PLAIN_NEXT_STEP = "Open to see available official information.";
+
 export type SearchResultEntry = {
   name: string;
   type: string;
   countryLabel: string | null;
+  distinguishingFact: string | null;
   evidenceStatus: EvidenceDisplayStatus;
   shortDescription: string;
   nextStep: string;
@@ -37,6 +40,29 @@ function resolveCountryLabel(entity: Entity): string | null {
   return null;
 }
 
+function resolveDistinguishingFact(entity: Entity): string | null {
+  if (entity.type === "country") {
+    const region = entity.metadata.region;
+    return typeof region === "string" && region.length > 0 ? region : null;
+  }
+
+  if (entity.type === "company") {
+    const industry = entity.metadata.industry;
+    return typeof industry === "string" && industry.length > 0 ? industry : null;
+  }
+
+  if (entity.type === "university") {
+    const city = entity.metadata.city;
+    if (typeof city === "string" && city.length > 0) {
+      return city;
+    }
+    const country = entity.metadata.country;
+    return typeof country === "string" && country.length > 0 ? country : null;
+  }
+
+  return null;
+}
+
 export function buildEntityResultEntry(
   entity: Entity,
   searchQuery?: string,
@@ -44,15 +70,17 @@ export function buildEntityResultEntry(
   const typeLabel = getEntityTypeLabel(entity.type);
   const href = buildPlatformEntityHref(entity, { searchQuery });
   const countryLabel = resolveCountryLabel(entity);
+  const distinguishingFact = resolveDistinguishingFact(entity);
 
   if (entity.type === "country") {
     return {
       name: entity.name,
       type: typeLabel,
       countryLabel,
-      evidenceStatus: "Registry available",
+      distinguishingFact,
+      evidenceStatus: "Available now",
       shortDescription: "Official country profile with evidence and reports.",
-      nextStep: "Review evidence, gaps, and reports.",
+      nextStep: PLAIN_NEXT_STEP,
       route: href,
       href,
       linked: true,
@@ -66,9 +94,10 @@ export function buildEntityResultEntry(
       name: entity.name,
       type: typeLabel,
       countryLabel,
-      evidenceStatus: "Registry available",
+      distinguishingFact,
+      evidenceStatus: "Available now",
       shortDescription: "Company profile with evidence and reports.",
-      nextStep: "Review evidence, gaps, and reports.",
+      nextStep: PLAIN_NEXT_STEP,
       route: href,
       href,
       linked: true,
@@ -82,9 +111,10 @@ export function buildEntityResultEntry(
       name: entity.name,
       type: typeLabel,
       countryLabel,
-      evidenceStatus: "Registry available",
+      distinguishingFact,
+      evidenceStatus: "Available now",
       shortDescription: "University profile with evidence and reports.",
-      nextStep: "Review evidence, gaps, and reports.",
+      nextStep: PLAIN_NEXT_STEP,
       route: href,
       href,
       linked: true,
@@ -97,6 +127,7 @@ export function buildEntityResultEntry(
     name: entity.name,
     type: typeLabel,
     countryLabel: null,
+    distinguishingFact: null,
     evidenceStatus: "Evidence unavailable",
     shortDescription: "Not available in search.",
     nextStep: "Try another name.",
@@ -121,6 +152,7 @@ export function buildTopicResultEntry(topic: {
     name: topic.label,
     type: topic.platformArea,
     countryLabel: null,
+    distinguishingFact: null,
     evidenceStatus: topic.evidenceStatus,
     shortDescription: topic.availableInformation,
     nextStep: "Open to continue.",

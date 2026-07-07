@@ -36,24 +36,24 @@ export default function InvestorWorkspace() {
 
       <WorkspaceCoverageGrid
         headingId="investor-evidence-map"
-        heading="Investment Evidence"
-        description="Macro, trade, procurement, and infrastructure domains."
+        heading="Investment evidence"
+        description="Macro, trade, procurement, and infrastructure topics."
         items={model.investmentEvidenceMap}
       />
 
       <WorkspaceEntityLinks links={model.entityLinks} />
 
       <WorkspaceSourceCoverage
-        heading="Source Coverage"
-        description="Official sources for investment due diligence scoping."
+        heading="Official sources"
+        description="Official sources for investment review."
         sources={model.sources}
         headingId="investor-source-coverage"
       />
 
       <WorkspaceCoverageGrid
         headingId="investor-opportunity-readiness"
-        heading="Opportunity Readiness"
-        description="Readiness labels by domain — no recommendations."
+        heading="Opportunity status"
+        description="Status by topic — information only, not recommendations."
         items={model.opportunityReadiness}
       />
     </div>

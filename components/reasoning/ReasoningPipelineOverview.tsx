@@ -14,11 +14,10 @@ export default function ReasoningPipelineOverview({
           id="reasoning-pipeline-heading"
           className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
         >
-          Reasoning Pipeline
+          How evidence is reviewed
         </h2>
         <p className="mt-1 text-sm text-zinc-500">
-          How CBAI separates evidence, indicators, methodology, and judgment — no hidden AI
-          stages.
+          Clear steps from available information to your decision — no hidden automation.
         </p>
       </div>
 
@@ -40,10 +39,7 @@ export default function ReasoningPipelineOverview({
             <div className="min-w-0 flex-1 rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 sm:px-5 sm:py-4">
               <p className="text-sm font-semibold text-zinc-100">{stage.title}</p>
               <p className="mt-1 text-sm text-zinc-400">{stage.description}</p>
-              <p className="mt-2 text-xs text-zinc-500">
-                <span className="text-zinc-400">User-facing: </span>
-                {stage.userFacingOutput}
-              </p>
+              <p className="mt-2 text-xs text-zinc-500">{stage.userFacingOutput}</p>
             </div>
             {index < stages.length - 1 && (
               <span

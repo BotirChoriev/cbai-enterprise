@@ -221,10 +221,21 @@ export function workspaceStatusClass(label: string): string {
 }
 
 export function displayStatusLabel(label: WorkspaceReadinessLabel | CoverageStatusLabel): string {
-  if (label === "Not connected") {
-    return "Evidence Source Not Connected";
+  switch (label) {
+    case "Not connected":
+    case "Evidence Source Not Connected":
+      return "No source connected";
+    case "Planned":
+      return "Not yet available";
+    case "Verification pending":
+      return "Review pending";
+    case "Connected":
+      return "Available now";
+    case "Insufficient Evidence":
+      return "Limited evidence";
+    default:
+      return label;
   }
-  return label;
 }
 
 export { buildGovernmentWorkspace } from "@/lib/workspaces/government";

@@ -23,10 +23,10 @@ export default function EvidenceComparisonMatrix({ comparison }: EvidenceCompari
           id="comparison-matrix-heading"
           className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
         >
-          Indicator Comparison Matrix
+          Side-by-side comparison
         </h4>
         <p className="mt-1 text-sm text-zinc-500">
-          Shared indicators with evidence status on each entity — not ranking or scoring.
+          Shared topics with evidence status on each profile — not ranking or scoring.
         </p>
       </div>
 
@@ -35,7 +35,7 @@ export default function EvidenceComparisonMatrix({ comparison }: EvidenceCompari
           <thead className="border-b border-zinc-800 bg-zinc-950">
             <tr>
               <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-                Indicator
+                Topic
               </th>
               <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
                 {comparison.leftEntityLabel}
@@ -44,7 +44,7 @@ export default function EvidenceComparisonMatrix({ comparison }: EvidenceCompari
                 {comparison.rightEntityLabel}
               </th>
               <th className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-                Comparison note
+                Note
               </th>
             </tr>
           </thead>
@@ -53,7 +53,6 @@ export default function EvidenceComparisonMatrix({ comparison }: EvidenceCompari
               <tr key={row.indicatorId}>
                 <td className="px-4 py-3">
                   <p className="font-medium text-zinc-300">{row.indicatorTitle}</p>
-                  <p className="font-mono text-[10px] text-zinc-600">{row.indicatorId}</p>
                 </td>
                 <td className="px-4 py-3">
                   <span

@@ -35,8 +35,8 @@ export default function GovernmentWorkspace() {
 
       <WorkspaceCoverageGrid
         headingId="government-governance-coverage"
-        heading="Governance Coverage"
-        description="Indicator domains for public institutions."
+        heading="Public governance"
+        description="Topics for public institutions and source status."
         items={model.governanceCoverage}
       />
 
@@ -44,7 +44,7 @@ export default function GovernmentWorkspace() {
 
       <WorkspaceCoverageGrid
         headingId="government-public-services"
-        heading="Public Service Areas"
+        heading="Public services"
         description="Citizen-facing service topics and evidence status."
         items={model.publicServiceAreas}
       />

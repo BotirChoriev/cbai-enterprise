@@ -41,21 +41,21 @@ export default function CitizenWorkspace() {
 
       <WorkspaceCoverageGrid
         headingId="citizen-topics"
-        heading="Citizen Topics"
+        heading="Citizen topics"
         description="Public topics and what official evidence is connected."
         items={model.topics}
       />
 
       <WorkspaceCoverageGrid
         headingId="citizen-evidence-coverage"
-        heading="Evidence Coverage"
-        description="Indicator domains supporting citizen-facing public information."
+        heading="Available evidence"
+        description="Topics supporting citizen-facing public information."
         items={model.evidenceCoverage}
       />
 
       <WorkspaceSourceCoverage
         heading="Official Sources"
-        description="Registered sources and connection status."
+        description="Registered sources and source status."
         sources={model.sources}
         headingId="citizen-source-coverage"
       />

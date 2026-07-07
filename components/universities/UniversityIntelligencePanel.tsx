@@ -4,10 +4,13 @@ import EvidenceComparisonPanel from "@/components/evidence-comparison/EvidenceCo
 import EntityOverviewSection from "@/components/shared/EntityOverviewSection";
 import EntityEvidenceSection from "@/components/shared/EntityEvidenceSection";
 import EntityCompareSection from "@/components/shared/EntityCompareSection";
+import EntityOptionalExploration from "@/components/shared/EntityOptionalExploration";
 import EvidenceGapPanel from "@/components/evidence-gap/EvidenceGapPanel";
-import EntityDecisionPackagePreview, {
-  EntityReportsAvailable,
-} from "@/components/shared/EntityDecisionPackagePreview";
+import { EntityReportsAvailable } from "@/components/shared/EntityDecisionPackagePreview";
+import {
+  countConnectedSources,
+  getConnectedAvailableItems,
+} from "@/components/shared/entity-profile-copy";
 
 type UniversityIntelligencePanelProps = {
   journey: UniversityUserJourney;
@@ -20,9 +23,7 @@ export function UniversityIntelligencePanel({
 }: UniversityIntelligencePanelProps) {
   const { profile, evidenceGaps, evidenceComparison } = journey;
   const { registryFacts, coverage } = profile;
-  const sourceConnectedCount = coverage.sources.filter(
-    (s) => s.statusLabel === "Connected",
-  ).length;
+  const sourceConnectedCount = countConnectedSources(coverage);
 
   return (
     <div className="space-y-6">
@@ -39,6 +40,7 @@ export function UniversityIntelligencePanel({
         connectedCount={coverage.evidenceCoverage.connected}
         sourceConnectedCount={sourceConnectedCount}
         totalSources={coverage.sources.length}
+        availableItems={getConnectedAvailableItems(coverage)}
       />
 
       <EvidenceGapPanel
@@ -48,17 +50,17 @@ export function UniversityIntelligencePanel({
         showMethodology={false}
       />
 
-      <EntityDecisionPackagePreview summary={journey.decisionSummary} />
+      <EntityReportsAvailable reports={journey.reports} entityLabel="university" />
 
-      <EntityReportsAvailable reports={journey.reports} />
-
-      <EntityCompareSection>
-        <EvidenceComparisonPanel
-          entityType="university"
-          leftLegacyId={university.id}
-          initialModel={evidenceComparison}
-        />
-      </EntityCompareSection>
+      <EntityOptionalExploration>
+        <EntityCompareSection>
+          <EvidenceComparisonPanel
+            entityType="university"
+            leftLegacyId={university.id}
+            initialModel={evidenceComparison}
+          />
+        </EntityCompareSection>
+      </EntityOptionalExploration>
     </div>
   );
 }

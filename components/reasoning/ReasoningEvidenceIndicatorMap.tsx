@@ -1,5 +1,6 @@
 import type { ReasoningDomainEvidenceRow } from "@/lib/reasoning-explorer";
 import { reasoningStatusClass } from "@/lib/reasoning-explorer";
+import { userConnectionLabel } from "@/components/shared/user-facing-copy";
 
 type ReasoningEvidenceIndicatorMapProps = {
   domains: readonly ReasoningDomainEvidenceRow[];
@@ -15,11 +16,10 @@ export default function ReasoningEvidenceIndicatorMap({
           id="reasoning-evidence-map-heading"
           className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
         >
-          Evidence-to-Indicator Map
+          Related information
         </h2>
         <p className="mt-1 text-sm text-zinc-500">
-          Indicator domains from the Global Indicator Framework — evidence needs and current
-          status by domain.
+          Topic areas, evidence needs, and current source status.
         </p>
       </div>
 
@@ -28,7 +28,7 @@ export default function ReasoningEvidenceIndicatorMap({
           <thead>
             <tr className="border-b border-zinc-800 text-[10px] font-medium uppercase tracking-wider text-zinc-500">
               <th className="px-5 py-3 font-medium">Domain</th>
-              <th className="px-5 py-3 font-medium">Indicators</th>
+              <th className="px-5 py-3 font-medium">Topics</th>
               <th className="px-5 py-3 font-medium">Connected</th>
               <th className="px-5 py-3 font-medium">Evidence needs</th>
               <th className="px-5 py-3 font-medium">Status</th>
@@ -49,9 +49,7 @@ export default function ReasoningEvidenceIndicatorMap({
                   <span
                     className={`inline-block rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${reasoningStatusClass(domain.statusLabel)}`}
                   >
-                    {domain.statusLabel === "Not connected"
-                      ? "Evidence Source Not Connected"
-                      : domain.statusLabel}
+                    {userConnectionLabel(domain.statusLabel)}
                   </span>
                 </td>
               </tr>

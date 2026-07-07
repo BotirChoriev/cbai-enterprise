@@ -20,7 +20,7 @@ export default function EvidenceComparisonLimitations({
           id="comparison-limitations-heading"
           className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
         >
-          Limitations &amp; Human Review
+          Before you decide
         </h4>
       </div>
 

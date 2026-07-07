@@ -23,13 +23,13 @@ export function getUniversityEvidenceGaps(university: University): EntityEvidenc
 export function gapStatusLabel(status: EntityEvidenceGapProfile["gaps"][number]["currentStatus"]): string {
   switch (status) {
     case "available":
-      return "Available";
+      return "Available now";
     case "planned":
-      return "Planned";
+      return "Not yet available";
     case "missing":
       return "Missing";
     case "blocked":
-      return "Blocked";
+      return "Unavailable";
   }
 }
 

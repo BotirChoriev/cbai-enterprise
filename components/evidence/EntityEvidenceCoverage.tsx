@@ -15,11 +15,10 @@ export default function EntityEvidenceCoverage({
           id="entity-evidence-coverage-heading"
           className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
         >
-          Entity Evidence Coverage
+          Available evidence by profile
         </h2>
         <p className="mt-1 text-sm text-zinc-500">
-          Registry availability and indicator coverage across Countries, Companies, and
-          Universities intelligence routes.
+          Evidence status across countries, companies, and universities.
         </p>
       </div>
 
@@ -34,27 +33,27 @@ export default function EntityEvidenceCoverage({
                 <h3 className="text-sm font-semibold text-zinc-100">{module.label}</h3>
                 <p className="mt-0.5 text-xs text-zinc-500">
                   {module.registryAvailable
-                    ? `${module.registryCount} entities in registry`
-                    : "Registry not available"}
+                    ? `${module.registryCount} profiles available`
+                    : "No profiles available yet"}
                 </p>
               </div>
               <Link
                 href={module.route}
-                className="shrink-0 text-xs text-cyan-400 underline-offset-2 hover:underline"
+                className="inline-flex min-h-9 shrink-0 items-center rounded-lg border border-zinc-700 bg-zinc-900 px-3 text-xs font-medium text-cyan-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
               >
-                Open route
+                Open →
               </Link>
             </div>
 
             <dl className="mt-4 space-y-2 text-xs">
               <div className="flex justify-between gap-4">
-                <dt className="text-zinc-500">Indicators connected</dt>
+                <dt className="text-zinc-500">Information connected</dt>
                 <dd className="font-medium text-zinc-300">
                   {module.indicatorsConnected} / {module.indicatorTotal}
                 </dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-zinc-500">Connected sources</dt>
+                <dt className="text-zinc-500">Sources connected</dt>
                 <dd className="font-medium text-zinc-300">
                   {module.connectedSourceCount} / {module.totalSourceCount}
                 </dd>
@@ -63,7 +62,7 @@ export default function EntityEvidenceCoverage({
 
             <div className="mt-4">
               <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
-                Missing evidence categories
+                Missing information
               </p>
               {module.missingEvidenceCategories.length > 0 ? (
                 <ul className="mt-2 space-y-1">
@@ -75,8 +74,7 @@ export default function EntityEvidenceCoverage({
                 </ul>
               ) : (
                 <p className="mt-2 text-xs text-zinc-600">
-                  No domain gaps — all applicable domains have at least one connected
-                  indicator.
+                  No missing information recorded for applicable topics.
                 </p>
               )}
             </div>

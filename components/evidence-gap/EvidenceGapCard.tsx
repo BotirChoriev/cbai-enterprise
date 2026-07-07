@@ -1,5 +1,6 @@
 import type { EvidenceGapRecord } from "@/lib/evidence-gap";
 import { gapStatusClass, gapStatusLabel } from "@/lib/evidence-gap";
+import { plainMissingReason, plainGapNextStep } from "@/components/shared/plain-gap-copy";
 
 type EvidenceGapCardProps = {
   gap: EvidenceGapRecord;
@@ -21,7 +22,9 @@ export default function EvidenceGapCard({ gap }: EvidenceGapCardProps) {
         {gap.missingReason ? (
           <div>
             <dt className="text-xs text-zinc-600">Why missing</dt>
-            <dd className="mt-0.5 text-zinc-400">{gap.missingReason}</dd>
+            <dd className="mt-0.5 text-zinc-400">
+              {plainMissingReason(gap.missingReason) ?? gap.missingReason}
+            </dd>
           </div>
         ) : null}
         <div>
@@ -30,7 +33,7 @@ export default function EvidenceGapCard({ gap }: EvidenceGapCardProps) {
         </div>
         <div>
           <dt className="text-xs text-zinc-600">Next step</dt>
-          <dd className="mt-0.5 text-xs text-zinc-500">{gap.nextPossibleStep}</dd>
+          <dd className="mt-0.5 text-xs text-zinc-500">{plainGapNextStep(gap)}</dd>
         </div>
       </dl>
     </article>

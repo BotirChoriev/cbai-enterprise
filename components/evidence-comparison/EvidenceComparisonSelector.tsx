@@ -11,7 +11,6 @@ type EvidenceComparisonSelectorProps = {
 };
 
 export default function EvidenceComparisonSelector({
-  leftLegacyId,
   candidates,
   selectedLegacyId,
   onSelect,
@@ -23,7 +22,7 @@ export default function EvidenceComparisonSelector({
         Compare with
       </label>
       <p className="mt-1 text-xs text-zinc-500">
-        Select another entity from the Global Registry — same type only, no suggestions.
+        Select another profile of the same type to compare.
       </p>
       <select
         id="comparison-target-select"
@@ -38,9 +37,6 @@ export default function EvidenceComparisonSelector({
           </option>
         ))}
       </select>
-      <p className="mt-2 font-mono text-[10px] text-zinc-600">
-        left: {leftLegacyId} · registry candidates: {candidates.length}
-      </p>
     </div>
   );
 }

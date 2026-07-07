@@ -12,6 +12,7 @@ import { usePlatformContext } from "@/components/platform/context/PlatformContex
 import UniversityFilters from "@/components/universities/UniversityFilters";
 import UniversityList from "@/components/universities/UniversityList";
 import UniversityRelationships from "@/components/universities/UniversityRelationships";
+import EntityOptionalExploration from "@/components/shared/EntityOptionalExploration";
 import { UniversityIntelligencePanel } from "@/components/universities/UniversityIntelligencePanel";
 
 export default function UniversitiesPage() {
@@ -72,22 +73,11 @@ export default function UniversitiesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 px-6 py-5">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-sky-500/5 to-violet-500/5"
-        />
-        <div className="relative">
-          <p className="text-[10px] font-medium uppercase tracking-widest text-cyan-400">
-            CBAI University Intelligence 2.0
-          </p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-50">
-            Universities
-          </h1>
-          <p className="mt-1 max-w-3xl text-sm text-zinc-500">
-            Overview, evidence, missing evidence, decision package, and reports for each university.
-          </p>
-        </div>
+      <div className="rounded-xl border border-cyan-500/10 bg-slate-950/50 px-6 py-5 backdrop-blur-sm">
+        <h1 className="text-2xl font-semibold tracking-tight text-zinc-50">Universities</h1>
+        <p className="mt-1 max-w-3xl text-sm text-zinc-500">
+          Overview, available information, missing information, and reports for each university.
+        </p>
       </div>
 
       <div className="grid gap-6 xl:grid-cols-12">
@@ -112,7 +102,9 @@ export default function UniversitiesPage() {
 
         <div className="space-y-8 xl:col-span-8">
           <UniversityIntelligencePanel journey={journey} university={selectedUniversity} />
-          <UniversityRelationships profile={journey.profile} />
+          <EntityOptionalExploration>
+            <UniversityRelationships profile={journey.profile} />
+          </EntityOptionalExploration>
         </div>
       </div>
     </div>

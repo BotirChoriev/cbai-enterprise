@@ -9,8 +9,8 @@ type WorkspaceSourceCoverageProps = {
 };
 
 export default function WorkspaceSourceCoverage({
-  heading = "Source Coverage",
-  description = "Official evidence sources from CBAI Evidence Infrastructure — connection status only.",
+  heading = "Official sources",
+  description = "Official sources and their connection status.",
   sources,
   headingId = "workspace-source-coverage-heading",
 }: WorkspaceSourceCoverageProps) {

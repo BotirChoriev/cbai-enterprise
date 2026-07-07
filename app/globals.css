@@ -1,19 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --background: #09090b;
+  --background: #050810;
   --foreground: #fafafa;
-  --surface: #18181b;
-  --border: #27272a;
-  --muted: #a1a1aa;
+  --surface: #0c1220;
+  --border: #1e293b;
+  --muted: #94a3b8;
+  --accent: #22d3ee;
+  --accent-muted: rgba(34, 211, 238, 0.12);
 }
 
 html.theme-light {
   --background: #fafafa;
-  --foreground: #18181b;
+  --foreground: #0f172a;
   --surface: #ffffff;
-  --border: #e4e4e7;
-  --muted: #71717a;
+  --border: #e2e8f0;
+  --muted: #64748b;
 }
 
 @theme inline {
@@ -29,11 +31,19 @@ body {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
+/* Premium glass surface */
+.cbai-glass {
+  background: color-mix(in srgb, var(--surface) 75%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 10%, var(--border));
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 48px -16px rgba(34, 211, 238, 0.1);
+}
+
 /* Home page design system */
 .home-page {
   display: flex;
   flex-direction: column;
-  gap: clamp(3.5rem, 6vw, 6rem);
+  gap: clamp(3.5rem, 6vw, 5rem);
 }
 
 .home-section {
@@ -59,11 +69,11 @@ body {
 .home-section-description {
   font-size: 1rem;
   line-height: 1.65;
-  color: #a1a1aa;
+  color: #94a3b8;
 }
 
 .home-surface {
-  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  background: transparent;
 }
 
 html.theme-light .home-section-title {
@@ -72,10 +82,6 @@ html.theme-light .home-section-title {
 
 html.theme-light .home-section-description {
   color: var(--muted);
-}
-
-html.theme-light .home-surface {
-  background: var(--surface);
 }
 
 .home-search-input {
