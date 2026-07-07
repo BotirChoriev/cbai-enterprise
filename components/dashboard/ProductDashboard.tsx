@@ -13,12 +13,18 @@ export default function ProductDashboard() {
 
   return (
     <div className="space-y-8">
-      <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-6 py-5">
-        <h2 className="text-lg font-semibold text-zinc-100">What you can do now</h2>
-        <p className="mt-1 max-w-2xl text-sm text-zinc-500">
-          Search a country, company, or university and follow one review from evidence through
-          decision package to reports.
+      <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 px-6 py-5">
+        <h2 className="text-lg font-semibold text-zinc-100">Where do I start?</h2>
+        <p className="mt-1 max-w-2xl text-sm text-zinc-400">
+          Search a name, open a profile, then scroll: Overview → Evidence → Missing Evidence →
+          Decision Package → Reports.
         </p>
+        <Link
+          href="/search"
+          className="mt-4 inline-flex min-h-10 items-center rounded-lg bg-zinc-100 px-5 text-sm font-semibold text-zinc-900 transition-colors hover:bg-white"
+        >
+          Start with Search →
+        </Link>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

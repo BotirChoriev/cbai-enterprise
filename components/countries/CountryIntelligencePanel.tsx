@@ -1,6 +1,5 @@
 import type { Country } from "@/lib/countries";
 import type { CountryUserJourney } from "@/lib/country-user-journey";
-import { COUNTRY_JOURNEY_DECISION_TEMPLATE } from "@/lib/country-user-journey";
 import CountryCoveragePanel from "@/components/countries/CountryCoveragePanel";
 import EvidenceGapPanel from "@/components/evidence-gap/EvidenceGapPanel";
 import EvidenceComparisonPanel from "@/components/evidence-comparison/EvidenceComparisonPanel";
@@ -77,10 +76,7 @@ export function CountryIntelligencePanel({
         heading="Missing Evidence"
       />
 
-      <EntityDecisionPackagePreview
-        summary={journey.decisionSummary}
-        templateSlug={COUNTRY_JOURNEY_DECISION_TEMPLATE}
-      />
+      <EntityDecisionPackagePreview summary={journey.decisionSummary} />
 
       <EntityReportsAvailable reports={journey.reports} />
 

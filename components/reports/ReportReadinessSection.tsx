@@ -26,11 +26,10 @@ export default function ReportReadinessSection({
           id="report-readiness-heading"
           className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
         >
-          Report Readiness
+          Available report types
         </h2>
         <p className="mt-1 text-sm text-zinc-500">
-          Honest readiness status per report type — no generated output until evidence and
-          methodology criteria are met.
+          What you can review today — readiness status per report type.
         </p>
       </div>
 
@@ -44,20 +43,19 @@ export default function ReportReadinessSection({
               <div className="min-w-0">
                 <h3 className="text-sm font-semibold text-zinc-100">{report.title}</h3>
                 <p className="mt-1 text-sm text-zinc-400">{report.description}</p>
-                <p className="mt-1 text-xs text-zinc-600">Audience: {report.audience}</p>
                 {report.relatedRoute && (
                   <Link
                     href={report.relatedRoute}
                     className="mt-2 inline-block text-xs text-cyan-400 underline-offset-2 hover:underline"
                   >
-                    Related route
+                    Open related module →
                   </Link>
                 )}
               </div>
               <StatusBadge label={report.availableToday} />
             </div>
 
-            <dl className="mt-4 grid gap-3 text-xs sm:grid-cols-2 lg:grid-cols-4">
+            <dl className="mt-4 grid gap-3 text-xs sm:grid-cols-3">
               <div>
                 <dt className="text-zinc-500">Evidence required</dt>
                 <dd className="mt-1 text-zinc-400">{report.evidenceRequired}</dd>
@@ -72,12 +70,6 @@ export default function ReportReadinessSection({
                 <dt className="text-zinc-500">Methodology status</dt>
                 <dd className="mt-1">
                   <StatusBadge label={report.methodologyStatus} />
-                </dd>
-              </div>
-              <div>
-                <dt className="text-zinc-500">Export status</dt>
-                <dd className="mt-1">
-                  <StatusBadge label={report.exportStatus} />
                 </dd>
               </div>
             </dl>

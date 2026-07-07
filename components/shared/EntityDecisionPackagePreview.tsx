@@ -1,9 +1,9 @@
+import Link from "next/link";
 import type { DecisionSummary, DecisionSummarySection } from "@/lib/decision-intelligence";
 import type { ReportTypeDefinition } from "@/lib/reports-center";
 
-const PREVIEW_SECTION_IDS = new Set([
-  "evidence-available",
-  "evidence-missing",
+/** Sections shown after dedicated Evidence / Missing Evidence blocks on entity profiles. */
+const ENTITY_DECISION_SECTION_IDS = new Set([
   "official-sources",
   "methodology",
   "limitations",
@@ -12,18 +12,18 @@ const PREVIEW_SECTION_IDS = new Set([
 
 type EntityDecisionPackagePreviewProps = {
   summary: DecisionSummary | null;
-  templateSlug?: string;
 };
 
 export default function EntityDecisionPackagePreview({
   summary,
-  templateSlug,
 }: EntityDecisionPackagePreviewProps) {
   if (!summary) return null;
 
   const sections = summary.sections.filter((section) =>
-    PREVIEW_SECTION_IDS.has(section.id),
+    ENTITY_DECISION_SECTION_IDS.has(section.id),
   );
+
+  if (sections.length === 0) return null;
 
   return (
     <section className="space-y-6" aria-labelledby="entity-decision-package-heading">
@@ -36,7 +36,6 @@ export default function EntityDecisionPackagePreview({
         </h3>
         <p className="mt-1 text-sm text-zinc-500">
           {summary.title} · {summary.readinessLabel}
-          {templateSlug ? ` · ${templateSlug}` : null}
         </p>
       </div>
 
@@ -75,16 +74,24 @@ export function EntityReportsAvailable({ reports }: EntityReportsAvailableProps)
 
   return (
     <section className="space-y-4" aria-labelledby="entity-reports-available-heading">
-      <div>
-        <h3
-          id="entity-reports-available-heading"
-          className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h3
+            id="entity-reports-available-heading"
+            className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
+          >
+            Reports
+          </h3>
+          <p className="mt-1 text-sm text-zinc-500">
+            Report types available for this scope today.
+          </p>
+        </div>
+        <Link
+          href="/analytics"
+          className="inline-flex min-h-9 shrink-0 items-center rounded-lg border border-zinc-700 bg-zinc-900 px-4 text-sm font-medium text-cyan-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
         >
-          Reports
-        </h3>
-        <p className="mt-1 text-sm text-zinc-500">
-          Report types available for this scope. Open Reports Center to browse all types.
-        </p>
+          Open Reports Center →
+        </Link>
       </div>
 
       <ul className="divide-y divide-zinc-800 rounded-xl border border-zinc-800 bg-zinc-950">

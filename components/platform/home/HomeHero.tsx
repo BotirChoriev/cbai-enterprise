@@ -6,9 +6,6 @@ import { HERO_TOPIC_CARDS, HOME_HERO } from "@/lib/platform-home";
 const ctaPrimary =
   "inline-flex min-h-11 items-center justify-center rounded-lg bg-zinc-100 px-6 py-2.5 text-sm font-semibold text-zinc-900 transition-colors hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400";
 
-const ctaSecondary =
-  "inline-flex min-h-11 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900/60 px-6 py-2.5 text-sm font-semibold text-zinc-100 transition-colors hover:border-zinc-600 hover:bg-zinc-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400";
-
 const topicLink =
   "flex min-h-[4.5rem] flex-col justify-center rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-3 text-left transition-colors hover:border-zinc-600 hover:bg-zinc-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400";
 
@@ -21,28 +18,12 @@ export default function HomeHero() {
             {HOME_HERO.eyebrow}
           </p>
           <h1 className="mt-4 text-3xl font-semibold leading-[1.12] tracking-tight text-zinc-50 sm:text-4xl lg:text-[2.65rem]">
-            {HOME_HERO.headline}
+            Search countries, companies, and universities
           </h1>
-          <p className="mt-4 text-lg font-medium text-zinc-200 sm:text-xl">
-            {HOME_HERO.subHeadline}
-          </p>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-zinc-400">
-            {HOME_HERO.explanation}
+            Open a profile to review evidence, missing evidence, decision package, and reports — one
+            flow, no dead ends.
           </p>
-
-          <ul className="mt-8 grid gap-2 sm:grid-cols-3" aria-label="Constitutional principles">
-            {HOME_HERO.principles.map((principle) => (
-              <li
-                key={principle.id}
-                className="rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-3 text-sm"
-              >
-                <span className="font-medium text-zinc-100">{principle.title}</span>
-                <span className="mt-1 block text-xs text-zinc-500">
-                  {principle.description}
-                </span>
-              </li>
-            ))}
-          </ul>
         </div>
 
         <div className="hidden items-center justify-center lg:col-span-2 lg:flex">
@@ -51,23 +32,23 @@ export default function HomeHero() {
       </div>
 
       <div className="border-t border-zinc-800 px-8 py-10 sm:px-10 lg:px-12 lg:py-12">
-        <div className="mx-auto max-w-3xl">
+        <p className="mx-auto max-w-3xl text-sm font-medium text-zinc-300">
+          Start with a name
+        </p>
+        <div className="mx-auto mt-3 max-w-3xl">
           <HomeHeroSearch />
         </div>
 
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
-          <Link href={HOME_HERO.primaryCta.href} className={ctaPrimary}>
-            {HOME_HERO.primaryCta.label}
+        <div className="mt-6 flex justify-center">
+          <Link href="/search" className={ctaPrimary}>
+            Open Search
           </Link>
-          <a href={HOME_HERO.secondaryCta.href} className={ctaSecondary}>
-            {HOME_HERO.secondaryCta.label}
-          </a>
         </div>
       </div>
 
       <div className="border-t border-zinc-800 px-8 pb-10 pt-8 sm:px-10 lg:px-12">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">
-          {HOME_HERO.understandPrompt}
+          Or browse directly
         </h2>
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {HERO_TOPIC_CARDS.filter((topic) => topic.connected && topic.href).map((topic) => (

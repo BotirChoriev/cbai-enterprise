@@ -1,6 +1,5 @@
 import type { Company } from "@/lib/companies";
 import type { CompanyUserJourney } from "@/lib/company-user-journey";
-import { COMPANY_JOURNEY_DECISION_TEMPLATE } from "@/lib/company-user-journey";
 import CompanyCoveragePanel from "@/components/companies/CompanyCoveragePanel";
 import EvidenceGapPanel from "@/components/evidence-gap/EvidenceGapPanel";
 import EvidenceComparisonPanel from "@/components/evidence-comparison/EvidenceComparisonPanel";
@@ -71,10 +70,7 @@ export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligen
         heading="Missing Evidence"
       />
 
-      <EntityDecisionPackagePreview
-        summary={journey.decisionSummary}
-        templateSlug={COMPANY_JOURNEY_DECISION_TEMPLATE}
-      />
+      <EntityDecisionPackagePreview summary={journey.decisionSummary} />
 
       <EntityReportsAvailable reports={journey.reports} />
 

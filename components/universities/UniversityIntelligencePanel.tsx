@@ -1,6 +1,5 @@
 import type { University } from "@/lib/universities";
 import type { UniversityUserJourney } from "@/lib/university-user-journey";
-import { UNIVERSITY_JOURNEY_DECISION_TEMPLATE } from "@/lib/university-user-journey";
 import UniversityCoveragePanel from "@/components/universities/UniversityCoveragePanel";
 import EvidenceGapPanel from "@/components/evidence-gap/EvidenceGapPanel";
 import EvidenceComparisonPanel from "@/components/evidence-comparison/EvidenceComparisonPanel";
@@ -75,10 +74,7 @@ export function UniversityIntelligencePanel({
         heading="Missing Evidence"
       />
 
-      <EntityDecisionPackagePreview
-        summary={journey.decisionSummary}
-        templateSlug={UNIVERSITY_JOURNEY_DECISION_TEMPLATE}
-      />
+      <EntityDecisionPackagePreview summary={journey.decisionSummary} />
 
       <EntityReportsAvailable reports={journey.reports} />
 

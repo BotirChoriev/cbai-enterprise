@@ -17,17 +17,14 @@ type SearchGatewayResultsProps = {
   query: string;
 };
 
-function resolveSingleCountryMatch(response: GatewaySearchResponse): Entity | null {
-  const countryGroup = response.groups.find((group) => group.id === "countries");
-  if (!countryGroup || countryGroup.entities.length !== 1) return null;
+const OPENABLE_GROUP_IDS = new Set(["countries", "companies", "universities"]);
 
-  const hasOtherEntities = response.groups.some(
-    (group) =>
-      (group.id === "companies" || group.id === "universities") && group.entities.length > 0,
-  );
-  if (hasOtherEntities) return null;
+function resolveSingleEntityMatch(response: GatewaySearchResponse): Entity | null {
+  const entities = response.groups
+    .filter((group) => OPENABLE_GROUP_IDS.has(group.id))
+    .flatMap((group) => group.entities.map((result) => result.entity));
 
-  return countryGroup.entities[0]?.entity ?? null;
+  return entities.length === 1 ? entities[0] : null;
 }
 
 export default function SearchGatewayResults({
@@ -35,17 +32,18 @@ export default function SearchGatewayResults({
   query,
 }: SearchGatewayResultsProps) {
   const router = useRouter();
-  const singleCountry = useMemo(() => resolveSingleCountryMatch(response), [response]);
+  const singleEntity = useMemo(() => resolveSingleEntityMatch(response), [response]);
 
   useEffect(() => {
-    if (!singleCountry) return;
-    router.replace(buildPlatformEntityHref(singleCountry, { searchQuery: query }));
-  }, [singleCountry, query, router]);
+    if (!singleEntity) return;
+    router.replace(buildPlatformEntityHref(singleEntity, { searchQuery: query }));
+  }, [singleEntity, query, router]);
 
   if (!response.query) {
     return (
       <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 px-6 py-8">
-        <p className="text-sm text-zinc-400">{SEARCH_GATEWAY.emptyPrompt}</p>
+        <p className="text-sm text-zinc-300">Type a country, company, or university name.</p>
+        <p className="mt-1 text-sm text-zinc-500">{SEARCH_GATEWAY.emptyPrompt}</p>
         <SupportedSearches />
       </div>
     );
@@ -63,9 +61,6 @@ export default function SearchGatewayResults({
         <p className="mx-auto mt-2 max-w-lg text-sm text-zinc-500">
           {SEARCH_GATEWAY.noResultsDetail}
         </p>
-        <p className="mt-4 font-mono text-xs text-zinc-600">
-          Query: &quot;{response.query}&quot;
-        </p>
         <div className="mt-8">
           <SupportedSearches centered />
         </div>
@@ -73,24 +68,31 @@ export default function SearchGatewayResults({
     );
   }
 
-  if (singleCountry) {
+  if (singleEntity) {
     return (
       <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 px-6 py-8">
-        <p className="text-sm text-zinc-400">Opening country intelligence for {singleCountry.name}…</p>
+        <p className="text-sm text-zinc-400">Opening {singleEntity.name}…</p>
       </div>
     );
   }
 
+  const entityGroups = response.groups.filter((group) => OPENABLE_GROUP_IDS.has(group.id));
+  const moduleGroups = response.groups.filter(
+    (group) =>
+      (group.id === "knowledge" || group.id === "evidence") &&
+      group.topics.some((topic) => topic.connected && topic.href),
+  );
+
   return (
     <div className="space-y-10">
       <p className="text-sm text-zinc-500">
-        {response.groups.reduce((n, g) => n + g.entities.length, 0)} matches for{" "}
+        {entityGroups.reduce((n, g) => n + g.entities.length, 0)} profiles match{" "}
         <span className="font-medium text-zinc-300">&quot;{response.query}&quot;</span>
         {" — "}
-        open a profile to review evidence, decision package, and reports.
+        select one to review evidence, decision package, and reports.
       </p>
 
-      {response.groups.map((group) => (
+      {entityGroups.map((group) => (
         <section
           key={group.id}
           aria-labelledby={`search-group-${group.id}`}
@@ -106,37 +108,54 @@ export default function SearchGatewayResults({
           <ul className="grid gap-4 lg:grid-cols-2">
             {group.entities.map((result) => {
               const entry = buildEntityResultEntry(result.entity, query);
-              const isCountry = result.entity.type === "country";
-
               return (
                 <li key={`${result.entity.type}-${result.entity.id}`}>
-                  {isCountry ? (
+                  <Link
+                    href={entry.href}
+                    className="group block rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 transition-colors hover:border-cyan-500/30 hover:bg-zinc-900/70"
+                  >
+                    <EntityResultContent entry={entry} />
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ))}
+
+      {moduleGroups.map((group) => (
+        <section
+          key={group.id}
+          aria-labelledby={`search-group-${group.id}`}
+          className="space-y-4"
+        >
+          <h2
+            id={`search-group-${group.id}`}
+            className="text-xs font-semibold uppercase tracking-widest text-zinc-500"
+          >
+            {group.label}
+          </h2>
+          <ul className="grid gap-4 lg:grid-cols-2">
+            {group.topics
+              .filter((topic) => topic.connected && topic.href)
+              .map((topic) => {
+                const entry = buildTopicResultEntry(topic);
+                return (
+                  <li key={topic.id}>
                     <Link
                       href={entry.href}
                       className="group block rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 transition-colors hover:border-cyan-500/30 hover:bg-zinc-900/70"
                     >
-                      <CountryResultContent entry={entry} />
+                      <p className="text-sm font-semibold text-zinc-100 group-hover:text-cyan-300">
+                        {entry.name}
+                      </p>
+                      <p className="mt-1 text-xs text-zinc-500">{entry.type}</p>
+                      <p className="mt-2 text-sm text-zinc-400">{entry.availableInformation}</p>
+                      <p className="mt-3 text-xs text-cyan-500/80">Open module →</p>
                     </Link>
-                  ) : (
-                    <Link
-                      href={entry.href}
-                      className="group block rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 transition-colors hover:border-cyan-500/30 hover:bg-zinc-900/70"
-                    >
-                      <SearchResultCardStatic entry={entry} />
-                      <p className="mt-3 text-xs text-cyan-500/80">Open profile →</p>
-                    </Link>
-                  )}
-                </li>
-              );
-            })}
-            {group.topics.map((topic) => {
-              const entry = buildTopicResultEntry(topic);
-              return (
-                <li key={topic.id}>
-                  <SearchResultCardStatic entry={entry} />
-                </li>
-              );
-            })}
+                  </li>
+                );
+              })}
           </ul>
         </section>
       ))}
@@ -144,14 +163,14 @@ export default function SearchGatewayResults({
   );
 }
 
-function CountryResultContent({
+function EntityResultContent({
   entry,
 }: {
   entry: ReturnType<typeof buildEntityResultEntry>;
 }) {
   return (
     <>
-      <p className="text-sm font-semibold text-cyan-400 group-hover:text-cyan-300">
+      <p className="text-sm font-semibold text-zinc-100 group-hover:text-cyan-300">
         {entry.name}
       </p>
       <p className="mt-1 text-xs text-zinc-500">{entry.type}</p>
@@ -161,29 +180,15 @@ function CountryResultContent({
   );
 }
 
-function SearchResultCardStatic({
-  entry,
-}: {
-  entry: ReturnType<typeof buildEntityResultEntry>;
-}) {
-  return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5">
-      <p className="text-sm font-semibold text-zinc-100">{entry.name}</p>
-      <p className="mt-1 text-xs text-zinc-500">{entry.type}</p>
-      <p className="mt-2 text-sm text-zinc-400">{entry.availableInformation}</p>
-    </div>
-  );
-}
-
 function SupportedSearches({ centered = false }: { centered?: boolean }) {
   return (
     <div className={centered ? "mx-auto max-w-xl" : "mt-6"}>
       <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
-        {SEARCH_GATEWAY.supportedSearchesLabel}
+        Try these examples
       </p>
       <ul
         className={`mt-3 flex flex-wrap gap-2 ${centered ? "justify-center" : ""}`}
-        aria-label="Supported searches"
+        aria-label="Example searches"
       >
         {SEARCH_SUPPORTED_SUGGESTIONS.map((example) => (
           <li key={example}>

@@ -46,8 +46,7 @@ export default function CountryCoveragePanel({
           Evidence
         </h3>
         <p className="mt-1 text-sm text-zinc-500">
-          Indicator and source connectivity across official evidence infrastructure — no
-          external API connected today except CBAI Local Registry.
+          Indicator and source connection status from the local registry.
         </p>
       </div>
 
@@ -81,12 +80,6 @@ export default function CountryCoveragePanel({
             <dd className="mt-1 font-mono text-zinc-200">
               {sourceConnectedCount} of {totalSources}
             </dd>
-          </div>
-          <div>
-            <dt className="text-xs uppercase tracking-wider text-zinc-600">
-              Coverage policy
-            </dt>
-            <dd className="mt-1 text-zinc-400">Evidence First — no scores without sources</dd>
           </div>
         </dl>
       </div>

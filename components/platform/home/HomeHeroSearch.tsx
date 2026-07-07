@@ -6,17 +6,17 @@ export default function HomeHeroSearch() {
       action={HOME_SEARCH.action}
       method="get"
       role="search"
-      aria-label="Global intelligence search"
+      aria-label="Search countries, companies, and universities"
       className="relative w-full"
     >
       <label htmlFor="home-global-search" className="sr-only">
-        Search global intelligence
+        Search country, company, or university
       </label>
       <input
         id="home-global-search"
         name={HOME_SEARCH.param}
         type="search"
-        placeholder={HOME_SEARCH.placeholder}
+        placeholder="e.g. Uzbekistan, Apple, Oxford"
         autoComplete="off"
         className="home-search-input w-full rounded-xl border border-zinc-700 bg-zinc-900/80 px-5 py-4 pr-28 text-base text-zinc-100 placeholder:text-zinc-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 sm:py-5 sm:text-lg"
       />
