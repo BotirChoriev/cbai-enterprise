@@ -4,6 +4,7 @@ import UniversityCoveragePanel from "@/components/universities/UniversityCoverag
 import EvidenceGapPanel from "@/components/evidence-gap/EvidenceGapPanel";
 import EvidenceComparisonPanel from "@/components/evidence-comparison/EvidenceComparisonPanel";
 import EntityProfileFlow from "@/components/shared/EntityProfileFlow";
+import EntityProfileSection from "@/components/shared/EntityProfileSection";
 import EntitySupportingDetails from "@/components/shared/EntitySupportingDetails";
 import EntityDecisionPackagePreview, {
   EntityReportsAvailable,
@@ -30,15 +31,13 @@ export function UniversityIntelligencePanel({
     <div className="space-y-8">
       <EntityProfileFlow entityName={university.name} />
 
-      <section aria-labelledby="university-overview-heading">
-        <h3
-          id="university-overview-heading"
-          className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
-        >
-          Overview
-        </h3>
-        <div className="mt-4 rounded-xl border border-zinc-800 bg-zinc-950 px-6 py-5">
-          <h2 className="text-2xl font-semibold tracking-tight text-zinc-50">
+      <EntityProfileSection
+        id="overview"
+        title="Overview"
+        nextStep={{ label: "Next: Evidence →", href: "#evidence" }}
+      >
+        <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-5 sm:px-6">
+          <h2 className="text-xl font-semibold tracking-tight text-zinc-50 sm:text-2xl">
             {registryFacts.name}
           </h2>
           <p className="mt-1 text-sm text-zinc-500">
@@ -58,12 +57,13 @@ export function UniversityIntelligencePanel({
             </div>
           </dl>
         </div>
-      </section>
+      </EntityProfileSection>
 
       <UniversityCoveragePanel
         summary={coverage.evidenceCoverage}
         sourceConnectedCount={sourceConnectedCount}
         totalSources={coverage.sources.length}
+        nextStep={{ label: "Next: Missing evidence →", href: "#missing-evidence" }}
       />
 
       <EvidenceGapPanel
@@ -71,7 +71,7 @@ export function UniversityIntelligencePanel({
         showSummary={false}
         showSources={false}
         showMethodology={false}
-        heading="Missing Evidence"
+        nextStep={{ label: "Next: Decision package →", href: "#decision-package" }}
       />
 
       <EntityDecisionPackagePreview summary={journey.decisionSummary} />
@@ -79,13 +79,13 @@ export function UniversityIntelligencePanel({
       <EntityReportsAvailable reports={journey.reports} />
 
       <EntitySupportingDetails>
-        <EntityPipelineReadinessSection model={pipelineReadiness} />
-        <IndicatorExplorerPanel variant="embedded" />
         <EvidenceComparisonPanel
           entityType="university"
           leftLegacyId={university.id}
           initialModel={evidenceComparison}
         />
+        <EntityPipelineReadinessSection model={pipelineReadiness} />
+        <IndicatorExplorerPanel variant="embedded" />
       </EntitySupportingDetails>
     </div>
   );

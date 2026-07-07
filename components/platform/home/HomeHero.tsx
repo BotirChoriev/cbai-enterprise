@@ -1,64 +1,140 @@
 import Link from "next/link";
-import HomeHeroIllustration from "@/components/platform/home/HomeHeroIllustration";
 import HomeHeroSearch from "@/components/platform/home/HomeHeroSearch";
-import { HERO_TOPIC_CARDS, HOME_HERO } from "@/lib/platform-home";
 
-const ctaPrimary =
-  "inline-flex min-h-11 items-center justify-center rounded-lg bg-zinc-100 px-6 py-2.5 text-sm font-semibold text-zinc-900 transition-colors hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400";
+const HOME_EXAMPLES = [
+  { label: "Country", query: "Japan" },
+  { label: "Company", query: "Apple" },
+  { label: "University", query: "Harvard University" },
+] as const;
 
-const topicLink =
-  "flex min-h-[4.5rem] flex-col justify-center rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-3 text-left transition-colors hover:border-zinc-600 hover:bg-zinc-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400";
+const AFTER_SEARCH_STEPS = [
+  "Open a profile from your results.",
+  "See what evidence is available.",
+  "See what evidence is missing.",
+  "Read the decision summary.",
+  "Open reports for this topic.",
+] as const;
+
+const AVAILABLE_TODAY = [
+  "Search by name",
+  "View evidence",
+  "Compare evidence",
+  "Review decision package",
+  "Open reports",
+] as const;
+
+const exploreLink =
+  "inline-flex min-h-11 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900/60 px-5 text-sm font-medium text-zinc-200 transition-colors hover:border-zinc-600 hover:bg-zinc-900";
 
 export default function HomeHero() {
   return (
-    <header className="home-surface overflow-hidden rounded-2xl border border-zinc-800">
-      <div className="grid gap-12 p-8 sm:p-10 lg:grid-cols-5 lg:gap-10 lg:p-12">
-        <div className="flex flex-col justify-center lg:col-span-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-400/90">
-            {HOME_HERO.eyebrow}
-          </p>
-          <h1 className="mt-4 text-3xl font-semibold leading-[1.12] tracking-tight text-zinc-50 sm:text-4xl lg:text-[2.65rem]">
-            Search countries, companies, and universities
-          </h1>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-zinc-400">
-            Open a profile to review evidence, missing evidence, decision package, and reports — one
-            flow, no dead ends.
-          </p>
-        </div>
-
-        <div className="hidden items-center justify-center lg:col-span-2 lg:flex">
-          <HomeHeroIllustration />
-        </div>
-      </div>
-
-      <div className="border-t border-zinc-800 px-8 py-10 sm:px-10 lg:px-12 lg:py-12">
-        <p className="mx-auto max-w-3xl text-sm font-medium text-zinc-300">
-          Start with a name
+    <main className="home-surface mx-auto max-w-2xl space-y-12 px-4 py-10 sm:px-6 sm:py-14">
+      <header className="space-y-4 text-center sm:text-left">
+        <p className="text-sm font-semibold uppercase tracking-widest text-sky-400/90">CBAI</p>
+        <h1 className="text-3xl font-semibold leading-tight tracking-tight text-zinc-50 sm:text-4xl">
+          What is CBAI?
+        </h1>
+        <p className="text-lg text-zinc-300">
+          Search a country, company, or university.
         </p>
-        <div className="mx-auto mt-3 max-w-3xl">
-          <HomeHeroSearch />
-        </div>
+        <p className="max-w-md text-base leading-relaxed text-zinc-400">
+          See official evidence. Know what is available. Review before you decide.
+        </p>
+      </header>
 
-        <div className="mt-6 flex justify-center">
-          <Link href="/search" className={ctaPrimary}>
-            Open Search
+      <section aria-labelledby="home-search-heading" className="space-y-4">
+        <h2 id="home-search-heading" className="sr-only">
+          Search
+        </h2>
+        <p className="text-center text-sm font-medium text-zinc-300 sm:text-left">
+          Where do I start? Search below.
+        </p>
+        <HomeHeroSearch />
+      </section>
+
+      <section aria-labelledby="home-examples-heading" className="space-y-3">
+        <h2
+          id="home-examples-heading"
+          className="text-center text-xs font-semibold uppercase tracking-wider text-zinc-500 sm:text-left"
+        >
+          Try an example
+        </h2>
+        <ul className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+          {HOME_EXAMPLES.map((example) => (
+            <li key={example.query} className="flex-1 sm:min-w-[9rem]">
+              <Link
+                href={`/search?q=${encodeURIComponent(example.query)}`}
+                className="flex min-h-11 flex-col justify-center rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-3 text-center transition-colors hover:border-zinc-600 hover:bg-zinc-900 sm:text-left"
+              >
+                <span className="text-sm font-semibold text-zinc-100">{example.query}</span>
+                <span className="mt-0.5 text-xs text-zinc-500">{example.label}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section aria-labelledby="home-after-search-heading" className="space-y-3">
+        <h2
+          id="home-after-search-heading"
+          className="text-sm font-semibold text-zinc-300"
+        >
+          What happens after search
+        </h2>
+        <ol className="space-y-2 text-sm text-zinc-400">
+          {AFTER_SEARCH_STEPS.map((step, index) => (
+            <li key={step} className="flex gap-3">
+              <span className="font-mono text-xs text-zinc-600">{index + 1}</span>
+              <span>{step}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section aria-labelledby="home-available-heading" className="space-y-3">
+        <h2
+          id="home-available-heading"
+          className="text-sm font-semibold text-zinc-300"
+        >
+          Available today
+        </h2>
+        <ul className="space-y-2 text-sm text-zinc-400">
+          {AVAILABLE_TODAY.map((item) => (
+            <li key={item} className="flex items-center gap-2">
+              <span className="text-emerald-500/90" aria-hidden="true">
+                ✓
+              </span>
+              {item}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section aria-labelledby="home-explore-heading" className="space-y-4 pb-4">
+        <h2
+          id="home-explore-heading"
+          className="text-sm font-semibold text-zinc-300"
+        >
+          Start exploring
+        </h2>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/search" className={exploreLink}>
+            Search
+          </Link>
+          <Link href="/countries" className={exploreLink}>
+            Countries
+          </Link>
+          <Link href="/companies" className={exploreLink}>
+            Companies
+          </Link>
+          <Link href="/universities" className={exploreLink}>
+            Universities
+          </Link>
+          <Link href="/analytics" className={exploreLink}>
+            Reports
           </Link>
         </div>
-      </div>
-
-      <div className="border-t border-zinc-800 px-8 pb-10 pt-8 sm:px-10 lg:px-12">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">
-          Or browse directly
-        </h2>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {HERO_TOPIC_CARDS.filter((topic) => topic.connected && topic.href).map((topic) => (
-            <Link key={topic.id} href={topic.href!} className={topicLink}>
-              <span className="text-sm font-semibold text-zinc-100">{topic.label}</span>
-              <span className="mt-1 text-xs text-sky-400/90">Open →</span>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </header>
+      </section>
+    </main>
   );
 }

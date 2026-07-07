@@ -33,8 +33,8 @@ export function buildEntityResultEntry(
       evidenceStatus: "Registry available",
       availableInformation:
         entity.type === "country"
-          ? "Reference profile, regional metadata, linked local catalog records."
-          : `Catalog profile: ${entity.category}, headquarters, founding year.`,
+          ? "Country profile with evidence status and available information."
+          : "Company profile with industry, location, and available information.",
       route: href,
       href,
       linked: true,
@@ -47,7 +47,7 @@ export function buildEntityResultEntry(
       type: typeLabel,
       evidenceStatus: "Registry available",
       availableInformation:
-        "University catalog profile: name, location, institution type, founding year, website when recorded.",
+        "University profile with location, type, and available information.",
       route: href,
       href,
       linked: true,

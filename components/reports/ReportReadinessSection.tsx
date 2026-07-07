@@ -21,57 +21,41 @@ export default function ReportReadinessSection({
 }: ReportReadinessSectionProps) {
   return (
     <section className="space-y-4" aria-labelledby="report-readiness-heading">
-      <div>
-        <h2
-          id="report-readiness-heading"
-          className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
-        >
-          Available report types
-        </h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          What you can review today — readiness status per report type.
-        </p>
-      </div>
+      <h2 id="report-readiness-heading" className="text-base font-semibold text-zinc-200">
+        Report types
+      </h2>
 
       <div className="space-y-4">
         {reportTypes.map((report) => (
           <div
             key={report.id}
-            className="rounded-xl border border-zinc-800 bg-zinc-950 p-5"
+            className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 sm:p-5"
           >
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
                 <h3 className="text-sm font-semibold text-zinc-100">{report.title}</h3>
                 <p className="mt-1 text-sm text-zinc-400">{report.description}</p>
-                {report.relatedRoute && (
-                  <Link
-                    href={report.relatedRoute}
-                    className="mt-2 inline-block text-xs text-cyan-400 underline-offset-2 hover:underline"
-                  >
-                    Open related module →
-                  </Link>
-                )}
               </div>
               <StatusBadge label={report.availableToday} />
             </div>
 
-            <dl className="mt-4 grid gap-3 text-xs sm:grid-cols-3">
+            <dl className="mt-4 space-y-3 text-sm">
               <div>
-                <dt className="text-zinc-500">Evidence required</dt>
+                <dt className="text-xs uppercase tracking-wider text-zinc-600">
+                  Evidence required
+                </dt>
                 <dd className="mt-1 text-zinc-400">{report.evidenceRequired}</dd>
               </div>
-              <div>
-                <dt className="text-zinc-500">Source status</dt>
-                <dd className="mt-1">
-                  <StatusBadge label={report.evidenceStatus} />
-                </dd>
-              </div>
-              <div>
-                <dt className="text-zinc-500">Methodology status</dt>
-                <dd className="mt-1">
-                  <StatusBadge label={report.methodologyStatus} />
-                </dd>
-              </div>
+              {report.relatedRoute ? (
+                <div>
+                  <Link
+                    href={report.relatedRoute}
+                    className="inline-flex min-h-10 w-full items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 px-4 text-sm font-medium text-cyan-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800 sm:w-auto"
+                  >
+                    Open related profile →
+                  </Link>
+                </div>
+              ) : null}
             </dl>
           </div>
         ))}
