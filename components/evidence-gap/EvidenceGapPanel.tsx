@@ -23,7 +23,7 @@ export default function EvidenceGapPanel({
   showMethodology = true,
   heading = "Missing evidence",
   sectionId = "missing-evidence",
-  nextStep,
+  nextStep = { label: "Decision package →", href: "#decision-package" },
 }: EvidenceGapPanelProps) {
   const nonAvailable = getNonAvailableGaps(profile);
   const compact = !showSummary && !showSources && !showMethodology;
@@ -31,19 +31,21 @@ export default function EvidenceGapPanel({
   return (
     <EntityProfileSection id={sectionId} title={heading} nextStep={nextStep}>
       {!compact ? (
+        <p className="text-sm text-zinc-500">What is missing and why.</p>
+      ) : (
         <p className="text-sm text-zinc-500">
-          What is missing and why — from official source records only.
+          What is missing, why, and which source applies.
         </p>
-      ) : null}
+      )}
 
       {showSummary && <EvidenceGapSummary profile={profile} />}
 
       {nonAvailable.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-zinc-800 bg-zinc-950 px-5 py-6 text-center">
-          <p className="text-sm text-zinc-400">No missing evidence for applicable indicators.</p>
-        </div>
+        <p className="rounded-lg bg-zinc-900/50 px-4 py-4 text-sm text-zinc-400">
+          No missing evidence for applicable items.
+        </p>
       ) : (
-        <ul className="grid gap-3 sm:grid-cols-2">
+        <ul className="space-y-2">
           {nonAvailable.map((gap) => (
             <li key={gap.gapId}>
               <EvidenceGapCard gap={gap} />
