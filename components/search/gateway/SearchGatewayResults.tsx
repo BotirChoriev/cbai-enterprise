@@ -4,7 +4,6 @@ import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { GatewaySearchResponse } from "@/lib/search-gateway";
-import { SEARCH_GATEWAY, SEARCH_SUPPORTED_SUGGESTIONS } from "@/lib/search-gateway";
 import { buildEntityResultEntry } from "@/lib/search-intelligence-entry";
 import { buildPlatformEntityHref } from "@/lib/global-search";
 import { profileSectionHref } from "@/components/shared/entity-profile-path";
@@ -17,11 +16,11 @@ type SearchGatewayResultsProps = {
 
 const OPENABLE_GROUP_IDS = new Set(["countries", "companies", "universities"]);
 
-const actionClass =
-  "inline-flex min-h-9 flex-1 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 px-3 text-xs font-medium text-zinc-300 transition-colors hover:border-zinc-600 hover:text-zinc-100 sm:flex-none sm:px-4 sm:text-sm";
-
-const actionPrimaryClass =
-  "inline-flex min-h-9 flex-1 items-center justify-center rounded-lg bg-zinc-100 px-3 text-xs font-semibold text-zinc-900 transition-colors hover:bg-white sm:flex-none sm:px-4 sm:text-sm";
+const SEARCH_EXAMPLES = [
+  { label: "Country", query: "Japan" },
+  { label: "Company", query: "Apple" },
+  { label: "University", query: "Harvard University" },
+] as const;
 
 function resolveSingleEntityMatch(response: GatewaySearchResponse): Entity | null {
   const entities = response.groups
@@ -29,6 +28,12 @@ function resolveSingleEntityMatch(response: GatewaySearchResponse): Entity | nul
     .flatMap((group) => group.entities.map((result) => result.entity));
 
   return entities.length === 1 ? entities[0] : null;
+}
+
+function collectEntityResults(response: GatewaySearchResponse) {
+  return response.groups
+    .filter((group) => OPENABLE_GROUP_IDS.has(group.id))
+    .flatMap((group) => group.entities);
 }
 
 export default function SearchGatewayResults({
@@ -44,117 +49,93 @@ export default function SearchGatewayResults({
   }, [singleEntity, query, router]);
 
   if (!response.query) {
-    return (
-      <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 px-4 py-8 sm:px-6">
-        <p className="text-sm text-zinc-300">Type a name above to find a profile.</p>
-        <SupportedSearches />
-      </div>
-    );
+    return <SearchExamples />;
   }
 
   if (!response.hasResults) {
     return (
-      <div
-        className="rounded-xl border border-dashed border-zinc-800 px-4 py-12 text-center sm:px-6"
-        role="status"
-      >
-        <p className="text-base font-medium text-zinc-300">{SEARCH_GATEWAY.noResultsMessage}</p>
-        <p className="mx-auto mt-2 max-w-lg text-sm text-zinc-500">
-          {SEARCH_GATEWAY.noResultsDetail}
+      <div className="space-y-4" role="status">
+        <p className="text-sm text-zinc-300">
+          No matching country, company, or university was found.
         </p>
-        <div className="mt-8">
-          <SupportedSearches centered />
-        </div>
+        <SearchExamples />
       </div>
     );
   }
 
   if (singleEntity) {
-    return (
-      <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 px-4 py-8 sm:px-6">
-        <p className="text-sm text-zinc-400">Opening {singleEntity.name}…</p>
-      </div>
-    );
+    return <p className="text-sm text-zinc-500">Opening {singleEntity.name}…</p>;
   }
 
-  const entityGroups = response.groups.filter((group) => OPENABLE_GROUP_IDS.has(group.id));
-  const matchCount = entityGroups.reduce((n, g) => n + g.entities.length, 0);
+  const results = collectEntityResults(response);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-3">
       <p className="text-sm text-zinc-500">
-        {matchCount} profile{matchCount === 1 ? "" : "s"} match &quot;{response.query}&quot;
+        {results.length} result{results.length === 1 ? "" : "s"} · pick one to open
       </p>
-
-      {entityGroups.map((group) => (
-        <section
-          key={group.id}
-          aria-labelledby={`search-group-${group.id}`}
-          className="space-y-4"
-        >
-          <h2
-            id={`search-group-${group.id}`}
-            className="text-xs font-semibold uppercase tracking-widest text-zinc-500"
-          >
-            {group.label}
-          </h2>
-
-          <ul className="grid gap-4">
-            {group.entities.map((result) => {
-              const entry = buildEntityResultEntry(result.entity, query);
-              return (
-                <li key={`${result.entity.type}-${result.entity.id}`}>
-                  <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 sm:p-5">
-                    <p className="text-sm font-semibold text-zinc-100">{entry.name}</p>
-                    <p className="mt-1 text-xs text-zinc-500">{entry.type}</p>
-                    <p className="mt-2 text-sm text-zinc-400">{entry.availableInformation}</p>
-                    <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-                      <Link href={entry.href} className={actionPrimaryClass}>
-                        Open profile
-                      </Link>
-                      <Link
-                        href={profileSectionHref(entry.href, "compare")}
-                        className={actionClass}
-                      >
-                        Compare evidence
-                      </Link>
-                      <Link
-                        href={profileSectionHref(entry.href, "reports")}
-                        className={actionClass}
-                      >
-                        View report readiness
-                      </Link>
-                    </div>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      ))}
+      <ul className="space-y-2">
+        {results.map((result) => {
+          const entry = buildEntityResultEntry(result.entity, query);
+          return (
+            <li key={`${result.entity.type}-${result.entity.id}`}>
+              <article className="rounded-lg bg-zinc-900/50 px-4 py-3">
+                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                  <h2 className="text-sm font-semibold text-zinc-100">{entry.name}</h2>
+                  <span className="text-xs text-zinc-500">{entry.type}</span>
+                  {entry.countryLabel ? (
+                    <span className="text-xs text-zinc-600">· {entry.countryLabel}</span>
+                  ) : null}
+                </div>
+                <p className="mt-1 text-xs text-zinc-400">{entry.shortDescription}</p>
+                <p className="mt-1 text-xs text-zinc-600">{entry.nextStep}</p>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <Link
+                    href={entry.href}
+                    className="inline-flex min-h-9 items-center rounded-lg bg-zinc-100 px-3.5 text-xs font-semibold text-zinc-900 transition-colors hover:bg-white"
+                  >
+                    Open profile →
+                  </Link>
+                  {entry.showCompare ? (
+                    <Link
+                      href={profileSectionHref(entry.href, "compare")}
+                      className="text-xs text-cyan-400/90 hover:text-cyan-300"
+                    >
+                      Compare evidence
+                    </Link>
+                  ) : null}
+                  {entry.showReports ? (
+                    <Link
+                      href={profileSectionHref(entry.href, "reports")}
+                      className="text-xs text-cyan-400/90 hover:text-cyan-300"
+                    >
+                      Reports
+                    </Link>
+                  ) : null}
+                </div>
+              </article>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }
 
-function SupportedSearches({ centered = false }: { centered?: boolean }) {
+function SearchExamples() {
   return (
-    <div className={centered ? "mx-auto max-w-xl" : "mt-6"}>
-      <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">Examples</p>
-      <ul
-        className={`mt-3 flex flex-wrap gap-2 ${centered ? "justify-center" : ""}`}
-        aria-label="Example searches"
-      >
-        {SEARCH_SUPPORTED_SUGGESTIONS.map((example) => (
-          <li key={example}>
-            <Link
-              href={`/search?q=${encodeURIComponent(example)}`}
-              className="inline-flex min-h-9 items-center rounded-full border border-zinc-800 bg-zinc-900/50 px-3.5 py-1.5 text-sm text-zinc-300 transition-colors hover:border-zinc-600 hover:bg-zinc-900"
-            >
-              {example}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <ul className="flex flex-wrap gap-2" aria-label="Example searches">
+      {SEARCH_EXAMPLES.map((example) => (
+        <li key={example.query}>
+          <Link
+            href={`/search?q=${encodeURIComponent(example.query)}`}
+            className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/60 px-3.5 text-sm text-zinc-300 transition-colors hover:border-zinc-600 hover:bg-zinc-900"
+          >
+            <span>{example.query}</span>
+            <span className="text-xs text-zinc-600">{example.label}</span>
+          </Link>
+        </li>
+      ))}
+    </ul>
   );
 }

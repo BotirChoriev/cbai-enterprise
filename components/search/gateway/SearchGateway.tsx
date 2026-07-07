@@ -9,9 +9,9 @@ type SearchGatewayProps = {
 
 export default function SearchGateway({ query, response }: SearchGatewayProps) {
   return (
-    <div className="home-page mx-auto max-w-6xl px-4 pb-16 sm:px-0">
+    <div className="home-page mx-auto max-w-2xl px-4 pb-12 pt-6 sm:px-6">
       <SearchGatewayHero query={query} />
-      <div className="mt-8">
+      <div className="mt-4">
         <SearchGatewayResults response={response} query={query} />
       </div>
     </div>
