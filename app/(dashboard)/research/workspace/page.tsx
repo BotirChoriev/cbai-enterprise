@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import ResearchWorkspaceHome from "@/components/research/workspace/ResearchWorkspaceHome";
+
+export const metadata: Metadata = {
+  title: "Research Workspace — Evidence Navigation",
+  description:
+    "Explore one research topic from catalog notebook, timeline, graph, and future knowledge perspectives.",
+};
 
 export default function ResearchWorkspacePage() {
   return <ResearchWorkspaceHome />;

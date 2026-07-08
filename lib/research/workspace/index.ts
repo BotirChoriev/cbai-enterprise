@@ -22,3 +22,16 @@ export {
   getResearchWorkspace,
   isWorkspaceModuleActive,
 } from "@/lib/research/workspace/workspace-model";
+
+export {
+  buildWorkspaceExplorerContext,
+  filterWorkspaceTopics,
+  getDefaultWorkspaceTopic,
+  getWorkspaceExplorerContext,
+  listWorkspaceTopics,
+  WORKSPACE_EXPLORER_DEFAULT_TOPIC_ID,
+  WORKSPACE_EVIDENCE_STATUS_KIND_LABELS,
+  type WorkspaceExplorerContext,
+  type WorkspaceEvidenceStatus,
+  type WorkspaceKnowledgeSummary,
+} from "@/lib/research/workspace/workspace-explorer";
