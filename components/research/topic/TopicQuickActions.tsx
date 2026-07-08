@@ -4,6 +4,10 @@ import { WORKSPACE_PATH } from "@/lib/research/workspace/workspace-types";
 import type { TopicTabId } from "@/components/research/topic/TopicSectionTabs";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
+function workspacePathForTopic(topicId: string): string {
+  return `${WORKSPACE_PATH}?topic=${encodeURIComponent(topicId)}`;
+}
+
 type TopicQuickActionsProps = {
   topic: ResearchTopic;
   onTabChange: (tab: TopicTabId) => void;
@@ -20,8 +24,8 @@ export default function TopicQuickActions({ topic, onTabChange }: TopicQuickActi
   const actions: ActionItem[] = [
     {
       label: "Open workspace",
-      description: "Evidence navigation for this topic",
-      href: WORKSPACE_PATH,
+      description: "Continue research review for this topic",
+      href: workspacePathForTopic(topic.topicId),
     },
     {
       label: "Explore related topics",

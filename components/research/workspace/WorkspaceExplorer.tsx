@@ -22,9 +22,21 @@ import ResearchLandscape from "@/components/research/landscape/ResearchLandscape
 import MethodComparisonPanel from "@/components/research/method-comparison/MethodComparisonPanel";
 import { cbaiGlassCard, cbaiHeroGlow, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
-export default function WorkspaceExplorer() {
+type WorkspaceExplorerProps = {
+  initialTopicId?: string;
+  showTopicNotFoundNotice?: boolean;
+  deepLinkTopicId?: string;
+};
+
+export default function WorkspaceExplorer({
+  initialTopicId,
+  showTopicNotFoundNotice = false,
+  deepLinkTopicId,
+}: WorkspaceExplorerProps) {
   const defaultTopic = getDefaultWorkspaceTopic();
-  const [selectedTopicId, setSelectedTopicId] = useState(defaultTopic.topicId);
+  const [selectedTopicId, setSelectedTopicId] = useState(
+    initialTopicId ?? defaultTopic.topicId,
+  );
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredTopics = useMemo(
@@ -55,6 +67,18 @@ export default function WorkspaceExplorer() {
             Evidence Navigation
           </h1>
           <p className="mt-1 max-w-3xl text-sm text-zinc-500">{WORKSPACE_SHELL_NOTICE}</p>
+          {showTopicNotFoundNotice ? (
+            <p className="mt-2 rounded-md border border-zinc-800/80 bg-zinc-900/40 px-3 py-2 text-xs text-zinc-500">
+              Selected topic was not found.
+            </p>
+          ) : null}
+          {deepLinkTopicId && !showTopicNotFoundNotice ? (
+            <p className="mt-2 text-xs text-zinc-500">
+              Selected research topic:{" "}
+              <span className="text-zinc-300">{context.topic.topicName}</span> — continue research
+              review.
+            </p>
+          ) : null}
         </div>
       </header>
 
