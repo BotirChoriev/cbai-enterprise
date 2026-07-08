@@ -1,5 +1,8 @@
+import type { ResearchGap } from "@/lib/research/gaps/research-gap-types";
+import { getTopicDetailResearchGaps } from "@/lib/research/gaps/research-gap-query";
 import type { ResearchTopic } from "@/lib/research/research-topics";
 import {
+  getResearchTopicById,
   RESEARCH_DOMAINS,
   RESEARCH_TOPICS,
 } from "@/lib/research/research-topics";
@@ -200,4 +203,77 @@ export function listNetworkConnectionsForTopic(
     (connection) =>
       connection.sourceTopicId === topicId || connection.targetTopicId === topicId,
   );
+}
+
+export type ResearchNetworkRelatedTopic = {
+  topicId: string;
+  topicName: string;
+  domain: string;
+  connectionTypes: readonly ResearchConnectionType[];
+};
+
+export type ResearchNetworkFocusContext = {
+  node: ResearchNetworkNode;
+  relatedTopics: readonly ResearchNetworkRelatedTopic[];
+  knowledgeGaps: readonly ResearchGap[];
+};
+
+/** Topic IDs connected to a topic through catalog metadata edges. */
+export function getConnectedTopicIds(
+  network: ResearchNetwork,
+  topicId: string,
+): ReadonlySet<string> {
+  const related = new Set<string>([topicId]);
+  for (const connection of network.connections) {
+    if (connection.sourceTopicId === topicId) {
+      related.add(connection.targetTopicId);
+    }
+    if (connection.targetTopicId === topicId) {
+      related.add(connection.sourceTopicId);
+    }
+  }
+  return related;
+}
+
+/** Build focus panel context for a selected network topic. */
+export function buildNetworkFocusContext(
+  network: ResearchNetwork,
+  topicId: string,
+): ResearchNetworkFocusContext | undefined {
+  const node = findNetworkNodeByTopicId(network, topicId);
+  if (!node) {
+    return undefined;
+  }
+
+  const nodeById = new Map(network.nodes.map((entry) => [entry.topicId, entry]));
+  const connections = listNetworkConnectionsForTopic(network, topicId);
+
+  const relatedTopics = connections
+    .map((connection) => {
+      const otherTopicId =
+        connection.sourceTopicId === topicId
+          ? connection.targetTopicId
+          : connection.sourceTopicId;
+      const otherNode = nodeById.get(otherTopicId);
+      if (!otherNode) {
+        return undefined;
+      }
+      return {
+        topicId: otherNode.topicId,
+        topicName: otherNode.topicName,
+        domain: otherNode.domain,
+        connectionTypes: connection.connectionTypes,
+      };
+    })
+    .filter((entry): entry is ResearchNetworkRelatedTopic => entry !== undefined)
+    .sort((left, right) => left.topicName.localeCompare(right.topicName));
+
+  const topic = getResearchTopicById(topicId);
+  const knowledgeGaps = topic ? getTopicDetailResearchGaps(topic, 6) : [];
+
+  return {
+    node,
+    relatedTopics,
+    knowledgeGaps,
+  };
 }

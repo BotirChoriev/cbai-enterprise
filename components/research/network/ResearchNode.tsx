@@ -1,5 +1,4 @@
 import type { ResearchNetworkNode } from "@/lib/research/network/network-types";
-import { getResearchTopicPath } from "@/lib/research/research-topics";
 import { RESEARCH_NETWORK_STATUS_LABELS } from "@/lib/research/network/network-types";
 
 const DOMAIN_COLORS: Record<string, string> = {
@@ -17,51 +16,61 @@ const DOMAIN_COLORS: Record<string, string> = {
 
 type ResearchNodeProps = {
   node: ResearchNetworkNode;
-  highlighted: boolean;
+  focused: boolean;
+  connected: boolean;
   dimmed: boolean;
-  onHover: (topicId: string | null) => void;
+  onSelect: (topicId: string) => void;
 };
 
-function nodeFill(domainId: string, highlighted: boolean): string {
+function nodeFill(domainId: string, focused: boolean, connected: boolean): string {
   const base = DOMAIN_COLORS[domainId] ?? "#22d3ee";
-  return highlighted ? base : `${base}99`;
+  if (focused) {
+    return base;
+  }
+  return connected ? base : `${base}99`;
 }
 
 export default function ResearchNode({
   node,
-  highlighted,
+  focused,
+  connected,
   dimmed,
-  onHover,
+  onSelect,
 }: ResearchNodeProps) {
-  const radius = highlighted ? 9 : 7;
-  const opacity = dimmed ? 0.35 : 1;
+  const active = focused || connected;
+  const radius = focused ? 12 : connected ? 8 : 7;
+  const opacity = dimmed ? 0.3 : 1;
 
   return (
-    <g
-      className="transition-opacity duration-300"
-      style={{ opacity }}
-      onMouseEnter={() => onHover(node.topicId)}
-      onMouseLeave={() => onHover(null)}
-      onFocus={() => onHover(node.topicId)}
-      onBlur={() => onHover(null)}
-    >
-      <a href={getResearchTopicPath(node.topicId)} aria-label={`Open ${node.topicName}`}>
-        <circle
-          cx={node.x}
-          cy={node.y}
-          r={radius}
-          fill={nodeFill(node.domainId, highlighted)}
-          stroke={highlighted ? "#ffffff" : "#0f172a"}
-          strokeWidth={highlighted ? 2 : 1}
-          className="cursor-pointer transition-all duration-300 hover:brightness-125"
-          style={{
-            filter: highlighted
-              ? "drop-shadow(0 0 10px rgba(34,211,238,0.65))"
-              : "drop-shadow(0 0 4px rgba(34,211,238,0.25))",
-          }}
-        />
-      </a>
-      {highlighted ? (
+    <g className="transition-opacity duration-[250ms]" style={{ opacity }}>
+      <circle
+        cx={node.x}
+        cy={node.y}
+        r={radius}
+        fill={nodeFill(node.domainId, focused, connected)}
+        stroke={focused ? "#ffffff" : active ? "#e2e8f0" : "#0f172a"}
+        strokeWidth={focused ? 2.5 : active ? 1.5 : 1}
+        className="cursor-pointer transition-all duration-[250ms] hover:brightness-125"
+        style={{
+          filter: focused
+            ? "drop-shadow(0 0 16px rgba(34,211,238,0.9))"
+            : connected
+              ? "drop-shadow(0 0 8px rgba(34,211,238,0.45))"
+              : "drop-shadow(0 0 4px rgba(34,211,238,0.2))",
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label={`Focus on ${node.topicName}`}
+        aria-pressed={focused}
+        onClick={() => onSelect(node.topicId)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            onSelect(node.topicId);
+          }
+        }}
+      />
+      {active ? (
         <g pointerEvents="none">
           <rect
             x={node.x - 72}
@@ -70,7 +79,7 @@ export default function ResearchNode({
             height={28}
             rx={6}
             fill="rgba(15,23,42,0.92)"
-            stroke="rgba(34,211,238,0.25)"
+            stroke={focused ? "rgba(34,211,238,0.45)" : "rgba(34,211,238,0.25)"}
           />
           <text
             x={node.x}

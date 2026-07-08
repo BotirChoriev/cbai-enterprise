@@ -5,8 +5,14 @@ import type {
 } from "@/lib/research/network/network-types";
 import {
   buildGlobalResearchNetwork,
+  buildNetworkFocusContext,
   findNetworkNodeByTopicId,
+  getConnectedTopicIds,
   listNetworkConnectionsForTopic,
+} from "@/lib/research/network/network-builder";
+import type {
+  ResearchNetworkFocusContext,
+  ResearchNetworkRelatedTopic,
 } from "@/lib/research/network/network-builder";
 
 /** Get the global research network snapshot. */
@@ -33,3 +39,21 @@ export function findNetworkConnection(
 export function listResearchNetworkNodes(network: ResearchNetwork): readonly ResearchNetworkNode[] {
   return network.nodes;
 }
+
+/** Connected topic IDs for focus-mode highlighting. */
+export function getConnectedTopicIdsForTopic(
+  network: ResearchNetwork,
+  topicId: string,
+): ReadonlySet<string> {
+  return getConnectedTopicIds(network, topicId);
+}
+
+/** Focus panel data for a selected topic node. */
+export function getNetworkFocusContext(
+  network: ResearchNetwork,
+  topicId: string,
+): ResearchNetworkFocusContext | undefined {
+  return buildNetworkFocusContext(network, topicId);
+}
+
+export type { ResearchNetworkFocusContext, ResearchNetworkRelatedTopic };

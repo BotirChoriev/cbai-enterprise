@@ -58,7 +58,8 @@ export default function ResearchNetworkLegend({ compact = false }: ResearchNetwo
           Interaction
         </p>
         <p className="mt-2 text-xs text-zinc-500">
-          Hover a node to highlight catalog connections. Click to open the research topic page.
+          Click a node to enter focus mode and review catalog metadata. Connected topics stay
+          bright; unrelated nodes fade. Use Open topic to visit the research topic page.
         </p>
       </div>
     </div>
