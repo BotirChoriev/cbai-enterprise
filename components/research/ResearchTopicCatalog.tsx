@@ -38,7 +38,7 @@ export default function ResearchTopicCatalog({ initialQuery = "" }: ResearchTopi
           Browse research domains and topics
         </h2>
         <p className="max-w-2xl text-sm leading-relaxed text-zinc-400">
-          Structured read-only catalog — foundation for future Research Topic Pages. No live
+          Structured read-only catalog with detail pages for each research topic. No live
           databases, publications, or researcher profiles are connected.
         </p>
       </div>

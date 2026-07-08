@@ -38,7 +38,33 @@ export const RESEARCH_TOPIC_STATUS_LABELS: Record<ResearchTopicStatus, string> =
   evidence_not_connected: "Evidence not connected",
 };
 
-export const RESEARCH_TOPIC_PAGE_NOTE = "Topic page coming in RI-BUILD-003";
+export const RESEARCH_TOPIC_AVAILABLE_TODAY = [
+  "Catalog profile for this research topic",
+  "Domain classification",
+  "Related methods listed in the catalog",
+  "Related evidence types listed in the catalog",
+] as const;
+
+export const RESEARCH_TOPIC_NOT_AVAILABLE_YET = [
+  "Live publications not connected",
+  "Researchers not connected",
+  "Experiments not connected",
+  "Datasets not connected",
+  "Patents not connected",
+  "Evidence discussions not connected",
+  "AI Notebook not connected",
+] as const;
+
+export const RESEARCH_TOPIC_FUTURE_SUPPORTS = [
+  "Publications",
+  "Experiments",
+  "Datasets",
+  "Patents",
+  "Laboratories",
+  "Open questions",
+  "Evidence discussions",
+  "AI Notebook",
+] as const;
 
 export const RESEARCH_DOMAINS: readonly ResearchDomain[] = [
   { domainId: "life-sciences", domainName: "Life Sciences" },
@@ -810,4 +836,12 @@ export function getResearchTopicCountByDomain(
   }
 
   return counts;
+}
+
+export function getResearchTopicById(topicId: string): ResearchTopic | undefined {
+  return RESEARCH_TOPICS.find((topic) => topic.topicId === topicId);
+}
+
+export function getResearchTopicPath(topicId: string): string {
+  return `/research/${topicId}`;
 }

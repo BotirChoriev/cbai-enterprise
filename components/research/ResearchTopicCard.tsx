@@ -1,6 +1,7 @@
+import Link from "next/link";
 import type { ResearchTopic } from "@/lib/research/research-topics";
 import {
-  RESEARCH_TOPIC_PAGE_NOTE,
+  getResearchTopicPath,
   RESEARCH_TOPIC_STATUS_LABELS,
 } from "@/lib/research/research-topics";
 import { cbaiGlassCard } from "@/components/brand/brand-classes";
@@ -21,6 +22,8 @@ type ResearchTopicCardProps = {
 };
 
 export default function ResearchTopicCard({ topic }: ResearchTopicCardProps) {
+  const topicPath = getResearchTopicPath(topic.topicId);
+
   return (
     <article className={`${cbaiGlassCard} flex h-full flex-col p-5`}>
       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -54,16 +57,12 @@ export default function ResearchTopicCard({ topic }: ResearchTopicCardProps) {
         </div>
       </dl>
 
-      <button
-        type="button"
-        disabled
-        aria-disabled="true"
-        title={RESEARCH_TOPIC_PAGE_NOTE}
-        className="mt-5 inline-flex min-h-10 w-full cursor-not-allowed items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900/80 px-4 text-sm font-medium text-zinc-500"
+      <Link
+        href={topicPath}
+        className="mt-5 inline-flex min-h-10 w-full items-center justify-center rounded-lg border border-cyan-500/25 bg-cyan-500/10 px-4 text-sm font-medium text-cyan-300 transition-colors hover:border-cyan-500/40 hover:bg-cyan-500/15 hover:text-cyan-200"
       >
         Open topic →
-      </button>
-      <p className="mt-2 text-center text-[11px] text-zinc-600">{RESEARCH_TOPIC_PAGE_NOTE}</p>
+      </Link>
     </article>
   );
 }
