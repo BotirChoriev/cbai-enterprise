@@ -56,8 +56,8 @@ export default function ResearchHero({ query = "" }: ResearchHeroProps) {
           </button>
         </form>
         <p className="text-xs text-zinc-600">
-          Search saves your query for orientation only — results are not connected to live
-          databases yet.
+          Search filters the topics catalog below — no live databases or publication results are
+          connected yet.
         </p>
       </div>
 

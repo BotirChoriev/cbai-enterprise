@@ -3,7 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import ResearchHero from "@/components/research/ResearchHero";
 import ResearchEcosystemOverview from "@/components/research/ResearchEcosystemOverview";
-import ResearchTopicPreview from "@/components/research/ResearchTopicPreview";
+import ResearchTopicCatalog from "@/components/research/ResearchTopicCatalog";
 import ResearchPrinciples from "@/components/research/ResearchPrinciples";
 import { cbaiHeroGlow } from "@/components/brand/brand-classes";
 import {
@@ -18,7 +18,7 @@ export default function ResearchHome() {
 
   return (
     <div
-      className={`mx-auto max-w-5xl space-y-14 px-4 py-10 sm:px-6 sm:py-14 ${cbaiHeroGlow}`}
+      className={`mx-auto max-w-6xl space-y-14 px-4 py-10 sm:px-6 sm:py-14 ${cbaiHeroGlow}`}
     >
       <ResearchHero query={query} />
 
@@ -60,8 +60,8 @@ export default function ResearchHome() {
         </div>
       </section>
 
+      <ResearchTopicCatalog initialQuery={query} />
       <ResearchEcosystemOverview />
-      <ResearchTopicPreview query={query} />
       <ResearchPrinciples />
     </div>
   );

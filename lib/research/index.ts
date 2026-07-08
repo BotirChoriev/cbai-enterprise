@@ -10,3 +10,16 @@ export {
   type ResearchPrinciple,
   type ResearchWorkspaceArea,
 } from "@/lib/research/research-home";
+
+export {
+  RESEARCH_DOMAINS,
+  RESEARCH_TOPICS,
+  RESEARCH_TOPIC_STATUS_LABELS,
+  RESEARCH_TOPIC_PAGE_NOTE,
+  filterResearchTopics,
+  getResearchTopicCountByDomain,
+  type ResearchDomain,
+  type ResearchDomainId,
+  type ResearchTopic,
+  type ResearchTopicStatus,
+} from "@/lib/research/research-topics";

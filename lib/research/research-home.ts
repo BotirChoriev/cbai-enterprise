@@ -71,6 +71,7 @@ export const RESEARCH_PRINCIPLES: readonly ResearchPrinciple[] = [
 
 export const RESEARCH_AVAILABLE_TODAY = [
   "Ecosystem vision and product direction",
+  "Research topics catalog (read-only)",
   "Topic exploration entry (this page)",
   "Public research intelligence positioning",
   "Link to university profiles in Public Intelligence",
