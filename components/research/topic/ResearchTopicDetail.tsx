@@ -11,6 +11,8 @@ import PublicationLayerOverview from "@/components/research/publications/Publica
 import PublicationTopicPreview from "@/components/research/publications/PublicationTopicPreview";
 import ExperimentLayerOverview from "@/components/research/experiments/ExperimentLayerOverview";
 import ExperimentEvidenceTypes from "@/components/research/experiments/ExperimentEvidenceTypes";
+import LaboratoryLayerOverview from "@/components/research/laboratories/LaboratoryLayerOverview";
+import LaboratoryEvidenceTypes from "@/components/research/laboratories/LaboratoryEvidenceTypes";
 import { cbaiGlassCard, cbaiHeroGlow, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type ResearchTopicDetailProps = {
@@ -78,6 +80,27 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
         <div className={`${cbaiGlassCard} space-y-6 p-5`}>
           <ExperimentLayerOverview />
           <ExperimentEvidenceTypes topic={topic} />
+        </div>
+      </section>
+
+      <section aria-labelledby="topic-laboratory-readiness-heading" className="space-y-6">
+        <div>
+          <p className={cbaiSectionEyebrow}>Laboratory readiness</p>
+          <h2
+            id="topic-laboratory-readiness-heading"
+            className="text-xl font-semibold text-zinc-100"
+          >
+            Laboratory records
+          </h2>
+          <p className="mt-1 text-sm text-zinc-500">
+            Laboratories are a core research object. Laboratory records, equipment, projects, and
+            affiliations are not connected yet — human review required before any future use.
+          </p>
+        </div>
+
+        <div className={`${cbaiGlassCard} space-y-6 p-5`}>
+          <LaboratoryLayerOverview />
+          <LaboratoryEvidenceTypes topic={topic} />
         </div>
       </section>
 
