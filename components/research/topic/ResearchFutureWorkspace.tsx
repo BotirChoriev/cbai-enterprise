@@ -3,7 +3,12 @@ import {
   getExperimentReadinessForTopic,
   getLaboratoryReadinessForTopic,
   getPublicationReadinessForTopic,
+  getResearcherReadinessForTopic,
+  RESEARCHER_TOPIC_NOT_CONNECTED_MESSAGE,
 } from "@/lib/research";
+import ResearcherLayerOverview from "@/components/research/researchers/ResearcherLayerOverview";
+import ResearcherVerificationReadiness from "@/components/research/researchers/ResearcherVerificationReadiness";
+import ResearcherContributionModel from "@/components/research/researchers/ResearcherContributionModel";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type FutureWorkspaceGroup = {
@@ -15,6 +20,7 @@ function buildFutureWorkspaceGroups(topic: ResearchTopic): FutureWorkspaceGroup[
   const publication = getPublicationReadinessForTopic(topic);
   const experiment = getExperimentReadinessForTopic(topic);
   const laboratory = getLaboratoryReadinessForTopic(topic);
+  const researcher = getResearcherReadinessForTopic(topic);
 
   return [
     {
@@ -46,6 +52,10 @@ function buildFutureWorkspaceGroups(topic: ResearchTopic): FutureWorkspaceGroup[
       ].filter((item): item is string => item !== null),
     },
     {
+      title: "Verified researchers and contributors",
+      items: researcher.layer.futureCapabilities.slice(0, 3),
+    },
+    {
       title: "Open questions",
       items: ["Track unresolved research questions and evidence gaps for this topic"],
     },
@@ -66,6 +76,7 @@ type ResearchFutureWorkspaceProps = {
 
 export default function ResearchFutureWorkspace({ topic }: ResearchFutureWorkspaceProps) {
   const groups = buildFutureWorkspaceGroups(topic);
+  const researcherReadiness = getResearcherReadinessForTopic(topic);
 
   return (
     <section aria-labelledby="topic-future-workspace-heading" className="space-y-4">
@@ -94,6 +105,22 @@ export default function ResearchFutureWorkspace({ topic }: ResearchFutureWorkspa
             </ul>
           </div>
         ))}
+      </div>
+
+      <div className={`${cbaiGlassCard} space-y-4 p-5`}>
+        <div>
+          <h3 className="text-sm font-semibold text-zinc-100">Researcher readiness</h3>
+          <p className="mt-1 text-sm text-zinc-500">{RESEARCHER_TOPIC_NOT_CONNECTED_MESSAGE}</p>
+          <p className="mt-1 text-xs text-zinc-600">
+            Verified researchers and academic contributors will be supported in the future workspace
+            — affiliations, research areas, and verification sources are not connected yet.
+          </p>
+        </div>
+        <div className="grid gap-5 lg:grid-cols-3">
+          <ResearcherLayerOverview layer={researcherReadiness.layer} />
+          <ResearcherVerificationReadiness layer={researcherReadiness.layer} />
+          <ResearcherContributionModel layer={researcherReadiness.layer} />
+        </div>
       </div>
 
       <p className="text-xs text-zinc-600">
