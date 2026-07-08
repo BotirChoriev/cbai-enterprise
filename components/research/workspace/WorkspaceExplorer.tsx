@@ -18,6 +18,7 @@ import {
 import WorkspaceSidebar from "@/components/research/workspace/WorkspaceSidebar";
 import WorkspaceContent from "@/components/research/workspace/WorkspaceContent";
 import ResearchGapExplorer from "@/components/research/gaps/ResearchGapExplorer";
+import MethodComparisonPanel from "@/components/research/method-comparison/MethodComparisonPanel";
 import { cbaiGlassCard, cbaiHeroGlow, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 export default function WorkspaceExplorer() {
@@ -116,6 +117,8 @@ export default function WorkspaceExplorer() {
           </section>
 
           <ResearchGapExplorer topic={context.topic} variant="workspace" />
+
+          <MethodComparisonPanel topic={context.topic} variant="workspace" />
 
           <section className={`${cbaiGlassCard} space-y-2 p-4`}>
             <p className="text-[10px] font-medium uppercase tracking-wider text-cyan-400/90">
