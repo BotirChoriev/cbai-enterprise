@@ -7,6 +7,8 @@ import ResearchTopicWorkspaceStatus from "@/components/research/topic/ResearchTo
 import ResearchTopicLimitations from "@/components/research/topic/ResearchTopicLimitations";
 import ResearchEntityTypeOverview from "@/components/research/entities/ResearchEntityTypeOverview";
 import ResearchEntityRelationshipPreview from "@/components/research/entities/ResearchEntityRelationshipPreview";
+import PublicationLayerOverview from "@/components/research/publications/PublicationLayerOverview";
+import PublicationTopicPreview from "@/components/research/publications/PublicationTopicPreview";
 import { cbaiGlassCard, cbaiHeroGlow, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type ResearchTopicDetailProps = {
@@ -38,6 +40,24 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
         <div className={`${cbaiGlassCard} space-y-6 p-5`}>
           <ResearchEntityTypeOverview />
           <ResearchEntityRelationshipPreview topic={topic} />
+        </div>
+      </section>
+
+      <section aria-labelledby="topic-publication-readiness-heading" className="space-y-6">
+        <div>
+          <p className={cbaiSectionEyebrow}>Publication readiness</p>
+          <h2 id="topic-publication-readiness-heading" className="text-xl font-semibold text-zinc-100">
+            Research literature
+          </h2>
+          <p className="mt-1 text-sm text-zinc-500">
+            Publications are a core evidence type. Publication sources and metadata are not
+            connected yet — human review required before any future use.
+          </p>
+        </div>
+
+        <div className={`${cbaiGlassCard} space-y-6 p-5`}>
+          <PublicationLayerOverview />
+          <PublicationTopicPreview topic={topic} />
         </div>
       </section>
 
