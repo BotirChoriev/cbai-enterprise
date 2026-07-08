@@ -5,6 +5,8 @@ import ResearchTopicMethods from "@/components/research/topic/ResearchTopicMetho
 import ResearchTopicEvidenceMap from "@/components/research/topic/ResearchTopicEvidenceMap";
 import ResearchTopicWorkspaceStatus from "@/components/research/topic/ResearchTopicWorkspaceStatus";
 import ResearchTopicLimitations from "@/components/research/topic/ResearchTopicLimitations";
+import ResearchEntityTypeOverview from "@/components/research/entities/ResearchEntityTypeOverview";
+import ResearchEntityRelationshipPreview from "@/components/research/entities/ResearchEntityRelationshipPreview";
 import { cbaiGlassCard, cbaiHeroGlow, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type ResearchTopicDetailProps = {
@@ -20,6 +22,25 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
       <ResearchTopicMethods topic={topic} />
       <ResearchTopicEvidenceMap topic={topic} />
       <ResearchTopicWorkspaceStatus topic={topic} />
+
+      <section aria-labelledby="topic-entity-model-heading" className="space-y-6">
+        <div>
+          <p className={cbaiSectionEyebrow}>Research entity model</p>
+          <h2 id="topic-entity-model-heading" className="text-xl font-semibold text-zinc-100">
+            Research object architecture
+          </h2>
+          <p className="mt-1 text-sm text-zinc-500">
+            Model preview using available catalog information — related research objects are static
+            references, not connected yet. Human review required before any future use in decisions.
+          </p>
+        </div>
+
+        <div className={`${cbaiGlassCard} space-y-6 p-5`}>
+          <ResearchEntityTypeOverview />
+          <ResearchEntityRelationshipPreview topic={topic} />
+        </div>
+      </section>
+
       <ResearchTopicLimitations />
 
       <section aria-labelledby="topic-next-steps-heading" className="space-y-4">
