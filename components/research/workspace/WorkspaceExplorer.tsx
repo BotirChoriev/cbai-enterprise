@@ -67,7 +67,7 @@ export default function WorkspaceExplorer() {
         </div>
 
         <main className="min-w-0">
-          <WorkspaceContent context={context} />
+          <WorkspaceContent context={context} onSelectTopic={setSelectedTopicId} />
         </main>
 
         <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start" aria-label="Workspace status">

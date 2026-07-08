@@ -9,6 +9,7 @@ import NegativeResultsOverview from "@/components/research/topic/NegativeResults
 import WorkspaceKnowledgeSummary from "@/components/research/workspace/WorkspaceKnowledgeSummary";
 import WorkspaceEvidenceOverview from "@/components/research/workspace/WorkspaceEvidenceOverview";
 import WorkspaceTopicNavigator from "@/components/research/workspace/WorkspaceTopicNavigator";
+import CrossTopicDiscovery from "@/components/research/discovery/CrossTopicDiscovery";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import {
   NOTEBOOK_CATALOG_ONLY_NOTICE,
@@ -19,9 +20,10 @@ import { RESEARCH_GRAPH_HONEST_NOTICE } from "@/lib/research/graph/research-grap
 
 type WorkspaceContentProps = {
   context: WorkspaceExplorerContext;
+  onSelectTopic?: (topicId: string) => void;
 };
 
-export default function WorkspaceContent({ context }: WorkspaceContentProps) {
+export default function WorkspaceContent({ context, onSelectTopic }: WorkspaceContentProps) {
   const { topic, knowledgeSummary, evidenceStatuses, notebook, timeline, graph } = context;
   const previewStages = timeline.stages.slice(0, 4);
 
@@ -39,6 +41,7 @@ export default function WorkspaceContent({ context }: WorkspaceContentProps) {
 
       <WorkspaceKnowledgeSummary summary={knowledgeSummary} />
       <WorkspaceEvidenceOverview evidenceStatuses={evidenceStatuses} />
+      <CrossTopicDiscovery topic={topic} variant="workspace" onSelectTopic={onSelectTopic} />
 
       <section aria-labelledby="workspace-notebook-preview-heading" className="space-y-3">
         <div className="flex flex-wrap items-end justify-between gap-2">

@@ -11,6 +11,7 @@ import OpenResearchQuestions from "@/components/research/topic/OpenResearchQuest
 import NegativeResultsOverview from "@/components/research/topic/NegativeResultsOverview";
 import ResearchFutureWorkspace from "@/components/research/topic/ResearchFutureWorkspace";
 import ResearchGraphPanel from "@/components/research/graph/ResearchGraphPanel";
+import CrossTopicDiscovery from "@/components/research/discovery/CrossTopicDiscovery";
 import ResearchNotebookPanel from "@/components/research/notebook/ResearchNotebookPanel";
 import KnowledgeTimeline from "@/components/research/timeline/KnowledgeTimeline";
 import { cbaiGlassCard, cbaiHeroGlow, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
@@ -31,6 +32,7 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
       <ResearchTopicMethods topic={topic} />
       <ResearchTopicEvidenceMap topic={topic} />
       <ResearchGraphPanel variant="topic" topic={topic} />
+      <CrossTopicDiscovery topic={topic} variant="topic" limit={6} />
       <ResearchEvidenceReadiness topic={topic} />
 
       <section aria-labelledby="topic-future-knowledge-heading" className="space-y-4">

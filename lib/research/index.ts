@@ -323,3 +323,24 @@ export {
   type WorkspaceStatus,
   type ResearchWorkspaceModel,
 } from "@/lib/research/workspace";
+
+export {
+  DISCOVERY_RELATIONSHIP_REASONS,
+  DISCOVERY_MODEL_VERSION,
+  DISCOVERY_RELATIONSHIP_REASON_LABELS,
+  DISCOVERY_STATUS_LABELS,
+  DISCOVERY_CATALOG_NOTICE,
+  DISCOVERY_HUMAN_REVIEW_NOTICE,
+  buildCrossTopicDiscovery,
+  buildCrossTopicDiscoveriesForTopic,
+  getCrossTopicDiscoveriesForTopic,
+  getCrossTopicDiscoveryContext,
+  findCrossTopicDiscovery,
+  validateCrossTopicDiscoveries,
+  type DiscoveryRelationshipReason,
+  type DiscoveryStatus,
+  type CrossTopicDiscovery,
+  type CrossTopicDiscoveryContext,
+  type DiscoveryValidationIssue,
+  type DiscoveryValidationReport,
+} from "@/lib/research/discovery";
