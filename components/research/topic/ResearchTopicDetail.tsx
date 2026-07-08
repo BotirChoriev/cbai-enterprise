@@ -9,6 +9,8 @@ import ResearchEntityTypeOverview from "@/components/research/entities/ResearchE
 import ResearchEntityRelationshipPreview from "@/components/research/entities/ResearchEntityRelationshipPreview";
 import PublicationLayerOverview from "@/components/research/publications/PublicationLayerOverview";
 import PublicationTopicPreview from "@/components/research/publications/PublicationTopicPreview";
+import ExperimentLayerOverview from "@/components/research/experiments/ExperimentLayerOverview";
+import ExperimentEvidenceTypes from "@/components/research/experiments/ExperimentEvidenceTypes";
 import { cbaiGlassCard, cbaiHeroGlow, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type ResearchTopicDetailProps = {
@@ -58,6 +60,24 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
         <div className={`${cbaiGlassCard} space-y-6 p-5`}>
           <PublicationLayerOverview />
           <PublicationTopicPreview topic={topic} />
+        </div>
+      </section>
+
+      <section aria-labelledby="topic-experiment-readiness-heading" className="space-y-6">
+        <div>
+          <p className={cbaiSectionEyebrow}>Experiment readiness</p>
+          <h2 id="topic-experiment-readiness-heading" className="text-xl font-semibold text-zinc-100">
+            Experiment records
+          </h2>
+          <p className="mt-1 text-sm text-zinc-500">
+            Experiments are a core research evidence type. Experiment records, methods, variables,
+            and results are not connected yet — human review required before any future use.
+          </p>
+        </div>
+
+        <div className={`${cbaiGlassCard} space-y-6 p-5`}>
+          <ExperimentLayerOverview />
+          <ExperimentEvidenceTypes topic={topic} />
         </div>
       </section>
 
