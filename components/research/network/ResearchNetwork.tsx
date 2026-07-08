@@ -1,7 +1,9 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
+  findNetworkNodeByTopicId,
   getConnectedTopicIdsForTopic,
   getGlobalResearchNetwork,
   getNetworkFocusContext,
@@ -12,14 +14,81 @@ import ResearchNode from "@/components/research/network/ResearchNode";
 import ResearchMiniMap from "@/components/research/network/ResearchMiniMap";
 import ResearchNetworkLegend from "@/components/research/network/ResearchNetworkLegend";
 import ResearchNetworkFocusPanel from "@/components/research/network/ResearchNetworkFocusPanel";
+import ResearchNetworkZoomControls from "@/components/research/network/ResearchNetworkZoomControls";
 import { cbaiGlassCard, cbaiHeroGlow, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 const NETWORK_FOCUS_NOTICE =
   "This network represents catalog relationships. It does not represent scientific proof.";
 
+const MIN_SCALE = 0.6;
+const MAX_SCALE = 2.5;
+const ZOOM_STEP = 1.2;
+
+type NetworkView = {
+  x: number;
+  y: number;
+  scale: number;
+};
+
+const DEFAULT_VIEW: NetworkView = { x: 0, y: 0, scale: 1 };
+const { width: NETWORK_WIDTH, height: NETWORK_HEIGHT } = RESEARCH_NETWORK_VIEWBOX;
+
+function viewBoxFromState(view: NetworkView, width: number, height: number): string {
+  return `${view.x} ${view.y} ${width / view.scale} ${height / view.scale}`;
+}
+
+function zoomView(
+  view: NetworkView,
+  direction: "in" | "out",
+  width: number,
+  height: number,
+): NetworkView {
+  const factor = direction === "in" ? ZOOM_STEP : 1 / ZOOM_STEP;
+  const nextScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, view.scale * factor));
+  if (nextScale === view.scale) {
+    return view;
+  }
+
+  const viewWidth = width / view.scale;
+  const viewHeight = height / view.scale;
+  const nextViewWidth = width / nextScale;
+  const nextViewHeight = height / nextScale;
+  const centerX = view.x + viewWidth / 2;
+  const centerY = view.y + viewHeight / 2;
+
+  return {
+    scale: nextScale,
+    x: centerX - nextViewWidth / 2,
+    y: centerY - nextViewHeight / 2,
+  };
+}
+
+type PanSession = {
+  pointerId: number;
+  startX: number;
+  startY: number;
+  viewX: number;
+  viewY: number;
+};
+
 export default function ResearchNetwork() {
   const network = useMemo(() => getGlobalResearchNetwork(), []);
-  const [focusedTopicId, setFocusedTopicId] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+  const svgRef = useRef<SVGSVGElement>(null);
+  const panSessionRef = useRef<PanSession | null>(null);
+
+  const [view, setView] = useState<NetworkView>(DEFAULT_VIEW);
+  const [isPanning, setIsPanning] = useState(false);
+
+  const focusedTopicId = useMemo(() => {
+    const focusId = searchParams.get("focus");
+    if (!focusId) {
+      return null;
+    }
+    return findNetworkNodeByTopicId(network, focusId) ? focusId : null;
+  }, [network, searchParams]);
 
   const nodeById = useMemo(
     () => new Map(network.nodes.map((node) => [node.topicId, node])),
@@ -40,15 +109,113 @@ export default function ResearchNetwork() {
     return getNetworkFocusContext(network, focusedTopicId);
   }, [focusedTopicId, network]);
 
-  const handleSelectTopic = useCallback((topicId: string) => {
-    setFocusedTopicId(topicId);
-  }, []);
+  const updateFocusParam = useCallback(
+    (topicId: string | null) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (topicId) {
+        params.set("focus", topicId);
+      } else {
+        params.delete("focus");
+      }
+      const query = params.toString();
+      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    },
+    [pathname, router, searchParams],
+  );
+
+  useEffect(() => {
+    const focusId = searchParams.get("focus");
+    if (!focusId || findNetworkNodeByTopicId(network, focusId)) {
+      return;
+    }
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("focus");
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+  }, [network, pathname, router, searchParams]);
+
+  const handleSelectTopic = useCallback(
+    (topicId: string) => {
+      updateFocusParam(topicId);
+    },
+    [updateFocusParam],
+  );
 
   const handleClearFocus = useCallback(() => {
-    setFocusedTopicId(null);
+    updateFocusParam(null);
+  }, [updateFocusParam]);
+
+  const handleZoomIn = useCallback(() => {
+    setView((current) => zoomView(current, "in", NETWORK_WIDTH, NETWORK_HEIGHT));
+  }, []);
+
+  const handleZoomOut = useCallback(() => {
+    setView((current) => zoomView(current, "out", NETWORK_WIDTH, NETWORK_HEIGHT));
+  }, []);
+
+  const handleResetView = useCallback(() => {
+    setView(DEFAULT_VIEW);
+  }, []);
+
+  const handlePanPointerDown = useCallback(
+    (event: React.PointerEvent<SVGRectElement>) => {
+      if (event.button !== 0) {
+        return;
+      }
+      panSessionRef.current = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        viewX: view.x,
+        viewY: view.y,
+      };
+      event.currentTarget.setPointerCapture(event.pointerId);
+      setIsPanning(true);
+    },
+    [view.x, view.y],
+  );
+
+  const handlePanPointerMove = useCallback(
+    (event: React.PointerEvent<SVGRectElement>) => {
+      const session = panSessionRef.current;
+      if (!session || session.pointerId !== event.pointerId) {
+        return;
+      }
+
+      const svg = svgRef.current;
+      if (!svg) {
+        return;
+      }
+
+      const rect = svg.getBoundingClientRect();
+      const viewWidth = NETWORK_WIDTH / view.scale;
+      const viewHeight = NETWORK_HEIGHT / view.scale;
+      const deltaX = ((event.clientX - session.startX) / rect.width) * viewWidth;
+      const deltaY = ((event.clientY - session.startY) / rect.height) * viewHeight;
+
+      setView((current) => ({
+        ...current,
+        x: session.viewX - deltaX,
+        y: session.viewY - deltaY,
+      }));
+    },
+    [view.scale],
+  );
+
+  const handlePanPointerUp = useCallback((event: React.PointerEvent<SVGRectElement>) => {
+    const session = panSessionRef.current;
+    if (!session || session.pointerId !== event.pointerId) {
+      return;
+    }
+    panSessionRef.current = null;
+    setIsPanning(false);
+    event.currentTarget.releasePointerCapture(event.pointerId);
   }, []);
 
   const { width, height } = RESEARCH_NETWORK_VIEWBOX;
+  const canZoomIn = view.scale < MAX_SCALE - 0.001;
+  const canZoomOut = view.scale > MIN_SCALE + 0.001;
 
   return (
     <section
@@ -99,16 +266,27 @@ export default function ResearchNetwork() {
               aria-hidden="true"
             />
 
+            <div className="absolute left-3 top-3 z-10">
+              <ResearchNetworkZoomControls
+                onZoomIn={handleZoomIn}
+                onZoomOut={handleZoomOut}
+                onResetView={handleResetView}
+                canZoomIn={canZoomIn}
+                canZoomOut={canZoomOut}
+              />
+            </div>
+
             <ResearchMiniMap
               network={network}
               activeTopicId={focusedTopicId}
               focusedTopicId={focusedTopicId}
             />
 
-            <div className="overflow-x-auto">
+            <div className="overflow-auto touch-pan-x touch-pan-y">
               <svg
-                viewBox={`0 0 ${width} ${height}`}
-                className="mx-auto h-auto min-h-[420px] w-full max-w-full"
+                ref={svgRef}
+                viewBox={viewBoxFromState(view, width, height)}
+                className={`mx-auto h-auto min-h-[420px] w-full max-w-full ${isPanning ? "cursor-grabbing" : "cursor-grab"}`}
                 role="img"
                 aria-label="Global research network of catalog topics"
               >
@@ -118,7 +296,16 @@ export default function ResearchNetwork() {
                     <stop offset="100%" stopColor="rgba(15,23,42,0)" />
                   </radialGradient>
                 </defs>
-                <rect width={width} height={height} fill="url(#network-bg-glow)" />
+
+                <rect
+                  width={width}
+                  height={height}
+                  fill="url(#network-bg-glow)"
+                  onPointerDown={handlePanPointerDown}
+                  onPointerMove={handlePanPointerMove}
+                  onPointerUp={handlePanPointerUp}
+                  onPointerCancel={handlePanPointerUp}
+                />
 
                 {network.connections.map((connection) => {
                   const source = nodeById.get(connection.sourceTopicId);

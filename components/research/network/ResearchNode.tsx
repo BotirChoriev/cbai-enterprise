@@ -42,7 +42,7 @@ export default function ResearchNode({
   const opacity = dimmed ? 0.3 : 1;
 
   return (
-    <g className="transition-opacity duration-[250ms]" style={{ opacity }}>
+    <g className="transition-opacity duration-[250ms]" style={{ opacity }} data-network-node="">
       <circle
         cx={node.x}
         cy={node.y}
@@ -50,6 +50,7 @@ export default function ResearchNode({
         fill={nodeFill(node.domainId, focused, connected)}
         stroke={focused ? "#ffffff" : active ? "#e2e8f0" : "#0f172a"}
         strokeWidth={focused ? 2.5 : active ? 1.5 : 1}
+        vectorEffect="non-scaling-stroke"
         className="cursor-pointer transition-all duration-[250ms] hover:brightness-125"
         style={{
           filter: focused
@@ -60,9 +61,13 @@ export default function ResearchNode({
         }}
         role="button"
         tabIndex={0}
-        aria-label={`Focus on ${node.topicName}`}
+        aria-label={`Focused topic: ${node.topicName}`}
         aria-pressed={focused}
-        onClick={() => onSelect(node.topicId)}
+        onPointerDown={(event) => event.stopPropagation()}
+        onClick={(event) => {
+          event.stopPropagation();
+          onSelect(node.topicId);
+        }}
         onKeyDown={(event) => {
           if (event.key === "Enter" || event.key === " ") {
             event.preventDefault();

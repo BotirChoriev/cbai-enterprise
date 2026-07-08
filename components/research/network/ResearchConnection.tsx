@@ -39,6 +39,7 @@ export default function ResearchConnection({
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeDasharray={focused ? undefined : "6 6"}
+        vectorEffect="non-scaling-stroke"
         className="transition-all duration-[250ms]"
         style={
           focused
