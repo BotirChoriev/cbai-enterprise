@@ -15,6 +15,7 @@ export type NavItem = {
     | "ai-control"
     | "agents"
     | "knowledge"
+    | "research"
     | "workflows"
     | "analytics"
     | "settings"
@@ -68,6 +69,12 @@ export const platformNavSections: NavSection[] = [
         href: "/knowledge",
         icon: "knowledge",
         description: "Official source status across profiles.",
+      },
+      {
+        label: "Research",
+        href: "/research",
+        icon: "research",
+        description: "Explore scientific topics, labs, experiments, and evidence.",
       },
       {
         label: "Reports",
@@ -143,6 +150,7 @@ export const PUBLIC_JOURNEY_ROUTES = new Set([
   "/companies",
   "/universities",
   "/knowledge",
+  "/research",
   "/analytics",
   "/dashboard",
 ]);
