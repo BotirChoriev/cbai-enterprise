@@ -17,12 +17,14 @@ type ResearchGapExplorerProps = {
   topic: ResearchTopic;
   variant?: "topic" | "workspace";
   limit?: number;
+  embedded?: boolean;
 };
 
 export default function ResearchGapExplorer({
   topic,
   variant = "topic",
   limit,
+  embedded = false,
 }: ResearchGapExplorerProps) {
   const context = getResearchGapContextForTopic(topic);
   const compact = variant === "workspace";
@@ -41,9 +43,11 @@ export default function ResearchGapExplorer({
         <h2 id={headingId} className="text-sm font-semibold text-zinc-100">
           {title}
         </h2>
-        <p className="mt-2 rounded-md border border-zinc-800/80 bg-zinc-900/40 px-3 py-2 text-xs text-zinc-500">
-          {RESEARCH_GAP_HONEST_NOTICE}
-        </p>
+        {!embedded ? (
+          <p className="mt-2 rounded-md border border-zinc-800/80 bg-zinc-900/40 px-3 py-2 text-xs text-zinc-500">
+            {RESEARCH_GAP_HONEST_NOTICE}
+          </p>
+        ) : null}
       </div>
 
       {variant === "topic" ? (
@@ -65,7 +69,9 @@ export default function ResearchGapExplorer({
 
       {variant === "topic" ? <ResearchGapSources gaps={gaps} /> : null}
 
-      <p className="text-[11px] text-zinc-600">{RESEARCH_GAP_HUMAN_REVIEW_NOTICE}</p>
+      {!embedded ? (
+        <p className="text-[11px] text-zinc-600">{RESEARCH_GAP_HUMAN_REVIEW_NOTICE}</p>
+      ) : null}
     </section>
   );
 }

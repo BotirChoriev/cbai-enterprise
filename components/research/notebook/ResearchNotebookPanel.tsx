@@ -9,25 +9,32 @@ import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-clas
 
 type ResearchNotebookPanelProps = {
   topic: ResearchTopic;
+  embedded?: boolean;
 };
 
-export default function ResearchNotebookPanel({ topic }: ResearchNotebookPanelProps) {
+export default function ResearchNotebookPanel({ topic, embedded = false }: ResearchNotebookPanelProps) {
   const notebook = getResearchNotebookForTopicObject(topic);
 
   return (
     <section aria-labelledby="topic-notebook-heading" className="space-y-4">
-      <div>
-        <p className={cbaiSectionEyebrow}>Structured notebook</p>
-        <h2 id="topic-notebook-heading" className="text-xl font-semibold text-zinc-100">
-          AI Research Notebook
+      {!embedded ? (
+        <div>
+          <p className={cbaiSectionEyebrow}>Structured notebook</p>
+          <h2 id="topic-notebook-heading" className="text-xl font-semibold text-zinc-100">
+            Research Notebook
+          </h2>
+          <p className="mt-1 text-sm text-zinc-500">
+            A structured notebook for reviewing this research topic.
+          </p>
+          <p className="mt-2 rounded-md border border-cyan-500/15 bg-cyan-500/5 px-3 py-2 text-xs text-zinc-400">
+            {NOTEBOOK_CATALOG_ONLY_NOTICE} Live evidence not connected.
+          </p>
+        </div>
+      ) : (
+        <h2 id="topic-notebook-heading" className="text-sm font-semibold text-zinc-100">
+          Research Notebook
         </h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          A structured notebook for reviewing this research topic.
-        </p>
-        <p className="mt-2 rounded-md border border-cyan-500/15 bg-cyan-500/5 px-3 py-2 text-xs text-zinc-400">
-          {NOTEBOOK_CATALOG_ONLY_NOTICE} Live evidence not connected.
-        </p>
-      </div>
+      )}
 
       <ResearchNotebookSummary notebook={notebook} />
 

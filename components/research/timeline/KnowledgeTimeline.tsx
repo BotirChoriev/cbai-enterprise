@@ -11,25 +11,32 @@ import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-clas
 
 type KnowledgeTimelineProps = {
   topic: ResearchTopic;
+  embedded?: boolean;
 };
 
-export default function KnowledgeTimeline({ topic }: KnowledgeTimelineProps) {
+export default function KnowledgeTimeline({ topic, embedded = false }: KnowledgeTimelineProps) {
   const timeline = getKnowledgeTimelineForTopicObject(topic);
 
   return (
     <section aria-labelledby="topic-knowledge-evolution-heading" className="space-y-4">
-      <div>
-        <p className={cbaiSectionEyebrow}>Knowledge evolution</p>
-        <h2 id="topic-knowledge-evolution-heading" className="text-xl font-semibold text-zinc-100">
+      {!embedded ? (
+        <div>
+          <p className={cbaiSectionEyebrow}>Knowledge evolution</p>
+          <h2 id="topic-knowledge-evolution-heading" className="text-xl font-semibold text-zinc-100">
+            Knowledge Evolution
+          </h2>
+          <p className="mt-1 text-sm text-zinc-500">
+            Understand how research around this topic progresses over time.
+          </p>
+          <p className="mt-2 rounded-md border border-zinc-800/80 bg-zinc-900/40 px-3 py-2 text-xs text-zinc-500">
+            {TIMELINE_WORKFLOW_NOTICE}
+          </p>
+        </div>
+      ) : (
+        <h2 id="topic-knowledge-evolution-heading" className="text-sm font-semibold text-zinc-100">
           Knowledge Evolution
         </h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          Understand how research around this topic progresses over time.
-        </p>
-        <p className="mt-2 rounded-md border border-zinc-800/80 bg-zinc-900/40 px-3 py-2 text-xs text-zinc-500">
-          {TIMELINE_WORKFLOW_NOTICE}
-        </p>
-      </div>
+      )}
 
       <div className={`${cbaiGlassCard} space-y-0 p-4`}>
         <ol className="space-y-0">
@@ -43,7 +50,9 @@ export default function KnowledgeTimeline({ topic }: KnowledgeTimelineProps) {
 
         <div className="mt-4 border-t border-zinc-800/80 pt-4">
           <TimelineLegend />
-          <p className="mt-3 text-[11px] text-zinc-600">{TIMELINE_HUMAN_REVIEW_NOTICE}</p>
+          {!embedded ? (
+            <p className="mt-3 text-[11px] text-zinc-600">{TIMELINE_HUMAN_REVIEW_NOTICE}</p>
+          ) : null}
         </div>
       </div>
     </section>

@@ -18,12 +18,14 @@ type ResearchLandscapeProps = {
   topic: ResearchTopic;
   variant?: "topic" | "workspace";
   onSelectTopic?: (topicId: string) => void;
+  embedded?: boolean;
 };
 
 export default function ResearchLandscape({
   topic,
   variant = "topic",
   onSelectTopic,
+  embedded = false,
 }: ResearchLandscapeProps) {
   const landscape = getResearchLandscapeForTopic(topic);
   const compact = variant === "workspace";
@@ -41,9 +43,11 @@ export default function ResearchLandscape({
           One integrated view of catalog methods, evidence areas, related research objects, research
           gaps, and future workspace connections.
         </p>
-        <p className="mx-auto max-w-2xl rounded-md border border-zinc-800/80 bg-zinc-900/40 px-3 py-2 text-xs text-zinc-500 sm:mx-0">
-          {LANDSCAPE_HONEST_NOTICE}
-        </p>
+        {!embedded ? (
+          <p className="mx-auto max-w-2xl rounded-md border border-zinc-800/80 bg-zinc-900/40 px-3 py-2 text-xs text-zinc-500 sm:mx-0">
+            {LANDSCAPE_HONEST_NOTICE}
+          </p>
+        ) : null}
       </div>
 
       <div
@@ -83,9 +87,11 @@ export default function ResearchLandscape({
 
       <div className={`${cbaiGlassCard} space-y-3 p-4`}>
         <LandscapeLegend />
-        <p className="text-center text-[11px] text-zinc-600 sm:text-left">
-          {LANDSCAPE_HUMAN_REVIEW_NOTICE}
-        </p>
+        {!embedded ? (
+          <p className="text-center text-[11px] text-zinc-600 sm:text-left">
+            {LANDSCAPE_HUMAN_REVIEW_NOTICE}
+          </p>
+        ) : null}
       </div>
     </section>
   );
