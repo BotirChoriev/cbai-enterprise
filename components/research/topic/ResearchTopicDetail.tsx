@@ -13,6 +13,7 @@ import ResearchFutureWorkspace from "@/components/research/topic/ResearchFutureW
 import ResearchGraphPanel from "@/components/research/graph/ResearchGraphPanel";
 import CrossTopicDiscovery from "@/components/research/discovery/CrossTopicDiscovery";
 import ResearchGapExplorer from "@/components/research/gaps/ResearchGapExplorer";
+import ResearchLandscape from "@/components/research/landscape/ResearchLandscape";
 import MethodComparisonPanel from "@/components/research/method-comparison/MethodComparisonPanel";
 import ResearchNotebookPanel from "@/components/research/notebook/ResearchNotebookPanel";
 import KnowledgeTimeline from "@/components/research/timeline/KnowledgeTimeline";
@@ -28,6 +29,7 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
       className={`mx-auto max-w-5xl space-y-10 px-4 py-10 sm:px-6 sm:py-12 ${cbaiHeroGlow}`}
     >
       <ResearchTopicHero topic={topic} />
+      <ResearchLandscape topic={topic} variant="topic" />
       <ResearchTopicWorkspaceStatus topic={topic} />
       <ResearchGapExplorer topic={topic} variant="topic" limit={6} />
       <ResearchNotebookPanel topic={topic} />

@@ -18,6 +18,7 @@ import {
 import WorkspaceSidebar from "@/components/research/workspace/WorkspaceSidebar";
 import WorkspaceContent from "@/components/research/workspace/WorkspaceContent";
 import ResearchGapExplorer from "@/components/research/gaps/ResearchGapExplorer";
+import ResearchLandscape from "@/components/research/landscape/ResearchLandscape";
 import MethodComparisonPanel from "@/components/research/method-comparison/MethodComparisonPanel";
 import { cbaiGlassCard, cbaiHeroGlow, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
@@ -68,7 +69,12 @@ export default function WorkspaceExplorer() {
           />
         </div>
 
-        <main className="min-w-0">
+        <main className="min-w-0 space-y-6">
+          <ResearchLandscape
+            topic={context.topic}
+            variant="workspace"
+            onSelectTopic={setSelectedTopicId}
+          />
           <WorkspaceContent context={context} onSelectTopic={setSelectedTopicId} />
         </main>
 
