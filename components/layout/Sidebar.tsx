@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { platformNavSections } from "@/lib/navigation";
 import NavIcon from "@/components/layout/NavIcon";
 import CBAILogo, { CBAIMark } from "@/components/brand/CBAILogo";
-import { cbaiNavActive, cbaiNavInactive } from "@/components/brand/brand-classes";
 
 function isNavItemActive(pathname: string, href: string): boolean {
   if (href === "/") {
@@ -21,7 +20,7 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`flex h-full shrink-0 flex-col border-r border-cyan-500/10 bg-slate-950 transition-all duration-200 ${
+      className={`flex h-full shrink-0 flex-col border-r border-cyan-500/10 bg-[#050810] transition-all duration-200 ${
         isHome ? "w-16 opacity-40 hover:opacity-90" : "w-64 opacity-100"
       }`}
     >
@@ -57,7 +56,9 @@ export default function Sidebar() {
                     href={item.href}
                     title={isHome ? item.label : undefined}
                     className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                      isActive ? cbaiNavActive : cbaiNavInactive
+                      isActive
+                        ? "bg-cyan-500/10 text-cyan-400"
+                        : "text-zinc-400 hover:bg-slate-900/80 hover:text-zinc-50"
                     } ${isHome ? "justify-center px-2" : ""}`}
                   >
                     <NavIcon name={item.icon} />

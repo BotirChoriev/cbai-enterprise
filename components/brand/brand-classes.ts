@@ -25,3 +25,12 @@ export const cbaiBtnSecondary =
 export const cbaiNavActive = "bg-cyan-500/10 text-cyan-400";
 export const cbaiNavInactive =
   "text-zinc-400 hover:bg-slate-900/80 hover:text-zinc-50";
+
+export const cbaiSearchShell =
+  "cbai-glass rounded-xl border border-cyan-500/20 p-2 shadow-[0_0_40px_-12px_rgba(34,211,238,0.2)] transition-shadow focus-within:border-cyan-400/40 focus-within:shadow-[0_0_56px_-8px_rgba(34,211,238,0.35)]";
+
+export const cbaiSearchInput =
+  "home-search-input w-full rounded-lg border border-zinc-800/80 bg-slate-950/70 px-5 py-4 text-lg text-zinc-100 placeholder:text-zinc-500 focus-visible:outline-none sm:py-5 sm:pr-36 sm:text-xl";
+
+export const cbaiHeroGlow =
+  "relative overflow-hidden before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_at_top_left,rgba(34,211,238,0.08),transparent_55%)]";

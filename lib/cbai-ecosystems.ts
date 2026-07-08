@@ -1,10 +1,12 @@
 export type EcosystemStatus = "available-today" | "in-development" | "future-workspace";
 
+export type EcosystemIconId = "public" | "research" | "economic" | "governance";
+
 export type CBAIEcosystem = {
-  id: string;
+  id: EcosystemIconId;
   title: string;
-  audience: string;
-  description: string;
+  valueSentence: string;
+  bullets: readonly [string, string, string];
   status: EcosystemStatus;
   href?: string;
 };
@@ -19,38 +21,46 @@ export const CBAI_ECOSYSTEMS: readonly CBAIEcosystem[] = [
   {
     id: "public",
     title: "Public Intelligence",
-    audience:
-      "For citizens, governments, investors, students, and institutions.",
-    description:
-      "Search public profiles and review available official information.",
+    valueSentence: "Search profiles and review what official information is available today.",
+    bullets: [
+      "Country, company, and university profiles",
+      "Available and missing information",
+      "Reports Center for continued review",
+    ],
     status: "available-today",
     href: "/search",
   },
   {
     id: "research",
     title: "Research Intelligence",
-    audience:
-      "For scientists, universities, labs, experiments, publications, patents, and research collaboration.",
-    description:
-      "Connect research topics, scientists, universities, labs, publications, patents, datasets, and experiments.",
+    valueSentence: "Connect research topics, institutions, and scientific evidence over time.",
+    bullets: [
+      "Universities, labs, and publications",
+      "Patents, datasets, and experiments",
+      "Research collaboration workspace",
+    ],
     status: "in-development",
   },
   {
     id: "economic",
     title: "Economic Intelligence",
-    audience:
-      "For economists, investors, banks, markets, inflation, interest rates, commodities, tenders, and global prices.",
-    description:
-      "Connect official economic data, banks, interest rates, inflation, tenders, commodity prices, markets, and investment evidence.",
+    valueSentence: "Connect official economic data, markets, and investment evidence.",
+    bullets: [
+      "Markets, inflation, and interest rates",
+      "Commodities, tenders, and global prices",
+      "Investment and banking evidence",
+    ],
     status: "future-workspace",
   },
   {
     id: "governance",
     title: "Governance Intelligence",
-    audience:
-      "For law, courts, rule of law, public administration, human rights, national strategies, geography, culture, and language.",
-    description:
-      "Connect governance, law, courts, rule of law, human rights, national strategies, geography, culture, and language.",
+    valueSentence: "Connect law, public administration, and national strategy evidence.",
+    bullets: [
+      "Courts, rule of law, and human rights",
+      "National strategies and public administration",
+      "Geography, culture, and language context",
+    ],
     status: "in-development",
   },
 ] as const;
