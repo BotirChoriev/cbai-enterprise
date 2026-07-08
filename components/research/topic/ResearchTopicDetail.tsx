@@ -11,6 +11,8 @@ import OpenResearchQuestions from "@/components/research/topic/OpenResearchQuest
 import NegativeResultsOverview from "@/components/research/topic/NegativeResultsOverview";
 import ResearchFutureWorkspace from "@/components/research/topic/ResearchFutureWorkspace";
 import ResearchGraphPanel from "@/components/research/graph/ResearchGraphPanel";
+import ResearchNotebookPanel from "@/components/research/notebook/ResearchNotebookPanel";
+import KnowledgeTimeline from "@/components/research/timeline/KnowledgeTimeline";
 import { cbaiGlassCard, cbaiHeroGlow, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type ResearchTopicDetailProps = {
@@ -24,6 +26,8 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
     >
       <ResearchTopicHero topic={topic} />
       <ResearchTopicWorkspaceStatus topic={topic} />
+      <ResearchNotebookPanel topic={topic} />
+      <KnowledgeTimeline topic={topic} />
       <ResearchTopicMethods topic={topic} />
       <ResearchTopicEvidenceMap topic={topic} />
       <ResearchGraphPanel variant="topic" topic={topic} />
