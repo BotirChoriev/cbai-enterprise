@@ -1,12 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import ResearchHero from "@/components/research/ResearchHero";
 import ResearchEcosystemOverview from "@/components/research/ResearchEcosystemOverview";
 import ResearchTopicCatalog from "@/components/research/ResearchTopicCatalog";
 import ResearchGraphPanel from "@/components/research/graph/ResearchGraphPanel";
 import ResearchPrinciples from "@/components/research/ResearchPrinciples";
-import { cbaiHeroGlow } from "@/components/brand/brand-classes";
+import { cbaiBtnSecondary, cbaiGlassCard, cbaiHeroGlow, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { WORKSPACE_PATH } from "@/lib/research/workspace";
 import {
   RESEARCH_AVAILABLE_TODAY,
   RESEARCH_HOME,
@@ -58,6 +60,24 @@ export default function ResearchHome() {
               ))}
             </ul>
           </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="research-workspace-cta-heading" className="space-y-3">
+        <p className={cbaiSectionEyebrow}>Research workspace</p>
+        <div className={`${cbaiGlassCard} flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between`}>
+          <div>
+            <h2 id="research-workspace-cta-heading" className="text-lg font-semibold text-zinc-100">
+              Structured knowledge organization
+            </h2>
+            <p className="mt-1 text-sm text-zinc-500">
+              Explore the read-only workspace shell where evidence review and future collaboration
+              will meet — human review required.
+            </p>
+          </div>
+          <Link href={WORKSPACE_PATH} className={`${cbaiBtnSecondary} shrink-0`}>
+            Explore Research Workspace →
+          </Link>
         </div>
       </section>
 

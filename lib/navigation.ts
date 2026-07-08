@@ -77,6 +77,12 @@ export const platformNavSections: NavSection[] = [
         description: "Explore scientific topics, labs, experiments, and evidence.",
       },
       {
+        label: "Research Workspace",
+        href: "/research/workspace",
+        icon: "research",
+        description: "Structured research workspace for knowledge organization and evidence review.",
+      },
+      {
         label: "Reports",
         href: "/analytics",
         icon: "analytics",
@@ -151,10 +157,17 @@ export const PUBLIC_JOURNEY_ROUTES = new Set([
   "/universities",
   "/knowledge",
   "/research",
+  "/research/workspace",
   "/analytics",
   "/dashboard",
 ]);
 
 export function isPublicJourneyRoute(pathname: string): boolean {
-  return PUBLIC_JOURNEY_ROUTES.has(pathname);
+  if (PUBLIC_JOURNEY_ROUTES.has(pathname)) {
+    return true;
+  }
+  if (pathname.startsWith("/research/")) {
+    return true;
+  }
+  return false;
 }
