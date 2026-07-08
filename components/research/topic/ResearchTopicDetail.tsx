@@ -7,7 +7,10 @@ import ResearchTopicLimitations from "@/components/research/topic/ResearchTopicL
 import ResearchEntityTypeOverview from "@/components/research/entities/ResearchEntityTypeOverview";
 import ResearchEntityRelationshipPreview from "@/components/research/entities/ResearchEntityRelationshipPreview";
 import ResearchEvidenceReadiness from "@/components/research/topic/ResearchEvidenceReadiness";
+import OpenResearchQuestions from "@/components/research/topic/OpenResearchQuestions";
+import NegativeResultsOverview from "@/components/research/topic/NegativeResultsOverview";
 import ResearchFutureWorkspace from "@/components/research/topic/ResearchFutureWorkspace";
+import ResearchGraphPanel from "@/components/research/graph/ResearchGraphPanel";
 import { cbaiGlassCard, cbaiHeroGlow, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type ResearchTopicDetailProps = {
@@ -23,7 +26,27 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
       <ResearchTopicWorkspaceStatus topic={topic} />
       <ResearchTopicMethods topic={topic} />
       <ResearchTopicEvidenceMap topic={topic} />
+      <ResearchGraphPanel variant="topic" topic={topic} />
       <ResearchEvidenceReadiness topic={topic} />
+
+      <section aria-labelledby="topic-future-knowledge-heading" className="space-y-4">
+        <div>
+          <p className={cbaiSectionEyebrow}>Living knowledge</p>
+          <h2 id="topic-future-knowledge-heading" className="text-xl font-semibold text-zinc-100">
+            Future scientific knowledge
+          </h2>
+          <p className="mt-1 text-sm text-zinc-500">
+            Structured research objects for open questions and negative results — not connected yet.
+            No discussion system or user-generated content.
+          </p>
+        </div>
+
+        <div className={`${cbaiGlassCard} grid gap-5 p-5 lg:grid-cols-2`}>
+          <OpenResearchQuestions topic={topic} />
+          <NegativeResultsOverview topic={topic} />
+        </div>
+      </section>
+
       <ResearchTopicLimitations />
 
       <section aria-labelledby="topic-entity-model-heading" className="space-y-4">

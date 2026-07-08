@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import ResearchHero from "@/components/research/ResearchHero";
 import ResearchEcosystemOverview from "@/components/research/ResearchEcosystemOverview";
 import ResearchTopicCatalog from "@/components/research/ResearchTopicCatalog";
+import ResearchGraphPanel from "@/components/research/graph/ResearchGraphPanel";
 import ResearchPrinciples from "@/components/research/ResearchPrinciples";
 import { cbaiHeroGlow } from "@/components/brand/brand-classes";
 import {
@@ -61,6 +62,7 @@ export default function ResearchHome() {
       </section>
 
       <ResearchTopicCatalog initialQuery={query} />
+      <ResearchGraphPanel variant="global" />
       <ResearchEcosystemOverview />
       <ResearchPrinciples />
     </div>

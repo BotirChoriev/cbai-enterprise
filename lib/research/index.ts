@@ -184,3 +184,75 @@ export {
   type ResearcherLayerValidationIssue,
   type ResearcherLayerValidationReport,
 } from "@/lib/research/researchers";
+
+export {
+  OPEN_QUESTION_CATEGORIES,
+  OPEN_QUESTION_STATUS_LABELS,
+  OPEN_QUESTION_CATEGORY_DESCRIPTIONS,
+  OPEN_QUESTION_MODEL_VERSION,
+  OPEN_QUESTIONS_NOT_CONNECTED_MESSAGE,
+  type OpenQuestionCategory,
+  type OpenQuestionStatus,
+  type OpenResearchQuestion,
+} from "@/lib/research/open-questions/question-types";
+
+export { OPEN_QUESTION_REGISTRY } from "@/lib/research/open-questions/question-registry";
+
+export {
+  findOpenQuestionById,
+  findOpenQuestionsByTopic,
+  listOpenQuestionCategories,
+  getOpenQuestionsForTopic,
+  listOpenQuestions,
+  type OpenQuestionTopicContext,
+} from "@/lib/research/open-questions/question-query";
+
+export {
+  NEGATIVE_RESULT_STATUS_LABELS,
+  NEGATIVE_RESULT_PRESERVATION_PURPOSE,
+  NEGATIVE_RESULT_MODEL_VERSION,
+  NEGATIVE_RESULTS_NOT_CONNECTED_MESSAGE,
+  type NegativeResultStatus,
+  type NegativeResultReadiness,
+} from "@/lib/research/negative-results/negative-result-types";
+
+export { NEGATIVE_RESULT_REGISTRY } from "@/lib/research/negative-results/negative-result-registry";
+
+export {
+  findNegativeResultById,
+  findNegativeResultsByTopic,
+  getNegativeResultsForTopic,
+  listNegativeResults,
+  type NegativeResultTopicContext,
+} from "@/lib/research/negative-results/negative-result-query";
+
+export {
+  RESEARCH_GRAPH_NODE_TYPES,
+  RESEARCH_GRAPH_RELATIONSHIP_TYPES,
+  RESEARCH_GRAPH_STATUS_LABELS,
+  RESEARCH_GRAPH_NODE_TYPE_LABELS,
+  RESEARCH_GRAPH_RELATIONSHIP_LABELS,
+  RESEARCH_GRAPH_HONEST_NOTICE,
+  RESEARCH_GRAPH_RELATED_TOPIC_LABEL,
+  RESEARCH_GRAPH_VERSION,
+  buildResearchGraphForTopic,
+  buildGlobalResearchGraphPreview,
+  buildDomainResearchGraph,
+  findRelatedTopicsByCatalog,
+  getResearchGraphForTopic,
+  getResearchGraphForTopicObject,
+  getGlobalResearchGraphPreview,
+  getRelatedTopicsForGraph,
+  findGraphNode,
+  groupGraphNodesByType,
+  getEdgesFromNode,
+  validateResearchGraph,
+  type ResearchGraphNodeType,
+  type ResearchGraphRelationshipType,
+  type ResearchGraphStatus,
+  type ResearchGraphNode,
+  type ResearchGraphEdge,
+  type ResearchGraph,
+  type ResearchGraphValidationIssue,
+  type ResearchGraphValidationReport,
+} from "@/lib/research/graph";
