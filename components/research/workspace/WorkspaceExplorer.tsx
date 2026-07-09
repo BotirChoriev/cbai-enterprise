@@ -17,6 +17,7 @@ import {
 } from "@/lib/research/workspace";
 import WorkspaceSidebar from "@/components/research/workspace/WorkspaceSidebar";
 import WorkspaceContent from "@/components/research/workspace/WorkspaceContent";
+import EvidenceNavigationExplorer from "@/components/research/evidence-navigation/EvidenceNavigationExplorer";
 import ResearchGapExplorer from "@/components/research/gaps/ResearchGapExplorer";
 import ResearchLandscape from "@/components/research/landscape/ResearchLandscape";
 import MethodComparisonPanel from "@/components/research/method-comparison/MethodComparisonPanel";
@@ -64,7 +65,7 @@ export default function WorkspaceExplorer({
         <div>
           <p className={cbaiSectionEyebrow}>Research Workspace</p>
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">
-            Evidence Navigation
+            Research Workspace
           </h1>
           <p className="mt-1 max-w-3xl text-sm text-zinc-500">{WORKSPACE_SHELL_NOTICE}</p>
           {showTopicNotFoundNotice ? (
@@ -94,6 +95,7 @@ export default function WorkspaceExplorer({
         </div>
 
         <main className="min-w-0 space-y-6">
+          <EvidenceNavigationExplorer topic={context.topic} />
           <ResearchLandscape
             topic={context.topic}
             variant="workspace"
