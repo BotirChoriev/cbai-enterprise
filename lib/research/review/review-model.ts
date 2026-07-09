@@ -9,6 +9,7 @@ import type {
 
 export interface ResearchReview {
   reviewId: string;
+  createdAt: string;
   relatedTopicIds: readonly string[];
   kind: ResearchReviewKind;
   status: ResearchReviewStatus;
@@ -21,6 +22,7 @@ export interface ResearchReview {
 
 export interface ReviewAssignment {
   assignmentId: string;
+  createdAt: string;
   reviewId: string;
   assigneeId: string;
   assigneeName: string;
@@ -29,6 +31,7 @@ export interface ReviewAssignment {
 
 export interface ReviewComment {
   commentId: string;
+  createdAt: string;
   reviewId: string;
   authorId: string;
   authorName: string;
@@ -38,6 +41,7 @@ export interface ReviewComment {
 
 export interface ReviewDecision {
   decisionId: string;
+  createdAt: string;
   reviewId: string;
   decision: ResearchReviewDecision;
   recommendation: ReviewRecommendation;
@@ -47,6 +51,7 @@ export interface ReviewDecision {
 
 export interface ReviewRevision {
   revisionId: string;
+  createdAt: string;
   reviewId: string;
   revisionNumber: number;
   summary: string;
@@ -55,6 +60,7 @@ export interface ReviewRevision {
 
 export interface ReviewHistory {
   historyId: string;
+  createdAt: string;
   reviewId: string;
   status: ResearchReviewStatus;
   changeSummary: string;
