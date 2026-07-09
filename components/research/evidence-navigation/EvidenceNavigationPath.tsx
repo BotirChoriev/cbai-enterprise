@@ -54,7 +54,10 @@ function buildPathSections(path: EvidenceNavigationPath) {
   }
 
   const topicSteps = listNavigationNextSteps(path, topicNode.nodeId);
-  const stepsGrouped = new Map<EvidenceNavigationRelationshipType, typeof topicSteps>();
+  const stepsGrouped = new Map<
+    EvidenceNavigationRelationshipType,
+    Array<(typeof topicSteps)[number]>
+  >();
 
   for (const step of topicSteps) {
     const group = stepsGrouped.get(step.edge.relationshipType) ?? [];

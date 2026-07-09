@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { ResearchTopic } from "@/lib/research/research-topics";
 import {
   buildEvidenceNavigationForTopic,
@@ -32,6 +33,8 @@ const HONEST_NOTICE =
 
 const HUMAN_REVIEW_NOTICE =
   "Human review is required before any catalog navigation supports a research decision.";
+
+const NODE_PARAM = "node";
 
 type EvidenceNavigationExplorerProps = {
   topic: ResearchTopic;
@@ -85,11 +88,61 @@ export default function EvidenceNavigationExplorer({ topic }: EvidenceNavigation
     return path?.nodes.find((node) => node.objectKind === "research_topic")?.nodeId ?? null;
   }, [path]);
 
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(topicNodeId);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(() => {
+    const nodeParam = searchParams.get(NODE_PARAM);
+    if (path && nodeParam && findNavigationNode(path, nodeParam)) {
+      return nodeParam;
+    }
+    return topicNodeId;
+  });
+
+  const updateNodeParam = useCallback(
+    (nodeId: string | null) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (nodeId) {
+        params.set(NODE_PARAM, nodeId);
+      } else {
+        params.delete(NODE_PARAM);
+      }
+      const query = params.toString();
+      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    },
+    [pathname, router, searchParams],
+  );
+
+  // Tracks the topic's root node so a topic switch resets selection without
+  // re-running on every URL change caused by updateNodeParam itself.
+  const previousTopicNodeIdRef = useRef(topicNodeId);
 
   useEffect(() => {
-    setSelectedNodeId(topicNodeId);
-  }, [topicNodeId]);
+    if (previousTopicNodeIdRef.current !== topicNodeId) {
+      previousTopicNodeIdRef.current = topicNodeId;
+      setSelectedNodeId(topicNodeId);
+      updateNodeParam(topicNodeId);
+      return;
+    }
+
+    if (!path) {
+      return;
+    }
+    const nodeParam = searchParams.get(NODE_PARAM);
+    if (!nodeParam || findNavigationNode(path, nodeParam)) {
+      return;
+    }
+    updateNodeParam(null);
+  }, [topicNodeId, path, searchParams, updateNodeParam]);
+
+  const handleSelectNode = useCallback(
+    (nodeId: string) => {
+      setSelectedNodeId(nodeId);
+      updateNodeParam(nodeId);
+    },
+    [updateNodeParam],
+  );
 
   if (!path || !selectedNodeId) {
     return null;
@@ -123,7 +176,7 @@ export default function EvidenceNavigationExplorer({ topic }: EvidenceNavigation
         <EvidenceNavigationPath
           path={path}
           selectedNodeId={selectedNodeId}
-          onSelectNode={setSelectedNodeId}
+          onSelectNode={handleSelectNode}
         />
 
         <EvidenceNavigationNode
@@ -137,7 +190,7 @@ export default function EvidenceNavigationExplorer({ topic }: EvidenceNavigation
           selectedNodeId={selectedNodeId}
           directNextSteps={directNextSteps}
           suggestedNextSteps={suggestedNextSteps}
-          onSelectNode={setSelectedNodeId}
+          onSelectNode={handleSelectNode}
         />
       </div>
 
