@@ -3,6 +3,7 @@ import type { ResearchReviewStatus } from "@/lib/research/review/review-types";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import ReviewTimeline from "@/components/research/review/ReviewTimeline";
 import ReviewDecisionPanel from "@/components/research/review/ReviewDecisionPanel";
+import ReviewCommentsPanel from "@/components/research/review/ReviewCommentsPanel";
 
 const STATUS_LABELS: Record<ResearchReviewStatus, string> = {
   draft: "Draft",
@@ -104,12 +105,7 @@ export default function ResearchReviewWorkspace({
 
       <ReviewTimeline review={review} />
 
-      <section aria-label="Review comments" className={`${cbaiGlassCard} space-y-2 p-4`}>
-        <p className={cbaiSectionEyebrow}>Comments</p>
-        <p className="text-xs text-zinc-500">
-          Reviewer comments will appear here once commenting is connected.
-        </p>
-      </section>
+      <ReviewCommentsPanel review={review} />
 
       <ReviewDecisionPanel review={review} />
     </section>
