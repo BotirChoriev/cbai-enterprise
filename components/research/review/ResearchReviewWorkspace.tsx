@@ -2,6 +2,7 @@ import type { ResearchReview, ReviewAssignment } from "@/lib/research/review/rev
 import type { ResearchReviewStatus } from "@/lib/research/review/review-types";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import ReviewTimeline from "@/components/research/review/ReviewTimeline";
+import ReviewDecisionPanel from "@/components/research/review/ReviewDecisionPanel";
 
 const STATUS_LABELS: Record<ResearchReviewStatus, string> = {
   draft: "Draft",
@@ -110,12 +111,7 @@ export default function ResearchReviewWorkspace({
         </p>
       </section>
 
-      <section aria-label="Review decision" className={`${cbaiGlassCard} space-y-2 p-4`}>
-        <p className={cbaiSectionEyebrow}>Decision</p>
-        <p className="text-xs text-zinc-500">
-          The review decision will appear here once a decision is recorded.
-        </p>
-      </section>
+      <ReviewDecisionPanel review={review} />
     </section>
   );
 }
