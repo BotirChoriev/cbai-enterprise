@@ -1,6 +1,7 @@
 import type { ResearchReview, ReviewAssignment } from "@/lib/research/review/review-model";
 import type { ResearchReviewStatus } from "@/lib/research/review/review-types";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import ReviewTimeline from "@/components/research/review/ReviewTimeline";
 
 const STATUS_LABELS: Record<ResearchReviewStatus, string> = {
   draft: "Draft",
@@ -100,12 +101,7 @@ export default function ResearchReviewWorkspace({
         )}
       </section>
 
-      <section aria-label="Review timeline" className={`${cbaiGlassCard} space-y-2 p-4`}>
-        <p className={cbaiSectionEyebrow}>Timeline</p>
-        <p className="text-xs text-zinc-500">
-          Review history will appear here once the timeline is connected.
-        </p>
-      </section>
+      <ReviewTimeline review={review} />
 
       <section aria-label="Review comments" className={`${cbaiGlassCard} space-y-2 p-4`}>
         <p className={cbaiSectionEyebrow}>Comments</p>
