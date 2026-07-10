@@ -4,3 +4,4 @@ export * from "./evidence-model";
 // which validates the transition before delegating to these same-named builder functions.
 export { createEvidence, appendEvidence, updateEvidence } from "./evidence-builder";
 export * from "./evidence-engine";
+export * from "./evidence-query";
