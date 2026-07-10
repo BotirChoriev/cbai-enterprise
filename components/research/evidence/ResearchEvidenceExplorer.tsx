@@ -54,13 +54,13 @@ function formatCreatedDate(value: string): string {
   return CREATED_DATE_FORMAT.format(new Date(value));
 }
 
-type EvidenceNavigationExplorerProps = {
+type ResearchEvidenceExplorerProps = {
   evidence: readonly ResearchEvidence[];
 };
 
-export default function EvidenceNavigationExplorer({
+export default function ResearchEvidenceExplorer({
   evidence,
-}: EvidenceNavigationExplorerProps) {
+}: ResearchEvidenceExplorerProps) {
   return (
     <section aria-labelledby="evidence-explorer-heading" className="space-y-4">
       <div className="space-y-2">
