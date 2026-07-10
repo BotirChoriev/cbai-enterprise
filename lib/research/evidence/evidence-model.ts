@@ -13,6 +13,8 @@ export interface ResearchEvidence {
   sourceId: string;
   status: EvidenceStatus;
   strength: EvidenceStrength;
+  /** Status held before archiveEvidence() ran, so restoreEvidence() can revert to it. */
+  previousStatus?: EvidenceStatus;
   createdAt: string;
   updatedAt: string;
 }
