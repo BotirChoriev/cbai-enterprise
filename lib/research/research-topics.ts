@@ -30,6 +30,8 @@ export type ResearchTopic = {
   relatedEvidenceTypes: readonly string[];
   status: ResearchTopicStatus;
   futureWorkspace: string;
+  /** Optional free-text tags. Not backfilled on existing catalog entries — omitted rather than invented. */
+  keywords?: readonly string[];
 };
 
 export const RESEARCH_TOPIC_STATUS_LABELS: Record<ResearchTopicStatus, string> = {
