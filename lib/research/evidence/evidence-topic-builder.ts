@@ -11,6 +11,8 @@ export type TopicEvidenceCatalogStatus =
 
 export interface TopicEvidenceCatalogItem {
   evidenceItemId: string;
+  /** Stable, topic-relative identifier suitable for a URL, e.g. "?evidence={slug}". */
+  slug: string;
   topicId: string;
   label: string;
   status: TopicEvidenceCatalogStatus;
@@ -57,20 +59,32 @@ function slugify(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-function buildEvidenceItemId(topicId: string, evidenceType: string): string {
-  return `topic-evidence:${topicId}:${slugify(evidenceType)}`;
+function buildEvidenceItemId(topicId: string, slug: string): string {
+  return `topic-evidence:${topicId}:${slug}`;
 }
 
 function buildEvidenceItems(topic: ResearchTopic): readonly TopicEvidenceCatalogItem[] {
   const status = mapTopicStatusToEvidenceStatus(topic.status);
 
-  return topic.relatedEvidenceTypes.map((evidenceType) => ({
-    evidenceItemId: buildEvidenceItemId(topic.topicId, evidenceType),
-    topicId: topic.topicId,
-    label: evidenceType,
-    status,
-    note: EVIDENCE_STATUS_NOTES[status],
-  }));
+  return topic.relatedEvidenceTypes.map((evidenceType) => {
+    const slug = slugify(evidenceType);
+    return {
+      evidenceItemId: buildEvidenceItemId(topic.topicId, slug),
+      slug,
+      topicId: topic.topicId,
+      label: evidenceType,
+      status,
+      note: EVIDENCE_STATUS_NOTES[status],
+    };
+  });
+}
+
+/** Find a catalog evidence item by its stable, topic-relative slug. */
+export function findTopicEvidenceItemBySlug(
+  evidenceItems: readonly TopicEvidenceCatalogItem[],
+  slug: string,
+): TopicEvidenceCatalogItem | undefined {
+  return evidenceItems.find((item) => item.slug === slug);
 }
 
 function buildReviewReadiness(topic: ResearchTopic): TopicReviewReadiness {

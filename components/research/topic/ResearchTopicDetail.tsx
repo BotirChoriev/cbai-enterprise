@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import type { ResearchTopic } from "@/lib/research/research-topics";
 import ResearchTopicHero from "@/components/research/topic/ResearchTopicHero";
 import ResearchFutureWorkspace from "@/components/research/topic/ResearchFutureWorkspace";
@@ -11,6 +11,7 @@ import TopicQuickActions from "@/components/research/topic/TopicQuickActions";
 import TopicInsightsPanel from "@/components/research/topic/TopicInsightsPanel";
 import TopicSectionTabs, { type TopicTabId } from "@/components/research/topic/TopicSectionTabs";
 import TopicEvidenceReviewWorkflow from "@/components/research/topic/TopicEvidenceReviewWorkflow";
+import TopicEvidenceSelection from "@/components/research/topic/TopicEvidenceSelection";
 import { buildTopicEvidenceReview } from "@/lib/research/evidence/evidence-topic-builder";
 import { cbaiHeroGlow } from "@/components/brand/brand-classes";
 
@@ -39,7 +40,18 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
 
       <TopicInsightsPanel topic={topic} />
 
-      {evidenceReview ? <TopicEvidenceReviewWorkflow review={evidenceReview} /> : null}
+      {evidenceReview ? (
+        <Suspense
+          fallback={
+            <TopicEvidenceReviewWorkflow
+              review={evidenceReview}
+              selectedEvidence={evidenceReview.selectedEvidence}
+            />
+          }
+        >
+          <TopicEvidenceSelection review={evidenceReview} />
+        </Suspense>
+      ) : null}
 
       <ResearchLandscape topic={topic} variant="topic" embedded />
 

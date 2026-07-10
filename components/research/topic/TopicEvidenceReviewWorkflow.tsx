@@ -1,4 +1,6 @@
+import Link from "next/link";
 import type {
+  TopicEvidenceCatalogItem,
   TopicEvidenceCatalogStatus,
   TopicEvidenceReview,
 } from "@/lib/research/evidence/evidence-topic-builder";
@@ -23,13 +25,15 @@ function statusAccent(status: TopicEvidenceCatalogStatus): string {
 
 type TopicEvidenceReviewWorkflowProps = {
   review: TopicEvidenceReview;
+  /** The evidence item to show in the detail column — resolved by the caller (e.g. from ?evidence=). */
+  selectedEvidence: TopicEvidenceCatalogItem | undefined;
 };
 
 export default function TopicEvidenceReviewWorkflow({
   review,
+  selectedEvidence,
 }: TopicEvidenceReviewWorkflowProps) {
-  const { topic, evidenceItems, selectedEvidence, reviewReadiness, limitations, nextActions } =
-    review;
+  const { topic, evidenceItems, reviewReadiness, limitations, nextActions } = review;
 
   return (
     <section aria-labelledby="topic-evidence-review-heading" className="space-y-4">
@@ -56,11 +60,14 @@ export default function TopicEvidenceReviewWorkflow({
                 const isSelected = item.evidenceItemId === selectedEvidence?.evidenceItemId;
                 return (
                   <li key={item.evidenceItemId}>
-                    <div
-                      className={`rounded-lg border px-3 py-2 ${
+                    <Link
+                      href={`?evidence=${item.slug}`}
+                      scroll={false}
+                      aria-current={isSelected ? "true" : undefined}
+                      className={`block rounded-lg border px-3 py-2 transition-colors ${
                         isSelected
                           ? "border-cyan-500/40 bg-cyan-500/10"
-                          : "border-zinc-800/80 bg-slate-950/40"
+                          : "border-zinc-800/80 bg-slate-950/40 hover:border-cyan-500/20 hover:bg-cyan-500/5"
                       }`}
                     >
                       <p className="text-sm font-medium text-zinc-200">{item.label}</p>
@@ -69,7 +76,7 @@ export default function TopicEvidenceReviewWorkflow({
                       >
                         {STATUS_LABELS[item.status]}
                       </span>
-                    </div>
+                    </Link>
                   </li>
                 );
               })}
