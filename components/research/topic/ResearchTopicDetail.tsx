@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import type { ResearchTopic } from "@/lib/research/research-topics";
 import ResearchTopicHero from "@/components/research/topic/ResearchTopicHero";
 import ResearchFutureWorkspace from "@/components/research/topic/ResearchFutureWorkspace";
@@ -10,11 +10,8 @@ import TopicQuickOverview, { TOPIC_EXPERIENCE_NOTICE } from "@/components/resear
 import TopicQuickActions from "@/components/research/topic/TopicQuickActions";
 import TopicInsightsPanel from "@/components/research/topic/TopicInsightsPanel";
 import TopicSectionTabs, { type TopicTabId } from "@/components/research/topic/TopicSectionTabs";
-import TopicEvidenceReviewWorkflow from "@/components/research/topic/TopicEvidenceReviewWorkflow";
-import TopicEvidenceSelection from "@/components/research/topic/TopicEvidenceSelection";
-import ResearchMissionWorkspace from "@/components/research/topic/ResearchMissionWorkspace";
+import TopicReviewWorkspace from "@/components/research/topic/TopicReviewWorkspace";
 import ResearchDecisionCard from "@/components/research/topic/ResearchDecisionCard";
-import { buildTopicEvidenceReview } from "@/lib/research/evidence/evidence-topic-builder";
 import { deriveResearchDecision } from "@/lib/research/intelligence/decision-engine";
 import { cbaiHeroGlow } from "@/components/brand/brand-classes";
 
@@ -24,7 +21,6 @@ type ResearchTopicDetailProps = {
 
 export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps) {
   const [activeTab, setActiveTab] = useState<TopicTabId>("overview");
-  const evidenceReview = buildTopicEvidenceReview(topic.topicId);
   const researchDecision = deriveResearchDecision(topic.topicId);
 
   return (
@@ -48,20 +44,7 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
 
       <TopicInsightsPanel topic={topic} />
 
-      {evidenceReview ? <ResearchMissionWorkspace review={evidenceReview} /> : null}
-
-      {evidenceReview ? (
-        <Suspense
-          fallback={
-            <TopicEvidenceReviewWorkflow
-              review={evidenceReview}
-              selectedEvidence={evidenceReview.selectedEvidence}
-            />
-          }
-        >
-          <TopicEvidenceSelection review={evidenceReview} />
-        </Suspense>
-      ) : null}
+      <TopicReviewWorkspace topic={topic} />
 
       <ResearchLandscape topic={topic} variant="topic" embedded />
 
