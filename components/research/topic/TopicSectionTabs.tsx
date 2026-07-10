@@ -2,7 +2,6 @@
 
 import type { ResearchTopic } from "@/lib/research/research-topics";
 import ResearchTopicMethods from "@/components/research/topic/ResearchTopicMethods";
-import ResearchTopicEvidenceMap from "@/components/research/topic/ResearchTopicEvidenceMap";
 import ResearchNotebookPanel from "@/components/research/notebook/ResearchNotebookPanel";
 import ResearchGraphPanel from "@/components/research/graph/ResearchGraphPanel";
 import KnowledgeTimeline from "@/components/research/timeline/KnowledgeTimeline";
@@ -75,7 +74,6 @@ export default function TopicSectionTabs({
         {activeTab === "overview" ? (
           <div className="space-y-8">
             <ResearchTopicMethods topic={topic} />
-            <ResearchTopicEvidenceMap topic={topic} />
           </div>
         ) : null}
 

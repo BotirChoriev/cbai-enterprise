@@ -5,3 +5,4 @@ export * from "./evidence-model";
 export { createEvidence, appendEvidence, updateEvidence } from "./evidence-builder";
 export * from "./evidence-engine";
 export * from "./evidence-query";
+export * from "./evidence-topic-builder";

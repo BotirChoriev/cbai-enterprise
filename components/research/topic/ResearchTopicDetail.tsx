@@ -10,6 +10,8 @@ import TopicQuickOverview, { TOPIC_EXPERIENCE_NOTICE } from "@/components/resear
 import TopicQuickActions from "@/components/research/topic/TopicQuickActions";
 import TopicInsightsPanel from "@/components/research/topic/TopicInsightsPanel";
 import TopicSectionTabs, { type TopicTabId } from "@/components/research/topic/TopicSectionTabs";
+import TopicEvidenceReviewWorkflow from "@/components/research/topic/TopicEvidenceReviewWorkflow";
+import { buildTopicEvidenceReview } from "@/lib/research/evidence/evidence-topic-builder";
 import { cbaiHeroGlow } from "@/components/brand/brand-classes";
 
 type ResearchTopicDetailProps = {
@@ -18,6 +20,7 @@ type ResearchTopicDetailProps = {
 
 export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps) {
   const [activeTab, setActiveTab] = useState<TopicTabId>("overview");
+  const evidenceReview = buildTopicEvidenceReview(topic.topicId);
 
   return (
     <div
@@ -35,6 +38,8 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
       </div>
 
       <TopicInsightsPanel topic={topic} />
+
+      {evidenceReview ? <TopicEvidenceReviewWorkflow review={evidenceReview} /> : null}
 
       <ResearchLandscape topic={topic} variant="topic" embedded />
 
