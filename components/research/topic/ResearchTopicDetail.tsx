@@ -12,6 +12,7 @@ import TopicInsightsPanel from "@/components/research/topic/TopicInsightsPanel";
 import TopicSectionTabs, { type TopicTabId } from "@/components/research/topic/TopicSectionTabs";
 import TopicEvidenceReviewWorkflow from "@/components/research/topic/TopicEvidenceReviewWorkflow";
 import TopicEvidenceSelection from "@/components/research/topic/TopicEvidenceSelection";
+import ResearchMissionWorkspace from "@/components/research/topic/ResearchMissionWorkspace";
 import { buildTopicEvidenceReview } from "@/lib/research/evidence/evidence-topic-builder";
 import { cbaiHeroGlow } from "@/components/brand/brand-classes";
 
@@ -39,6 +40,8 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
       </div>
 
       <TopicInsightsPanel topic={topic} />
+
+      {evidenceReview ? <ResearchMissionWorkspace review={evidenceReview} /> : null}
 
       {evidenceReview ? (
         <Suspense
