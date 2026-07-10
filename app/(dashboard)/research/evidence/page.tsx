@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import ResearchEvidenceExplorer from "@/components/research/evidence/ResearchEvidenceExplorer";
 import ResearchEvidenceWorkspace from "@/components/research/evidence/ResearchEvidenceWorkspace";
 import type { ResearchEvidence } from "@/lib/research/evidence/evidence-model";
 import { cbaiHeroGlow } from "@/components/brand/brand-classes";
@@ -33,7 +34,8 @@ export default function ResearchEvidencePage() {
         ← Back to Research Intelligence
       </Link>
 
-      <div className="mt-6">
+      <div className="mt-6 grid gap-4 lg:grid-cols-2">
+        <ResearchEvidenceExplorer evidence={[PLACEHOLDER_EVIDENCE]} />
         <ResearchEvidenceWorkspace evidence={PLACEHOLDER_EVIDENCE} />
       </div>
     </div>
