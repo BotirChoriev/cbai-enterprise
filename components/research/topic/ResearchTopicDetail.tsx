@@ -13,7 +13,9 @@ import TopicSectionTabs, { type TopicTabId } from "@/components/research/topic/T
 import TopicEvidenceReviewWorkflow from "@/components/research/topic/TopicEvidenceReviewWorkflow";
 import TopicEvidenceSelection from "@/components/research/topic/TopicEvidenceSelection";
 import ResearchMissionWorkspace from "@/components/research/topic/ResearchMissionWorkspace";
+import ResearchDecisionCard from "@/components/research/topic/ResearchDecisionCard";
 import { buildTopicEvidenceReview } from "@/lib/research/evidence/evidence-topic-builder";
+import { deriveResearchDecision } from "@/lib/research/intelligence/decision-engine";
 import { cbaiHeroGlow } from "@/components/brand/brand-classes";
 
 type ResearchTopicDetailProps = {
@@ -23,12 +25,17 @@ type ResearchTopicDetailProps = {
 export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps) {
   const [activeTab, setActiveTab] = useState<TopicTabId>("overview");
   const evidenceReview = buildTopicEvidenceReview(topic.topicId);
+  const researchDecision = deriveResearchDecision(topic.topicId);
 
   return (
     <div
       className={`mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6 sm:py-10 ${cbaiHeroGlow}`}
     >
       <ResearchTopicHero topic={topic} />
+
+      {researchDecision ? (
+        <ResearchDecisionCard topic={topic} decision={researchDecision} />
+      ) : null}
 
       <p className="rounded-lg border border-zinc-800/80 bg-zinc-900/40 px-4 py-3 text-sm text-zinc-500">
         {TOPIC_EXPERIENCE_NOTICE}
