@@ -11,8 +11,9 @@ import TopicQuickActions from "@/components/research/topic/TopicQuickActions";
 import TopicInsightsPanel from "@/components/research/topic/TopicInsightsPanel";
 import TopicSectionTabs, { type TopicTabId } from "@/components/research/topic/TopicSectionTabs";
 import TopicReviewWorkspace from "@/components/research/topic/TopicReviewWorkspace";
-import ResearchDecisionCard from "@/components/research/topic/ResearchDecisionCard";
-import { deriveResearchDecision } from "@/lib/research/intelligence/decision-engine";
+import WorkspaceContextBar from "@/components/research/topic/WorkspaceContextBar";
+import MissionControlPanel from "@/components/research/topic/MissionControlPanel";
+import { deriveEvidenceGapIntelligence } from "@/lib/research/intelligence/intelligence-engine";
 import { cbaiHeroGlow } from "@/components/brand/brand-classes";
 
 type ResearchTopicDetailProps = {
@@ -21,7 +22,7 @@ type ResearchTopicDetailProps = {
 
 export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps) {
   const [activeTab, setActiveTab] = useState<TopicTabId>("overview");
-  const researchDecision = deriveResearchDecision(topic.topicId);
+  const intelligence = deriveEvidenceGapIntelligence(topic.topicId);
 
   return (
     <div
@@ -29,9 +30,11 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
     >
       <ResearchTopicHero topic={topic} />
 
-      {researchDecision ? (
-        <ResearchDecisionCard topic={topic} decision={researchDecision} />
+      {intelligence ? (
+        <WorkspaceContextBar topic={topic} readiness={intelligence.researchReadiness} />
       ) : null}
+
+      <MissionControlPanel topic={topic} />
 
       <p className="rounded-lg border border-zinc-800/80 bg-zinc-900/40 px-4 py-3 text-sm text-zinc-500">
         {TOPIC_EXPERIENCE_NOTICE}

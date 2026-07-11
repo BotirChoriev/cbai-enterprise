@@ -2,7 +2,8 @@ import { Suspense } from "react";
 import type { ResearchTopic } from "@/lib/research/research-topics";
 import { buildTopicEvidenceReview } from "@/lib/research/evidence/evidence-topic-builder";
 import { buildResearchReviewWorkspace } from "@/lib/research/intelligence/review-workspace-engine";
-import { RESEARCH_READINESS_LABELS } from "@/lib/research/intelligence/intelligence-types";
+import { getWorkspaceTimeline } from "@/lib/research/intelligence/workspace-shell-engine";
+import { WORKSPACE_TIMELINE_EVENT_LABELS } from "@/lib/research/intelligence/workspace-shell-model";
 import { RESEARCH_DECISION_LABELS } from "@/lib/research/intelligence/decision-types";
 import ResearchMissionWorkspace from "@/components/research/topic/ResearchMissionWorkspace";
 import TopicEvidenceReviewWorkflow from "@/components/research/topic/TopicEvidenceReviewWorkflow";
@@ -21,6 +22,7 @@ type TopicReviewWorkspaceProps = {
 export default function TopicReviewWorkspace({ topic }: TopicReviewWorkspaceProps) {
   const evidenceReview = buildTopicEvidenceReview(topic.topicId);
   const workspace = buildResearchReviewWorkspace(topic.topicId);
+  const timeline = getWorkspaceTimeline(topic.topicId);
 
   if (!evidenceReview || !workspace) {
     return null;
@@ -40,17 +42,6 @@ export default function TopicReviewWorkspace({ topic }: TopicReviewWorkspaceProp
       </div>
 
       <ResearchMissionWorkspace review={evidenceReview} />
-
-      <div className={`${cbaiGlassCard} space-y-1 p-4`}>
-        <p className={cbaiSectionEyebrow}>Current research state</p>
-        <p className="text-sm font-medium text-zinc-200">
-          {RESEARCH_READINESS_LABELS[workspace.progress.readiness]}
-        </p>
-        <p className="text-xs text-zinc-500">
-          {workspace.progress.connectedCount} of {workspace.progress.totalCount} evidence
-          categories connected at the catalog level.
-        </p>
-      </div>
 
       <Suspense
         fallback={
@@ -111,6 +102,27 @@ export default function TopicReviewWorkspace({ topic }: TopicReviewWorkspaceProp
           </ul>
         ) : (
           <p className="text-xs text-zinc-600">No open review questions right now.</p>
+        )}
+      </div>
+
+      <div className={`${cbaiGlassCard} space-y-2 p-4`}>
+        <p className={cbaiSectionEyebrow}>Workspace timeline</p>
+        {timeline.length > 0 ? (
+          <ol className="space-y-1.5">
+            {timeline.map((event) => (
+              <li key={event.eventId} className="flex items-start gap-2 text-xs text-zinc-500">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-zinc-600" />
+                <span>
+                  <span className="text-zinc-400">
+                    {WORKSPACE_TIMELINE_EVENT_LABELS[event.eventType]}
+                  </span>{" "}
+                  — {event.description}
+                </span>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p className="text-xs text-zinc-600">No workspace activity recorded yet.</p>
         )}
       </div>
 

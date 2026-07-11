@@ -5,7 +5,7 @@ import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-clas
 
 const NOT_ENOUGH_EVIDENCE = "Not enough evidence available.";
 
-function buildMissionStatement(topic: ResearchTopic): string {
+export function buildMissionStatement(topic: ResearchTopic): string {
   return `Investigate ${topic.topicName} within ${topic.domain}, using available catalog evidence.`;
 }
 

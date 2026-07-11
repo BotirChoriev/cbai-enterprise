@@ -5,3 +5,5 @@ export * from "./decision-types";
 export * from "./decision-engine";
 export * from "./review-workspace-model";
 export * from "./review-workspace-engine";
+export * from "./workspace-shell-model";
+export * from "./workspace-shell-engine";
