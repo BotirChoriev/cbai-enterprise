@@ -5,6 +5,7 @@ import { buildResearchReviewWorkspace } from "@/lib/research/intelligence/review
 import { getWorkspaceTimeline } from "@/lib/research/intelligence/workspace-shell-engine";
 import { WORKSPACE_TIMELINE_EVENT_LABELS } from "@/lib/research/intelligence/workspace-shell-model";
 import { RESEARCH_DECISION_LABELS } from "@/lib/research/intelligence/decision-types";
+import { deriveResearchReadiness } from "@/lib/research/readiness/readiness-engine";
 import ResearchMissionWorkspace from "@/components/research/topic/ResearchMissionWorkspace";
 import TopicEvidenceReviewWorkflow from "@/components/research/topic/TopicEvidenceReviewWorkflow";
 import TopicEvidenceSelection from "@/components/research/topic/TopicEvidenceSelection";
@@ -23,8 +24,9 @@ export default function TopicReviewWorkspace({ topic }: TopicReviewWorkspaceProp
   const evidenceReview = buildTopicEvidenceReview(topic.topicId);
   const workspace = buildResearchReviewWorkspace(topic.topicId);
   const timeline = getWorkspaceTimeline(topic.topicId);
+  const readiness = deriveResearchReadiness(topic.topicId);
 
-  if (!evidenceReview || !workspace) {
+  if (!evidenceReview || !workspace || !readiness) {
     return null;
   }
 
@@ -42,6 +44,46 @@ export default function TopicReviewWorkspace({ topic }: TopicReviewWorkspaceProp
       </div>
 
       <ResearchMissionWorkspace review={evidenceReview} />
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className={`${cbaiGlassCard} space-y-2 p-4`}>
+          <p className={cbaiSectionEyebrow}>Completed milestones</p>
+          {readiness.completedMilestones.length > 0 ? (
+            <ul className="space-y-1.5">
+              {readiness.completedMilestones.map((milestone) => (
+                <li
+                  key={milestone.id}
+                  className="flex items-start gap-2 text-xs text-zinc-400"
+                >
+                  <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70" />
+                  {milestone.label}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-xs text-zinc-600">No milestones completed yet.</p>
+          )}
+        </div>
+
+        <div className={`${cbaiGlassCard} space-y-2 p-4`}>
+          <p className={cbaiSectionEyebrow}>Remaining milestones</p>
+          {readiness.remainingMilestones.length > 0 ? (
+            <ul className="space-y-1.5">
+              {readiness.remainingMilestones.map((milestone) => (
+                <li
+                  key={milestone.id}
+                  className="flex items-start gap-2 text-xs text-zinc-500"
+                >
+                  <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-zinc-600" />
+                  {milestone.label}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-xs text-zinc-600">All tracked milestones are complete.</p>
+          )}
+        </div>
+      </div>
 
       <Suspense
         fallback={
