@@ -148,7 +148,7 @@ lifecycle) and was not integrated. Also documented: the pre-existing, narrower
 untouched and is not a duplicate — it answers a different, Research-specific question ("what's
 the one next action") at a different granularity than the new universal 12-state vocabulary.
 
-## v2.6 — Intelligence Orchestration Layer (EPIC-07, this release)
+## v2.6 — Intelligence Orchestration Layer (EPIC-07)
 
 `lib/foundation/orchestration-types.ts` + `lib/orchestration/` — this release adds no new
 capability. It connects the five that already exist (Foundation, Evidence, Relationship,
@@ -185,6 +185,46 @@ intelligence-result`) with its own, differently-scoped `IntelligenceResult` type
 same numeric `ConfidenceAssessment`/`TrustAssessment` scoring model found incompatible in
 EPIC-04/EPIC-05. Not integrated, for the same reason as every prior finding.
 
+## v2.7 — Global Intelligence Network (EPIC-08, this release)
+
+`lib/foundation/network-types.ts` + `lib/network/` — not a social network: no followers, no
+messaging, no popularity signal anywhere in this layer. `INTELLIGENCE_ENTITY_KINDS` names the
+sixteen real Intelligence Entity kinds the mission specified (Researcher, Engineer, Laboratory,
+University, Research Center, Company, Investor, Government Agency, Policy Program, Grant,
+Mission, Evidence, Patent, Dataset, Publication, Technology) as a closed vocabulary. A node
+(`IntelligenceNetworkNode`) wraps the Foundation's own `Subject` with a real entity kind — it
+does not retype `Subject.subjectKind` itself, since that field is a plain string relied on by
+every existing Subject producer. An edge is the Foundation's own `Relationship` type, entirely
+unmodified — every connection is evidence-aware and traceable by construction, with no new edge
+primitive introduced.
+
+`lib/network/network-collaboration.ts` is the one genuinely new derivation: collaboration
+candidates are found only from real shared references — two nodes named on the same Evidence
+record (`shared_evidence`), or two nodes with a real edge to the same third entity
+(`shared_relationship_target`, or `shared_mission` when that entity is mission-kind). Every
+`CollaborationCandidate` carries `sharedReferenceIds` pointing at the real id it's grounded in;
+nothing is scored, ranked, or inferred from a connection count. `network-validation.ts` enforces
+the mission's two hard rules at the data level — every node has a real identity, and every edge
+declares real evidence or real, honest limitations, never silence.
+
+`NetworkExtensionPoints` reserves ten always-empty, `unknown`-typed slots for the future
+capabilities the mission named — Research Collaboration, Funding Discovery, Innovation
+Partnerships, University Networks, Government Programs, Industrial R&D, International
+Collaboration, Mission Matching, Knowledge Exchange, Evidence Sharing — the same "declare the
+slot, populate nothing" pattern EPIC-07 established for `IntelligenceExtensionPoints`.
+
+A new `research-entity-network-adapter.ts` maps the pre-existing `lib/research/entities/`
+catalog onto the network, resolving technical debt flagged since EPIC-02/03 ("not yet connected
+to the Foundation's Relationship pillar"). Only entity types with an honest, direct match are
+mapped (`researcher`, `laboratory`, `university`, `technology`, `publication`, `dataset`,
+`patent` 1:1; `research_topic` → `"mission"`, the same relationship `toMission()` already
+expresses elsewhere); six entity types with no honest match (`organism`, `disease`, `method`,
+`experiment`, `open_question`, `negative_result`) are excluded, not forced. Edges come only from
+the registry's own real cross-references. Verified structurally by a successful `npm run build`;
+not called from any static-generation path, so — like EPIC-07's
+`runResearchIntelligencePipeline` — it is type-checked but not functionally exercised for real
+data during the build.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation
@@ -194,13 +234,16 @@ exists to de-risk the migration. Unifying or retiring `lib/intelligence/evidence
 numeric-scoring Evidence model, `lib/intelligence/engine/`'s numeric confidence-scoring
 reasoning pipeline, `lib/intelligence/agents/tasks/` / `runtime/`'s dormant task-dispatch system,
 and `lib/intelligence/orchestrator/`'s dormant nine-stage pipeline. Wiring
-`IntelligenceFoundationView.reasoning`/`.workflow` and `IntelligenceResult` into UI, and giving a
-real caller a way to record real `WorkflowTransition`s as work actually happens (currently every
-demo Workflow honestly starts and stays at `not_started` with empty history). Extension points
-for Executive Briefing, Voice Intelligence, Knowledge Collaboration, Mission Monitoring,
-Analytics, and future AI agents are reserved on `IntelligenceResult` but unimplemented. AI
+`IntelligenceFoundationView.reasoning`/`.workflow`, `IntelligenceResult`, and
+`IntelligenceNetwork` into UI, and giving a real caller a way to record real
+`WorkflowTransition`s as work actually happens (currently every demo Workflow honestly starts and
+stays at `not_started` with empty history). Extension points for Executive Briefing, Voice
+Intelligence, Knowledge Collaboration, Mission Monitoring, Analytics, future AI agents, Research
+Collaboration, Funding Discovery, Innovation Partnerships, University Networks, Government
+Programs, Industrial R&D, International Collaboration, Mission Matching, Knowledge Exchange, and
+Evidence Sharing are reserved on `IntelligenceResult`/`IntelligenceNetwork` but unimplemented. AI
 reasoning (model-backed, as opposed to the deterministic structural reasoning built in EPIC-05),
-a rendered Timeline, and a Knowledge Graph view remain future work too — the Evidence,
-Relationship, Reasoning, Workflow, and Orchestration shapes are architecturally ready for all of
-these, but no UI or derivation logic exists yet. No target date is committed here — see
-`docs/current-progress.md` for what's honestly available today.
+a rendered Timeline, and a visual Knowledge Graph view remain future work too — the Evidence,
+Relationship, Reasoning, Workflow, Orchestration, and Network shapes are architecturally ready
+for all of these, but no UI or derivation logic exists yet. No target date is committed here —
+see `docs/current-progress.md` for what's honestly available today.

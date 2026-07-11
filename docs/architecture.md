@@ -428,6 +428,78 @@ recorded as known technical debt (see `docs/current-progress.md`), not migrated,
 would mean adopting its numeric scoring model or a high-risk rewrite with no way to visually
 verify the result in this environment.
 
+## Global Intelligence Network (`lib/network/`)
+
+Introduced in EPIC-08. Not a social network — no followers, no messaging, no popularity signal
+anywhere in this layer. A node is a real Intelligence Entity (researcher, laboratory,
+university, company, investor, government agency, policy program, grant, mission, evidence,
+patent, dataset, publication, technology, engineer, research center); an edge is the Foundation's
+own `Relationship` type, unmodified — so every connection is evidence-aware and traceable by
+construction (`Relationship.evidence`, `.limitations`), with no new edge primitive introduced.
+
+`lib/foundation/network-types.ts` (Foundation tier) defines:
+
+- `INTELLIGENCE_ENTITY_KINDS` — the sixteen entity kinds the mission named, a closed vocabulary
+  (same discipline as `RELATIONSHIP_TYPES`/`WORKFLOW_STATES`). Deliberately **not** used to
+  retype `Subject.subjectKind` (a plain string relied on by every existing Subject producer,
+  including Research's own `"research_topic"`, which isn't one of the sixteen kinds) — instead,
+  `IntelligenceNetworkNode = { subject: Subject; entityKind: IntelligenceEntityKind }` wraps a
+  Subject with a real, honestly-chosen kind, so nothing existing is retyped or broken.
+- `IntelligenceNetwork` — `{ nodes, edges, extensions }`, the whole network.
+- `CollaborationCandidate` — `{ nodeAId, nodeBId, basis, sharedReferenceIds }`. `basis` is one of
+  `shared_evidence | shared_relationship_target | shared_mission`; `sharedReferenceIds` always
+  names the real Evidence or target-entity id the candidate is grounded in. There is no
+  popularity, connection-count, or "mutual friends" concept anywhere in this type.
+- `NetworkExtensionPoints` — ten always-empty, `unknown`-typed slots for the future capabilities
+  the mission named (Research Collaboration, Funding Discovery, Innovation Partnerships,
+  University Networks, Government Programs, Industrial R&D, International Collaboration,
+  Mission Matching, Knowledge Exchange, Evidence Sharing) — same "declare the slot, populate
+  nothing" pattern as EPIC-07's `IntelligenceExtensionPoints`.
+
+`lib/network/` is the reusable engine:
+
+- `network-builder.ts` — `buildIntelligenceNetwork`, pure assembly of caller-supplied nodes and
+  edges.
+- `network-validation.ts` — `validateIntelligenceNetwork`, deterministic structural checks:
+  every node has a real identity and no duplicates; every edge is evidence-aware (declares real
+  `evidence` or real `limitations` — never silent about an unconnected source). This directly
+  enforces the mission's "every connection must be evidence-aware" and "must be traceable" rules
+  at the data level, not just as a design intention.
+- `network-query.ts` — `findNodesByEntityKind`, `findNodeById`, `findEdgesForNode`,
+  `findConnectedNodes`, `traceEdgeEvidence`. `findEdgesForNode`/`findConnectedNodes` delegate
+  directly to `lib/relationships/relationship-query.ts`'s `findRelationshipsForSubject`/
+  `resolveConnectedSubjectIds` — graph traversal is not re-implemented.
+- `network-collaboration.ts` — the one genuinely new derivation: `findSharedEvidenceCollaboration
+  Candidates` (two nodes both named in the same Evidence's `relatedSubjectIds`),
+  `findSharedRelationshipTargetCollaborationCandidates` (two nodes with a real edge to the same
+  third entity, reported as `shared_mission` when that entity is mission-kind), and
+  `findCollaborationCandidates` (both, combined). Every candidate traces to a real id; nothing is
+  scored, ranked, or inferred from popularity.
+
+### Real-data demonstration: `lib/research/entities/` → Global Intelligence Network
+
+`lib/foundation/adapters/research-entity-network-adapter.ts` maps the pre-existing
+`lib/research/entities/` catalog (`ResearchEntity`, flagged since EPIC-02/03 as "not yet
+connected to the Foundation's Relationship pillar") onto the network — resolving that exact,
+previously-documented technical debt. Only entity types with an honest, direct match are mapped:
+`researcher`, `laboratory`, `university`, `technology`, `publication`, `dataset`, `patent` map
+1:1; `research_topic` maps to `"mission"` (a ResearchTopic is exactly what a Mission is about —
+the same relationship `toMission()` already expresses in the topic-based adapter). `organism`,
+`disease`, `method`, `experiment`, `open_question`, and `negative_result` have no honest match in
+the sixteen-kind vocabulary and are **excluded**, not forced — no entity is mislabeled to make a
+demo look richer. Edges come only from the registry's own `relatedEntityIds` cross-references,
+built through `buildRelationship` (never constructed by hand), and only connect two entities that
+both mapped to a real network node. Verified structurally by a successful `npm run build`; like
+`runResearchIntelligencePipeline` (EPIC-07), `buildResearchIntelligenceNetwork()` is not called
+from any static-generation path, so it is type-checked but not functionally exercised during the
+build — see `docs/current-progress.md`.
+
+### Extension only — no UI, no React, no fake data
+
+Per the mission's explicit scope, this Epic ships architecture only: no component imports
+`lib/network/`, no new route, and no invented researcher/university/company/grant records were
+added anywhere — every node in the one real demonstration above is a pre-existing catalog entry.
+
 ## Research Intelligence module map (current)
 
 ```
@@ -452,7 +524,9 @@ lib/foundation/                     universal Foundation (EPIC-02)
 ├── reasoning-types.ts              universal reasoning shapes — ReasoningInput/ReasoningResult (EPIC-05)
 ├── workflow-types.ts                universal workflow shapes — Workflow/WorkflowState/WorkflowTransition (EPIC-06)
 ├── orchestration-types.ts           universal pipeline output — IntelligenceResult/pipelineTrace (EPIC-07)
-└── adapters/research-foundation-adapter.ts
+├── network-types.ts                 universal network shapes — IntelligenceNetwork/CollaborationCandidate (EPIC-08)
+├── adapters/research-foundation-adapter.ts
+└── adapters/research-entity-network-adapter.ts
 
 lib/relationships/                  Universal Relationship Engine (EPIC-03)
 ├── relationship-builder.ts         buildRelationship, deriveRelationshipConfidence
@@ -480,6 +554,12 @@ lib/orchestration/                  Intelligence Orchestration Layer (EPIC-07)
 ├── pipeline-engine.ts              runIntelligencePipeline (zero domain logic)
 └── pipeline-validation.ts          validateIntelligencePipelineProviders
 
+lib/network/                        Global Intelligence Network (EPIC-08)
+├── network-builder.ts              buildIntelligenceNetwork
+├── network-validation.ts           validateIntelligenceNetwork
+├── network-query.ts                findNodesByEntityKind, findEdgesForNode, ... (delegates to lib/relationships/)
+└── network-collaboration.ts        findCollaborationCandidates (shared-evidence / shared-target only, never popularity)
+
 components/research/topic/
 ├── ResearchTopicDetail.tsx         page orchestrator ("/research/[topicId]")
 ├── ResearchCockpit.tsx             operational summary (workflow + health, replaces old Mission Control Panel)
@@ -503,7 +583,11 @@ engine itself stays a thin, dependency-light state machine. `lib/orchestration/`
 engine — it depends on `lib/foundation/`, `lib/reasoning/`, and `lib/workflow/` (to call the real
 default engines), but no engine or Foundation module ever imports `lib/orchestration/` back, and
 `lib/orchestration/` never imports a domain module (`lib/research/*`) directly — domain data only
-enters through the caller-supplied `IntelligencePipelineProviders`. Only the research adapter and
-the type aliases in `review-workspace-model.ts`, `lib/research/evidence/evidence-types.ts`, and
+enters through the caller-supplied `IntelligencePipelineProviders`. `lib/network/` depends only
+on `lib/foundation/` plus `lib/relationships/` (for traversal reuse) — it never imports a domain
+module either; `lib/research/entities/` data only enters the network through
+`research-entity-network-adapter.ts`, the same adapter-boundary discipline as every other
+domain↔Foundation crossing. Only the research adapters and the type aliases in
+`review-workspace-model.ts`, `lib/research/evidence/evidence-types.ts`, and
 `lib/evidence-infrastructure/types.ts` cross the Research↔Foundation boundary, and all are
 additive, non-breaking changes.

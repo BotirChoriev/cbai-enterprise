@@ -1,6 +1,6 @@
 # CBAI Current Progress
 
-Snapshot as of EPIC-07. Update this file, not a new one, as state changes.
+Snapshot as of EPIC-08. Update this file, not a new one, as state changes.
 
 ## Real and working today
 
@@ -44,6 +44,14 @@ Snapshot as of EPIC-07. Update this file, not a new one, as state changes.
   (`researchIntelligencePipelineProviders`, `runResearchIntelligencePipeline`), verified
   structurally by successful `npm run build`. Not yet wired into any UI, and not yet exercised
   functionally for all 65 topics during the build (see below for why).
+- **Global Intelligence Network** (`lib/foundation/network-types.ts` + `lib/network/`): a
+  16-entity-kind vocabulary, `IntelligenceNetwork` (nodes + Relationship edges), and
+  evidence-grounded collaboration discovery (`findCollaborationCandidates` — shared evidence or
+  shared relationship target only, never a connection/popularity count). Wired into a new
+  `research-entity-network-adapter.ts` mapping the real `lib/research/entities/` catalog onto
+  the network. Verified structurally by successful `npm run build`. Not yet wired into any UI,
+  and not yet exercised functionally during the build (same reason as the orchestration layer —
+  see below).
 - **Public entry experience**: hero, three-ecosystem model, capability flow, audience section,
   trust section — all real, honest content, no fabricated statistics.
 - **Public search / Evidence Core** (`/search`, `/countries`, `/companies`, `/universities`):
@@ -102,6 +110,22 @@ Snapshot as of EPIC-07. Update this file, not a new one, as state changes.
 - `IntelligenceExtensionPoints` (`executiveBriefing`, `voiceIntelligence`,
   `knowledgeCollaboration`, `missionMonitoring`, `analytics`, `agentInsights`) are reserved but
   always empty — no Epic has implemented any of them yet.
+- No UI consumes `IntelligenceNetwork` — per EPIC-08's explicit scope ("Extension only. No UI.
+  No React."), the layer is proven only at the type/build level this Epic.
+- `buildResearchIntelligenceNetwork()` is not called from any static-generation path, so — like
+  `runResearchIntelligencePipeline` — it is type-checked by `npm run build` but not functionally
+  executed for real data during the build. No functional correctness issue is known; this is a
+  verification-depth gap, not a behavior gap.
+- `NetworkExtensionPoints` (Research Collaboration, Funding Discovery, Innovation Partnerships,
+  University Networks, Government Programs, Industrial R&D, International Collaboration,
+  Mission Matching, Knowledge Exchange, Evidence Sharing) are reserved but always empty — no
+  Epic has implemented any of them yet.
+- No fabricated entities were added to demonstrate the network richly: the current real
+  demonstration (`lib/research/entities/`) has only 10 seed entities, of which 7 map onto the
+  network's vocabulary (5 `research_topic` → `mission`, 1 `laboratory`, 1 `dataset`) with 3 real
+  edges between them. The network engine is correct and ready for richer real data (actual
+  researcher, university, company, investor, grant, patent, and publication records); none exist
+  in this repository yet.
 
 ## Known technical debt
 
