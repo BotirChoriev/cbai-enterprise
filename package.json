@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test:research-slice": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-research-slice.ts",
-    "test:product-activation": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-product-activation.ts"
+    "test:product-activation": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-product-activation.ts",
+    "test:companies-intelligence": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-companies-intelligence.ts"
   },
   "dependencies": {
     "next": "16.2.10",
