@@ -939,6 +939,116 @@ Platform Core, `lib/research-domain/`, or `lib/research-workspace/` imports
 Per the mission's explicit scope, `lib/research-mission/` contains zero React, zero components,
 zero pages, and zero routes. No component anywhere imports it yet.
 
+## Research Intelligence — First Live Vertical Slice
+
+The mission that produced this section reused the label "Phase 4" (its title was "CBAI RESEARCH
+INTELLIGENCE PHASE 4 — FIRST LIVE VERTICAL SLICE"), colliding with the Research Mission Engine's
+own "Phase 4" above. To avoid ambiguity this section is filed under its subtitle, not a phase
+number; the two are unrelated (the Mission Engine adds a new capability, this section activates
+existing ones).
+
+Everything built through this point in the Research Intelligence series — Foundation,
+Relationships, Evidence, Reasoning, Workflow, Orchestration, Network, Workspace (Platform Core,
+EPIC-02–10), plus the Research Domain (Phase 1/2) and Research Workspace Contract (Phase 3) — was
+real and structurally verified, but never exercised by an actual UI consumer, and never rendered
+in a browser. This work closes that gap for one real subject.
+
+### Chosen test topic: `microbiology`
+
+The richest real topic in the 65-topic catalog: `status: "catalog_available"` (the most complete
+of the three real statuses), 3 real `relatedMethods`, 3 real `relatedEvidenceTypes`, and the only
+topic cross-referenced by *two* separate `lib/research/entities/` registry records (a real
+laboratory and a real dataset). No topic was fabricated; this is the existing catalog entry with
+the most real data already connected to it.
+
+### End-to-end data path traced
+
+```
+lib/research/research-topics.ts (RESEARCH_TOPICS["microbiology"])
+  → research-foundation-adapter.ts (toSubject, toMission, toEvidence, toRelationships)
+  → lib/orchestration/ (runIntelligencePipeline via researchIntelligencePipelineProviders)
+  → IntelligenceResult { evidence, relationships, reasoning, workflow, pipelineTrace }
+  → lib/network/ + research-entity-network-adapter.ts (buildResearchIntelligenceNetwork)
+  → lib/workspace/ (buildWorkspaceView)
+  → lib/research-workspace/ (buildResearchWorkspaceContract)
+  → components/research/topic/ResearchIntelligenceOverview.tsx (new server component)
+  → app/(dashboard)/research/[topicId]/page.tsx (existing route, one new render call)
+```
+
+Traced by static inspection (Phase 1 of this mission), then confirmed by the 10 automated tests
+and a real `npm run build` static-generation pass across all 65 topics (below).
+
+### Disconnected handoffs found, and what was done about each
+
+| # | Finding | Disposition |
+|---|---|---|
+| 1 | `ResearchWorkspaceContract` had no field carrying a real, actionable "recommended next step" — `RecommendationsSection` (Reasoning's possible options) and `MonitoringSection` (the new Workflow's state) are both real, but neither is the same thing as the existing, already-working single-next-action signal `lib/research/workflow/workflow-engine.ts`'s `deriveResearchWorkflow` has produced since BUILD-004x. Without a fix, the new UI would have had to call that engine directly, violating "React must not call separate lower-level engines independently." | **Fixed** — added `RecommendedNextStep` + `MissionProgressSection.recommendedNextStep?` to `lib/research-workspace/research-workspace-contract.ts`; added `resolveRecommendedNextStep` to `ResearchWorkspaceProviders`, implemented by calling `deriveResearchWorkflow` unmodified. |
+| 2 | `ResearchWorkspaceContract` never surfaced Platform's `IntelligenceBriefSection` (observed facts, known unknowns, reasoning path — EPIC-09) at all — an oversight from Phase 3. "Known evidence gaps" and "a reasoning summary" (both explicitly required content for the new UI section) had no field to read from. | **Fixed** — added `MissionSummarySection.intelligenceBrief?: IntelligenceBriefSection`, reusing Platform's own type unmodified; wired from `workspaceView.intelligenceBrief` in the Builder. |
+| 3 | `buildResearchWorkspaceContract`'s `researchTimeline.events` double-counted a topic entity's own timeline (once directly, once again via a mission-linked-entities flat-map that includes the topic entity itself, since it links to its own mission). | **Fixed** — the flat-map now excludes the topic entity by id. Currently latent (topic timelines are always empty — no persistence layer exists), but a real duplication, worth fixing while already editing this function. |
+| 4 | `IntelligenceNetwork` (EPIC-08, `lib/network/`) node ids come from `lib/research/entities/`'s raw registry ids (e.g. `re-entity-research-topic-microbiology`); `IntelligenceResult`/`ResearchDomainEntity` ids come from the real topicId or Phase 2's own `research-topic:${topicId}` convention. These are two disconnected id spaces within the same `KnowledgeNetworkSection` — a UI naively cross-referencing `network.nodes` by topicId would find nothing. | **Not fixed** — reconciling two independent id schemes is an architectural decision beyond "fix only what is required for one vertical slice." The new UI section avoids the mismatch by sourcing "related entities" from the Contract's own correctly-scoped `relatedOrganizations`/`relatedDatasets` sections instead of trying to filter `knowledgeNetwork.network` by subject id. Documented here and in `docs/current-progress.md` as known debt. |
+| 5 | In Next.js dev mode only, requesting an unknown `/research/[topicId]` path throws a 500 ("Page is missing param... required with output: export config") instead of a clean 404 — confirmed present on the clean `main` tree before any change in this mission (tested via `git stash`), so it predates this work. | **Not fixed** — a Next.js dev-server limitation specific to `output: "export"` + dynamic routes; does not affect the real static export (only 65 real paths are ever generated; any other path 404s at the hosting layer, never reaching React). Verified `buildResearchWorkspaceContract` itself returns `undefined` safely for an unknown id (test #2) — the application code path is correct. |
+
+### New server component: `components/research/topic/ResearchIntelligenceOverview.tsx`
+
+Server component (no `"use client"`, no hooks, no client state). Calls
+`buildResearchWorkspaceContract({ subjectId: topicId })` exactly once and renders only from its
+already-computed output — the component itself contains no evidence, relationship, reasoning, or
+workflow logic. Rendered from `app/(dashboard)/research/[topicId]/page.tsx` as a sibling after
+the existing `ResearchTopicDetail` (untouched) — zero changes to the existing client component
+tree, zero risk to `?evidence=` selection or the Review Workspace anchor it already links to.
+
+Shows, from real Contract output only: workflow state, evidence count, open-question count,
+pipeline stage count, per-evidence verification status, known evidence gaps, a reasoning summary
+(or an honest "nothing verified yet" sentence), the recommended next step (a real link when one
+exists, non-interactive text otherwise, or an honest "no further action" sentence), related
+organizations/datasets, and recent real timeline activity — with one consolidated honest-empty
+sentence for whichever of Hypotheses/Findings/Publications/Patents/Technologies/Team/Funding/
+Collaborators/Risks have no real data yet, rather than nine separate empty-state blocks. Does
+not duplicate `ResearchCockpit` (current legacy stage, blocking factors, latest legacy workspace
+activity) — it surfaces what the Platform Core layer specifically adds instead.
+
+### Real action path
+
+The "Recommended next step" link is real for `microbiology`: `deriveResearchWorkflow` resolves
+to `open_evidence_review`, which `lib/research/workflow/workflow-derivation.ts`'s
+`deriveActionLink` maps to `/research/microbiology#topic-review-workspace-heading` — the existing
+Review Workspace section's real heading anchor, confirmed present in
+`components/research/topic/TopicReviewWorkspace.tsx`. No dead button, no fabricated action verb.
+
+### Functional test harness: `npm run test:research-slice`
+
+Zero new dependencies — no Jest, Vitest, ts-node, or tsx. Uses Node's own built-in test runner
+(`node:test`) and native TypeScript execution (stable since Node 23+), plus one ~15-line loader
+(`scripts/register-alias-loader.mjs`) that resolves this repo's `@/...` path alias, which Node's
+native TS execution does not know about on its own. All 10 required checks pass:
+
+1. Valid topic ID produces a workspace contract.
+2. Unknown topic ID fails safely (returns `undefined`, never throws).
+3. No fabricated fields appear (no evidence ever claims `"verified"`; Researchers/Hypotheses stay empty).
+4. Empty data remains empty (Findings, Research Timeline).
+5. Pipeline evidence is traceable to source data (every `evidenceId` real, `relatedSubjectIds` includes the topic).
+6. Relationship output is traceable (every `sourceId` matches the topic, every `explanation` real).
+7. Reasoning cannot assert a final decision (`humanDecisionRequired === true`, asserted at runtime, not just by type).
+8. Workflow state is valid (`currentState` is one of the declared `WORKFLOW_STATES`).
+9. Workspace output reuses pipeline and network results (contract evidence/relationship ids exactly match the pipeline's own output — never re-derived).
+10. The topic's data layer does not throw (real JSX rendering verified separately by `npm run build`'s successful static generation of `/research/microbiology`, alongside all other 64 real topics).
+
+### Performance and recomputation
+
+Within one page render, `buildResearchWorkspaceContract` is called exactly once (a single call
+site inside `ResearchIntelligenceOverview`), and its result is read from a single local variable
+— no repeated pipeline execution within a render, satisfying this mission's requirement. No
+caching was introduced (no clear invalidation model would exist for one). The pre-existing,
+already-documented debt remains unchanged: `researchWorkspaceProviders`'s four resolvers each
+independently rebuild the full 65-topic Research Domain entity collection and the full global
+Network on every call, so — because `output: "export"` pre-generates every topic page at build
+time — this recomputation now runs up to 65× per `npm run build`, once per statically generated
+page. Acceptable at today's catalog scale (10 registry entities, 65 topics; the build completed
+in ~2–3 seconds including this). A future optimization (memoizing the two subject-independent
+resolvers, `resolveResearchDomainEntities`/`resolveIntelligenceNetwork`, at the module level)
+would remove the duplicate work cheaply — not attempted here to keep this change a pure
+activation exercise, not a platform refactor.
+
 ## Research Intelligence module map (current)
 
 ```

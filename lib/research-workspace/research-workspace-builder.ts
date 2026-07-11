@@ -69,9 +69,15 @@ export function buildResearchWorkspaceContract(
     (entity): entity is FindingEntity => entity.entityKind === "finding",
   );
 
+  // topicEntity is itself included in missionLinkedEntities (it carries its own mission link),
+  // so its timeline is excluded from the flatMap below to avoid double-counting the same real
+  // events — found during the first live vertical-slice trace; currently latent (topic timelines
+  // are always empty today, see docs/current-progress.md) but a real, worth-fixing duplication.
   const researchTimelineEvents = [
     ...(topicEntity?.timeline ?? []),
-    ...missionLinkedEntities.flatMap((entity) => entity.timeline),
+    ...missionLinkedEntities
+      .filter((entity) => entity.entityId !== topicEntity?.entityId)
+      .flatMap((entity) => entity.timeline),
   ];
 
   const openHypotheses: readonly HypothesisEntity[] = ofKind(domainEntities, "hypothesis");
@@ -100,8 +106,14 @@ export function buildResearchWorkspaceContract(
 
   return {
     subjectId: input.subjectId,
-    missionSummary: { missionCenter: workspaceView.missionCenter },
-    missionProgress: { monitoring: workspaceView.monitoring },
+    missionSummary: {
+      missionCenter: workspaceView.missionCenter,
+      intelligenceBrief: workspaceView.intelligenceBrief,
+    },
+    missionProgress: {
+      monitoring: workspaceView.monitoring,
+      recommendedNextStep: providers.resolveRecommendedNextStep?.(input.subjectId),
+    },
     evidenceSummary: workspaceView.evidenceCenter,
     researchTimeline: { events: researchTimelineEvents },
     researchQuestions: { questions: researchQuestions },

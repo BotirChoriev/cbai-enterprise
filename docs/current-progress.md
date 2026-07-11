@@ -1,8 +1,9 @@
 # CBAI Current Progress
 
 Snapshot as of EPIC-10 (**CBAI Platform RC-1** — Platform Core frozen) plus Research Intelligence
-Phase 1 (Domain Foundation), Phase 2 (Domain Integration), Phase 3 (Workspace Contract), and
-Phase 4 (Mission Engine). Update this file, not a new one, as state changes.
+Phase 1 (Domain Foundation), Phase 2 (Domain Integration), Phase 3 (Workspace Contract), Phase 4
+(Mission Engine), and the First Live Vertical Slice (real UI activation for `microbiology`).
+Update this file, not a new one, as state changes.
 
 ## Real and working today
 
@@ -92,8 +93,11 @@ Phase 4 (Mission Engine). Update this file, not a new one, as state changes.
   Opportunities). `buildResearchWorkspaceContract` + `ResearchWorkspaceProviders` +
   `researchWorkspaceProviders` (calling `runResearchIntelligencePipeline`,
   `buildResearchIntelligenceNetwork`, `buildAllResearchDomainEntities` — all unmodified). Zero
-  Platform Core files touched, zero Research Domain files modified, zero UI/React/components.
-  Verified structurally by successful `npm run build`.
+  Platform Core files touched, zero Research Domain files modified. **Now functionally active**,
+  not just type-checked: rendered live on `/research/[topicId]` (see below) — gained
+  `MissionSummarySection.intelligenceBrief` and `MissionProgressSection.recommendedNextStep`
+  during that activation work (both reuse existing engines unmodified; see the vertical-slice
+  entry below for why).
 - **Research Mission Engine, Phase 4** (`lib/research-mission/`): `ResearchMission` — a real
   nine-state project lifecycle (`draft/planned/active/paused/blocked/review/completed/archived/
   cancelled`) with transition history (reason/timestamp/actor/evidenceReference), plus every
@@ -106,6 +110,26 @@ Phase 4 (Mission Engine). Update this file, not a new one, as state changes.
   `buildResearchWorkspaceContract`, `buildAllResearchDomainEntities` — both unmodified). Zero
   Platform Core, Research Domain, or Workspace Contract files touched, zero UI/React/components.
   Verified structurally by successful `npm run build`.
+- **Research Intelligence: First Live Vertical Slice** — the first real UI consumer of the whole
+  stack, for real topic **`microbiology`** (the richest real topic: 3 real methods, 3 real
+  evidence types, `catalog_available` status, the only topic with two real
+  `lib/research/entities/` cross-references). New server component
+  `components/research/topic/ResearchIntelligenceOverview.tsx` renders a "Research Intelligence
+  Overview" section on the existing `/research/[topicId]` route (one new call to
+  `buildResearchWorkspaceContract`, alongside — not replacing — `ResearchTopicDetail`/
+  `ResearchCockpit`). Verified by: `npm run build` (real static generation of all 65 real topic
+  pages, not just type-checking), `npm run test:research-slice` (10/10 passing — see below), and
+  a manual dev-server + curl pass confirming HTTP 200, real content, the existing
+  `?evidence=`/review-workspace anchor still work, and no server-side errors logged.
+  **Functionally active** — this is the first Platform Core/Research Domain/Workspace Contract
+  output this repository actually renders anywhere.
+- **`npm run test:research-slice`** — a new, zero-dependency functional test harness
+  (`scripts/test-research-slice.ts` + `scripts/register-alias-loader.mjs`) using only Node's
+  built-in `node:test` runner and native TypeScript execution (no Jest/Vitest/ts-node/tsx
+  installed). Covers: valid/unknown topic ID handling, no fabricated fields, empty data stays
+  empty, evidence/relationship traceability, `humanDecisionRequired === true` at runtime, valid
+  `WorkflowState`, Contract-reuses-pipeline verification, and a data-layer throw check. All 10
+  pass. This is the first automated test coverage of any kind in this repository.
 - **Public entry experience**: hero, three-ecosystem model, capability flow, audience section,
   trust section — all real, honest content, no fabricated statistics.
 - **Public search / Evidence Core** (`/search`, `/countries`, `/companies`, `/universities`):
@@ -225,6 +249,21 @@ Phase 4 (Mission Engine). Update this file, not a new one, as state changes.
   transitioned states anywhere in this repository; every real `ResearchMission` a caller builds
   today honestly starts and stays at `draft` with empty history, the same "no fabricated
   provenance" status `Workflow` (EPIC-06) and `Workflow`-based demos have always had.
+- **`lib/research-mission/` remains entirely disconnected from the now-live UI** — the vertical
+  slice activates Workspace Contract/Reasoning/Evidence/Workflow/Network, but not the Research
+  Mission Engine (Phase 4). Still type-checked only, unchanged by this work.
+- The vertical slice activates only `microbiology`'s data path structurally (via tests) and by
+  rendering it live; the other 64 real topics are exercised only by `npm run build`'s static
+  generation (confirmed successful, but not individually spot-checked in a browser or by a
+  dedicated test). No topic-specific bug is known, but only one topic received the full manual
+  verification pass described above.
+- `RecommendedNextStep`/`intelligenceBrief` were added only to `ResearchWorkspaceContract`, not
+  propagated to `lib/research-mission/`'s `ResearchMission` (which embeds a whole
+  `ResearchWorkspaceContract`, so the new fields *are* reachable via
+  `mission.workspaceContract?.missionSummary.intelligenceBrief`, but `ResearchMission` itself
+  exposes no dedicated shortcut field for either, the way it already does for `risks`/
+  `researchQuestions`/etc.). Not added — no current caller needs it, and Phase 4 is itself not
+  yet wired to any UI.
 
 ## Known technical debt
 
@@ -404,3 +443,31 @@ Phase 4 (Mission Engine). Update this file, not a new one, as state changes.
   `lib/workflow/workflow-transition.ts`, even though no Platform Core file was modified or its
   code copied verbatim. A future generic "state machine" utility that both could share is a
   plausible refactor, not attempted here to avoid touching the frozen `lib/workflow/`.
+- **Two disconnected id spaces inside `KnowledgeNetworkSection`**, found and documented during
+  the First Live Vertical Slice: `IntelligenceNetwork` (EPIC-08) node ids come from
+  `lib/research/entities/`'s raw registry ids (e.g. `re-entity-research-topic-microbiology`);
+  `IntelligenceResult`/`ResearchDomainEntity` ids come from the real topicId or Phase 2's
+  `research-topic:${topicId}` convention. Both are real and correct on their own, but they don't
+  share a namespace, so `knowledgeNetwork.network`/`.collaborationCandidates` cannot be honestly
+  cross-referenced against the current subject by id. The new UI works around this by sourcing
+  "related entities" from the Contract's own `relatedOrganizations`/`relatedDatasets` sections
+  instead. Not fixed — reconciling the two id schemes is an architectural decision, not a
+  vertical-slice-blocking defect.
+- **A pre-existing Next.js dev-server limitation**, found and confirmed (via `git stash`, tested
+  against the clean `main` tree) during the First Live Vertical Slice: with `output: "export"`,
+  requesting an unknown `/research/[topicId]` path in `npm run dev` throws a 500
+  ("Page is missing param... required with output: export config") instead of a clean 404. Not
+  introduced by this work; does not affect the real static export (`npm run build` only ever
+  generates the 65 real topic paths — any other path 404s at the hosting layer, never reaching
+  React). `buildResearchWorkspaceContract` itself returns `undefined` safely for an unknown id,
+  confirmed by an automated test. Not fixed — out of scope, and not a defect in application code.
+- **Recomputation debt now runs on every real static-generation build, not just hypothetically**:
+  `researchWorkspaceProviders`'s four resolvers each independently rebuild the full 65-topic
+  Research Domain entity collection and the full global Network on every call, and
+  `ResearchIntelligenceOverview` calls `buildResearchWorkspaceContract` once per topic page — so
+  `npm run build` now triggers this recomputation up to 65 times (once per statically generated
+  topic page). Acceptable at today's catalog scale (build completes in ~2–3 seconds including
+  this); a future optimization (memoizing the two subject-independent resolvers at module level)
+  would remove the duplicate work cheaply. Not attempted — out of scope for "make one vertical
+  slice work," and doing so would touch the already-shipped Workspace Contract more than the two
+  minimal, targeted fixes this phase already made.

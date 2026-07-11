@@ -389,7 +389,7 @@ Zero Platform Core files touched, zero Research Domain files modified, zero lega
 `lib/research/*` files modified — confirmed by `git diff --stat` at commit time. No UI, no React,
 no components, no pages, per the mission's explicit scope.
 
-## v3.4 — Research Mission Engine, Phase 4 (this release)
+## v3.4 — Research Mission Engine, Phase 4
 
 A fourth layer — `lib/research-mission/`, new, on top of Platform RC-1, the Research Domain
 (Phase 1/2), and the Workspace Contract (Phase 3), all three frozen and unmodified. Gives a
@@ -425,6 +425,54 @@ Platform Workflows.
 Zero Platform Core files touched, zero Research Domain files modified, zero Workspace Contract
 files modified — confirmed by `git diff --stat` at commit time. No UI, no React, no pages, no
 components, per the mission's explicit scope.
+
+## v3.5 — Research Intelligence: First Live Vertical Slice (this release)
+
+Everything built through v3.4 was real and structurally verified but never exercised by an
+actual UI consumer or rendered in a browser. This release closes that gap for one real subject —
+`microbiology`, the richest real topic in the catalog (3 real methods, 3 real evidence types,
+`catalog_available` status, and the only topic cross-referenced by two separate real
+`lib/research/entities/` records). No topic, researcher, organization, evidence, or relationship
+was fabricated to make the slice richer.
+
+Tracing the full path (`ResearchTopic → research-foundation-adapter → Orchestration Pipeline →
+Evidence/Relationships/Reasoning/Workflow → Global Intelligence Network → buildWorkspaceView →
+buildResearchWorkspaceContract → UI`) surfaced two genuine disconnected handoffs in the Workspace
+Contract (Phase 3), both fixed with minimal, additive corrections: the Contract never carried a
+real actionable "next step" (only Reasoning's `possibleOptions`, a different concept from the
+existing, already-working single-recommendation signal `deriveResearchWorkflow` has produced
+since BUILD-004x) — added `RecommendedNextStep` sourced from that existing engine, unmodified.
+The Contract also never surfaced Platform's `IntelligenceBriefSection` (observed facts, known
+unknowns — EPIC-09) at all — added as `MissionSummarySection.intelligenceBrief`, reusing the
+Platform type unmodified. A third finding — a latent timeline double-count — was fixed in the
+same function while already editing it. A fourth finding (two disconnected id spaces between
+`lib/network/`'s registry-sourced node ids and Research Domain's topic-based ids) and a fifth
+(a pre-existing Next.js dev-mode quirk with `output: "export"` and unknown dynamic paths,
+confirmed present on the clean `main` tree via `git stash` before any change here) were
+deliberately left undisturbed and documented, not fixed — neither blocks this vertical slice, and
+fixing either would have meant more than "fix only what is required."
+
+A new server component, `components/research/topic/ResearchIntelligenceOverview.tsx` — zero
+hooks, zero client state, one call to `buildResearchWorkspaceContract` — renders a curated
+"Research Intelligence Overview" section on the existing `/research/[topicId]` route, alongside
+(never replacing) the existing `ResearchTopicDetail`/`ResearchCockpit`. It surfaces exactly what
+the Platform Core layer adds that the legacy Cockpit does not — Evidence Center's per-item
+verification status, Reasoning's known evidence gaps, real related organizations/datasets — with
+one honest consolidated empty-state sentence for whichever sections have no real data yet, rather
+than nineteen sections shown regardless of content. The recommended-next-step link is real: for
+microbiology it resolves to the existing Review Workspace's real heading anchor.
+
+A new zero-dependency test harness, `npm run test:research-slice`, uses only Node's built-in
+`node:test` runner and native TypeScript execution (stable since Node 23+) plus a ~15-line loader
+resolving this repo's `@/` path alias — no Jest, Vitest, ts-node, or tsx installed. All 10
+required checks pass, including runtime (not just type-level) confirmation that
+`humanDecisionRequired` is always `true` and that the Contract's evidence/relationship ids
+exactly match what the Orchestration pipeline itself produced (never re-derived). `npm run build`
+independently confirms real JSX rendering succeeds for all 65 real topics via static generation.
+
+Zero Platform RC-1, Research Domain, or Research Mission Engine files were modified — only the
+already-shipped Workspace Contract (Phase 3) received the two minimal, documented corrections
+above, plus one new server component, one route file, and the new test harness.
 
 ## Planned (not started)
 

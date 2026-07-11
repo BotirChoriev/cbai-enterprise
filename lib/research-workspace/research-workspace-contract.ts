@@ -14,6 +14,7 @@
 
 import type {
   EvidenceCenterSection,
+  IntelligenceBriefSection,
   KnowledgeNetworkSection,
   MissionCenterSection,
   MonitoringSection,
@@ -42,12 +43,41 @@ import type {
 } from "@/lib/research-domain/research-entities-funding";
 import type { ResearchDomainEntity } from "@/lib/research-domain/research-relationships";
 
+/**
+ * `intelligenceBrief` reuses Platform's own `IntelligenceBriefSection` (observed facts, known
+ * unknowns, reasoning path — EPIC-09) unmodified. Added to close a second disconnected handoff
+ * found while activating the first live vertical slice: the Contract never surfaced this
+ * Platform Core section at all, even though "known evidence gaps" and "a reasoning summary" are
+ * both real, already-computed data available since EPIC-09 — this field exposes it rather than
+ * requiring a consumer to bypass the Contract and call the Reasoning Framework directly.
+ */
 export interface MissionSummarySection {
   missionCenter: MissionCenterSection;
+  intelligenceBrief?: IntelligenceBriefSection;
+}
+
+/**
+ * A real, actionable next step — never a fabricated call to action. Present only when a real
+ * route/anchor exists for it (`href`); a genuine "nothing to do right now" state is honestly
+ * represented by omitting this field entirely, not by a placeholder step with no real target.
+ *
+ * Added to close a disconnected handoff found while activating the first live vertical slice:
+ * `RecommendationsSection` (ReasoningResult's possible options) and `MonitoringSection`
+ * (the new Workflow's not-yet-transitioned state) are both real, but neither carries the
+ * existing, already-real, already-working single-next-action signal
+ * `lib/research/workflow/workflow-engine.ts`'s `deriveResearchWorkflow` has produced since
+ * BUILD-004x — this field surfaces that existing engine's real output through the Contract, so a
+ * consumer never needs to call it directly.
+ */
+export interface RecommendedNextStep {
+  label: string;
+  reason: string;
+  href?: string;
 }
 
 export interface MissionProgressSection {
   monitoring: MonitoringSection;
+  recommendedNextStep?: RecommendedNextStep;
 }
 
 /**
