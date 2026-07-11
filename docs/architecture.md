@@ -500,6 +500,77 @@ Per the mission's explicit scope, this Epic ships architecture only: no componen
 `lib/network/`, no new route, and no invented researcher/university/company/grant records were
 added anywhere — every node in the one real demonstration above is a pre-existing catalog entry.
 
+## Intelligence Workspace Platform (`lib/workspace/`)
+
+Introduced in EPIC-09. Not a dashboard, not a page, not isolated UI — one reusable
+`WorkspaceView` shape (`lib/foundation/workspace-types.ts`) that every future workspace
+(Research, Government, University, Enterprise, Engineering, Investment, Legal, Education) will
+render. It is built **entirely** from data the Orchestration Layer (EPIC-07) and the Global
+Intelligence Network (EPIC-08) already produced — `buildWorkspaceView(result, network?)`
+contains no new intelligence logic, only assembly and honest defaulting:
+
+```
+Orchestration Layer          lib/orchestration/  → IntelligenceResult
+Global Intelligence Network  lib/network/        → IntelligenceNetwork (optional)
+    ↓
+Workspace Platform           lib/workspace/  → WorkspaceView (nine sections)
+    ↓
+Experience                   (not built this Epic — see below)
+```
+
+The nine required sections, and exactly what each one is (a pass-through or a trivial default,
+never a re-derivation):
+
+| Section | Source | Logic |
+|---|---|---|
+| Mission Center | `IntelligenceResult.subject` / `.mission` / `.question` | none — direct pass-through |
+| Intelligence Brief | `ReasoningResult.observedFacts` / `.knownUnknowns` / `.reasoningPath` | none — present only when reasoning ran |
+| Evidence Center | `IntelligenceResult.evidence` + `ReasoningResult.supportingEvidence` / `.conflictingEvidence` | none |
+| Knowledge Network | `IntelligenceResult.relationships` + optional `IntelligenceNetwork` | calls `findCollaborationCandidates` (EPIC-08), never re-implemented |
+| Recommendations | `ReasoningResult.possibleOptions` / `.tradeOffs` | none |
+| Monitoring | `Workflow.currentState` | calls `isWorkflowStateTerminal`/`latestWorkflowTransition` (EPIC-06), never re-implemented |
+| Timeline | `Workflow.history` | none — the Workflow's own transition log *is* the honest timeline |
+| Open Questions | `ReasoningResult.openQuestions` | none |
+| Activity | `IntelligenceResult.pipelineTrace` | none — the Orchestration Layer's own stage trace *is* the honest activity record |
+
+`extensions` on `WorkspaceView` is `IntelligenceResult.extensions` itself, not a new type —
+Voice, Executive Briefing, Collaboration, Analytics, and Mission Monitoring support (the "Support
+future" list this Epic named) were already reserved by EPIC-07's `IntelligenceExtensionPoints`;
+the Workspace adds no parallel extension vocabulary.
+
+`lib/workspace/workspace-validation.ts`'s `validateWorkspaceView` checks only identity and
+Mission Center completeness — every other section is optional by design (reasoning/workflow may
+not have run yet for a given pipeline result), so their absence is never flagged.
+`lib/workspace/workspace-query.ts` provides deterministic boolean readers
+(`hasConflictingEvidence`, `hasOpenQuestions`, `hasCollaborationCandidates`,
+`isWorkspaceMonitoring`, `isWorkspaceTerminal`) so a future React component asks these questions
+instead of inspecting array lengths or field presence itself — the mechanism that keeps
+intelligence logic out of components once a workspace UI is built.
+
+`research-workspace-adapter.ts`'s `buildResearchWorkspaceView(topicId)` proves the platform
+against real data by composing two already-real pipelines — `runResearchIntelligencePipeline`
+(EPIC-07) and `buildResearchIntelligenceNetwork` (EPIC-08) — with zero new logic. Verified
+structurally by a successful `npm run build`; like its two dependencies, it is not called from
+any static-generation path, so it is type-checked but not functionally exercised during the
+build — see `docs/current-progress.md`.
+
+### No dashboards, no pages, no UI this Epic
+
+Per the mission's explicit scope, `lib/workspace/` contains zero React, zero components, and
+zero routes. No component anywhere imports it yet. When a future Epic renders a workspace, the
+component will receive an already-computed `WorkspaceView` exactly as every other Foundation
+output is consumed today — "every section must communicate only through the Orchestration
+Layer" is enforced by construction, since `WorkspaceView` cannot be built from anything else.
+
+### Related, not duplicated: `lib/workspaces/`
+
+The pre-existing `lib/workspaces/` (plural) is a different, real, active system: persona-based
+evidence-coverage explorers (`WorkspaceBaseModel`, `WorkspacePersona`, `WorkspaceCoverageItem`)
+backing the live `/investor`, `/citizen`, and `/government` routes, built on the Indicator
+Framework and Evidence Infrastructure — unrelated in shape and purpose to the new singular
+`lib/workspace/`, and untouched. No naming collision exists (`WorkspaceView` vs.
+`WorkspaceBaseModel`, `WorkspaceSummary`, etc. — all distinct identifiers).
+
 ## Research Intelligence module map (current)
 
 ```
@@ -525,8 +596,10 @@ lib/foundation/                     universal Foundation (EPIC-02)
 ├── workflow-types.ts                universal workflow shapes — Workflow/WorkflowState/WorkflowTransition (EPIC-06)
 ├── orchestration-types.ts           universal pipeline output — IntelligenceResult/pipelineTrace (EPIC-07)
 ├── network-types.ts                 universal network shapes — IntelligenceNetwork/CollaborationCandidate (EPIC-08)
+├── workspace-types.ts                universal workspace shapes — WorkspaceView, nine sections (EPIC-09)
 ├── adapters/research-foundation-adapter.ts
-└── adapters/research-entity-network-adapter.ts
+├── adapters/research-entity-network-adapter.ts
+└── adapters/research-workspace-adapter.ts
 
 lib/relationships/                  Universal Relationship Engine (EPIC-03)
 ├── relationship-builder.ts         buildRelationship, deriveRelationshipConfidence
@@ -560,6 +633,11 @@ lib/network/                        Global Intelligence Network (EPIC-08)
 ├── network-query.ts                findNodesByEntityKind, findEdgesForNode, ... (delegates to lib/relationships/)
 └── network-collaboration.ts        findCollaborationCandidates (shared-evidence / shared-target only, never popularity)
 
+lib/workspace/                      Intelligence Workspace Platform (EPIC-09)
+├── workspace-builder.ts            buildWorkspaceView (assembly only, zero new logic)
+├── workspace-validation.ts         validateWorkspaceView
+└── workspace-query.ts              hasConflictingEvidence, hasOpenQuestions, isWorkspaceMonitoring, ...
+
 components/research/topic/
 ├── ResearchTopicDetail.tsx         page orchestrator ("/research/[topicId]")
 ├── ResearchCockpit.tsx             operational summary (workflow + health, replaces old Mission Control Panel)
@@ -587,7 +665,10 @@ enters through the caller-supplied `IntelligencePipelineProviders`. `lib/network
 on `lib/foundation/` plus `lib/relationships/` (for traversal reuse) — it never imports a domain
 module either; `lib/research/entities/` data only enters the network through
 `research-entity-network-adapter.ts`, the same adapter-boundary discipline as every other
-domain↔Foundation crossing. Only the research adapters and the type aliases in
-`review-workspace-model.ts`, `lib/research/evidence/evidence-types.ts`, and
-`lib/evidence-infrastructure/types.ts` cross the Research↔Foundation boundary, and all are
-additive, non-breaking changes.
+domain↔Foundation crossing. `lib/workspace/` sits above both `lib/orchestration/` and
+`lib/network/` — it depends on `lib/foundation/`, `lib/workflow/` (for its two query re-exports),
+and `lib/network/` (for `findCollaborationCandidates`), but never imports a domain module, and
+neither `lib/orchestration/` nor `lib/network/` ever imports `lib/workspace/` back. Only the
+research adapters and the type aliases in `review-workspace-model.ts`,
+`lib/research/evidence/evidence-types.ts`, and `lib/evidence-infrastructure/types.ts` cross the
+Research↔Foundation boundary, and all are additive, non-breaking changes.

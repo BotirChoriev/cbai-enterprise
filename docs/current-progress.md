@@ -1,6 +1,6 @@
 # CBAI Current Progress
 
-Snapshot as of EPIC-08. Update this file, not a new one, as state changes.
+Snapshot as of EPIC-09. Update this file, not a new one, as state changes.
 
 ## Real and working today
 
@@ -52,6 +52,13 @@ Snapshot as of EPIC-08. Update this file, not a new one, as state changes.
   the network. Verified structurally by successful `npm run build`. Not yet wired into any UI,
   and not yet exercised functionally during the build (same reason as the orchestration layer —
   see below).
+- **Intelligence Workspace Platform** (`lib/foundation/workspace-types.ts` + `lib/workspace/`):
+  `WorkspaceView` composes the nine required sections (Mission Center, Intelligence Brief,
+  Evidence Center, Knowledge Network, Recommendations, Monitoring, Timeline, Open Questions,
+  Activity) entirely from `IntelligenceResult` (EPIC-07) and `IntelligenceNetwork` (EPIC-08) —
+  zero new intelligence logic. Wired into a new `research-workspace-adapter.ts`. Verified
+  structurally by successful `npm run build`. Ships zero React, zero components, zero routes —
+  the mission's explicit scope.
 - **Public entry experience**: hero, three-ecosystem model, capability flow, audience section,
   trust section — all real, honest content, no fabricated statistics.
 - **Public search / Evidence Core** (`/search`, `/countries`, `/companies`, `/universities`):
@@ -126,17 +133,33 @@ Snapshot as of EPIC-08. Update this file, not a new one, as state changes.
   edges between them. The network engine is correct and ready for richer real data (actual
   researcher, university, company, investor, grant, patent, and publication records); none exist
   in this repository yet.
+- No dashboards, pages, or isolated UI were built for the Workspace Platform — deliberately out
+  of scope per the mission ("Do NOT create dashboards. Do NOT create pages. Do NOT create
+  isolated UI."). `lib/workspace/` contains zero React.
+- No UI consumes `WorkspaceView` — per EPIC-09's explicit scope, the platform is proven only at
+  the type/build level this Epic.
+- `buildResearchWorkspaceView()` is not called from any static-generation path, so — like its two
+  dependencies (`runResearchIntelligencePipeline`, `buildResearchIntelligenceNetwork`) — it is
+  type-checked by `npm run build` but not functionally executed for real data during the build.
+  No functional correctness issue is known; this is a verification-depth gap, not a behavior gap.
 
 ## Known technical debt
 
 - `/companies` and `/universities` fabricated-score issue (see above) — pre-existing, not
   addressed by EPIC-01, EPIC-02, or EPIC-03.
 - `lib/research/entities/` (a separate, broader entity/relationship catalog — organisms,
-  diseases, technologies, publications, etc.) is not yet connected to the Foundation's
-  `Relationship` pillar or to the topic detail page's workflow at all. The Foundation's
-  research adapter currently derives relationships only from `ResearchTopic.relatedMethods` /
-  `relatedEvidenceTypes`. Flagged as a natural next integration point, not attempted this Epic
-  to keep the change set verifiable.
+  diseases, technologies, publications, etc.) is now connected to the Foundation via the Global
+  Intelligence Network (EPIC-08's `research-entity-network-adapter.ts`), but only for the 7 of
+  14 entity types with an honest match in `IntelligenceEntityKind`. It is still **not** connected
+  to `research-foundation-adapter.ts`'s `toRelationships()`, which continues to derive
+  relationships only from `ResearchTopic.relatedMethods` / `relatedEvidenceTypes` — so a topic's
+  `IntelligenceResult.relationships` and its Network-layer edges remain two separate views over
+  related-but-different data. Unifying them is flagged as a natural next integration point.
+- `lib/research/entities/`'s `organism`, `disease`, `method`, `experiment`, `open_question`, and
+  `negative_result` entity types have no honest match in the Network's 16-kind vocabulary and
+  cannot participate in `IntelligenceNetwork` today. Extending `IntelligenceEntityKind` (or
+  accepting these types stay network-invisible) is left as a future decision, not made this
+  Epic.
 - `lib/research/review/` (the standalone `ResearchReview`/`ReviewAssignment`/etc. domain from
   the RI-BUILD-027 series) remains disconnected from any real topic — still only consumed by
   the standalone `/research/review` placeholder page.
@@ -208,3 +231,12 @@ Snapshot as of EPIC-08. Update this file, not a new one, as state changes.
   analog to this Epic's own mission found anywhere in the repo. Built on the same numeric
   `ConfidenceAssessment`/`TrustAssessment` scoring model found incompatible in EPIC-04/EPIC-05.
   Confirmed unused outside `lib/intelligence/`; not integrated.
+- `WorkspaceView.knowledgeNetwork.network` is optional and, in the current real demonstration,
+  always the **global** `buildResearchIntelligenceNetwork()` (all research entities), not a
+  network scoped to just the current subject and its immediate connections — every
+  `buildResearchWorkspaceView` call recomputes the same full network. Scoping the network to a
+  subject before composing the Workspace is left as future work, not attempted this Epic.
+- The pre-existing `lib/workspaces/` (plural, persona-based evidence-coverage explorers behind
+  `/investor`, `/citizen`, `/government`) remains a separate, unrelated system and was not
+  unified with the new singular `lib/workspace/` — they solve different problems at different
+  layers (UI-facing methodology explainer vs. a universal, UI-agnostic composed data shape).

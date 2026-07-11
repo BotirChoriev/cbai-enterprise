@@ -185,7 +185,7 @@ intelligence-result`) with its own, differently-scoped `IntelligenceResult` type
 same numeric `ConfidenceAssessment`/`TrustAssessment` scoring model found incompatible in
 EPIC-04/EPIC-05. Not integrated, for the same reason as every prior finding.
 
-## v2.7 — Global Intelligence Network (EPIC-08, this release)
+## v2.7 — Global Intelligence Network (EPIC-08)
 
 `lib/foundation/network-types.ts` + `lib/network/` — not a social network: no followers, no
 messaging, no popularity signal anywhere in this layer. `INTELLIGENCE_ENTITY_KINDS` names the
@@ -225,6 +225,44 @@ not called from any static-generation path, so — like EPIC-07's
 `runResearchIntelligencePipeline` — it is type-checked but not functionally exercised for real
 data during the build.
 
+## v2.8 — Intelligence Workspace Platform (EPIC-09, this release)
+
+`lib/foundation/workspace-types.ts` + `lib/workspace/` — not a dashboard, not a page, not
+isolated UI. One reusable `WorkspaceView` shape with the nine sections the mission required
+(Mission Center, Intelligence Brief, Evidence Center, Knowledge Network, Recommendations,
+Monitoring, Timeline, Open Questions, Activity), built entirely from data the Orchestration
+Layer (EPIC-07) and the Global Intelligence Network (EPIC-08) already produced.
+`buildWorkspaceView(result, network?)` contains no new intelligence logic — every section is a
+direct pass-through or a trivial default: Mission Center from `IntelligenceResult.subject`/
+`.mission`/`.question`; Intelligence Brief and Recommendations from `ReasoningResult`; Evidence
+Center from `IntelligenceResult.evidence` plus the Reasoning Framework's own supporting/
+conflicting split; Knowledge Network from `IntelligenceResult.relationships` plus
+`findCollaborationCandidates` (EPIC-08, not re-implemented); Monitoring and Timeline from
+`Workflow.currentState`/`.history` (EPIC-06); Open Questions from `ReasoningResult.openQuestions`;
+Activity from `IntelligenceResult.pipelineTrace` (EPIC-07's own stage trace, reused as the
+honest activity record).
+
+`extensions` on `WorkspaceView` is `IntelligenceResult.extensions` itself — Voice, Executive
+Briefing, Collaboration, Analytics, and Mission Monitoring support (the "Support future" list
+this Epic named) were already reserved by EPIC-07; no parallel extension vocabulary was
+declared. `workspace-query.ts` provides deterministic boolean readers
+(`hasConflictingEvidence`, `hasOpenQuestions`, `hasCollaborationCandidates`,
+`isWorkspaceMonitoring`, `isWorkspaceTerminal`) so a future component asks these questions
+instead of inspecting the view's internals itself — the mechanism, established now, that keeps
+intelligence logic out of components once a workspace UI is built. This release ships **zero
+React, zero components, zero routes** — the mission's explicit scope.
+
+`research-workspace-adapter.ts`'s `buildResearchWorkspaceView(topicId)` proves the platform
+against real data by composing two already-real pipelines
+(`runResearchIntelligencePipeline`, `buildResearchIntelligenceNetwork`) with no new logic,
+verified structurally by a successful `npm run build`; like both of its dependencies, it is
+type-checked but not functionally exercised for real data during the build.
+
+Also documented: the pre-existing `lib/workspaces/` (plural) — persona-based evidence-coverage
+explorers behind `/investor`, `/citizen`, `/government` — is a different, real, active system
+built on the Indicator Framework, unrelated in shape and purpose to the new singular
+`lib/workspace/`, and untouched.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation
@@ -234,16 +272,17 @@ exists to de-risk the migration. Unifying or retiring `lib/intelligence/evidence
 numeric-scoring Evidence model, `lib/intelligence/engine/`'s numeric confidence-scoring
 reasoning pipeline, `lib/intelligence/agents/tasks/` / `runtime/`'s dormant task-dispatch system,
 and `lib/intelligence/orchestrator/`'s dormant nine-stage pipeline. Wiring
-`IntelligenceFoundationView.reasoning`/`.workflow`, `IntelligenceResult`, and
-`IntelligenceNetwork` into UI, and giving a real caller a way to record real
+`IntelligenceFoundationView.reasoning`/`.workflow`, `IntelligenceResult`, `IntelligenceNetwork`,
+and now `WorkspaceView` into UI — the first real workspace experience (Research, most likely,
+given it is the only ecosystem with real data) — and giving a real caller a way to record real
 `WorkflowTransition`s as work actually happens (currently every demo Workflow honestly starts and
 stays at `not_started` with empty history). Extension points for Executive Briefing, Voice
 Intelligence, Knowledge Collaboration, Mission Monitoring, Analytics, future AI agents, Research
 Collaboration, Funding Discovery, Innovation Partnerships, University Networks, Government
 Programs, Industrial R&D, International Collaboration, Mission Matching, Knowledge Exchange, and
-Evidence Sharing are reserved on `IntelligenceResult`/`IntelligenceNetwork` but unimplemented. AI
-reasoning (model-backed, as opposed to the deterministic structural reasoning built in EPIC-05),
-a rendered Timeline, and a visual Knowledge Graph view remain future work too — the Evidence,
-Relationship, Reasoning, Workflow, Orchestration, and Network shapes are architecturally ready
-for all of these, but no UI or derivation logic exists yet. No target date is committed here —
-see `docs/current-progress.md` for what's honestly available today.
+Evidence Sharing are reserved but unimplemented. AI reasoning (model-backed, as opposed to the
+deterministic structural reasoning built in EPIC-05), a rendered Timeline UI, and a visual
+Knowledge Graph view remain future work too — the Evidence, Relationship, Reasoning, Workflow,
+Orchestration, Network, and Workspace shapes are architecturally ready for all of these, but no
+UI or derivation logic exists yet. No target date is committed here — see
+`docs/current-progress.md` for what's honestly available today.

@@ -7,3 +7,4 @@ export * from "./reasoning-types";
 export * from "./workflow-types";
 export * from "./orchestration-types";
 export * from "./network-types";
+export * from "./workspace-types";
