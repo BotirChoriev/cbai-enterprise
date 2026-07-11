@@ -13,6 +13,9 @@ import {
   buildPlatformContext,
   parseContextParams,
   loadRecentEntities,
+  loadPinnedEntities,
+  pinEntity,
+  unpinEntity,
   recordRecentEntity,
   resolveEntityRef,
   serializeContextToParams,
@@ -32,6 +35,9 @@ type PlatformContextValue = {
   setSearchQuery: (query: string) => void;
   recordEntityView: (entity: ContextEntityRef) => void;
   navigateWithContext: (path: string, overrides?: Partial<PlatformContextSnapshot>) => void;
+  pinEntityToWorkspace: (entity: ContextEntityRef) => void;
+  unpinEntityFromWorkspace: (kind: ContextEntityRef["kind"], id: string) => void;
+  isEntityPinned: (kind: ContextEntityRef["kind"], id: string) => boolean;
 };
 
 const PlatformContext = createContext<PlatformContextValue | null>(null);
@@ -53,6 +59,9 @@ export function PlatformContextProvider({ children }: { children: ReactNode }) {
   const [recentEntities, setRecentEntities] = useState<ContextEntityRef[]>(() =>
     loadRecentEntities(),
   );
+  const [pinnedEntities, setPinnedEntities] = useState<ContextEntityRef[]>(() =>
+    loadPinnedEntities(),
+  );
 
   const params = useMemo(
     () => parseContextParams(searchParams),
@@ -70,8 +79,9 @@ export function PlatformContextProvider({ children }: { children: ReactNode }) {
         pathname,
       ),
       recentEntities,
+      pinnedEntities,
     };
-  }, [params, pathname, recentEntities]);
+  }, [params, pathname, recentEntities, pinnedEntities]);
 
   const pushContext = useCallback(
     (
@@ -142,6 +152,20 @@ export function PlatformContextProvider({ children }: { children: ReactNode }) {
     setRecentEntities(recordRecentEntity(entity));
   }, []);
 
+  const pinEntityToWorkspace = useCallback((entity: ContextEntityRef) => {
+    setPinnedEntities(pinEntity(entity));
+  }, []);
+
+  const unpinEntityFromWorkspace = useCallback((kind: ContextEntityRef["kind"], id: string) => {
+    setPinnedEntities(unpinEntity(kind, id));
+  }, []);
+
+  const isEntityPinned = useCallback(
+    (kind: ContextEntityRef["kind"], id: string) =>
+      pinnedEntities.some((entity) => entity.kind === kind && entity.id === id),
+    [pinnedEntities],
+  );
+
   const navigateWithContext = useCallback(
     (path: string, overrides?: Partial<PlatformContextSnapshot>) => {
       const merged = {
@@ -167,6 +191,9 @@ export function PlatformContextProvider({ children }: { children: ReactNode }) {
       setSearchQuery,
       recordEntityView,
       navigateWithContext,
+      pinEntityToWorkspace,
+      unpinEntityFromWorkspace,
+      isEntityPinned,
     }),
     [
       context,
@@ -177,6 +204,9 @@ export function PlatformContextProvider({ children }: { children: ReactNode }) {
       setSearchQuery,
       recordEntityView,
       navigateWithContext,
+      pinEntityToWorkspace,
+      unpinEntityFromWorkspace,
+      isEntityPinned,
     ],
   );
 

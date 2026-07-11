@@ -81,4 +81,4 @@ export const RECENT_ENTITIES_ARCHITECTURE_NOTE =
   "Recent history stores locally viewed registry entities only — no fabricated activity.";
 
 export const PINNED_ENTITIES_ARCHITECTURE_NOTE =
-  "Pinned entities architecture reserved for a future release — no default pins.";
+  "No entities pinned to this workspace yet — no default pins, nothing fabricated.";

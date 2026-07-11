@@ -7,6 +7,7 @@ import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-clas
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import RecentEntities from "@/components/platform/context/RecentEntities";
+import PinnedEntities from "@/components/platform/context/PinnedEntities";
 import StatusBadge from "@/components/shared/StatusBadge";
 import Avatar from "@/components/shared/Avatar";
 import {
@@ -181,10 +182,7 @@ export default function MyWork() {
           <p className={cbaiSectionEyebrow} id="my-work-saved-heading">
             Saved Work
           </p>
-          <p className="text-xs text-zinc-500">
-            No persistence layer exists yet for saved work — this is an honest empty state, not
-            an error.
-          </p>
+          <PinnedEntities entities={context.pinnedEntities} />
         </section>
       </div>
     </div>
