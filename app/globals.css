@@ -107,3 +107,21 @@ html.theme-light .home-search-input {
   white-space: nowrap;
   border-width: 0;
 }
+
+/* Assistant accessibility settings — real effects, applied via a class on <html>. */
+.cbai-reduced-motion *,
+.cbai-reduced-motion *::before,
+.cbai-reduced-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+.cbai-high-contrast {
+  filter: contrast(1.15) brightness(1.08);
+}
+
+.cbai-larger-text {
+  font-size: 112.5%;
+}
