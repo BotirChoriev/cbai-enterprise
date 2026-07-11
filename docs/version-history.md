@@ -426,7 +426,7 @@ Zero Platform Core files touched, zero Research Domain files modified, zero Work
 files modified — confirmed by `git diff --stat` at commit time. No UI, no React, no pages, no
 components, per the mission's explicit scope.
 
-## v3.5 — Research Intelligence: First Live Vertical Slice (this release)
+## v3.5 — Research Intelligence: First Live Vertical Slice
 
 Everything built through v3.4 was real and structurally verified but never exercised by an
 actual UI consumer or rendered in a browser. This release closes that gap for one real subject —
@@ -473,6 +473,38 @@ independently confirms real JSX rendering succeeds for all 65 real topics via st
 Zero Platform RC-1, Research Domain, or Research Mission Engine files were modified — only the
 already-shipped Workspace Contract (Phase 3) received the two minimal, documented corrections
 above, plus one new server component, one route file, and the new test harness.
+
+## v3.6 — Research Intelligence: Workspace Activation (this release)
+
+Closes the one gap v3.5 left open: the Research Mission Engine (Phase 4) was built and
+structurally verified but never connected to the live UI. No new engine, domain, or contract —
+per the mission's explicit "Do NOT create" list, this release only rewires an existing consumer.
+
+`ResearchIntelligenceOverview.tsx`'s single call site changed from
+`buildResearchWorkspaceContract` to `buildResearchMission` — which itself embeds the same
+`ResearchWorkspaceContract`, computed once, internally, via its own providers — so the section
+still consumes exactly one Workspace object, now carrying the full chain the mission specified:
+Research Domain → Research Mission → Workspace Contract → Orchestration Pipeline →
+Evidence/Relationships/Reasoning/Workflow → Global Intelligence Network. A new "Mission
+lifecycle" stat surfaces `mission.currentState` — honestly `draft` for every real topic today, no
+mission having ever transitioned, the same "no fabricated provenance" rule `Workflow` (EPIC-06)
+already established.
+
+One minimal correction was required to activate cleanly: `BuildResearchMissionInput.goal`/
+`.scope` were required fields, which would have forced the UI to derive them itself (duplicating
+work the builder already does, or reaching into a lower-level resolver from React). Made
+optional, defaulting to real Research Domain text the function already resolves via its own
+providers — `ResearchMissionEntity.statement` for goal, `ResearchTopicEntity.description` for
+scope (found via the existing `findResearchDomainEntityById` query function, Phase 2) — an honest
+empty string when neither resolves, never a placeholder.
+
+`npm run test:research-slice` gained an eleventh test confirming `buildResearchMission` and
+`buildResearchWorkspaceContract` share the same evidence set for the same topic (never
+re-derived), that `goal`/`scope` are real non-empty strings, and that `currentState` is a
+declared `MissionLifecycleState`. All 11 tests pass. `npm run build` regenerates all 89 routes,
+now exercising the Mission layer on every one of the 65 real topic pages. Zero Platform RC-1,
+Research Domain, or Workspace Contract files touched — only one minimal correction to
+`lib/research-mission/research-mission-builder.ts` (Phase 4) and the component/test updates.
 
 ## Planned (not started)
 

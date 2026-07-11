@@ -2,8 +2,8 @@
 
 Snapshot as of EPIC-10 (**CBAI Platform RC-1** — Platform Core frozen) plus Research Intelligence
 Phase 1 (Domain Foundation), Phase 2 (Domain Integration), Phase 3 (Workspace Contract), Phase 4
-(Mission Engine), and the First Live Vertical Slice (real UI activation for `microbiology`).
-Update this file, not a new one, as state changes.
+(Mission Engine), the First Live Vertical Slice, and Workspace Activation (Research Mission wired
+into the live UI). Update this file, not a new one, as state changes.
 
 ## Real and working today
 
@@ -108,27 +108,35 @@ Update this file, not a new one, as state changes.
   Deliverables are genuinely new (Milestones/Deliverables use categorical status only, never a
   completion percentage). `MissionProviders` + `researchMissionProviders` (calling
   `buildResearchWorkspaceContract`, `buildAllResearchDomainEntities` — both unmodified). Zero
-  Platform Core, Research Domain, or Workspace Contract files touched, zero UI/React/components.
-  Verified structurally by successful `npm run build`.
-- **Research Intelligence: First Live Vertical Slice** — the first real UI consumer of the whole
-  stack, for real topic **`microbiology`** (the richest real topic: 3 real methods, 3 real
-  evidence types, `catalog_available` status, the only topic with two real
-  `lib/research/entities/` cross-references). New server component
-  `components/research/topic/ResearchIntelligenceOverview.tsx` renders a "Research Intelligence
-  Overview" section on the existing `/research/[topicId]` route (one new call to
-  `buildResearchWorkspaceContract`, alongside — not replacing — `ResearchTopicDetail`/
-  `ResearchCockpit`). Verified by: `npm run build` (real static generation of all 65 real topic
-  pages, not just type-checking), `npm run test:research-slice` (10/10 passing — see below), and
+  Platform Core or Research Domain files touched. **Now functionally active**, not just
+  type-checked: rendered live on `/research/[topicId]` (see below). `goal`/`scope` are now
+  optional on `buildResearchMission`'s input, defaulting to real
+  `ResearchMissionEntity.statement`/`ResearchTopicEntity.description` — the one minimal
+  correction made to activate it.
+- **Research Intelligence: First Live Vertical Slice, now with the Mission layer wired in** — the
+  first real UI consumer of the whole stack, for real topic **`microbiology`** (the richest real
+  topic: 3 real methods, 3 real evidence types, `catalog_available` status, the only topic with
+  two real `lib/research/entities/` cross-references). Server component
+  `components/research/topic/ResearchIntelligenceOverview.tsx` renders a "Research Intelligence"
+  section on the existing `/research/[topicId]` route (one call to `buildResearchMission` — which
+  itself embeds the same `ResearchWorkspaceContract` internally, so the UI still consumes exactly
+  one Workspace object — alongside, never replacing, `ResearchTopicDetail`/`ResearchCockpit`).
+  Now shows a "Mission lifecycle" stat (`mission.currentState`, honestly `draft` — no mission has
+  ever transitioned). Verified by: `npm run build` (real static generation of all 65 real topic
+  pages, not just type-checking), `npm run test:research-slice` (11/11 passing — see below), and
   a manual dev-server + curl pass confirming HTTP 200, real content, the existing
   `?evidence=`/review-workspace anchor still work, and no server-side errors logged.
-  **Functionally active** — this is the first Platform Core/Research Domain/Workspace Contract
-  output this repository actually renders anywhere.
-- **`npm run test:research-slice`** — a new, zero-dependency functional test harness
+  **Functionally active** — this is the first place in this repository that Platform Core,
+  Research Domain, Workspace Contract, *and* Research Mission Engine output are all actually
+  rendered together.
+- **`npm run test:research-slice`** — a zero-dependency functional test harness
   (`scripts/test-research-slice.ts` + `scripts/register-alias-loader.mjs`) using only Node's
   built-in `node:test` runner and native TypeScript execution (no Jest/Vitest/ts-node/tsx
   installed). Covers: valid/unknown topic ID handling, no fabricated fields, empty data stays
   empty, evidence/relationship traceability, `humanDecisionRequired === true` at runtime, valid
-  `WorkflowState`, Contract-reuses-pipeline verification, and a data-layer throw check. All 10
+  `WorkflowState`, Contract-reuses-pipeline verification, a data-layer throw check, and (new)
+  confirmation that `buildResearchMission` and `buildResearchWorkspaceContract` share the same
+  evidence set with real, non-empty `goal`/`scope` and a valid `MissionLifecycleState`. All 11
   pass. This is the first automated test coverage of any kind in this repository.
 - **Public entry experience**: hero, three-ecosystem model, capability flow, audience section,
   trust section — all real, honest content, no fabricated statistics.
@@ -244,26 +252,25 @@ Update this file, not a new one, as state changes.
 - No UI, React, components, or pages were built for Phase 4 — deliberately out of scope per its
   own mission ("No UI. No React. No Pages. No Components."). `lib/research-mission/` remains a
   plain data-composition and state-machine module.
-- `buildResearchMission`/`applyMissionTransition` are not called from any static-generation path
-  — type-checked by `npm run build`, not functionally exercised. No mission has ever actually
-  transitioned states anywhere in this repository; every real `ResearchMission` a caller builds
-  today honestly starts and stays at `draft` with empty history, the same "no fabricated
-  provenance" status `Workflow` (EPIC-06) and `Workflow`-based demos have always had.
-- **`lib/research-mission/` remains entirely disconnected from the now-live UI** — the vertical
-  slice activates Workspace Contract/Reasoning/Evidence/Workflow/Network, but not the Research
-  Mission Engine (Phase 4). Still type-checked only, unchanged by this work.
-- The vertical slice activates only `microbiology`'s data path structurally (via tests) and by
-  rendering it live; the other 64 real topics are exercised only by `npm run build`'s static
-  generation (confirmed successful, but not individually spot-checked in a browser or by a
-  dedicated test). No topic-specific bug is known, but only one topic received the full manual
-  verification pass described above.
-- `RecommendedNextStep`/`intelligenceBrief` were added only to `ResearchWorkspaceContract`, not
-  propagated to `lib/research-mission/`'s `ResearchMission` (which embeds a whole
-  `ResearchWorkspaceContract`, so the new fields *are* reachable via
-  `mission.workspaceContract?.missionSummary.intelligenceBrief`, but `ResearchMission` itself
-  exposes no dedicated shortcut field for either, the way it already does for `risks`/
-  `researchQuestions`/etc.). Not added — no current caller needs it, and Phase 4 is itself not
-  yet wired to any UI.
+- `applyMissionTransition` is not called from any static-generation path or any UI — type-checked
+  by `npm run build`, not functionally exercised. No mission has ever actually transitioned
+  states anywhere in this repository; every real `ResearchMission` the live UI now builds
+  honestly starts and stays at `draft` with empty history, rendered as-is (the "Mission
+  lifecycle" stat shows `Draft` for every real topic today) — the same "no fabricated provenance"
+  status `Workflow` (EPIC-06) and `Workflow`-based demos have always had.
+- `buildResearchMission` (and therefore `lib/research-mission/`) **is now called from the live
+  UI** — the "Workspace Activation" release resolved the disconnection previously recorded here.
+- The vertical slice + activation work exercises only `microbiology`'s data path structurally
+  (via tests) and by rendering it live; the other 64 real topics are exercised only by
+  `npm run build`'s static generation (confirmed successful, but not individually spot-checked in
+  a browser or by a dedicated test). No topic-specific bug is known, but only one topic received
+  the full manual verification pass described above.
+- `RecommendedNextStep`/`intelligenceBrief` (added to `ResearchWorkspaceContract` during the
+  vertical slice) have no dedicated shortcut field on `ResearchMission` itself — they remain
+  reachable only via `mission.workspaceContract?.missionSummary.intelligenceBrief` /
+  `.missionProgress.recommendedNextStep`, unlike `risks`/`researchQuestions`/etc., which
+  `ResearchMission` does expose directly. Not added — the live UI reads them off
+  `mission.workspaceContract` directly today, so no current caller needs a shortcut.
 
 ## Known technical debt
 
@@ -471,3 +478,13 @@ Update this file, not a new one, as state changes.
   would remove the duplicate work cheaply. Not attempted — out of scope for "make one vertical
   slice work," and doing so would touch the already-shipped Workspace Contract more than the two
   minimal, targeted fixes this phase already made.
+- **The live UI now recomputes one more layer per topic page**: `buildResearchMission` calls
+  `resolveWorkspaceContract` (which itself triggers the full pipeline/network/domain-entity
+  rebuild above) *and* independently calls `resolveResearchDomainEntities`/
+  `resolveResearchMissionEntity` again for its own `expectedOutcomes`/`dependencies`/goal/scope
+  derivation — so the 65-topic Research Domain entity collection is now rebuilt roughly twice per
+  page (once inside `resolveWorkspaceContract`, once directly by `buildResearchMission`) rather
+  than once. Still bounded and acceptable at today's scale (`npm run build` remains a few
+  seconds); the same future module-level-memoization fix noted above would remove this too. Not
+  attempted here, per the mission's "Do NOT create any new Platform capability" — a caching layer
+  is a new capability, not an activation.

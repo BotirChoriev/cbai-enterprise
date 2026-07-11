@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { buildResearchWorkspaceContract } from "@/lib/research-workspace/research-workspace-builder";
+import { buildResearchMission } from "@/lib/research-mission/research-mission-builder";
+import { MISSION_LIFECYCLE_STATE_LABELS } from "@/lib/research-mission/research-mission-engine";
 import { WORKFLOW_STATE_LABELS } from "@/lib/foundation/workflow-types";
 import { VERIFICATION_STATUS_LABELS } from "@/lib/foundation/evidence-types";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
@@ -9,21 +10,26 @@ type ResearchIntelligenceOverviewProps = {
 };
 
 /**
- * The first live consumer of the Research Workspace Contract (Phase 3) and everything it
- * composes — Evidence, Relationships, Reasoning, Workflow, and the Global Intelligence Network.
- * Server component: no client state, no hooks. Calls `buildResearchWorkspaceContract` exactly
- * once and renders only from its already-computed output — this file contains no evidence,
- * relationship, reasoning, or workflow logic of its own.
+ * The one live consumer of the full Research Intelligence chain — Research Domain (Phase 1/2) →
+ * Research Mission (Phase 4) → Research Workspace Contract (Phase 3) → Orchestration Pipeline →
+ * Evidence/Relationships/Reasoning/Workflow → Global Intelligence Network. Server component: no
+ * client state, no hooks. Calls `buildResearchMission` exactly once — the single Workspace
+ * object this section renders from — and reads everything else off its already-computed
+ * `workspaceContract` and mission-lifecycle fields; this file contains no evidence, relationship,
+ * reasoning, or workflow logic of its own, and never calls a lower-level engine directly.
  *
  * Deliberately does not duplicate ResearchCockpit (current stage / blocking factors / latest
- * workspace activity, all from the pre-existing legacy engines) — this section shows what the
- * Platform Core layer specifically adds: the Evidence Center's supporting/conflicting split, the
- * Reasoning Framework's known-unknowns and observed facts, the new universal Workflow's own
- * state, and real Research Domain connections (organizations, datasets). Where the Contract has
- * no real data yet, an honest empty-state sentence is shown — never a fabricated value.
+ * workspace activity, all from the pre-existing legacy engines), the Review Workspace, or the
+ * Evidence Workspace — this section shows what the Platform Core + Research Domain layers
+ * specifically add: the Evidence Center's per-item verification status, the Reasoning
+ * Framework's known-unknowns and observed facts, the new universal Workflow's own state, the
+ * Research Mission's own project lifecycle, and real Research Domain connections (organizations,
+ * datasets). Where the Contract has no real data yet, an honest empty-state sentence is shown —
+ * never a fabricated value.
  */
 export default function ResearchIntelligenceOverview({ topicId }: ResearchIntelligenceOverviewProps) {
-  const contract = buildResearchWorkspaceContract({ subjectId: topicId });
+  const mission = buildResearchMission({ missionId: topicId });
+  const contract = mission.workspaceContract;
 
   if (!contract) {
     return null;
@@ -38,27 +44,35 @@ export default function ResearchIntelligenceOverview({ topicId }: ResearchIntell
   ];
 
   const emptySections: string[] = [];
-  if (contract.openHypotheses.hypotheses.length === 0) emptySections.push("hypotheses");
+  if (mission.hypotheses.length === 0) emptySections.push("hypotheses");
   if (contract.researchFindings.findings.length === 0) emptySections.push("findings");
-  if (contract.relatedPublications.publications.length === 0) emptySections.push("publications");
-  if (contract.relatedPatents.patents.length === 0) emptySections.push("patents");
+  if (mission.relatedPublications.length === 0) emptySections.push("publications");
+  if (mission.relatedPatents.length === 0) emptySections.push("patents");
   if (contract.relatedTechnologies.technologies.length === 0) emptySections.push("technologies");
-  if (contract.researchTeam.team.length === 0) emptySections.push("team members");
+  if (mission.participants.length === 0) emptySections.push("team members");
   if (contract.fundingOpportunities.opportunities.length === 0 && contract.fundingOpportunities.grants.length === 0)
     emptySections.push("funding opportunities");
   if (contract.potentialCollaborators.candidates.length === 0) emptySections.push("potential collaborators");
-  if (contract.openRisks.risks.length === 0) emptySections.push("risks");
+  if (mission.risks.length === 0) emptySections.push("risks");
+  if (mission.milestones.length === 0) emptySections.push("milestones");
+  if (mission.deliverables.length === 0) emptySections.push("deliverables");
 
   return (
     <section aria-labelledby="research-intelligence-overview-heading" className={`${cbaiGlassCard} space-y-5 p-4 sm:p-5`}>
       <div>
-        <p className={cbaiSectionEyebrow}>Research intelligence overview</p>
+        <p className={cbaiSectionEyebrow}>Research intelligence</p>
         <h2 id="research-intelligence-overview-heading" className="mt-1 text-base font-semibold text-zinc-100">
           {missionSummary.missionCenter.question.question}
         </h2>
       </div>
 
       <dl className="flex flex-wrap gap-2">
+        <div className="rounded-md border border-zinc-800/80 bg-slate-950/50 px-2.5 py-1">
+          <dt className="text-[9px] font-medium uppercase tracking-wider text-zinc-600">Mission lifecycle</dt>
+          <dd className="mt-0.5 text-xs font-medium text-zinc-200">
+            {MISSION_LIFECYCLE_STATE_LABELS[mission.currentState]}
+          </dd>
+        </div>
         <div className="rounded-md border border-zinc-800/80 bg-slate-950/50 px-2.5 py-1">
           <dt className="text-[9px] font-medium uppercase tracking-wider text-zinc-600">Workflow state</dt>
           <dd className="mt-0.5 text-xs font-medium text-zinc-200">

@@ -1049,6 +1049,52 @@ resolvers, `resolveResearchDomainEntities`/`resolveIntelligenceNetwork`, at the 
 would remove the duplicate work cheaply — not attempted here to keep this change a pure
 activation exercise, not a platform refactor.
 
+## Research Intelligence — Workspace Activation (Research Mission wired in)
+
+A follow-up mission ("CBAI RESEARCH INTELLIGENCE PHASE 5 — ACTIVATE EXISTING RESEARCH WORKSPACE")
+closed the one gap the First Live Vertical Slice above left open: `lib/research-mission/` (Phase
+4) was built, structurally verified, and never connected to the live UI. This section wires it
+in — no new engine, domain, or contract, per that mission's explicit "Do NOT create" list.
+
+### `ResearchIntelligenceOverview.tsx` now consumes `buildResearchMission`, not `buildResearchWorkspaceContract`, directly
+
+The component's single call site changed from `buildResearchWorkspaceContract({ subjectId })` to
+`buildResearchMission({ missionId: topicId })`. `ResearchMission` (Phase 4) already embeds a
+`workspaceContract?: ResearchWorkspaceContract` field — the exact same Contract, computed once,
+internally, by `buildResearchMission`'s own call into `researchMissionProviders`. The component
+reads `mission.workspaceContract` for everything it already showed, plus one new stat: **Mission
+lifecycle** (`mission.currentState`, via `MISSION_LIFECYCLE_STATE_LABELS`) — the Research Mission
+Engine's own 9-state project lifecycle (draft/planned/active/.../archived/cancelled), honestly
+`"draft"` for every real topic today (no mission has ever transitioned; `mission.history` is
+always empty, the same "no fabricated provenance" rule `Workflow` (EPIC-06) already established).
+This satisfies "the UI must consume ONE Workspace object" more completely than before: one call,
+one object, which itself carries the full Research Domain → Research Mission → Workspace
+Contract → Pipeline → Evidence/Reasoning/Workflow/Network chain the mission specified.
+
+### One minimal correction to `lib/research-mission/research-mission-builder.ts`
+
+`BuildResearchMissionInput.goal`/`.scope` were required fields — a UI caller would otherwise have
+had to derive them itself (reaching into Research Domain data directly, which either duplicates
+work `buildResearchMission` already does internally via its own providers, or means calling a
+"lower-level" resolver from React). Made optional, defaulting to real data the function already
+resolves via its own providers: `goal` defaults to the real `ResearchMissionEntity.statement`
+(Phase 2); `scope` defaults to the real `ResearchTopicEntity.description` (Phase 2, looked up via
+`findResearchDomainEntityById`, an existing Phase 2 query function — no new lookup logic). Never a
+placeholder string — an honest empty string when neither real source resolves (e.g. an unknown
+topic id). This is the same "minimal, documented correction to enable activation" pattern used
+for the Workspace Contract fixes in the prior mission, applied here to `lib/research-mission/`.
+
+### Verification
+
+`npm run test:research-slice` gained one new test (11 of 11 passing): confirms `buildResearchMission`
+and `buildResearchWorkspaceContract` produce the same evidence set for the same topic (never
+re-derived), that `goal`/`scope` are real non-empty strings, and that `currentState` is one of
+the declared `MISSION_LIFECYCLE_STATES`. `npm run build` regenerates all 89 routes, including all
+65 real topic pages, now exercising the Mission layer on every one. A dev-server + curl pass
+confirmed the new "Mission lifecycle: Draft" stat renders, and every previously-verified route
+(`/research/antibiotic-resistance`, `/research?evidence=...`, `/research`) still returns 200 with
+no new server-side errors.
+
 ## Research Intelligence module map (current)
 
 ```

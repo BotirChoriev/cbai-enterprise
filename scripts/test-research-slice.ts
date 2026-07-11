@@ -13,6 +13,8 @@ import assert from "node:assert/strict";
 import { buildResearchWorkspaceContract } from "@/lib/research-workspace/research-workspace-builder";
 import { runResearchIntelligencePipeline } from "@/lib/foundation/adapters/research-foundation-adapter";
 import { WORKFLOW_STATES } from "@/lib/foundation/workflow-types";
+import { buildResearchMission } from "@/lib/research-mission/research-mission-builder";
+import { MISSION_LIFECYCLE_STATES } from "@/lib/research-mission/research-mission-engine";
 
 // The richest real topic in the catalog: 3 real relatedMethods, 3 real relatedEvidenceTypes,
 // "catalog_available" status, and the only topic cross-referenced by two entities-registry
@@ -120,9 +122,11 @@ test("9. workspace output reuses pipeline and network results (never re-derives)
 
 test("10. the selected topic's data layer does not throw (real JSX render verified by `npm run build`'s static generation of /research/microbiology)", () => {
   assert.doesNotThrow(() => {
-    const contract = buildResearchWorkspaceContract({ subjectId: TEST_TOPIC_ID });
+    const mission = buildResearchMission({ missionId: TEST_TOPIC_ID });
+    const contract = mission.workspaceContract;
     assert.ok(contract);
     // Exercise the exact same field accesses ResearchIntelligenceOverview.tsx reads.
+    void mission.currentState;
     void contract!.missionSummary.missionCenter.question.question;
     void contract!.missionProgress.monitoring.currentState;
     void contract!.missionProgress.recommendedNextStep;
@@ -133,4 +137,28 @@ test("10. the selected topic's data layer does not throw (real JSX render verifi
     void contract!.researchTimeline.events;
     void contract!.activityTimeline.pipelineTrace;
   });
+});
+
+test("11. the full chain wires Research Domain through Research Mission to the same Workspace Contract (one Workspace object, never re-derived)", () => {
+  const mission = buildResearchMission({ missionId: TEST_TOPIC_ID });
+  const contract = buildResearchWorkspaceContract({ subjectId: TEST_TOPIC_ID });
+  assert.ok(mission.workspaceContract);
+  assert.ok(contract);
+
+  // Real, non-fabricated goal/scope, sourced from the Research Domain (Phase 1/2), not invented.
+  assert.ok(mission.goal.length > 0, "goal should default to the real ResearchMissionEntity statement");
+  assert.ok(mission.scope.length > 0, "scope should default to the real ResearchTopicEntity description");
+
+  assert.ok(
+    (MISSION_LIFECYCLE_STATES as readonly string[]).includes(mission.currentState),
+    `"${mission.currentState}" must be one of the declared MISSION_LIFECYCLE_STATES`,
+  );
+
+  const missionEvidenceIds = mission.evidence.map((item) => item.evidenceId).sort();
+  const contractEvidenceIds = contract!.evidenceSummary.evidence.map((item) => item.evidenceId).sort();
+  assert.deepEqual(
+    missionEvidenceIds,
+    contractEvidenceIds,
+    "mission.evidence must be the same records the Workspace Contract carries — never re-derived",
+  );
 });

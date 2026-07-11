@@ -1,5 +1,7 @@
 import type { RelationshipType } from "@/lib/foundation/relationship-types";
 import type { ResearchOutcomeEntity } from "@/lib/research-domain/research-entities-outcomes";
+import type { ResearchTopicEntity } from "@/lib/research-domain/research-entities-intent";
+import { findResearchDomainEntityById } from "@/lib/research-domain/research-domain-query";
 import type { ResearchMission } from "@/lib/research-mission/research-mission-engine";
 import {
   researchMissionProviders,
@@ -46,8 +48,10 @@ const DEPENDENCY_RELATIONSHIP_TYPE: RelationshipType = "depends_on";
 
 export interface BuildResearchMissionInput {
   missionId: string;
-  goal: string;
-  scope: string;
+  /** Optional — defaults to the real ResearchMissionEntity's own statement when omitted, never a placeholder. */
+  goal?: string;
+  /** Optional — defaults to the real ResearchTopicEntity's own description when omitted, never a placeholder. */
+  scope?: string;
   providers?: MissionProviders;
 }
 
@@ -58,14 +62,30 @@ export interface BuildResearchMissionInput {
  * reference into data Phase 2/Phase 3 already built; "dependencies" is the one field this
  * function filters itself, and only by a real, existing field (`relationshipType`) on an
  * already-real Relationship collection — never a new relationship or evidence derivation.
+ *
+ * `goal`/`scope` default to real Research Domain text (the mission entity's own statement; the
+ * topic entity's own description) rather than requiring every caller to supply them, so a UI
+ * consumer can build a full ResearchMission from nothing but a subject id — never a fabricated
+ * default, always the real record already resolved via `providers`.
  */
 export function buildResearchMission(input: BuildResearchMissionInput): ResearchMission {
   const providers = input.providers ?? researchMissionProviders;
-  const base = createResearchMission(input);
 
   const workspaceContract = providers.resolveWorkspaceContract(input.missionId);
   const domainEntities = providers.resolveResearchDomainEntities();
   const researchMissionEntity = providers.resolveResearchMissionEntity(input.missionId);
+  const resolvedTopicEntity = findResearchDomainEntityById(
+    domainEntities,
+    `research-topic:${input.missionId}`,
+  );
+  const researchTopicEntity: ResearchTopicEntity | undefined =
+    resolvedTopicEntity?.entityKind === "research_topic" ? resolvedTopicEntity : undefined;
+
+  const base = createResearchMission({
+    missionId: input.missionId,
+    goal: input.goal ?? researchMissionEntity?.statement ?? "",
+    scope: input.scope ?? researchTopicEntity?.description ?? "",
+  });
 
   const expectedOutcomes = domainEntities.filter(
     (entity): entity is ResearchOutcomeEntity => entity.entityKind === "research_outcome",
