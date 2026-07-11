@@ -225,7 +225,7 @@ not called from any static-generation path, so — like EPIC-07's
 `runResearchIntelligencePipeline` — it is type-checked but not functionally exercised for real
 data during the build.
 
-## v2.8 — Intelligence Workspace Platform (EPIC-09, this release)
+## v2.8 — Intelligence Workspace Platform (EPIC-09)
 
 `lib/foundation/workspace-types.ts` + `lib/workspace/` — not a dashboard, not a page, not
 isolated UI. One reusable `WorkspaceView` shape with the nine sections the mission required
@@ -263,6 +263,40 @@ explorers behind `/investor`, `/citizen`, `/government` — is a different, real
 built on the Indicator Framework, unrelated in shape and purpose to the new singular
 `lib/workspace/`, and untouched.
 
+## v3.0 — CBAI Platform RC-1 (EPIC-10, this release)
+
+No new capability, no new domain, no new ecosystem — this release is an audit and a freeze. A
+full Phase 1–4 platform audit of the Platform Core (`lib/foundation/` through `lib/workspace/`
+plus `lib/foundation/adapters/`, 41 files, 2,761 lines) found and fixed one real duplicate: six
+independently-declared, byte-for-byte-identical `{ valid, issues }` validator-result interfaces,
+consolidated into `lib/foundation/validation-types.ts`'s `PlatformValidationResult` with all six
+original names kept as zero-behavior-change aliases — the same promotion discipline used for
+`Confidence`, `EvidenceSourceType`, and `VerificationStatus` in EPIC-04.
+
+A full import-graph extraction confirmed zero circular dependencies — the Platform Core is a
+strict DAG exactly as every prior Epic's architecture notes claimed, verified directly rather
+than by inspection alone. One documentation imprecision was corrected. Two further findings were
+deliberately **not** acted on, to keep this freeze itself low-risk: a `createWorkflow` vs.
+`build*` naming inconsistency (fixing it would mean rewriting four historical Epic doc records,
+a blast radius judged not worth a cosmetic gain), and six validator functions with zero callers
+(published capability awaiting a real caller, not orphaned code).
+
+A full Constitution audit against nine principles (Evidence First, Human Decision, No fabricated
+data, No fabricated confidence, No fake metrics, Explainable Intelligence, Traceable
+Intelligence, Universal Platform, Ecosystem Neutral) found **zero violations** inside the
+Platform Core. Pre-existing, already-documented violations outside the Platform Core
+(`/companies`/`/universities` fabricated scores; six dormant `lib/intelligence/` subsystems;
+three unmigrated graph systems) remain unchanged and out of this Epic's scope.
+
+The full audit trail, health analysis, and Core Freeze declaration live in
+`docs/CBAI-Platform-RC1.md`. `docs/standards/01-cbai-constitution.md` was amended with a
+ratified "Platform Core Principles" section codifying the nine principles above as the governing
+rules for `lib/foundation/` onward. The Platform Core is now frozen: future Epics extend it
+through the four Extension Points named in `docs/CBAI-Platform-RC1.md` (the
+`IntelligencePipelineProviders` plugin contract, the two `ExtensionPoints` interfaces, the
+per-domain adapter pattern, and closed-but-extensible vocabularies) rather than modifying it,
+except to fix a genuine defect.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation
@@ -284,5 +318,8 @@ Evidence Sharing are reserved but unimplemented. AI reasoning (model-backed, as 
 deterministic structural reasoning built in EPIC-05), a rendered Timeline UI, and a visual
 Knowledge Graph view remain future work too — the Evidence, Relationship, Reasoning, Workflow,
 Orchestration, Network, and Workspace shapes are architecturally ready for all of these, but no
-UI or derivation logic exists yet. No target date is committed here — see
+UI or derivation logic exists yet. Renaming `createWorkflow`/`CreateWorkflowInput` to
+`buildWorkflow`/`BuildWorkflowInput` for naming consistency, in a dedicated commit that can
+afford to update the four historical Epic doc records that name it verbatim (RC-1 deliberately
+left this alone — see `docs/CBAI-Platform-RC1.md`). No target date is committed here — see
 `docs/current-progress.md` for what's honestly available today.

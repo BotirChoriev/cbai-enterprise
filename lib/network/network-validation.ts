@@ -1,9 +1,8 @@
 import type { IntelligenceNetwork } from "@/lib/foundation/network-types";
+import type { PlatformValidationResult } from "@/lib/foundation/validation-types";
 
-export interface NetworkValidationResult {
-  valid: boolean;
-  issues: readonly string[];
-}
+/** Promoted to lib/foundation/validation-types.ts — re-exported here so existing imports keep working. */
+export type NetworkValidationResult = PlatformValidationResult;
 
 /**
  * Deterministic structural validation only — confirms the network is internally honest, not

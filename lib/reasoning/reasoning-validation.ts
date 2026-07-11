@@ -1,9 +1,8 @@
 import type { ReasoningInput } from "@/lib/foundation/reasoning-types";
+import type { PlatformValidationResult } from "@/lib/foundation/validation-types";
 
-export interface ReasoningInputValidationResult {
-  valid: boolean;
-  issues: readonly string[];
-}
+/** Promoted to lib/foundation/validation-types.ts — re-exported here so existing imports keep working. */
+export type ReasoningInputValidationResult = PlatformValidationResult;
 
 /**
  * Deterministic structural validation only — confirms the input is complete enough to reason

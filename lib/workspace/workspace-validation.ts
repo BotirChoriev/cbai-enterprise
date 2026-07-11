@@ -1,9 +1,8 @@
 import type { WorkspaceView } from "@/lib/foundation/workspace-types";
+import type { PlatformValidationResult } from "@/lib/foundation/validation-types";
 
-export interface WorkspaceValidationResult {
-  valid: boolean;
-  issues: readonly string[];
-}
+/** Promoted to lib/foundation/validation-types.ts — re-exported here so existing imports keep working. */
+export type WorkspaceValidationResult = PlatformValidationResult;
 
 /**
  * Deterministic structural validation only — confirms the workspace has a real identity and a

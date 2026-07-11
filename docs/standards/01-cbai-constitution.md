@@ -1,8 +1,12 @@
 # 01 — CBAI Constitution Standard
 
 **Document ID:** CBAI-Standard-01-Constitution  
-**Version:** 1.0.0  
+**Version:** 1.1.0  
 **Status:** Official
+**Amendment (v1.1.0):** Ratifies the Platform Core Principles below, effective with the CBAI
+Platform RC-1 freeze (EPIC-10). No prior principle is superseded or weakened — the amendment adds
+principles verified against the Platform Core built in EPICs 02–09; see
+`docs/CBAI-Platform-RC1.md` for the audit that grounds them.
 
 ---
 
@@ -38,6 +42,32 @@ Supporting engineering principles (from architecture baseline):
 - **Graph as relationship authority** — typed edges with provenance, not ad hoc string matching
 - **Explainable by default** — pipeline stages and evidence paths are auditable
 - **Stability over novelty** — lint and build must pass; dead code removed
+
+---
+
+## Platform Core Principles (ratified with CBAI Platform RC-1, EPIC-10)
+
+The Platform Core (`lib/foundation/`, `lib/relationships/`, `lib/evidence/`, `lib/reasoning/`,
+`lib/workflow/`, `lib/orchestration/`, `lib/network/`, `lib/workspace/`, and
+`lib/foundation/adapters/`) is a domain-agnostic layer built across EPICs 02–09 and audited for
+Constitution compliance at freeze time (EPIC-10, `docs/CBAI-Platform-RC1.md`). It governs its own
+nine principles, consistent with and additive to the principles above:
+
+| Principle | Definition | Verified by |
+|-----------|------------|-------------|
+| **Evidence First** | No Relationship, ReasoningResult field, or WorkflowTransition without a traceable Evidence id or an explicit, honest absence — never a silent omission | `evidenceReference: string \| null` (required key, honest nullable value) |
+| **Human Decision** | The platform never claims to have made a decision on a human's behalf | `ReasoningResult.humanDecisionRequired: true` — a TypeScript literal type, not just a runtime default |
+| **No fabricated data** | Every Platform Core output is a real transformation of real input; nothing is invented to fill a gap | Zero mock/fake/placeholder literals confirmed by audit across all Platform Core files |
+| **No fabricated confidence** | Confidence, reliability, and strength are always categorical, never a numeric score | `Confidence`, `RelationshipStrength`, `EvidenceReliability` are closed string unions; every numeric field is a real, derivable count |
+| **No fake metrics** | Every number the platform reports is a real, countable fact | Confirmed by audit: `outputCount`, `evidenceCount`, `historyLength`, `sourceCount` — no scores, no percentages |
+| **Explainable Intelligence** | Every output shows how it was reached, not just what it concluded | `ReasoningResult.reasoningPath`, `IntelligenceResult.pipelineTrace`, `Workflow.history` |
+| **Traceable Intelligence** | Traceability survives composition — a Workspace-level view is exactly as auditable as the engine outputs it composes | `WorkspaceView`'s nine sections are pass-throughs, never re-derivations |
+| **Universal Platform** | No Platform Core module is written for one ecosystem | Confirmed by import-graph audit: zero domain-specific logic outside `lib/foundation/adapters/` |
+| **Ecosystem Neutral** | Platform Core vocabularies use domain-neutral terms, usable by Research, Governance, Economic, Engineering, Education, Legal, Healthcare, Technology, and Climate ecosystems alike | No ecosystem name appears in any Platform Core file outside the adapter boundary |
+
+These nine principles apply specifically to `lib/foundation/` and its sibling engines; the
+platform-wide principles in the table above (Evidence First, Zero Demo Policy, Golden Rule, etc.)
+continue to apply everywhere, including outside the Platform Core.
 
 ---
 
@@ -134,3 +164,7 @@ Constitution compliance is layered:
 - [06 — Methodology Standard](./06-methodology-standard.md)
 - [07 — Persona Standard](./07-persona-standard.md)
 - `docs/CBAI-Constitution-v1.md` (historical architecture baseline)
+- `docs/CBAI-Platform-RC1.md` (Platform Core audit and freeze — grounds the Platform Core
+  Principles section above)
+- `docs/architecture.md`, `docs/build-ledger.md`, `docs/version-history.md`,
+  `docs/current-progress.md` (the living Platform Core record, EPICs 02–10)

@@ -1,10 +1,9 @@
 import type { Workflow } from "@/lib/foundation/workflow-types";
 import { canTransitionWorkflow } from "@/lib/workflow/workflow-transition";
+import type { PlatformValidationResult } from "@/lib/foundation/validation-types";
 
-export interface WorkflowValidationResult {
-  valid: boolean;
-  issues: readonly string[];
-}
+/** Promoted to lib/foundation/validation-types.ts — re-exported here so existing imports keep working. */
+export type WorkflowValidationResult = PlatformValidationResult;
 
 /**
  * Deterministic structural validation only — confirms the Workflow record is internally

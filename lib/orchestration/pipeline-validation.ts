@@ -1,9 +1,8 @@
 import type { IntelligencePipelineProviders } from "@/lib/orchestration/pipeline-types";
+import type { PlatformValidationResult } from "@/lib/foundation/validation-types";
 
-export interface PipelineProvidersValidationResult {
-  valid: boolean;
-  issues: readonly string[];
-}
+/** Promoted to lib/foundation/validation-types.ts — re-exported here so existing imports keep working. */
+export type PipelineProvidersValidationResult = PlatformValidationResult;
 
 /**
  * Deterministic structural validation only — confirms a domain has supplied the required,

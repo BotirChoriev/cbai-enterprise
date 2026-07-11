@@ -1,9 +1,8 @@
 import type { Evidence } from "@/lib/foundation/foundation-model";
+import type { PlatformValidationResult } from "@/lib/foundation/validation-types";
 
-export interface EvidenceValidationResult {
-  valid: boolean;
-  issues: readonly string[];
-}
+/** Promoted to lib/foundation/validation-types.ts — re-exported here so existing imports keep working. */
+export type EvidenceValidationResult = PlatformValidationResult;
 
 /**
  * Deterministic structural validation only — never a quality, trust, or truth score. Confirms

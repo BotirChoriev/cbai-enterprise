@@ -1,6 +1,7 @@
 # CBAI Current Progress
 
-Snapshot as of EPIC-09. Update this file, not a new one, as state changes.
+Snapshot as of EPIC-10 (**CBAI Platform RC-1** — Platform Core frozen). Update this file, not a
+new one, as state changes.
 
 ## Real and working today
 
@@ -59,6 +60,13 @@ Snapshot as of EPIC-09. Update this file, not a new one, as state changes.
   zero new intelligence logic. Wired into a new `research-workspace-adapter.ts`. Verified
   structurally by successful `npm run build`. Ships zero React, zero components, zero routes —
   the mission's explicit scope.
+- **CBAI Platform RC-1** (`docs/CBAI-Platform-RC1.md`): the Platform Core (`lib/foundation/`
+  through `lib/workspace/` plus `lib/foundation/adapters/`, 41 files, 2,761 lines) is audited and
+  frozen. Zero circular dependencies confirmed by a full import-graph extraction; one real
+  duplicate found and fixed (six identical validator-result interfaces consolidated into
+  `lib/foundation/validation-types.ts`'s `PlatformValidationResult`); zero Constitution
+  violations found inside the Platform Core across nine audited principles. See the audit
+  document for the full Phase 1–4 findings.
 - **Public entry experience**: hero, three-ecosystem model, capability flow, audience section,
   trust section — all real, honest content, no fabricated statistics.
 - **Public search / Evidence Core** (`/search`, `/countries`, `/companies`, `/universities`):
@@ -142,6 +150,16 @@ Snapshot as of EPIC-09. Update this file, not a new one, as state changes.
   dependencies (`runResearchIntelligencePipeline`, `buildResearchIntelligenceNetwork`) — it is
   type-checked by `npm run build` but not functionally executed for real data during the build.
   No functional correctness issue is known; this is a verification-depth gap, not a behavior gap.
+- No new Intelligence Engine, business domain, ecosystem, or feature was built this Epic —
+  deliberately out of scope per the mission ("This mission is NOT feature development."). EPIC-10
+  performed a platform audit and Core Freeze only.
+- The `createWorkflow` → `buildWorkflow` naming-consistency rename was identified but not
+  performed this Epic, to keep the freeze itself low-risk (see `docs/CBAI-Platform-RC1.md`).
+- No test suite was added — the Platform Core's correctness continues to rely on TypeScript's
+  structural type-checking (`npm run build`) and manual audit, not automated tests. This is a
+  pre-existing, platform-wide condition (no test runner is configured anywhere in this repo),
+  not introduced or newly discovered by this Epic, but explicitly noted as a Future Risk in the
+  RC-1 health analysis.
 
 ## Known technical debt
 
@@ -240,3 +258,17 @@ Snapshot as of EPIC-09. Update this file, not a new one, as state changes.
   `/investor`, `/citizen`, `/government`) remains a separate, unrelated system and was not
   unified with the new singular `lib/workspace/` — they solve different problems at different
   layers (UI-facing methodology explainer vs. a universal, UI-agnostic composed data shape).
+- **`createWorkflow`/`CreateWorkflowInput` naming inconsistency**, found and documented during
+  EPIC-10 (`docs/CBAI-Platform-RC1.md` has the full write-up): every sibling engine's
+  constructor uses `build*`, but the Workflow engine's uses `create*`, visible even in
+  `IntelligencePipelineProviders.buildWorkflow` (a field named `build...` defaulting to a
+  function named `create...`). Not renamed this Epic — the rename's blast radius (three code call
+  sites, four historical Epic doc records) exceeded the freeze's low-risk bar. Flagged for a
+  future, non-freeze commit.
+- **Six zero-caller validator exports**, found and documented during EPIC-10:
+  `validateEvidenceRecord`, `validateReasoningInput`, `validateWorkflowRecord`,
+  `validateIntelligenceNetwork`, `validateIntelligencePipelineProviders`, and
+  `validateWorkspaceView` are published, deterministic structural checks with no current caller
+  anywhere in the repo. Not removed — each is real, documented capability awaiting a future
+  caller (a persistence layer, a UI form, or a new domain adapter), not orphaned code. Risk: with
+  no test suite, a future refactor could silently break one without any call site catching it.

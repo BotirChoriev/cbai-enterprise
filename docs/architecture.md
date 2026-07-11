@@ -571,6 +571,42 @@ Framework and Evidence Infrastructure — unrelated in shape and purpose to the 
 `lib/workspace/`, and untouched. No naming collision exists (`WorkspaceView` vs.
 `WorkspaceBaseModel`, `WorkspaceSummary`, etc. — all distinct identifiers).
 
+## Platform Core Freeze — CBAI Platform RC-1
+
+EPIC-10 performed a full audit of everything above (`lib/foundation/` through `lib/workspace/`,
+plus `lib/foundation/adapters/` — 41 files, 2,761 lines) and declared it frozen as **CBAI
+Platform RC-1**. Full audit trail, Constitution audit, health analysis, and freeze declaration:
+`docs/CBAI-Platform-RC1.md`. Summary of what changed structurally:
+
+- **One real duplicate found and fixed**: six independently-declared, byte-for-byte-identical
+  `{ valid, issues }` validator-result interfaces were consolidated into
+  `lib/foundation/validation-types.ts`'s `PlatformValidationResult`, with all six original names
+  kept as zero-behavior-change aliases (`EvidenceValidationResult`,
+  `ReasoningInputValidationResult`, `WorkflowValidationResult`, `NetworkValidationResult`,
+  `PipelineProvidersValidationResult`, `WorkspaceValidationResult`).
+- **Zero circular dependencies** confirmed by a full import-graph extraction — the Platform Core
+  is a strict DAG (Foundation → single-input engines → composite engines → Orchestration/
+  Workspace → adapters), exactly as every prior Epic's architecture notes claimed.
+  `lib/foundation/`'s core files (excluding `adapters/`) have zero outbound imports, confirmed
+  directly rather than by inspection alone.
+- **One documentation imprecision fixed**: this file previously said `lib/workspace/` "sits
+  above" `lib/orchestration/` in a way that implied a direct import; it consumes
+  `IntelligenceResult` (a type declared in `lib/foundation/`) but never imports the
+  `lib/orchestration/` engine module itself. Corrected above.
+- **One naming inconsistency found, deliberately not fixed**: `createWorkflow`/
+  `CreateWorkflowInput` break the `build*`/`Build*Input` convention every sibling engine follows.
+  Not renamed — the blast radius (three code call sites plus four historical Epic doc records)
+  exceeded this freeze's low-risk bar. Recorded as accepted technical debt.
+- **Six dead exports identified, not removed**: `validateEvidenceRecord`,
+  `validateReasoningInput`, `validateWorkflowRecord`, `validateIntelligenceNetwork`,
+  `validateIntelligencePipelineProviders`, and `validateWorkspaceView` have no callers yet — each
+  is a published, deterministic capability awaiting a real caller, not orphaned code.
+- **Zero Constitution violations found** inside the Platform Core across all nine principles
+  audited (Evidence First, Human Decision, No fabricated data, No fabricated confidence, No fake
+  metrics, Explainable Intelligence, Traceable Intelligence, Universal Platform, Ecosystem
+  Neutral). See `docs/standards/01-cbai-constitution.md` for the newly-ratified Platform Core
+  Principles section this Epic added.
+
 ## Research Intelligence module map (current)
 
 ```
@@ -597,6 +633,7 @@ lib/foundation/                     universal Foundation (EPIC-02)
 ├── orchestration-types.ts           universal pipeline output — IntelligenceResult/pipelineTrace (EPIC-07)
 ├── network-types.ts                 universal network shapes — IntelligenceNetwork/CollaborationCandidate (EPIC-08)
 ├── workspace-types.ts                universal workspace shapes — WorkspaceView, nine sections (EPIC-09)
+├── validation-types.ts               PlatformValidationResult — shared validator-result shape (EPIC-10)
 ├── adapters/research-foundation-adapter.ts
 ├── adapters/research-entity-network-adapter.ts
 └── adapters/research-workspace-adapter.ts
@@ -665,10 +702,14 @@ enters through the caller-supplied `IntelligencePipelineProviders`. `lib/network
 on `lib/foundation/` plus `lib/relationships/` (for traversal reuse) — it never imports a domain
 module either; `lib/research/entities/` data only enters the network through
 `research-entity-network-adapter.ts`, the same adapter-boundary discipline as every other
-domain↔Foundation crossing. `lib/workspace/` sits above both `lib/orchestration/` and
-`lib/network/` — it depends on `lib/foundation/`, `lib/workflow/` (for its two query re-exports),
-and `lib/network/` (for `findCollaborationCandidates`), but never imports a domain module, and
-neither `lib/orchestration/` nor `lib/network/` ever imports `lib/workspace/` back. Only the
+domain↔Foundation crossing. `lib/workspace/` consumes `lib/orchestration/`'s *output type*
+(`IntelligenceResult`, declared in `lib/foundation/orchestration-types.ts`) but does not import
+the `lib/orchestration/` engine module itself — a caller runs the pipeline and hands the result
+to `buildWorkspaceView`. `lib/workspace/` does directly import `lib/network/` (for
+`findCollaborationCandidates`) and `lib/workflow/` (for its two query re-exports). It never
+imports a domain module, and none of `lib/orchestration/`, `lib/network/`, or `lib/workflow/`
+ever imports `lib/workspace/` back — confirmed by a full import-graph audit during EPIC-10
+(RC-1): the Platform Core is a directed acyclic graph with zero cycles. Only the
 research adapters and the type aliases in `review-workspace-model.ts`,
 `lib/research/evidence/evidence-types.ts`, and `lib/evidence-infrastructure/types.ts` cross the
 Research↔Foundation boundary, and all are additive, non-breaking changes.
