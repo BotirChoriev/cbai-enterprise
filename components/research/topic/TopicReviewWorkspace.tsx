@@ -4,8 +4,9 @@ import { buildTopicEvidenceReview } from "@/lib/research/evidence/evidence-topic
 import { buildResearchReviewWorkspace } from "@/lib/research/intelligence/review-workspace-engine";
 import { getWorkspaceTimeline } from "@/lib/research/intelligence/workspace-shell-engine";
 import { WORKSPACE_TIMELINE_EVENT_LABELS } from "@/lib/research/intelligence/workspace-shell-model";
-import { RESEARCH_DECISION_LABELS } from "@/lib/research/intelligence/decision-types";
 import { deriveResearchReadiness } from "@/lib/research/readiness/readiness-engine";
+import { deriveResearchWorkflow } from "@/lib/research/workflow/workflow-engine";
+import { WORKFLOW_NEXT_ACTION_LABELS } from "@/lib/research/workflow/workflow-types";
 import ResearchMissionWorkspace from "@/components/research/topic/ResearchMissionWorkspace";
 import TopicEvidenceReviewWorkflow from "@/components/research/topic/TopicEvidenceReviewWorkflow";
 import TopicEvidenceSelection from "@/components/research/topic/TopicEvidenceSelection";
@@ -25,8 +26,9 @@ export default function TopicReviewWorkspace({ topic }: TopicReviewWorkspaceProp
   const workspace = buildResearchReviewWorkspace(topic.topicId);
   const timeline = getWorkspaceTimeline(topic.topicId);
   const readiness = deriveResearchReadiness(topic.topicId);
+  const workflow = deriveResearchWorkflow(topic.topicId);
 
-  if (!evidenceReview || !workspace || !readiness) {
+  if (!evidenceReview || !workspace || !readiness || !workflow) {
     return null;
   }
 
@@ -168,11 +170,22 @@ export default function TopicReviewWorkspace({ topic }: TopicReviewWorkspaceProp
         )}
       </div>
 
+      <div className={`${cbaiGlassCard} space-y-2 p-4`}>
+        <p className={cbaiSectionEyebrow}>Not yet available</p>
+        <ul className="space-y-1.5">
+          {workflow.unavailableActions.map((unavailable) => (
+            <li key={unavailable.action} className="text-xs text-zinc-500">
+              <span className="text-zinc-400">{unavailable.action}</span> — {unavailable.reason}
+            </li>
+          ))}
+        </ul>
+      </div>
+
       <div className={`${cbaiGlassCard} flex flex-wrap items-center justify-between gap-3 p-4`}>
         <div>
           <p className={cbaiSectionEyebrow}>Continue review</p>
           <p className="mt-1 text-sm font-medium text-zinc-200">
-            {RESEARCH_DECISION_LABELS[workspace.decision]}
+            {WORKFLOW_NEXT_ACTION_LABELS[workflow.nextAction]}
           </p>
         </div>
         <p className="max-w-sm text-xs text-zinc-500">
