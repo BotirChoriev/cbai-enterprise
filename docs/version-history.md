@@ -650,6 +650,46 @@ routes are never misread as a topic id. `npm run lint` clean, `npm run build` 91
 research topics), 17 + 11 = 28 tests passing. Zero Platform Core files touched; zero new engines,
 AI systems, or duplicate workspaces. Full detail: `docs/product-activation-audit.md` §9.
 
+## v3.11 — Premium Global Interface & Personal Operator Experience (Release 5)
+
+"CBAI Personal Operator" is the product-facing name for the existing Assistant/Command Center —
+user-visible copy only, no internal rename, no second profile store, no new AI. Implementing it
+literally surfaced a real gap in the Release 2 data model (user name vs. Operator's own chosen
+name were conflated in one field) — fixed additively with one new `operatorName` field on the same
+`AssistantProfile`, backward-compatible with any already-saved profile.
+
+New `components/shared/Avatar.tsx` consolidates three separate inline avatar renderings (Settings,
+My Work, Home greeting) into one component, now also used in the new Command Center identity chip
+and Account Menu — real accessible label, real fallback state, three size variants. No
+photorealistic or demographic avatar imagery added; considered and declined uploaded-image avatars
+given `localStorage`'s poor fit for image data.
+
+Rebuilt the home arrival experience to the mission's literal structure — avatar, name, Operator
+name, role, one greeting line, exactly one primary next step, four named secondary actions —
+replacing a heavier four-tile summary grid. New `lib/assistant/assistant-next-step.ts` —
+`resolveNextStep()`, a pure, tested deterministic function: continue real recent local work when
+available, else open the role's real default workspace, else prompt setup.
+
+New `lib/world-map.ts` + `components/countries/WorldIntelligenceMap.tsx` — a World Intelligence
+Map built as an accessible, region-grouped grid of real country tiles with real status badges and
+a text search, not a hand-coded geographic SVG (this repo has no map/geo-data library, and faking
+one would itself be fabricated geography). Placed in exactly the two recommended locations: Home
+and `/countries`.
+
+New `components/assistant/AccountMenu.tsx` in the Topbar, and
+`components/assistant/ContextualOperatorBanner.tsx` — a real "You are viewing {name}" statement
+with real, entity-kind-specific actions, wired into Countries, Companies, Universities, and the
+Research topic page, reusing Release 4's `resolveAssistantContext` unchanged.
+
+11 new tests (18–28): next-step priority across all three real states, every workspace role
+resolves to a real route, Operator-name fallback, avatar-id uniqueness, and the World Map
+containing only real catalog countries with only declared status values and real profile links.
+`npm run lint` clean, `npm run build` 91 routes (65 research topics), 28 + 11 = 39 tests passing.
+Zero Platform Core files touched. Not attempted this release: a guided multi-step onboarding
+wizard, a single unified `PageHeader` component across all nine named page types, and a full shell
+redesign audit beyond the shared components already in place — see
+`docs/product-activation-audit.md` §10 for the complete list of what was deliberately deferred.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation

@@ -427,3 +427,146 @@ unchanged 11/11 research-slice suite.
 - **Research topic ↔ Country/Company/University links** — genuinely impossible with real data today
   (§9.1); would require new data ingestion, explicitly out of scope for a "connect existing
   capabilities" mission.
+
+## 10. Release 5 — Premium Global Interface & Personal Operator Experience
+
+Response to "CBAI Product Activation — Release 5." Scope: a product-facing presentation upgrade
+over the existing Assistant/Command Center/profile — not a new AI, not a second assistant, not a
+new storage model. No Platform Core files touched.
+
+### 10.1 CBAI Personal Operator (Phase 1) and a real data-model gap it surfaced
+
+"CBAI Personal Operator" is the product-facing name for the existing Assistant/Command Center —
+applied to user-visible copy (Settings, Home greeting, Command Center labels) only; no internal
+rename, no second profile store. Implementing this literally surfaced a genuine gap in the
+Release 2 data model: the mission's field list distinguishes "user name" from "assistant name,"
+but the existing `AssistantProfile.name` field was used for both, inconsistently. Fixed by adding
+one new field, `operatorName`, to the same profile object (`lib/assistant/assistant-profile.ts`)
+— additive only, backward-compatible with any already-saved profile (missing `operatorName`
+sanitizes to `""`, which `resolveOperatorName()` falls back to the honest default `"CBAI
+Operator"` for). This is not a second storage model — one `AssistantProfile`, one
+`localStorage` key, unchanged.
+
+### 10.2 Avatar system (Phase 3)
+
+New `components/shared/Avatar.tsx` — the initials-badge presentation that already existed in three
+separate inline copies (Settings, My Work, Home greeting) is now one component, used identically in
+all three plus the new Command Center and Account Menu. Real accessible label (`aria-label` with
+the full saved name, not just the visible initial), a real fallback state (a generic outline-person
+icon, never a blank box, when no name is set), and `sm`/`md`/`lg` size variants. Deliberately did
+**not** add photorealistic, demographic, or "professional" avatar imagery — the existing six-color
+initials system already satisfies "a small set of built-in neutral avatars" honestly (no
+assumptions about gender, race, age, nationality, religion, or profession), and adding more without
+a clear product need would have added visual complexity Phase 12 explicitly warns against.
+Uploaded-image avatars were considered and **not implemented** — this platform's only storage is
+`localStorage`, which is a poor, size-constrained fit for image blobs; the mission's own phrasing
+("if the current local-only architecture safely supports it") was read as permission to decline.
+
+### 10.3 Arrival experience and deterministic next step (Phases 2 and 4)
+
+Rebuilt `HomeAssistantGreeting.tsx` to match the mission's literal structure: avatar, real name,
+Operator name, workspace role, one concise greeting line, exactly **one** primary next step, and
+exactly the four named secondary actions (Open My Work, Search Intelligence, Explore Countries,
+Review Evidence) — replacing the previous four-tile "Today's summary / Recent changes /
+Recommendations" grid, which was honest but visually heavier than this release's "one obvious next
+action" standard.
+
+New `lib/assistant/assistant-next-step.ts` — `resolveNextStep(profile, mostRecentEntity)`, a pure,
+tested function implementing the mission's priority list: continue real local work (the most
+recently viewed real entity, from the already-real `RecentEntities` history) when one exists,
+otherwise open the user's real role-based default workspace, otherwise (no profile yet) prompt
+setup. The mission's tiers 3–4 ("review evidence," "explore a catalog") were not implemented as
+further primary-tier branches: every real workspace role always resolves to a real destination, so
+a literal third/fourth tier would be dead code that could never fire. They are offered instead as
+two of the four always-present secondary actions, which is where they are genuinely reachable.
+
+The full 7-step "no saved profile" onboarding wizard the mission describes was **not** built as a
+separate guided flow — `/settings` already collects every one of those fields on one page via
+`AssistantSettingsForm`, and the Account Menu (§10.5) now links there whenever no profile exists.
+A dedicated multi-step wizard remains a real, separately-scoped enhancement, not attempted here.
+
+### 10.4 World Intelligence Map (Phases 6–7)
+
+New `lib/world-map.ts` + `components/countries/WorldIntelligenceMap.tsx`. Built as an accessible,
+region-grouped grid of real country tiles (real name, real region, a real status badge reusing the
+Release 3 status vocabulary derived from each country's actual connected-source count) with a text
+search over the same data — **not** a hand-coded geographic SVG/canvas map. This repository has no
+map or geo-data library anywhere, and plotting country shapes or coordinates without one would
+itself have been a form of fabricated geography, which the mission explicitly forbids alongside
+scores, ratings, and heatmaps. Because every tile is a real focusable `<a>` with real text (not an
+image), there is no separate "list-based fallback" mode to build — the same view already serves
+both roles, satisfying the accessibility requirement by construction rather than as a bolt-on.
+Placed in exactly the two locations the mission recommended: Home (`HomeHero.tsx`, the global entry
+point) and `/countries` (the primary country discovery tool, above the existing filter/list, which
+remains fully functional as an alternate access path).
+
+### 10.5 Global shell and account identity (Phase 5)
+
+New `components/assistant/AccountMenu.tsx` in `Topbar.tsx` — an avatar-triggered account menu
+(native `<details>`/`<summary>`, matching this codebase's existing disclosure pattern rather than a
+new dropdown mechanism) showing Operator name and workspace role with links to My Work and
+Settings, or an honest "Set up Operator" prompt when no profile exists. Always rendered, including
+at mobile widths — user identity is never hidden behind a separate mobile-only menu, since no
+separate mobile navigation component exists in this codebase to hide it behind. A full "premium
+shell" pass across all 16 named routes (topbar/sidebar/breadcrumb/footer audit) was not attempted
+as a from-scratch redesign this release — the existing shared Sidebar/Topbar/`cbaiGlassCard`
+token system already gives every route a consistent shell; this release's changes (Account Menu,
+Command Center identity, Contextual Operator banners) sit inside that existing shell rather than
+replacing it, consistent with Phase 5's own "do not redesign every page independently."
+
+### 10.6 Menu and page-header changes (Phases 8–9)
+
+Not pursued as a literal architecture rename this release — the existing route labels (My Work,
+Research, Countries, Companies, Universities, Evidence, Reports, Trust) already avoid the generic
+terms (Dashboard/Overview/Module/System/Control) the mission calls out, aside from the
+already-known, already-documented `/dashboard` route (labeled "Dashboard" — real, working, and
+intentionally distinct from the persona workspaces). A single new reusable page-header component
+was not built; see §10.7 for why, and why the Contextual Operator banner was chosen instead as
+the more honest, lower-risk way to add "Assistant context" per page.
+
+### 10.7 Contextual Operator (Phase 10)
+
+New `components/assistant/ContextualOperatorBanner.tsx`, reusing `resolveAssistantContext` from
+Release 4 unchanged. Shows a real "You are viewing {name}" statement plus a small set of real,
+entity-kind-specific actions (Country: open evidence / view reports / explore universities;
+Research topic: continue workspace / open evidence / review questions; Company/University:
+equivalent real links) — every link verified against a real anchor id or real route, never a
+guessed destination. Wired into Countries, Companies, Universities, and the Research topic page.
+This was chosen over building a new unified `PageHeader` component (Phase 9): retrofitting nine
+different existing page types onto one new header component was judged higher-risk than this
+release's time budget could verify safely, while the Contextual Operator banner delivers the
+specific, mission-named capability ("You are viewing Japan," real actions) as a small, additive,
+independently-verifiable piece.
+
+### 10.8 Complexity reduction (Phases 12–13)
+
+The home greeting rebuild (§10.3) is this release's main complexity reduction: four cards down to
+one primary action plus a compact secondary-action row. No new gradients, glow effects, or
+decorative charts were added anywhere in this release; every new component reuses
+`cbaiGlassCard`/`cbaiSectionEyebrow` and the existing zinc/cyan token palette.
+
+### 10.9 Tests (Phase 18)
+
+11 new tests (18–28) added to `scripts/test-product-activation.ts`: next-step priority (no
+profile → complete-setup; profile with recent work → continue-work; profile with no recent work →
+real role-based workspace), every workspace role resolves to a real declared route, Operator-name
+fallback, avatar-id uniqueness, and four tests asserting the World Map only ever contains real
+catalog countries, never a fabricated status value, always a real profile link, and honestly empty
+search results for a non-existent country. 28/28 passing in this suite, 11/11 unchanged in the
+research-slice suite.
+
+### 10.10 Known limitations recorded this release
+
+- **Local-browser-only, by design**: the entire Personal Operator profile (name, Operator name,
+  avatar, language, role, country, organization, timezone, notifications, accessibility) is
+  `localStorage` on one browser. Nothing here is a real account; there is no cross-device sync
+  because there is no backend or authentication anywhere in this codebase.
+- **Requires authentication/backend to go further**: multi-device profile sync, uploaded-image
+  avatars at meaningful size, and any real "recent activity" beyond locally-viewed entities would
+  all require a real backend — none exists, none was added.
+- **Requires real data integration**: notification delivery (preferences are saved, never sent);
+  translated interface languages beyond English; a literal geographic world map (would need a
+  map/geo-data source this repository does not have).
+- **Planned, not attempted this release**: a guided multi-step onboarding wizard (§10.3); a single
+  unified `PageHeader` component across all nine named page types (§10.7); a full shell redesign
+  audit across all 16 named routes beyond the shared components already in place (§10.5).

@@ -549,3 +549,21 @@ replaces the narrower Release 3 `EntityDataStatus`. The Assistant now derives cu
 (real research topic or focused entity) with zero new tracking. 4 new tests directly covering the
 new context-resolution logic, 28 total passing. Full detail, including what was deliberately left
 unwired to avoid duplicating already-live information: `docs/product-activation-audit.md` §9.
+
+## Premium Global Interface & Personal Operator Experience, Release 5
+
+"CBAI Personal Operator" — the product-facing name for the existing Assistant, copy only, no new
+AI or second profile store. Implementing it surfaced a real gap (user name vs. Operator's own
+chosen name were one conflated field) — fixed additively with a new `operatorName` field on the
+same profile object, backward-compatible. New `Avatar` component consolidates three separate
+inline avatar renderings into one, with a real accessible label and fallback state, now also in
+the Command Center and a new Account Menu. Rebuilt the home arrival experience around one primary
+next step (real deterministic resolver: continue recent local work, else open the role's real
+default workspace, else prompt setup) plus four named secondary actions. New World Intelligence
+Map — a real, region-grouped, status-badged country grid with search, deliberately not a
+geographic SVG map (no map/geo-data library exists in this repo) — placed on Home and `/countries`
+only. New Contextual Operator banner ("You are viewing {name}" + real actions) on
+Countries/Companies/Universities/Research. 11 new tests, 39 total passing. What was deliberately
+not attempted this release (a guided onboarding wizard, a single unified page-header component, a
+full shell redesign) is recorded honestly, not silently dropped: `docs/product-activation-audit.md`
+§10.
