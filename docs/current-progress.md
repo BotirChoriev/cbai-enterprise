@@ -1,8 +1,8 @@
 # CBAI Current Progress
 
 Snapshot as of EPIC-10 (**CBAI Platform RC-1** — Platform Core frozen) plus Research Intelligence
-Domain Foundation Phase 1 and Phase 2 (Integration). Update this file, not a new one, as state
-changes.
+Phase 1 (Domain Foundation), Phase 2 (Domain Integration), and Phase 3 (Workspace Contract).
+Update this file, not a new one, as state changes.
 
 ## Real and working today
 
@@ -83,6 +83,17 @@ changes.
   and Hypotheses honestly map to `[]` — no real data exists for either. Zero Platform Core files
   touched, zero Phase 1 files modified, zero legacy `lib/research/*` files modified. Verified
   structurally by successful `npm run build`.
+- **Research Workspace Contract, Phase 3** (`lib/research-workspace/`): `ResearchWorkspaceContract`
+  — 19 sections, 8 reused directly from Platform's `WorkspaceView`/`ReasoningResult`/Network
+  (Mission Summary, Mission Progress, Evidence Summary, Potential Collaborators, Open Risks,
+  Recommendations, Activity Timeline, Knowledge Network), 11 new thin compositions over Research
+  Domain entities (Research Timeline, Research Questions, Open Hypotheses, Research Findings,
+  Related Publications/Patents/Datasets/Technologies/Organizations, Research Team, Funding
+  Opportunities). `buildResearchWorkspaceContract` + `ResearchWorkspaceProviders` +
+  `researchWorkspaceProviders` (calling `runResearchIntelligencePipeline`,
+  `buildResearchIntelligenceNetwork`, `buildAllResearchDomainEntities` — all unmodified). Zero
+  Platform Core files touched, zero Research Domain files modified, zero UI/React/components.
+  Verified structurally by successful `npm run build`.
 - **Public entry experience**: hero, three-ecosystem model, capability flow, audience section,
   trust section — all real, honest content, no fabricated statistics.
 - **Public search / Evidence Core** (`/search`, `/countries`, `/companies`, `/universities`):
@@ -188,6 +199,12 @@ changes.
   `npm run build` against the real `IntelligencePipelineProviders` contract, but not functionally
   exercised. Same verification-depth status as `researchIntelligencePipelineProviders` (EPIC-07),
   `buildResearchIntelligenceNetwork` (EPIC-08), and `buildResearchWorkspaceView` (EPIC-09).
+- No UI, React, components, or pages were built for Phase 3 — deliberately out of scope per its
+  own mission ("No React. No Components. No Pages. No UI."). `lib/research-workspace/` remains a
+  plain data-composition module.
+- `buildResearchWorkspaceContract` is not called from any static-generation path — type-checked
+  by `npm run build`, not functionally exercised. Same verification-depth status as every prior
+  real-data adapter in this series.
 
 ## Known technical debt
 
@@ -325,3 +342,24 @@ changes.
   (`buildAllResearchDomainEntities()`) on every single `resolveFoundation`/`discoverEvidence`/
   `resolveRelationships` call — the same accepted-debt pattern as `buildResearchIntelligenceNetwork()`
   (EPIC-08) and `buildResearchWorkspaceView()` (EPIC-09); no caching was introduced.
+- **`buildResearchWorkspaceContract` recomputes everything on every call**, following the exact
+  same accepted-debt pattern: `researchWorkspaceProviders`'s three functions each independently
+  call their own underlying builder with no memoization, so a single contract build triggers a
+  fresh 65-topic `buildAllResearchDomainEntities()`, a fresh `buildResearchIntelligenceNetwork()`,
+  and a fresh `runResearchIntelligencePipeline()`. Acceptable at today's data scale (10 seed
+  entities, 65 topics); a real caching layer is future work, not attempted here to keep this
+  phase's change set a pure composition exercise.
+- Given the current real data, 11 of `ResearchWorkspaceContract`'s 19 sections will honestly be
+  empty for every subject today: Open Hypotheses, Research Findings, Related Publications,
+  Related Patents, Related Technologies, and Research Team have zero real backing records
+  anywhere in this repository (see Phase 2's own debt entries above); Research Timeline and
+  Funding Opportunities are empty for the same reason. Related Organizations and Related Datasets
+  each have exactly one real entry. This is the honest, correct output of a real, working
+  contract over real, currently-sparse data — not a defect.
+- `RelatedOrganizationsSection.organizations` and `ResearchTeamSection.team` are typed as
+  `readonly ResearchDomainEntity[]` (the full 27-kind union) rather than a narrower
+  organization-only or people-only union, since TypeScript has no built-in way to express "one of
+  these five specific members of a larger discriminated union" as a single reusable named type
+  without declaring a new one — declaring one was judged not worth it for two fields. Callers
+  narrow further by `entityKind` themselves if needed, using the same `ofKind`-style pattern the
+  Builder already uses internally.

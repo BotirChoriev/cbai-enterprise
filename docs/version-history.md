@@ -324,7 +324,7 @@ colliding with three pre-existing, differently-shaped types of the same short na
 this repo (`ResearchTopic`, `University`, `ResearchEntity`) — none of which this module touches,
 imports, or replaces.
 
-## v3.2 — Research Intelligence Domain Integration, Phase 2 (this release)
+## v3.2 — Research Intelligence Domain Integration, Phase 2
 
 Wires Phase 1's types to real, already-shipped repository data. Five new files, all in the same
 `lib/research-domain/` directory Phase 1 created: a Builder (`buildResearchEntityBase`), an
@@ -358,6 +358,36 @@ exactly as Phase 1's `ResearchEntityBase` requires — populated with real data 
 left as honest empty arrays where it does not. Zero Platform RC-1 files touched, zero Phase 1
 files modified, zero legacy `lib/research/*` files modified — confirmed by `git diff --stat` at
 commit time. No UI, no React, no components, no dashboard, per the mission's explicit scope.
+
+## v3.3 — Research Workspace Contract, Phase 3 (this release)
+
+A third, distinct layer — `lib/research-workspace/`, new, sitting on top of both Platform RC-1's
+Workspace Platform (`lib/workspace/`, EPIC-09) and the Research Domain (`lib/research-domain/`,
+Phase 1/2) without modifying either. `ResearchWorkspaceContract` defines the nineteen sections
+the mission named. Eight are direct reuse — Mission Summary and Mission Progress wrap Platform's
+`MissionCenterSection`/`MonitoringSection`; Evidence Summary, Recommendations, and Knowledge
+Network *are* Platform's own `EvidenceCenterSection`/`RecommendationsSection`/
+`KnowledgeNetworkSection` with no wrapper at all; Open Risks *is* the Reasoning Framework's own
+`ReasoningRisk[]` (EPIC-05); Potential Collaborators calls `findCollaborationCandidates` (EPIC-08)
+directly; Activity Timeline composes Platform's `ActivitySection`/`TimelineSection` fields. The
+remaining eleven (Research Timeline, Research Questions, Open Hypotheses, Research Findings,
+Related Publications/Patents/Datasets/Technologies/Organizations, Research Team, Funding
+Opportunities) are new, thin `{ items: ... }` compositions over Research Domain entities — no
+Platform Core equivalent exists for these, since they need the Research Domain's richer,
+kind-specific entity types.
+
+`buildResearchWorkspaceContract` is the entire "logic": call Platform's `buildWorkspaceView` for
+the reused sections, narrow a `ResearchDomainEntity[]` collection by `entityKind` (a small
+generic type-guard helper, pure narrowing, not new business logic) for the new ones. Returns
+`undefined` honestly when Foundation cannot resolve for the subject — never a partial or
+fabricated contract. `ResearchWorkspaceProviders` mirrors `IntelligencePipelineProviders`'s
+injection-contract role, scoped to this Workspace layer; its real implementation calls three
+already-real functions unmodified (`runResearchIntelligencePipeline`, EPIC-07;
+`buildResearchIntelligenceNetwork`, EPIC-08; `buildAllResearchDomainEntities`, Phase 2).
+
+Zero Platform Core files touched, zero Research Domain files modified, zero legacy
+`lib/research/*` files modified — confirmed by `git diff --stat` at commit time. No UI, no React,
+no components, no pages, per the mission's explicit scope.
 
 ## Planned (not started)
 

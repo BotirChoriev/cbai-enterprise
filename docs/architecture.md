@@ -761,6 +761,91 @@ domain crossing already follows, not a new kind of dependency. `research-domain-
 importing only `lib/foundation/` types and Phase 1's own `lib/research-domain/` types. Nothing in
 the Platform Core, and nothing in `lib/research/*`, imports `lib/research-domain/` back.
 
+## Research Workspace Contract, Phase 3 (`lib/research-workspace/`)
+
+A third, distinct layer on top of both Platform RC-1's Workspace Platform (`lib/workspace/`,
+EPIC-09) and the Research Domain (`lib/research-domain/`, Phase 1/2) — a new top-level
+directory, mirroring `lib/research-domain/`'s own separation from the Platform Core it sits on.
+Neither is modified: confirmed by `git diff --stat` at commit time (zero files under
+`lib/foundation/`, `lib/relationships/`, `lib/evidence/`, `lib/reasoning/`, `lib/workflow/`,
+`lib/orchestration/`, `lib/network/`, `lib/workspace/`, or `lib/research-domain/` changed).
+
+`research-workspace-contract.ts` defines `ResearchWorkspaceContract`'s nineteen sections. Ten are
+new, thin `{ items: readonly XEntity[] }`-shaped compositions over Research Domain entities (no
+Platform Core equivalent exists for these); the rest are direct reuse — a section is either the
+exact type Platform Core already defines, or it isn't declared at all:
+
+| # | Section | Source | Reuse |
+|---|---|---|---|
+| 1 | Mission Summary | `WorkspaceView.missionCenter` | Wraps Platform's `MissionCenterSection` unmodified |
+| 2 | Mission Progress | `WorkspaceView.monitoring` | Wraps Platform's `MonitoringSection` unmodified |
+| 3 | Evidence Summary | `WorkspaceView.evidenceCenter` | **Is** Platform's `EvidenceCenterSection`, no wrapper |
+| 4 | Research Timeline | `ResearchDomainEntity.timeline` (mission-linked entities) | New — real research events, distinct from #18 |
+| 5 | Research Questions | Research Domain `research_question`-kind entities | New |
+| 6 | Open Hypotheses | Research Domain `hypothesis`-kind entities | New |
+| 7 | Research Findings | Research Domain `finding`-kind entities | New |
+| 8 | Related Publications | Research Domain `publication`-kind entities | New |
+| 9 | Related Patents | Research Domain `patent`-kind entities | New |
+| 10 | Related Datasets | Research Domain `dataset`-kind entities | New |
+| 11 | Related Technologies | Research Domain `technology`-kind entities | New |
+| 12 | Related Organizations | Research Domain `laboratory`/`research_center`/`university`-kind entities | New |
+| 13 | Research Team | Research Domain `researcher`/`engineer`/`scientist`/`academic`/`student_researcher`-kind entities | New |
+| 14 | Potential Collaborators | `findCollaborationCandidates(network)` | Calls EPIC-08's function directly, unmodified |
+| 15 | Funding Opportunities | Research Domain `funding_opportunity`/`grant`/`sponsor`-kind entities | New |
+| 16 | Open Risks | `IntelligenceResult.reasoning.risks` | **Is** the Reasoning Framework's own `ReasoningRisk[]` (EPIC-05), no wrapper |
+| 17 | Recommendations | `WorkspaceView.recommendations` | **Is** Platform's `RecommendationsSection`, no wrapper |
+| 18 | Activity Timeline | `WorkspaceView.activity` + `WorkspaceView.timeline` | Composes Platform's `ActivitySection.pipelineTrace` + `TimelineSection.transitions` — process/system audit trail, distinct from #4 |
+| 19 | Knowledge Network | `WorkspaceView.knowledgeNetwork` | **Is** Platform's `KnowledgeNetworkSection`, no wrapper |
+
+`research-workspace-builder.ts`'s `buildResearchWorkspaceContract(input)` is the entire
+"logic" — assembly, nothing derived. It calls Platform's own `buildWorkspaceView` (EPIC-09) to
+get sections 1, 2, 3, 17, 18, 19 for free, then narrows a `ResearchDomainEntity[]` collection
+by `entityKind` (via a small generic `ofKind` type-guard helper — pure type narrowing, not new
+business logic) to compose sections 4–13 and 15, and calls `findCollaborationCandidates`
+directly for section 14. Returns `undefined`, honestly, when the Orchestration Layer cannot
+resolve Foundation for the subject — no partial or fabricated contract is ever returned.
+
+`research-workspace-providers.ts`'s `ResearchWorkspaceProviders` interface — `resolveIntelligenceResult`,
+`resolveIntelligenceNetwork`, `resolveResearchDomainEntities` — is the injection contract the
+Builder consumes, mirroring `lib/orchestration/pipeline-types.ts`'s `IntelligencePipelineProviders`
+role but scoped to this Workspace layer. `researchWorkspaceProviders`, the real implementation,
+calls three already-real functions unmodified: `runResearchIntelligencePipeline` (EPIC-07),
+`buildResearchIntelligenceNetwork` (EPIC-08), and `buildAllResearchDomainEntities` (Phase 2) —
+zero new evidence, relationship, reasoning, or catalog logic.
+
+`research-workspace-query.ts` provides deterministic boolean/count readers
+(`hasOpenHypotheses`, `hasResearchFindings`, `hasFundingOpportunities`,
+`hasPotentialCollaborators`, `hasOpenRisks`, `hasResearchTeam`, `countRelatedArtifacts`) — the
+same "component asks, never inspects" discipline `lib/workspace/workspace-query.ts` established.
+`research-workspace-validation.ts`'s `validateResearchWorkspaceContract` reuses
+`PlatformValidationResult` (EPIC-10) rather than declaring an eighth independent `{valid, issues}`
+interface.
+
+### No UI this phase
+
+Per the mission's explicit scope, `lib/research-workspace/` contains zero React, zero
+components, zero pages, and zero routes. No component anywhere imports it yet.
+
+### Module map
+
+```
+lib/research-workspace/
+├── research-workspace-contract.ts      ResearchWorkspaceContract, its 19 sections
+├── research-workspace-providers.ts     ResearchWorkspaceProviders, researchWorkspaceProviders
+├── research-workspace-builder.ts       buildResearchWorkspaceContract
+├── research-workspace-query.ts         hasOpenHypotheses, hasResearchFindings, countRelatedArtifacts, ...
+└── research-workspace-validation.ts    validateResearchWorkspaceContract
+```
+
+### Dependency direction (Phase 3)
+
+`lib/research-workspace/` imports from `lib/workspace/` (`buildWorkspaceView`), `lib/network/`
+(`findCollaborationCandidates`), `lib/research-domain/` (query functions + all entity types),
+and `lib/foundation/adapters/` (`runResearchIntelligencePipeline`,
+`buildResearchIntelligenceNetwork`, all Platform Core per RC-1) — every import is of an
+already-real, unmodified function or type. Nothing in `lib/workspace/`, `lib/network/`,
+`lib/research-domain/`, or `lib/foundation/adapters/` imports `lib/research-workspace/` back.
+
 ## Research Intelligence module map (current)
 
 ```
