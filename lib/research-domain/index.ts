@@ -6,3 +6,8 @@ export * from "./research-entities-organizations";
 export * from "./research-entities-funding";
 export * from "./research-entities-outcomes";
 export * from "./research-relationships";
+export * from "./research-domain-builder";
+export * from "./research-domain-adapter";
+export * from "./research-domain-query";
+export * from "./research-domain-validation";
+export * from "./research-domain-providers";

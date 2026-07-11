@@ -670,16 +670,96 @@ lib/research-domain/
 ├── research-entities-organizations.ts  LaboratoryEntity, ResearchCenterEntity, UniversityEntity
 ├── research-entities-funding.ts        FundingOpportunityEntity, GrantEntity, SponsorEntity
 ├── research-entities-outcomes.ts       PeerReviewEntity, FindingEntity, ResearchOutcomeEntity, ResearchImpactEntity
-└── research-relationships.ts           RESEARCH_RELATIONSHIP_PATTERNS, ResearchDomainEntity (27-way union)
+├── research-relationships.ts           RESEARCH_RELATIONSHIP_PATTERNS, ResearchDomainEntity (27-way union)
+├── research-domain-builder.ts          buildResearchEntityBase                              (Phase 2)
+├── research-domain-adapter.ts          toResearchTopicEntity, toResearchMissionEntity, ...   (Phase 2)
+├── research-domain-query.ts            findResearchDomainEntityById, ...ByKind/Organization/Mission/Evidence (Phase 2)
+├── research-domain-validation.ts       validateResearchDomainEntity(ies)                     (Phase 2)
+└── research-domain-providers.ts        researchDomainPipelineProviders                       (Phase 2)
 ```
 
-### Dependency direction
+### Dependency direction (Phase 1)
 
-`lib/research-domain/` depends only on `lib/foundation/` (for `Evidence`, `Mission`,
-`Relationship`, `TimelineEvent`, `Question`, `RelationshipType`) — it imports no engine
-(`lib/evidence/`, `lib/relationships/`, `lib/reasoning/`, `lib/workflow/`, `lib/orchestration/`,
-`lib/network/`, `lib/workspace/`) and no other domain module (`lib/research/*`,
-`lib/universities.ts`). Nothing in the Platform Core imports `lib/research-domain/` back.
+The five Phase 1 type files (`research-entity-base.ts` through `research-relationships.ts`)
+depend only on `lib/foundation/` (for `Evidence`, `Mission`, `Relationship`, `TimelineEvent`,
+`Question`, `RelationshipType`) — zero engine or domain-module imports. Nothing in the Platform
+Core imports them back. This remains true after Phase 2 — see below.
+
+## Research Domain Integration, Phase 2 (`lib/research-domain/`)
+
+Wires the Phase 1 Research Domain Foundation to real, already-shipped repository data. Platform
+RC-1 remains untouched — confirmed by `git diff --stat` at commit time (zero files under
+`lib/foundation/`, `lib/relationships/`, `lib/evidence/`, `lib/reasoning/`, `lib/workflow/`,
+`lib/orchestration/`, `lib/network/`, or `lib/workspace/` changed) — and the Phase 1 type files
+are also untouched; Phase 2 adds five new files to the same `lib/research-domain/` directory.
+
+| File | Mission deliverable | What it does |
+|---|---|---|
+| `research-domain-builder.ts` | Research Domain Builder | `buildResearchEntityBase` — the one shared assembly function every concrete entity builder in the adapter calls; defaults every unsupplied collection to an honest empty array |
+| `research-domain-adapter.ts` | Research Domain Adapter | Pure translation functions from real `lib/research/*` data (and `research-foundation-adapter.ts`'s existing `toSubject`/`toMission`/`toEvidence`/`toRelationships`) onto `ResearchDomainEntity` instances |
+| `research-domain-query.ts` | Research Domain Query | `findResearchDomainEntityById`, `findResearchDomainEntitiesByKind`, `...ByOrganization`, `...ByMission`, `...ByEvidence` — pure filters over an already-built collection |
+| `research-domain-validation.ts` | Research Domain Validation | `validateResearchDomainEntity`/`validateResearchDomainEntities` — reuses `PlatformValidationResult` (`lib/foundation/validation-types.ts`, EPIC-10) rather than declaring a seventh independent `{valid, issues}` interface |
+| `research-domain-providers.ts` | Research Domain Providers | `researchDomainPipelineProviders: IntelligencePipelineProviders` — plugs the Research Domain into `lib/orchestration/`'s pipeline unmodified |
+
+### What real data was mapped, and what honestly stayed empty
+
+| Mission's named source | Real repository origin | Mapped to |
+|---|---|---|
+| Research Topics | `lib/research/research-topics.ts`'s `RESEARCH_TOPICS` (65 real topics) | `ResearchTopicEntity` — one per topic |
+| Research Missions | `research-foundation-adapter.ts`'s `toMission()` (EPIC-02) | `ResearchMissionEntity` — one per topic, parallel to, not embedded in, the topic |
+| Evidence | `lib/research/evidence/evidence-topic-builder.ts`'s `buildTopicEvidenceReview` + `research-foundation-adapter.ts`'s `toEvidence()` (EPIC-04) | `ResearchTopicEntity.evidence` |
+| Reviews | `lib/research/intelligence/review-workspace-engine.ts`'s `buildResearchReviewWorkspace` | `.openQuestions` → `ResearchQuestionEntity`; `.findings` → `FindingEntity` (always empty today — no persistence layer exists anywhere in this platform; the mapping is real, ready to produce entities the moment one does) |
+| Questions | Same Review Workspace, `ReviewOpenQuestion` (a direct alias of Foundation's `Question`) | `ResearchQuestionEntity.question` embeds the real `Question` object directly |
+| Knowledge Graph | `lib/research/graph/`'s `getResearchGraphForTopicObject` (the real, live `/research` Global Research Network) | Only `related_topic` edges with status `catalog_available` become `Relationship` records — see below for why the other edge types are excluded |
+| Relationships | `research-foundation-adapter.ts`'s `toRelationships()` (EPIC-02/03) | `ResearchTopicEntity.relationships`, combined with the Knowledge Graph edges above |
+| Timeline | `lib/research/intelligence/workspace-shell-engine.ts`'s `getWorkspaceTimeline` | `ResearchTopicEntity.timeline` (always empty today — same "honest stub, no persistence" status documented since EPIC-02) |
+| Organizations | `lib/research/entities/`'s `RESEARCH_ENTITY_REGISTRY` (1 real `laboratory` entry) | `LaboratoryEntity` |
+| Researchers | *(none exist)* | `mapResearchers()` honestly returns `[]` — no real researcher record exists anywhere in this repository |
+
+`toDatasetEntity` additionally maps the registry's 1 real `dataset` entry (not explicitly named
+in the mission's list, but present in the same registry as the Organizations source, and a real
+mapped `DatasetEntity` matches the mission's own 27-entity roster). `mapHypotheses()` mirrors
+`mapResearchers()` — honestly empty, no real hypothesis record exists yet.
+
+**Knowledge Graph mapping detail — why only `related_topic` edges convert.** The graph's
+`uses_method`/`requires_evidence` edges describe the exact same `relatedMethods`/
+`relatedEvidenceTypes` catalog fields `toRelationships()` already converts — re-converting them
+here would duplicate that existing intelligence. `future_supports` edges name aspirational
+product roadmap items (`RESEARCH_TOPIC_FUTURE_SUPPORTS`), not real research connections;
+converting them into a `Relationship` record would overclaim that a connection exists today. Only
+`related_topic` — topic-to-topic connections based on shared methods/evidence/domain, with
+`status: "catalog_available"` — is genuinely new information the Knowledge Graph adds beyond what
+`toRelationships()` already provides.
+
+**`lib/research/entities/` mapping detail — why only `laboratory` and `dataset` convert.** The
+registry's `research_topic` entries (5) are stub duplicates of the same 5 topics already
+comprehensively covered by the canonical, 65-topic `research-topics.ts` catalog — re-mapping them
+would duplicate, not add, information. `method`, `open_question`, and `negative_result` have no
+honest match in the Domain's 27-kind vocabulary (the same exclusions EPIC-08's Global
+Intelligence Network adapter already made, for the same reason) and are excluded, not forced.
+
+### Traceability
+
+Every `ResearchDomainEntity` this phase produces is traceable to Mission (via `.missions`),
+Evidence (via `.evidence`), Relationship (via `.relationships`), Timeline (via `.timeline`), and
+Organization (via `.organizationIds`) exactly as `ResearchEntityBase` (Phase 1) already requires
+— Phase 2 populates these fields with real data where it exists and leaves them as honest empty
+arrays where it does not, never fabricating a value to make an entity look more connected than it
+is.
+
+### Dependency direction (Phase 2)
+
+`research-domain-adapter.ts` and `research-domain-providers.ts` import from `lib/relationships/`
+(`buildRelationship`), `lib/orchestration/` (`IntelligencePipelineProviders`, the type only —
+Phase 2 does not call `runIntelligencePipeline` itself), `lib/foundation/adapters/
+research-foundation-adapter.ts`, and several real `lib/research/*` modules
+(`research-topics.ts`, `evidence/evidence-topic-builder.ts`,
+`intelligence/review-workspace-engine.ts`, `intelligence/workspace-shell-engine.ts`, `graph/`,
+`entities/`) — this is the sanctioned adapter boundary, the same pattern every Platform Core
+domain crossing already follows, not a new kind of dependency. `research-domain-builder.ts`,
+`research-domain-query.ts`, and `research-domain-validation.ts` remain dependency-light,
+importing only `lib/foundation/` types and Phase 1's own `lib/research-domain/` types. Nothing in
+the Platform Core, and nothing in `lib/research/*`, imports `lib/research-domain/` back.
 
 ## Research Intelligence module map (current)
 

@@ -297,7 +297,7 @@ through the four Extension Points named in `docs/CBAI-Platform-RC1.md` (the
 per-domain adapter pattern, and closed-but-extensible vocabularies) rather than modifying it,
 except to fix a genuine defect.
 
-## v3.1 — Research Intelligence Domain Foundation, Phase 1 (this release)
+## v3.1 — Research Intelligence Domain Foundation, Phase 1
 
 The first build after the RC-1 freeze, and the first to exercise the Extension Points
 `docs/CBAI-Platform-RC1.md` declared: a new `lib/research-domain/` module, built entirely as an
@@ -324,6 +324,41 @@ colliding with three pre-existing, differently-shaped types of the same short na
 this repo (`ResearchTopic`, `University`, `ResearchEntity`) — none of which this module touches,
 imports, or replaces.
 
+## v3.2 — Research Intelligence Domain Integration, Phase 2 (this release)
+
+Wires Phase 1's types to real, already-shipped repository data. Five new files, all in the same
+`lib/research-domain/` directory Phase 1 created: a Builder (`buildResearchEntityBase`), an
+Adapter (real-data mapping functions), a Query module, a Validation module (reusing EPIC-10's
+`PlatformValidationResult` rather than declaring a seventh independent result type), and a
+Providers module (`researchDomainPipelineProviders`, implementing EPIC-07's
+`IntelligencePipelineProviders` contract unmodified).
+
+All ten data sources the mission named were mapped, honestly: 65 real topics become
+`ResearchTopicEntity` + `ResearchMissionEntity` pairs, carrying real Evidence (via the existing
+`buildTopicEvidenceReview`/`toEvidence`), real Relationships (via the existing `toRelationships`,
+plus newly-added Knowledge Graph `related_topic` edges), and real open Questions. The registry's
+one real `laboratory` and one real `dataset` entry become `LaboratoryEntity`/`DatasetEntity`.
+Reviews/Timeline map through real functions that are honestly always-empty today (no persistence
+layer exists anywhere in this platform) — the mapping is correct and will start producing real
+entities the moment one does, with no code change needed. Researchers and Hypotheses map to `[]`
+— zero real records of either kind exist anywhere in this repository, and none were fabricated to
+fill the roster.
+
+Two deliberate exclusions, both documented rather than silently applied: the Knowledge Graph's
+`uses_method`/`requires_evidence` edges are not re-converted (they'd duplicate what
+`toRelationships()` already produces from the same catalog fields), and `future_supports` edges
+are not converted at all (they name aspirational roadmap items, not real connections). The
+entities registry's `research_topic` stub entries are not re-mapped (duplicate of the canonical
+65-topic catalog); `method`, `open_question`, and `negative_result` have no honest match in the
+Domain's 27-kind vocabulary and are excluded, the same discipline EPIC-08 already established for
+the Global Intelligence Network adapter.
+
+Every produced entity is traceable to Mission, Evidence, Relationship, Timeline, and Organization
+exactly as Phase 1's `ResearchEntityBase` requires — populated with real data where it exists,
+left as honest empty arrays where it does not. Zero Platform RC-1 files touched, zero Phase 1
+files modified, zero legacy `lib/research/*` files modified — confirmed by `git diff --stat` at
+commit time. No UI, no React, no components, no dashboard, per the mission's explicit scope.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation
@@ -348,9 +383,6 @@ Orchestration, Network, and Workspace shapes are architecturally ready for all o
 UI or derivation logic exists yet. Renaming `createWorkflow`/`CreateWorkflowInput` to
 `buildWorkflow`/`BuildWorkflowInput` for naming consistency, in a dedicated commit that can
 afford to update the four historical Epic doc records that name it verbatim (RC-1 deliberately
-left this alone — see `docs/CBAI-Platform-RC1.md`). A Research Domain Foundation Phase 2 —
-builder functions, an adapter mapping `lib/research-domain/` onto real data (`lib/research/*`,
-`lib/research/entities/`), and wiring into `IntelligencePipelineProviders` so a real Research
-Intelligence pipeline run can produce real `ResearchDomainEntity` records — has not been started;
-Phase 1 is types only. No target date is committed here — see `docs/current-progress.md` for
+left this alone — see `docs/CBAI-Platform-RC1.md`). No target date is committed here — see
+`docs/current-progress.md` for
 what's honestly available today.

@@ -1,7 +1,8 @@
 # CBAI Current Progress
 
 Snapshot as of EPIC-10 (**CBAI Platform RC-1** — Platform Core frozen) plus Research Intelligence
-Domain Foundation Phase 1. Update this file, not a new one, as state changes.
+Domain Foundation Phase 1 and Phase 2 (Integration). Update this file, not a new one, as state
+changes.
 
 ## Real and working today
 
@@ -71,9 +72,17 @@ Domain Foundation Phase 1. Update this file, not a new one, as state changes.
   entity type definitions (Research Mission through Research Impact), each extending
   `ResearchEntityBase`'s eight required concerns and reusing Platform Core pillars
   (`Relationship`, `Evidence`, `Mission`, `TimelineEvent`, `Question`) directly. Types only — no
-  builder functions, no validators, no seed data, no wiring to real data yet. Built entirely as
-  an extension with zero Platform Core files modified. Verified structurally by successful
-  `npm run build`.
+  builder functions, no validators, no seed data. Built entirely as an extension with zero
+  Platform Core files modified. Verified structurally by successful `npm run build`.
+- **Research Intelligence Domain Integration, Phase 2** (`lib/research-domain/`): five new files
+  — Builder, Adapter, Query, Validation (reuses EPIC-10's `PlatformValidationResult`), Providers
+  (`researchDomainPipelineProviders`, implementing EPIC-07's `IntelligencePipelineProviders`) —
+  wiring Phase 1's types to real data: 65 real topics → `ResearchTopicEntity` +
+  `ResearchMissionEntity` (with real Evidence, Relationships, Questions), 1 real laboratory and 1
+  real dataset from `lib/research/entities/`, Knowledge Graph `related_topic` edges. Researchers
+  and Hypotheses honestly map to `[]` — no real data exists for either. Zero Platform Core files
+  touched, zero Phase 1 files modified, zero legacy `lib/research/*` files modified. Verified
+  structurally by successful `npm run build`.
 - **Public entry experience**: hero, three-ecosystem model, capability flow, audience section,
   trust section — all real, honest content, no fabricated statistics.
 - **Public search / Evidence Core** (`/search`, `/countries`, `/companies`, `/universities`):
@@ -167,15 +176,18 @@ Domain Foundation Phase 1. Update this file, not a new one, as state changes.
   pre-existing, platform-wide condition (no test runner is configured anywhere in this repo),
   not introduced or newly discovered by this Epic, but explicitly noted as a Future Risk in the
   RC-1 health analysis.
-- No builder functions, validators, seed data, adapter, or UI were built for the Research Domain
-  Foundation — deliberately out of scope for Phase 1 ("This is NOT a UI task... Define only
-  relationships. Do not create fake data. Do not create business logic."). `lib/research-domain/`
-  is types only, with no data ever instantiated.
-- `lib/research-domain/`'s 27 entity types are not wired to any real data — no adapter maps
-  `lib/research/*` or `lib/research/entities/` records onto `ResearchDomainEntity` yet, and
-  nothing constructs a `ResearchDomainEntity` anywhere in this repo. This is expected for a
-  Phase 1 (types-only) deliverable, the same status EPIC-02's Foundation had before EPIC-03/04
-  built engines on top of it.
+- Phase 1 built no builder functions, validators, seed data, adapter, or UI — deliberately out of
+  scope for that phase ("This is NOT a UI task... Define only relationships. Do not create fake
+  data. Do not create business logic."). Phase 2 added the Builder, Adapter, Query, Validation,
+  and Providers — see the entry above.
+- No UI, React, components, or dashboard were built for Phase 2 either — deliberately out of
+  scope per its own mission ("No UI. No React. No Dashboard. No Components."). Every function in
+  `lib/research-domain/` remains a plain data function; nothing renders anything.
+- `researchDomainPipelineProviders` is not called from any static-generation path and is not
+  passed to `runIntelligencePipeline` anywhere in this repo yet — it is type-checked by
+  `npm run build` against the real `IntelligencePipelineProviders` contract, but not functionally
+  exercised. Same verification-depth status as `researchIntelligencePipelineProviders` (EPIC-07),
+  `buildResearchIntelligenceNetwork` (EPIC-08), and `buildResearchWorkspaceView` (EPIC-09).
 
 ## Known technical debt
 
@@ -288,13 +300,28 @@ Domain Foundation Phase 1. Update this file, not a new one, as state changes.
   anywhere in the repo. Not removed — each is real, documented capability awaiting a future
   caller (a persistence layer, a UI form, or a new domain adapter), not orphaned code. Risk: with
   no test suite, a future refactor could silently break one without any call site catching it.
-- **`lib/research-domain/` has zero real callers**, by design (Phase 1 is types only). All 27
-  `ResearchEntityKind` values, `RESEARCH_RELATIONSHIP_PATTERNS`'s 30 entries, and
-  `ResearchDomainEntity` itself are unexercised until a future Phase 2 adds builders and an
-  adapter. `npm run build`'s full-project TypeScript pass type-checks every file, but nothing
-  constructs a value of any of these types anywhere in the repo yet.
-- Three pre-existing, differently-shaped, same-short-named types remain unconnected to the new
-  domain model: `lib/research/research-topics.ts`'s `ResearchTopic`, `lib/universities.ts`'s
-  `University`, and `lib/research/entities/research-entity-types.ts`'s `ResearchEntity`. No
-  adapter yet maps any of them onto `lib/research-domain/`'s `ResearchTopicEntity`,
-  `UniversityEntity`, or `ResearchDomainEntity` — building that adapter is natural Phase 2 work.
+- **`lib/research-domain/` now has real callers via Phase 2's adapter and providers, but nothing
+  outside `lib/research-domain/` itself calls them yet.** `buildAllResearchDomainEntities()` is
+  not invoked from any static-generation path, and `researchDomainPipelineProviders` is not
+  passed to `runIntelligencePipeline` anywhere. `npm run build`'s full-project TypeScript pass
+  type-checks every file including full construction of all 27 entity interfaces (confirmed by a
+  successful build), but no page render or script actually executes
+  `buildAllResearchDomainEntities()` — a verification-depth gap, not a known behavior gap, the
+  same status every prior real-data adapter (EPIC-07/08/09) already carries.
+- Of the 27 `ResearchEntityKind` values, only 9 have any real backing data today
+  (`research_topic`, `research_mission`, `research_question`, `finding` [always empty — no
+  persistence], `laboratory`, `dataset`, plus the honestly-empty `researcher` and `hypothesis`
+  mapping functions that exist and are correct). The remaining 17 kinds (Engineer, Scientist,
+  Academic, Student Researcher, Research Center, University, Funding Opportunity, Grant, Sponsor,
+  Peer Review, Publication, Patent, Technology, Methodology, Experiment, Research Outcome,
+  Research Impact, Research Program, Research Project) have no adapter mapping yet — no real data
+  source for any of them exists anywhere in this repository.
+- `lib/universities.ts`'s `University` and `lib/research/entities/research-entity-types.ts`'s
+  `ResearchEntityType`'s `research_topic`/`method`/`open_question`/`negative_result` values
+  remain unconnected to `lib/research-domain/` — the first because no real per-university data
+  source was mapped this phase (Organizations only covered the entities registry's one
+  laboratory), the other three by deliberate exclusion (documented in `docs/architecture.md`).
+- `researchDomainPipelineProviders` recomputes the full 65-topic entity collection
+  (`buildAllResearchDomainEntities()`) on every single `resolveFoundation`/`discoverEvidence`/
+  `resolveRelationships` call — the same accepted-debt pattern as `buildResearchIntelligenceNetwork()`
+  (EPIC-08) and `buildResearchWorkspaceView()` (EPIC-09); no caching was introduced.
