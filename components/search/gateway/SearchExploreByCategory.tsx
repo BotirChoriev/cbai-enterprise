@@ -13,6 +13,8 @@ const iconByCategory: Record<string, HomeModuleIconId> = {
   infrastructure: "graph",
   economy: "reasoning",
   education: "universities",
+  research: "graph",
+  trust: "governance",
 };
 
 const linkClass =

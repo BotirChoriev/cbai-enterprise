@@ -2,13 +2,16 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import type { GatewaySearchResponse } from "@/lib/search-gateway";
+import type { GatewaySearchResponse, SearchResultGroupId } from "@/lib/search-gateway";
 import {
   buildEntityResultEntry,
+  buildResearchTopicResultEntry,
+  buildTopicResultEntry,
   type SearchResultEntry,
 } from "@/lib/search-intelligence-entry";
 import { profileSectionHref } from "@/components/shared/entity-profile-path";
 import type { Entity } from "@/lib/entity/entity.types";
+import TopicResultCard from "@/components/search/gateway/SearchResultCard";
 
 type SearchGatewayResultsProps = {
   response: GatewaySearchResponse;
@@ -16,11 +19,18 @@ type SearchGatewayResultsProps = {
 };
 
 const OPENABLE_GROUP_IDS = new Set(["countries", "companies", "universities"]);
+const TOPIC_GROUP_IDS = new Set<SearchResultGroupId>([
+  "research_topics",
+  "knowledge",
+  "evidence",
+  "future_modules",
+]);
 
 const SEARCH_EXAMPLES = [
   { label: "Country", query: "Japan" },
   { label: "Company", query: "Apple" },
   { label: "University", query: "Harvard University" },
+  { label: "Research Topic", query: "microbiology" },
 ] as const;
 
 function resolveSingleEntityMatch(response: GatewaySearchResponse): Entity | null {
@@ -37,6 +47,14 @@ function collectEntityResults(response: GatewaySearchResponse) {
     .flatMap((group) => group.entities);
 }
 
+function collectTopicGroups(response: GatewaySearchResponse) {
+  return response.groups.filter(
+    (group) =>
+      TOPIC_GROUP_IDS.has(group.id) &&
+      (group.topics.length > 0 || group.researchTopics.length > 0),
+  );
+}
+
 export default function SearchGatewayResults({
   response,
   query,
@@ -51,45 +69,69 @@ export default function SearchGatewayResults({
     return (
       <div className="space-y-4" role="status">
         <p className="text-sm text-zinc-300">
-          No matching country, company, or university was found.
+          No matching country, company, university, or research topic was found.
         </p>
         <SearchExamples />
       </div>
     );
   }
 
-  if (singleEntity) {
+  const topicGroups = collectTopicGroups(response);
+
+  if (singleEntity && topicGroups.length === 0) {
     const entry = buildEntityResultEntry(singleEntity, query);
-    return <SearchResultCard entry={entry} matchedLabel={`Matched: ${entry.name}`} />;
+    return <EntityMatchCard entry={entry} matchedLabel={`Matched: ${entry.name}`} />;
   }
 
   const results = collectEntityResults(response);
 
   return (
-    <div className="space-y-3">
-      <p className="text-sm text-zinc-500">
-        {results.length} result{results.length === 1 ? "" : "s"} · pick one to open
-      </p>
-      <ul className="space-y-2">
-        {results.map((result) => {
-          const entry = buildEntityResultEntry(result.entity, query);
-          return (
-            <li key={`${result.entity.type}-${result.entity.id}`}>
-              <SearchResultCard entry={entry} />
-            </li>
-          );
-        })}
-      </ul>
+    <div className="space-y-6">
+      {results.length > 0 ? (
+        <div className="space-y-3">
+          <p className="text-sm text-zinc-500">
+            {results.length} profile{results.length === 1 ? "" : "s"} · pick one to open
+          </p>
+          <ul className="space-y-2">
+            {results.map((result) => {
+              const entry = buildEntityResultEntry(result.entity, query);
+              return (
+                <li key={`${result.entity.type}-${result.entity.id}`}>
+                  <EntityMatchCard entry={entry} />
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ) : null}
+
+      {topicGroups.map((group) => (
+        <div key={group.id} className="space-y-3">
+          <p className="text-sm text-zinc-500">{group.label}</p>
+          <ul className="space-y-2">
+            {group.researchTopics.map((topic) => (
+              <li key={topic.topicId}>
+                <TopicResultCard entry={buildResearchTopicResultEntry(topic)} />
+              </li>
+            ))}
+            {group.topics.map((topic) => (
+              <li key={topic.id}>
+                <TopicResultCard entry={buildTopicResultEntry(topic)} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </div>
   );
 }
 
-type SearchResultCardProps = {
+type EntityMatchCardProps = {
   entry: SearchResultEntry;
   matchedLabel?: string;
 };
 
-function SearchResultCard({ entry, matchedLabel }: SearchResultCardProps) {
+function EntityMatchCard({ entry, matchedLabel }: EntityMatchCardProps) {
   const showCountryInHeader = entry.type !== "Country" && entry.countryLabel;
 
   return (

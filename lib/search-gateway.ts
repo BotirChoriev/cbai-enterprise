@@ -7,14 +7,23 @@ import { industries } from "@/lib/companies";
 import type { SearchResult } from "@/lib/global-search";
 import { searchEntities } from "@/lib/global-search";
 import { EVIDENCE_NOT_CONNECTED_LABEL } from "@/lib/platform-home";
+import {
+  RESEARCH_TOPICS,
+  filterResearchTopics,
+  type ResearchTopic,
+} from "@/lib/research/research-topics";
 
 export type SearchResultGroupId =
   | "countries"
   | "companies"
   | "universities"
+  | "research_topics"
   | "knowledge"
   | "evidence"
   | "future_modules";
+
+/** Cap on real research-topic matches shown per search — same catalog /research/[topicId] uses. */
+const MAX_RESEARCH_TOPIC_RESULTS = 8;
 
 export type EvidenceDisplayStatus =
   | "Available now"
@@ -43,11 +52,14 @@ export type SearchTopicMatch = SearchTopicDefinition & {
   matchReason: string;
 };
 
+export type ResearchTopicMatch = ResearchTopic & { matchReason: string };
+
 export type SearchResultGroup = {
   id: SearchResultGroupId;
   label: string;
   entities: SearchResult[];
   topics: SearchTopicMatch[];
+  researchTopics: ResearchTopicMatch[];
 };
 
 export type GatewaySearchResponse = {
@@ -231,6 +243,18 @@ export const SEARCH_EXPLORE_CATEGORIES: ExploreCategory[] = [
     connected: true,
     searchQuery: "Education",
   },
+  {
+    id: "research",
+    label: "Research",
+    href: "/research",
+    connected: true,
+  },
+  {
+    id: "trust",
+    label: "Trust",
+    href: "/trust",
+    connected: true,
+  },
 ];
 
 export const SEARCH_PERSONAS: SearchPersonaEntry[] = [
@@ -328,6 +352,31 @@ export const SEARCH_PIPELINE_STAGES = [
 const industryKeywords = industries.map((industry) => industry.toLowerCase());
 
 export const SEARCH_TOPICS: SearchTopicDefinition[] = [
+  {
+    id: "trust",
+    label: "Trust Center",
+    keywords: ["trust", "constitution", "methodology", "evidence policy", "privacy", "copyright"],
+    platformArea: "Trust module",
+    resultGroup: "knowledge",
+    connected: true,
+    href: "/trust",
+    evidenceStatus: "Available now",
+    availableInformation:
+      "Constitution, methodology, evidence policy, human decision, privacy, copyright, and version history.",
+    route: "/trust",
+  },
+  {
+    id: "reports",
+    label: "Reports Center",
+    keywords: ["report", "reports", "reporting"],
+    platformArea: "Reports module",
+    resultGroup: "knowledge",
+    connected: true,
+    href: "/analytics",
+    evidenceStatus: "Available now",
+    availableInformation: "Available report types by profile scope.",
+    route: "/analytics",
+  },
   {
     id: "governance",
     label: "Governance",
@@ -478,6 +527,7 @@ const GROUP_LABELS: Record<SearchResultGroupId, string> = {
   countries: "Countries",
   companies: "Companies",
   universities: "Universities",
+  research_topics: "Research Topics",
   knowledge: "Knowledge",
   evidence: "Evidence",
   future_modules: "Future Modules",
@@ -551,18 +601,26 @@ export function executeGatewaySearch(query: string): GatewaySearchResponse {
     (topic) => topic.resultGroup === "future_modules",
   );
 
+  const researchTopicMatches: ResearchTopicMatch[] = filterResearchTopics(RESEARCH_TOPICS, {
+    query: trimmed,
+  })
+    .slice(0, MAX_RESEARCH_TOPIC_RESULTS)
+    .map((topic) => ({ ...topic, matchReason: `Matched research topic: ${topic.topicName}` }));
+
   const groups = [
     {
       id: "countries" as const,
       label: GROUP_LABELS.countries,
       entities: entityResults.filter((result) => result.entity.type === "country"),
       topics: [],
+      researchTopics: [],
     },
     {
       id: "companies" as const,
       label: GROUP_LABELS.companies,
       entities: entityResults.filter((result) => result.entity.type === "company"),
       topics: [],
+      researchTopics: [],
     },
     {
       id: "universities" as const,
@@ -571,27 +629,38 @@ export function executeGatewaySearch(query: string): GatewaySearchResponse {
         (result) => result.entity.type === "university",
       ),
       topics: [],
+      researchTopics: [],
+    },
+    {
+      id: "research_topics" as const,
+      label: GROUP_LABELS.research_topics,
+      entities: [],
+      topics: [],
+      researchTopics: researchTopicMatches,
     },
     {
       id: "knowledge" as const,
       label: GROUP_LABELS.knowledge,
       entities: [],
       topics: knowledgeTopics,
+      researchTopics: [],
     },
     {
       id: "evidence" as const,
       label: GROUP_LABELS.evidence,
       entities: [],
       topics: evidenceTopics,
+      researchTopics: [],
     },
     {
       id: "future_modules" as const,
       label: GROUP_LABELS.future_modules,
       entities: [],
       topics: futureTopics,
+      researchTopics: [],
     },
   ].filter(
-    (group) => group.entities.length > 0 || group.topics.length > 0,
+    (group) => group.entities.length > 0 || group.topics.length > 0 || group.researchTopics.length > 0,
   ) satisfies SearchResultGroup[];
 
   return {
