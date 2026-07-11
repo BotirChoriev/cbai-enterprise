@@ -1,5 +1,8 @@
+import Link from "next/link";
 import type { UniversityIntelligenceProfile } from "@/lib/universities.intelligence";
 import { coverageStatusClass } from "@/lib/universities.coverage";
+import { countryHrefByName, hrefForEntity } from "@/components/shared/resolve-entity-link";
+import LinkedNamesList from "@/components/shared/LinkedNamesList";
 
 type UniversityRelationshipsProps = {
   profile: UniversityIntelligenceProfile;
@@ -43,23 +46,32 @@ export default function UniversityRelationships({ profile }: UniversityRelations
           </div>
         ) : (
           <ul className="divide-y divide-zinc-800">
-            {graphRelationships.map((rel) => (
-              <li
-                key={`${rel.entityType}-${rel.entityName}-${rel.relationshipLabel}`}
-                className="flex flex-col gap-2 px-6 py-4 sm:flex-row sm:items-center sm:justify-between"
-              >
-                <div>
-                  <p className="text-sm font-medium text-zinc-200">{rel.entityName}</p>
-                  <p className="text-xs capitalize text-zinc-500">{rel.entityType}</p>
-                  <p className="mt-1 text-xs text-zinc-600">{rel.relationshipLabel}</p>
-                </div>
-                <span
-                  className={`self-start rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${coverageStatusClass(rel.evidenceLabel === "Verified local catalog" ? "Connected" : "Not connected")}`}
+            {graphRelationships.map((rel) => {
+              const href = hrefForEntity(rel.entityType, rel.entityName);
+              return (
+                <li
+                  key={`${rel.entityType}-${rel.entityName}-${rel.relationshipLabel}`}
+                  className="flex flex-col gap-2 px-6 py-4 sm:flex-row sm:items-center sm:justify-between"
                 >
-                  {rel.evidenceLabel}
-                </span>
-              </li>
-            ))}
+                  <div>
+                    {href ? (
+                      <Link href={href} className="text-sm font-medium text-cyan-400 hover:text-cyan-300">
+                        {rel.entityName}
+                      </Link>
+                    ) : (
+                      <p className="text-sm font-medium text-zinc-200">{rel.entityName}</p>
+                    )}
+                    <p className="text-xs capitalize text-zinc-500">{rel.entityType}</p>
+                    <p className="mt-1 text-xs text-zinc-600">{rel.relationshipLabel}</p>
+                  </div>
+                  <span
+                    className={`self-start rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${coverageStatusClass(rel.evidenceLabel === "Verified local catalog" ? "Connected" : "Not connected")}`}
+                  >
+                    {rel.evidenceLabel}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         )}
 
@@ -70,7 +82,20 @@ export default function UniversityRelationships({ profile }: UniversityRelations
                 Country (local catalog)
               </dt>
               <dd className="mt-1 text-zinc-300">
-                {profile.linkedEntities.country ?? "Not linked"}
+                {profile.linkedEntities.country ? (
+                  (() => {
+                    const href = countryHrefByName(profile.linkedEntities.country);
+                    return href ? (
+                      <Link href={href} className="text-cyan-400 hover:text-cyan-300">
+                        {profile.linkedEntities.country}
+                      </Link>
+                    ) : (
+                      profile.linkedEntities.country
+                    );
+                  })()
+                ) : (
+                  "Not linked"
+                )}
               </dd>
             </div>
             <div>
@@ -78,9 +103,7 @@ export default function UniversityRelationships({ profile }: UniversityRelations
                 Companies in same country (local catalog)
               </dt>
               <dd className="mt-1 text-zinc-300">
-                {profile.linkedEntities.companies.length > 0
-                  ? profile.linkedEntities.companies.join(", ")
-                  : "None indexed"}
+                <LinkedNamesList names={profile.linkedEntities.companies} entityType="company" />
               </dd>
             </div>
             <div className="sm:col-span-2">
