@@ -552,6 +552,67 @@ unification, Trust/legal center, full accessibility/localization audits, and mor
 and prioritized as backlog in `docs/product-activation-audit.md` §6 — not silently dropped, not
 claimed as done.
 
+## v3.8 — Personal Intelligence Assistant (Release 2)
+
+Introduced the Assistant as a personalization and routing layer over the existing product — no
+new AI, LLM, or reasoning engine. `lib/assistant/` (profile model, localStorage persistence, a
+deterministic phrase-to-route command table). Because this platform has no authentication or
+backend (static export, zero auth/session code anywhere), "one Assistant per user" is honestly a
+profile saved to that browser, never a fabricated cross-device account.
+
+New persistent Command Center in the Topbar (every route, never a floating overlay): keyboard
+input, real Web Speech API voice recognition (feature-detected, honestly disabled where
+unsupported), an upload control honest about no ingestion pipeline being connected. `/settings`
+went from a "coming soon" placeholder to a real Assistant profile form (name, avatar, voice,
+languages, workspace role, timezone, country, organization, notifications, accessibility —
+accessibility toggles have real effect via document-level CSS classes). Signed-in-style home
+greeting shown only once a real local profile exists, with honest "not connected yet" framing for
+recent changes and recommendations rather than fabricating either.
+
+Deleted a fully dead, pre-existing decorative "AI command center" mockup
+(`components/core/{CommandCenter,MissionControl,ThinkingPipeline,MemoryPanel,ModuleStatus}.tsx`,
+`lib/core.ts`) — zero references anywhere, hardcoded-disabled inputs, an empty example-command
+list — rather than leaving it beside the one real Command Center this release added.
+
+`npm run lint` clean, `npm run build` 91 routes (65 research topics), `npm run test:research-slice`
+11/11 unchanged. Zero Platform Core files touched.
+
+## v3.9 — Empty States, Missing Capabilities, and Global Discovery Activation (Release 3)
+
+Repo-wide audit for unexplained dead-end UI text found the codebase already runs a strong, honest
+empty-state convention almost everywhere; fixed the real exceptions — 8 bare "Not yet" values
+across three `/research/review` panels, a bare dashboard activity empty state, and a search result
+card that silently dropped its call-to-action for unavailable results with no visible cue.
+
+Activated two capabilities that were fully built but never wired to any UI: `buildTopicResultEntry`
+and its target component `SearchResultCard` (in `components/search/gateway/`) existed to render
+Global Search's "knowledge"/"evidence"/"future_modules" result groups, but `SearchGatewayResults.tsx`
+only ever rendered entity (country/company/university) results — those groups were computed every
+search and silently discarded. Wired them in, and added a genuinely new capability alongside them:
+a real "Research Topics" search group using the existing `filterResearchTopics` query over the real
+65-topic catalog — previously, none of those topics were findable by name through Global Search at
+all. Also activated `RecentEntities` (already built for the page context header) a second time on
+`/my-work` as "Recently Viewed."
+
+Extended the Command Center's deterministic command table with the mission's new fixed commands
+(Open Research, Open Trust, Open Settings, Open Reports) and parameterized patterns ("find country
+X," "show research topic X") resolved against the same real catalogs Global Search uses. Unmatched
+input no longer silently redirects to search — it shows an explicit "not recognized yet" panel with
+supported example commands and a link to Global Search.
+
+New `lib/product-status.ts` + `components/shared/StatusBadge.tsx` — one seven-value status
+vocabulary (Live/Partial/Waiting for verified data/Preview/Restricted/Not connected/Planned), each
+with a visible label and a full-sentence explanation, never color-only. Used in the fixed review
+panels, the search result card, and a new `EntityDataStatus` component now shown on all three
+Country/Company/University intelligence panels.
+
+New `scripts/test-product-activation.ts` (`npm run test:product-activation`) — 13 tests covering
+grouped real search results, safe handling of unknown search terms and unknown commands, status
+vocabulary completeness, and Assistant profile honesty. `npm run lint` clean, `npm run build` 91
+routes (65 research topics), both test suites passing (11 + 13 = 24). Zero Platform Core, Research
+Domain, Workspace Contract, Research Mission, or Assistant architecture files touched — this
+release is empty-state and discovery activation only. Full detail: `docs/product-activation-audit.md` §8.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation

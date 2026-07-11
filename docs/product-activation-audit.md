@@ -167,3 +167,140 @@ server smoke test of every changed route (`/`, `/research/microbiology`, `/compa
 `/universities`, `/countries`, `/dashboard`, `/government`) returning 200 with no console/hydration
 errors, and manual confirmation that the new "Workspaces" sidebar section renders with all six
 labels in the served HTML.
+
+## 8. Release 3 — Empty States, Missing Capabilities, and Global Discovery Activation
+
+Response to "CBAI Product Activation — Release 3." Scope: remove unexplained dead ends, activate
+disconnected-but-already-built search/entity/status capabilities, connect the Command Center to
+real navigation. No new engine, AI, assistant, or Platform Core change.
+
+### 8.1 Empty/missing-state audit
+
+Repo-wide search across `app/`, `components/`, `lib/` for bare "Missing/Empty/No data/Coming
+soon/TODO/Unavailable/Not yet"-style text. Result: the codebase already has a strong, consistent
+"honest empty state" convention (~150+ occurrences read in full — short status word + a full
+sentence explaining why + what's connected instead). A small, genuine cluster of bare, unexplained
+text was found and fixed:
+
+- `ReviewCommentsPanel.tsx`, `ReviewDecisionPanel.tsx`, `ReviewTimeline.tsx` (rendered together on
+  `/research/review`) — 8 bare "Not yet" values with zero visible explanation (the reasoning
+  existed only in code comments). Replaced with the new status vocabulary (§8.6) plus one compact
+  explanation per panel instead of repeating the same reason per row — `ReviewCommentsPanel` in
+  particular went from 3 repeated bare rows to one explanation block, since all 3 fields were
+  empty for the same reason.
+- `RuntimeActivityFeed.tsx` — bare "No activity recorded yet" brought in line with its sibling
+  `AgentActivity.tsx`'s fuller wording. (This component itself has zero render call sites anywhere
+  in the app today — dead but honest; not activated further this pass, see §8.7.)
+- `ResearchReviewWorkspace.tsx` ("Not assigned yet.") and `WorkspaceExplorer.tsx`'s deep-link
+  not-found notice — both minor, given one clause of reason and (for the latter) a real link to
+  browse all topics.
+- `SearchResultCard.tsx` — silently dropped its "Open profile →" CTA for unavailable results with
+  no visible cue at all. Now shows a status badge plus the entry's real next-step text instead of
+  disappearing silently.
+
+Everything else read (evidence gap panels, coverage panels, comparison/relationship panels, agent
+components, timeline components, the research topic empty-section notice, the Trust page's privacy
+placeholder, the custom 404) was already a complete, honest sentence and was left unchanged.
+
+### 8.2 Global Search activation
+
+`/search` already computed grouped multi-type results (`executeGatewaySearch` in
+`lib/search-gateway.ts`) — but `SearchGatewayResults.tsx` only ever rendered the entity groups
+(countries/companies/universities); the "knowledge"/"evidence"/"future_modules" topic groups were
+computed and silently discarded, and `buildTopicResultEntry` (the adapter built to render them) had
+zero call sites anywhere. Real research topics (the 65-topic catalog) were not searchable by name
+at all.
+
+Fixed: added a real `research_topics` search group using the existing `filterResearchTopics`
+query over the real `RESEARCH_TOPICS` catalog (no new engine — the filter function already
+existed, unused for search). Wired `SearchGatewayResults.tsx` to render every populated group
+(entities, research topics, and the previously-dropped knowledge/evidence/future-module topics)
+using the also-previously-unwired `SearchResultCard` component. Added "Trust Center" and "Reports
+Center" as real, keyword-searchable entries, and added "Research"/"Trust" to the Explore-by-category
+quick links. Searching "microbiology" now surfaces the real `/research/microbiology` page;
+searching "trust" surfaces the real `/trust` page.
+
+### 8.3 Command Center activation
+
+Extended `lib/assistant/assistant-commands.ts`'s deterministic phrase table with the mission's new
+fixed commands (Open Research, Open Trust, Open Settings, Open Reports) and a small set of
+**parameterized** patterns — "find country X", "find university X", "find company X", "search
+evidence for X", "show research topic X" — resolved via the same real catalogs Global Search uses
+(`searchEntities`, `filterResearchTopics`), never a new lookup engine. Unmatched input no longer
+silently redirects to search: the Command Center now shows an explicit "not recognized yet" panel
+with supported example commands and a link to Global Search, per the mission's "no fake AI
+response" rule.
+
+### 8.4 Country/Company/University profile activation
+
+All three `*IntelligencePanel.tsx` components were already structurally identical (confirmed by
+this audit and the prior Release 1 investigation) and contained zero fabricated scores or
+unexplained empty sections. Added one real, consistent addition: a shared `EntityDataStatus`
+component using the new status vocabulary, showing `live` / `partial` / `waiting_for_verified_data`
+based on each entity's real connected-source count — the one piece of the mission's 8-section
+profile structure (Identity/Available intelligence/Evidence/Relationships/Timeline/Reports/Open
+questions/**Data status**) that wasn't already present as a labeled section.
+
+### 8.5 Research empty-state cleanup
+
+Confirmed (not re-fixed) — `ResearchIntelligenceOverview.tsx`'s `emptySections` handling already
+matches the mission's bar exactly: one compact trailing sentence ("No hypotheses, findings,
+publications… are connected yet — honestly empty, not an error"), never a wall of empty panels.
+The one real fix in this area was `/research/review`'s three panels (§8.1) — reachable from every
+research topic, not sparse-topic-specific. `npm run build` confirms all 65 topic pages still
+generate; Research Cockpit, Research Workspace, Review Workspace, Evidence Workspace, and the
+`?evidence=` URL-selection flow are all unchanged.
+
+### 8.6 Status vocabulary (Phase 8)
+
+New `lib/product-status.ts` + `components/shared/StatusBadge.tsx`: seven statuses (Live, Partial,
+Waiting for verified data, Preview, Restricted, Not connected, Planned), each with a visible label
+and a full-sentence explanation — never color-only, always with a real `sr-only` accessible label.
+This does not replace the several existing per-module status-label mappings already in the
+codebase (`workspaceStatusClass`, `explorerStatusClass`, and similar) — those are honest and
+working; migrating every existing call site was judged out of scope for this pass's risk budget.
+The new vocabulary is used in the review panels (§8.1), `SearchResultCard` (§8.1), and the new
+`EntityDataStatus` component (§8.4) — proving the pattern in real, newly-touched code rather than
+a repo-wide relabeling.
+
+### 8.7 My Work and Assistant connection
+
+`MyWork.tsx` did not check the Assistant profile at all. Now: when a local profile is active, My
+Work shows a real identity summary (avatar, name, workspace role, preferred language, a `live`
+status badge) instead of the generic "no accounts" banner. When inactive, the onboarding banner
+now includes the mission's exact five links (Explore Research, Explore Countries, Search Evidence,
+Configure Assistant, Open Trust Center). Also activated a second existing-but-unused capability:
+`RecentEntities` (already built, already used in the page context header) is now also shown on My
+Work as "Recently Viewed" — real local view history for countries/companies/universities, honestly
+empty until the user browses a profile. "Recent Missions" and "Recent Research" remain honestly
+empty — no mission or per-topic browsing history is tracked anywhere in this platform.
+
+### 8.8 Tests
+
+New `scripts/test-product-activation.ts` (`npm run test:product-activation`, same zero-dependency
+`node:test` harness as the research slice suite) — 13 tests: grouped real search results, unknown
+search terms failing safely, empty-query safety, fixed and parameterized Command Center routing
+against real catalogs, unknown-command → `null` (never a guess), status-vocabulary completeness,
+and Assistant profile honesty (inactive until named, SSR-safe with no `window`). 13/13 passing,
+alongside the unchanged 11/11 research-slice suite.
+
+### 8.9 Remaining data blockers / not attempted this pass
+
+- **Voice and upload** remain exactly as activated in Release 2 — real Web Speech API voice input,
+  honest "not connected" upload notice. Not revisited this pass beyond routing parity.
+- **Full repo-wide status-vocabulary migration** — the several pre-existing status-label systems
+  (`workspaceStatusClass`, `explorerStatusClass`, coverage-panel chips) were not migrated to the
+  new vocabulary; documented as a deliberate scoping choice (§8.6), not an oversight.
+- **`RuntimeActivityFeed.tsx`** has zero render call sites anywhere in the app — its text was fixed
+  for honesty but it was not wired into `/dashboard` or anywhere else; doing so would require
+  deciding what real runtime data (if any) it should show, out of scope for an empty-state pass.
+- **Organizations, Technologies, Publications, Patents** as standalone Global Search categories —
+  not added. The real research-domain data behind these (one laboratory, one dataset, zero real
+  publications/patents anywhere in the catalog) is too sparse to justify a dedicated search group
+  without either padding it with near-empty results or excluding it entirely; the mission's own
+  "do not include entity types with no real data" rule was applied by omitting them.
+- **Company/University/Country full 8-section literal restructuring** — Data status was added;
+  Identity/Evidence/Reports/Open questions were already present as labeled sections;
+  Relationships/Timeline exist as separate page-level components (`*Relationships.tsx`) rather than
+  inside the panel itself. Not consolidated into one literal panel this pass — low risk, but a real
+  IA decision better made deliberately than folded into an empty-states release.

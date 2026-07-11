@@ -505,3 +505,30 @@ under one `title.template`. One redundant `deriveResearchWorkflow` call removed 
 topic page (lifted to the shared parent). Full inventory, the companies/universities score
 re-verification, the research-topic-page duplication findings, and the complete backlog of phases
 not attempted this pass are recorded in `docs/product-activation-audit.md` — not duplicated here.
+
+## Personal Intelligence Assistant, Release 2
+
+Device-local Assistant profile (`lib/assistant/`, localStorage — honestly not a real account, no
+auth/backend exists in this static-export app) plus a deterministic command router, both reusing
+the existing product rather than adding a new AI. Persistent Command Center in the Topbar on every
+route. `/settings` activated from a placeholder into a real profile form. Deleted a fully dead
+decorative "AI command center" mockup (`components/core/*`, `lib/core.ts`) found to have zero
+references anywhere. Full detail: `docs/version-history.md` v3.8.
+
+## Empty States, Missing Capabilities, and Global Discovery, Release 3
+
+Repo-wide honest-empty-state audit fixed a real cluster of bare, unexplained text (mainly three
+`/research/review` panels rendering 8 bare "Not yet" values with no visible reason). Activated two
+capabilities that were fully built but never wired to any UI: Global Search's knowledge/evidence
+result groups (computed every search, silently discarded before this release) and a new real
+"Research Topics" search group over the actual 65-topic catalog (previously not searchable by name
+at all). Extended the Command Center with real parameterized commands ("find country X") and an
+honest "not recognized yet" fallback instead of silently guessing search intent for unmatched
+input. New one-vocabulary status system (`lib/product-status.ts`, `StatusBadge`) used in the fixed
+panels and a new `EntityDataStatus` section now on all three Country/Company/University panels. My
+Work now shows Assistant identity when a profile is active, and real "Recently Viewed" history
+(activating the existing `RecentEntities` component a second time). 13 new tests
+(`test:product-activation`) alongside the unchanged 11 research-slice tests. Full detail, including
+what was deliberately not attempted this pass (full status-vocabulary migration, wiring
+`RuntimeActivityFeed`, new search categories with too little real data to justify one): see
+`docs/product-activation-audit.md` §8.
