@@ -44,11 +44,12 @@ export default function AssistantCommandCenter() {
   const router = useRouter();
   const pathname = usePathname();
   const { profile, isActive } = useAssistantProfile();
-  const { context } = usePlatformContext();
+  const { context, pinEntityToWorkspace } = usePlatformContext();
   const [input, setInput] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [uploadNotice, setUploadNotice] = useState<string | null>(null);
   const [unrecognized, setUnrecognized] = useState<string | null>(null);
+  const [confirmation, setConfirmation] = useState<string | null>(null);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -64,6 +65,25 @@ export default function AssistantCommandCenter() {
     (rawInput: string) => {
       const trimmed = rawInput.trim();
       if (!trimmed) return;
+      setConfirmation(null);
+
+      // "Save workspace" is a real action (pin the current entity), not a navigation — handled
+      // here rather than in the pure resolver, using the same focused platform entity the
+      // Contextual Operator already shows. Never fabricates something to save.
+      const normalized = trimmed.toLowerCase();
+      if (["save workspace", "save to workspace", "bookmark", "save company"].some((phrase) => normalized.includes(phrase))) {
+        const focused = context.country ?? context.company ?? context.university;
+        if (focused) {
+          pinEntityToWorkspace(focused);
+          setConfirmation(`Saved "${focused.name}" to your workspace.`);
+        } else {
+          setConfirmation("Nothing to save yet — open a country, company, or university profile first.");
+        }
+        setUnrecognized(null);
+        setInput("");
+        return;
+      }
+
       const match = resolveAssistantCommand(trimmed);
       if (match) {
         setUnrecognized(null);
@@ -75,7 +95,7 @@ export default function AssistantCommandCenter() {
         setUnrecognized(trimmed);
       }
     },
-    [router],
+    [router, context.country, context.company, context.university, pinEntityToWorkspace],
   );
 
   function handleSubmit(event: React.FormEvent) {
@@ -166,6 +186,7 @@ export default function AssistantCommandCenter() {
             onChange={(e) => {
               setInput(e.target.value);
               setUnrecognized(null);
+              setConfirmation(null);
             }}
             placeholder={isListening ? "Listening…" : "Open my work, continue research…"}
             className="w-full rounded-lg border border-zinc-800 bg-slate-900/80 py-2 pl-10 pr-4 text-sm text-zinc-300 placeholder:text-zinc-600 outline-none transition-colors focus:border-cyan-500/30 focus:ring-1 focus:ring-cyan-500/20"
@@ -230,6 +251,13 @@ export default function AssistantCommandCenter() {
       {uploadNotice ? (
         <p role="status" className="mt-1.5 text-[11px] text-zinc-500">
           {uploadNotice}
+        </p>
+      ) : null}
+
+      {confirmation ? (
+        <p role="status" className="mt-1.5 flex items-center gap-1.5 text-[11px] text-emerald-400">
+          <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+          {confirmation}
         </p>
       ) : null}
 

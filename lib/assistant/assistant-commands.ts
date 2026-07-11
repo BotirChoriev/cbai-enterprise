@@ -95,6 +95,24 @@ export const ASSISTANT_COMMANDS: readonly AssistantCommand[] = [
     href: "/analytics",
     keywords: ["open reports", "reports"],
   },
+  {
+    id: "open-companies",
+    phrase: "Open company",
+    href: "/companies",
+    keywords: ["open company", "open companies", "companies"],
+  },
+  {
+    id: "compare-companies",
+    phrase: "Compare companies",
+    href: "/companies",
+    keywords: ["compare companies", "compare company"],
+  },
+  {
+    id: "generate-report",
+    phrase: "Generate report",
+    href: "/analytics",
+    keywords: ["generate report", "generate a report", "create report"],
+  },
 ] as const;
 
 export type AssistantCommandMatch =
