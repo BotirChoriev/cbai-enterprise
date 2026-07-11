@@ -690,6 +690,40 @@ wizard, a single unified `PageHeader` component across all nine named page types
 redesign audit beyond the shared components already in place — see
 `docs/product-activation-audit.md` §10 for the complete list of what was deliberately deferred.
 
+## v3.12 — Companies Intelligence Module Activation
+
+Fixed a real, confirmed bug: bidirectional navigation between Country/Company/University profiles
+was broken everywhere — every "linked entity" list rendered correct, real, non-fabricated names as
+inert plain text, never a link. New `resolve-entity-link.ts` + `LinkedNamesList.tsx` make every one
+of those names a real link to its real profile.
+
+Activated a fully-built, zero-caller bookmark system (`pinEntity`/`unpinEntity`, previously
+"architecture hook for future UI" only) — a real "Save to workspace" button on the company profile,
+a real "remove" action on pinned entities, and My Work's "Saved Work" section (previously an
+honestly-empty stub claiming no persistence layer existed) now shows real saved companies.
+
+New honest Company↔Research connection (`lib/company-research.ts`): confirmed zero real data-model
+link exists between companies and research topics, and rather than fabricate one, matches a
+company's real industry against real research topic text via a curated keyword table — labeled
+"related by subject matter," never a claimed sponsorship. Wired both directions.
+
+Added a real `website` field (real, public, verifiable URLs for all 8 companies). Activated
+`CompanyMethodology.tsx`/`CompanyTrustSection.tsx` (confirmed dead) since this mission specifically
+asked for Trust/Methodology inside Company Intelligence. Deleted the confirmed-redundant
+`CompanyCoveragePanel.tsx`. Evidence detail now honestly shows "Not assessed"/"Not available" for
+confidence, citation, and publication date — fields that exist nowhere as real data in this
+platform for any entity type — rather than omitting or inventing them.
+
+New real Company Report (`lib/company-report.ts`) compiling only already-computed data (Overview,
+Evidence, Research, Country, Methodology, Trust statement, Limitations), triggered by a real
+"Generate report" button. Command Center gained `open company`/`compare companies`/`generate
+report`; `save workspace` is a real pin action using the currently focused entity, with a real
+confirmation message.
+
+New `scripts/test-companies-intelligence.ts` — 15 tests. `npm run lint` clean, `npm run build` 91
+routes, 54 total tests passing (15 + 28 + 11). Zero Platform Core files touched; no new engines, no
+fabricated companies or statistics. Full detail: `docs/product-activation-audit.md` §11.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation

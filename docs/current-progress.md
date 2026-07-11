@@ -567,3 +567,19 @@ Countries/Companies/Universities/Research. 11 new tests, 39 total passing. What 
 not attempted this release (a guided onboarding wizard, a single unified page-header component, a
 full shell redesign) is recorded honestly, not silently dropped: `docs/product-activation-audit.md`
 §10.
+
+## Companies Intelligence Module Activation
+
+Fixed a real, confirmed bug: bidirectional navigation between Country/Company/University "linked
+entity" lists was broken everywhere — real, correct names rendered as inert plain text, never a
+link, now real `<Link>`s. Activated a fully-built, zero-caller bookmark system — a real "Save to
+workspace" button and My Work's "Saved Work" section, which previously claimed no persistence
+layer existed when one did, just unwired. New honest Company↔Research connection via industry
+keyword matching against real research topics, labeled "related by subject matter," never a
+sponsorship claim, wired in both directions. Added a real `website` field. Activated
+`CompanyMethodology`/`CompanyTrustSection` (dead, mission-requested); deleted the redundant
+`CompanyCoveragePanel`. Evidence detail now honestly shows "Not assessed"/"Not available" for
+confidence, citation, and publication date instead of omitting them. New real Company Report
+compiled from already-computed data via a real "Generate report" button. Command Center gained
+`open company`/`compare companies`/`generate report`, plus a real context-aware "save workspace"
+pin action. 15 new tests, 54 total passing. Full detail: `docs/product-activation-audit.md` §11.

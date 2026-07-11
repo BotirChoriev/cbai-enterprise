@@ -570,3 +570,76 @@ research-slice suite.
 - **Planned, not attempted this release**: a guided multi-step onboarding wizard (§10.3); a single
   unified `PageHeader` component across all nine named page types (§10.7); a full shell redesign
   audit across all 16 named routes beyond the shared components already in place (§10.5).
+
+## 11. Companies Intelligence — module-depth activation
+
+Response to "CBAI Product Activation — Companies Intelligence" (target: a complete, real,
+end-to-end Companies workflow, not a broader platform pass). No new engine, no fake companies, no
+fake statistics.
+
+**Fixed a real, confirmed bug**: bidirectional navigation was broken everywhere. Country → Company,
+University → Company, Company → Country, and Company → University "linked entity" lists all
+rendered real, correct, non-fabricated names — as inert plain text, not links. New
+`components/shared/resolve-entity-link.ts` + `LinkedNamesList.tsx` resolve a real catalog name back
+to its real profile URL (exact match against the same catalogs the names already came from) and
+render real `<Link>`s in `CompanyRelationships.tsx`, `CountryRelationships.tsx`, and
+`UniversityRelationships.tsx`, including every Knowledge Graph relationship row.
+
+**Activated a fully-built, zero-caller bookmark system**: `pinEntity`/`unpinEntity`
+(`lib/context/context-history.ts`) existed only as "architecture hook for future UI" — no button
+anywhere called them. Wired `pinEntityToWorkspace`/`unpinEntityFromWorkspace`/`isEntityPinned`
+into `PlatformContextProvider`, added a new `SaveToWorkspaceButton` to the company profile, and
+`PinnedEntities.tsx` (already used in the context header) now renders real links plus a real
+"remove from workspace" action — the same component now also powers My Work's "Saved Work"
+section, which previously stated no persistence layer existed. It does; it was simply unwired.
+
+**New, honest Company↔Research connection**: confirmed zero real data-model link exists between
+any company and any research topic (the Research Domain's organization types are documented
+stubs). Rather than fabricate one, `lib/company-research.ts` matches a company's real `industry`
+against real research topic domain/name/description text via a curated keyword table (the same
+pattern `lib/search-gateway.ts`'s `SEARCH_TOPICS` already uses) — every match labeled "related by
+subject matter," explicitly never a sponsorship or institutional claim. Wired both directions:
+`CompanyRelatedResearch.tsx` on the company profile, `ResearchRelatedCompanies.tsx` on the
+research topic page (hidden when empty).
+
+**Added a real `website` field** to the `Company` catalog (real, publicly-known official URLs for
+all 8 companies) and extended `EntityOverviewSection` to render a real fact as a clickable link
+when an `href` is provided — additive, backward-compatible with its Country/University callers.
+
+**Activated `CompanyMethodology.tsx`/`CompanyTrustSection.tsx`** (confirmed dead, zero callers) —
+this mission explicitly asked for Trust and Methodology as sections of Company Intelligence
+specifically, not just a link to the platform-wide `/trust` page. Deleted `CompanyCoveragePanel.tsx`
+(also dead, confirmed redundant with the already-live `EntityEvidenceSection`).
+
+**Honest Evidence detail**: `CompanySourceCoverage.tsx` now shows the full field set the mission
+asked for per source — Publisher (real), Open source link (real), Publication date ("Not
+available"), Confidence ("Not assessed" — the mission's own required wording), Citation ("Not
+available"). No rich per-item evidence record (`CbaiEvidenceItem`, with citation/confidence/date)
+exists anywhere in this platform for any entity type — confirmed architecture-only, never
+instantiated. Shown honestly rather than fabricated.
+
+**New real Company Report**: `lib/company-report.ts` (`buildCompanyReport`) compiles only
+already-computed real data — Overview, Evidence, Research, Country, Methodology, Trust statement,
+Limitations — from the same `journey`/`coverage` objects the profile page already uses, never
+re-derived. A real "Generate report" button on the company profile toggles `CompanyReportView.tsx`
+in place; no PDF/export pipeline exists (Reports Center already declares that Planned elsewhere),
+so none was implied here.
+
+**Command Center**: added `open company`/`compare companies` (mirroring the existing country
+commands) and `generate report` (routes to Reports Center) to the deterministic phrase table.
+`save workspace` is handled as a real action in `AssistantCommandCenter.tsx` itself, not the pure
+resolver — it pins whichever entity `PlatformContextProvider` currently has focused, with a real
+confirmation message, and an honest "nothing to save yet" message when no entity is focused, never
+inventing something to save.
+
+**Tests**: new `scripts/test-companies-intelligence.ts` (`npm run test:companies-intelligence`) —
+15 tests covering real link resolution for every real catalog name, honest `null`/empty results
+for unknown names and unmapped industries, report-field traceability, the real https website
+format, and the new Command Center commands. 15/15 passing, alongside the unchanged 28
+(product-activation) + 11 (research-slice) = 54 total.
+
+**Not attempted**: no new external evidence sources were connected (would require real data
+ingestion, out of scope); no PDF/CSV export was built (Reports Center already honestly declares
+this Planned); the Company↔Research keyword table covers the 6 seeded industries only — a new
+industry added to the catalog without a matching keyword entry would honestly show "No verified
+data available" rather than silently guessing.
