@@ -25,6 +25,8 @@ function sanitizeProfile(raw: unknown): AssistantProfile {
 
   return {
     name: typeof candidate.name === "string" ? candidate.name : fallback.name,
+    operatorName:
+      typeof candidate.operatorName === "string" ? candidate.operatorName : fallback.operatorName,
     avatar:
       typeof candidate.avatar === "string" &&
       (ASSISTANT_AVATARS as string[]).includes(candidate.avatar)

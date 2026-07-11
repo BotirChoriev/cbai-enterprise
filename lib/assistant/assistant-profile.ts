@@ -118,8 +118,13 @@ export type AccessibilitySettings = {
   largerText: boolean;
 };
 
+export const DEFAULT_OPERATOR_NAME = "CBAI Operator";
+
 export type AssistantProfile = {
+  /** The person's own name — used for the greeting ("Good morning, Botir"). */
   name: string;
+  /** The Operator's chosen name — e.g. "Ava." Falls back to DEFAULT_OPERATOR_NAME when empty. */
+  operatorName: string;
   avatar: AssistantAvatarId;
   voiceInputEnabled: boolean;
   preferredLanguage: string;
@@ -144,6 +149,7 @@ function browserTimezone(): string {
 export function createEmptyAssistantProfile(): AssistantProfile {
   return {
     name: "",
+    operatorName: "",
     avatar: "cyan",
     voiceInputEnabled: false,
     preferredLanguage: "en",
@@ -169,4 +175,9 @@ export function createEmptyAssistantProfile(): AssistantProfile {
 /** A profile is "set up" once it has a real name — never inferred or fabricated. */
 export function isAssistantProfileActive(profile: AssistantProfile): boolean {
   return profile.name.trim().length > 0;
+}
+
+/** The Operator's display name — the user's chosen name, or the honest product default. */
+export function resolveOperatorName(profile: AssistantProfile): string {
+  return profile.operatorName.trim() || DEFAULT_OPERATOR_NAME;
 }

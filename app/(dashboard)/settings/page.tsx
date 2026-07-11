@@ -4,7 +4,7 @@ import AssistantSettingsForm from "@/components/assistant/AssistantSettingsForm"
 
 export const metadata: Metadata = {
   title: "Settings",
-  description: "Your Personal Intelligence Assistant — saved to this browser.",
+  description: "Your CBAI Personal Operator — saved to this browser.",
 };
 
 export default function SettingsPage() {
@@ -12,7 +12,7 @@ export default function SettingsPage() {
     <div className="space-y-8">
       <PageHeader
         title="Settings"
-        description="Your Personal Intelligence Assistant — saved to this browser."
+        description="Your CBAI Personal Operator — saved to this browser."
       />
       <AssistantSettingsForm />
     </div>

@@ -8,10 +8,11 @@ import { useAssistantProfile } from "@/components/platform/context/AssistantProf
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import RecentEntities from "@/components/platform/context/RecentEntities";
 import StatusBadge from "@/components/shared/StatusBadge";
+import Avatar from "@/components/shared/Avatar";
 import {
-  ASSISTANT_AVATAR_CLASSES,
   ASSISTANT_LANGUAGES,
   WORKSPACE_ROLE_LABELS,
+  resolveOperatorName,
 } from "@/lib/assistant/assistant-profile";
 
 const continueLinks = [
@@ -41,7 +42,7 @@ const ONBOARDING_LINKS = [
   { label: "Explore Research", href: "/research" },
   { label: "Explore Countries", href: "/countries" },
   { label: "Search Evidence", href: "/knowledge" },
-  { label: "Configure Assistant", href: "/settings" },
+  { label: "Configure Personal Operator", href: "/settings" },
   { label: "Open Trust Center", href: "/trust" },
 ] as const;
 
@@ -57,16 +58,12 @@ export default function MyWork() {
       {isActive ? (
         <div className={`${cbaiGlassCard} border-cyan-500/15 px-6 py-5`}>
           <div className="flex flex-wrap items-center gap-3">
-            <span
-              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-sm font-semibold uppercase ${ASSISTANT_AVATAR_CLASSES[profile.avatar]}`}
-            >
-              {profile.name.slice(0, 1)}
-            </span>
+            <Avatar name={profile.name} avatar={profile.avatar} />
             <div>
               <h2 className="text-lg font-semibold text-zinc-100">{profile.name}&apos;s Work</h2>
               <p className="text-xs text-zinc-500">
-                {WORKSPACE_ROLE_LABELS[profile.workspaceRole]} workspace ·{" "}
-                {preferredLanguage?.label ?? profile.preferredLanguage}
+                {resolveOperatorName(profile)} · {WORKSPACE_ROLE_LABELS[profile.workspaceRole]}{" "}
+                workspace · {preferredLanguage?.label ?? profile.preferredLanguage}
               </p>
             </div>
             <StatusBadge status="live" className="ml-auto" />

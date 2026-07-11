@@ -3,14 +3,15 @@
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import {
   ASSISTANT_AVATARS,
-  ASSISTANT_AVATAR_CLASSES,
   ASSISTANT_LANGUAGES,
+  DEFAULT_OPERATOR_NAME,
   WORKSPACE_ROLES,
   WORKSPACE_ROLE_LABELS,
   type WorkspaceRole,
 } from "@/lib/assistant/assistant-profile";
 import { countries } from "@/lib/countries";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import Avatar from "@/components/shared/Avatar";
 
 const inputClass =
   "w-full rounded-lg border border-zinc-800 bg-slate-900/80 px-3 py-2 text-sm text-zinc-200 outline-none transition-colors focus:border-cyan-500/30 focus:ring-1 focus:ring-cyan-500/20";
@@ -27,29 +28,40 @@ export default function AssistantSettingsForm() {
         />
         <p className="text-sm text-zinc-300">
           {isActive
-            ? `Assistant ready — saved to this browser as "${profile.name}."`
-            : "Assistant not set up yet — add a name below to activate it."}
+            ? `Your CBAI Personal Operator is ready — saved to this browser as "${profile.name}."`
+            : "Your CBAI Personal Operator is not set up yet — add your name below to activate it."}
         </p>
       </div>
 
       <section aria-labelledby="assistant-identity-heading" className={`${cbaiGlassCard} space-y-4 p-5`}>
         <p className={cbaiSectionEyebrow} id="assistant-identity-heading">
-          Assistant Identity
+          Personal Operator Identity
         </p>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="space-y-1.5">
-            <span className={labelClass}>Assistant Name</span>
+            <span className={labelClass}>Your Name</span>
             <input
               type="text"
               value={profile.name}
               onChange={(e) => updateProfile({ name: e.target.value })}
-              placeholder="e.g. Ava"
+              placeholder="e.g. Botir"
               className={inputClass}
             />
           </label>
 
           <label className="space-y-1.5">
+            <span className={labelClass}>Operator Name</span>
+            <input
+              type="text"
+              value={profile.operatorName}
+              onChange={(e) => updateProfile({ operatorName: e.target.value })}
+              placeholder={DEFAULT_OPERATOR_NAME}
+              className={inputClass}
+            />
+          </label>
+
+          <label className="space-y-1.5 sm:col-span-2">
             <span className={labelClass}>Workspace Role</span>
             <select
               value={profile.workspaceRole}
@@ -66,7 +78,7 @@ export default function AssistantSettingsForm() {
         </div>
 
         <div className="space-y-1.5">
-          <span className={labelClass}>Assistant Avatar</span>
+          <span className={labelClass}>Avatar</span>
           <div className="flex flex-wrap gap-2">
             {ASSISTANT_AVATARS.map((avatar) => (
               <button
@@ -74,12 +86,12 @@ export default function AssistantSettingsForm() {
                 type="button"
                 onClick={() => updateProfile({ avatar })}
                 aria-pressed={profile.avatar === avatar}
-                title={avatar}
-                className={`flex h-9 w-9 items-center justify-center rounded-full border text-xs font-semibold uppercase transition-colors ${ASSISTANT_AVATAR_CLASSES[avatar]} ${
-                  profile.avatar === avatar ? "ring-2 ring-cyan-400/60" : ""
+                title={`${avatar} avatar`}
+                className={`rounded-full transition-shadow ${
+                  profile.avatar === avatar ? "ring-2 ring-cyan-400/60 ring-offset-2 ring-offset-slate-950" : ""
                 }`}
               >
-                {(profile.name || avatar).slice(0, 1)}
+                <Avatar name={profile.name || avatar} avatar={avatar} />
               </button>
             ))}
           </div>
@@ -262,7 +274,7 @@ export default function AssistantSettingsForm() {
         onClick={resetProfile}
         className="text-xs font-medium text-zinc-500 transition-colors hover:text-zinc-300"
       >
-        Reset Assistant on this browser
+        Reset Personal Operator on this browser
       </button>
     </div>
   );
