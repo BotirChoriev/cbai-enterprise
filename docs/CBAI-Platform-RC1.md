@@ -305,10 +305,10 @@ in the Platform Core.
 
 ### Core Freeze Version
 
-**CBAI Platform RC-1** — declared by the `feat(platform): freeze cbai platform rc1` commit (see
-`docs/build-ledger.md`'s EPIC-10 row for the exact hash). Everything under the Platform Core file
-list at the top of this document is frozen as of that commit: its shape, its public interface,
-and its guarantees. Future Epics build *on* it via the Extension Points above; they do not
+**CBAI Platform RC-1** — declared by commit `298b834` (`feat(platform): freeze cbai platform
+rc1`). Everything under the Platform Core file list at the top of this document is frozen as of
+that commit: its shape, its public interface, and its guarantees. Future Epics build *on* it via
+the Extension Points above; they do not
 modify it except to fix a genuine defect (a real bug, a real duplicate, a real violation) — never
 to add a feature.
 
