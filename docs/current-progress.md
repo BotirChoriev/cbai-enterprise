@@ -1,6 +1,6 @@
 # CBAI Current Progress
 
-Snapshot as of EPIC-02. Update this file, not a new one, as state changes.
+Snapshot as of EPIC-03. Update this file, not a new one, as state changes.
 
 ## Real and working today
 
@@ -12,6 +12,9 @@ Snapshot as of EPIC-02. Update this file, not a new one, as state changes.
 - **Universal Intelligence Foundation** (`lib/foundation/`): ten pillars defined, one working
   adapter (Research), verified by successful `npm run build` (structural type-check against
   every real engine output).
+- **Universal Relationship Engine** (`lib/relationships/`): builder + query engine over the
+  Foundation's `Relationship` type; Research Intelligence's catalog relationships now flow
+  through it. Not yet wired into any UI.
 - **Public entry experience**: hero, three-ecosystem model, capability flow, audience section,
   trust section — all real, honest content, no fabricated statistics.
 - **Public search / Evidence Core** (`/search`, `/countries`, `/companies`, `/universities`):
@@ -47,7 +50,7 @@ Snapshot as of EPIC-02. Update this file, not a new one, as state changes.
 ## Known technical debt
 
 - `/companies` and `/universities` fabricated-score issue (see above) — pre-existing, not
-  addressed by EPIC-01 or EPIC-02.
+  addressed by EPIC-01, EPIC-02, or EPIC-03.
 - `lib/research/entities/` (a separate, broader entity/relationship catalog — organisms,
   diseases, technologies, publications, etc.) is not yet connected to the Foundation's
   `Relationship` pillar or to the topic detail page's workflow at all. The Foundation's
@@ -57,3 +60,14 @@ Snapshot as of EPIC-02. Update this file, not a new one, as state changes.
 - `lib/research/review/` (the standalone `ResearchReview`/`ReviewAssignment`/etc. domain from
   the RI-BUILD-027 series) remains disconnected from any real topic — still only consumed by
   the standalone `/research/review` placeholder page.
+- **Three unmigrated graph/relationship systems**, found and documented during EPIC-03
+  (`docs/architecture.md` has the full breakdown):
+  - `lib/graph/` — real, live, wired to `/graph` (countries/companies/universities only).
+  - `lib/research/graph/` — real, live, backs the Global Research Network on `/research`.
+  - `lib/intelligence/graph/` — a large (150+ file), entirely dormant confidence/contradiction/
+    graph backend from an earlier build era; nothing outside `lib/intelligence/` consumes it.
+  None were touched this Epic — the first two are real, working features with no way to
+  visually verify a migration here, and the third is far larger than this Epic's scope
+  supports auditing safely. `lib/relationships/` is the intended long-term unification point.
+- `IntelligenceFoundationView.relationships` is not yet wired into any UI — proven only via
+  `npm run build`'s type-check, same status as the rest of the Foundation view.

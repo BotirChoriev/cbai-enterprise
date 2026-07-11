@@ -25,7 +25,7 @@ Research Review domain scaffolding (`lib/research/review/`). Consolidated a dupl
 `TopicReviewWorkspace`, `ResearchReviewWorkspaceState`, honest empty states for notes/findings,
 process-level open questions derived from real gap/review state.
 
-## EPIC series — Platform-wide transformation (this is EPIC-02)
+## EPIC series — Platform-wide transformation (this is EPIC-03)
 
 | Epic | Commit | Scope |
 |---|---|---|
@@ -35,7 +35,8 @@ process-level open questions derived from real gap/review state.
 | — | `067b101` | Research Workflow Engine — stage, next action, real action links, `lib/research/workflow/` |
 | — | `4cf366c` | Research Cockpit — one operational surface, consolidated Mission Control Panel + Timeline |
 | EPIC-01 | `b8d65e3` | Universal product identity, positioning, and public entry experience |
-| EPIC-02 | *(this)* | Universal Intelligence Foundation — `lib/foundation/`, research adapter |
+| EPIC-02 | `a9f419c` | Universal Intelligence Foundation — `lib/foundation/`, research adapter |
+| EPIC-03 | *(this)* | Universal Relationship Engine — `lib/relationships/`, 16-type vocabulary, richer `Relationship` envelope; found and documented three pre-existing, unmigrated graph/relationship systems (`lib/graph/`, `lib/research/graph/`, `lib/intelligence/graph/`) |
 
 ## Pattern established across every engine build
 

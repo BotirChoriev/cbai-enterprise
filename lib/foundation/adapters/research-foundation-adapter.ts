@@ -24,6 +24,7 @@ import type {
   TimelineEvent,
 } from "@/lib/foundation/foundation-model";
 import type { IntelligenceFoundationView } from "@/lib/foundation/foundation-view";
+import { buildRelationship } from "@/lib/relationships/relationship-builder";
 
 /**
  * Pure adapters mapping Research Intelligence's existing engine outputs onto the universal
@@ -62,23 +63,28 @@ export function toEvidence(item: TopicEvidenceCatalogItem): Evidence {
  * Relationships from a topic's own catalog fields — the honestly-detectable connections
  * already present in ResearchTopic, not the separate lib/research/entities registry (a
  * broader, not-yet-topic-integrated catalog left as a future foundation integration point).
+ * Built through the universal relationship engine (lib/relationships/) rather than
+ * constructing Relationship objects by hand, so confidence/limitations stay consistent with
+ * every other ecosystem that will use the same builder.
  */
 export function toRelationships(topic: ResearchTopic): readonly Relationship[] {
-  const methodRelationships = topic.relatedMethods.map(
-    (method, index): Relationship => ({
-      relationshipId: `${topic.topicId}:method:${index}`,
+  const methodRelationships = topic.relatedMethods.map((method) =>
+    buildRelationship({
       sourceId: topic.topicId,
       targetId: method,
-      relationshipType: "uses_method",
+      relationshipType: "uses",
+      explanation: `${topic.topicName} uses the method "${method}" per the research catalog.`,
+      source: "catalog",
     }),
   );
 
-  const evidenceTypeRelationships = topic.relatedEvidenceTypes.map(
-    (evidenceType, index): Relationship => ({
-      relationshipId: `${topic.topicId}:evidence_type:${index}`,
+  const evidenceTypeRelationships = topic.relatedEvidenceTypes.map((evidenceType) =>
+    buildRelationship({
       sourceId: topic.topicId,
       targetId: evidenceType,
-      relationshipType: "requires_evidence_type",
+      relationshipType: "depends_on",
+      explanation: `${topic.topicName} depends on the evidence category "${evidenceType}" per the research catalog.`,
+      source: "catalog",
     }),
   );
 

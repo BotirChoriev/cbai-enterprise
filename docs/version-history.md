@@ -27,7 +27,7 @@ Public entry experience rewritten to present CBAI as a universal Intelligence Op
 with three named ecosystems (Research — flagship, Governance, Economic) sharing one Intelligence
 Core, rather than a country/company/university search tool.
 
-## v2.1 — Universal Intelligence Foundation (EPIC-02, this release)
+## v2.1 — Universal Intelligence Foundation (EPIC-02)
 
 `lib/foundation/` — ten domain-agnostic pillars (Subject, Mission, Question, Evidence,
 Relationship, Analysis, Recommendation, Execution, Timeline, Knowledge) that every future
@@ -37,8 +37,28 @@ No existing engine was rewritten; the Foundation was proven compatible with Rese
 Intelligence's real, already-shipped output through pure translation functions, verified by
 TypeScript's structural type-checking at build time.
 
+## v2.2 — Universal Relationship Engine (EPIC-03, this release)
+
+`lib/relationships/` — a builder (`buildRelationship`, with deterministic, evidence-count-based
+confidence — never a fabricated score) and a query engine (subject lookup, type filtering,
+connected-ID resolution, bounded one-hop traversal) over the Foundation's `Relationship` type,
+now enriched with direction, strength, evidence, confidence, time, status, source, explanation,
+and known limitations. Sixteen domain-agnostic relationship types defined and extensible.
+Research Intelligence's catalog-derived relationships (method/evidence-type connections) now
+flow through this builder instead of being constructed by hand.
+
+This release also produced a significant audit finding: three separate, real graph/relationship
+systems already exist in this repository (`lib/graph/`, `lib/research/graph/`, and a large,
+entirely dormant `lib/intelligence/graph/`), none unified. This is the exact duplication problem
+the Foundation and Relationship Engine exist to eventually solve — but migrating two live,
+working routes (`/graph`, the research network) without a way to visually verify the result was
+judged too risky for this Epic. Recorded as a deliberate scope decision, not an oversight — see
+`docs/current-progress.md`.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation
-adapter once real domain data exists to adapt. No target date is committed here — see
+adapter once real domain data exists to adapt. Consolidating `lib/graph/`, `lib/research/graph/`,
+and `lib/intelligence/graph/` onto `lib/relationships/` once a visual verification workflow
+exists to de-risk the migration. No target date is committed here — see
 `docs/current-progress.md` for what's honestly available today.

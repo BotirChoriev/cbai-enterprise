@@ -4,6 +4,14 @@
 // research-only vocabulary. Domain modules own their own data; this module only defines the
 // shared shape that lets different domains be understood, composed, and displayed the same way.
 
+import type {
+  RelationshipConfidence,
+  RelationshipDirection,
+  RelationshipStatus,
+  RelationshipStrength,
+  RelationshipType,
+} from "@/lib/foundation/relationship-types";
+
 /** The thing an intelligence workflow is about — a research topic, a country, an indicator. */
 export interface Subject {
   subjectId: string;
@@ -31,12 +39,36 @@ export interface Evidence {
   note?: string;
 }
 
-/** A directed connection between two subjects, entities, or evidence records. */
+/** When a relationship was observed or held — omitted fields mean genuinely unknown, never guessed. */
+export interface RelationshipTime {
+  observedAt?: string;
+  validFrom?: string;
+  validTo?: string;
+}
+
+/**
+ * A connection between two subjects, entities, or evidence records — the universal
+ * Relationship pillar. Only relationshipType, sourceId, targetId, and explanation are
+ * required; every other field is optional so existing, simpler relationship records remain
+ * valid. See lib/relationships/ for the builder and query engine that construct and traverse
+ * these honestly (deterministic confidence from evidence count, never a fabricated score).
+ */
 export interface Relationship {
   relationshipId: string;
   sourceId: string;
   targetId: string;
-  relationshipType: string;
+  relationshipType: RelationshipType;
+  /** One-sentence explanation of why this relationship exists — required, never omitted. */
+  explanation: string;
+  direction?: RelationshipDirection;
+  strength?: RelationshipStrength;
+  evidence?: readonly Evidence[];
+  confidence?: RelationshipConfidence;
+  time?: RelationshipTime;
+  status?: RelationshipStatus;
+  source?: string;
+  /** Honest caveats about what is not known or verified — never hidden. */
+  limitations?: readonly string[];
 }
 
 /** A deterministic assessment of a subject's current state, with reasons — never a score. */
