@@ -36,10 +36,9 @@ export class EntityEvidenceMapper {
       retrievedAt: options.retrievedAt,
     };
 
-    const drafts: EvidenceDraft[] =
-      entity.type === "country"
-        ? buildCountryEvidenceDrafts(entity, relationshipsSummary)
-        : buildDefaultEvidenceDrafts(entity, relationshipsSummary);
+    const drafts: EvidenceDraft[] = hasAssessedScores(entity)
+      ? buildDefaultEvidenceDrafts(entity, relationshipsSummary)
+      : buildUnassessedEvidenceDrafts(entity, relationshipsSummary);
 
     return drafts.slice(0, MAX_EVIDENCE_ITEMS_PER_ENTITY).map((draft) => ({
       id: draft.id,
@@ -99,7 +98,20 @@ function buildDefaultEvidenceDrafts(
   return drafts;
 }
 
-function buildCountryEvidenceDrafts(
+/**
+ * Scores are only "assessed" once a real methodology produces a non-zero value. Every current
+ * adapter (country, company, university) sends zeroed placeholders, so this stays honest rather
+ * than reporting "0/100" as if a platform assessment actually ran.
+ */
+function hasAssessedScores(entity: Entity): boolean {
+  return (
+    entity.scores.aiScore !== 0 ||
+    entity.scores.investmentScore !== 0 ||
+    entity.scores.riskScore !== 0
+  );
+}
+
+function buildUnassessedEvidenceDrafts(
   entity: Entity,
   relationshipsSummary?: string,
 ): EvidenceDraft[] {
@@ -129,7 +141,7 @@ function buildCountryEvidenceDrafts(
     id: `${baseId}:evidence-status`,
     relevance: 45,
     excerpt:
-      "Country registry evidence only. AI, investment, and risk scores withheld — assessment sources not connected.",
+      "Registry evidence only. AI, investment, and risk scores withheld — assessment sources not connected.",
   });
 
   return drafts;
