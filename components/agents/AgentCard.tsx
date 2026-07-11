@@ -1,29 +1,20 @@
-import type { Agent, AgentStatus } from "@/lib/agents";
+import type { Agent, AgentAvailability } from "@/lib/agents";
+import { AGENT_RUNTIME_NOT_CONNECTED_LABEL } from "@/lib/agents";
 import { Card, CardContent } from "@/components/ui/Card";
 
-const statusConfig: Record<
-  AgentStatus,
+const availabilityConfig: Record<
+  AgentAvailability,
   { label: string; dot: string; badge: string }
 > = {
-  active: {
-    label: "Active",
+  capability_defined: {
+    label: "Connected",
     dot: "bg-emerald-400",
     badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
   },
-  idle: {
-    label: "Idle",
+  runtime_not_connected: {
+    label: AGENT_RUNTIME_NOT_CONNECTED_LABEL,
     dot: "bg-zinc-500",
     badge: "bg-zinc-500/10 text-zinc-400 border-zinc-700",
-  },
-  paused: {
-    label: "Paused",
-    dot: "bg-amber-400",
-    badge: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  },
-  error: {
-    label: "Error",
-    dot: "bg-red-400",
-    badge: "bg-red-500/10 text-red-400 border-red-500/20",
   },
 };
 
@@ -77,7 +68,7 @@ type AgentCardProps = {
 };
 
 export default function AgentCard({ agent }: AgentCardProps) {
-  const status = statusConfig[agent.status];
+  const availability = availabilityConfig[agent.availability];
 
   return (
     <Card className="transition-colors hover:border-zinc-700">
@@ -95,10 +86,10 @@ export default function AgentCard({ agent }: AgentCardProps) {
             </svg>
           </div>
           <span
-            className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider ${status.badge}`}
+            className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider ${availability.badge}`}
           >
-            <span className={`h-1.5 w-1.5 rounded-full ${status.dot}`} />
-            {status.label}
+            <span className={`h-1.5 w-1.5 rounded-full ${availability.dot}`} />
+            {availability.label}
           </span>
         </div>
 
@@ -108,33 +99,6 @@ export default function AgentCard({ agent }: AgentCardProps) {
         <p className="mt-1.5 text-xs leading-relaxed text-zinc-500">
           {agent.description}
         </p>
-
-        <div className="mt-5 grid grid-cols-3 gap-3 border-t border-zinc-800 pt-4">
-          <div>
-            <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
-              Tasks
-            </p>
-            <p className="mt-0.5 text-sm font-semibold text-zinc-200">
-              {agent.tasksCompleted.toLocaleString()}
-            </p>
-          </div>
-          <div>
-            <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
-              Success
-            </p>
-            <p className="mt-0.5 text-sm font-semibold text-emerald-400">
-              {agent.successRate}%
-            </p>
-          </div>
-          <div>
-            <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
-              Last Run
-            </p>
-            <p className="mt-0.5 text-sm font-semibold text-zinc-200">
-              {agent.lastRun}
-            </p>
-          </div>
-        </div>
       </CardContent>
     </Card>
   );

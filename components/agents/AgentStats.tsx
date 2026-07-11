@@ -1,15 +1,15 @@
 import StatCard from "@/components/ui/StatCard";
-import { getAgentStats, agents } from "@/lib/agents";
+import { getAgentStats, agents, AGENT_RUNTIME_NOT_CONNECTED_LABEL } from "@/lib/agents";
 
 const stats = getAgentStats(agents);
 
 export default function AgentStats() {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-4 sm:grid-cols-2">
       <StatCard
-        label="Total Agents"
+        label="Agent Capabilities Defined"
         value={stats.totalAgents}
-        change="6 specialized agents deployed"
+        change="Described below — none execute live tasks yet"
         changeType="neutral"
         icon={
           <svg
@@ -28,10 +28,10 @@ export default function AgentStats() {
         }
       />
       <StatCard
-        label="Active Agents"
-        value={stats.activeAgents}
-        change={`${stats.totalAgents - stats.activeAgents} idle or paused`}
-        changeType="positive"
+        label="Runtime Status"
+        value={AGENT_RUNTIME_NOT_CONNECTED_LABEL}
+        change="No live agent execution is connected to this platform"
+        changeType="neutral"
         icon={
           <svg
             className="h-4 w-4"
@@ -44,48 +44,6 @@ export default function AgentStats() {
               strokeLinecap="round"
               strokeLinejoin="round"
               d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"
-            />
-          </svg>
-        }
-      />
-      <StatCard
-        label="Tasks Completed"
-        value={stats.tasksCompleted.toLocaleString()}
-        change="↑ 342 this week"
-        changeType="positive"
-        icon={
-          <svg
-            className="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={1.5}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        }
-      />
-      <StatCard
-        label="Avg Success Rate"
-        value={`${stats.avgSuccessRate}%`}
-        change="Above 90% target"
-        changeType="positive"
-        icon={
-          <svg
-            className="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={1.5}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941"
             />
           </svg>
         }

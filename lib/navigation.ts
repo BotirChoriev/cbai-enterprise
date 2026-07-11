@@ -4,6 +4,7 @@ export type NavItem = {
   description: string;
   icon:
     | "home"
+    | "my-work"
     | "dashboard"
     | "core"
     | "countries"
@@ -21,7 +22,8 @@ export type NavItem = {
     | "settings"
     | "government"
     | "investor"
-    | "citizen";
+    | "citizen"
+    | "trust";
 };
 
 export type NavSection = {
@@ -29,10 +31,13 @@ export type NavSection = {
   items: NavItem[];
 };
 
-/** Public investor-facing navigation — production journey only. */
-export const platformNavSections: NavSection[] = [
+/**
+ * The universal product IA: HOME, MY WORK, EXPLORE, ECOSYSTEMS, INTELLIGENCE, TRUST. Everything
+ * else is contextual (workspace-local nav, tabs, /core's full route grid) rather than primary.
+ */
+export const primaryNavSections: NavSection[] = [
   {
-    title: "Platform",
+    title: "",
     items: [
       {
         label: "Home",
@@ -40,6 +45,17 @@ export const platformNavSections: NavSection[] = [
         icon: "home",
         description: "Official evidence intelligence for countries, companies, and universities.",
       },
+      {
+        label: "My Work",
+        href: "/my-work",
+        icon: "my-work",
+        description: "Continue research, evidence reviews, and reports in progress.",
+      },
+    ],
+  },
+  {
+    title: "Explore",
+    items: [
       {
         label: "Search",
         href: "/search",
@@ -90,25 +106,9 @@ export const platformNavSections: NavSection[] = [
       },
     ],
   },
-];
-
-/** Role-specific workspaces — shown in the sidebar as a secondary section. */
-export const internalNavSections: NavSection[] = [
   {
-    title: "Workspaces",
+    title: "Ecosystems",
     items: [
-      {
-        label: "Dashboard",
-        href: "/dashboard",
-        icon: "dashboard",
-        description: "What is available today and what you can do now.",
-      },
-      {
-        label: "Reasoning",
-        href: "/reasoning",
-        icon: "reasoning",
-        description: "How official information supports review before decisions.",
-      },
       {
         label: "Government",
         href: "/government",
@@ -127,21 +127,58 @@ export const internalNavSections: NavSection[] = [
         icon: "citizen",
         description: "Public information topics in clear language.",
       },
+    ],
+  },
+  {
+    title: "Intelligence",
+    items: [
+      {
+        label: "Dashboard",
+        href: "/dashboard",
+        icon: "dashboard",
+        description: "What is available today and what you can do now.",
+      },
+      {
+        label: "Reasoning",
+        href: "/reasoning",
+        icon: "reasoning",
+        description: "How official information supports review before decisions.",
+      },
+      {
+        label: "Knowledge Graph",
+        href: "/graph",
+        icon: "graph",
+        description: "Navigate verified relationships between platform entities.",
+      },
       {
         label: "Governance",
         href: "/ai-control",
         icon: "ai-control",
         description: "Platform rules, standards, and review process.",
       },
+      {
+        label: "Agents",
+        href: "/agents",
+        icon: "agents",
+        description: "Agent capabilities defined on this platform.",
+      },
+    ],
+  },
+  {
+    title: "",
+    items: [
+      {
+        label: "Trust",
+        href: "/trust",
+        icon: "trust",
+        description: "Constitution, methodology, evidence policy, and version history.",
+      },
     ],
   },
 ];
 
 /** Flat navigation list for module grids and legacy consumers. */
-export const mainNav: NavItem[] = [
-  ...platformNavSections.flatMap((section) => section.items),
-  ...internalNavSections.flatMap((section) => section.items),
-];
+export const mainNav: NavItem[] = primaryNavSections.flatMap((section) => section.items);
 
 /** Platform modules excluding the home route. */
 export const platformModules: NavItem[] = mainNav.filter(
