@@ -25,7 +25,7 @@ Research Review domain scaffolding (`lib/research/review/`). Consolidated a dupl
 `TopicReviewWorkspace`, `ResearchReviewWorkspaceState`, honest empty states for notes/findings,
 process-level open questions derived from real gap/review state.
 
-## EPIC series — Platform-wide transformation (this is EPIC-10, RC-1)
+## EPIC series — Platform-wide transformation (frozen at EPIC-10, RC-1)
 
 | Epic | Commit | Scope |
 |---|---|---|
@@ -44,6 +44,15 @@ process-level open questions derived from real gap/review state.
 | EPIC-08 | `288884f` | Global Intelligence Network — `lib/foundation/network-types.ts` (shape: `IntelligenceEntityKind` 16-value vocabulary, `IntelligenceNetwork`, `CollaborationCandidate`, `NetworkExtensionPoints`) + `lib/network/` (engine: `buildIntelligenceNetwork`, `validateIntelligenceNetwork`, query primitives reusing `lib/relationships/`, `findCollaborationCandidates`); nodes are real Intelligence Entities (not a social graph — no followers, no messaging, no popularity), edges reuse the Foundation's `Relationship` type unmodified so every connection is evidence-aware/traceable by construction; every collaboration candidate traces to a real shared Evidence or relationship-target id, never a connection count; wired into a new `research-entity-network-adapter.ts` mapping the pre-existing `lib/research/entities/` catalog onto the network (resolving previously-documented technical debt), verified structurally via `npm run build` |
 | EPIC-09 | `b3d8c21` | Intelligence Workspace Platform — `lib/foundation/workspace-types.ts` (shape: `WorkspaceView` and its nine sections — Mission Center, Intelligence Brief, Evidence Center, Knowledge Network, Recommendations, Monitoring, Timeline, Open Questions, Activity) + `lib/workspace/` (engine: `buildWorkspaceView`, `validateWorkspaceView`, boolean query readers); every section is a pass-through or trivial default over `IntelligenceResult` (EPIC-07) and `IntelligenceNetwork` (EPIC-08) — zero new intelligence logic, zero UI, zero components, zero routes; `extensions` reuses `IntelligenceExtensionPoints` directly rather than declaring a parallel vocabulary; wired into a new `research-workspace-adapter.ts` composing the EPIC-07/EPIC-08 pipelines with no new logic, verified structurally via `npm run build` |
 | EPIC-10 | `298b834` | **CBAI Platform RC-1** — full Platform Core audit (Foundation through Workspace, 41 files/2,761 lines), Constitution audit, health analysis, and Core Freeze declaration. No new capability, no new domain, no new ecosystem. One real duplicate found and fixed: six identical `{valid, issues}` validator-result interfaces consolidated into `lib/foundation/validation-types.ts`'s `PlatformValidationResult` (zero-behavior-change alias, matching the `Confidence`/`EvidenceSourceType`/`VerificationStatus` promotion pattern). Zero circular dependencies confirmed by full import-graph audit. One doc-precision fix. One naming inconsistency (`createWorkflow` vs. `build*`) and six zero-caller validator exports identified and deliberately left as documented technical debt rather than risk-bearing renames/deletions. Zero Constitution violations found in the Platform Core across nine audited principles. Full audit trail: `docs/CBAI-Platform-RC1.md`. Platform Constitution amended with a ratified Platform Core Principles section (`docs/standards/01-cbai-constitution.md`) |
+
+## Research Intelligence series — extensions built on the frozen Platform Core
+
+Built after CBAI Platform RC-1 (EPIC-10). Each entry extends the Platform Core via the four
+sanctioned Extension Points (`docs/CBAI-Platform-RC1.md`) — none modifies a frozen module.
+
+| Build | Commit | Scope |
+|---|---|---|
+| Phase 1 | *(this)* | Research Domain Foundation — `lib/research-domain/` (types only, no builders, no validators, no seed data): 27 Research entity interfaces (Research Mission through Research Impact), each extending `ResearchEntityBase`'s eight required concerns (Identity, Lifecycle, Relationships, Evidence Links, Mission Links, Organization Links, Timeline, Traceability), reusing `Evidence`/`Mission`/`Relationship`/`TimelineEvent`/`Question` from `lib/foundation/` directly rather than redeclaring them; a new, small, closed lifecycle vocabulary (`proposed \| active \| completed \| archived`) deliberately distinct from `WorkflowState`; `RESEARCH_RELATIONSHIP_PATTERNS` documents 30 realistic entity-pair connections using 15 of the Platform's existing 16 `RelationshipType` values — no new relationship vocabulary needed. Zero Platform Core files touched. |
 
 ## Pattern established across every engine build
 

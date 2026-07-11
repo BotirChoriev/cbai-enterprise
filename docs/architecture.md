@@ -607,6 +607,80 @@ Platform RC-1**. Full audit trail, Constitution audit, health analysis, and free
   Neutral). See `docs/standards/01-cbai-constitution.md` for the newly-ratified Platform Core
   Principles section this Epic added.
 
+## Research Intelligence Domain Foundation (`lib/research-domain/`)
+
+Introduced by the first Research Intelligence build after the CBAI Platform RC-1 freeze
+(`docs/CBAI-Platform-RC1.md`). This is an **extension**, not a Platform Core change — no file
+under `lib/foundation/`, `lib/relationships/`, `lib/evidence/`, `lib/reasoning/`,
+`lib/workflow/`, `lib/orchestration/`, `lib/network/`, or `lib/workspace/` was modified to build
+it, confirmed by `git diff --stat` at commit time (zero Platform Core files touched).
+
+`lib/research-domain/` models the twenty-seven real Research Intelligence entities the mission
+named (Research Mission through Research Impact — full list and vocabulary in
+`research-entity-base.ts`'s `RESEARCH_ENTITY_KINDS`) as **types only** — no builder functions, no
+validators, no seed data, mirroring EPIC-02's own Foundation, which was types-only until later
+Epics added engines. Every entity extends `ResearchEntityBase`, which carries the eight concerns
+the mission required, each a direct reuse of a Platform Core pillar:
+
+| Concern | Field | Reused from |
+|---|---|---|
+| Identity | `entityId`, `entityKind`, `label` | — (new, domain-scoped identity) |
+| Lifecycle | `lifecycleState` | New, small, closed vocabulary (`proposed \| active \| completed \| archived`) — deliberately not `WorkflowState` (EPIC-06), which describes a process's stages, not an entity's own existence lifecycle |
+| Relationships | `relationships: readonly Relationship[]` | `lib/foundation/foundation-model.ts` (EPIC-03) |
+| Evidence Links | `evidence: readonly Evidence[]` | `lib/foundation/foundation-model.ts` (EPIC-04) |
+| Mission Links | `missions: readonly Mission[]` | `lib/foundation/foundation-model.ts` (EPIC-02) |
+| Organization Links | `organizationIds: readonly string[]` | Plain id references to other entities — avoids circular embedding between organizations and the people/artifacts that belong to them |
+| Timeline | `timeline: readonly TimelineEvent[]` | `lib/foundation/foundation-model.ts` (EPIC-02) |
+| Traceability | `source?: string` | Same field name/shape as `Relationship.source` |
+
+No field on any of the 27 entities is a score, a percentage, or a confidence value.
+`GrantEntity.fundingAmount` is the one entity-specific field that looks numeric-adjacent — it is
+an honest, optional **string**, never a derived or estimated amount.
+
+Every concrete entity interface carries an `Entity` suffix (`ResearchTopicEntity`,
+`UniversityEntity`, ...) specifically to avoid colliding with pre-existing, differently-shaped
+types of the same short name already in this repo: `lib/research/research-topics.ts`'s
+`ResearchTopic`, `lib/universities.ts`'s `University`, and
+`lib/research/entities/research-entity-types.ts`'s `ResearchEntity`. None of those three files
+were touched or imported by this module — `lib/research-domain/` is a parallel,
+Foundation-aligned model, not a replacement for any of them, and not yet wired to any of them via
+an adapter (that is future work, consistent with how `research-foundation-adapter.ts` already
+separates "existing engine" from "Foundation shape").
+
+`research-relationships.ts`'s `RESEARCH_RELATIONSHIP_PATTERNS` is documentation expressed as
+typed data, not a validator: it records which of the Platform's existing 16 `RelationshipType`
+values (`lib/foundation/relationship-types.ts`, EPIC-03) are the realistic fit for 30 common
+Research entity-pair connections (researcher↔laboratory, project↔grant, finding↔hypothesis,
+technology↔technology, ...). **No new `RelationshipType` value was needed** — 15 of the 16
+existing values have a natural fit; `measures` has none demonstrated here and remains available,
+unused, rather than being stretched to fit something it doesn't honestly describe. Nothing in
+this table is constructed or consumed at runtime by any code in this module — real connections
+between real entities are still built with `lib/relationships/`'s `buildRelationship`,
+unmodified, exactly as before.
+
+### Module map
+
+```
+lib/research-domain/
+├── research-entity-base.ts             RESEARCH_ENTITY_KINDS (27), lifecycle vocabulary, ResearchEntityBase
+├── research-entities-intent.ts         ResearchMissionEntity, ResearchProgramEntity, ResearchProjectEntity,
+│                                        ResearchTopicEntity, ResearchQuestionEntity, HypothesisEntity, MethodologyEntity
+├── research-entities-artifacts.ts      ExperimentEntity, DatasetEntity, PublicationEntity, PatentEntity, TechnologyEntity
+├── research-entities-people.ts         ResearcherEntity, EngineerEntity, ScientistEntity, AcademicEntity, StudentResearcherEntity
+├── research-entities-organizations.ts  LaboratoryEntity, ResearchCenterEntity, UniversityEntity
+├── research-entities-funding.ts        FundingOpportunityEntity, GrantEntity, SponsorEntity
+├── research-entities-outcomes.ts       PeerReviewEntity, FindingEntity, ResearchOutcomeEntity, ResearchImpactEntity
+└── research-relationships.ts           RESEARCH_RELATIONSHIP_PATTERNS, ResearchDomainEntity (27-way union)
+```
+
+### Dependency direction
+
+`lib/research-domain/` depends only on `lib/foundation/` (for `Evidence`, `Mission`,
+`Relationship`, `TimelineEvent`, `Question`, `RelationshipType`) — it imports no engine
+(`lib/evidence/`, `lib/relationships/`, `lib/reasoning/`, `lib/workflow/`, `lib/orchestration/`,
+`lib/network/`, `lib/workspace/`) and no other domain module (`lib/research/*`,
+`lib/universities.ts`). Nothing in the Platform Core imports `lib/research-domain/` back.
+
 ## Research Intelligence module map (current)
 
 ```

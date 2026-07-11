@@ -263,7 +263,7 @@ explorers behind `/investor`, `/citizen`, `/government` — is a different, real
 built on the Indicator Framework, unrelated in shape and purpose to the new singular
 `lib/workspace/`, and untouched.
 
-## v3.0 — CBAI Platform RC-1 (EPIC-10, this release)
+## v3.0 — CBAI Platform RC-1 (EPIC-10)
 
 No new capability, no new domain, no new ecosystem — this release is an audit and a freeze. A
 full Phase 1–4 platform audit of the Platform Core (`lib/foundation/` through `lib/workspace/`
@@ -297,6 +297,33 @@ through the four Extension Points named in `docs/CBAI-Platform-RC1.md` (the
 per-domain adapter pattern, and closed-but-extensible vocabularies) rather than modifying it,
 except to fix a genuine defect.
 
+## v3.1 — Research Intelligence Domain Foundation, Phase 1 (this release)
+
+The first build after the RC-1 freeze, and the first to exercise the Extension Points
+`docs/CBAI-Platform-RC1.md` declared: a new `lib/research-domain/` module, built entirely as an
+extension with zero Platform Core files modified (confirmed by `git diff --stat` at commit
+time).
+
+Types only — no builder functions, no validators, no seed data, mirroring how EPIC-02's own
+Foundation was types-only before later Epics added engines. Twenty-seven Research entities
+(Research Mission, Research Program, Research Project, Research Topic, Research Question,
+Hypothesis, Methodology, Experiment, Dataset, Publication, Patent, Technology, Researcher,
+Engineer, Scientist, Academic, Student Researcher, Laboratory, Research Center, University,
+Funding Opportunity, Grant, Sponsor, Peer Review, Finding, Research Outcome, Research Impact),
+each extending a shared `ResearchEntityBase` that carries the eight required concerns — every one
+a direct reuse of a Platform Core pillar (`Relationship`, `Evidence`, `Mission`, `TimelineEvent`,
+`Question`), never a redeclaration. A new, small, closed lifecycle vocabulary
+(`proposed | active | completed | archived`) was added deliberately distinct from `WorkflowState`
+— an entity's own existence lifecycle is a different concept from an intelligence process's
+stages, and forcing the latter onto the former would have been a dishonest fit.
+
+`RESEARCH_RELATIONSHIP_PATTERNS` documents 30 realistic Research entity-pair connections using
+15 of the Platform's existing 16 `RelationshipType` values — no new relationship vocabulary was
+needed. Every concrete entity interface carries an `Entity` suffix specifically to avoid
+colliding with three pre-existing, differently-shaped types of the same short name already in
+this repo (`ResearchTopic`, `University`, `ResearchEntity`) — none of which this module touches,
+imports, or replaces.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation
@@ -321,5 +348,9 @@ Orchestration, Network, and Workspace shapes are architecturally ready for all o
 UI or derivation logic exists yet. Renaming `createWorkflow`/`CreateWorkflowInput` to
 `buildWorkflow`/`BuildWorkflowInput` for naming consistency, in a dedicated commit that can
 afford to update the four historical Epic doc records that name it verbatim (RC-1 deliberately
-left this alone — see `docs/CBAI-Platform-RC1.md`). No target date is committed here — see
-`docs/current-progress.md` for what's honestly available today.
+left this alone — see `docs/CBAI-Platform-RC1.md`). A Research Domain Foundation Phase 2 —
+builder functions, an adapter mapping `lib/research-domain/` onto real data (`lib/research/*`,
+`lib/research/entities/`), and wiring into `IntelligencePipelineProviders` so a real Research
+Intelligence pipeline run can produce real `ResearchDomainEntity` records — has not been started;
+Phase 1 is types only. No target date is committed here — see `docs/current-progress.md` for
+what's honestly available today.
