@@ -14,6 +14,7 @@ import UniversityList from "@/components/universities/UniversityList";
 import UniversityRelationships from "@/components/universities/UniversityRelationships";
 import EntityOptionalExploration from "@/components/shared/EntityOptionalExploration";
 import { UniversityIntelligencePanel } from "@/components/universities/UniversityIntelligencePanel";
+import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
 
 export default function UniversitiesPageClient() {
   const { context, setUniversity, recordEntityView } = usePlatformContext();
@@ -79,6 +80,8 @@ export default function UniversitiesPageClient() {
           Overview, available information, missing information, and reports for each university.
         </p>
       </div>
+
+      <ContextualOperatorBanner />
 
       <div className="grid gap-6 xl:grid-cols-12">
         <div className="space-y-4 xl:col-span-4">

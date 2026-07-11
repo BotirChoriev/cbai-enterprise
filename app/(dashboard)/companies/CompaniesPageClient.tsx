@@ -14,6 +14,7 @@ import CompanyList from "@/components/companies/CompanyList";
 import CompanyRelationships from "@/components/companies/CompanyRelationships";
 import EntityOptionalExploration from "@/components/shared/EntityOptionalExploration";
 import { CompanyIntelligencePanel } from "@/components/companies/CompanyIntelligencePanel";
+import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
 
 export default function CompaniesPageClient() {
   const { context, setCompany, recordEntityView } = usePlatformContext();
@@ -70,6 +71,8 @@ export default function CompaniesPageClient() {
           Overview, available information, missing information, and reports for each company.
         </p>
       </div>
+
+      <ContextualOperatorBanner />
 
       <div className="grid gap-6 xl:grid-cols-12">
         <div className="space-y-4 xl:col-span-4">

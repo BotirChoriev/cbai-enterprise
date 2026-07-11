@@ -7,6 +7,8 @@ import { useAssistantProfile } from "@/components/platform/context/AssistantProf
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import { ASSISTANT_COMMANDS, resolveAssistantCommand } from "@/lib/assistant/assistant-commands";
 import { resolveAssistantContext } from "@/lib/assistant/assistant-context";
+import { resolveOperatorName } from "@/lib/assistant/assistant-profile";
+import Avatar from "@/components/shared/Avatar";
 
 const SUGGESTED_COMMAND_IDS = ["open-my-work", "continue-research", "open-evidence", "open-trust"];
 const SUGGESTED_COMMANDS = ASSISTANT_COMMANDS.filter((command) =>
@@ -41,7 +43,7 @@ function getSpeechRecognitionConstructor(): SpeechRecognitionConstructor | null 
 export default function AssistantCommandCenter() {
   const router = useRouter();
   const pathname = usePathname();
-  const { profile } = useAssistantProfile();
+  const { profile, isActive } = useAssistantProfile();
   const { context } = usePlatformContext();
   const [input, setInput] = useState("");
   const [isListening, setIsListening] = useState(false);
@@ -121,7 +123,7 @@ export default function AssistantCommandCenter() {
         <Link
           href={assistantContext.href}
           className="mb-1.5 inline-flex items-center gap-1.5 text-[11px] text-zinc-500 hover:text-cyan-300"
-          title={`Assistant context: ${assistantContext.name}`}
+          title={`Operator context: ${assistantContext.name}`}
         >
           <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
           Context: {assistantContext.name}
@@ -129,10 +131,13 @@ export default function AssistantCommandCenter() {
       ) : null}
       <form
         role="search"
-        aria-label="Assistant command center"
+        aria-label="CBAI Personal Operator command center"
         onSubmit={handleSubmit}
         className="relative flex items-center gap-1.5"
       >
+        {isActive ? (
+          <Avatar name={profile.name} avatar={profile.avatar} size="sm" className="shrink-0" />
+        ) : null}
         <div className="relative flex-1">
           <svg
             className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500"
@@ -149,7 +154,9 @@ export default function AssistantCommandCenter() {
             />
           </svg>
           <label htmlFor="assistant-command-input" className="sr-only">
-            Ask the Assistant, or search countries, companies, and universities
+            {isActive
+              ? `Ask your ${resolveOperatorName(profile)}, or search countries, companies, and universities`
+              : "Search countries, companies, and universities"}
           </label>
           <input
             id="assistant-command-input"
