@@ -4,6 +4,8 @@ import { plainAvailableInformation } from "@/components/shared/entity-profile-co
 export type EntityOverviewFacts = {
   label: string;
   value: string;
+  /** Real external link, e.g. an official website — rendered as a real <a>, never a bare label. */
+  href?: string;
 };
 
 type EntityOverviewSectionProps = {
@@ -58,7 +60,20 @@ export default function EntityOverviewSection({
           {facts.map((fact) => (
             <div key={fact.label}>
               <dt className="text-xs text-zinc-600">{fact.label}</dt>
-              <dd className="mt-0.5 text-zinc-300">{fact.value}</dd>
+              <dd className="mt-0.5 text-zinc-300">
+                {fact.href ? (
+                  <a
+                    href={fact.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-cyan-400 underline-offset-2 hover:underline"
+                  >
+                    {fact.value}
+                  </a>
+                ) : (
+                  fact.value
+                )}
+              </dd>
             </div>
           ))}
         </dl>

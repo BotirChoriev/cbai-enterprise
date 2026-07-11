@@ -1,5 +1,10 @@
+"use client";
+
+import { useState } from "react";
 import type { Company } from "@/lib/companies";
 import type { CompanyUserJourney } from "@/lib/company-user-journey";
+import { buildCompanyReport } from "@/lib/company-report";
+import CompanyReportView from "@/components/companies/CompanyReportView";
 import EvidenceComparisonPanel from "@/components/evidence-comparison/EvidenceComparisonPanel";
 import EntityOverviewSection from "@/components/shared/EntityOverviewSection";
 import IntelligenceContextPanel from "@/components/shared/IntelligenceContextPanel";
@@ -15,6 +20,10 @@ import {
   getConnectedAvailableItems,
 } from "@/components/shared/entity-profile-copy";
 import { getCompanyRelationships } from "@/lib/companies.adapter";
+import CompanyRelatedResearch from "@/components/companies/CompanyRelatedResearch";
+import CompanyMethodology from "@/components/companies/CompanyMethodology";
+import CompanyTrustSection from "@/components/companies/CompanyTrustSection";
+import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 
 type CompanyIntelligencePanelProps = {
   journey: CompanyUserJourney;
@@ -22,6 +31,7 @@ type CompanyIntelligencePanelProps = {
 };
 
 export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligencePanelProps) {
+  const [showReport, setShowReport] = useState(false);
   const { profile, evidenceGaps, evidenceComparison } = journey;
   const { registryFacts, coverage } = profile;
   const sourceConnectedCount = countConnectedSources(coverage);
@@ -32,13 +42,32 @@ export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligen
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-end">
+        <SaveToWorkspaceButton
+          entity={{
+            kind: "company",
+            id: company.id,
+            name: company.name,
+            code: company.icon,
+            countryName: company.country,
+          }}
+        />
+      </div>
+
       <EntityOverviewSection
         name={registryFacts.name}
         entityType="Company"
         country={registryFacts.country}
         subtitle={`${registryFacts.icon} · ${registryFacts.industry}`}
         availableInformation={registryFacts.sourceLabel}
-        facts={[{ label: "Founded", value: String(registryFacts.founded) }]}
+        facts={[
+          { label: "Founded", value: String(registryFacts.founded) },
+          {
+            label: "Official website",
+            value: company.website ?? "No verified data available.",
+            href: company.website,
+          },
+        ]}
       />
 
       <IntelligenceContextPanel
@@ -63,7 +92,20 @@ export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligen
         showMethodology={false}
       />
 
+      <CompanyRelatedResearch company={company} />
+
       <EntityReportsAvailable reports={journey.reports} entityLabel="company" />
+
+      <div className="space-y-4">
+        <button
+          type="button"
+          onClick={() => setShowReport((current) => !current)}
+          className="inline-flex items-center gap-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-300 transition-colors hover:border-cyan-500/50"
+        >
+          {showReport ? "Hide report" : "Generate report"}
+        </button>
+        {showReport ? <CompanyReportView report={buildCompanyReport(company, journey)} /> : null}
+      </div>
 
       <EntityOptionalExploration>
         <EntityCompareSection>
@@ -77,6 +119,10 @@ export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligen
         <CompanyIndicatorCoverage indicatorsByDomain={coverage.indicatorsByDomain} />
 
         <CompanySourceCoverage sources={coverage.sources} />
+
+        <CompanyMethodology />
+
+        <CompanyTrustSection pillars={profile.trustPillars} neutralityNotice={profile.neutralityNotice} />
       </EntityOptionalExploration>
     </div>
   );

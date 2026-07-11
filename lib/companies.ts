@@ -16,6 +16,8 @@ export type Company = {
   industry: string;
   /** Founding year from local catalog reference. */
   founded: number;
+  /** Official public website, when known — real, publicly verifiable, never fabricated. */
+  website?: string;
 };
 
 export const industries = [
@@ -45,6 +47,7 @@ export const companies: Company[] = [
     country: "United States",
     industry: "Consumer Electronics",
     founded: 1976,
+    website: "https://www.apple.com",
   },
   {
     id: "microsoft",
@@ -53,6 +56,7 @@ export const companies: Company[] = [
     country: "United States",
     industry: "Technology",
     founded: 1975,
+    website: "https://www.microsoft.com",
   },
   {
     id: "google",
@@ -61,6 +65,7 @@ export const companies: Company[] = [
     country: "United States",
     industry: "Technology",
     founded: 1998,
+    website: "https://www.google.com",
   },
   {
     id: "nvidia",
@@ -69,6 +74,7 @@ export const companies: Company[] = [
     country: "United States",
     industry: "Semiconductors",
     founded: 1993,
+    website: "https://www.nvidia.com",
   },
   {
     id: "tesla",
@@ -77,6 +83,7 @@ export const companies: Company[] = [
     country: "United States",
     industry: "Automotive",
     founded: 2003,
+    website: "https://www.tesla.com",
   },
   {
     id: "amazon",
@@ -85,6 +92,7 @@ export const companies: Company[] = [
     country: "United States",
     industry: "E-Commerce",
     founded: 1994,
+    website: "https://www.amazon.com",
   },
   {
     id: "openai",
@@ -93,6 +101,7 @@ export const companies: Company[] = [
     country: "United States",
     industry: "Artificial Intelligence",
     founded: 2015,
+    website: "https://www.openai.com",
   },
   {
     id: "samsung",
@@ -101,6 +110,7 @@ export const companies: Company[] = [
     country: "South Korea",
     industry: "Consumer Electronics",
     founded: 1938,
+    website: "https://www.samsung.com",
   },
 ];
 

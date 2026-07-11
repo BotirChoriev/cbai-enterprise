@@ -13,6 +13,7 @@ import TopicSectionTabs, { type TopicTabId } from "@/components/research/topic/T
 import TopicReviewWorkspace from "@/components/research/topic/TopicReviewWorkspace";
 import ResearchCockpit from "@/components/research/topic/ResearchCockpit";
 import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
+import ResearchRelatedCompanies from "@/components/research/topic/ResearchRelatedCompanies";
 import { deriveResearchWorkflow } from "@/lib/research/workflow/workflow-engine";
 import { cbaiHeroGlow } from "@/components/brand/brand-classes";
 
@@ -44,6 +45,8 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
       </div>
 
       <TopicInsightsPanel topic={topic} />
+
+      <ResearchRelatedCompanies topic={topic} />
 
       <TopicReviewWorkspace topic={topic} workflow={workflow} />
 
