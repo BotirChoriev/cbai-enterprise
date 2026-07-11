@@ -81,11 +81,12 @@ export default function HomeEcosystems() {
           id="home-ecosystems-heading"
           className="text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl"
         >
-          One global evidence platform
+          One Intelligence Core, three ecosystems
         </h2>
         <p className="max-w-2xl text-sm leading-relaxed text-zinc-400 sm:text-base">
-          Four intelligence ecosystems — honest status for what is available now and what is
-          coming next.
+          Research Intelligence is CBAI&apos;s flagship ecosystem today. Governance and Economic
+          Intelligence share the same evidence core and are in active development — honest
+          status for what is available now and what is coming next.
         </p>
       </div>
 
@@ -99,7 +100,14 @@ export default function HomeEcosystems() {
                 <EcosystemIcon id={ecosystem.id} />
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-start justify-between gap-2">
-                    <h3 className="text-base font-semibold text-zinc-50">{ecosystem.title}</h3>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="text-base font-semibold text-zinc-50">{ecosystem.title}</h3>
+                      {ecosystem.flagship ? (
+                        <span className="shrink-0 rounded-md border border-cyan-400/40 bg-cyan-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-cyan-300">
+                          Flagship
+                        </span>
+                      ) : null}
+                    </div>
                     <span
                       className={`shrink-0 rounded-md border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${statusBadgeClass(ecosystem.status)}`}
                     >
@@ -133,7 +141,7 @@ export default function HomeEcosystems() {
                   href={ecosystem.href}
                   className="mt-5 inline-flex text-sm font-semibold text-cyan-400 transition-colors hover:text-cyan-300"
                 >
-                  Start with Search →
+                  {ecosystem.ctaLabel ?? "Open →"}
                 </Link>
               ) : (
                 <p className="mt-5 text-xs text-zinc-600">

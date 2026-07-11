@@ -16,11 +16,11 @@ function gradientDefs(id: string) {
         <stop offset="100%" stopColor="#2563eb" />
       </linearGradient>
       <radialGradient id={`${id}-glow`} cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.35" />
+        <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.18" />
         <stop offset="100%" stopColor="#22d3ee" stopOpacity="0" />
       </radialGradient>
       <filter id={`${id}-node-glow`} x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="1.2" result="blur" />
+        <feGaussianBlur stdDeviation="0.6" result="blur" />
         <feMerge>
           <feMergeNode in="blur" />
           <feMergeNode in="SourceGraphic" />
@@ -40,7 +40,7 @@ function CBAIMark({ size = 36, id = "cbai" }: { size?: number; id?: string }) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
-      className="shrink-0 drop-shadow-[0_0_12px_rgba(34,211,238,0.35)]"
+      className="shrink-0 drop-shadow-[0_0_6px_rgba(34,211,238,0.2)]"
     >
       {gradientDefs(id)}
       <circle cx="32" cy="32" r="30" fill={`url(#${id}-glow)`} />

@@ -13,20 +13,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CBAI Enterprise — AI Platform for Modern Organizations",
+  title: "CBAI — Universal Intelligence Operating System",
   description:
-    "Secure, scalable enterprise AI infrastructure. Deploy agents, automate workflows, and govern AI across your organization with CBAI Enterprise.",
+    "CBAI connects evidence, measures change, and explains options and consequences across research, governance, and economics — so people and organizations can make informed, human decisions.",
   keywords: [
-    "enterprise AI",
-    "AI platform",
-    "agent orchestration",
-    "AI gateway",
+    "intelligence operating system",
+    "evidence intelligence",
+    "research intelligence",
+    "governance intelligence",
+    "economic intelligence",
+    "decision support",
     "CBAI",
   ],
   openGraph: {
-    title: "CBAI Enterprise — AI Platform for Modern Organizations",
+    title: "CBAI — Universal Intelligence Operating System",
     description:
-      "Secure, scalable enterprise AI infrastructure for modern organizations.",
+      "Connects evidence, measures change, and explains options and consequences across research, governance, and economics. Humans decide.",
     type: "website",
   },
 };

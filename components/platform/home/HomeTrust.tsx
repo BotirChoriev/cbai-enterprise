@@ -3,17 +3,20 @@ import { TRUST_PILLARS } from "@/lib/platform-home";
 
 export default function HomeTrust() {
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-gradient-to-b from-zinc-900/40 to-zinc-950/80 p-8 sm:p-10">
+    <section
+      aria-labelledby="home-trust-heading"
+      className="rounded-2xl border border-zinc-800 bg-gradient-to-b from-zinc-900/40 to-zinc-950/80 p-8 sm:p-10"
+    >
       <div className="mb-8 flex items-center gap-3">
         <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900 text-sky-400">
           <HomeTrustIcon className="h-6 w-6" />
         </div>
         <div>
-          <p className="text-xl font-semibold text-zinc-50 sm:text-2xl">
-            Trust Center
-          </p>
+          <h2 id="home-trust-heading" className="text-xl font-semibold text-zinc-50 sm:text-2xl">
+            How CBAI earns trust
+          </h2>
           <p className="text-sm text-zinc-500">
-            Why trust CBAI — methodology and honesty, not confidence theater.
+            Product mechanics, not a slogan — this is how evidence becomes a recommendation.
           </p>
         </div>
       </div>
@@ -31,6 +34,6 @@ export default function HomeTrust() {
           </article>
         ))}
       </div>
-    </div>
+    </section>
   );
 }

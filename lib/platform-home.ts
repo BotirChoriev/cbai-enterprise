@@ -332,52 +332,52 @@ export const HOME_MODULES: HomeModule[] = [
 
 export const TRUST_PILLARS: TrustPillar[] = [
   {
-    id: "evidence-first",
-    title: "Evidence First",
+    id: "sources-before-conclusions",
+    title: "Sources Before Conclusions",
     description:
-      "Nothing is presented as fact without a traceable source path or an explicit insufficient-evidence label.",
+      "Evidence is connected and reviewed before any conclusion is presented — never the reverse.",
   },
   {
-    id: "transparent-methodology",
-    title: "Transparent Methodology",
+    id: "uncertainty-visible",
+    title: "Uncertainty Is Visible",
     description:
-      "Methods are documented before scores ship. Users see how conclusions would be formed.",
+      "When evidence is insufficient, that is stated directly — never hidden behind a score.",
   },
   {
-    id: "political-neutrality",
-    title: "Political Neutrality",
+    id: "explainable-recommendations",
+    title: "Recommendations Are Explainable",
     description:
-      "No national, partisan, or ideological endorsements appear in intelligence output.",
+      "Every recommendation traces back to the evidence and reasoning that produced it.",
   },
   {
-    id: "human-oversight",
-    title: "Human Oversight",
+    id: "comparable-alternatives",
+    title: "Alternatives Can Be Compared",
     description:
-      "Platform intelligence supports human decisions — it does not replace accountability.",
+      "Options are presented side by side, never as a single forced answer.",
   },
   {
-    id: "source-attribution",
-    title: "Source Attribution",
+    id: "consequences-shown",
+    title: "Consequences Are Shown",
     description:
-      "Connected sources are identified. Disconnected sources are never implied.",
+      "Possible outcomes and limitations are explained alongside every option.",
   },
   {
-    id: "explainability",
-    title: "Explainability",
+    id: "ai-never-the-source",
+    title: "AI Is Never The Source",
     description:
-      "Every future score shows inputs, method steps, and evidence status.",
+      "CBAI connects and explains evidence — it never originates facts or acts as a citation.",
   },
   {
-    id: "confidence-calculation",
-    title: "Confidence Calculation",
+    id: "history-preserved",
+    title: "History Is Preserved",
     description:
-      "Confidence derives from evidence quality — zero when inputs are insufficient.",
+      "Research and evidence changes are kept, not overwritten, so context is never lost.",
   },
   {
-    id: "no-fabricated-data",
-    title: "No Fabricated Data",
+    id: "humans-decide",
+    title: "Humans Decide",
     description:
-      "Insufficient evidence and disconnected sources are stated explicitly — never hidden.",
+      "Final judgment and responsibility always belong to the people using CBAI.",
   },
 ];
 
