@@ -1,7 +1,18 @@
+"use client";
+
 import Link from "next/link";
 import { buildEvidenceExplorerModel } from "@/lib/evidence-explorer";
 import { buildReportsCenterModel } from "@/lib/reports-center";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
+import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
+import RecentEntities from "@/components/platform/context/RecentEntities";
+import StatusBadge from "@/components/shared/StatusBadge";
+import {
+  ASSISTANT_AVATAR_CLASSES,
+  ASSISTANT_LANGUAGES,
+  WORKSPACE_ROLE_LABELS,
+} from "@/lib/assistant/assistant-profile";
 
 const continueLinks = [
   {
@@ -26,20 +37,66 @@ const continueLinks = [
   },
 ] as const;
 
+const ONBOARDING_LINKS = [
+  { label: "Explore Research", href: "/research" },
+  { label: "Explore Countries", href: "/countries" },
+  { label: "Search Evidence", href: "/knowledge" },
+  { label: "Configure Assistant", href: "/settings" },
+  { label: "Open Trust Center", href: "/trust" },
+] as const;
+
 export default function MyWork() {
   const evidence = buildEvidenceExplorerModel();
   const reports = buildReportsCenterModel();
+  const { profile, isActive } = useAssistantProfile();
+  const { context } = usePlatformContext();
+  const preferredLanguage = ASSISTANT_LANGUAGES.find((l) => l.code === profile.preferredLanguage);
 
   return (
     <div className="space-y-8">
-      <div className={`${cbaiGlassCard} border-cyan-500/15 px-6 py-5`}>
-        <h2 className="text-lg font-semibold text-zinc-100">My Work</h2>
-        <p className="mt-1 max-w-2xl text-sm text-zinc-400">
-          CBAI does not yet have accounts or saved sessions, so nothing below is personalized to
-          you. These are the real, working entry points into research and evidence review across
-          the platform — never a fabricated history.
-        </p>
-      </div>
+      {isActive ? (
+        <div className={`${cbaiGlassCard} border-cyan-500/15 px-6 py-5`}>
+          <div className="flex flex-wrap items-center gap-3">
+            <span
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-sm font-semibold uppercase ${ASSISTANT_AVATAR_CLASSES[profile.avatar]}`}
+            >
+              {profile.name.slice(0, 1)}
+            </span>
+            <div>
+              <h2 className="text-lg font-semibold text-zinc-100">{profile.name}&apos;s Work</h2>
+              <p className="text-xs text-zinc-500">
+                {WORKSPACE_ROLE_LABELS[profile.workspaceRole]} workspace ·{" "}
+                {preferredLanguage?.label ?? profile.preferredLanguage}
+              </p>
+            </div>
+            <StatusBadge status="live" className="ml-auto" />
+          </div>
+          <p className="mt-3 max-w-2xl text-xs text-zinc-500">
+            Saved to this browser — real research and evidence entry points below, never
+            fabricated activity or recommendations.
+          </p>
+        </div>
+      ) : (
+        <div className={`${cbaiGlassCard} border-cyan-500/15 px-6 py-5`}>
+          <h2 className="text-lg font-semibold text-zinc-100">My Work</h2>
+          <p className="mt-1 max-w-2xl text-sm text-zinc-400">
+            CBAI does not yet have accounts or saved sessions, so nothing below is personalized to
+            you. These are the real, working entry points into research and evidence review
+            across the platform — never a fabricated history.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {ONBOARDING_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="rounded-full border border-zinc-800 bg-zinc-900/40 px-3 py-1.5 text-xs text-zinc-300 transition-colors hover:border-cyan-500/30 hover:text-cyan-300"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       <section aria-labelledby="my-work-continue-heading" className="space-y-3">
         <p className={cbaiSectionEyebrow} id="my-work-continue-heading">
@@ -57,6 +114,13 @@ export default function MyWork() {
             </Link>
           ))}
         </div>
+      </section>
+
+      <section aria-labelledby="my-work-recent-heading" className={`${cbaiGlassCard} space-y-2 p-5`}>
+        <p className={cbaiSectionEyebrow} id="my-work-recent-heading">
+          Recently Viewed
+        </p>
+        <RecentEntities entities={context.recentEntities} />
       </section>
 
       <section aria-labelledby="my-work-reports-heading" className="space-y-3">
