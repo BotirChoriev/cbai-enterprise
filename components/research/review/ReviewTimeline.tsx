@@ -1,7 +1,6 @@
 import type { ResearchReview } from "@/lib/research/review/review-model";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
-
-const NOT_YET = "Not yet";
+import StatusBadge from "@/components/shared/StatusBadge";
 
 const TIMELINE_DATE_FORMAT = new Intl.DateTimeFormat("en-US", {
   dateStyle: "medium",
@@ -9,29 +8,25 @@ const TIMELINE_DATE_FORMAT = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
 });
 
-function formatTimelineDate(value: string | undefined): string {
-  if (!value) {
-    return NOT_YET;
-  }
-  return TIMELINE_DATE_FORMAT.format(new Date(value));
+function formatTimelineDate(value: string | undefined): string | null {
+  return value ? TIMELINE_DATE_FORMAT.format(new Date(value)) : null;
 }
 
 type ReviewTimelineProps = {
   review: ResearchReview;
 };
 
-// ResearchReview currently only records a creation timestamp. Submitted,
-// assigned, decision, and archived events live on separate
-// ReviewAssignment/ReviewDecision/ReviewHistory records that this
-// single-prop component does not receive, so they render as "Not yet"
-// until a future build wires that data through.
+// ResearchReview currently only records a creation timestamp. Submitted, assigned, decision, and
+// archived events live on separate ReviewAssignment/ReviewDecision/ReviewHistory records this
+// single-prop component does not receive — one trailing sentence explains all four rather than
+// repeating the same reason four times.
 export default function ReviewTimeline({ review }: ReviewTimelineProps) {
   const milestones = [
     { label: "Created", value: formatTimelineDate(review.createdAt) },
-    { label: "Submitted", value: NOT_YET },
-    { label: "Assigned", value: NOT_YET },
-    { label: "Decision", value: NOT_YET },
-    { label: "Archived", value: NOT_YET },
+    { label: "Submitted", value: null },
+    { label: "Assigned", value: null },
+    { label: "Decision", value: null },
+    { label: "Archived", value: null },
   ];
 
   return (
@@ -44,10 +39,18 @@ export default function ReviewTimeline({ review }: ReviewTimelineProps) {
             className="flex items-center justify-between gap-3 rounded-lg border border-zinc-800/80 bg-slate-950/50 px-3 py-2"
           >
             <span className="text-sm font-medium text-zinc-200">{milestone.label}</span>
-            <span className="text-xs text-zinc-500">{milestone.value}</span>
+            {milestone.value ? (
+              <span className="text-xs text-zinc-500">{milestone.value}</span>
+            ) : (
+              <StatusBadge status="waiting_for_verified_data" />
+            )}
           </li>
         ))}
       </ol>
+      <p className="text-xs text-zinc-600">
+        Submitted, assigned, decision, and archived events connect once assignment and history
+        tracking are wired to this workspace.
+      </p>
     </section>
   );
 }

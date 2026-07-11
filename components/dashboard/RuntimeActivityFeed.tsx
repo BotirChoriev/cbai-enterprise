@@ -30,8 +30,12 @@ export default function RuntimeActivityFeed({
       />
       <CardContent className="px-0 py-0">
         {activities.length === 0 ? (
-          <div className="flex h-64 items-center justify-center px-5">
+          <div className="flex h-64 flex-col items-center justify-center gap-1 px-5 text-center">
             <p className="text-sm text-zinc-500">No activity recorded yet</p>
+            <p className="max-w-xs text-xs text-zinc-600">
+              Session, task, queue, and scheduler events appear here once this runtime records
+              real activity — not an error.
+            </p>
           </div>
         ) : (
           <ul className="divide-y divide-zinc-800">

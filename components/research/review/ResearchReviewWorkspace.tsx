@@ -99,7 +99,9 @@ export default function ResearchReviewWorkspace({
             </p>
           </div>
         ) : (
-          <p className="text-xs text-zinc-500">Not assigned yet.</p>
+          <p className="text-xs text-zinc-500">
+            Not assigned yet — no reviewer record is connected to this topic.
+          </p>
         )}
       </section>
 
