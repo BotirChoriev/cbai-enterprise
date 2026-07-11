@@ -6,7 +6,7 @@ import type { ResearchEvidence } from "@/lib/research/evidence/evidence-model";
 import { cbaiHeroGlow } from "@/components/brand/brand-classes";
 
 export const metadata: Metadata = {
-  title: "Research Evidence — Research Intelligence",
+  title: "Research Evidence",
   description: "Review a piece of research evidence, its source, status, and strength.",
 };
 

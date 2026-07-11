@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import ResearchWorkspaceHome from "@/components/research/workspace/ResearchWorkspaceHome";
 
 export const metadata: Metadata = {
-  title: "Research Workspace — Evidence Navigation",
+  title: "Research Workspace",
   description:
     "Explore one research topic from catalog notebook, timeline, graph, and future knowledge perspectives.",
 };

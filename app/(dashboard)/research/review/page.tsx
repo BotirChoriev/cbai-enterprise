@@ -5,7 +5,7 @@ import type { ResearchReview } from "@/lib/research/review/review-model";
 import { cbaiHeroGlow } from "@/components/brand/brand-classes";
 
 export const metadata: Metadata = {
-  title: "Research Review — Research Intelligence",
+  title: "Research Review",
   description: "Review a research topic's evidence, decisions, and reviewer status.",
 };
 

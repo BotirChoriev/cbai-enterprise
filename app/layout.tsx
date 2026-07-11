@@ -13,7 +13,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CBAI — Universal Intelligence Operating System",
+  title: {
+    default: "CBAI — Universal Intelligence Operating System",
+    template: "%s — CBAI",
+  },
   description:
     "CBAI connects evidence, measures change, and explains options and consequences across research, governance, and economics — so people and organizations can make informed, human decisions.",
   keywords: [

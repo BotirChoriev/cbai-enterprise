@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import ResearchHome from "@/components/research/ResearchHome";
 
 export const metadata: Metadata = {
-  title: "Research Intelligence — Global Research Network",
+  title: "Research",
   description:
     "Explore 64 catalog research topics and their metadata connections in the Global Research Network.",
 };
