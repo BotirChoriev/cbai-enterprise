@@ -19,6 +19,16 @@ import {
   PRODUCT_STATUS_EXPLANATIONS,
   PRODUCT_STATUS_LABELS,
 } from "@/lib/product-status";
+import { resolveNextStep } from "@/lib/assistant/assistant-next-step";
+import {
+  ASSISTANT_AVATARS,
+  DEFAULT_OPERATOR_NAME,
+  ROLE_DEFAULT_WORKSPACE,
+  WORKSPACE_ROLES,
+  resolveOperatorName,
+} from "@/lib/assistant/assistant-profile";
+import { buildWorldIntelligenceMap, searchWorldMapCountries } from "@/lib/world-map";
+import { countries } from "@/lib/countries";
 
 const UNKNOWN_QUERY = "zzz-not-a-real-entity-or-topic-9182";
 
@@ -136,4 +146,87 @@ test("16. Assistant context is honestly null with no page entity and no platform
 
 test("17. Assistant context never invents a topic for a non-topic research route", () => {
   assert.equal(resolveAssistantContext("/research/workspace", null), null);
+});
+
+test("18. No saved profile: the next step is honestly to complete setup", () => {
+  const inactive = { ...createEmptyAssistantProfile() };
+  const step = resolveNextStep(inactive, null);
+  assert.equal(step.id, "complete-setup");
+  assert.equal(step.href, "/settings");
+});
+
+test("19. Saved profile with recent local work: the next step continues that real entity", () => {
+  const active = { ...createEmptyAssistantProfile(), name: "Botir" };
+  const step = resolveNextStep(active, { kind: "country", id: "japan", name: "Japan" });
+  assert.equal(step.id, "continue-work");
+  assert.match(step.href, /^\/countries\?country=japan$/);
+});
+
+test("20. Saved profile with no recent work: the next step opens the role's real default workspace", () => {
+  const active = { ...createEmptyAssistantProfile(), name: "Botir", workspaceRole: "investor" as const };
+  const step = resolveNextStep(active, null);
+  assert.equal(step.id, "open-workspace");
+  assert.equal(step.href, ROLE_DEFAULT_WORKSPACE.investor);
+});
+
+test("21. Every workspace role resolves to a real, declared default route", () => {
+  for (const role of WORKSPACE_ROLES) {
+    assert.ok(ROLE_DEFAULT_WORKSPACE[role].startsWith("/"), `${role} must map to a real route`);
+  }
+});
+
+test("22. Operator name falls back to the honest product default when not set", () => {
+  const empty = createEmptyAssistantProfile();
+  assert.equal(resolveOperatorName(empty), DEFAULT_OPERATOR_NAME);
+  assert.equal(resolveOperatorName({ ...empty, operatorName: "Ava" }), "Ava");
+});
+
+test("23. Every built-in avatar id has no duplicate and is a non-empty string", () => {
+  const unique = new Set(ASSISTANT_AVATARS);
+  assert.equal(unique.size, ASSISTANT_AVATARS.length);
+  for (const avatar of ASSISTANT_AVATARS) {
+    assert.ok(avatar.length > 0);
+  }
+});
+
+test("24. World Intelligence Map only ever contains real catalog countries", () => {
+  const groups = buildWorldIntelligenceMap();
+  const mappedIds = groups.flatMap((group) => group.countries.map((entry) => entry.country.id));
+  const realIds = countries.map((c) => c.id);
+  assert.equal(mappedIds.length, realIds.length, "every real country must appear exactly once");
+  for (const id of mappedIds) {
+    assert.ok(realIds.includes(id), `${id} must be a real catalog country, never invented`);
+  }
+});
+
+test("25. World Intelligence Map never fabricates a status outside the declared vocabulary", () => {
+  const groups = buildWorldIntelligenceMap();
+  for (const group of groups) {
+    for (const entry of group.countries) {
+      assert.ok(
+        (PRODUCT_STATUSES as readonly string[]).includes(entry.status),
+        `"${entry.status}" must be one of the declared PRODUCT_STATUSES`,
+      );
+    }
+  }
+});
+
+test("26. World Intelligence Map country links route to the real country profile", () => {
+  const groups = buildWorldIntelligenceMap();
+  for (const group of groups) {
+    for (const entry of group.countries) {
+      assert.equal(entry.href, `/countries?country=${entry.country.id}`);
+    }
+  }
+});
+
+test("27. World Intelligence Map search is honestly empty for a non-existent country", () => {
+  const results = searchWorldMapCountries("Not A Real Country Name");
+  assert.deepEqual(results, []);
+});
+
+test("28. World Intelligence Map search finds a real country by name", () => {
+  const results = searchWorldMapCountries("Japan");
+  assert.ok(results.length >= 1);
+  assert.ok(results.some((entry) => entry.country.name === "Japan"));
 });
