@@ -92,10 +92,10 @@ export const platformNavSections: NavSection[] = [
   },
 ];
 
-/** Internal routes — not shown in public sidebar. */
+/** Role-specific workspaces — shown in the sidebar as a secondary section. */
 export const internalNavSections: NavSection[] = [
   {
-    title: "Internal",
+    title: "Workspaces",
     items: [
       {
         label: "Dashboard",

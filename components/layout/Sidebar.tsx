@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { platformNavSections } from "@/lib/navigation";
+import { platformNavSections, internalNavSections } from "@/lib/navigation";
 import NavIcon from "@/components/layout/NavIcon";
 import CBAILogo, { CBAIMark } from "@/components/brand/CBAILogo";
 
@@ -38,8 +38,8 @@ export default function Sidebar() {
         )}
       </Link>
 
-      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
-        {platformNavSections.map((section) => (
+      <nav className="flex-1 space-y-4 overflow-y-auto px-3 py-4">
+        {[...platformNavSections, ...internalNavSections].map((section) => (
           <div key={section.title}>
             {!isHome ? (
               <p className="mb-2 px-3 text-[10px] font-medium uppercase tracking-widest text-zinc-600">
