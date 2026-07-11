@@ -532,3 +532,20 @@ Work now shows Assistant identity when a profile is active, and real "Recently V
 what was deliberately not attempted this pass (full status-vocabulary migration, wiring
 `RuntimeActivityFeed`, new search categories with too little real data to justify one): see
 `docs/product-activation-audit.md` §8.
+
+## Connected Intelligence Experience, Release 4
+
+Investigated what real cross-entity relationship data exists before building anything: real
+Country↔Company↔University links were already computed and already live, just tucked behind a
+collapsed disclosure — surfaced a real count of them instead of recomputing. Found and
+deliberately left unwired a second, fully-computed, zero-caller relationship graph
+(`lib/registry/entity-links.ts`) that would have duplicated the first. Confirmed research topics
+have zero real links to any country/company/university record. Activated a cluster of fully-built,
+zero-consumer country/company/university components — real domain-grouped Economy/Judicial
+System/Education/Health sections, named official-source lists, and the country timeline engine
+(company/university have no timeline builder, so honestly none was added there). New
+`IntelligenceContextPanel` (real related-entity count, evidence, reports, open questions, status)
+replaces the narrower Release 3 `EntityDataStatus`. The Assistant now derives current-page context
+(real research topic or focused entity) with zero new tracking. 4 new tests directly covering the
+new context-resolution logic, 28 total passing. Full detail, including what was deliberately left
+unwired to avoid duplicating already-live information: `docs/product-activation-audit.md` §9.

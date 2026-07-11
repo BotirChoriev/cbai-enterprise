@@ -1,10 +1,12 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
+import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import { ASSISTANT_COMMANDS, resolveAssistantCommand } from "@/lib/assistant/assistant-commands";
+import { resolveAssistantContext } from "@/lib/assistant/assistant-context";
 
 const SUGGESTED_COMMAND_IDS = ["open-my-work", "continue-research", "open-evidence", "open-trust"];
 const SUGGESTED_COMMANDS = ASSISTANT_COMMANDS.filter((command) =>
@@ -38,13 +40,23 @@ function getSpeechRecognitionConstructor(): SpeechRecognitionConstructor | null 
 
 export default function AssistantCommandCenter() {
   const router = useRouter();
+  const pathname = usePathname();
   const { profile } = useAssistantProfile();
+  const { context } = usePlatformContext();
   const [input, setInput] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [uploadNotice, setUploadNotice] = useState<string | null>(null);
   const [unrecognized, setUnrecognized] = useState<string | null>(null);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Phase 5: the Assistant always knows where the user currently is — derived from the same
+  // real page context the platform already tracks, never a separate tracking system and never a
+  // question asked of the user.
+  const assistantContext = useMemo(
+    () => resolveAssistantContext(pathname, context.country ?? context.company ?? context.university),
+    [pathname, context.country, context.company, context.university],
+  );
 
   const route = useCallback(
     (rawInput: string) => {
@@ -105,6 +117,16 @@ export default function AssistantCommandCenter() {
 
   return (
     <div className="w-full min-w-0 max-w-md">
+      {assistantContext ? (
+        <Link
+          href={assistantContext.href}
+          className="mb-1.5 inline-flex items-center gap-1.5 text-[11px] text-zinc-500 hover:text-cyan-300"
+          title={`Assistant context: ${assistantContext.name}`}
+        >
+          <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
+          Context: {assistantContext.name}
+        </Link>
+      ) : null}
       <form
         role="search"
         aria-label="Assistant command center"
@@ -213,6 +235,18 @@ export default function AssistantCommandCenter() {
             {`"${unrecognized}" is not a recognized command yet — no reasoning is applied, so unmatched input is never guessed at.`}
           </p>
           <div className="flex flex-wrap gap-1.5">
+            {assistantContext ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setUnrecognized(null);
+                  router.push(assistantContext.href);
+                }}
+                className="rounded-full border border-cyan-500/30 bg-cyan-500/10 px-2.5 py-1 text-[11px] text-cyan-300 transition-colors hover:border-cyan-500/50"
+              >
+                {`Open ${assistantContext.name}`}
+              </button>
+            ) : null}
             {SUGGESTED_COMMANDS.map((command) => (
               <button
                 key={command.id}

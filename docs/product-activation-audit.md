@@ -304,3 +304,126 @@ alongside the unchanged 11/11 research-slice suite.
   Relationships/Timeline exist as separate page-level components (`*Relationships.tsx`) rather than
   inside the panel itself. Not consolidated into one literal panel this pass — low risk, but a real
   IA decision better made deliberately than folded into an empty-states release.
+
+## 9. Release 4 — Connected Intelligence Experience
+
+Response to "CBAI Product Activation — Release 4." Scope: connect existing capabilities together
+(cross-entity links, Assistant context-awareness, a real "Intelligence Context" summary), not build
+new ones. No new engine, AI system, or duplicate workspace.
+
+### 9.1 Cross-entity relationship audit
+
+Investigated what real relationship data actually exists between Countries, Companies,
+Universities, and the 65-topic Research catalog before building anything:
+
+- **Country ↔ Company ↔ University links are real and already live** — `getCountryRelationships`/
+  `getCompanyRelationships`/`getUniversityRelationships` (in each entity's `.adapter.ts`) name-match
+  companies/universities to countries via `lib/name-match.ts`, and were already rendered by
+  `CountryRelationships.tsx`/`CompanyRelationships.tsx`/`UniversityRelationships.tsx` — just tucked
+  inside a collapsed "Optional exploration" `<details>` on each page. Nothing to activate here; this
+  release surfaces a real *count* of these already-computed links in the new Intelligence Context
+  panel (§9.3) so the connection is visible before a user expands the details.
+- **Research topics have zero real links to any Country/Company/University record** — confirmed by
+  reading `research-domain-adapter.ts` and `research-entities-organizations.ts` in full; the
+  Research Domain's organization/university/laboratory types are deliberately-documented stubs,
+  disjoint from the real `lib/countries.ts`/`lib/companies.ts`/`lib/universities.ts` catalogs.
+  `ResearchIntelligenceOverview.tsx`'s "Related entities and network connections" section was
+  verified to already correctly scope itself to real research-internal organizations/datasets only
+  — it does not, and should not, claim a link to a specific country or company. Left unchanged.
+- **The Universal Relationship Engine and Global Intelligence Network (Platform Core) are Research
+  Intelligence-only** — zero imports anywhere under `components/countries|companies|universities`.
+  Confirmed, not touched (Platform Core is frozen).
+- **A second, fully-computed, entirely dead cross-entity relationship graph was found**:
+  `lib/registry/entity-links.ts` + `registry-query.ts`'s `resolveRelatedEntities()`/
+  `getEntityLinkGraph()` — real, name-matched, zero callers anywhere. Deliberately **not**
+  activated: the same relationship data is already live via the adapters above, and wiring a second
+  parallel system in would be exactly the "duplicate information" this release explicitly forbids.
+  Documented here as known dead code, not activated.
+- **A large cluster of fully-built, fully-styled, zero-consumer country/company/university
+  components was found**: `Country/Company/UniversityIndicatorCoverage.tsx` (indicator domains —
+  Economy, Judicial System, Education, Health, Research, Digital Development, etc. — grouped exactly
+  as Phase 2 asked for), `CountryTimelineSection.tsx` (+ 6 Timeline sub-panels), `*CoveragePanel.tsx`,
+  `*Methodology.tsx`, `*TrustSection.tsx`, `*SourceCoverage.tsx`. Activated the highest-value,
+  non-duplicate ones (§9.2); left `*CoveragePanel.tsx` (redundant with the already-live
+  `EntityEvidenceSection`) and `*Methodology.tsx`/`*TrustSection.tsx` (redundant with the Release 1
+  `/trust` page) deliberately unwired to avoid duplicating information already shown.
+
+### 9.2 Country and Organization workspace activation (Phases 2–3)
+
+Wired into `CountryIntelligencePanel.tsx`, `CompanyIntelligencePanel.tsx`,
+`UniversityIntelligencePanel.tsx`:
+
+- **Indicator Coverage by domain** (`*IndicatorCoverage.tsx`) — real domain-grouped sections
+  (Economy, Judicial System, Education, Health, Research, Digital Development, and more, per
+  `lib/indicator-framework/domains/catalog.ts`), inside the existing "Optional exploration"
+  disclosure (progressive disclosure, Phase 9 — this can be a long list, so it's not forced on
+  first view).
+- **Source Coverage** (`*SourceCoverage.tsx`) — real named official evidence sources with
+  organization, supported-indicator count, connection status, and official website link. Genuinely
+  new information, not a repeat of the aggregate counts `EntityEvidenceSection` already shows.
+  Also inside Optional exploration.
+- **Timeline** (`CountryIntelligencePanel` only — no company/university timeline builder exists in
+  this codebase, so none was added; Phase 8's "if impossible, hide it" applied honestly rather than
+  building a placeholder). The compact `TimelineReadinessPanel` (real status badge + real year
+  counts) is always visible as a primary section; the five more detailed timeline sub-panels
+  (Coverage/EvidenceGap/Sources/Methodology/HumanReview) live in Optional exploration to avoid
+  showing six stacked panels — most of which say "not connected" for every real country today —
+  on first load.
+
+### 9.3 Intelligence Context panel (Phase 6)
+
+New `components/shared/IntelligenceContextPanel.tsx` — real related-entity count (from the
+already-live relationship adapters, §9.1), evidence connected/total, reports count, open-questions
+count, and a status badge (reusing the Release 3 status vocabulary). Replaces the narrower Release 3
+`EntityDataStatus` component (deleted — fully superseded, would otherwise have duplicated the status
+badge this panel already shows) on all three Country/Company/University panels. Not built as a
+literal CSS-grid right-hand column: the existing three-panel Country/Company/University page layout
+(filters, list, panel) would have needed restructuring to fit a fourth column safely on mobile: this
+release places the panel in-flow at the top of the panel instead, satisfying the "every workspace
+gets an Intelligence Context summary, real data only, nothing decorative" requirement without a
+layout risk. Research topic pages were not given a second panel — `ResearchIntelligenceOverview.tsx`
+already serves this exact purpose there (evidence count, open questions, related entities, status),
+and building a second one would duplicate it.
+
+### 9.4 Assistant context awareness (Phase 5)
+
+New `lib/assistant/assistant-context.ts` — `resolveAssistantContext(pathname, platformEntity)`
+derives "where the user currently is" from data the platform already tracks: a real research topic
+when the pathname is an exact topic route, otherwise whichever entity `PlatformContextProvider` has
+focused (country, then company, then university). No new tracking system, no question ever asked of
+the user. The Command Center (`AssistantCommandCenter.tsx`) now shows a small "Context: {name}"
+link, and the "not recognized" fallback panel offers a context-aware "Open {name}" suggestion first
+when a context exists.
+
+### 9.5 Cross-navigation and capability audit (Phases 7–8)
+
+No new dead ends introduced — every activated component reuses real data already flowing through
+each page's existing `journey`/`coverage` objects. `npm run build` regenerates all 91 routes with no
+errors; dev-server spot checks of Countries/Companies/Universities (bare and with a real entity
+query param), a research topic, Trust, and My Work all returned 200 with no console errors. No new
+buttons were added this release — only real, already-built display components were wired into
+existing pages.
+
+### 9.6 Tests
+
+Extended `scripts/test-product-activation.ts` with 4 new tests (14–17) covering
+`resolveAssistantContext`: real topic resolution from the URL, real entity fallback when not on a
+topic page, honest `null` with no context available, and confirmation that non-topic `/research/*`
+routes (like `/research/workspace`) never get misread as a topic id. 17/17 passing, alongside the
+unchanged 11/11 research-slice suite.
+
+### 9.7 Remaining data blockers / not attempted this pass
+
+- **`lib/registry/entity-links.ts`'s parallel relationship graph** — confirmed dead, deliberately
+  left unwired (§9.1) rather than duplicating the already-live relationship adapters. A future
+  cleanup pass could remove it, or migrate the live adapters onto it if it's ever found to be more
+  complete — not attempted here.
+- **`*CoveragePanel.tsx`, `*Methodology.tsx`, `*TrustSection.tsx`** (country/company/university) —
+  confirmed dead, deliberately left unwired as redundant with content already live elsewhere on the
+  same page or on `/trust`.
+- **A literal right-side CSS-grid Context Panel column** — not built; the in-flow panel placement
+  (§9.3) was judged the safer choice given the existing three-column responsive layout. Revisiting
+  this as a deliberate IA/layout decision (not bundled into a connectivity release) remains open.
+- **Research topic ↔ Country/Company/University links** — genuinely impossible with real data today
+  (§9.1); would require new data ingestion, explicitly out of scope for a "connect existing
+  capabilities" mission.

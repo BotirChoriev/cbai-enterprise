@@ -12,6 +12,7 @@ import {
   isAssistantProfileActive,
 } from "@/lib/assistant/assistant-profile";
 import { loadAssistantProfile } from "@/lib/assistant/assistant-storage";
+import { resolveAssistantContext } from "@/lib/assistant/assistant-context";
 import { resolveEntityDataStatus } from "@/components/shared/entity-profile-copy";
 import {
   PRODUCT_STATUSES,
@@ -108,4 +109,31 @@ test("13. Loading the Assistant profile outside a browser is SSR-safe and never 
     const profile = loadAssistantProfile();
     assert.equal(isAssistantProfileActive(profile), false);
   });
+});
+
+test("14. Assistant context resolves a real research topic from the page path", () => {
+  const context = resolveAssistantContext("/research/microbiology", null);
+  assert.ok(context);
+  assert.equal(context!.kind, "research_topic");
+  assert.equal(context!.href, "/research/microbiology");
+});
+
+test("15. Assistant context falls back to the focused platform entity when not on a topic page", () => {
+  const context = resolveAssistantContext("/countries", {
+    kind: "country",
+    id: "japan",
+    name: "Japan",
+  });
+  assert.ok(context);
+  assert.equal(context!.kind, "country");
+  assert.equal(context!.name, "Japan");
+  assert.match(context!.href, /^\/countries\?country=japan$/);
+});
+
+test("16. Assistant context is honestly null with no page entity and no platform focus", () => {
+  assert.equal(resolveAssistantContext("/dashboard", null), null);
+});
+
+test("17. Assistant context never invents a topic for a non-topic research route", () => {
+  assert.equal(resolveAssistantContext("/research/workspace", null), null);
 });

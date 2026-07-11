@@ -2,7 +2,9 @@ import type { University } from "@/lib/universities";
 import type { UniversityUserJourney } from "@/lib/university-user-journey";
 import EvidenceComparisonPanel from "@/components/evidence-comparison/EvidenceComparisonPanel";
 import EntityOverviewSection from "@/components/shared/EntityOverviewSection";
-import EntityDataStatus from "@/components/shared/EntityDataStatus";
+import IntelligenceContextPanel from "@/components/shared/IntelligenceContextPanel";
+import UniversityIndicatorCoverage from "@/components/universities/UniversityIndicatorCoverage";
+import UniversitySourceCoverage from "@/components/universities/UniversitySourceCoverage";
 import EntityEvidenceSection from "@/components/shared/EntityEvidenceSection";
 import EntityCompareSection from "@/components/shared/EntityCompareSection";
 import EntityOptionalExploration from "@/components/shared/EntityOptionalExploration";
@@ -12,6 +14,7 @@ import {
   countConnectedSources,
   getConnectedAvailableItems,
 } from "@/components/shared/entity-profile-copy";
+import { getUniversityRelationships } from "@/lib/universities.adapter";
 
 type UniversityIntelligencePanelProps = {
   journey: UniversityUserJourney;
@@ -25,6 +28,9 @@ export function UniversityIntelligencePanel({
   const { profile, evidenceGaps, evidenceComparison } = journey;
   const { registryFacts, coverage } = profile;
   const sourceConnectedCount = countConnectedSources(coverage);
+  const relationships = getUniversityRelationships(university);
+  const relatedEntityCount = (relationships.country ? 1 : 0) + relationships.companies.length;
+  const openQuestionsCount = evidenceGaps.plannedCount + evidenceGaps.missingCount + evidenceGaps.blockedCount;
 
   return (
     <div className="space-y-6">
@@ -37,9 +43,12 @@ export function UniversityIntelligencePanel({
         facts={[{ label: "Founded", value: String(registryFacts.founded) }]}
       />
 
-      <EntityDataStatus
-        sourceConnectedCount={sourceConnectedCount}
-        totalSources={coverage.sources.length}
+      <IntelligenceContextPanel
+        relatedEntityCount={relatedEntityCount}
+        evidenceConnectedCount={sourceConnectedCount}
+        evidenceTotalCount={coverage.sources.length}
+        reportsCount={journey.reports.length}
+        openQuestionsCount={openQuestionsCount}
       />
 
       <EntityEvidenceSection
@@ -66,6 +75,10 @@ export function UniversityIntelligencePanel({
             initialModel={evidenceComparison}
           />
         </EntityCompareSection>
+
+        <UniversityIndicatorCoverage indicatorsByDomain={coverage.indicatorsByDomain} />
+
+        <UniversitySourceCoverage sources={coverage.sources} />
       </EntityOptionalExploration>
     </div>
   );

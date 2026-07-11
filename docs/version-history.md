@@ -613,6 +613,43 @@ routes (65 research topics), both test suites passing (11 + 13 = 24). Zero Platf
 Domain, Workspace Contract, Research Mission, or Assistant architecture files touched — this
 release is empty-state and discovery activation only. Full detail: `docs/product-activation-audit.md` §8.
 
+## v3.10 — Connected Intelligence Experience (Release 4)
+
+Investigated what real cross-entity relationship data actually exists before building anything.
+Found real Country↔Company↔University links already computed and already rendered
+(`get{Country,Company,University}Relationships`, name-matched via `lib/name-match.ts`) — just
+tucked inside a collapsed disclosure on each page; surfaced a real count of them in a new summary
+panel instead of duplicating the underlying computation. Found and deliberately left unwired a
+second, fully-computed, zero-caller relationship graph (`lib/registry/entity-links.ts`) that would
+have duplicated the first. Confirmed research topics have zero real links to any country/company/
+university record — the Research Domain's organization/university types are documented stubs,
+disjoint from the real catalogs — and confirmed `ResearchIntelligenceOverview.tsx` already scopes
+its "related entities" honestly to research-internal data only.
+
+Activated a cluster of fully-built, fully-styled, zero-consumer country/company/university
+components: `*IndicatorCoverage.tsx` (real domain-grouped sections — Economy, Judicial System,
+Education, Health, Research, Digital Development, and more — exactly the "Economy/Justice/
+Education/Health" structure this release asked for), `*SourceCoverage.tsx` (named official
+sources), and `CountryTimelineSection.tsx`'s real timeline engine (country-only — no company/
+university timeline builder exists in this codebase, so honestly none was added). Left three
+further dead components (`*CoveragePanel.tsx`, `*Methodology.tsx`, `*TrustSection.tsx`)
+deliberately unwired as redundant with content already live elsewhere.
+
+New `components/shared/IntelligenceContextPanel.tsx` — real related-entity count, evidence
+connected/total, reports, open questions, and a status badge, replacing (not duplicating) the
+narrower Release 3 `EntityDataStatus`, which was deleted as superseded. New
+`lib/assistant/assistant-context.ts` — the Assistant now derives "where the user currently is"
+from data the platform already tracks (the real research topic on a topic page, or whichever
+entity `PlatformContextProvider` has focused), shown as a context chip in the Command Center with
+a context-aware suggestion in the "not recognized" fallback panel. No new tracking system, no
+question ever asked of the user.
+
+4 new tests (14–17, `test:product-activation`) cover `resolveAssistantContext` directly — real
+topic resolution, real entity fallback, honest null, and confirmation that non-topic `/research/*`
+routes are never misread as a topic id. `npm run lint` clean, `npm run build` 91 routes (65
+research topics), 17 + 11 = 28 tests passing. Zero Platform Core files touched; zero new engines,
+AI systems, or duplicate workspaces. Full detail: `docs/product-activation-audit.md` §9.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation
