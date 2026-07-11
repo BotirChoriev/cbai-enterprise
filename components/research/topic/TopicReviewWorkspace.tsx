@@ -2,8 +2,6 @@ import { Suspense } from "react";
 import type { ResearchTopic } from "@/lib/research/research-topics";
 import { buildTopicEvidenceReview } from "@/lib/research/evidence/evidence-topic-builder";
 import { buildResearchReviewWorkspace } from "@/lib/research/intelligence/review-workspace-engine";
-import { getWorkspaceTimeline } from "@/lib/research/intelligence/workspace-shell-engine";
-import { WORKSPACE_TIMELINE_EVENT_LABELS } from "@/lib/research/intelligence/workspace-shell-model";
 import { deriveResearchReadiness } from "@/lib/research/readiness/readiness-engine";
 import { deriveResearchWorkflow } from "@/lib/research/workflow/workflow-engine";
 import { WORKFLOW_NEXT_ACTION_LABELS } from "@/lib/research/workflow/workflow-types";
@@ -24,7 +22,6 @@ type TopicReviewWorkspaceProps = {
 export default function TopicReviewWorkspace({ topic }: TopicReviewWorkspaceProps) {
   const evidenceReview = buildTopicEvidenceReview(topic.topicId);
   const workspace = buildResearchReviewWorkspace(topic.topicId);
-  const timeline = getWorkspaceTimeline(topic.topicId);
   const readiness = deriveResearchReadiness(topic.topicId);
   const workflow = deriveResearchWorkflow(topic.topicId);
 
@@ -146,27 +143,6 @@ export default function TopicReviewWorkspace({ topic }: TopicReviewWorkspaceProp
           </ul>
         ) : (
           <p className="text-xs text-zinc-600">No open review questions right now.</p>
-        )}
-      </div>
-
-      <div className={`${cbaiGlassCard} space-y-2 p-4`}>
-        <p className={cbaiSectionEyebrow}>Workspace timeline</p>
-        {timeline.length > 0 ? (
-          <ol className="space-y-1.5">
-            {timeline.map((event) => (
-              <li key={event.eventId} className="flex items-start gap-2 text-xs text-zinc-500">
-                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-zinc-600" />
-                <span>
-                  <span className="text-zinc-400">
-                    {WORKSPACE_TIMELINE_EVENT_LABELS[event.eventType]}
-                  </span>{" "}
-                  — {event.description}
-                </span>
-              </li>
-            ))}
-          </ol>
-        ) : (
-          <p className="text-xs text-zinc-600">No workspace activity recorded yet.</p>
         )}
       </div>
 

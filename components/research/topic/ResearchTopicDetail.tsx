@@ -12,7 +12,7 @@ import TopicInsightsPanel from "@/components/research/topic/TopicInsightsPanel";
 import TopicSectionTabs, { type TopicTabId } from "@/components/research/topic/TopicSectionTabs";
 import TopicReviewWorkspace from "@/components/research/topic/TopicReviewWorkspace";
 import WorkspaceContextBar from "@/components/research/topic/WorkspaceContextBar";
-import MissionControlPanel from "@/components/research/topic/MissionControlPanel";
+import ResearchCockpit from "@/components/research/topic/ResearchCockpit";
 import { deriveEvidenceGapIntelligence } from "@/lib/research/intelligence/intelligence-engine";
 import { cbaiHeroGlow } from "@/components/brand/brand-classes";
 
@@ -34,7 +34,7 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
         <WorkspaceContextBar topic={topic} readiness={intelligence.researchReadiness} />
       ) : null}
 
-      <MissionControlPanel topic={topic} />
+      <ResearchCockpit topic={topic} />
 
       <p className="rounded-lg border border-zinc-800/80 bg-zinc-900/40 px-4 py-3 text-sm text-zinc-500">
         {TOPIC_EXPERIENCE_NOTICE}
