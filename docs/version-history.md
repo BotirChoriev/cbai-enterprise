@@ -84,7 +84,7 @@ audit: a third, pre-existing "Evidence" concept exists in the large, mostly-dorm
 never-fabricated approach used everywhere else in the Foundation. Recorded as known technical
 debt, not an oversight — see `docs/current-progress.md`.
 
-## v2.4 — Intelligence Reasoning Framework (EPIC-05, this release)
+## v2.4 — Intelligence Reasoning Framework (EPIC-05)
 
 `lib/foundation/reasoning-types.ts` + `lib/reasoning/` — a domain-agnostic reasoning framework
 that transforms Evidence, Relationships, and Timeline into structured, explainable decision
@@ -113,16 +113,54 @@ an earlier "governed inference pipeline" design on top of a numeric `ConfidenceA
 model — the same philosophical mismatch as the numeric Evidence model found in EPIC-04. Not
 integrated; recorded as known technical debt — see `docs/current-progress.md`.
 
+## v2.5 — Universal Intelligence Workflow Framework (EPIC-06, this release)
+
+`lib/foundation/workflow-types.ts` + `lib/workflow/` — a domain-agnostic Workflow: not project
+management, not task management, but the process record that connects every capability already
+built (Question, Mission, Evidence, Relationships, Reasoning, Execution) to one auditable,
+12-state state machine (`not_started` → `collecting_evidence` → `review_in_progress` →
+`ready_for_reasoning` → `reasoning_complete` → `waiting_for_human_decision` → `approved` →
+`executing` → `monitoring` → `completed` → `archived`, plus `waiting_for_information` reachable
+from every active phase). "Evolution" is represented as the graph's own capability to loop from
+`monitoring`/`completed` back to `collecting_evidence`, not a thirteenth state.
+
+Every `WorkflowTransition` carries all six mission-required fields — `reason`, `timestamp`,
+`actor`, `evidenceReference`, `previousState`, `nextState`. `evidenceReference` is a required
+key with an honest nullable value (`string | null`) rather than a fabricated placeholder, since
+many real transitions (starting evidence collection, for example) genuinely have no specific
+evidence record behind them yet. `applyWorkflowTransition` is pure and rejects any transition
+outside the declared graph rather than silently allowing drift; `validateWorkflowRecord`
+independently re-checks that a Workflow's own history is internally consistent.
+
+Wired into `research-foundation-adapter.ts`: `IntelligenceFoundationView` gained a new optional
+`workflow` field, populated by composing a topic's real Question/Mission/Evidence/Relationships/
+Reasoning through `createWorkflow`, proven for all 65 real catalog topics via a successful
+`npm run build`. Deliberately does not fabricate a transition history for these demo workflows —
+see `docs/current-progress.md` for why. Not yet wired into any UI, following the same precedent
+as the Relationship, Evidence, and Reasoning engines.
+
+This release also produced an audit finding, following the same pattern as the prior three
+Epics: a fifth dormant area exists in `lib/intelligence/` — `agents/tasks/task-lifecycle.ts` (a
+real, well-built agent **task** dispatch lifecycle) and `runtime/` (scheduler/queue/worker). It
+solves a genuinely different problem (agent task dispatch, not an intelligence process
+lifecycle) and was not integrated. Also documented: the pre-existing, narrower
+`lib/research/workflow/` (`WorkflowStage`, 5 values tied to `ResearchTopicStatus`) remains
+untouched and is not a duplicate — it answers a different, Research-specific question ("what's
+the one next action") at a different granularity than the new universal 12-state vocabulary.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation
 adapter once real domain data exists to adapt. Consolidating `lib/graph/`, `lib/research/graph/`,
 and `lib/intelligence/graph/` onto `lib/relationships/` once a visual verification workflow
 exists to de-risk the migration. Unifying or retiring `lib/intelligence/evidence.types.ts`'s
-numeric-scoring Evidence model and `lib/intelligence/engine/`'s numeric confidence-scoring
-reasoning pipeline. Wiring `IntelligenceFoundationView.reasoning` into UI. AI reasoning (model-
-backed, as opposed to this Epic's deterministic structural reasoning), Executive Briefing, Voice
-Intelligence, Evidence-backed Recommendations, a rendered Timeline, a Knowledge Graph view, and
-Mission Execution — the Evidence, Relationship, and Reasoning shapes are architecturally ready
-for these, but no UI or derivation logic exists yet. No target date is committed here — see
-`docs/current-progress.md` for what's honestly available today.
+numeric-scoring Evidence model, `lib/intelligence/engine/`'s numeric confidence-scoring
+reasoning pipeline, and `lib/intelligence/agents/tasks/` / `runtime/`'s dormant task-dispatch
+system. Wiring `IntelligenceFoundationView.reasoning` and `.workflow` into UI, and giving a real
+caller a way to record real `WorkflowTransition`s as work actually happens (currently every demo
+Workflow honestly starts and stays at `not_started` with empty history). AI reasoning
+(model-backed, as opposed to the deterministic structural reasoning built in EPIC-05), Executive
+Briefing, Voice Intelligence, Evidence-backed Recommendations, a rendered Timeline, a Knowledge
+Graph view, and Mission Execution — the Evidence, Relationship, Reasoning, and Workflow shapes
+are architecturally ready for these, but no UI or derivation logic exists yet. No target date is
+committed here — see `docs/current-progress.md` for what's honestly available today.

@@ -4,3 +4,4 @@ export * from "./relationship-types";
 export * from "./evidence-types";
 export * from "./confidence";
 export * from "./reasoning-types";
+export * from "./workflow-types";

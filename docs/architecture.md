@@ -254,6 +254,97 @@ platform's reasoning *philosophy* (pipeline stages, methodology, trust limits), 
 executable reasoning engine, and does not construct or consume `ReasoningResult`. No naming
 collision exists (`lib/reasoning-explorer.ts` vs. the new `lib/reasoning/` directory).
 
+## Universal Intelligence Workflow Framework (`lib/workflow/`)
+
+Introduced in EPIC-06. Not project management, not task management — no assignees, due dates,
+or subtasks. A `Workflow` (`lib/foundation/workflow-types.ts`) is the process record that
+connects every capability already built — `question`, `mission`, `evidence`, `relationships`,
+`reasoning`, and `execution` — to one auditable state machine, the same types/engine split
+already established for Relationship, Evidence, and Reasoning:
+
+```
+Foundation                  lib/foundation/  (..., Workflow, WorkflowState, WorkflowTransition)
+    ↓
+Evidence Engine + Relationship Engine   lib/evidence/, lib/relationships/
+    ↓
+Reasoning Framework          lib/reasoning/
+    ↓
+Workflow Framework           lib/workflow/  (createWorkflow, applyWorkflowTransition, ...)
+```
+
+`WORKFLOW_STATES` is the twelve reusable states the mission named, treated as a closed
+vocabulary (the same discipline as `RELATIONSHIP_TYPES`): `not_started`, `collecting_evidence`,
+`review_in_progress`, `waiting_for_information`, `ready_for_reasoning`, `reasoning_complete`,
+`waiting_for_human_decision`, `approved`, `executing`, `monitoring`, `completed`, `archived`.
+"Evolution" — one of the ten capabilities every workflow must support — is deliberately **not**
+a thirteenth state; it is represented as the transition graph's own capability to loop from
+`monitoring` (or `completed`) back to `collecting_evidence` once new information surfaces, so a
+shipped workflow can honestly reopen evidence collection without inventing a new terminal state.
+"Evidence Collection" and "Evidence Review" map to `collecting_evidence`/`review_in_progress`;
+"Relationship Discovery" happens during collection/review (Relationships are carried directly on
+`Workflow.relationships`, not given a separate state); "Reasoning" maps to
+`ready_for_reasoning`/`reasoning_complete`; "Human Decision" maps to
+`waiting_for_human_decision`/`approved`; "Execution" and "Monitoring" map to `executing`/
+`monitoring` 1:1.
+
+Every `WorkflowTransition` carries all six fields the mission required — `reason`, `timestamp`,
+`actor`, `evidenceReference`, `previousState`, `nextState`. `evidenceReference` is a **required
+key with an honest nullable value** (`string | null`): most early transitions (e.g. "start
+collecting evidence") genuinely have no specific evidence record behind them yet, and forcing a
+fabricated reference there would violate the platform's anti-fabrication rule — so the field is
+always present, explicitly `null` when nothing real backs it, never silently omitted. `actor` is
+`{ actorType: "human" | "system"; actorId?: string }` — deliberately minimal, since the platform
+ships without authentication (constitution §15.1); no fabricated user identity is invented.
+
+`lib/workflow/` is the reusable Workflow Engine:
+
+- `workflow-builder.ts` — `createWorkflow`, starts a Workflow at `not_started` with empty
+  history. Entering the initial state is not itself a recorded transition — there is no real
+  prior state to transition from.
+- `workflow-transition.ts` — `WORKFLOW_TRANSITIONS` (the declared graph),
+  `canTransitionWorkflow`, `validateWorkflowTransition`, and `applyWorkflowTransition` (pure —
+  returns a new `Workflow` with the transition appended, or an explicit rejection reason; never
+  mutates, never allows a transition outside the declared graph).
+- `workflow-validation.ts` — `validateWorkflowRecord`, deterministic structural checks: identity
+  present, every recorded transition legal per the graph, transitions chain consistently, and
+  `currentState` matches the last transition's `nextState`.
+- `workflow-query.ts` — `isWorkflowStateTerminal` (only `archived` is terminal — `completed` can
+  still evolve back into collection), `latestWorkflowTransition`,
+  `findWorkflowTransitionsByActor`, `findWorkflowTransitionsToState`, `describeWorkflowProgress`.
+
+`research-foundation-adapter.ts`'s `toWorkflow()` wires the framework to a topic's real
+Question/Mission/Evidence/Relationships/Reasoning, and `buildResearchFoundationView()` populates
+the new optional `IntelligenceFoundationView.workflow` field with it, proven for all 65 real
+catalog topics by a successful `npm run build`. It deliberately does **not** synthesize a fake
+transition history from the pre-existing Research Workflow Engine's point-in-time stage signal
+(`WorkflowResult.currentStage`) — inventing an actor, timestamp, and reason for transitions that
+were never actually recorded would fabricate provenance. Every demo `Workflow` honestly starts at
+`not_started` with empty history; a real caller applies real transitions via
+`applyWorkflowTransition` as work actually happens.
+
+### Related, not duplicated: `lib/research/workflow/`
+
+The pre-existing Research Workflow Engine (`WorkflowStage`: 5 values tied 1:1 to the current
+3-value `ResearchTopicStatus` model; `WorkflowNextAction`: 6 values) is a different, narrower
+tool solving a different problem — a single deterministic "what's the one next action" signal
+for Research topics specifically, with no transition history at all. It is untouched and remains
+the source `toRecommendation()` and `executionHref` already consume. No vocabulary overlaps: the
+universal `WorkflowState`'s 12 values and the Research-specific `WorkflowStage`'s 5 values name
+different concepts at different granularities, by design.
+
+### Known non-integration: `lib/intelligence/agents/tasks/` and `lib/intelligence/runtime/`
+
+Inspection for this Epic found a fifth dormant area in `lib/intelligence/`:
+`agents/tasks/task-lifecycle.ts` defines a real, well-built agent **task** lifecycle
+(`created → queued → ready → running → completed/failed/cancelled/timeout`) with its own
+transition-graph validator (`validateTaskLifecycleTransition`), and `runtime/` layers a
+scheduler/queue/worker/registry system on top. This solves a genuinely different problem — agent
+task dispatch, not an intelligence process's Question→Mission→Evidence→...→Execution lifecycle —
+and is unrelated in vocabulary and purpose to the new `lib/workflow/`. Confirmed via repo-wide
+search that nothing outside `lib/intelligence/` consumes `lib/intelligence/agents/tasks/` or
+`lib/intelligence/runtime/`. Not integrated; recorded as known technical debt, not an oversight
+(see `docs/current-progress.md`).
+
 ## Research Intelligence module map (current)
 
 ```
@@ -276,6 +367,7 @@ lib/foundation/                     universal Foundation (EPIC-02)
 ├── evidence-types.ts               universal evidence vocabulary (EPIC-04)
 ├── confidence.ts                   shared Confidence type + deriveConfidenceFromSourceCount (EPIC-04)
 ├── reasoning-types.ts              universal reasoning shapes — ReasoningInput/ReasoningResult (EPIC-05)
+├── workflow-types.ts                universal workflow shapes — Workflow/WorkflowState/WorkflowTransition (EPIC-06)
 └── adapters/research-foundation-adapter.ts
 
 lib/relationships/                  Universal Relationship Engine (EPIC-03)
@@ -293,6 +385,12 @@ lib/reasoning/                      Intelligence Reasoning Framework (EPIC-05)
 ├── reasoning-engine.ts             buildReasoningResult (consumes lib/evidence/, lib/relationships/)
 └── reasoning-validation.ts         validateReasoningInput
 
+lib/workflow/                       Universal Intelligence Workflow Framework (EPIC-06)
+├── workflow-builder.ts             createWorkflow
+├── workflow-transition.ts          WORKFLOW_TRANSITIONS, applyWorkflowTransition, validateWorkflowTransition
+├── workflow-validation.ts          validateWorkflowRecord
+└── workflow-query.ts               isWorkflowStateTerminal, findWorkflowTransitionsByActor, ...
+
 components/research/topic/
 ├── ResearchTopicDetail.tsx         page orchestrator ("/research/[topicId]")
 ├── ResearchCockpit.tsx             operational summary (workflow + health, replaces old Mission Control Panel)
@@ -309,7 +407,10 @@ Research, not the reverse — Research predates the Foundation and remains indep
 correct). `lib/relationships/` and `lib/evidence/` depend only on `lib/foundation/`.
 `lib/reasoning/` depends on `lib/foundation/` plus its sibling engines (`lib/evidence/`,
 `lib/relationships/`) — it is one layer above them, never the reverse: neither engine imports
-from `lib/reasoning/`. Only the research adapter and the type aliases in
-`review-workspace-model.ts`, `lib/research/evidence/evidence-types.ts`, and
+from `lib/reasoning/`. `lib/workflow/` depends only on `lib/foundation/` — it does not import
+`lib/reasoning/`, `lib/evidence/`, or `lib/relationships/` directly; a `Workflow` merely *carries*
+their output as data (via `Workflow.evidence` / `.relationships` / `.reasoning`), so the Workflow
+engine itself stays a thin, dependency-light state machine. Only the research adapter and the
+type aliases in `review-workspace-model.ts`, `lib/research/evidence/evidence-types.ts`, and
 `lib/evidence-infrastructure/types.ts` cross the Research↔Foundation boundary, and all are
 additive, non-breaking changes.

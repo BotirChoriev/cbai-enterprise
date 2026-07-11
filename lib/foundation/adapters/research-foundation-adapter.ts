@@ -33,6 +33,8 @@ import { buildEvidence } from "@/lib/evidence/evidence-builder";
 import type { VerificationStatus } from "@/lib/foundation/evidence-types";
 import type { ReasoningResult } from "@/lib/foundation/reasoning-types";
 import { buildReasoningResult } from "@/lib/reasoning/reasoning-engine";
+import type { Workflow } from "@/lib/foundation/workflow-types";
+import { createWorkflow } from "@/lib/workflow/workflow-builder";
 
 /**
  * Pure adapters mapping Research Intelligence's existing engine outputs onto the universal
@@ -199,6 +201,35 @@ export function toReasoningResult(
 }
 
 /**
+ * Compose the universal Intelligence Workflow (lib/workflow/) around a topic's own Foundation
+ * objects. This demonstrates the framework can carry a topic's full Question/Mission/Evidence/
+ * Relationships/Reasoning composition — it deliberately does not synthesize a fake transition
+ * history from the pre-existing Research Workflow Engine's point-in-time stage signal
+ * (`WorkflowResult.currentStage`): inventing an actor, timestamp, and reason for transitions
+ * that were never actually recorded would fabricate provenance. Every research topic's demo
+ * Workflow honestly starts at "not_started" with empty history; a real caller applies real
+ * transitions via applyWorkflowTransition as work actually happens.
+ */
+export function toWorkflow(
+  topic: ResearchTopic,
+  question: Question,
+  mission: Mission,
+  evidence: readonly Evidence[],
+  relationships: readonly Relationship[],
+  reasoning: ReasoningResult,
+): Workflow {
+  return createWorkflow({
+    workflowId: `workflow:${topic.topicId}`,
+    subjectId: topic.topicId,
+    question,
+    mission,
+    evidence,
+    relationships,
+    reasoning,
+  });
+}
+
+/**
  * Assemble the full Intelligence Foundation view for a research topic. Composes every existing
  * engine's output through the adapters above — the only "logic" in this function is
  * composition and undefined-guarding, matching the required
@@ -209,9 +240,9 @@ export function buildResearchFoundationView(
 ): IntelligenceFoundationView | undefined {
   const evidenceReview = buildTopicEvidenceReview(topicId);
   const intelligence = deriveEvidenceGapIntelligence(topicId);
-  const workflow = deriveResearchWorkflow(topicId);
+  const workflowResult = deriveResearchWorkflow(topicId);
   const workspace = buildResearchReviewWorkspace(topicId);
-  if (!evidenceReview || !intelligence || !workflow || !workspace) {
+  if (!evidenceReview || !intelligence || !workflowResult || !workspace) {
     return undefined;
   }
 
@@ -221,6 +252,14 @@ export function buildResearchFoundationView(
   const relationships = toRelationships(intelligence.topic);
   const timelineEvents = toTimelineEvents(timeline);
   const question = toReasoningQuestion(intelligence.topic, workspace.openQuestions);
+  const reasoning = toReasoningResult(
+    intelligence.topic,
+    question,
+    mission,
+    evidence,
+    relationships,
+    timelineEvents,
+  );
 
   return {
     subject: toSubject(intelligence.topic),
@@ -229,17 +268,11 @@ export function buildResearchFoundationView(
     evidence,
     relationships,
     analysis: toAnalysis(intelligence),
-    recommendation: toRecommendation(workflow),
-    executionHref: workflow.actionLink?.href,
+    recommendation: toRecommendation(workflowResult),
+    executionHref: workflowResult.actionLink?.href,
     timeline: timelineEvents,
     knowledge: toKnowledge(workspace),
-    reasoning: toReasoningResult(
-      intelligence.topic,
-      question,
-      mission,
-      evidence,
-      relationships,
-      timelineEvents,
-    ),
+    reasoning,
+    workflow: toWorkflow(intelligence.topic, question, mission, evidence, relationships, reasoning),
   };
 }

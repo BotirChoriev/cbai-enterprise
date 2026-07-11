@@ -1,6 +1,6 @@
 # CBAI Current Progress
 
-Snapshot as of EPIC-05. Update this file, not a new one, as state changes.
+Snapshot as of EPIC-06. Update this file, not a new one, as state changes.
 
 ## Real and working today
 
@@ -26,6 +26,14 @@ Snapshot as of EPIC-05. Update this file, not a new one, as state changes.
   Consequences, and Open Questions from real Evidence/Relationship/Timeline input — zero model
   calls, zero fabricated confidence. Wired into `research-foundation-adapter.ts`
   (`IntelligenceFoundationView.reasoning`), verified for all 65 catalog topics by successful
+  `npm run build`. Not yet wired into any UI.
+- **Universal Intelligence Workflow Framework** (`lib/foundation/workflow-types.ts` +
+  `lib/workflow/`): a 12-state, transition-audited state machine (`createWorkflow`,
+  `applyWorkflowTransition`, `validateWorkflowTransition`, `validateWorkflowRecord`) that
+  connects a subject's Question/Mission/Evidence/Relationships/Reasoning/Execution into one
+  `Workflow` record. Every transition carries reason/timestamp/actor/evidenceReference
+  (honestly nullable)/previousState/nextState. Wired into `research-foundation-adapter.ts`
+  (`IntelligenceFoundationView.workflow`), verified for all 65 catalog topics by successful
   `npm run build`. Not yet wired into any UI.
 - **Public entry experience**: hero, three-ecosystem model, capability flow, audience section,
   trust section — all real, honest content, no fabricated statistics.
@@ -67,6 +75,12 @@ Snapshot as of EPIC-05. Update this file, not a new one, as state changes.
 - No UI consumes `ReasoningResult` or `IntelligenceFoundationView.reasoning` — per EPIC-05's
   explicit scope boundary ("prepare reusable reasoning objects... React must consume the
   framework" once built), the framework is proven only at the type/build level this Epic.
+- No UI consumes `Workflow` or `IntelligenceFoundationView.workflow`, and no real caller records
+  real `WorkflowTransition`s yet — per EPIC-06's explicit scope ("No React logic. Everything
+  belongs in lib/."), the framework is proven only at the type/build level this Epic. Every demo
+  Workflow honestly starts and stays at `not_started` with empty history (see below for why).
+- No project/task management was built — deliberately out of scope per the mission
+  ("Do NOT build project management. Do NOT build task management.").
 
 ## Known technical debt
 
@@ -123,3 +137,20 @@ Snapshot as of EPIC-05. Update this file, not a new one, as state changes.
   the `contradicts`/`affects` types the reasoning engine looks for. The framework is correct and
   ready; the richer relationship data that would populate these sections meaningfully does not
   exist yet.
+- **A fifth, non-integrated dormant subsystem**, found and documented during EPIC-06
+  (`docs/architecture.md` has the full breakdown): `lib/intelligence/agents/tasks/` (a real,
+  well-built agent task dispatch lifecycle) and `lib/intelligence/runtime/`
+  (scheduler/queue/worker) solve a different problem — agent task dispatch, not an intelligence
+  process lifecycle — and were not integrated with the new Workflow framework. Confirmed unused
+  outside `lib/intelligence/`.
+- Every research topic's demo `Workflow` (via `toWorkflow()`) honestly starts and stays at
+  `not_started` with empty `history` — the pre-existing Research Workflow Engine only ever
+  produces a point-in-time stage signal (`WorkflowResult.currentStage`), never a real recorded
+  transition with an actor/timestamp/reason, so synthesizing a fake transition history from it
+  would fabricate provenance. The framework is correct and ready for a real caller to record
+  real transitions as work actually happens; none exists yet for Research Intelligence.
+- The pre-existing `lib/research/workflow/` (`WorkflowStage`, 5 values) remains a separate,
+  narrower, Research-specific tool and was not merged into the new universal `WorkflowState` (12
+  values) — they answer different questions at different granularities. Unifying them (so a
+  topic's real stage signal could drive real universal-workflow transitions) is flagged as
+  future work, not attempted this Epic to keep the change set verifiable.
