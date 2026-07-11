@@ -8,14 +8,12 @@ export const INFRASTRUCTURE_VERSION = "1.0.0" as const;
 /** Infrastructure schema version — supports future v1, v2, v3 evolution. */
 export type EvidenceSchemaVersion = "v1" | "v2" | "v3";
 
+import type { VerificationStatus } from "@/lib/foundation/evidence-types";
+
 export type ConnectionStatus = "planned" | "connected" | "deprecated";
 
-export type VerificationStatus =
-  | "not_started"
-  | "verification_pending"
-  | "verified"
-  | "failed"
-  | "not_applicable";
+/** Promoted to lib/foundation/evidence-types.ts — re-exported here so existing imports keep working. */
+export type { VerificationStatus };
 
 export type SupportedEntityType =
   | "country"

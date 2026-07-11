@@ -1,3 +1,5 @@
+import type { EvidenceSourceType } from "@/lib/foundation/evidence-types";
+
 export type EvidenceStatus =
   | "draft"
   | "verified"
@@ -7,14 +9,5 @@ export type EvidenceStatus =
 
 export type EvidenceStrength = "weak" | "moderate" | "strong" | "conclusive";
 
-export type EvidenceSourceType =
-  | "publication"
-  | "dataset"
-  | "experiment"
-  | "patent"
-  | "laboratory"
-  | "researcher"
-  | "institution"
-  | "company"
-  | "government"
-  | "other";
+/** Promoted to lib/foundation/evidence-types.ts — re-exported here so existing imports keep working. */
+export type { EvidenceSourceType };

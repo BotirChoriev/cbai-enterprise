@@ -1,3 +1,6 @@
+import type { Confidence } from "@/lib/foundation/confidence";
+import { CONFIDENCE_LABELS } from "@/lib/foundation/confidence";
+
 // Universal relationship vocabulary — domain-agnostic, shared by every ecosystem. Extensible:
 // add new values here as real ecosystems need them; nothing about the Relationship shape in
 // foundation-model.ts depends on this being a closed set beyond normal TypeScript union rules.
@@ -59,15 +62,13 @@ export const RELATIONSHIP_STRENGTH_LABELS: Record<RelationshipStrength, string> 
   unknown: "Unknown",
 };
 
-// Categorical, deterministically derived from evidence count — never a fabricated percentage.
-export type RelationshipConfidence = "unverified" | "single_source" | "corroborated" | "disputed";
+// Aliased to the shared Confidence type (lib/foundation/confidence.ts) — Evidence uses the
+// exact same vocabulary, so this is one definition, not two. Kept as a named export for
+// existing consumers (zero breaking change).
+export type RelationshipConfidence = Confidence;
 
-export const RELATIONSHIP_CONFIDENCE_LABELS: Record<RelationshipConfidence, string> = {
-  unverified: "Unverified",
-  single_source: "Single source",
-  corroborated: "Corroborated",
-  disputed: "Disputed",
-};
+export const RELATIONSHIP_CONFIDENCE_LABELS: Record<RelationshipConfidence, string> =
+  CONFIDENCE_LABELS;
 
 export type RelationshipStatus = "active" | "historical" | "proposed" | "retracted";
 

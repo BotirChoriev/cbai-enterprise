@@ -1,6 +1,9 @@
 import type { ResearchTopic } from "@/lib/research/research-topics";
 import { buildTopicEvidenceReview } from "@/lib/research/evidence/evidence-topic-builder";
-import type { TopicEvidenceCatalogItem } from "@/lib/research/evidence/evidence-topic-builder";
+import type {
+  TopicEvidenceCatalogItem,
+  TopicEvidenceCatalogStatus,
+} from "@/lib/research/evidence/evidence-topic-builder";
 import { deriveEvidenceGapIntelligence } from "@/lib/research/intelligence/intelligence-engine";
 import type { EvidenceGapIntelligence } from "@/lib/research/intelligence/intelligence-model";
 import { deriveResearchWorkflow } from "@/lib/research/workflow/workflow-engine";
@@ -25,6 +28,8 @@ import type {
 } from "@/lib/foundation/foundation-model";
 import type { IntelligenceFoundationView } from "@/lib/foundation/foundation-view";
 import { buildRelationship } from "@/lib/relationships/relationship-builder";
+import { buildEvidence } from "@/lib/evidence/evidence-builder";
+import type { VerificationStatus } from "@/lib/foundation/evidence-types";
 
 /**
  * Pure adapters mapping Research Intelligence's existing engine outputs onto the universal
@@ -50,13 +55,29 @@ export function toMission(topic: ResearchTopic): Mission {
   };
 }
 
+/**
+ * The catalog only tracks a coarse connection status, not a real verification workflow — so
+ * the mapping below is deliberately narrow: it never claims "verified", only what the catalog
+ * status honestly implies about where the item stands.
+ */
+const CATALOG_STATUS_TO_VERIFICATION_STATUS: Record<
+  TopicEvidenceCatalogStatus,
+  VerificationStatus
+> = {
+  catalog_available: "not_started",
+  source_not_connected: "not_applicable",
+  human_review_required: "verification_pending",
+};
+
 export function toEvidence(item: TopicEvidenceCatalogItem): Evidence {
-  return {
+  return buildEvidence({
     evidenceId: item.evidenceItemId,
     label: item.label,
     status: item.status,
     note: item.note,
-  };
+    verificationStatus: CATALOG_STATUS_TO_VERIFICATION_STATUS[item.status],
+    relatedSubjectIds: [item.topicId],
+  });
 }
 
 /**

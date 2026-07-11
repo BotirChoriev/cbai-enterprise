@@ -1,6 +1,6 @@
 # CBAI Current Progress
 
-Snapshot as of EPIC-03. Update this file, not a new one, as state changes.
+Snapshot as of EPIC-04. Update this file, not a new one, as state changes.
 
 ## Real and working today
 
@@ -15,6 +15,11 @@ Snapshot as of EPIC-03. Update this file, not a new one, as state changes.
 - **Universal Relationship Engine** (`lib/relationships/`): builder + query engine over the
   Foundation's `Relationship` type; Research Intelligence's catalog relationships now flow
   through it. Not yet wired into any UI.
+- **Universal Evidence Operating System** (`lib/evidence/`): build/validate/link/history/query
+  engine over the Foundation's now-21-field `Evidence` type; Research Intelligence's catalog
+  evidence flows through `buildEvidence`, verified by successful `npm run build`. Not yet wired
+  into any UI beyond the existing evidence display, which already consumed the same underlying
+  catalog data before this Epic.
 - **Public entry experience**: hero, three-ecosystem model, capability flow, audience section,
   trust section — all real, honest content, no fabricated statistics.
 - **Public search / Evidence Core** (`/search`, `/countries`, `/companies`, `/universities`):
@@ -40,12 +45,18 @@ Snapshot as of EPIC-03. Update this file, not a new one, as state changes.
 ## Explicitly not started this Epic (by design)
 
 - No deep rewrite of Research Intelligence's internal engines to literally implement the
-  Foundation interfaces — only a translation adapter and one zero-risk type alias
-  (`ReviewOpenQuestion`). A full internal rewrite was judged too high-risk to attempt without a
-  way to visually/behaviorally verify the result in this environment.
+  Foundation interfaces — only a translation adapter and three zero-risk type aliases
+  (`ReviewOpenQuestion`, `EvidenceSourceType`, `VerificationStatus`). A full internal rewrite was
+  judged too high-risk to attempt without a way to visually/behaviorally verify the result in
+  this environment.
 - No Governance or Economic foundation adapter — nothing real to adapt yet.
 - No wiring of `IntelligenceFoundationView` into any UI component — it is currently proven only
   at the type level (`npm run build`) and is available for a future Epic to render.
+- No AI reasoning, Executive Briefing, Voice Intelligence, Evidence-backed Recommendations,
+  rendered Timeline, Knowledge Graph view, or Mission Execution — per EPIC-04's explicit scope
+  boundary, the Evidence shape and engine are architecturally ready to support these
+  (`relatedMissionIds`, `relatedQuestionIds`, `relatedRelationshipIds`, `timeline`, `history`),
+  but no such UI or derivation logic was built this Epic.
 
 ## Known technical debt
 
@@ -71,3 +82,17 @@ Snapshot as of EPIC-03. Update this file, not a new one, as state changes.
   supports auditing safely. `lib/relationships/` is the intended long-term unification point.
 - `IntelligenceFoundationView.relationships` is not yet wired into any UI — proven only via
   `npm run build`'s type-check, same status as the rest of the Foundation view.
+- **A third, non-integrated Evidence model**, found and documented during EPIC-04
+  (`docs/architecture.md` has the full breakdown): `lib/intelligence/evidence.types.ts` defines
+  a numeric `relevance: number` (0–100) scoring model with its own quality-assessment layer
+  (`lib/intelligence/evidence/quality/`). Deliberately not integrated with the new universal
+  Evidence pillar — numeric scoring is philosophically incompatible with the categorical,
+  never-fabricated approach this platform otherwise enforces everywhere. It remains untouched
+  and unused outside `lib/intelligence/`; unifying or retiring it is left as future work.
+- Research catalog evidence's `verificationStatus` is honestly derived from a coarse, three-value
+  catalog connection status (`catalog_available | source_not_connected | human_review_required`)
+  — it can currently only ever be `not_started`, `not_applicable`, or `verification_pending`,
+  never `verified` or `failed`, because no real verification workflow exists yet. All other new
+  Evidence fields (`authors`, `publicationDate`, `originalSource`, `reliability`, etc.) are
+  `undefined` for every existing Research evidence record, since no real source metadata exists
+  to populate them — shown as absent, not guessed.

@@ -6,23 +6,19 @@ import type {
   RelationshipStrength,
   RelationshipType,
 } from "@/lib/foundation/relationship-types";
+import { deriveConfidenceFromSourceCount } from "@/lib/foundation/confidence";
 
 /**
  * Deterministically derive confidence from evidence count — never a fabricated score.
- * 0 evidence → unverified. 1 → single_source. 2+ → corroborated. Callers may still pass an
- * explicit "disputed" confidence when a real, known contradiction exists — this function only
- * supplies the honest default when nothing else is known.
+ * Delegates to the shared lib/foundation/confidence.ts derivation (Evidence uses the same
+ * rule) so this logic exists once, not twice. Callers may still pass an explicit "disputed"
+ * confidence when a real, known contradiction exists — this function only supplies the honest
+ * default when nothing else is known.
  */
 export function deriveRelationshipConfidence(
   evidence: readonly Evidence[],
 ): RelationshipConfidence {
-  if (evidence.length === 0) {
-    return "unverified";
-  }
-  if (evidence.length === 1) {
-    return "single_source";
-  }
-  return "corroborated";
+  return deriveConfidenceFromSourceCount(evidence.length);
 }
 
 export interface BuildRelationshipInput {

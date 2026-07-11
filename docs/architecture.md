@@ -27,7 +27,7 @@ Economic, Education, Engineering, Legal, ...) is expected to express its concept
 | Subject | `{ subjectId, subjectLabel, subjectKind }` | `ResearchTopic` |
 | Mission | `{ subjectId, statement }` | `buildMissionStatement` output |
 | Question | `{ questionId, question }` | `ReviewOpenQuestion` (now a direct type alias) |
-| Evidence | `{ evidenceId, label, status, note? }` | `TopicEvidenceCatalogItem` |
+| Evidence | see "Universal Evidence Operating System" below | `TopicEvidenceCatalogItem` |
 | Relationship | see "Universal Relationship Engine" below | `relatedMethods` / `relatedEvidenceTypes` |
 | Analysis | `{ subjectId, summary, reasons }` | `EvidenceGapIntelligence` |
 | Recommendation | `{ recommendationId, label, reason }` | `WorkflowResult.nextAction` / `.reason` |
@@ -104,6 +104,80 @@ much larger (150+ file) subsystem than this Epic's scope supports auditing safel
 `lib/relationships/` engine is the one intended to eventually unify them, but that migration is
 explicitly deferred — see `docs/current-progress.md`.
 
+## Universal Evidence Operating System (`lib/evidence/`)
+
+Introduced in EPIC-04. Evidence is now a first-class Foundation pillar, not a Research-only
+concept: `lib/foundation/foundation-model.ts`'s `Evidence` interface carries all 21 fields the
+mission named — identity, original source, source type, origin organization, authors,
+publication date, version, language, original language, verification status, reliability,
+confidence, known limitations, supporting/conflicting evidence links, related subjects/
+missions/questions/relationships, timeline, and an append-only history log. Only `evidenceId`,
+`label`, and `status` are required — every new field is optional and left `undefined` when the
+real value is genuinely unknown, so every existing Evidence record (catalog items, Relationship
+evidence arrays) remains valid without any migration.
+
+Two vocabularies were **promoted, not duplicated**, from real pre-existing domain modules into
+`lib/foundation/evidence-types.ts`:
+
+- `EvidenceSourceType` (`publication | dataset | experiment | patent | laboratory | researcher |
+  institution | company | government | other`) — promoted from
+  `lib/research/evidence/evidence-types.ts`, which now re-exports the Foundation type as a
+  zero-behavior-change alias.
+- `VerificationStatus` (`not_started | verification_pending | verified | failed |
+  not_applicable`) — promoted from `lib/evidence-infrastructure/types.ts` (a real, active,
+  philosophically-aligned "no scores or rankings" system), which now re-exports the Foundation
+  type the same way.
+
+`EvidenceReliability` (`unknown | low | moderate | high`) is new — no existing module defined an
+equivalent concept. `Confidence` (`unverified | single_source | corroborated | disputed`) was
+extracted out of EPIC-03's `RelationshipConfidence` into a shared `lib/foundation/confidence.ts`
+so Evidence and Relationship use one definition, not two; `RelationshipConfidence` is now
+`export type RelationshipConfidence = Confidence` and `deriveRelationshipConfidence` delegates to
+the shared `deriveConfidenceFromSourceCount`. All four vocabularies are categorical, never
+numeric — no fabricated score is ever attached to a piece of evidence.
+
+`lib/evidence/` is the reusable Evidence Engine:
+
+- `evidence-builder.ts` — `buildEvidence`, constructs an honest record with every unsupplied
+  field left undefined.
+- `evidence-validation.ts` — `validateEvidenceRecord`, deterministic structural checks only
+  (has an identity/label/status, does not claim to support or conflict with itself or claim both
+  relations to the same record) — never a quality or truth score.
+- `evidence-linking.ts` — `linkSupportingEvidence` / `linkConflictingEvidence`, additive and
+  deduplicated.
+- `evidence-history.ts` — `appendEvidenceHistory`, append-only (history is never rewritten in
+  place).
+- `evidence-query.ts` — `findEvidenceForSubject`, `groupEvidenceBySourceType`,
+  `groupEvidenceByVerificationStatus`, `compareEvidence` (relation derived only from a record's
+  own declared supporting/conflicting links, never inferred from content similarity), and
+  `traceEvidence` (provenance/history summary).
+
+`research-foundation-adapter.ts`'s `toEvidence()` now calls `buildEvidence` instead of
+constructing `Evidence` objects by hand, and honestly maps the Research catalog's coarse
+`TopicEvidenceCatalogStatus` to `VerificationStatus` (`catalog_available → not_started`,
+`source_not_connected → not_applicable`, `human_review_required → verification_pending`) — it
+never claims `verified`, since nothing in the catalog has actually been verified.
+
+### Prepared for, not implemented, this Epic
+
+Per the mission's explicit scope boundary, the following remain **architectural placeholders
+only** — the Evidence shape and engine are ready to support them, but no UI or derivation logic
+was added: AI reasoning over evidence, Executive Briefing generation, Voice Intelligence,
+Evidence-backed Recommendations, a rendered Timeline, a Knowledge Graph view, and Mission
+Execution. Each can consume `Evidence.relatedMissionIds` / `.relatedQuestionIds` /
+`.relatedRelationshipIds` / `.timeline` / `.history` once built, without another shape change.
+
+### Known non-integration: `lib/intelligence/evidence.types.ts`
+
+Inspection for this Epic found a third, pre-existing "Evidence" concept in the large, mostly-
+dormant `lib/intelligence/` subsystem: a numeric `relevance: number` (0–100) scoring model with
+an `EvidenceQualityBand`/`EvidenceQualityDimensionScore` quality-assessment layer
+(`lib/intelligence/evidence/quality/quality.types.ts`). This was deliberately **not** integrated
+with the new universal Evidence pillar — it is philosophically incompatible with the categorical,
+never-fabricated-score approach used everywhere else in the Foundation. It remains untouched,
+internally consistent, and unused outside `lib/intelligence/`; unifying or retiring it is left as
+known technical debt (see `docs/current-progress.md`).
+
 ## Research Intelligence module map (current)
 
 ```
@@ -123,11 +197,20 @@ lib/research/
 
 lib/foundation/                     universal Foundation (EPIC-02)
 ├── relationship-types.ts           universal relationship vocabulary (EPIC-03)
+├── evidence-types.ts               universal evidence vocabulary (EPIC-04)
+├── confidence.ts                   shared Confidence type + deriveConfidenceFromSourceCount (EPIC-04)
 └── adapters/research-foundation-adapter.ts
 
 lib/relationships/                  Universal Relationship Engine (EPIC-03)
 ├── relationship-builder.ts         buildRelationship, deriveRelationshipConfidence
 └── relationship-query.ts           findRelationshipsForSubject, resolveConnectedSubjectIds, ...
+
+lib/evidence/                       Universal Evidence Operating System (EPIC-04)
+├── evidence-builder.ts             buildEvidence
+├── evidence-validation.ts          validateEvidenceRecord
+├── evidence-linking.ts             linkSupportingEvidence, linkConflictingEvidence
+├── evidence-history.ts             appendEvidenceHistory
+└── evidence-query.ts               findEvidenceForSubject, groupEvidenceBy*, compareEvidence, traceEvidence
 
 components/research/topic/
 ├── ResearchTopicDetail.tsx         page orchestrator ("/research/[topicId]")
@@ -142,6 +225,7 @@ components/research/topic/
 Every arrow above points one way. `lib/foundation/` has zero dependency on `components/`.
 `lib/research/*` engines have zero dependency on `lib/foundation/` (the Foundation depends on
 Research, not the reverse — Research predates the Foundation and remains independently
-correct). `lib/relationships/` depends only on `lib/foundation/`. Only the research adapter and
-the type alias in `review-workspace-model.ts` cross the Research↔Foundation boundary, and both
-are additive, non-breaking changes.
+correct). `lib/relationships/` and `lib/evidence/` depend only on `lib/foundation/`. Only the
+research adapter and the type aliases in `review-workspace-model.ts`,
+`lib/research/evidence/evidence-types.ts`, and `lib/evidence-infrastructure/types.ts` cross the
+Research↔Foundation boundary, and all are additive, non-breaking changes.

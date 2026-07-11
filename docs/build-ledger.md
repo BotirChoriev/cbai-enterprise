@@ -25,7 +25,7 @@ Research Review domain scaffolding (`lib/research/review/`). Consolidated a dupl
 `TopicReviewWorkspace`, `ResearchReviewWorkspaceState`, honest empty states for notes/findings,
 process-level open questions derived from real gap/review state.
 
-## EPIC series — Platform-wide transformation (this is EPIC-03)
+## EPIC series — Platform-wide transformation (this is EPIC-04)
 
 | Epic | Commit | Scope |
 |---|---|---|
@@ -36,7 +36,8 @@ process-level open questions derived from real gap/review state.
 | — | `4cf366c` | Research Cockpit — one operational surface, consolidated Mission Control Panel + Timeline |
 | EPIC-01 | `b8d65e3` | Universal product identity, positioning, and public entry experience |
 | EPIC-02 | `a9f419c` | Universal Intelligence Foundation — `lib/foundation/`, research adapter |
-| EPIC-03 | *(this)* | Universal Relationship Engine — `lib/relationships/`, 16-type vocabulary, richer `Relationship` envelope; found and documented three pre-existing, unmigrated graph/relationship systems (`lib/graph/`, `lib/research/graph/`, `lib/intelligence/graph/`) |
+| EPIC-03 | `05777e7` | Universal Relationship Engine — `lib/relationships/`, 16-type vocabulary, richer `Relationship` envelope; found and documented three pre-existing, unmigrated graph/relationship systems (`lib/graph/`, `lib/research/graph/`, `lib/intelligence/graph/`) |
+| EPIC-04 | *(this)* | Universal Evidence Operating System — `lib/evidence/` engine (build, validate, link, history, query/compare/trace); `Evidence` enriched to 21 fields; `EvidenceSourceType`/`VerificationStatus` promoted from existing Research/evidence-infrastructure modules (aliased, not duplicated); shared `Confidence` extracted for Relationship + Evidence; found and documented a third, non-integrated numeric-scoring Evidence model in `lib/intelligence/` |
 
 ## Pattern established across every engine build
 
