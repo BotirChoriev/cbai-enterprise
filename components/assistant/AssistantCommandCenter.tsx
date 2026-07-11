@@ -1,9 +1,15 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
-import { resolveAssistantCommand } from "@/lib/assistant/assistant-commands";
+import { ASSISTANT_COMMANDS, resolveAssistantCommand } from "@/lib/assistant/assistant-commands";
+
+const SUGGESTED_COMMAND_IDS = ["open-my-work", "continue-research", "open-evidence", "open-trust"];
+const SUGGESTED_COMMANDS = ASSISTANT_COMMANDS.filter((command) =>
+  SUGGESTED_COMMAND_IDS.includes(command.id),
+);
 
 // Minimal ambient shape for the Web Speech API — not part of TypeScript's DOM lib. Only the
 // members this component actually reads/calls are declared; everything routes through the same
@@ -36,6 +42,7 @@ export default function AssistantCommandCenter() {
   const [input, setInput] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [uploadNotice, setUploadNotice] = useState<string | null>(null);
+  const [unrecognized, setUnrecognized] = useState<string | null>(null);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -45,11 +52,14 @@ export default function AssistantCommandCenter() {
       if (!trimmed) return;
       const match = resolveAssistantCommand(trimmed);
       if (match) {
-        router.push(match.command.href);
+        setUnrecognized(null);
+        router.push(match.href);
+        setInput("");
       } else {
-        router.push(`/search?q=${encodeURIComponent(trimmed)}`);
+        // Honest fallback per the Command Center's no-fake-AI-response rule: an unmatched
+        // command shows what's actually supported, never a guessed destination.
+        setUnrecognized(trimmed);
       }
-      setInput("");
     },
     [router],
   );
@@ -124,7 +134,10 @@ export default function AssistantCommandCenter() {
             name="q"
             type="search"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => {
+              setInput(e.target.value);
+              setUnrecognized(null);
+            }}
             placeholder={isListening ? "Listening…" : "Open my work, continue research…"}
             className="w-full rounded-lg border border-zinc-800 bg-slate-900/80 py-2 pl-10 pr-4 text-sm text-zinc-300 placeholder:text-zinc-600 outline-none transition-colors focus:border-cyan-500/30 focus:ring-1 focus:ring-cyan-500/20"
           />
@@ -189,6 +202,35 @@ export default function AssistantCommandCenter() {
         <p role="status" className="mt-1.5 text-[11px] text-zinc-500">
           {uploadNotice}
         </p>
+      ) : null}
+
+      {unrecognized ? (
+        <div
+          role="status"
+          className="mt-2 space-y-2 rounded-lg border border-zinc-800 bg-slate-950/90 p-3"
+        >
+          <p className="text-xs text-zinc-400">
+            {`"${unrecognized}" is not a recognized command yet — no reasoning is applied, so unmatched input is never guessed at.`}
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {SUGGESTED_COMMANDS.map((command) => (
+              <button
+                key={command.id}
+                type="button"
+                onClick={() => route(command.phrase)}
+                className="rounded-full border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-[11px] text-zinc-400 transition-colors hover:text-zinc-100"
+              >
+                {command.phrase}
+              </button>
+            ))}
+          </div>
+          <Link
+            href={`/search?q=${encodeURIComponent(unrecognized)}`}
+            className="inline-flex text-xs font-medium text-cyan-400 hover:text-cyan-300"
+          >
+            Search Global Search for &quot;{unrecognized}&quot; →
+          </Link>
+        </div>
       ) : null}
     </div>
   );
