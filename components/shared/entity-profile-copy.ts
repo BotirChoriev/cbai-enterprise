@@ -1,5 +1,6 @@
 import type { EntityEvidenceGapProfile } from "@/lib/evidence-gap";
 import { getNonAvailableGaps } from "@/lib/evidence-gap";
+import type { ProductStatus } from "@/lib/product-status";
 
 export type EntityDecisionReviewSummary = {
   entityName: string;
@@ -43,6 +44,14 @@ export function getConnectedAvailableItems(coverage: CoverageWithIndicators): st
 
 export function countConnectedSources(coverage: CoverageWithIndicators): number {
   return coverage.sources.filter((source) => source.statusLabel === "Connected").length;
+}
+
+/** Overall entity data status — real registry facts are always live; sourced evidence may not be. */
+export function resolveEntityDataStatus(sourceConnectedCount: number, totalSources: number): ProductStatus {
+  if (sourceConnectedCount > 0) {
+    return sourceConnectedCount >= totalSources ? "live" : "partial";
+  }
+  return "waiting_for_verified_data";
 }
 
 export function buildEntityReviewSummary(

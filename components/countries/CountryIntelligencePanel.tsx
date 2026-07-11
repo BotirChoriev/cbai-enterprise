@@ -2,6 +2,7 @@ import type { Country } from "@/lib/countries";
 import type { CountryUserJourney } from "@/lib/country-user-journey";
 import EvidenceComparisonPanel from "@/components/evidence-comparison/EvidenceComparisonPanel";
 import EntityOverviewSection from "@/components/shared/EntityOverviewSection";
+import EntityDataStatus from "@/components/shared/EntityDataStatus";
 import EntityEvidenceSection from "@/components/shared/EntityEvidenceSection";
 import EntityCompareSection from "@/components/shared/EntityCompareSection";
 import EntityOptionalExploration from "@/components/shared/EntityOptionalExploration";
@@ -43,6 +44,11 @@ export function CountryIntelligencePanel({
         subtitle={`${registryFacts.code} · ${registryFacts.capital}`}
         availableInformation={registryFacts.sourceLabel}
         facts={[{ label: "Government", value: registryFacts.government }]}
+      />
+
+      <EntityDataStatus
+        sourceConnectedCount={sourceConnectedCount}
+        totalSources={coverage.sources.length}
       />
 
       <EntityEvidenceSection

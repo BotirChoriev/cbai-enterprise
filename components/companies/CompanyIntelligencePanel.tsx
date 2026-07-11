@@ -2,6 +2,7 @@ import type { Company } from "@/lib/companies";
 import type { CompanyUserJourney } from "@/lib/company-user-journey";
 import EvidenceComparisonPanel from "@/components/evidence-comparison/EvidenceComparisonPanel";
 import EntityOverviewSection from "@/components/shared/EntityOverviewSection";
+import EntityDataStatus from "@/components/shared/EntityDataStatus";
 import EntityEvidenceSection from "@/components/shared/EntityEvidenceSection";
 import EntityCompareSection from "@/components/shared/EntityCompareSection";
 import EntityOptionalExploration from "@/components/shared/EntityOptionalExploration";
@@ -31,6 +32,11 @@ export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligen
         subtitle={`${registryFacts.icon} · ${registryFacts.industry}`}
         availableInformation={registryFacts.sourceLabel}
         facts={[{ label: "Founded", value: String(registryFacts.founded) }]}
+      />
+
+      <EntityDataStatus
+        sourceConnectedCount={sourceConnectedCount}
+        totalSources={coverage.sources.length}
       />
 
       <EntityEvidenceSection
