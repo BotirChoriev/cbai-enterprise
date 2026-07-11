@@ -11,6 +11,8 @@ import CountryCard from "@/components/countries/CountryCard";
 import CountryRelationships from "@/components/countries/CountryRelationships";
 import EntityOptionalExploration from "@/components/shared/EntityOptionalExploration";
 import { CountryIntelligencePanel } from "@/components/countries/CountryIntelligencePanel";
+import WorldIntelligenceMap from "@/components/countries/WorldIntelligenceMap";
+import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
 
 export default function CountriesPageClient() {
   const { context, setCountry, recordEntityView } = usePlatformContext();
@@ -61,6 +63,10 @@ export default function CountriesPageClient() {
           Overview, available information, missing information, and reports for each country.
         </p>
       </div>
+
+      <ContextualOperatorBanner />
+
+      <WorldIntelligenceMap />
 
       <div className="grid gap-6 xl:grid-cols-12">
         <div className="space-y-4 xl:col-span-4">

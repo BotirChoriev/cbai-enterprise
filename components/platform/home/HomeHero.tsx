@@ -5,6 +5,7 @@ import HomeHeroVisual from "@/components/platform/home/HomeHeroVisual";
 import HomeCapabilityFlow from "@/components/platform/home/HomeCapabilityFlow";
 import HomeAudience from "@/components/platform/home/HomeAudience";
 import HomeTrust from "@/components/platform/home/HomeTrust";
+import WorldIntelligenceMap from "@/components/countries/WorldIntelligenceMap";
 import {
   cbaiBtnPrimary,
   cbaiBtnSecondary,
@@ -82,6 +83,8 @@ export default function HomeHero() {
       </section>
 
       <HomeEcosystems />
+
+      <WorldIntelligenceMap />
 
       <HomeCapabilityFlow />
 
