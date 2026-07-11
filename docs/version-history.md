@@ -359,7 +359,7 @@ left as honest empty arrays where it does not. Zero Platform RC-1 files touched,
 files modified, zero legacy `lib/research/*` files modified — confirmed by `git diff --stat` at
 commit time. No UI, no React, no components, no dashboard, per the mission's explicit scope.
 
-## v3.3 — Research Workspace Contract, Phase 3 (this release)
+## v3.3 — Research Workspace Contract, Phase 3
 
 A third, distinct layer — `lib/research-workspace/`, new, sitting on top of both Platform RC-1's
 Workspace Platform (`lib/workspace/`, EPIC-09) and the Research Domain (`lib/research-domain/`,
@@ -388,6 +388,43 @@ already-real functions unmodified (`runResearchIntelligencePipeline`, EPIC-07;
 Zero Platform Core files touched, zero Research Domain files modified, zero legacy
 `lib/research/*` files modified — confirmed by `git diff --stat` at commit time. No UI, no React,
 no components, no pages, per the mission's explicit scope.
+
+## v3.4 — Research Mission Engine, Phase 4 (this release)
+
+A fourth layer — `lib/research-mission/`, new, on top of Platform RC-1, the Research Domain
+(Phase 1/2), and the Workspace Contract (Phase 3), all three frozen and unmodified. Gives a
+Research Mission a real nine-state project lifecycle (`draft → planned → active →
+paused/blocked/review → completed/cancelled → archived`), every transition recorded with
+reason/timestamp/actor/evidenceReference — the exact discipline `lib/workflow/` (EPIC-06)
+established for Platform Workflows, applied here to a new, mission-specific vocabulary
+(`MissionLifecycleState`) rather than reusing `WorkflowState` (a different concept — an
+intelligence process's stages, not a mission's own real-world project lifecycle) or the Research
+Domain's generic 4-state `ResearchEntityLifecycleState` (too coarse for pause/block/review).
+`MissionTransition` reuses Platform's own `WorkflowActor` type directly.
+
+`ResearchMission` exposes every "Support:" concern the mission named. Eleven of sixteen are
+direct references into Workspace Contract or Research Domain output composed once by
+`buildResearchMission` and never re-derived (Research Questions, Hypotheses, Evidence, Timeline,
+Participants, Organizations, Risks, Related Publications/Patents/Datasets, plus Dependencies —
+filtered from the mission's own real Relationships by `relationshipType === "depends_on"`, not a
+new relationship concept). Expected Outcomes is the one field the Workspace Contract doesn't
+already carry a section for, filtered fresh from Research Domain entities by
+`entityKind === "research_outcome"`. Only Goal, Scope, Milestones, and Deliverables are
+genuinely new — Milestones and Deliverables use categorical status only
+(`pending | achieved | missed`; `planned | in_progress | delivered | cancelled`), never a
+completion percentage or quality score, honoring "Never create fake progress. Never fabricate
+completion." literally.
+
+`MissionProviders` mirrors `ResearchWorkspaceProviders`'s (Phase 3) and
+`IntelligencePipelineProviders`'s (EPIC-07) injection-contract role; its real implementation
+calls `buildResearchWorkspaceContract` (Phase 3) and `buildAllResearchDomainEntities` (Phase 2)
+unmodified. `validateResearchMission` reuses `PlatformValidationResult` (EPIC-10) and performs
+the same transition-chain/legality checks `validateWorkflowRecord` (EPIC-06) already performs for
+Platform Workflows.
+
+Zero Platform Core files touched, zero Research Domain files modified, zero Workspace Contract
+files modified — confirmed by `git diff --stat` at commit time. No UI, no React, no pages, no
+components, per the mission's explicit scope.
 
 ## Planned (not started)
 

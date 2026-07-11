@@ -1,8 +1,8 @@
 # CBAI Current Progress
 
 Snapshot as of EPIC-10 (**CBAI Platform RC-1** — Platform Core frozen) plus Research Intelligence
-Phase 1 (Domain Foundation), Phase 2 (Domain Integration), and Phase 3 (Workspace Contract).
-Update this file, not a new one, as state changes.
+Phase 1 (Domain Foundation), Phase 2 (Domain Integration), Phase 3 (Workspace Contract), and
+Phase 4 (Mission Engine). Update this file, not a new one, as state changes.
 
 ## Real and working today
 
@@ -93,6 +93,18 @@ Update this file, not a new one, as state changes.
   `researchWorkspaceProviders` (calling `runResearchIntelligencePipeline`,
   `buildResearchIntelligenceNetwork`, `buildAllResearchDomainEntities` — all unmodified). Zero
   Platform Core files touched, zero Research Domain files modified, zero UI/React/components.
+  Verified structurally by successful `npm run build`.
+- **Research Mission Engine, Phase 4** (`lib/research-mission/`): `ResearchMission` — a real
+  nine-state project lifecycle (`draft/planned/active/paused/blocked/review/completed/archived/
+  cancelled`) with transition history (reason/timestamp/actor/evidenceReference), plus every
+  "Support:" concern the mission named. 11 of 16 are direct references into Workspace Contract/
+  Research Domain output (Research Questions, Hypotheses, Evidence, Timeline, Dependencies,
+  Participants, Organizations, Risks, Related Publications/Patents/Datasets); Expected Outcomes
+  is freshly filtered from Research Domain entities by kind; only Goal, Scope, Milestones, and
+  Deliverables are genuinely new (Milestones/Deliverables use categorical status only, never a
+  completion percentage). `MissionProviders` + `researchMissionProviders` (calling
+  `buildResearchWorkspaceContract`, `buildAllResearchDomainEntities` — both unmodified). Zero
+  Platform Core, Research Domain, or Workspace Contract files touched, zero UI/React/components.
   Verified structurally by successful `npm run build`.
 - **Public entry experience**: hero, three-ecosystem model, capability flow, audience section,
   trust section — all real, honest content, no fabricated statistics.
@@ -205,6 +217,14 @@ Update this file, not a new one, as state changes.
 - `buildResearchWorkspaceContract` is not called from any static-generation path — type-checked
   by `npm run build`, not functionally exercised. Same verification-depth status as every prior
   real-data adapter in this series.
+- No UI, React, components, or pages were built for Phase 4 — deliberately out of scope per its
+  own mission ("No UI. No React. No Pages. No Components."). `lib/research-mission/` remains a
+  plain data-composition and state-machine module.
+- `buildResearchMission`/`applyMissionTransition` are not called from any static-generation path
+  — type-checked by `npm run build`, not functionally exercised. No mission has ever actually
+  transitioned states anywhere in this repository; every real `ResearchMission` a caller builds
+  today honestly starts and stays at `draft` with empty history, the same "no fabricated
+  provenance" status `Workflow` (EPIC-06) and `Workflow`-based demos have always had.
 
 ## Known technical debt
 
@@ -363,3 +383,24 @@ Update this file, not a new one, as state changes.
   without declaring a new one — declaring one was judged not worth it for two fields. Callers
   narrow further by `entityKind` themselves if needed, using the same `ofKind`-style pattern the
   Builder already uses internally.
+- **Given the current real, sparse Research Domain data, most of `ResearchMission`'s fields will
+  honestly be empty for every real subject today** — Hypotheses, Expected Outcomes, Milestones,
+  Deliverables, Related Publications/Patents, Participants are empty for the same reasons
+  documented in Phase 2/3's own debt entries (no real backing data exists yet). Evidence,
+  Timeline, Dependencies, Organizations, Related Datasets each have at most a handful of real
+  entries. This is the honest, correct output of a real, working engine over real,
+  currently-sparse data — not a defect.
+- `buildResearchMission` recomputes everything on every call — `researchMissionProviders`'s three
+  functions each independently rebuild their underlying collection with no memoization, so a
+  single mission build triggers a fresh full Research Domain entity collection build, a fresh
+  Workspace Contract build (which itself triggers a fresh Network build and a fresh orchestration
+  pipeline run). The same accepted-debt pattern as every prior phase in this series; a real
+  caching layer remains future work.
+- `MISSION_LIFECYCLE_STATES` and `MISSION_STATE_TRANSITIONS` are a new, independent vocabulary
+  and graph, not literally reusing `lib/workflow/`'s `WorkflowState`/`WORKFLOW_TRANSITIONS` code
+  — this is a deliberate design choice (the two concepts are genuinely different), but it does
+  mean the transition-validation logic itself (the shape of `canTransitionMission`/
+  `validateMissionTransition`/`applyMissionTransition`) is structurally duplicated from
+  `lib/workflow/workflow-transition.ts`, even though no Platform Core file was modified or its
+  code copied verbatim. A future generic "state machine" utility that both could share is a
+  plausible refactor, not attempted here to avoid touching the frozen `lib/workflow/`.

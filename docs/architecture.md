@@ -846,6 +846,99 @@ and `lib/foundation/adapters/` (`runResearchIntelligencePipeline`,
 already-real, unmodified function or type. Nothing in `lib/workspace/`, `lib/network/`,
 `lib/research-domain/`, or `lib/foundation/adapters/` imports `lib/research-workspace/` back.
 
+## Research Mission Engine, Phase 4 (`lib/research-mission/`)
+
+A fourth layer, on top of Platform RC-1, the Research Domain (Phase 1/2), and the Research
+Workspace Contract (Phase 3) — all three frozen, none modified (confirmed by `git diff --stat`
+at commit time). `lib/research-mission/` gives a Research Mission a real project lifecycle: nine
+states (`draft → planned → active → paused/blocked/review → completed/cancelled → archived`),
+every transition recorded with reason/timestamp/actor/evidenceReference, exactly the discipline
+`lib/workflow/` (EPIC-06) established for the Platform's own `Workflow` — applied here to a new,
+mission-specific vocabulary, not a copy of Platform Core code (`MISSION_STATE_TRANSITIONS`,
+`canTransitionMission`, `validateMissionTransition`, and `applyMissionTransition` mirror
+`lib/workflow/workflow-transition.ts`'s shape exactly, but operate on the new
+`MissionLifecycleState`, not `WorkflowState`, since a mission's own real-world project lifecycle
+is a genuinely different concept from an intelligence process's stages). `MissionTransition`
+reuses Platform's own `WorkflowActor` type directly rather than redeclaring it.
+
+`MISSION_LIFECYCLE_STATES` is deliberately distinct from both `WorkflowState` (an intelligence
+process's stages) and the Research Domain's own `ResearchEntityLifecycleState` (a generic
+4-state entity lifecycle — `proposed | active | completed | archived`, too coarse for a
+mission's real project lifecycle with pause/block/review states).
+
+### Every "Support:" concern is a direct reference, never a re-derivation
+
+`ResearchMission` exposes every concern the mission named. All but four fields
+(`goal`, `scope`, `milestones`, `deliverables` — genuinely new, since no Platform/Domain/
+Workspace concept already covers a dated project checkpoint or a concrete deliverable) are
+direct references into Research Domain or Workspace Contract output, composed once by
+`buildResearchMission` and never re-derived:
+
+| Support | Field | Source |
+|---|---|---|
+| Mission Goal | `goal` | New — a plain, caller-supplied string |
+| Mission Scope | `scope` | New — a plain, caller-supplied string |
+| Research Questions | `researchQuestions` | `WorkspaceContract.researchQuestions.questions` |
+| Hypotheses | `hypotheses` | `WorkspaceContract.openHypotheses.hypotheses` |
+| Expected Outcomes | `expectedOutcomes` | Research Domain entities filtered to `entityKind === "research_outcome"` — the one field the Workspace Contract doesn't already carry a section for |
+| Evidence Collection | `evidence` | `WorkspaceContract.evidenceSummary.evidence` |
+| Timeline | `timeline` | `WorkspaceContract.researchTimeline.events` |
+| Dependencies | `dependencies` | `WorkspaceContract.knowledgeNetwork.relationships`, filtered to `relationshipType === "depends_on"` — a real existing field on a real existing collection, not a new relationship concept |
+| Participants | `participants` | `WorkspaceContract.researchTeam.team` |
+| Organizations | `organizations` | `WorkspaceContract.relatedOrganizations.organizations` |
+| Risks | `risks` | `WorkspaceContract.openRisks.risks` |
+| Milestones | `milestones` | New — `MissionMilestone[]`, categorical status only (`pending \| achieved \| missed`), never a completion percentage |
+| Deliverables | `deliverables` | New — `MissionDeliverable[]`, categorical status only (`planned \| in_progress \| delivered \| cancelled`), never a quality score |
+| Related Publications | `relatedPublications` | `WorkspaceContract.relatedPublications.publications` |
+| Related Patents | `relatedPatents` | `WorkspaceContract.relatedPatents.patents` |
+| Related Datasets | `relatedDatasets` | `WorkspaceContract.relatedDatasets.datasets` |
+
+Traceability to Research Domain and Workspace Contract themselves is explicit, not just implicit
+in the fields above: `ResearchMission.researchMissionEntity` (the real `ResearchMissionEntity`,
+Phase 2, when one exists) and `ResearchMission.workspaceContract` (the real
+`ResearchWorkspaceContract`, Phase 3, when one could be resolved) are both carried directly on
+every mission.
+
+`research-mission-providers.ts`'s `MissionProviders` — `resolveWorkspaceContract`,
+`resolveResearchDomainEntities`, `resolveResearchMissionEntity` — mirrors
+`ResearchWorkspaceProviders`'s (Phase 3) and `IntelligencePipelineProviders`'s (EPIC-07)
+injection-contract role at this new layer. `researchMissionProviders`, the real implementation,
+calls `buildResearchWorkspaceContract` (Phase 3) and `buildAllResearchDomainEntities` (Phase 2)
+unmodified.
+
+`research-mission-validation.ts`'s `validateResearchMission` reuses `PlatformValidationResult`
+(EPIC-10) and performs the same chain/legality checks
+`lib/workflow/workflow-validation.ts`'s `validateWorkflowRecord` (EPIC-06) already performs for
+Platform Workflows, applied to a mission's own history.
+
+### Module map
+
+```
+lib/research-mission/
+├── research-mission-engine.ts       MissionLifecycleState (9), MISSION_STATE_TRANSITIONS, canTransitionMission,
+│                                     validateMissionTransition, applyMissionTransition, ResearchMission,
+│                                     MissionTransition, MissionMilestone, MissionDeliverable
+├── research-mission-providers.ts    MissionProviders, researchMissionProviders
+├── research-mission-builder.ts      createResearchMission, buildResearchMission
+├── research-mission-query.ts        isMissionTerminal/Blocked/Active, hasOpenMissionRisks, findAchievedMilestones, ...
+└── research-mission-validation.ts   validateResearchMission
+```
+
+### Dependency direction (Phase 4)
+
+`lib/research-mission/` imports from `lib/foundation/` (`WorkflowActor`, `Evidence`,
+`Relationship`, `TimelineEvent`, `ReasoningRisk`, `RelationshipType`, `PlatformValidationResult`
+— all Platform Core per RC-1), `lib/research-domain/` (entity types + query functions, Phase
+1/2), and `lib/research-workspace/` (`ResearchWorkspaceContract`, `buildResearchWorkspaceContract`,
+Phase 3) — every import is of an already-real, unmodified function or type. Nothing in the
+Platform Core, `lib/research-domain/`, or `lib/research-workspace/` imports
+`lib/research-mission/` back.
+
+### No UI this phase
+
+Per the mission's explicit scope, `lib/research-mission/` contains zero React, zero components,
+zero pages, and zero routes. No component anywhere imports it yet.
+
 ## Research Intelligence module map (current)
 
 ```
