@@ -1,6 +1,6 @@
 # CBAI Current Progress
 
-Snapshot as of EPIC-04. Update this file, not a new one, as state changes.
+Snapshot as of EPIC-05. Update this file, not a new one, as state changes.
 
 ## Real and working today
 
@@ -20,6 +20,13 @@ Snapshot as of EPIC-04. Update this file, not a new one, as state changes.
   evidence flows through `buildEvidence`, verified by successful `npm run build`. Not yet wired
   into any UI beyond the existing evidence display, which already consumed the same underlying
   catalog data before this Epic.
+- **Intelligence Reasoning Framework** (`lib/foundation/reasoning-types.ts` + `lib/reasoning/`):
+  `buildReasoningResult` deterministically derives Observed Facts, Known Unknowns, Supporting/
+  Conflicting Evidence, Reasoning Path, Possible Options, Trade-offs, Risks, Potential
+  Consequences, and Open Questions from real Evidence/Relationship/Timeline input — zero model
+  calls, zero fabricated confidence. Wired into `research-foundation-adapter.ts`
+  (`IntelligenceFoundationView.reasoning`), verified for all 65 catalog topics by successful
+  `npm run build`. Not yet wired into any UI.
 - **Public entry experience**: hero, three-ecosystem model, capability flow, audience section,
   trust section — all real, honest content, no fabricated statistics.
 - **Public search / Evidence Core** (`/search`, `/countries`, `/companies`, `/universities`):
@@ -52,11 +59,14 @@ Snapshot as of EPIC-04. Update this file, not a new one, as state changes.
 - No Governance or Economic foundation adapter — nothing real to adapt yet.
 - No wiring of `IntelligenceFoundationView` into any UI component — it is currently proven only
   at the type level (`npm run build`) and is available for a future Epic to render.
-- No AI reasoning, Executive Briefing, Voice Intelligence, Evidence-backed Recommendations,
-  rendered Timeline, Knowledge Graph view, or Mission Execution — per EPIC-04's explicit scope
-  boundary, the Evidence shape and engine are architecturally ready to support these
-  (`relatedMissionIds`, `relatedQuestionIds`, `relatedRelationshipIds`, `timeline`, `history`),
-  but no such UI or derivation logic was built this Epic.
+- No AI (model-backed) reasoning, Executive Briefing, Voice Intelligence, Evidence-backed
+  Recommendations, rendered Timeline, Knowledge Graph view, or Mission Execution — per EPIC-04's
+  explicit scope boundary, the Evidence shape and engine are architecturally ready to support
+  these (`relatedMissionIds`, `relatedQuestionIds`, `relatedRelationshipIds`, `timeline`,
+  `history`), but no such UI or derivation logic was built in that Epic.
+- No UI consumes `ReasoningResult` or `IntelligenceFoundationView.reasoning` — per EPIC-05's
+  explicit scope boundary ("prepare reusable reasoning objects... React must consume the
+  framework" once built), the framework is proven only at the type/build level this Epic.
 
 ## Known technical debt
 
@@ -96,3 +106,20 @@ Snapshot as of EPIC-04. Update this file, not a new one, as state changes.
   Evidence fields (`authors`, `publicationDate`, `originalSource`, `reliability`, etc.) are
   `undefined` for every existing Research evidence record, since no real source metadata exists
   to populate them — shown as absent, not guessed.
+- **A fourth, non-integrated dormant subsystem**, found and documented during EPIC-05
+  (`docs/architecture.md` has the full breakdown): `lib/intelligence/engine/`,
+  `lib/intelligence/orchestrator/`, and related types implement an earlier "governed inference
+  pipeline" design built on a numeric `ConfidenceAssessment` model — the same philosophical
+  mismatch as the numeric Evidence model found in EPIC-04. Confirmed unused outside
+  `lib/intelligence/`; not integrated with the new Reasoning Framework.
+- Because Research catalog `verificationStatus` currently never reaches `"verified"` (see
+  above), `ReasoningResult.observedFacts` is always empty for every real topic today — an honest
+  reflection of the fact that nothing in the catalog has actually been verified yet, not a bug in
+  the reasoning engine. `possibleOptions` is populated (one per catalog `relatedMethods` entry,
+  since `toRelationships()` derives a `uses` relationship for each), but every option carries
+  `support: "unverified"` and zero supporting evidence, because those catalog-derived
+  relationships carry no evidence of their own. `risks` and `potentialConsequences` are always
+  empty, since `toRelationships()` only derives `uses`/`depends_on` relationships today — none of
+  the `contradicts`/`affects` types the reasoning engine looks for. The framework is correct and
+  ready; the richer relationship data that would populate these sections meaningfully does not
+  exist yet.

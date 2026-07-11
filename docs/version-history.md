@@ -55,7 +55,7 @@ working routes (`/graph`, the research network) without a way to visually verify
 judged too risky for this Epic. Recorded as a deliberate scope decision, not an oversight — see
 `docs/current-progress.md`.
 
-## v2.3 — Universal Evidence Operating System (EPIC-04, this release)
+## v2.3 — Universal Evidence Operating System (EPIC-04)
 
 `lib/evidence/` — a reusable Evidence Engine (`buildEvidence`, `validateEvidenceRecord`,
 `linkSupportingEvidence`/`linkConflictingEvidence`, `appendEvidenceHistory`,
@@ -84,14 +84,45 @@ audit: a third, pre-existing "Evidence" concept exists in the large, mostly-dorm
 never-fabricated approach used everywhere else in the Foundation. Recorded as known technical
 debt, not an oversight — see `docs/current-progress.md`.
 
+## v2.4 — Intelligence Reasoning Framework (EPIC-05, this release)
+
+`lib/foundation/reasoning-types.ts` + `lib/reasoning/` — a domain-agnostic reasoning framework
+that transforms Evidence, Relationships, and Timeline into structured, explainable decision
+**support**: Observed Facts, Known Unknowns, Supporting Evidence, Conflicting Evidence,
+Reasoning Path, Possible Options, Trade-offs, Risks, Potential Consequences, and Open Questions.
+`buildReasoningResult` is a pure, deterministic function — zero model calls, zero fabricated
+confidence or certainty. Every output section has an explicit derivation rule traced to real
+input data (see `docs/architecture.md` for the full table); nothing is generated from nothing.
+
+`humanDecisionRequired` is `true` at the TypeScript type level, not just at runtime — this
+framework cannot produce a result that claims to have made a decision. `ReasoningOption.support`
+reuses the shared `Confidence` vocabulary (EPIC-04) and `ReasoningRisk.severity` reuses
+`RelationshipStrength` (EPIC-03), so reasoning output describes certainty using the exact same
+categorical language as the rest of the platform — no new, parallel scale was introduced.
+
+Wired into `research-foundation-adapter.ts`: `IntelligenceFoundationView` gained a new optional
+`reasoning` field, populated by composing the topic's own real evidence and relationships
+through the framework, proven for all 65 real catalog topics via a successful `npm run build`.
+Not yet wired into any UI — the framework is available for a future Epic to render, following
+the same precedent set by the Relationship and Evidence engines.
+
+This release also produced an audit finding, following the same pattern as EPIC-03's graph audit
+and EPIC-04's evidence audit: a fourth, large, entirely dormant subsystem exists in
+`lib/intelligence/` (`engine/`, `orchestrator/`, `result.types.ts`, `trust.types.ts`) implementing
+an earlier "governed inference pipeline" design on top of a numeric `ConfidenceAssessment`
+model — the same philosophical mismatch as the numeric Evidence model found in EPIC-04. Not
+integrated; recorded as known technical debt — see `docs/current-progress.md`.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation
 adapter once real domain data exists to adapt. Consolidating `lib/graph/`, `lib/research/graph/`,
 and `lib/intelligence/graph/` onto `lib/relationships/` once a visual verification workflow
 exists to de-risk the migration. Unifying or retiring `lib/intelligence/evidence.types.ts`'s
-numeric-scoring Evidence model. AI reasoning, Executive Briefing, Voice Intelligence,
-Evidence-backed Recommendations, a rendered Timeline, a Knowledge Graph view, and Mission
-Execution — the Evidence and Relationship shapes are architecturally ready for these, but no UI
-or derivation logic exists yet. No target date is committed here — see
+numeric-scoring Evidence model and `lib/intelligence/engine/`'s numeric confidence-scoring
+reasoning pipeline. Wiring `IntelligenceFoundationView.reasoning` into UI. AI reasoning (model-
+backed, as opposed to this Epic's deterministic structural reasoning), Executive Briefing, Voice
+Intelligence, Evidence-backed Recommendations, a rendered Timeline, a Knowledge Graph view, and
+Mission Execution — the Evidence, Relationship, and Reasoning shapes are architecturally ready
+for these, but no UI or derivation logic exists yet. No target date is committed here — see
 `docs/current-progress.md` for what's honestly available today.

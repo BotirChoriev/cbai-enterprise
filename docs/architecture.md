@@ -178,6 +178,82 @@ never-fabricated-score approach used everywhere else in the Foundation. It remai
 internally consistent, and unused outside `lib/intelligence/`; unifying or retiring it is left as
 known technical debt (see `docs/current-progress.md`).
 
+## Intelligence Reasoning Framework (`lib/reasoning/`)
+
+Introduced in EPIC-05. Sits one layer above the Evidence and Relationship engines: it consumes
+their real output (never re-derives it) and produces `ReasoningResult` — structured,
+explainable decision **support**, never a decision, an opinion, or a fabricated confidence
+value. The shape lives in `lib/foundation/reasoning-types.ts` (Foundation tier, alongside
+`relationship-types.ts` and `evidence-types.ts`); the derivation logic lives in
+`lib/reasoning/reasoning-engine.ts` (Engine tier, alongside `lib/relationships/` and
+`lib/evidence/`) — the same types/engine split already established for Relationship and
+Evidence.
+
+```
+Foundation                  lib/foundation/  (Subject, Mission, Question, Evidence, Relationship, ReasoningResult, ...)
+    ↓
+Evidence Engine + Relationship Engine   lib/evidence/, lib/relationships/
+    ↓
+Reasoning Framework          lib/reasoning/  (buildReasoningResult, validateReasoningInput)
+    ↓
+Workspace / Experience       (not wired to any UI yet — see below)
+```
+
+`ReasoningInput` takes exactly the five inputs the mission named — `question`, an optional
+`mission`, `evidence`, optional `relationships`, and an optional `timeline` — nothing else, and
+nothing is fetched internally. `buildReasoningResult(input)` deterministically derives every one
+of the eleven required output sections, each with an explicit, auditable rule:
+
+| Output | Derivation | Honesty rule |
+|---|---|---|
+| Observed Facts | Evidence items with `verificationStatus === "verified"` | Never asserted from anything less than an explicit "verified" status |
+| Known Unknowns | Evidence items with `verificationStatus` unresolved (`undefined`, `not_started`, `verification_pending`) | Named, not hidden — the reason states the real status |
+| Supporting / Conflicting Evidence | `compareEvidence` (reused from `lib/evidence/evidence-query.ts`, not duplicated) applied pairwise | Only a record's own declared `supportingEvidenceIds`/`conflictingEvidenceIds` are consulted, never content similarity |
+| Reasoning Path | One audit-trail `ReasoningStep` per stage actually executed, each naming which evidence it used | Describes what the engine did, not a hidden inference |
+| Possible Options | One `ReasoningOption` per real `improves`/`replaces`/`extends`/`uses` relationship the caller supplied | Never invented — every option is a relationship the caller already declared, with `support` reusing the shared `Confidence` vocabulary |
+| Trade-offs | One per option with a real declared conflict count | States a count, never a fabricated pro/con narrative |
+| Risks | One per real `contradicts` relationship, `severity` reusing `RelationshipStrength` | No risk without a declared contradiction |
+| Potential Consequences | One per real `affects` relationship, using the relationship's own `explanation` text | No consequence text is generated — only relayed |
+| Open Questions | Known Unknowns rendered back as `Question` objects | 1:1 with Known Unknowns, no new claims |
+| Human Decision Required | Always `true` — enforced at the type level (`humanDecisionRequired: true`) | This framework produces reasoning, never a decision; `humanDecisionReason` explains why, varying with what conflicts/risks/unknowns were actually found |
+
+`lib/reasoning/reasoning-validation.ts` (`validateReasoningInput`) is deterministic structural
+validation only (subjectId and question present) — an empty evidence array is not treated as
+invalid, since honestly reasoning over "no evidence yet" is a real, expected case.
+
+`research-foundation-adapter.ts`'s `toReasoningResult()` wires the framework to Research
+Intelligence's real, already-shipped catalog evidence and relationships, and
+`buildResearchFoundationView()` populates the new optional `IntelligenceFoundationView.reasoning`
+field with it — proven for all 65 real catalog topics by a successful `npm run build`. The
+question a topic reasons over is its first real open question when one exists, otherwise one
+mechanically composed from the topic's own name (the same "real data reworded into a sentence"
+pattern `toMission()` already used) — never an invented claim.
+
+### Prepared for, not implemented, this Epic
+
+No UI consumes `IntelligenceFoundationView.reasoning` yet — per the mission's explicit scope
+("prepare reusable reasoning objects... React must consume the framework" once it does), the
+framework is proven only at the type/build level, matching the same precedent set by the
+Relationship and Evidence engines in EPIC-03/04.
+
+### Known non-integration: `lib/intelligence/` reasoning subsystem
+
+Inspection for this Epic found a fourth, large, entirely dormant subsystem in `lib/intelligence/`
+implementing an earlier "governed inference pipeline" design (`result.types.ts`, `trace.types.ts`,
+`trust.types.ts`, `engine/`, `orchestrator/` — referencing a separate, never-wired
+`CBAI-Intelligence-Specification-v1.md`). It uses a `ConfidenceAssessment` model built on
+`lib/intelligence/confidence.types.ts`'s numeric scoring, the same philosophical mismatch found
+with `lib/intelligence/evidence.types.ts` in EPIC-04. Confirmed via repo-wide search that nothing
+outside `lib/intelligence/` consumes `lib/intelligence/engine/` or `lib/intelligence/orchestrator/`.
+Not integrated, for the same reason as before — recorded as known technical debt, not an
+oversight (see `docs/current-progress.md`).
+
+The existing, real, live `/reasoning` route (`lib/reasoning-explorer.ts`,
+`components/reasoning/*`) is unrelated and untouched: it is architectural documentation of the
+platform's reasoning *philosophy* (pipeline stages, methodology, trust limits), not an
+executable reasoning engine, and does not construct or consume `ReasoningResult`. No naming
+collision exists (`lib/reasoning-explorer.ts` vs. the new `lib/reasoning/` directory).
+
 ## Research Intelligence module map (current)
 
 ```
@@ -199,6 +275,7 @@ lib/foundation/                     universal Foundation (EPIC-02)
 ├── relationship-types.ts           universal relationship vocabulary (EPIC-03)
 ├── evidence-types.ts               universal evidence vocabulary (EPIC-04)
 ├── confidence.ts                   shared Confidence type + deriveConfidenceFromSourceCount (EPIC-04)
+├── reasoning-types.ts              universal reasoning shapes — ReasoningInput/ReasoningResult (EPIC-05)
 └── adapters/research-foundation-adapter.ts
 
 lib/relationships/                  Universal Relationship Engine (EPIC-03)
@@ -211,6 +288,10 @@ lib/evidence/                       Universal Evidence Operating System (EPIC-04
 ├── evidence-linking.ts             linkSupportingEvidence, linkConflictingEvidence
 ├── evidence-history.ts             appendEvidenceHistory
 └── evidence-query.ts               findEvidenceForSubject, groupEvidenceBy*, compareEvidence, traceEvidence
+
+lib/reasoning/                      Intelligence Reasoning Framework (EPIC-05)
+├── reasoning-engine.ts             buildReasoningResult (consumes lib/evidence/, lib/relationships/)
+└── reasoning-validation.ts         validateReasoningInput
 
 components/research/topic/
 ├── ResearchTopicDetail.tsx         page orchestrator ("/research/[topicId]")
@@ -225,7 +306,10 @@ components/research/topic/
 Every arrow above points one way. `lib/foundation/` has zero dependency on `components/`.
 `lib/research/*` engines have zero dependency on `lib/foundation/` (the Foundation depends on
 Research, not the reverse — Research predates the Foundation and remains independently
-correct). `lib/relationships/` and `lib/evidence/` depend only on `lib/foundation/`. Only the
-research adapter and the type aliases in `review-workspace-model.ts`,
-`lib/research/evidence/evidence-types.ts`, and `lib/evidence-infrastructure/types.ts` cross the
-Research↔Foundation boundary, and all are additive, non-breaking changes.
+correct). `lib/relationships/` and `lib/evidence/` depend only on `lib/foundation/`.
+`lib/reasoning/` depends on `lib/foundation/` plus its sibling engines (`lib/evidence/`,
+`lib/relationships/`) — it is one layer above them, never the reverse: neither engine imports
+from `lib/reasoning/`. Only the research adapter and the type aliases in
+`review-workspace-model.ts`, `lib/research/evidence/evidence-types.ts`, and
+`lib/evidence-infrastructure/types.ts` cross the Research↔Foundation boundary, and all are
+additive, non-breaking changes.

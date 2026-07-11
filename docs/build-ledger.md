@@ -25,7 +25,7 @@ Research Review domain scaffolding (`lib/research/review/`). Consolidated a dupl
 `TopicReviewWorkspace`, `ResearchReviewWorkspaceState`, honest empty states for notes/findings,
 process-level open questions derived from real gap/review state.
 
-## EPIC series — Platform-wide transformation (this is EPIC-04)
+## EPIC series — Platform-wide transformation (this is EPIC-05)
 
 | Epic | Commit | Scope |
 |---|---|---|
@@ -37,7 +37,8 @@ process-level open questions derived from real gap/review state.
 | EPIC-01 | `b8d65e3` | Universal product identity, positioning, and public entry experience |
 | EPIC-02 | `a9f419c` | Universal Intelligence Foundation — `lib/foundation/`, research adapter |
 | EPIC-03 | `05777e7` | Universal Relationship Engine — `lib/relationships/`, 16-type vocabulary, richer `Relationship` envelope; found and documented three pre-existing, unmigrated graph/relationship systems (`lib/graph/`, `lib/research/graph/`, `lib/intelligence/graph/`) |
-| EPIC-04 | *(this)* | Universal Evidence Operating System — `lib/evidence/` engine (build, validate, link, history, query/compare/trace); `Evidence` enriched to 21 fields; `EvidenceSourceType`/`VerificationStatus` promoted from existing Research/evidence-infrastructure modules (aliased, not duplicated); shared `Confidence` extracted for Relationship + Evidence; found and documented a third, non-integrated numeric-scoring Evidence model in `lib/intelligence/` |
+| EPIC-04 | `0401f22` | Universal Evidence Operating System — `lib/evidence/` engine (build, validate, link, history, query/compare/trace); `Evidence` enriched to 21 fields; `EvidenceSourceType`/`VerificationStatus` promoted from existing Research/evidence-infrastructure modules (aliased, not duplicated); shared `Confidence` extracted for Relationship + Evidence; found and documented a third, non-integrated numeric-scoring Evidence model in `lib/intelligence/` |
+| EPIC-05 | *(this)* | Intelligence Reasoning Framework — `lib/foundation/reasoning-types.ts` (shape) + `lib/reasoning/` (engine): `buildReasoningResult` deterministically derives Observed Facts, Known Unknowns, Supporting/Conflicting Evidence, Reasoning Path, Possible Options, Trade-offs, Risks, Potential Consequences, Open Questions, and an always-`true` Human Decision Required flag from real Evidence/Relationship/Timeline input — never a model call; wired into `research-foundation-adapter.ts` (`IntelligenceFoundationView.reasoning`) and proven for all 65 catalog topics via `npm run build`; found and documented a fourth, non-integrated dormant subsystem (`lib/intelligence/engine/`, `orchestrator/`, numeric `ConfidenceAssessment`) |
 
 ## Pattern established across every engine build
 

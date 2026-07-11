@@ -21,6 +21,7 @@ import type {
   Evidence,
   Knowledge,
   Mission,
+  Question,
   Recommendation,
   Relationship,
   Subject,
@@ -30,6 +31,8 @@ import type { IntelligenceFoundationView } from "@/lib/foundation/foundation-vie
 import { buildRelationship } from "@/lib/relationships/relationship-builder";
 import { buildEvidence } from "@/lib/evidence/evidence-builder";
 import type { VerificationStatus } from "@/lib/foundation/evidence-types";
+import type { ReasoningResult } from "@/lib/foundation/reasoning-types";
+import { buildReasoningResult } from "@/lib/reasoning/reasoning-engine";
 
 /**
  * Pure adapters mapping Research Intelligence's existing engine outputs onto the universal
@@ -156,6 +159,46 @@ export function toKnowledge(workspace: ResearchReviewWorkspaceState): readonly K
 }
 
 /**
+ * The question this reasoning pass answers — the topic's first real open question when one
+ * exists, otherwise a question mechanically composed from the topic's own name (same pattern
+ * as toMission: real data reworded into a sentence, never an invented claim).
+ */
+function toReasoningQuestion(
+  topic: ResearchTopic,
+  openQuestions: IntelligenceFoundationView["questions"],
+): Question {
+  return (
+    openQuestions[0] ?? {
+      questionId: `${topic.topicId}:reasoning-question`,
+      question: `What can be honestly concluded about ${topic.topicName} from the evidence currently connected?`,
+    }
+  );
+}
+
+/**
+ * Run the universal Reasoning Framework (lib/reasoning/) over a topic's own Foundation
+ * evidence, relationships, and timeline. Pure composition — the framework itself is entirely
+ * domain-agnostic and contains no Research-specific logic.
+ */
+export function toReasoningResult(
+  topic: ResearchTopic,
+  question: Question,
+  mission: Mission,
+  evidence: readonly Evidence[],
+  relationships: readonly Relationship[],
+  timeline: readonly TimelineEvent[],
+): ReasoningResult {
+  return buildReasoningResult({
+    subjectId: topic.topicId,
+    question,
+    mission,
+    evidence,
+    relationships,
+    timeline,
+  });
+}
+
+/**
  * Assemble the full Intelligence Foundation view for a research topic. Composes every existing
  * engine's output through the adapters above — the only "logic" in this function is
  * composition and undefined-guarding, matching the required
@@ -173,17 +216,30 @@ export function buildResearchFoundationView(
   }
 
   const timeline = getWorkspaceTimeline(topicId);
+  const mission = toMission(intelligence.topic);
+  const evidence = evidenceReview.evidenceItems.map(toEvidence);
+  const relationships = toRelationships(intelligence.topic);
+  const timelineEvents = toTimelineEvents(timeline);
+  const question = toReasoningQuestion(intelligence.topic, workspace.openQuestions);
 
   return {
     subject: toSubject(intelligence.topic),
-    mission: toMission(intelligence.topic),
+    mission,
     questions: workspace.openQuestions,
-    evidence: evidenceReview.evidenceItems.map(toEvidence),
-    relationships: toRelationships(intelligence.topic),
+    evidence,
+    relationships,
     analysis: toAnalysis(intelligence),
     recommendation: toRecommendation(workflow),
     executionHref: workflow.actionLink?.href,
-    timeline: toTimelineEvents(timeline),
+    timeline: timelineEvents,
     knowledge: toKnowledge(workspace),
+    reasoning: toReasoningResult(
+      intelligence.topic,
+      question,
+      mission,
+      evidence,
+      relationships,
+      timelineEvents,
+    ),
   };
 }
