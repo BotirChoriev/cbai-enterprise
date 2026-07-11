@@ -345,6 +345,89 @@ search that nothing outside `lib/intelligence/` consumes `lib/intelligence/agent
 `lib/intelligence/runtime/`. Not integrated; recorded as known technical debt, not an oversight
 (see `docs/current-progress.md`).
 
+## Intelligence Orchestration Layer (`lib/orchestration/`)
+
+Introduced in EPIC-07. This Epic creates no new capability — it connects the five that already
+exist (Foundation, Evidence, Relationship, Reasoning, Workflow) into one reusable pipeline:
+
+```
+Question → Foundation → Evidence Discovery → Relationship Resolution → Reasoning → Workflow → Intelligence Result
+```
+
+`IntelligenceResult` (`lib/foundation/orchestration-types.ts`, Foundation tier) is the output
+shape: `subject`, `question`, `mission?`, `evidence`, `relationships`, `reasoning?`, `workflow?`,
+plus `pipelineTrace` (one honest `IntelligencePipelineStageTrace` per stage — `ran` and a real
+`outputCount`, never a fabricated completeness score) and `extensions` (see below). It is
+deliberately **not nested inside `IntelligenceFoundationView`** — both shapes carry
+evidence/relationships/reasoning/workflow, but for different purposes: `IntelligenceFoundationView`
+is EPIC-02's broader "current state of a subject" view (it also carries Analysis, Recommendation,
+Knowledge, Timeline); `IntelligenceResult` is the audit record of one orchestration pipeline
+execution, with per-stage traceability. Nesting one inside the other would duplicate the same
+evidence/relationships/reasoning/workflow data twice in one object for no real benefit.
+
+`lib/orchestration/pipeline-engine.ts`'s `runIntelligencePipeline(providers, input)` is the
+entire orchestration layer — and it contains **zero domain logic**. `providers`
+(`IntelligencePipelineProviders`, `lib/orchestration/pipeline-types.ts`) is a plugin contract:
+
+| Provider | Domain-specific? | Default |
+|---|---|---|
+| `resolveFoundation` | Yes — every domain must supply it | none |
+| `discoverEvidence` | Yes — every domain must supply it | none |
+| `resolveRelationships` | Yes — every domain must supply it | none |
+| `reason` | No — already domain-agnostic | `buildReasoningResult` (`lib/reasoning/`) |
+| `buildWorkflow` | No — already domain-agnostic | `createWorkflow` (`lib/workflow/`) |
+
+The orchestrator never knows what a "research topic" or a "government policy" is — Foundation
+resolution, Evidence Discovery, and Relationship Resolution are always supplied by the caller.
+Reasoning and Workflow are consumed **directly** from the real EPIC-05/EPIC-06 engines (never
+re-derived), with the option to override for a domain that needs a different engine entirely —
+satisfying "every stage must be replaceable" without duplicating the defaults' logic. Every
+provider function, and `runIntelligencePipeline` itself, is a plain pure function — independently
+testable in isolation with no pipeline scaffolding required.
+`lib/orchestration/pipeline-validation.ts`'s `validateIntelligencePipelineProviders` performs
+deterministic structural validation (the three required providers are real functions) before a
+domain's providers are used.
+
+`IntelligenceExtensionPoints` reserves six named slots for future Epics — `executiveBriefing`,
+`voiceIntelligence`, `knowledgeCollaboration`, `missionMonitoring`, `analytics`,
+`agentInsights` — every one `unknown | undefined` and always empty today. Declaring the slots now
+means a future Epic composes a real value into an existing field, not a shape change.
+
+`research-foundation-adapter.ts`'s `researchIntelligencePipelineProviders` +
+`runResearchIntelligencePipeline(topicId)` wire the layer to Research Intelligence's real data —
+every provider function is a thin wrapper around the adapters EPIC-02/03/04 already defined
+(`toSubject`, `toMission`, `toEvidence` via `buildTopicEvidenceReview`, `toRelationships`), so no
+evidence/relationship logic is duplicated. Verified structurally by a successful `npm run build`
+(the full-project TypeScript pass type-checks it against every real Research type); unlike
+`toReasoningResult`/`toWorkflow`, this entry point is not called from
+`buildResearchFoundationView`'s static-generation path (that would recompute the same
+evidence/relationships/reasoning/workflow a second time per page, for the reason given above), so
+it is not yet functionally exercised during the build for all 65 topics — see
+`docs/current-progress.md`.
+
+### React never performs orchestration
+
+No component imports `lib/orchestration/`. `runIntelligencePipeline` and every provider are pure
+`lib/` functions; if a future Epic renders `IntelligenceResult`, the component will receive an
+already-computed result exactly as every other Foundation output is consumed today.
+
+### Known non-integration: `lib/intelligence/orchestrator/` and `lib/intelligence/pipeline-stage.types.ts`
+
+Inspection for this Epic found the closest analog yet in the dormant `lib/intelligence/`
+subsystem: a full "BUILD-022" pipeline orchestrator (`orchestrator/orchestrator.ts`) sequencing
+nine stages (`request → evidence-collection → contradiction-detection → confidence-assessment →
+trust-assessment → graph-context → memory-context → reasoning-trace → intelligence-result`,
+`pipeline-stage.types.ts`) with its own `IntelligenceResult` type (`result.types.ts`) — same name
+as the new Foundation-tier type, different module, no import collision, but a direct conceptual
+overlap. It is built on the same numeric `ConfidenceAssessment`/`TrustAssessment` scoring model
+already found philosophically incompatible in EPIC-04/EPIC-05, and is wired to its own dormant
+`runtime/`, `agents/`, and `registry/` subsystems (EPIC-06's fifth finding). Confirmed via
+repo-wide search that nothing outside `lib/intelligence/` consumes
+`lib/intelligence/orchestrator/`. Not integrated, for the same reason as every prior finding —
+recorded as known technical debt (see `docs/current-progress.md`), not migrated, since doing so
+would mean adopting its numeric scoring model or a high-risk rewrite with no way to visually
+verify the result in this environment.
+
 ## Research Intelligence module map (current)
 
 ```
@@ -368,6 +451,7 @@ lib/foundation/                     universal Foundation (EPIC-02)
 ├── confidence.ts                   shared Confidence type + deriveConfidenceFromSourceCount (EPIC-04)
 ├── reasoning-types.ts              universal reasoning shapes — ReasoningInput/ReasoningResult (EPIC-05)
 ├── workflow-types.ts                universal workflow shapes — Workflow/WorkflowState/WorkflowTransition (EPIC-06)
+├── orchestration-types.ts           universal pipeline output — IntelligenceResult/pipelineTrace (EPIC-07)
 └── adapters/research-foundation-adapter.ts
 
 lib/relationships/                  Universal Relationship Engine (EPIC-03)
@@ -391,6 +475,11 @@ lib/workflow/                       Universal Intelligence Workflow Framework (E
 ├── workflow-validation.ts          validateWorkflowRecord
 └── workflow-query.ts               isWorkflowStateTerminal, findWorkflowTransitionsByActor, ...
 
+lib/orchestration/                  Intelligence Orchestration Layer (EPIC-07)
+├── pipeline-types.ts               IntelligencePipelineProviders (the plugin contract)
+├── pipeline-engine.ts              runIntelligencePipeline (zero domain logic)
+└── pipeline-validation.ts          validateIntelligencePipelineProviders
+
 components/research/topic/
 ├── ResearchTopicDetail.tsx         page orchestrator ("/research/[topicId]")
 ├── ResearchCockpit.tsx             operational summary (workflow + health, replaces old Mission Control Panel)
@@ -410,7 +499,11 @@ correct). `lib/relationships/` and `lib/evidence/` depend only on `lib/foundatio
 from `lib/reasoning/`. `lib/workflow/` depends only on `lib/foundation/` — it does not import
 `lib/reasoning/`, `lib/evidence/`, or `lib/relationships/` directly; a `Workflow` merely *carries*
 their output as data (via `Workflow.evidence` / `.relationships` / `.reasoning`), so the Workflow
-engine itself stays a thin, dependency-light state machine. Only the research adapter and the
-type aliases in `review-workspace-model.ts`, `lib/research/evidence/evidence-types.ts`, and
+engine itself stays a thin, dependency-light state machine. `lib/orchestration/` sits above every
+engine — it depends on `lib/foundation/`, `lib/reasoning/`, and `lib/workflow/` (to call the real
+default engines), but no engine or Foundation module ever imports `lib/orchestration/` back, and
+`lib/orchestration/` never imports a domain module (`lib/research/*`) directly — domain data only
+enters through the caller-supplied `IntelligencePipelineProviders`. Only the research adapter and
+the type aliases in `review-workspace-model.ts`, `lib/research/evidence/evidence-types.ts`, and
 `lib/evidence-infrastructure/types.ts` cross the Research↔Foundation boundary, and all are
 additive, non-breaking changes.

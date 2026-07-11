@@ -113,7 +113,7 @@ an earlier "governed inference pipeline" design on top of a numeric `ConfidenceA
 model — the same philosophical mismatch as the numeric Evidence model found in EPIC-04. Not
 integrated; recorded as known technical debt — see `docs/current-progress.md`.
 
-## v2.5 — Universal Intelligence Workflow Framework (EPIC-06, this release)
+## v2.5 — Universal Intelligence Workflow Framework (EPIC-06)
 
 `lib/foundation/workflow-types.ts` + `lib/workflow/` — a domain-agnostic Workflow: not project
 management, not task management, but the process record that connects every capability already
@@ -148,6 +148,43 @@ lifecycle) and was not integrated. Also documented: the pre-existing, narrower
 untouched and is not a duplicate — it answers a different, Research-specific question ("what's
 the one next action") at a different granularity than the new universal 12-state vocabulary.
 
+## v2.6 — Intelligence Orchestration Layer (EPIC-07, this release)
+
+`lib/foundation/orchestration-types.ts` + `lib/orchestration/` — this release adds no new
+capability. It connects the five that already exist (Foundation, Evidence, Relationship,
+Reasoning, Workflow) into one reusable pipeline: `Question → Foundation → Evidence Discovery →
+Relationship Resolution → Reasoning → Workflow → Intelligence Result`. `runIntelligencePipeline`
+contains zero domain logic — Foundation resolution, Evidence Discovery, and Relationship
+Resolution are always supplied by the caller through an `IntelligencePipelineProviders` plugin
+contract; Reasoning and Workflow are consumed directly from the real EPIC-05/EPIC-06 engines,
+with optional overrides for full stage replaceability. Every provider and the orchestrator
+itself is a plain pure function, independently testable without any pipeline scaffolding.
+
+`IntelligenceResult` preserves Evidence, Relationship, Reasoning, and Workflow traceability by
+carrying the real records each stage produced plus a `pipelineTrace` (one honest
+`ran`/`outputCount` entry per stage). It is deliberately not nested inside
+`IntelligenceFoundationView` — nesting would duplicate the same evidence/relationships/reasoning/
+workflow data twice in one object. `IntelligenceExtensionPoints` reserves six named, always-empty
+slots for future Epics (Executive Briefing, Voice Intelligence, Knowledge Collaboration, Mission
+Monitoring, Analytics, Future AI agents) so those Epics compose a real value into an existing
+field rather than requiring another shape change.
+
+Wired into `research-foundation-adapter.ts`: `researchIntelligencePipelineProviders` and
+`runResearchIntelligencePipeline(topicId)` are thin wrappers around the adapters EPIC-02/03/04
+already defined — no evidence or relationship logic is duplicated — verified structurally by a
+successful `npm run build`. Unlike `toReasoningResult`/`toWorkflow`, this entry point is not
+called from the static-generation path (that would recompute the same composition a second time
+per page), so it is type-checked but not functionally exercised for all 65 topics during the
+build — see `docs/current-progress.md`.
+
+This release also produced its own audit finding: the closest analog yet to this Epic's own
+mission already exists, dormant, in `lib/intelligence/orchestrator/` — a full nine-stage
+pipeline orchestrator (`request → evidence-collection → contradiction-detection →
+confidence-assessment → trust-assessment → graph-context → memory-context → reasoning-trace →
+intelligence-result`) with its own, differently-scoped `IntelligenceResult` type, built on the
+same numeric `ConfidenceAssessment`/`TrustAssessment` scoring model found incompatible in
+EPIC-04/EPIC-05. Not integrated, for the same reason as every prior finding.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation
@@ -155,12 +192,15 @@ adapter once real domain data exists to adapt. Consolidating `lib/graph/`, `lib/
 and `lib/intelligence/graph/` onto `lib/relationships/` once a visual verification workflow
 exists to de-risk the migration. Unifying or retiring `lib/intelligence/evidence.types.ts`'s
 numeric-scoring Evidence model, `lib/intelligence/engine/`'s numeric confidence-scoring
-reasoning pipeline, and `lib/intelligence/agents/tasks/` / `runtime/`'s dormant task-dispatch
-system. Wiring `IntelligenceFoundationView.reasoning` and `.workflow` into UI, and giving a real
-caller a way to record real `WorkflowTransition`s as work actually happens (currently every demo
-Workflow honestly starts and stays at `not_started` with empty history). AI reasoning
-(model-backed, as opposed to the deterministic structural reasoning built in EPIC-05), Executive
-Briefing, Voice Intelligence, Evidence-backed Recommendations, a rendered Timeline, a Knowledge
-Graph view, and Mission Execution — the Evidence, Relationship, Reasoning, and Workflow shapes
-are architecturally ready for these, but no UI or derivation logic exists yet. No target date is
-committed here — see `docs/current-progress.md` for what's honestly available today.
+reasoning pipeline, `lib/intelligence/agents/tasks/` / `runtime/`'s dormant task-dispatch system,
+and `lib/intelligence/orchestrator/`'s dormant nine-stage pipeline. Wiring
+`IntelligenceFoundationView.reasoning`/`.workflow` and `IntelligenceResult` into UI, and giving a
+real caller a way to record real `WorkflowTransition`s as work actually happens (currently every
+demo Workflow honestly starts and stays at `not_started` with empty history). Extension points
+for Executive Briefing, Voice Intelligence, Knowledge Collaboration, Mission Monitoring,
+Analytics, and future AI agents are reserved on `IntelligenceResult` but unimplemented. AI
+reasoning (model-backed, as opposed to the deterministic structural reasoning built in EPIC-05),
+a rendered Timeline, and a Knowledge Graph view remain future work too — the Evidence,
+Relationship, Reasoning, Workflow, and Orchestration shapes are architecturally ready for all of
+these, but no UI or derivation logic exists yet. No target date is committed here — see
+`docs/current-progress.md` for what's honestly available today.

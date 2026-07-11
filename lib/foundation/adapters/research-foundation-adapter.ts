@@ -1,4 +1,5 @@
 import type { ResearchTopic } from "@/lib/research/research-topics";
+import { getResearchTopicById } from "@/lib/research/research-topics";
 import { buildTopicEvidenceReview } from "@/lib/research/evidence/evidence-topic-builder";
 import type {
   TopicEvidenceCatalogItem,
@@ -35,6 +36,9 @@ import type { ReasoningResult } from "@/lib/foundation/reasoning-types";
 import { buildReasoningResult } from "@/lib/reasoning/reasoning-engine";
 import type { Workflow } from "@/lib/foundation/workflow-types";
 import { createWorkflow } from "@/lib/workflow/workflow-builder";
+import type { IntelligenceResult } from "@/lib/foundation/orchestration-types";
+import type { IntelligencePipelineProviders } from "@/lib/orchestration/pipeline-types";
+import { runIntelligencePipeline } from "@/lib/orchestration/pipeline-engine";
 
 /**
  * Pure adapters mapping Research Intelligence's existing engine outputs onto the universal
@@ -275,4 +279,51 @@ export function buildResearchFoundationView(
     reasoning,
     workflow: toWorkflow(intelligence.topic, question, mission, evidence, relationships, reasoning),
   };
+}
+
+/**
+ * Research Intelligence's plugin into the universal Orchestration Layer (lib/orchestration/).
+ * Every function here is a thin wrapper around the adapters already defined above — no
+ * evidence, relationship, reasoning, or workflow logic is re-derived; this object only tells
+ * the domain-agnostic pipeline engine where to find Research's real data.
+ */
+const researchIntelligencePipelineProviders: IntelligencePipelineProviders = {
+  resolveFoundation: (input) => {
+    const topic = getResearchTopicById(input.subjectId);
+    if (!topic) {
+      return undefined;
+    }
+    return { subject: toSubject(topic), mission: toMission(topic) };
+  },
+  discoverEvidence: (foundation) => {
+    const evidenceReview = buildTopicEvidenceReview(foundation.subject.subjectId);
+    return evidenceReview ? evidenceReview.evidenceItems.map(toEvidence) : [];
+  },
+  resolveRelationships: (foundation) => {
+    const topic = getResearchTopicById(foundation.subject.subjectId);
+    return topic ? toRelationships(topic) : [];
+  },
+};
+
+/**
+ * Run the universal Intelligence Orchestration pipeline (lib/orchestration/) for a research
+ * topic. Proves the domain-agnostic pipeline engine is compatible with Research Intelligence's
+ * real data without duplicating any of the logic buildResearchFoundationView already composes.
+ */
+export function runResearchIntelligencePipeline(
+  topicId: string,
+  question?: Question,
+): IntelligenceResult | undefined {
+  const topic = getResearchTopicById(topicId);
+  if (!topic) {
+    return undefined;
+  }
+
+  const workspace = buildResearchReviewWorkspace(topicId);
+  const resolvedQuestion = question ?? toReasoningQuestion(topic, workspace?.openQuestions ?? []);
+
+  return runIntelligencePipeline(researchIntelligencePipelineProviders, {
+    subjectId: topicId,
+    question: resolvedQuestion,
+  });
 }

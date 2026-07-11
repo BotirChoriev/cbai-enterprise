@@ -1,6 +1,6 @@
 # CBAI Current Progress
 
-Snapshot as of EPIC-06. Update this file, not a new one, as state changes.
+Snapshot as of EPIC-07. Update this file, not a new one, as state changes.
 
 ## Real and working today
 
@@ -35,6 +35,15 @@ Snapshot as of EPIC-06. Update this file, not a new one, as state changes.
   (honestly nullable)/previousState/nextState. Wired into `research-foundation-adapter.ts`
   (`IntelligenceFoundationView.workflow`), verified for all 65 catalog topics by successful
   `npm run build`. Not yet wired into any UI.
+- **Intelligence Orchestration Layer** (`lib/foundation/orchestration-types.ts` +
+  `lib/orchestration/`): `runIntelligencePipeline` sequences Foundation → Evidence Discovery →
+  Relationship Resolution → Reasoning → Workflow into one `IntelligenceResult`, with zero domain
+  logic — domain-specific stages are supplied via a plugin contract
+  (`IntelligencePipelineProviders`); Reasoning/Workflow are consumed directly from the real
+  engines. Wired into `research-foundation-adapter.ts`
+  (`researchIntelligencePipelineProviders`, `runResearchIntelligencePipeline`), verified
+  structurally by successful `npm run build`. Not yet wired into any UI, and not yet exercised
+  functionally for all 65 topics during the build (see below for why).
 - **Public entry experience**: hero, three-ecosystem model, capability flow, audience section,
   trust section — all real, honest content, no fabricated statistics.
 - **Public search / Evidence Core** (`/search`, `/countries`, `/companies`, `/universities`):
@@ -81,6 +90,18 @@ Snapshot as of EPIC-06. Update this file, not a new one, as state changes.
   Workflow honestly starts and stays at `not_started` with empty history (see below for why).
 - No project/task management was built — deliberately out of scope per the mission
   ("Do NOT build project management. Do NOT build task management.").
+- No UI consumes `IntelligenceResult` — per EPIC-07's explicit scope ("React consumes
+  orchestration. React never performs orchestration."), the layer is proven only at the
+  type/build level this Epic.
+- `runResearchIntelligencePipeline` is not called from `buildResearchFoundationView`'s
+  static-generation path, so unlike `toReasoningResult`/`toWorkflow` it is type-checked by
+  `npm run build` but not functionally executed for all 65 topics during the build. Calling it
+  from that path would recompute the same evidence/relationships/reasoning/workflow composition
+  a second time per page — deliberately avoided (see `docs/architecture.md`). No functional
+  correctness issue is known; this is a verification-depth gap, not a behavior gap.
+- `IntelligenceExtensionPoints` (`executiveBriefing`, `voiceIntelligence`,
+  `knowledgeCollaboration`, `missionMonitoring`, `analytics`, `agentInsights`) are reserved but
+  always empty — no Epic has implemented any of them yet.
 
 ## Known technical debt
 
@@ -154,3 +175,12 @@ Snapshot as of EPIC-06. Update this file, not a new one, as state changes.
   values) — they answer different questions at different granularities. Unifying them (so a
   topic's real stage signal could drive real universal-workflow transitions) is flagged as
   future work, not attempted this Epic to keep the change set verifiable.
+- **A sixth, non-integrated dormant subsystem**, found and documented during EPIC-07
+  (`docs/architecture.md` has the full breakdown): `lib/intelligence/orchestrator/` is a full,
+  real, nine-stage pipeline orchestrator (`request → evidence-collection → contradiction-
+  detection → confidence-assessment → trust-assessment → graph-context → memory-context →
+  reasoning-trace → intelligence-result`) with its own `IntelligenceResult` type — same name as
+  the new Foundation-tier type, different module, no import collision, but the closest conceptual
+  analog to this Epic's own mission found anywhere in the repo. Built on the same numeric
+  `ConfidenceAssessment`/`TrustAssessment` scoring model found incompatible in EPIC-04/EPIC-05.
+  Confirmed unused outside `lib/intelligence/`; not integrated.
