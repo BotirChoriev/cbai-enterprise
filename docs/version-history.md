@@ -506,6 +506,52 @@ now exercising the Mission layer on every one of the 65 real topic pages. Zero P
 Research Domain, or Workspace Contract files touched — only one minimal correction to
 `lib/research-mission/research-mission-builder.ts` (Phase 4) and the component/test updates.
 
+## v3.7 — Product Activation Audit (this release)
+
+First response to the "CBAI Product Activation Program" master mission. This mission asked for a
+15-phase full-platform simplification and activation pass; this release is a scoped first pass —
+real inventory across the whole product, plus the highest-value, safest fixes implemented and
+verified end to end, honestly documented rather than claimed as complete. Full record:
+`docs/product-activation-audit.md`.
+
+Three real fixes:
+
+1. **Navigation discoverability.** Six fully working routes (`/dashboard`, `/reasoning`,
+   `/government`, `/investor`, `/citizen`, `/ai-control`) had zero sidebar entry — `Sidebar.tsx`
+   only ever rendered `platformNavSections`, never the `internalNavSections` that already
+   described them. Now rendered as a second "Workspaces" section. No new routes or components.
+2. **Metadata consistency.** Root layout now defines a `title.template`; Countries, Companies,
+   Universities, and Dashboard gained metadata they previously lacked (silently inheriting the
+   root's); the four `/research/*` routes' three mutually-inconsistent title formats were
+   normalized to the shared template. Countries/Companies/Universities `page.tsx` were Client
+   Components (metadata cannot be exported from one) — split into a thin Server Component
+   `page.tsx` plus sibling `*PageClient.tsx`, the pattern Next.js's own docs specify for this case.
+3. **Research topic page deduplication (bounded).** `ResearchCockpit` and `TopicReviewWorkspace`
+   independently called `deriveResearchWorkflow` and rendered the same "next action" value under
+   two headings. Lifted to the shared parent (`ResearchTopicDetail`), passed down as a prop,
+   redundant "Continue review" footer removed. A fuller consolidation (topic identity shown 3x,
+   "current stage" computed by 3 unrelated engines) was audited and documented as backlog, not
+   attempted — it requires an IA decision about which engine becomes authoritative, not a
+   mechanical dedup.
+
+One re-verification: the fabricated-confidence-score issue tracked against `/companies` and
+`/universities` since EPIC-01 was found already remediated by a prior, undocumented-in-version-history
+epic (`docs/companies-constitution-compliance-report.md`, dated 2026-07-06). One real residual
+inconsistency one layer below the UI was found and fixed instead —
+`entity-evidence-mapper.ts`'s honest "scores withheld" framing was a country-only special case;
+generalized to `hasAssessedScores()` so it applies to any entity type.
+
+`npm run lint` clean, `npm run build` regenerates all 89 routes (including all 65 real research
+topic pages), `npm run test:research-slice` 11/11 unchanged (confirms the workflow-prop refactor
+didn't alter any derived value), dev-server smoke test of every changed route with no console or
+hydration errors. Zero Platform Core, Research Domain, Workspace Contract, or Research Mission
+files touched.
+
+The remaining 15-phase mission (top-level IA restructure, signed-in home, workspace-shell
+unification, Trust/legal center, full accessibility/localization audits, and more) is inventoried
+and prioritized as backlog in `docs/product-activation-audit.md` §6 — not silently dropped, not
+claimed as done.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation

@@ -141,10 +141,15 @@ into the live UI). Update this file, not a new one, as state changes.
 - **Public entry experience**: hero, three-ecosystem model, capability flow, audience section,
   trust section — all real, honest content, no fabricated statistics.
 - **Public search / Evidence Core** (`/search`, `/countries`, `/companies`, `/universities`):
-  functional profile search and review; per the last constitution-compliance audit
-  (`docs/platform-transformation-master-plan.md`), `/countries` is compliant but `/companies`
-  and `/universities` still contain fabricated confidence scores — a known, pre-existing issue,
-  not introduced by this Epic and not yet fixed.
+  functional profile search and review. The fabricated-confidence-score issue tracked here since
+  EPIC-01 is now fixed — `/companies` and `/universities` were remediated on 2026-07-06 (see
+  `docs/companies-constitution-compliance-report.md`, `docs/universities-constitution-compliance-report.md`)
+  and re-verified directly against source during the Product Activation Audit
+  (`docs/product-activation-audit.md`): no score fields remain in `lib/companies.ts`/
+  `lib/universities.ts`, and `*IntelligencePanel` components are structurally identical to
+  `CountryIntelligencePanel`. The audit found and fixed one residual inconsistency one layer
+  below the UI (`lib/intelligence/evidence/adapters/entity/entity-evidence-mapper.ts` — see that
+  doc §3).
 
 ## Honest placeholders (explicitly labeled as such in-product)
 
@@ -488,3 +493,15 @@ into the live UI). Update this file, not a new one, as state changes.
   seconds); the same future module-level-memoization fix noted above would remove this too. Not
   attempted here, per the mission's "Do NOT create any new Platform capability" — a caching layer
   is a new capability, not an activation.
+
+## Product Activation Audit (2026-07-11)
+
+Full route/navigation/capability inventory plus the highest-value, safest P0/P1 fixes from the
+"CBAI Product Activation Program" master mission. Six real, fully working routes (`/dashboard`,
+`/reasoning`, `/government`, `/investor`, `/citizen`, `/ai-control`) had no sidebar entry point at
+all — fixed by rendering `internalNavSections` (renamed "Workspaces") as a second sidebar section.
+Page metadata normalized across Home/Countries/Companies/Universities/Dashboard/Research routes
+under one `title.template`. One redundant `deriveResearchWorkflow` call removed from the research
+topic page (lifted to the shared parent). Full inventory, the companies/universities score
+re-verification, the research-topic-page duplication findings, and the complete backlog of phases
+not attempted this pass are recorded in `docs/product-activation-audit.md` — not duplicated here.
