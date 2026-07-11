@@ -3,8 +3,7 @@ import type { ResearchTopic } from "@/lib/research/research-topics";
 import { buildTopicEvidenceReview } from "@/lib/research/evidence/evidence-topic-builder";
 import { buildResearchReviewWorkspace } from "@/lib/research/intelligence/review-workspace-engine";
 import { deriveResearchReadiness } from "@/lib/research/readiness/readiness-engine";
-import { deriveResearchWorkflow } from "@/lib/research/workflow/workflow-engine";
-import { WORKFLOW_NEXT_ACTION_LABELS } from "@/lib/research/workflow/workflow-types";
+import type { WorkflowResult } from "@/lib/research/workflow/workflow-model";
 import ResearchMissionWorkspace from "@/components/research/topic/ResearchMissionWorkspace";
 import TopicEvidenceReviewWorkflow from "@/components/research/topic/TopicEvidenceReviewWorkflow";
 import TopicEvidenceSelection from "@/components/research/topic/TopicEvidenceSelection";
@@ -12,18 +11,20 @@ import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-clas
 
 type TopicReviewWorkspaceProps = {
   topic: ResearchTopic;
+  workflow: WorkflowResult | undefined;
 };
 
 // Server-rendered orchestrator: composes the existing Mission Workspace and Evidence
 // Selection/Workflow (unchanged) with new, honestly-derived Current State / Notes / Findings /
-// Open Questions / Continue Review sections into one connected review flow. No new client
-// boundary here — TopicEvidenceSelection already owns the one useSearchParams() call needed
-// for URL-driven evidence selection, tightly Suspense-scoped exactly as before.
-export default function TopicReviewWorkspace({ topic }: TopicReviewWorkspaceProps) {
+// Open Questions sections into one connected review flow. No new client boundary here —
+// TopicEvidenceSelection already owns the one useSearchParams() call needed for URL-driven
+// evidence selection, tightly Suspense-scoped exactly as before. `workflow` is derived once by
+// the parent and shared with ResearchCockpit, which already surfaces the recommended next
+// action — this component only adds the actions that are still unavailable.
+export default function TopicReviewWorkspace({ topic, workflow }: TopicReviewWorkspaceProps) {
   const evidenceReview = buildTopicEvidenceReview(topic.topicId);
   const workspace = buildResearchReviewWorkspace(topic.topicId);
   const readiness = deriveResearchReadiness(topic.topicId);
-  const workflow = deriveResearchWorkflow(topic.topicId);
 
   if (!evidenceReview || !workspace || !readiness || !workflow) {
     return null;
@@ -155,18 +156,6 @@ export default function TopicReviewWorkspace({ topic }: TopicReviewWorkspaceProp
             </li>
           ))}
         </ul>
-      </div>
-
-      <div className={`${cbaiGlassCard} flex flex-wrap items-center justify-between gap-3 p-4`}>
-        <div>
-          <p className={cbaiSectionEyebrow}>Continue review</p>
-          <p className="mt-1 text-sm font-medium text-zinc-200">
-            {WORKFLOW_NEXT_ACTION_LABELS[workflow.nextAction]}
-          </p>
-        </div>
-        <p className="max-w-sm text-xs text-zinc-500">
-          The next step to continue this topic&apos;s research review.
-        </p>
       </div>
     </section>
   );

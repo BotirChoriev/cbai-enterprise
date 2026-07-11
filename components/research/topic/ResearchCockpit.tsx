@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ResearchTopic } from "@/lib/research/research-topics";
-import { deriveResearchWorkflow } from "@/lib/research/workflow/workflow-engine";
+import type { WorkflowResult } from "@/lib/research/workflow/workflow-model";
 import { WORKFLOW_NEXT_ACTION_LABELS, WORKFLOW_STAGE_LABELS } from "@/lib/research/workflow/workflow-types";
 import { deriveResearchHealth } from "@/lib/research/health/health-engine";
 import { RESEARCH_HEALTH_LABELS } from "@/lib/research/health/health-types";
@@ -15,15 +15,16 @@ import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-clas
 
 type ResearchCockpitProps = {
   topic: ResearchTopic;
+  workflow: WorkflowResult | undefined;
 };
 
 // The operational center of a research mission. Purely presentational — every field is read
 // from the Workflow and Health engines (which already compose Readiness, Gap, Decision, and
 // Review Workspace beneath them); nothing is calculated here. Replaces MissionControlPanel
 // and the Workspace Timeline section that previously lived inside TopicReviewWorkspace, so
-// "current situation" is answered in one place instead of two.
-export default function ResearchCockpit({ topic }: ResearchCockpitProps) {
-  const workflow = deriveResearchWorkflow(topic.topicId);
+// "current situation" is answered in one place instead of two. `workflow` is derived once by
+// the parent and shared with TopicReviewWorkspace so both cards never disagree.
+export default function ResearchCockpit({ topic, workflow }: ResearchCockpitProps) {
   const health = deriveResearchHealth(topic.topicId);
   const timeline = getWorkspaceTimeline(topic.topicId);
   const memory = getWorkspaceMemory(topic.topicId);

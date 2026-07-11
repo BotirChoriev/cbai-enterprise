@@ -14,6 +14,7 @@ import TopicReviewWorkspace from "@/components/research/topic/TopicReviewWorkspa
 import WorkspaceContextBar from "@/components/research/topic/WorkspaceContextBar";
 import ResearchCockpit from "@/components/research/topic/ResearchCockpit";
 import { deriveEvidenceGapIntelligence } from "@/lib/research/intelligence/intelligence-engine";
+import { deriveResearchWorkflow } from "@/lib/research/workflow/workflow-engine";
 import { cbaiHeroGlow } from "@/components/brand/brand-classes";
 
 type ResearchTopicDetailProps = {
@@ -23,6 +24,7 @@ type ResearchTopicDetailProps = {
 export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps) {
   const [activeTab, setActiveTab] = useState<TopicTabId>("overview");
   const intelligence = deriveEvidenceGapIntelligence(topic.topicId);
+  const workflow = deriveResearchWorkflow(topic.topicId);
 
   return (
     <div
@@ -34,7 +36,7 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
         <WorkspaceContextBar topic={topic} readiness={intelligence.researchReadiness} />
       ) : null}
 
-      <ResearchCockpit topic={topic} />
+      <ResearchCockpit topic={topic} workflow={workflow} />
 
       <p className="rounded-lg border border-zinc-800/80 bg-zinc-900/40 px-4 py-3 text-sm text-zinc-500">
         {TOPIC_EXPERIENCE_NOTICE}
@@ -47,7 +49,7 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
 
       <TopicInsightsPanel topic={topic} />
 
-      <TopicReviewWorkspace topic={topic} />
+      <TopicReviewWorkspace topic={topic} workflow={workflow} />
 
       <ResearchLandscape topic={topic} variant="topic" embedded />
 
