@@ -813,6 +813,40 @@ routes, 93 total tests passing (13 + 14 + 12 + 15 + 28 + 11). Zero Platform Core
 rewrite, no routing changes, no visual regressions. Full detail:
 `docs/product-activation-audit.md` §14.
 
+## v3.16 — Platform Core Completion
+
+Finished every deferral from v3.15. `EntityRelatedPanel` now replaces
+`CountryRelationships.tsx`/`CompanyRelationships.tsx`/`UniversityRelationships.tsx`'s duplicate
+rendering — the regression risk that blocked this was resolved by tracing the Knowledge Graph
+builder back to its source (it's built from the exact same functions the name-list relationships
+were, so it's a strict superset, never missing an entry) and giving `EntityRelationship` real
+`label`/`verified` fields so nothing was lost in the swap.
+
+`EntityHeader` migrated into Country/Company/University (same props, zero output change) and,
+newly, Research — replacing `ResearchTopicHero.tsx`'s generic boilerplate paragraph with real
+per-topic data while preserving the real "human review required" safety statement it also carried.
+Research topics gained a fourth real report (`ResearchTopicReportView.tsx` + a Generate Report
+button); Country/Company/University's existing report buttons now call the same
+`buildEntityReport` facade instead of their direct per-module builders.
+
+Trust connected: every report now carries a real `dataStatus`, rendered as a `StatusBadge` in all
+four report views — completing Methodology/Trust/Limitations/Data Status through the shared
+Entity layer.
+
+Universal Search completed: research topics are now real `Entity` objects in the same
+`searchEntities()`/`getAllEntities()` index as Country/Company/University, rendered through the
+same result card — the bespoke research-topic-only search path was removed outright, not left
+running in parallel. Closed a real recall gap first (research topics gained real tags from their
+methods/evidence-types) so the migration lost no search coverage.
+
+Command Center completed: the inline `context.country ?? context.company ?? context.university`
+chain, duplicated three times across the Assistant components, was replaced with
+`getPrimaryEntity(context)` — an already-existing, previously underused canonical accessor.
+
+New `scripts/test-platform-core-completion.ts` — 10 tests. `npm run lint` clean, `npm run build`
+91 routes, 103 total tests passing (10 + 13 + 14 + 12 + 15 + 28 + 11). Zero Platform Core files
+touched; no working functionality removed. Full detail: `docs/product-activation-audit.md` §15.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation

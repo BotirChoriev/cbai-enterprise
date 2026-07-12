@@ -897,3 +897,98 @@ Search's group-rendering layer was not restructured. `EntityRelationship`'s
 (Government Institution, Laboratory, Dataset, Patent, Researcher, Investor, Policy, Court, Law,
 Economic Indicator) that don't exist as real catalogs yet — declared honestly, not wired to
 fabricated data.
+
+## 15. Platform Core Completion
+
+Response to "CBAI Product Activation — Platform Core Completion" (priority: Critical; finish the
+migration the prior mission started, not build more architecture). Every deferral from §14 was
+revisited here; each was completed for real, or re-deferred with a concrete, verified reason.
+
+**`EntityRelatedPanel` now replaces `CountryRelationships.tsx`/`CompanyRelationships.tsx`/
+`UniversityRelationships.tsx`'s duplicate rendering — the regression risk that blocked this in §14
+was resolved, not just re-assessed.** Investigation found the risk was real but solvable:
+`buildEntityRelationships` only sourced the narrow `getXRelationships()` name lists, while the old
+components rendered the richer Knowledge Graph edges (`profile.coverage.graphRelationships`) *and*
+a redundant bottom summary of the same names. Traced `lib/graph/graph.builder.ts`'s edge
+construction and confirmed every edge is built directly from `getCountryRelationships`/
+`getCompanyRelationships` by name-matching against a node built from that same name — so the graph
+is a strict superset, never missing an entry the name lists have. `EntityRelationship` gained
+optional `label`/`verified` fields; `buildEntityRelationships` for country/company/university now
+reads `buildCountryCoverageProfile`/`buildCompanyCoverageProfile`/`buildUniversityCoverageProfile`'s
+`graphRelationships` directly (Company↔Research edges, absent from the graph, are still layered on
+top via the existing keyword matcher). `EntityRelatedPanel` renders the real edge label
+("Located In", "Registered In", "Belongs To") and verification badge when present. The three
+former "legacy" components are now thin wrappers — heading, description, and (for Company/
+University) the honest "partner claims not shown" note stay page-specific; the duplicate
+graph-list-plus-redundant-summary rendering is gone, replaced by one shared call.
+
+**`EntityHeader` migrated into Country/Company/University and, newly, Research.** Extended
+`EntityHeader` to accept either a universal `Entity` object or the exact explicit prop set
+`EntityOverviewSection` always took — the three profile panels now import `EntityHeader` instead
+of `EntityOverviewSection` directly, passing identical props (zero output change, verified by
+build + curl content match). Research topics previously had no structured overview card at all;
+`ResearchTopicHero.tsx`'s generic "This read-only catalog profile describes…" boilerplate paragraph
+is now `<EntityHeader entity={toResearchTopicEntity(topic)} />` — real per-topic data (type,
+domain, metrics-derived facts) replacing static filler text. The real "Human review is required…"
+safety statement that paragraph also carried was preserved as its own line, not dropped.
+
+**Research topics gained a fourth real report.** New `ResearchTopicReportView.tsx` + a "Generate
+report" button on the topic page, using the same `buildEntityReport("research_topic", id)` facade
+built (but not wired to any UI) in §14. Country/Company/University's existing "Generate report"
+buttons were switched from calling `buildCountryReport`/`buildCompanyReport`/`buildUniversityReport`
+directly to `buildEntityReport(type, id)` — proven byte-identical by the existing facade tests, now
+exercised from real call sites, not just tests. `buildEntityReport` was given overloaded signatures
+per literal `entityType` so each call site gets its exact report shape back with no manual
+narrowing.
+
+**Trust connected**: every report now carries `dataStatus` (`ProductStatus`, via the already-real
+`resolveEntityDataStatus`), rendered as a real `StatusBadge` in all four report views. Methodology,
+Trust (statement), and Limitations were already present in every report from §14 — `dataStatus`
+was the missing piece connecting "Data Status" through the shared Entity layer for real, without
+inventing a new "verification status" concept where none honestly exists (per-relationship
+`verified` from the Knowledge Graph already covers that).
+
+**Universal Search completed**: research topics are now real `Entity` objects in
+`getAllEntities()`/`searchEntities()`, not a second, parallel search path. `EntityType`'s
+`research_topic` case was added to `buildPlatformEntityHref` (path-segment routing,
+`/research/{topicId}`, not the query-param pattern the other three use) and to
+`buildEntityResultEntry` (a real branch: `showReports: true`, `showCompare: false`). The bespoke
+`ResearchTopicMatch`/`buildResearchTopicResultEntry`/`TopicResultCard`-for-topics path was removed
+outright — `SearchGatewayResults.tsx` now renders research topics through the exact same
+`EntityMatchCard` path as Country/Company/University. To keep this lossless, `toResearchTopicEntity`
+gained real `tags` from `relatedMethods`/`relatedEvidenceTypes` (the same haystack the old
+`filterResearchTopics` searched that `searchEntities`'s generic text match didn't previously cover),
+closing a real recall gap before switching the data source, not after.
+
+**Command Center completed**: `AssistantCommandCenter.tsx`/`ContextualOperatorBanner.tsx` both
+computed "whichever entity is focused" via an inline `context.country ?? context.company ?? context.university`
+ternary chain, duplicated three times. Replaced every occurrence with `getPrimaryEntity(context)` —
+an already-existing, previously underused canonical accessor in `lib/context`. Same computation,
+now one named call instead of a repeated inline chain; commands now read as operating on "the
+Entity Context" rather than three separate PlatformContext fields.
+
+**Legacy removed**: the duplicate-rendering code inside `CountryRelationships.tsx`/
+`CompanyRelationships.tsx`/`UniversityRelationships.tsx` (a hand-built Knowledge Graph list plus a
+redundant linked-name summary showing the same data twice) is gone, replaced by `EntityRelatedPanel`.
+The bespoke research-topic search path (`ResearchTopicMatch` type, `researchTopics` field on
+`SearchResultGroup`, `buildResearchTopicResultEntry`, the `filterResearchTopics` call inside
+`executeGatewaySearch`) is gone, replaced by the unified Entity-based path. No working functionality
+was removed in either case — verified via the full existing test suite (93/93 unchanged) plus 10 new
+tests targeting the migrated behavior specifically.
+
+**Tests**: new `scripts/test-platform-core-completion.ts` (`npm run test:platform-core-completion`)
+— 10 tests covering the graph-sourced relationship builder's real labels/verification status, the
+lossless University migration, research topics as real Entity search results, the closed tag-recall
+gap, `dataStatus` on every report kind, and `getPrimaryEntity`'s precedence. 10/10 passing, alongside
+the unchanged 13 + 14 + 12 + 15 + 28 + 11 = 93 total — **103 tests overall**.
+
+**Not attempted**: no new entity kind (Government Institution, Laboratory, Dataset, Patent,
+Researcher, Investor, Policy, Court, Law, Economic Indicator) was added — none has a real catalog
+yet. `/trust` (the platform-wide methodology center) still isn't cross-linked with each entity's
+own Trust section — both remain real and honest on their own; this is still judged lower value than
+the completions above. `EntityHeader`'s explicit-prop mode means Country/Company/University's
+richer bespoke facts (Government, Founded, Official website) are not yet expressed as part of the
+universal `Entity` type itself — they still live in each module's own `registryFacts`, passed
+through `EntityHeader` verbatim. Unifying that fully would mean extending `Entity` with per-kind
+fact schemas, a real but separate migration not attempted here to avoid touching working fact
+displays without a concrete need.

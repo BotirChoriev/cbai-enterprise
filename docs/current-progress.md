@@ -644,3 +644,24 @@ every existing header already works, and swapping one risked either losing bespo
 visual redesign, both explicitly forbidden. Universal Search was not migrated in this pass, for
 the same reason. 13 new tests, 93 total passing. Full detail:
 `docs/product-activation-audit.md` §14.
+
+## Platform Core Completion
+
+Finished every deferral the prior mission left open, instead of re-deferring them. Resolved the
+regression risk blocking `EntityRelatedPanel` from replacing
+`CountryRelationships`/`CompanyRelationships`/`UniversityRelationships` by tracing the Knowledge
+Graph builder to its source — it's built from the exact same functions the narrower name-list
+relationships were, so switching to it loses nothing and gains real per-edge labels and
+verification status (`EntityRelationship` gained `label`/`verified` fields to carry them).
+`EntityHeader` migrated into Country/Company/University (identical props, zero output change) and
+into Research for the first time, replacing `ResearchTopicHero`'s generic boilerplate paragraph
+with real per-topic data while keeping its real safety statement. Research topics gained a fourth
+real report; Country/Company/University's report buttons now call the shared `buildEntityReport`
+facade instead of their direct per-module builders. Every report now carries a real `dataStatus`,
+completing Methodology/Trust/Limitations/Data Status through the shared Entity layer. Universal
+Search finished: research topics are real `Entity` objects in the unified search index now,
+rendered through the same card as the other three kinds — the old parallel research-topic search
+path was removed outright, after first closing a real recall gap (real tags from methods/
+evidence-types) so nothing was lost in the switch. Command Center's triplicated inline focus-
+resolution chain was replaced with the existing, previously underused `getPrimaryEntity(context)`
+accessor. 10 new tests, 103 total passing. Full detail: `docs/product-activation-audit.md` §15.
