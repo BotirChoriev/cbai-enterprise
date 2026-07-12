@@ -124,7 +124,7 @@ test("9. deriveProjectProgress calculates only from real completed work — neve
     visibility: "private",
     status: "active",
   });
-  const progress = deriveProjectProgress(bareProject, false);
+  const progress = deriveProjectProgress(bareProject);
   assert.equal(progress.totalCount, 6);
   // Outside a browser, notes/entities/evidence honestly load as empty, and researchQuestion/
   // objectives were never set — every milestone must be false, not a default-true fabrication.
@@ -140,7 +140,7 @@ test("9. deriveProjectProgress calculates only from real completed work — neve
     visibility: "private",
     status: "active",
   });
-  const progressWithQuestion = deriveProjectProgress(projectWithQuestion, false);
+  const progressWithQuestion = deriveProjectProgress(projectWithQuestion);
   const questionMilestone = progressWithQuestion.milestones.find((m) => m.id === "question_defined");
   assert.equal(questionMilestone?.achieved, true);
   assert.equal(progressWithQuestion.completedCount, 1);
