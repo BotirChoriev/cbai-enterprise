@@ -95,9 +95,10 @@ const sections: TrustSection[] = [
     id: "privacy",
     title: "Privacy",
     body: [
-      "A real local account is available (email, password, display name, organization) — the password is hashed and salted with your browser's own cryptography before it is stored, and every account, Project, and Bookmark stays in this browser's local storage only. Nothing is sent to a server, because this platform has none yet.",
-      "There is no cross-device sync, no analytics, no tracking script, and no third party ever receives this data.",
-      "A complete privacy policy will be published ahead of any real cloud-backed account or personalization system, once legal review is complete.",
+      "Two account types exist: a Device-Local Account (email, password, display name, organization — hashed and salted with your browser's own cryptography, stored only in this browser, never sent anywhere) and, where this deployment is configured for it, a real Cloud Account backed by Supabase, a real authentication provider — your Projects, Bookmarks, Reports, and Assistant preferences sync across the devices you sign into with that account.",
+      "Row Level Security is enforced on every cloud table: only your own signed-in session can read, write, or delete your records — see supabase/migrations/0002_rls_policies.sql for the exact policies.",
+      "There is no analytics, no tracking script, and no third party ever receives this data. Supabase (when configured) is the only processor, and only for the account you explicitly create.",
+      "A complete privacy policy will be published ahead of any commercial or public launch, once legal review is complete.",
     ],
   },
   {
@@ -107,7 +108,8 @@ const sections: TrustSection[] = [
       "This is a minimum, honest statement of real current behavior — not a substitute for a lawyer-drafted Terms of Service, which will be published before any commercial or cloud-backed launch.",
       "CBAI is provided as-is, with no warranty of accuracy, completeness, or fitness for a particular purpose. Evidence-based information is not professional, legal, financial, or medical advice.",
       "You are responsible for verifying any information before relying on it for a real decision — the Human Decision principle above applies to your use of this platform, not only to what it produces.",
-      "Local accounts and locally stored data may be lost if this browser's storage is cleared; there is no backup or recovery today.",
+      "Device-Local accounts and locally stored data may be lost if this browser's storage is cleared; there is no backup or recovery for that data.",
+      "Account deletion: a Device-Local account and its data can be cleared by clearing this browser's site storage. A Cloud Account cannot yet be self-service deleted from within the app — this platform has no server component that can safely hold the elevated credential such a deletion requires; contact the operator of this deployment to request cloud account and data deletion until a real self-service flow is built.",
     ],
   },
   {
@@ -123,7 +125,7 @@ const sections: TrustSection[] = [
     title: "Known Limitations",
     body: [
       "Coverage today is intentionally shown as it really is, not as it will eventually be: most profiles have only a small number of official sources connected so far, and the remaining gaps are labeled individually rather than hidden.",
-      "Local accounts exist (email/password, hashed and salted on-device), but there is no server to verify them, no cross-device sync, and no account recovery — Projects, notes, and saved work stay on the device that created them.",
+      "Device-Local accounts (email/password, hashed and salted on-device) have no server to verify them and no cross-device sync — Projects, notes, and saved work stay on the device that created them. Where a Cloud Account is configured, it is server-verified and syncs across devices, but still has no email-based account recovery, no rate limiting, and no self-service deletion yet.",
       "Governance, Investor, and Citizen workspaces, and the Knowledge Graph and Reasoning views, share the same evidence core and are still early — treat their current depth as a preview of the intended experience, not the finished one.",
     ],
   },
