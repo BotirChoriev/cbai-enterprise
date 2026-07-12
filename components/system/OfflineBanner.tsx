@@ -6,9 +6,14 @@ import { useEffect, useState } from "react";
  * Real connectivity detection (the browser's own online/offline events) — not a fabricated
  * status. CBAI's data is local-first (localStorage), so being offline doesn't break navigation;
  * this banner exists only so a user isn't left guessing why something feels stale.
+ *
+ * Checks `window`, not just `navigator` — modern Node has a global `navigator` object (with
+ * `onLine` always `undefined`), so a `typeof navigator` check alone reads as "offline" during
+ * every server render, which both misrepresents server-side state and risks a hydration mismatch
+ * against a genuinely-online browser.
  */
 function isCurrentlyOffline(): boolean {
-  return typeof navigator !== "undefined" && !navigator.onLine;
+  return typeof window !== "undefined" && typeof navigator !== "undefined" && !navigator.onLine;
 }
 
 export default function OfflineBanner() {

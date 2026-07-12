@@ -80,7 +80,14 @@ export default function CountriesPageClient() {
 
       <ContextualOperatorBanner />
 
-      <WorldIntelligenceMap />
+      <details className="scroll-mt-6 rounded-lg border border-zinc-800/60 bg-zinc-950/50" open={!context.country}>
+        <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium text-zinc-500 marker:content-none [&::-webkit-details-marker]:hidden">
+          {context.country ? `World Intelligence Map — showing ${context.country.name}` : "World Intelligence Map"}
+        </summary>
+        <div className="border-t border-zinc-800 px-4 py-4">
+          <WorldIntelligenceMap />
+        </div>
+      </details>
 
       <div className="grid gap-6 xl:grid-cols-12">
         <div className="space-y-4 xl:col-span-4">
