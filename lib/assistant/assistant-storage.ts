@@ -5,6 +5,9 @@ import {
   WORKSPACE_ROLES,
   ASSISTANT_AVATARS,
 } from "@/lib/assistant/assistant-profile";
+import { resolveStorageKey } from "@/lib/storage/namespaced-key";
+import { getSyncedCloudUserId } from "@/lib/supabase/cloud-session-sync";
+import { upsertCloudProfile } from "@/lib/supabase/cloud-profile";
 
 const ASSISTANT_STORAGE_KEY = "cbai-assistant-profile";
 
@@ -68,11 +71,13 @@ function sanitizeProfile(raw: unknown): AssistantProfile {
   };
 }
 
-/** Load the local Assistant profile — an honest empty profile until the user sets one up. */
+/** Load the local Assistant profile — an honest empty profile until the user sets one up.
+ * Real-user-namespaced (Real Supabase Authentication + Cloud Persistence mission): a signed-in
+ * identity's Assistant profile no longer leaks into another identity's on the same browser. */
 export function loadAssistantProfile(): AssistantProfile {
   if (!isBrowser()) return createEmptyAssistantProfile();
   try {
-    const raw = window.localStorage.getItem(ASSISTANT_STORAGE_KEY);
+    const raw = window.localStorage.getItem(resolveStorageKey(ASSISTANT_STORAGE_KEY));
     if (!raw) return createEmptyAssistantProfile();
     return sanitizeProfile(JSON.parse(raw));
   } catch {
@@ -80,17 +85,34 @@ export function loadAssistantProfile(): AssistantProfile {
   }
 }
 
+/** Saves locally (unchanged, always) and — when a cloud session is active — also upserts the
+ * subset of fields the `profiles` table owns (Phase 12). Fire-and-forget: preference sync failure
+ * is not treated as data loss the way Project mutations are (no outbox/retry queue here), since
+ * the local save above always succeeds first and is never blocked on the network. */
 export function saveAssistantProfile(profile: AssistantProfile): void {
   if (!isBrowser()) return;
-  window.localStorage.setItem(ASSISTANT_STORAGE_KEY, JSON.stringify(profile));
+  window.localStorage.setItem(resolveStorageKey(ASSISTANT_STORAGE_KEY), JSON.stringify(profile));
+
+  const cloudUserId = getSyncedCloudUserId();
+  if (!cloudUserId) return;
+  void upsertCloudProfile(cloudUserId, {
+    assistantName: profile.name,
+    avatarMode: profile.avatar,
+    preferredLanguage: profile.preferredLanguage,
+    workspaceRole: profile.workspaceRole,
+    country: profile.country,
+    timezone: profile.timezone,
+    organization: profile.organization,
+    accessibilityPreferences: profile.accessibility,
+  });
 }
 
 export function clearAssistantProfile(): void {
   if (!isBrowser()) return;
-  window.localStorage.removeItem(ASSISTANT_STORAGE_KEY);
+  window.localStorage.removeItem(resolveStorageKey(ASSISTANT_STORAGE_KEY));
 }
 
 export const ASSISTANT_PROFILE_ARCHITECTURE_NOTE =
-  "The Assistant profile is saved to this browser only, separately from the real local account " +
-  "system (lib/auth/) — there is no cross-device sync for either. Nothing here is a fabricated " +
-  "user record.";
+  "The Assistant profile is saved to this browser, namespaced to whichever identity is signed in " +
+  "(device-local or cloud). Signed into a cloud account, these preferences also sync to your " +
+  "profile there; otherwise they stay on this device only. Nothing here is a fabricated user record.";

@@ -17,6 +17,7 @@ import CreateProjectForm from "@/components/project/CreateProjectForm";
 import ProjectList from "@/components/project/ProjectList";
 import ProjectHome from "@/components/project/ProjectHome";
 import LocalWorkMigrationPrompt from "@/components/account/LocalWorkMigrationPrompt";
+import CloudProfileImportPrompt from "@/components/account/CloudProfileImportPrompt";
 import PendingSyncNotice from "@/components/shared/PendingSyncNotice";
 import { loadProject } from "@/lib/project/project-store";
 import { PROJECT_TYPES, type ProjectTypeId } from "@/lib/project/project-types";
@@ -178,6 +179,7 @@ function MyWorkContent() {
         </div>
       )}
 
+      {accountMode === "cloud" ? <CloudProfileImportPrompt /> : null}
       {accountMode === "cloud" ? <LocalWorkMigrationPrompt /> : null}
 
       <CreateProjectForm initialPrimaryEntity={initialPrimaryEntity} initialType={initialType} />
