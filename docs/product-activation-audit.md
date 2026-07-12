@@ -1108,3 +1108,107 @@ persistence (save then reload) could not be exercised inside the Node test harne
 handles) — verified instead via code review of the identical, already-proven
 `context-history.ts` pattern, plus curl-based confirmation that the create-forms and honest-empty
 states render correctly server-side.
+
+## 17. Project Engine Activation
+
+Response to "CBAI Product Activation — Project Engine Activation" (priority: Maximum; Project
+becomes the primary working object of CBAI, reusing every existing engine rather than building a
+new one). The explicit "STOP — do not create new pages" constraint shaped every UI decision below.
+
+**Project is the fifth `EntityType`**, alongside Country/Company/University/Research Topic —
+`toProjectEntity` (mirroring `toResearchTopicEntity` exactly) gives every real project a valid
+universal `Entity`, participating in `getAllEntities()`/`searchEntities()` (Universal Search),
+`buildEntityRelationships("project", id)` (Relationship Engine), and `buildEntityReport("project",
+id)` (Report Engine) — the same three engines every other entity kind already uses, not a fourth
+parallel system for Projects specifically.
+
+**Project Types are pure configuration**: `PROJECT_TYPES` (8 entries — Research Project, Country
+Analysis, Company Analysis, University Study, Policy Analysis, Investment Analysis, Technology
+Assessment, Evidence Review) is a plain descriptive array. No code anywhere branches on a specific
+type id — every Project, regardless of type, is created, stored, rendered, and reported by the
+exact same functions and components, satisfying "Do NOT hardcode workflows. Use configuration"
+literally rather than by convention.
+
+**Real local persistence**: new `lib/project/project-store.ts` follows the exact pattern already
+proven by `context-history.ts`/`research-workspace-store.ts` (isBrowser guard, one JSON blob per
+localStorage key, sanitize-on-read, never throws) — six real, independent stores (Projects,
+Project↔Entity links, Notes, Tasks, Open Questions, Evidence references), not one competing
+mega-store and not six different persistence shapes.
+
+**No new page was created.** "Project Home" — the mission's own long list of required sections
+(Overview, Research Question, Objectives, Evidence, Notes, Related Entities, Countries/Companies/
+Universities, Timeline, Tasks, Reports, Activity, Bookmarks, Trust, Methodology) — lives entirely
+inside the *existing* `/my-work` route as a query-param-driven view (`/my-work?project=id`), the
+same architectural pattern Country/Company/University already use (`?country=id` etc.) rather than
+a new dynamic route file. `MyWork.tsx` was restructured (still the same file, same route) into a
+Suspense-wrapped `useSearchParams()` reader: with `?project=`, it renders the full `ProjectHome`;
+without it, the Project-first list view. **My Work is now Project-first**: `CreateProjectForm` and
+`ProjectList` (Recent Projects, Pinned Projects — via the exact same `pinEntity`/
+`SaveToWorkspaceButton` architecture every other entity kind uses, `EntityKind` extended with
+`"project"` the same way it was extended with `"research_topic"` two missions ago, touching the
+same five real switch-consumers) now sit above the pre-existing Continue Working/Recently Viewed/
+Reports/Saved Work sections — none of which were removed.
+
+**Evidence and Notes belong to both Projects and Entities, as required**: `ProjectEvidenceReference`
+and `ProjectNote` are real, user-authored, projectId-scoped records — never an automated
+"discovery" system — while every Country/Company/University/Research topic's own real evidence
+coverage and notes (built in prior missions) are completely untouched and still belong to those
+entities directly. A Project's Notes/Evidence optionally *link* to a real Entity or Evidence
+reference by id; they don't replace or duplicate the entity-level systems.
+
+**Open Questions remain visible until resolved** — `ProjectQuestion.resolved: boolean`, set only by
+an explicit user action (`resolveProjectQuestion`), never auto-resolved or hidden by a timer.
+
+**Related Entities use the Relationship Engine, both directions.** `buildEntityRelationships`
+gained a `"project"` case (forward: real linked entities, from `loadProjectEntities`) and every
+existing case (country/company/university/research_topic) gained a real backlink
+(`PART_OF_WORKSPACE`-typed, via a new `getProjectsLinkedToEntity` reverse lookup) — so a Country's
+own Related panel now honestly shows which Projects reference it too, not just the reverse. Reused
+`EntityRelatedPanel` (built two missions ago) for every rendering — no new "related items" UI.
+
+**Project Progress is six real boolean checks** (question defined / objectives written / evidence
+added / notes created / entities linked / report generated this session), mirroring the exact
+milestone-count pattern `lib/research/readiness/`'s Research Progress already established — never
+a fabricated percentage. A freshly created, still-empty project honestly starts at 0/6.
+
+**Project Reports assemble Overview, Research Question, Evidence, Notes, Entities, Timeline,
+Trust, and Limitations** — `buildEntityReport("project", id)` dispatches through the same
+overloaded facade Country/Company/University/Research Topic reports already use.
+
+**Command Center**: `create project`/`open project` added as real fixed commands (both route to
+`/my-work`, where the create form and project list already live). `continue project`/`add
+evidence`/`open notes` are handled by a new, deliberately scoped `resolveProjectCommand` —
+investigated first whether the Command Center could know "which project is currently open" the
+same way it knows the focused Country/Company/University (via `?project=` on the current page),
+and found that would require adding `useSearchParams()` to the *global* Command Center component,
+forcing a Suspense boundary around every page's chrome — a real risk this mission explicitly
+warned against ("Do NOT build another architecture" / backward compatibility). Instead, these
+three commands operate on the real most-recently-updated project (`loadProjects()` is already
+sorted that way) — an honest, real interpretation of "continue," not a fabricated per-page guess.
+`find related entity` reuses the existing `resolveRelationshipCommand`, extended with the same
+`"project"` focus case described above. `generate report` was deliberately left unchanged (still
+routes to Reports Center) rather than overloaded with project-specific meaning — a Project's own
+report is one real click away on its own Project Home page.
+
+**Search**: "Create Project from Country/Company/University/Research" is real on both surfaces the
+mission named — a `CreateProjectFromEntityButton` on every Country/Company/University/Research
+topic profile page (next to the existing `SaveToWorkspaceButton`), and a `createProjectHref` field
+added to `SearchResultEntry` itself, rendered as a real "Create Project →" action on every openable
+search result card. Both deep-link to `/my-work` with the real entity pre-filled as Primary Entity
+via query params — never a fabricated default.
+
+**Tests**: new `scripts/test-project-engine.ts` (`npm run test:project-engine`) — 15 tests covering
+real PROJECT_TYPES configuration, SSR-safe persistence across all six stores, `toProjectEntity`
+validity, the relationship/report engine extensions, `buildPlatformEntityHref`'s project routing,
+honest zero-progress on a fresh project (never a fabricated default), and both new Command Center
+resolvers. 15/15 passing, alongside the unchanged 12 + 10 + 13 + 14 + 12 + 15 + 28 + 11 = 115
+total — **130 tests overall**.
+
+**Not attempted**: multi-user Visibility ("Team"/"Public") is declared honestly as Planned in the
+create form (disabled, not offered as working) — there is no account system to build real sharing
+on top of. Command Center project-command routing operates on "most recent project," not
+"currently open project," a documented, deliberate scope limitation (see above) rather than a
+fabricated capability. Project Timeline in the report reuses the same real create/update
+timestamps `ResearchWorkspaceActivity.tsx` already established for Research topics — no new
+timeline engine was built for Projects specifically.
+states render correctly server-side.

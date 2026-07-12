@@ -690,3 +690,28 @@ sources — zero new engines. New `ResearchWorkspaceActivity.tsx`, a real single
 from real note/finding/lifecycle timestamps. `ResearchTopicReport` gained real `question`/
 `supportingEvidence`/`counterEvidence`/`notes` fields. 12 new tests, 115 total passing. Full
 detail: `docs/product-activation-audit.md` §16.
+
+## Project Engine Activation
+
+Project is now the fifth `EntityType` — participating in Universal Search, the Relationship
+Engine (both directions: every Country/Company/University/Research topic now shows which real
+Projects reference it, not just the reverse), and the Report Engine, via the same three engines
+every other entity kind already used. 8 Project Types are pure configuration — no code anywhere
+branches on a specific type id. New `lib/project/project-store.ts` follows the exact
+`context-history.ts` persistence pattern for Projects, Notes, Tasks, Open Questions, and Evidence
+references.
+
+No new page was created. Project Home lives inside the existing `/my-work` route as a
+query-param-driven view (`/my-work?project=id`), the same pattern Country/Company/University
+already use — `MyWork.tsx` was restructured, not replaced, into a Suspense-wrapped
+`useSearchParams()` reader. My Work is now Project-first: Recent/Pinned Projects sit above the
+pre-existing Continue Working/Recently Viewed/Reports/Saved Work sections, none of which were
+removed. Project Progress is six real boolean checks, mirroring Research Progress's proven
+milestone-count pattern — never a fabricated percentage. Command Center gained `create
+project`/`open project` (fixed) and `continue project`/`add evidence`/`open notes` — the latter
+three operate on the real most-recently-updated project after investigating and deliberately
+avoiding `useSearchParams()` on the global Command Center (would force a Suspense boundary around
+every page). Search gained a real "Create Project from this entity" action on every
+Country/Company/University/Research profile page and every openable search result card,
+pre-filling the real entity as Primary Entity. 15 new tests, 130 total passing. Full detail:
+`docs/product-activation-audit.md` §17.

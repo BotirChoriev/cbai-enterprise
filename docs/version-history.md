@@ -884,6 +884,35 @@ build` 91 routes, 115 total tests passing (12 + 10 + 13 + 14 + 12 + 15 + 28 + 11
 Core files touched; `/research/workspace`'s separate shell left unchanged. Full detail:
 `docs/product-activation-audit.md` §16.
 
+## v3.18 — Project Engine Activation
+
+Project becomes the fifth `EntityType` — `toProjectEntity` gives every real project a valid
+universal Entity, participating in Universal Search, the Relationship Engine
+(`buildEntityRelationships("project", id)`, both directions — every other entity kind gained a
+real backlink to the Projects that reference it), and the Report Engine
+(`buildEntityReport("project", id)`). Project Types (8, configuration-only — no code branches on a
+specific type id) and real local persistence (`lib/project/project-store.ts`, the exact
+`context-history.ts` pattern) for Projects, Notes, Tasks, Open Questions, and Evidence references.
+
+No new page was created. Project Home lives inside the *existing* `/my-work` route as a
+query-param-driven view (`/my-work?project=id`), the same pattern Country/Company/University
+already use — `MyWork.tsx` was restructured, not replaced, into a Suspense-wrapped
+`useSearchParams()` reader. My Work is now Project-first (Recent/Pinned Projects above the
+pre-existing Continue Working/Recently Viewed/Reports/Saved Work sections, none removed).
+
+Project Progress is six real boolean checks (question/objectives/evidence/notes/entities/report),
+mirroring Research Progress's proven milestone-count pattern — never a fabricated percentage.
+Command Center gained `create project`/`open project` (fixed) and `continue project`/`add
+evidence`/`open notes` (operating on the real most-recently-updated project — investigated adding
+live per-page project focus first, and deliberately avoided it since it would require
+`useSearchParams()` on the *global* Command Center, forcing a Suspense boundary everywhere).
+Search gained a real "Create Project from this entity" action on every profile page and every
+openable search result card, pre-filling the real entity as Primary Entity.
+
+New `scripts/test-project-engine.ts` — 15 tests. `npm run lint` clean, `npm run build` 91 routes,
+130 total tests passing (15 + 12 + 10 + 13 + 14 + 12 + 15 + 28 + 11). Zero Platform Core files
+touched; no new pages; nothing removed. Full detail: `docs/product-activation-audit.md` §17.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation
