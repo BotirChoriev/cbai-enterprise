@@ -767,3 +767,18 @@ per result instead of a hardcoded "Available now." Compare pages fixed generic "
 "Second profile" labels and a misleading "Shared sources" metric that didn't actually mean
 connected evidence. 14 new tests, 171 total passing. Full detail:
 `docs/product-activation-audit.md` §20.
+
+## Authentication + User Platform Foundation
+
+A real local account system: genuine salted SHA-256 password hashing, real sign-up/sign-in/sign-
+out, a real session, honestly labeled everywhere as device-local (not a secure server-verified
+account, since a static export has no server). Every Project, Bookmark, and Recent-Activity entry
+now belongs to the real signed-in user via a per-user localStorage key namespace, without
+duplicating any storage shape — existing store functions needed zero call-site changes. Confronted
+"prepare for Supabase" honestly: a real cloud backend is inherently async while this app's stores
+are all synchronous, so converting everything would be the redesign this mission explicitly ruled
+out, and there's no real Supabase project in this environment anyway. Built a real, typed
+`CloudStorageAdapter` interface and a `SupabaseStorageAdapter` that honestly rejects every call as
+unconfigured — real scaffolding, never a faked connection. New `/account` page and real-auth-aware
+Topbar/My Work. 12 new tests, 183 total passing. Full detail: `docs/product-activation-audit.md`
+§21.

@@ -1013,6 +1013,38 @@ New `scripts/test-data-activation.ts` — 14 tests, including a real aggregate-c
 `npm run lint` clean, `npm run build` 91 routes, 171 total tests passing (14 + 15 + 12 + 15 + 12 +
 10 + 13 + 14 + 12 + 15 + 28 + 11). Full detail: `docs/product-activation-audit.md` §20.
 
+## v3.22 — Authentication + User Platform Foundation
+
+A real local account system — genuine salted SHA-256 password hashing (Web Crypto), real sign-up/
+sign-in/sign-out, a real session — honestly labeled everywhere as a device-local account, not a
+secure server-verified one, since a static export has no server to verify anything against. New
+`lib/auth/` (types, crypto, store) and a real `AuthProvider` React context using the same
+`useSyncExternalStore` pattern `AssistantProfileProvider` already established.
+
+Every Project, Bookmark, and Recent-Activity entry now belongs to the real signed-in user, without
+duplicating any storage shape: new `lib/storage/namespaced-key.ts` computes a real per-user key
+from the current session, and the existing `project-store.ts`/`context-history.ts` read/write
+helpers were changed to resolve it — their ~30 call sites needed zero changes. Signed out,
+everyone shares one `:local` bucket (a one-time migration moves any pre-existing data into it
+automatically, so nothing already saved becomes unreachable).
+
+Also confronted the mission's "prepare the platform for Supabase" request honestly: a real cloud
+backend is inherently async, while every existing store in this app is synchronous — converting
+the whole app would be a redesign this mission explicitly rules out, and there is no real Supabase
+project or credentials in this environment to build against. New `lib/storage/storage-provider.ts`
+defines a real, typed `CloudStorageAdapter` interface and a real `SupabaseStorageAdapter` class
+that honestly rejects every call as unconfigured — real, typed scaffolding, never wired into any
+store, never faking a live connection. `currentStorageMode()` is the one real switch point for
+when that changes.
+
+New `/account` page (sign-in/sign-up, real account summary, sign out) and a real-auth-aware
+`AccountMenu`/`MyWork` — the latter's old "CBAI does not yet have accounts" copy, true when
+written, was corrected now that it's false.
+
+New `scripts/test-auth-platform.ts` — 12 tests. `npm run lint` clean, `npm run build` 92 routes
+(`/account` is the one new page), 183 total tests passing (12 + 14 + 15 + 12 + 15 + 12 + 10 + 13 +
+14 + 12 + 15 + 28 + 11). Full detail: `docs/product-activation-audit.md` §21.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation

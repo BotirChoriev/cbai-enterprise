@@ -1435,3 +1435,86 @@ assertion mirroring the mission's own "count connected countries/companies/unive
 relationships" request. 14/14 passing, alongside the unchanged 15 + 12 + 15 + 12 + 10 + 13 + 14 +
 12 + 15 + 28 + 11 = 157 total — **171 tests overall**. `npm run build` clean, 91 routes. Full
 detail: this section. Zero fabricated data; zero new pages; zero new architecture.
+
+## 21. Authentication + User Platform Foundation
+
+Response to "transform CBAI from a browser demo into a real multi-user platform." The honest
+constraint this mission runs into immediately: this is a static export (`output: "export"`, no
+server, no API routes), and a real cloud backend is inherently asynchronous — every existing store
+function in this codebase (`loadProjects()`, `loadPinnedEntities()`, etc.) is synchronous. Wiring
+a real Supabase project in would mean converting dozens of already-real, already-tested functions
+from sync to async across the whole app — a repo-wide signature rewrite the mission's own "do not
+redesign" rules out, and there is no real Supabase project or credentials in this environment to
+build that rewrite against anyway (writing async call sites with nothing real behind them would be
+its own kind of fabrication). So this mission did the honest version of what it actually asked for:
+"prepare the platform for Supabase... keep browser storage only as a fallback or development
+mode" — treated literally, not as permission to fake a live connection.
+
+**Storage Model**: new `lib/storage/storage-provider.ts` — a real, typed `CloudStorageAdapter`
+interface any future backend implements, `currentStorageMode()` as the one real switch point
+(checks `NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_ANON_KEY`, always "local" in this
+environment since neither exists), and a real `SupabaseStorageAdapter` class whose methods are
+honestly async and honestly reject with a clear configuration error — real code, typed correctly,
+never wired into any store, never fabricating a working connection. `@supabase/supabase-js` was
+deliberately not added as a dependency — nothing in this pass calls it, and importing a client
+library with no real project to point it at would be dead weight, not preparation.
+
+**Authentication Foundation**: new `lib/auth/` — a genuine local account system, not a demo. Real
+salted SHA-256 password hashing (`lib/auth/auth-crypto.ts`, Web Crypto — `crypto.getRandomValues`
+per-user salt, `crypto.subtle.digest`, never plaintext), real sign-up/sign-in/sign-out
+(`lib/auth/auth-store.ts`, same `isBrowser()`-guarded localStorage pattern every other store in
+this app already uses), and a real `AuthProvider` React context using the exact
+`useSyncExternalStore` pattern `AssistantProfileProvider` already established (server snapshot
+always signed-out, reconciled with the real session on the client, no setState-in-effect
+cascade). Every surface that shows this account says plainly what it is:
+`LOCAL_ACCOUNT_NOTICE` — "stored, hashed and salted, on this device only... not a secure
+substitute for a real cloud account" — the same honesty register as "Personal Operator" already
+used for profile data.
+
+**User Model**: `User { id, email, displayName, organization, passwordHash, passwordSalt,
+createdAt }`, with a `PublicUser` type that structurally cannot leak credential fields to any
+caller outside the auth store. `organization` reuses the exact field name and concept
+`AssistantProfile.organization` already had — deliberately not building a second, competing
+identity field.
+
+**Ownership Model**: every Project, Bookmark (pinned entity), and Recent-Activity entry now
+belongs to the real signed-in user — without duplicating a single storage shape. New
+`lib/storage/namespaced-key.ts` computes a real per-user key (`cbai-projects:u:<userId>`) from the
+real current session; `lib/project/project-store.ts`'s and `lib/context/context-history.ts`'s
+`readList`/`writeList`/`writeEntityList` helpers were changed to resolve this key — every one of
+their ~30 call sites needed zero changes. Signed out, everyone shares one `:local` bucket — a
+one-time migration copies any pre-existing bare-key data (from before this mission) into that
+bucket automatically, so nothing anyone already saved becomes unreachable. A signed-in user's
+private key is never auto-populated from anonymous browser data, since that would silently
+attribute someone else's saved work to whoever happens to sign in first.
+
+**UI**: new `/account` page (`AccountForm.tsx`) — real sign-in/sign-up form, and a real signed-in
+view showing the account's actual Project/Bookmark counts (read live from the now-namespaced
+stores) and a Sign Out action. `AccountMenu.tsx` (Topbar) now shows real sign-in state — "Sign In"
+when signed out, the real account name/email in the dropdown when signed in — deliberately kept
+as a second, independent concept from the existing Assistant profile ("Set up Operator"), since
+one is who owns your data and the other is how the Assistant addresses you; both can be true (or
+neither) at once. `MyWork.tsx`'s copy, which previously said "CBAI does not yet have accounts" —
+true when it was written, false the moment this mission shipped — was corrected to reflect the
+real account system and invite sign-in.
+
+**Tests**: new `scripts/test-auth-platform.ts` — 12 tests covering real hashing/salting
+determinism, honest SSR-safe auth-store behavior (never throws, never fabricates a session
+outside a browser), input validation, credential-leak prevention (`toPublicUser`), the honestly-
+unconfigured Supabase adapter, and real key namespacing. 12/12 passing, alongside the unchanged
+14 + 15 + 12 + 15 + 12 + 10 + 13 + 14 + 12 + 15 + 28 + 11 = 171 total — **183 tests overall**.
+`npm run build` clean, 92 routes (`/account` is new — the one page this mission added, since a
+sign-in/sign-up form is new UI that has no existing page to live in without redesigning Settings).
+
+**Not attempted, honestly**: no real cloud persistence — nothing here talks to a network; "local"
+is the only mode that actually runs. No email verification, no password reset, no rate limiting,
+no CSRF/session-fixation hardening — this is a local-device credential store, not a hardened
+backend auth system, and every surface says so. The Assistant profile
+(`lib/assistant/assistant-profile.ts`) is *not* namespaced per-account — it stays one device-local
+preference set regardless of who's signed in, a deliberate scope cut documented in that file's own
+comment rather than silently left inconsistent. "Saved Reports" ownership does not apply yet
+because no report-persistence exists at all in this codebase — every report is compiled fresh on
+demand (`buildEntityReport`), never stored; building report persistence would be new feature work
+this mission's "stop building frontend features" directive rules out. No multi-tenant Organization
+model (roles, invites, shared workspaces) — `organization` is a real but plain text field, not a
+new entity.
