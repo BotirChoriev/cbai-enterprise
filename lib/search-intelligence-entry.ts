@@ -8,6 +8,13 @@ import { getEntityTypeLabel } from "@/lib/entity/entity.helpers";
 import { buildPlatformEntityHref } from "@/lib/global-search";
 import type { EvidenceDisplayStatus } from "@/lib/search-gateway";
 import { EVIDENCE_NOT_CONNECTED_LABEL } from "@/lib/platform-home";
+import { countries } from "@/lib/countries";
+import { companies } from "@/lib/companies";
+import { universities } from "@/lib/universities";
+import { buildCountryCoverageProfile } from "@/lib/countries.coverage";
+import { buildCompanyCoverageProfile } from "@/lib/companies.coverage";
+import { buildUniversityCoverageProfile } from "@/lib/universities.coverage";
+import { deriveEvidenceGapIntelligence } from "@/lib/research/intelligence/intelligence-engine";
 
 const PLAIN_NEXT_STEP = "Open to see available official information.";
 
@@ -26,7 +33,44 @@ export type SearchResultEntry = {
   showReports: boolean;
   /** Real "Create Project from this entity" link — null when this result isn't a linkable entity. */
   createProjectHref: string | null;
+  /** Real "X of Y sources connected" (or evidence-connected) count — so how much information
+   * exists is visible before opening the profile. Null only for kinds with no coverage model. */
+  coverageLabel: string | null;
 };
+
+/** Real, already-computed coverage counts — never a fabricated summary. */
+function resolveCoverageLabel(entity: Entity): string | null {
+  if (entity.type === "country") {
+    const country = countries.find((c) => c.id === entity.id);
+    if (!country) return null;
+    const { connected, total } = buildCountryCoverageProfile(country).evidenceCoverage;
+    return `${connected} of ${total} sources connected`;
+  }
+
+  if (entity.type === "company") {
+    const company = companies.find((c) => c.id === entity.id);
+    if (!company) return null;
+    const { connected, total } = buildCompanyCoverageProfile(company).evidenceCoverage;
+    return `${connected} of ${total} sources connected`;
+  }
+
+  if (entity.type === "university") {
+    const university = universities.find((u) => u.id === entity.id);
+    if (!university) return null;
+    const { connected, total } = buildUniversityCoverageProfile(university).evidenceCoverage;
+    return `${connected} of ${total} sources connected`;
+  }
+
+  if (entity.type === "research_topic") {
+    const intelligence = deriveEvidenceGapIntelligence(entity.id);
+    if (!intelligence) return null;
+    const connected = intelligence.connectedEvidence.length;
+    const total = connected + intelligence.disconnectedEvidence.length;
+    return `${connected} of ${total} evidence items connected`;
+  }
+
+  return null;
+}
 
 function createProjectHref(entity: Entity): string {
   const params = new URLSearchParams({ entityKind: entity.type, entityId: entity.id, entityName: entity.name });
@@ -78,6 +122,7 @@ export function buildEntityResultEntry(
   const href = buildPlatformEntityHref(entity, { searchQuery });
   const countryLabel = resolveCountryLabel(entity);
   const distinguishingFact = resolveDistinguishingFact(entity);
+  const coverageLabel = resolveCoverageLabel(entity);
 
   if (entity.type === "country") {
     return {
@@ -94,6 +139,7 @@ export function buildEntityResultEntry(
       showCompare: true,
       showReports: true,
       createProjectHref: createProjectHref(entity),
+      coverageLabel,
     };
   }
 
@@ -112,6 +158,7 @@ export function buildEntityResultEntry(
       showCompare: true,
       showReports: true,
       createProjectHref: createProjectHref(entity),
+      coverageLabel,
     };
   }
 
@@ -130,6 +177,7 @@ export function buildEntityResultEntry(
       showCompare: true,
       showReports: true,
       createProjectHref: createProjectHref(entity),
+      coverageLabel,
     };
   }
 
@@ -148,6 +196,7 @@ export function buildEntityResultEntry(
       showCompare: false,
       showReports: true,
       createProjectHref: createProjectHref(entity),
+      coverageLabel,
     };
   }
 
@@ -166,6 +215,7 @@ export function buildEntityResultEntry(
       showCompare: false,
       showReports: true,
       createProjectHref: null,
+      coverageLabel: null,
     };
   }
 
@@ -183,6 +233,7 @@ export function buildEntityResultEntry(
     showCompare: false,
     showReports: false,
     createProjectHref: null,
+    coverageLabel: null,
   };
 }
 
@@ -209,6 +260,7 @@ export function buildTopicResultEntry(topic: {
     showCompare: false,
     showReports: false,
     createProjectHref: null,
+    coverageLabel: null,
   };
 }
 

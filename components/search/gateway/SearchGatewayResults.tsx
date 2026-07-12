@@ -150,6 +150,10 @@ function EntityMatchCard({ entry, matchedLabel }: EntityMatchCardProps) {
         <p className="mt-1 text-xs text-zinc-400">{entry.distinguishingFact}</p>
       ) : null}
 
+      {entry.coverageLabel ? (
+        <p className="mt-1 text-xs text-cyan-400/80">{entry.coverageLabel}</p>
+      ) : null}
+
       <p className="mt-1 text-xs text-zinc-600">{entry.nextStep}</p>
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
