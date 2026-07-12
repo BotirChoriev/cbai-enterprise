@@ -1,15 +1,20 @@
-import Link from "next/link";
 import type { CountryIntelligenceProfile } from "@/lib/countries.intelligence";
-import { coverageStatusClass } from "@/lib/countries.coverage";
-import { hrefForEntity } from "@/components/shared/resolve-entity-link";
-import LinkedNamesList from "@/components/shared/LinkedNamesList";
+import { buildEntityRelationships } from "@/lib/entity/entity-relationships";
+import EntityRelatedPanel from "@/components/shared/EntityRelatedPanel";
 
 type CountryRelationshipsProps = {
   profile: CountryIntelligenceProfile;
 };
 
+/**
+ * Migrated onto the Universal Entity Engine (Platform Core Completion mission) — was two
+ * overlapping views of the same data (a Knowledge Graph edge list, plus a redundant linked-
+ * companies/universities summary below it, both ultimately derived from the same
+ * getCountryRelationships() call the graph itself is built from). EntityRelatedPanel now shows
+ * the graph's richer per-edge label and evidence status once, grouped by type, with nothing lost.
+ */
 export default function CountryRelationships({ profile }: CountryRelationshipsProps) {
-  const { graphRelationships, graphRelationshipCount } = profile.coverage;
+  const relationships = buildEntityRelationships("country", profile.countryId);
 
   return (
     <section className="space-y-4" aria-labelledby="country-relationships-heading">
@@ -26,74 +31,12 @@ export default function CountryRelationships({ profile }: CountryRelationshipsPr
         </p>
       </div>
 
-      <div className="rounded-xl border border-zinc-800 bg-zinc-950">
-        <div className="border-b border-zinc-800 px-6 py-4">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-zinc-50">Knowledge Graph connections</p>
-            <span className="font-mono text-xs text-zinc-500">
-              {graphRelationshipCount} verified edge
-              {graphRelationshipCount === 1 ? "" : "s"}
-            </span>
-          </div>
-        </div>
-
-        {graphRelationships.length === 0 ? (
-          <div className="px-6 py-8">
-            <p className="text-sm text-zinc-500">
-              No verified catalog relationships indexed for this country in the Knowledge Graph.
-            </p>
-          </div>
-        ) : (
-          <ul className="divide-y divide-zinc-800">
-            {graphRelationships.map((rel) => {
-              const href = hrefForEntity(rel.entityType, rel.entityName);
-              return (
-                <li
-                  key={`${rel.entityType}-${rel.entityName}-${rel.relationshipLabel}`}
-                  className="flex flex-col gap-2 px-6 py-4 sm:flex-row sm:items-center sm:justify-between"
-                >
-                  <div>
-                    {href ? (
-                      <Link href={href} className="text-sm font-medium text-cyan-400 hover:text-cyan-300">
-                        {rel.entityName}
-                      </Link>
-                    ) : (
-                      <p className="text-sm font-medium text-zinc-200">{rel.entityName}</p>
-                    )}
-                    <p className="text-xs capitalize text-zinc-500">{rel.entityType}</p>
-                    <p className="mt-1 text-xs text-zinc-600">{rel.relationshipLabel}</p>
-                  </div>
-                  <span
-                    className={`self-start rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${coverageStatusClass(rel.evidenceLabel === "Verified local catalog" ? "Connected" : "Not connected")}`}
-                  >
-                    {rel.evidenceLabel}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-
-        <div className="border-t border-zinc-800 px-6 py-4">
-          <dl className="grid gap-3 text-sm sm:grid-cols-2">
-            <div>
-              <dt className="text-xs uppercase tracking-wider text-zinc-600">
-                Linked companies (local catalog)
-              </dt>
-              <dd className="mt-1 text-zinc-300">
-                <LinkedNamesList names={profile.linkedEntities.relatedCompanies} entityType="company" />
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs uppercase tracking-wider text-zinc-600">
-                Linked universities (local catalog)
-              </dt>
-              <dd className="mt-1 text-zinc-300">
-                <LinkedNamesList names={profile.linkedEntities.universities} entityType="university" />
-              </dd>
-            </div>
-          </dl>
-        </div>
+      <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-6">
+        <EntityRelatedPanel
+          showHeading={false}
+          relationships={relationships}
+          emptyLabel="No verified catalog relationships indexed for this country in the Knowledge Graph."
+        />
       </div>
     </section>
   );

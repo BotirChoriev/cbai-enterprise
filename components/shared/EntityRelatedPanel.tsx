@@ -9,6 +9,8 @@ type EntityRelatedPanelProps = {
   emptyLabel: string;
   /** Optional short note about how these relationships were derived (e.g. "matched by subject matter"). */
   note?: string;
+  /** Set false when the caller already renders its own section heading around this panel. */
+  showHeading?: boolean;
 };
 
 const GROUP_ORDER: readonly EntityType[] = [
@@ -36,21 +38,78 @@ function groupByType(
   }));
 }
 
+function verifiedBadgeClass(verified: boolean): string {
+  return verified
+    ? "text-cyan-400 bg-cyan-500/10 border-cyan-500/20"
+    : "text-zinc-400 bg-zinc-800/50 border-zinc-700/50";
+}
+
+function RelationshipRow({ item }: { item: EntityRelationship }) {
+  return (
+    <li className="flex flex-col gap-2 rounded-lg border border-zinc-800 bg-zinc-900/40 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        {item.targetHref ? (
+          <Link href={item.targetHref} className="text-sm font-medium text-cyan-400 hover:text-cyan-300">
+            {item.targetName}
+          </Link>
+        ) : (
+          <p className="text-sm font-medium text-zinc-200">{item.targetName}</p>
+        )}
+        {item.label ? <p className="mt-0.5 text-xs text-zinc-600">{item.label}</p> : null}
+      </div>
+      {item.verified !== undefined ? (
+        <span className={`self-start rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${verifiedBadgeClass(item.verified)}`}>
+          {item.verified ? "Verified local catalog" : "Evidence missing"}
+        </span>
+      ) : null}
+    </li>
+  );
+}
+
+function RelationshipPill({ item }: { item: EntityRelationship }) {
+  return (
+    <li>
+      {item.targetHref ? (
+        <Link
+          href={item.targetHref}
+          className="inline-flex items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-900/60 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:border-cyan-500/30 hover:text-cyan-300"
+        >
+          {item.targetName}
+        </Link>
+      ) : (
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-900/60 px-3 py-1.5 text-xs text-zinc-500">
+          {item.targetName}
+        </span>
+      )}
+    </li>
+  );
+}
+
 /**
  * Universal Entity Engine — one "Related Entities" panel, grouped by real target type, replacing
  * the need for a bespoke "Related Companies"/"Related Universities"/"Related Research" component
  * per entity module. Only ever renders relationships the caller actually computed via
- * lib/entity/entity-relationships.ts's buildEntityRelationships — never fabricates a group.
+ * lib/entity/entity-relationships.ts's buildEntityRelationships — never fabricates a group. When a
+ * group's relationships carry a real label/verification status (Knowledge Graph edges), it renders
+ * the richer row layout; otherwise (e.g. subject-matter-matched research topics) a compact pill.
  */
-export default function EntityRelatedPanel({ title = "Related Entities", relationships, emptyLabel, note }: EntityRelatedPanelProps) {
+export default function EntityRelatedPanel({
+  title = "Related Entities",
+  relationships,
+  emptyLabel,
+  note,
+  showHeading = true,
+}: EntityRelatedPanelProps) {
   const groups = groupByType(relationships);
 
   if (groups.length === 0) {
     return (
       <section aria-labelledby="entity-related-panel-heading" className="space-y-2">
-        <p className={cbaiSectionEyebrow} id="entity-related-panel-heading">
-          {title}
-        </p>
+        {showHeading ? (
+          <p className={cbaiSectionEyebrow} id="entity-related-panel-heading">
+            {title}
+          </p>
+        ) : null}
         <p className="text-sm text-zinc-500">{emptyLabel}</p>
       </section>
     );
@@ -58,38 +117,36 @@ export default function EntityRelatedPanel({ title = "Related Entities", relatio
 
   return (
     <section aria-labelledby="entity-related-panel-heading" className="space-y-3">
-      <div>
-        <p className={cbaiSectionEyebrow} id="entity-related-panel-heading">
-          {title}
-        </p>
-        {note ? <p className="mt-1 text-xs text-zinc-600">{note}</p> : null}
-      </div>
-      <div className="space-y-3">
-        {groups.map((group) => (
-          <div key={group.targetType}>
-            <p className="mb-1.5 text-[10px] uppercase tracking-wider text-zinc-600">
-              {getEntityTypePluralLabel(group.targetType)}
+      {showHeading || note ? (
+        <div>
+          {showHeading ? (
+            <p className={cbaiSectionEyebrow} id="entity-related-panel-heading">
+              {title}
             </p>
-            <ul className="flex flex-wrap gap-2">
-              {group.items.map((item) => (
-                <li key={`${item.type}-${item.targetType}-${item.targetId}`}>
-                  {item.targetHref ? (
-                    <Link
-                      href={item.targetHref}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-900/60 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:border-cyan-500/30 hover:text-cyan-300"
-                    >
-                      {item.targetName}
-                    </Link>
+          ) : null}
+          {note ? <p className="mt-1 text-xs text-zinc-600">{note}</p> : null}
+        </div>
+      ) : null}
+      <div className="space-y-4">
+        {groups.map((group) => {
+          const useRows = group.items.some((item) => item.label !== undefined || item.verified !== undefined);
+          return (
+            <div key={group.targetType}>
+              <p className="mb-1.5 text-[10px] uppercase tracking-wider text-zinc-600">
+                {getEntityTypePluralLabel(group.targetType)}
+              </p>
+              <ul className={useRows ? "space-y-2" : "flex flex-wrap gap-2"}>
+                {group.items.map((item) =>
+                  useRows ? (
+                    <RelationshipRow key={`${item.type}-${item.targetType}-${item.targetId}`} item={item} />
                   ) : (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-900/60 px-3 py-1.5 text-xs text-zinc-500">
-                      {item.targetName}
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+                    <RelationshipPill key={`${item.type}-${item.targetType}-${item.targetId}`} item={item} />
+                  ),
+                )}
+              </ul>
+            </div>
+          );
+        })}
       </div>
     </section>
   );

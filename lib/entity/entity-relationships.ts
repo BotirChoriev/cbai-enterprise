@@ -1,38 +1,46 @@
 /**
- * Universal Entity Engine — relationship builder (Platform Core mission).
+ * Universal Entity Engine — relationship builder (Platform Core mission, upgraded in the Platform
+ * Core Completion mission).
  *
- * No new relationship data is computed here. Every relationship this file exposes is read
- * straight from the already-real, already-tested per-module adapters
- * (getCountryRelationships/getCompanyRelationships/getUniversityRelationships,
- * getRelatedResearchTopics/getRelatedCompaniesForTopic) and mapped onto one shared vocabulary
- * (EntityRelationshipType). This is a normalization layer, not a new relationship engine — it
- * lets any caller ask "what is this entity connected to?" without knowing which per-module
- * function to call first.
+ * No new relationship data is computed here. Country/Company/University relationships are read
+ * straight from each module's already-real, already-computed Knowledge Graph edges
+ * (`buildCountryCoverageProfile`/`buildCompanyCoverageProfile`/`buildUniversityCoverageProfile`'s
+ * `graphRelationships` — the same data `CountryRelationships.tsx`/`CompanyRelationships.tsx`/
+ * `UniversityRelationships.tsx` already render) rather than the narrower name lists, so a caller
+ * gets the real relationship label ("Located In", "Registered In", "Belongs To") and evidence
+ * status too, not just a bare name. The Knowledge Graph itself is built directly from
+ * `getCountryRelationships`/`getCompanyRelationships` (see lib/graph/graph.builder.ts), so this
+ * is a strict superset of the earlier name-list-only version — nothing that resolved before stops
+ * resolving. Company<->Research edges (`getRelatedResearchTopics`/`getRelatedCompaniesForTopic`)
+ * are layered on top, since the Knowledge Graph has no notion of research topics at all. This is
+ * a normalization layer, not a new relationship engine — it lets any caller ask "what is this
+ * entity connected to?" without knowing which per-module function to call first.
  */
 
 import { countries } from "@/lib/countries";
 import { companies } from "@/lib/companies";
 import { universities } from "@/lib/universities";
-import { getCountryRelationships } from "@/lib/countries.adapter";
-import { getCompanyRelationships } from "@/lib/companies.adapter";
-import { getUniversityRelationships } from "@/lib/universities.adapter";
+import { buildCountryCoverageProfile } from "@/lib/countries.coverage";
+import { buildCompanyCoverageProfile } from "@/lib/companies.coverage";
+import { buildUniversityCoverageProfile } from "@/lib/universities.coverage";
 import { getRelatedResearchTopics, getRelatedCompaniesForTopic } from "@/lib/company-research";
 import { getResearchTopicById, getResearchTopicPath } from "@/lib/research/research-topics";
-import { countryHrefByName, companyHrefByName, universityHrefByName } from "@/components/shared/resolve-entity-link";
-import type { EntityRelationship, EntityType } from "@/lib/entity/entity.types";
+import { companyHrefByName, hrefForEntity, type LinkableEntityType } from "@/components/shared/resolve-entity-link";
+import type { EntityRelationship } from "@/lib/entity/entity.types";
 
-function relatedFrom(
-  type: EntityRelationship["type"],
-  targetType: EntityType,
-  names: readonly string[],
-  hrefFn: (name: string) => string | null,
+const VERIFIED_LABEL = "Verified local catalog";
+
+function fromGraphRelationships(
+  graphRelationships: readonly { entityName: string; entityType: LinkableEntityType; relationshipLabel: string; evidenceLabel: string }[],
 ): EntityRelationship[] {
-  return names.map((name) => ({
-    type,
-    targetType,
-    targetId: name,
-    targetName: name,
-    targetHref: hrefFn(name),
+  return graphRelationships.map((rel) => ({
+    type: rel.entityType === "country" ? "LOCATED_IN" : "RELATED_TO",
+    targetType: rel.entityType,
+    targetId: rel.entityName,
+    targetName: rel.entityName,
+    targetHref: hrefForEntity(rel.entityType, rel.entityName),
+    label: rel.relationshipLabel,
+    verified: rel.evidenceLabel === VERIFIED_LABEL,
   }));
 }
 
@@ -45,27 +53,12 @@ export function buildEntityRelationships(
     case "country": {
       const country = countries.find((c) => c.id === id);
       if (!country) return [];
-      const rel = getCountryRelationships(country);
-      return [
-        ...relatedFrom("RELATED_TO", "company", rel.relatedCompanies, companyHrefByName),
-        ...relatedFrom("RELATED_TO", "university", rel.universities, universityHrefByName),
-      ];
+      return fromGraphRelationships(buildCountryCoverageProfile(country).graphRelationships);
     }
     case "company": {
       const company = companies.find((c) => c.id === id);
       if (!company) return [];
-      const rel = getCompanyRelationships(company);
-      const located: EntityRelationship[] = rel.headquartersCountry
-        ? [
-            {
-              type: "LOCATED_IN",
-              targetType: "country",
-              targetId: rel.headquartersCountry,
-              targetName: rel.headquartersCountry,
-              targetHref: countryHrefByName(rel.headquartersCountry),
-            },
-          ]
-        : [];
+      const graph = fromGraphRelationships(buildCompanyCoverageProfile(company).graphRelationships);
       const research = getRelatedResearchTopics(company).map(
         (match): EntityRelationship => ({
           type: "HAS_RESEARCH",
@@ -75,28 +68,12 @@ export function buildEntityRelationships(
           targetHref: getResearchTopicPath(match.topic.topicId),
         }),
       );
-      return [
-        ...located,
-        ...relatedFrom("RELATED_TO", "university", rel.universities, universityHrefByName),
-        ...research,
-      ];
+      return [...graph, ...research];
     }
     case "university": {
       const university = universities.find((u) => u.id === id);
       if (!university) return [];
-      const rel = getUniversityRelationships(university);
-      const located: EntityRelationship[] = rel.country
-        ? [
-            {
-              type: "LOCATED_IN",
-              targetType: "country",
-              targetId: rel.country,
-              targetName: rel.country,
-              targetHref: countryHrefByName(rel.country),
-            },
-          ]
-        : [];
-      return [...located, ...relatedFrom("RELATED_TO", "company", rel.companies, companyHrefByName)];
+      return fromGraphRelationships(buildUniversityCoverageProfile(university).graphRelationships);
     }
     case "research_topic": {
       const topic = getResearchTopicById(id);

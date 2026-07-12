@@ -135,6 +135,10 @@ export type EntityRelationship = {
   targetName: string;
   /** Real, navigable link — null when the target has no resolvable profile route. */
   targetHref: string | null;
+  /** Real relationship description, when the source has one (e.g. Knowledge Graph edge labels). */
+  label?: string;
+  /** Real evidence-verification status for this specific edge, when the source tracks one. */
+  verified?: boolean;
 };
 
 /** Props shared by all entity presentation components */
