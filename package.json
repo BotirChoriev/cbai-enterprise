@@ -11,7 +11,8 @@
     "test:product-activation": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-product-activation.ts",
     "test:companies-intelligence": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-companies-intelligence.ts",
     "test:countries-intelligence": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-countries-intelligence.ts",
-    "test:relationship-activation": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-relationship-activation.ts"
+    "test:relationship-activation": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-relationship-activation.ts",
+    "test:universal-entity-engine": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-universal-entity-engine.ts"
   },
   "dependencies": {
     "next": "16.2.10",
