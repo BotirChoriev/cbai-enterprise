@@ -14,6 +14,7 @@ import TopicReviewWorkspace from "@/components/research/topic/TopicReviewWorkspa
 import ResearchCockpit from "@/components/research/topic/ResearchCockpit";
 import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
 import ResearchRelatedCompanies from "@/components/research/topic/ResearchRelatedCompanies";
+import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import { deriveResearchWorkflow } from "@/lib/research/workflow/workflow-engine";
 import { cbaiHeroGlow } from "@/components/brand/brand-classes";
 
@@ -30,6 +31,10 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
       className={`mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6 sm:py-10 ${cbaiHeroGlow}`}
     >
       <ResearchTopicHero topic={topic} />
+
+      <div className="flex justify-end">
+        <SaveToWorkspaceButton entity={{ kind: "research_topic", id: topic.topicId, name: topic.topicName }} />
+      </div>
 
       <ContextualOperatorBanner />
 

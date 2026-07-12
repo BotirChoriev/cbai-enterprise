@@ -4,12 +4,13 @@ import Link from "next/link";
 import { buildContextualHref, snapshotWithEntityFocus, type ContextEntityRef } from "@/lib/context";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import { PINNED_ENTITIES_ARCHITECTURE_NOTE } from "@/lib/context";
+import { getResearchTopicPath } from "@/lib/research/research-topics";
 
 type PinnedEntitiesProps = {
   entities: readonly ContextEntityRef[];
 };
 
-function entityRoute(kind: ContextEntityRef["kind"]): string {
+function entityRoute(kind: "country" | "company" | "university"): string {
   switch (kind) {
     case "country":
       return "/countries";
@@ -18,6 +19,18 @@ function entityRoute(kind: ContextEntityRef["kind"]): string {
     case "university":
       return "/universities";
   }
+}
+
+/**
+ * Research topics are routed by path segment (`/research/[topicId]`), not the
+ * country/company/university query-param focus system — so a pinned research topic gets a
+ * direct link instead of going through buildContextualHref/snapshotWithEntityFocus.
+ */
+function entityHref(entity: ContextEntityRef, context: Parameters<typeof snapshotWithEntityFocus>[0]): string {
+  if (entity.kind === "research_topic") {
+    return getResearchTopicPath(entity.id);
+  }
+  return buildContextualHref(entityRoute(entity.kind), snapshotWithEntityFocus(context, entity));
 }
 
 export default function PinnedEntities({ entities }: PinnedEntitiesProps) {
@@ -35,13 +48,7 @@ export default function PinnedEntities({ entities }: PinnedEntitiesProps) {
               key={`${entity.kind}-${entity.id}`}
               className="flex items-center gap-1 rounded-md border border-zinc-800 pl-2 pr-1 py-1 text-[11px] text-zinc-400"
             >
-              <Link
-                href={buildContextualHref(
-                  entityRoute(entity.kind),
-                  snapshotWithEntityFocus(context, entity),
-                )}
-                className="hover:text-cyan-300"
-              >
+              <Link href={entityHref(entity, context)} className="hover:text-cyan-300">
                 {entity.name}
               </Link>
               <button

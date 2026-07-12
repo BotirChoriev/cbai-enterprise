@@ -21,6 +21,11 @@ function entityProfilePath(entity: ContextEntityRef): string {
       return PLATFORM_MODULES.companies.path;
     case "university":
       return PLATFORM_MODULES.universities.path;
+    case "research_topic":
+      // Never reached in practice — getPrimaryEntity only ever returns
+      // context.country/company/university (research topics are never stored there; see
+      // EntityKind). Present for type exhaustiveness only.
+      return PLATFORM_MODULES.reports.path;
   }
 }
 

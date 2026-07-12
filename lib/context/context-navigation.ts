@@ -196,6 +196,11 @@ function entityPrimaryModules(kind: ContextEntityRef["kind"]): PlatformModuleId[
       return ["companies", "countries", "investor", "evidence", "reports", "reasoning"];
     case "university":
       return ["universities", "countries", "evidence", "reports", "reasoning", "graph"];
+    case "research_topic":
+      // Never reached in practice — research topic focus is never stored in
+      // snapshot.country/company/university (see EntityKind), so this switch's caller never
+      // passes this kind. Present for type exhaustiveness only.
+      return ["evidence", "reports"];
   }
 }
 

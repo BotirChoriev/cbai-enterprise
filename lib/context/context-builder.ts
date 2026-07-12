@@ -66,6 +66,9 @@ export function resolveEntityRef(
       return resolveCompanyRef(id);
     case "university":
       return resolveUniversityRef(id);
+    case "research_topic":
+      // Research topics are never resolved through the URL-param focus system — see EntityKind.
+      return null;
   }
 }
 

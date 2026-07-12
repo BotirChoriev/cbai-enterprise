@@ -23,7 +23,8 @@ function parseEntityList(raw: string | null): ContextEntityRef[] {
         typeof (item as ContextEntityRef).name === "string" &&
         ((item as ContextEntityRef).kind === "country" ||
           (item as ContextEntityRef).kind === "company" ||
-          (item as ContextEntityRef).kind === "university"),
+          (item as ContextEntityRef).kind === "university" ||
+          (item as ContextEntityRef).kind === "research_topic"),
     );
   } catch {
     return [];
