@@ -30,6 +30,11 @@ export default function ResearchTopicReportView({ report }: ResearchTopicReportV
       </div>
 
       <div className="space-y-2">
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Research Question</p>
+        <p className="text-sm text-zinc-300">{report.question}</p>
+      </div>
+
+      <div className="space-y-2 border-t border-zinc-800/80 pt-4">
         <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Overview</p>
         <dl className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
           <div>
@@ -45,7 +50,25 @@ export default function ResearchTopicReportView({ report }: ResearchTopicReportV
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
         <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Evidence</p>
-        <p className="text-sm text-zinc-400">{report.evidenceConnectedCount} items connected.</p>
+        <p className="text-sm text-zinc-400">
+          {report.evidenceConnectedCount} items connected · {report.supportingEvidence.length} supporting ·{" "}
+          {report.counterEvidence.length} counter evidence.
+        </p>
+      </div>
+
+      <div className="space-y-2 border-t border-zinc-800/80 pt-4">
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Research Notes</p>
+        {report.notes.length > 0 ? (
+          <ul className="space-y-1.5">
+            {report.notes.map((note) => (
+              <li key={note.noteId} className="text-sm text-zinc-400">
+                {note.body}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-zinc-500">No research notes recorded yet.</p>
+        )}
       </div>
 
       <div className="border-t border-zinc-800/80 pt-4">

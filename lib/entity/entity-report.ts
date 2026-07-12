@@ -26,15 +26,23 @@ import { buildResearchMission } from "@/lib/research-mission/research-mission-bu
 import { getResearchTopicById } from "@/lib/research/research-topics";
 import { buildEntityRelationships } from "@/lib/entity/entity-relationships";
 import type { EntityRelationship } from "@/lib/entity/entity.types";
+import type { Evidence } from "@/lib/foundation/foundation-model";
 import { resolveEntityDataStatus } from "@/components/shared/entity-profile-copy";
 import type { ProductStatus } from "@/lib/product-status";
+import { loadResearchNotes, type PersistedResearchNote } from "@/lib/research/research-workspace-store";
 
 export type ResearchTopicReport = {
   topicId: string;
   topicName: string;
   domain: string;
   description: string;
+  /** The real research question, from the Research Mission's own mission center. */
+  question: string;
   evidenceConnectedCount: number;
+  supportingEvidence: readonly Evidence[];
+  counterEvidence: readonly Evidence[];
+  /** Real, persisted user notes for this topic — empty until the user writes one. */
+  notes: readonly PersistedResearchNote[];
   relationships: EntityRelationship[];
   trustStatement: string;
   limitations: string[];
@@ -56,6 +64,8 @@ function buildResearchTopicReport(topicId: string): ResearchTopicReport | null {
   const mission = buildResearchMission({ missionId: topicId });
   const contract = mission.workspaceContract;
   const evidenceConnectedCount = contract?.evidenceSummary.evidence.length ?? 0;
+  const question = contract?.missionSummary.missionCenter.question.question ?? topic.description;
+  const notes = loadResearchNotes(topicId);
 
   const limitations: string[] = [
     "No verified link between this research topic and any country or university exists yet.",
@@ -64,13 +74,20 @@ function buildResearchTopicReport(topicId: string): ResearchTopicReport | null {
   if (evidenceConnectedCount === 0) {
     limitations.push("No evidence is connected to this research topic yet.");
   }
+  if ((contract?.evidenceSummary.conflictingEvidence.length ?? 0) === 0) {
+    limitations.push("No counter evidence is connected yet — this does not confirm the absence of one.");
+  }
 
   return {
     topicId: topic.topicId,
     topicName: topic.topicName,
     domain: topic.domain,
     description: topic.description,
+    question,
     evidenceConnectedCount,
+    supportingEvidence: contract?.evidenceSummary.supportingEvidence ?? [],
+    counterEvidence: contract?.evidenceSummary.conflictingEvidence ?? [],
+    notes,
     relationships: buildEntityRelationships("research_topic", topicId),
     trustStatement: RESEARCH_TRUST_STATEMENT,
     limitations,
