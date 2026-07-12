@@ -708,3 +708,88 @@ data ingestion); no PDF/CSV export was built (Reports Center already honestly de
 Planned); no Country↔Research connection was fabricated — if a real link (e.g. a national research
 funder registry) is ever added to the catalog, `CountryRelatedResearch.tsx` becomes the real place
 to wire it, not before; no Population field was added, since none exists as real data.
+
+## 13. Platform Relationship Activation
+
+Response to "CBAI Product Activation — Platform Relationship Activation" (target: activate the
+relationship layer across the whole platform — Country/Company/University/Research/Evidence/
+Report/Workspace/Search/Command Center/Trust — rather than build another isolated module). No new
+architecture; every fix below reuses an already-real relationship function, adapter, or component.
+
+**University brought to parity with Country/Company**: the third Golden Rule entity had fallen
+behind — `UniversityMethodology.tsx`/`UniversityTrustSection.tsx` were confirmed dead (zero
+callers, same pattern already found and fixed for Country/Company), `UniversityCoveragePanel.tsx`
+was confirmed dead and redundant with the already-live `EntityEvidenceSection` (deleted), no
+`SaveToWorkspaceButton` had ever been wired onto a University profile, and no University Report
+existed. All four fixed the same way Country/Company were: `UniversityMethodology`/
+`UniversityTrustSection` activated into Optional Exploration, `UniversityCoveragePanel.tsx`
+deleted, `SaveToWorkspaceButton` wired in, and a new `lib/university-report.ts`
+(`buildUniversityReport`) + `UniversityReportView.tsx` compiling Overview/Evidence/
+Research/Organizations/Methodology/Trust/Limitations from already-computed journey/coverage data,
+behind a real "Generate report" toggle. `UniversitySourceCoverage.tsx` now shows the same honest
+Publisher/Publication-date/Confidence/Citation fields Country/Company already have. University↔
+Research has the same zero-signal problem as Country↔Research (no research topic mentions any
+institution, and `University` has no field to anchor a match) — rather than force an always-empty
+section, this mission's own "hide unsupported modules" instruction was applied literally: no
+Related Research section was added to University at all.
+
+**Workspace Activation extended to Research topics**: the mission requires Save/Bookmark/Continue
+from Research, not just Country/Company/University. The existing bookmark architecture
+(`pinEntity`/`unpinEntity`, `EntityKind`) was scoped to those three kinds only. Traced every
+consumer of `EntityKind`/`ContextEntityRef["kind"]` before changing it (4 real call sites:
+`context-history.ts`'s validation whitelist, `context-builder.ts`'s `resolveEntityRef`,
+`context-navigation.ts`'s `entityPrimaryModules`, and `PinnedEntities.tsx`/`RecentEntities.tsx`'s
+`entityRoute`) and confirmed `pinEntityToWorkspace`/`unpinEntityFromWorkspace`/`isEntityPinned`
+themselves are already fully generic — extending `EntityKind` to add `"research_topic"` needed no
+change to the pin functions, only a case added at each of those 4 switches (research topics are
+path-routed, `/research/[topicId]`, not query-param routed, so they're never resolved through the
+country/company/university URL-focus system — each new case says so explicitly). A real
+`SaveToWorkspaceButton` is now on every research topic page; My Work's Pinned/Recent lists render
+a real research topic link via `getResearchTopicPath` instead of the query-param builder used for
+the other three kinds.
+
+**Fixed a real, confirmed dead end**: Research topic pages' "Open evidence" action (both the
+Contextual Operator banner and, previously, the Command Center) routed to `/knowledge` — a real
+Evidence Explorer hub, but one with zero awareness of Research (`entityModules` only covers
+country/company/university). Clicking it from a research topic dropped the user on an unrelated
+page with no way back. Fixed by giving `ResearchIntelligenceOverview.tsx`'s already-real
+"Evidence status" block a real `id="evidence"` anchor and pointing both the banner and the new
+Command Center resolver at `/research/{topicId}#evidence` instead — an in-context fix, not a new
+evidence system.
+
+**New relationship-aware Command Center**: `resolveAssistantCommand` is a pure phrase→fixed-href
+table with no notion of "the entity on screen," so it could never answer "open related research"
+for whichever entity the user is actually viewing. New `lib/assistant/assistant-relationship-commands.ts`
+(`resolveRelationshipCommand`) uses the real relationship functions every entity module already
+computes — `getCountryRelationships`, `getCompanyRelationships`, `getUniversityRelationships`,
+`getRelatedResearchTopics`/`getRelatedCompaniesForTopic` — to answer "open related
+research/company/university/evidence" and "open country" against whichever real entity (including
+a research topic) is currently focused: one real match navigates straight there, several open the
+real listing page, zero returns an honest message, never a guess. Wired into
+`AssistantCommandCenter.tsx` ahead of the fixed table, so it also makes the existing generic "open
+evidence" phrase context-aware for free.
+
+**Browser-verified the full relationship graph**: USA → Apple (real linked company) → Apple's real
+related research topics (Materials Science domain, matched via the existing Company↔Research
+keyword table — e.g. `semiconductors`) → that topic's real related companies (Apple, NVIDIA,
+Samsung, closing the loop) → the topic's real Evidence anchor → Save to workspace → My Work's
+Pinned list. Repeated for Japan and Germany (both show real official-website facts, a real Save
+button, and an honest "No verified catalog relationships" empty state where no real company/
+university is linked — never fabricated).
+
+**Tests**: new `scripts/test-relationship-activation.ts` (`npm run test:relationship-activation`)
+— 14 tests covering University report traceability, the research-topic pin round-trip, and every
+branch of the new relationship resolver (single match, multi match, honest empty, already-viewing,
+unfocused fallback, and fall-through for phrases it doesn't own). 14/14 passing, alongside the
+unchanged 12 (countries) + 15 (companies) + 28 (product-activation) + 11 (research-slice) = 80
+total.
+
+**Not attempted**: no new "Evidence" entity was built to unify the Evidence Explorer
+(`/knowledge`, country/company/university only) with Research's own real per-topic evidence model
+(`ResearchIntelligenceOverview.tsx`'s `evidenceSummary`) — these remain two real, honest, separate
+systems rather than one merged for cosmetic consistency; the standalone `/research/evidence` demo
+page (a single hardcoded placeholder record, already honestly labeled as such) was left untouched,
+out of scope for this mission. No fabricated Country↔Research or University↔Research connection
+was added. `/trust` (the platform-wide methodology center) was not cross-linked with each entity's
+own Trust section — both are already real and honest on their own; unifying them was judged lower
+value than the relationship gaps above and was not attempted.

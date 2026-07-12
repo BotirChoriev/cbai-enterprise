@@ -602,3 +602,22 @@ Organizations, Methodology, Trust statement, Limitations — via a real "Generat
 Command Center, global search (region already indexed via `entity.category`), and bidirectional
 relationship links (already fixed in the Companies mission) all required no further changes. 12 new
 tests, 66 total passing. Full detail: `docs/product-activation-audit.md` §12.
+
+## Platform Relationship Activation
+
+Shifted focus from any single module to the relationship layer connecting all of them. Brought
+University to parity with the now-activated Country/Company (dead Trust/Methodology activated,
+redundant CoveragePanel deleted, first-ever SaveToWorkspaceButton wired, new University Report) —
+University↔Research was honestly omitted rather than shown empty, since no real signal exists,
+mirroring the Country↔Research decision. Extended the bookmark architecture to Research topics
+after tracing every real consumer of `EntityKind` (4 switches, each given a `research_topic`
+case; the pin functions themselves were already generic) — a real Save button is now on every
+research topic page, and My Work renders pinned topics as real links. Fixed a real dead end:
+research topics' "Open evidence" action routed to a generic hub with zero Research awareness;
+repointed at a new real anchor on the topic's own already-real evidence section. New
+`lib/assistant/assistant-relationship-commands.ts` makes the Command Center answer "open related
+research/company/university/evidence" and "open country" against whichever real entity is
+focused — one match navigates directly, several open the real listing, zero is an honest message,
+never a guess. Browser-verified the full graph (Country → Company → Research → Company → Evidence
+→ Save → My Work) for USA, Japan, and Germany. 14 new tests, 80 total passing. Full detail:
+`docs/product-activation-audit.md` §13.

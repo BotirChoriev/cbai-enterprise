@@ -748,6 +748,39 @@ routes, 66 total tests passing (12 + 15 + 28 + 11). Zero Platform Core files tou
 engines, no fabricated countries, ratings, or geopolitical analysis. Full detail:
 `docs/product-activation-audit.md` §12.
 
+## v3.14 — Platform Relationship Activation
+
+Brought University to parity with the now-activated Country/Company: activated confirmed-dead
+`UniversityMethodology.tsx`/`UniversityTrustSection.tsx`, deleted the redundant
+`UniversityCoveragePanel.tsx`, wired a `SaveToWorkspaceButton` (University had never gotten one),
+and added a new real University Report. University↔Research has the same zero-signal problem as
+Country↔Research — rather than force an empty section, it was honestly omitted entirely per this
+mission's own "hide unsupported modules" instruction.
+
+Extended the existing bookmark architecture (`pinEntity`/`EntityKind`) to Research topics after
+tracing every real consumer of `EntityKind` (4 switches, each given a `research_topic` case) and
+confirming the pin functions themselves are already fully generic. A real "Save to workspace"
+button is now on every research topic page; My Work renders pinned research topics as real links.
+
+Fixed a real, confirmed dead end: research topic pages' "Open evidence" action routed to a generic
+Evidence hub with zero awareness of Research. Gave the topic page's own real evidence section a
+real anchor and pointed the action there instead — in-context, not a new system.
+
+New relationship-aware Command Center (`lib/assistant/assistant-relationship-commands.ts`) answers
+"open related research/company/university/evidence" and "open country" against whichever real
+entity is currently focused, using the same relationship functions every entity module already
+computes — one match navigates directly, several open the real listing, zero returns an honest
+message, never a guess.
+
+Browser-verified the full relationship graph for three countries (USA, Japan, Germany): Country →
+Company → Research → back to Company → Evidence → Save to workspace → My Work, with no dead ends
+and no fabricated links.
+
+New `scripts/test-relationship-activation.ts` — 14 tests. `npm run lint` clean, `npm run build` 91
+routes, 80 total tests passing (14 + 12 + 15 + 28 + 11). Zero Platform Core files touched; no new
+relationship engine — every fix reuses an already-real adapter or component. Full detail:
+`docs/product-activation-audit.md` §13.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation
