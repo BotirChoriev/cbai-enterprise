@@ -26,6 +26,8 @@ import { buildResearchMission } from "@/lib/research-mission/research-mission-bu
 import { getResearchTopicById } from "@/lib/research/research-topics";
 import { buildEntityRelationships } from "@/lib/entity/entity-relationships";
 import type { EntityRelationship } from "@/lib/entity/entity.types";
+import { resolveEntityDataStatus } from "@/components/shared/entity-profile-copy";
+import type { ProductStatus } from "@/lib/product-status";
 
 export type ResearchTopicReport = {
   topicId: string;
@@ -39,10 +41,10 @@ export type ResearchTopicReport = {
 };
 
 export type EntityReport =
-  | ({ entityType: "country" } & CountryReport)
-  | ({ entityType: "company" } & CompanyReport)
-  | ({ entityType: "university" } & UniversityReport)
-  | ({ entityType: "research_topic" } & ResearchTopicReport);
+  | ({ entityType: "country"; dataStatus: ProductStatus } & CountryReport)
+  | ({ entityType: "company"; dataStatus: ProductStatus } & CompanyReport)
+  | ({ entityType: "university"; dataStatus: ProductStatus } & UniversityReport)
+  | ({ entityType: "research_topic"; dataStatus: ProductStatus } & ResearchTopicReport);
 
 const RESEARCH_TRUST_STATEMENT =
   "CBAI provides evidence-based research intelligence. Findings, hypotheses, and connections are shown only when verified — never inferred or fabricated.";
@@ -78,8 +80,14 @@ function buildResearchTopicReport(topicId: string): ResearchTopicReport | null {
 /**
  * Universal entry point: one function name for "generate a report for this entity," dispatching
  * to the real per-module builder. Returns null when the entity id doesn't resolve to a real
- * catalog record — never a fabricated report.
+ * catalog record — never a fabricated report. Overloaded per literal entityType so call sites get
+ * the exact report shape back (e.g. CountryReportView can take the "country" call's result
+ * directly) without a manual narrowing check at every call site.
  */
+export function buildEntityReport(entityType: "country", id: string): (EntityReport & { entityType: "country" }) | null;
+export function buildEntityReport(entityType: "company", id: string): (EntityReport & { entityType: "company" }) | null;
+export function buildEntityReport(entityType: "university", id: string): (EntityReport & { entityType: "university" }) | null;
+export function buildEntityReport(entityType: "research_topic", id: string): (EntityReport & { entityType: "research_topic" }) | null;
 export function buildEntityReport(
   entityType: "country" | "company" | "university" | "research_topic",
   id: string,
@@ -89,23 +97,47 @@ export function buildEntityReport(
       const country = countries.find((c) => c.id === id);
       if (!country) return null;
       const journey = buildCountryUserJourney(country, getCountryRelationships(country));
-      return { entityType: "country", ...buildCountryReport(country, journey) };
+      const report = buildCountryReport(country, journey);
+      return {
+        entityType: "country",
+        dataStatus: resolveEntityDataStatus(report.evidence.connectedSources, report.evidence.totalSources),
+        ...report,
+      };
     }
     case "company": {
       const company = companies.find((c) => c.id === id);
       if (!company) return null;
       const journey = buildCompanyUserJourney(company, getCompanyLinkedEntities(company));
-      return { entityType: "company", ...buildCompanyReport(company, journey) };
+      const report = buildCompanyReport(company, journey);
+      return {
+        entityType: "company",
+        dataStatus: resolveEntityDataStatus(report.evidence.connectedSources, report.evidence.totalSources),
+        ...report,
+      };
     }
     case "university": {
       const university = universities.find((u) => u.id === id);
       if (!university) return null;
       const journey = buildUniversityUserJourney(university, getUniversityRelationships(university));
-      return { entityType: "university", ...buildUniversityReport(university, journey) };
+      const report = buildUniversityReport(university, journey);
+      return {
+        entityType: "university",
+        dataStatus: resolveEntityDataStatus(report.evidence.connectedSources, report.evidence.totalSources),
+        ...report,
+      };
     }
     case "research_topic": {
       const report = buildResearchTopicReport(id);
-      return report ? { entityType: "research_topic", ...report } : null;
+      if (!report) return null;
+      // No real "total possible sources" concept exists for research topics (unlike
+      // Country/Company/University's coverage.sources.length), so this reports "live" only when
+      // real evidence is connected and "waiting for verified data" otherwise — never a fabricated
+      // ratio against a total that doesn't exist.
+      return {
+        entityType: "research_topic",
+        dataStatus: report.evidenceConnectedCount > 0 ? "live" : "waiting_for_verified_data",
+        ...report,
+      };
     }
   }
 }

@@ -14,8 +14,10 @@ import TopicReviewWorkspace from "@/components/research/topic/TopicReviewWorkspa
 import ResearchCockpit from "@/components/research/topic/ResearchCockpit";
 import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
 import ResearchRelatedCompanies from "@/components/research/topic/ResearchRelatedCompanies";
+import ResearchTopicReportView from "@/components/research/topic/ResearchTopicReportView";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import { deriveResearchWorkflow } from "@/lib/research/workflow/workflow-engine";
+import { buildEntityReport } from "@/lib/entity/entity-report";
 import { cbaiHeroGlow } from "@/components/brand/brand-classes";
 
 type ResearchTopicDetailProps = {
@@ -24,6 +26,7 @@ type ResearchTopicDetailProps = {
 
 export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps) {
   const [activeTab, setActiveTab] = useState<TopicTabId>("overview");
+  const [showReport, setShowReport] = useState(false);
   const workflow = deriveResearchWorkflow(topic.topicId);
 
   return (
@@ -52,6 +55,22 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
       <TopicInsightsPanel topic={topic} />
 
       <ResearchRelatedCompanies topic={topic} />
+
+      <div className="space-y-4">
+        <button
+          type="button"
+          onClick={() => setShowReport((current) => !current)}
+          className="inline-flex items-center gap-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-300 transition-colors hover:border-cyan-500/50"
+        >
+          {showReport ? "Hide report" : "Generate report"}
+        </button>
+        {showReport
+          ? (() => {
+              const report = buildEntityReport("research_topic", topic.topicId);
+              return report ? <ResearchTopicReportView report={report} /> : null;
+            })()
+          : null}
+      </div>
 
       <TopicReviewWorkspace topic={topic} workflow={workflow} />
 

@@ -1,9 +1,11 @@
 import Link from "next/link";
 import type { UniversityReport, UniversityReportLink } from "@/lib/university-report";
+import type { ProductStatus } from "@/lib/product-status";
+import StatusBadge from "@/components/shared/StatusBadge";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type UniversityReportViewProps = {
-  report: UniversityReport;
+  report: UniversityReport & { dataStatus?: ProductStatus };
 };
 
 function LinkList({ links, emptyLabel }: { links: readonly UniversityReportLink[]; emptyLabel: string }) {
@@ -39,11 +41,14 @@ export default function UniversityReportView({ report }: UniversityReportViewPro
       aria-labelledby="university-report-heading"
       className={`${cbaiGlassCard} space-y-6 border-cyan-500/15 p-5 sm:p-6`}
     >
-      <div>
-        <p className={cbaiSectionEyebrow}>University Intelligence Report</p>
-        <h2 id="university-report-heading" className="mt-1 text-lg font-semibold text-zinc-100">
-          {report.university.name}
-        </h2>
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div>
+          <p className={cbaiSectionEyebrow}>University Intelligence Report</p>
+          <h2 id="university-report-heading" className="mt-1 text-lg font-semibold text-zinc-100">
+            {report.university.name}
+          </h2>
+        </div>
+        {report.dataStatus ? <StatusBadge status={report.dataStatus} /> : null}
       </div>
 
       <div className="space-y-2">

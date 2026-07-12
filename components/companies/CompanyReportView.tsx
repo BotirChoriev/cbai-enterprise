@@ -1,10 +1,12 @@
 import Link from "next/link";
 import type { CompanyReport } from "@/lib/company-report";
+import type { ProductStatus } from "@/lib/product-status";
+import StatusBadge from "@/components/shared/StatusBadge";
 import { getResearchTopicPath } from "@/lib/research/research-topics";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type CompanyReportViewProps = {
-  report: CompanyReport;
+  report: CompanyReport & { dataStatus?: ProductStatus };
 };
 
 /** Real, compiled Company Intelligence Report — every field traces to already-real data; nothing invented. */
@@ -14,11 +16,14 @@ export default function CompanyReportView({ report }: CompanyReportViewProps) {
       aria-labelledby="company-report-heading"
       className={`${cbaiGlassCard} space-y-6 border-cyan-500/15 p-5 sm:p-6`}
     >
-      <div>
-        <p className={cbaiSectionEyebrow}>Company Intelligence Report</p>
-        <h2 id="company-report-heading" className="mt-1 text-lg font-semibold text-zinc-100">
-          {report.company.name}
-        </h2>
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div>
+          <p className={cbaiSectionEyebrow}>Company Intelligence Report</p>
+          <h2 id="company-report-heading" className="mt-1 text-lg font-semibold text-zinc-100">
+            {report.company.name}
+          </h2>
+        </div>
+        {report.dataStatus ? <StatusBadge status={report.dataStatus} /> : null}
       </div>
 
       <div className="space-y-2">

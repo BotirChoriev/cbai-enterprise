@@ -1,9 +1,11 @@
 import Link from "next/link";
 import type { CountryReport, CountryReportLink } from "@/lib/country-report";
+import type { ProductStatus } from "@/lib/product-status";
+import StatusBadge from "@/components/shared/StatusBadge";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type CountryReportViewProps = {
-  report: CountryReport;
+  report: CountryReport & { dataStatus?: ProductStatus };
 };
 
 function LinkList({ links, emptyLabel }: { links: readonly CountryReportLink[]; emptyLabel: string }) {
@@ -39,11 +41,14 @@ export default function CountryReportView({ report }: CountryReportViewProps) {
       aria-labelledby="country-report-heading"
       className={`${cbaiGlassCard} space-y-6 border-cyan-500/15 p-5 sm:p-6`}
     >
-      <div>
-        <p className={cbaiSectionEyebrow}>Country Intelligence Report</p>
-        <h2 id="country-report-heading" className="mt-1 text-lg font-semibold text-zinc-100">
-          {report.country.name}
-        </h2>
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div>
+          <p className={cbaiSectionEyebrow}>Country Intelligence Report</p>
+          <h2 id="country-report-heading" className="mt-1 text-lg font-semibold text-zinc-100">
+            {report.country.name}
+          </h2>
+        </div>
+        {report.dataStatus ? <StatusBadge status={report.dataStatus} /> : null}
       </div>
 
       <div className="space-y-2">
