@@ -3,27 +3,12 @@
 import Link from "next/link";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
+import { useTranslation } from "@/lib/i18n/use-translation";
 import Avatar from "@/components/shared/Avatar";
 import StatusBadge from "@/components/shared/StatusBadge";
 import { WORKSPACE_ROLE_LABELS, resolveOperatorName } from "@/lib/assistant/assistant-profile";
 import { resolveNextStep } from "@/lib/assistant/assistant-next-step";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
-
-function timeOfDayGreeting(timezone: string): string {
-  let hour = new Date().getHours();
-  try {
-    hour = Number(
-      new Intl.DateTimeFormat("en-US", { hour: "numeric", hour12: false, timeZone: timezone }).format(
-        new Date(),
-      ),
-    );
-  } catch {
-    // Invalid or unsupported timezone string — fall back to the local browser hour above.
-  }
-  if (hour < 12) return "Good morning";
-  if (hour < 18) return "Good afternoon";
-  return "Good evening";
-}
 
 const SECONDARY_ACTIONS = [
   { label: "Open My Work", href: "/my-work" },
@@ -32,11 +17,29 @@ const SECONDARY_ACTIONS = [
   { label: "Review Evidence", href: "/knowledge" },
 ] as const;
 
+/**
+ * Personalized greeting (Phase 7) — uses the real saved Assistant Profile name only, in the
+ * user's selected interface language (assistant.greetingReturning). Never fabricates a name,
+ * personal task, or notification. Signed-out visitors see a real, neutral welcome instead of
+ * nothing — same component, no personal data referenced.
+ */
 export default function HomeAssistantGreeting() {
   const { profile, isActive } = useAssistantProfile();
   const { context } = usePlatformContext();
+  const { t } = useTranslation();
 
-  if (!isActive) return null;
+  if (!isActive) {
+    return (
+      <section
+        aria-labelledby="home-assistant-greeting-heading"
+        className={`${cbaiGlassCard} mx-auto mt-8 max-w-6xl p-6 text-center sm:p-8`}
+      >
+        <h1 id="home-assistant-greeting-heading" className="text-xl font-semibold text-zinc-50 sm:text-2xl">
+          {t("assistant.greetingSignedOut")}
+        </h1>
+      </section>
+    );
+  }
 
   const nextStep = resolveNextStep(profile, context.recentEntities[0] ?? null);
 
@@ -49,7 +52,7 @@ export default function HomeAssistantGreeting() {
         <Avatar name={profile.name} avatar={profile.avatar} size="lg" />
         <div className="min-w-0 flex-1">
           <h1 id="home-assistant-greeting-heading" className="text-xl font-semibold text-zinc-50 sm:text-2xl">
-            {timeOfDayGreeting(profile.timezone)}, {profile.name}.
+            {t("assistant.greetingReturning", { name: profile.name })}
           </h1>
           <p className="mt-0.5 text-sm text-zinc-400">
             Your {resolveOperatorName(profile)} is ready — {WORKSPACE_ROLE_LABELS[profile.workspaceRole]}{" "}
@@ -64,14 +67,14 @@ export default function HomeAssistantGreeting() {
         className="flex items-center justify-between gap-3 rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-5 py-4 transition-colors hover:border-cyan-500/50 hover:bg-cyan-500/15"
       >
         <div>
-          <p className={cbaiSectionEyebrow}>Suggested next step</p>
+          <p className={cbaiSectionEyebrow}>{t("project.nextStep")}</p>
           <p className="mt-1 text-sm font-medium text-zinc-100">{nextStep.label}</p>
         </div>
         <span className="shrink-0 text-cyan-300">→</span>
       </Link>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className={cbaiSectionEyebrow}>Available actions</p>
+        <p className={cbaiSectionEyebrow}>{t("home.quickActions")}</p>
         <div className="flex flex-wrap gap-2">
           {SECONDARY_ACTIONS.map((action) => (
             <Link

@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import CBAILogo from "@/components/brand/CBAILogo";
 import HomeEcosystems from "@/components/platform/home/HomeEcosystems";
@@ -6,6 +8,7 @@ import HomeCapabilityFlow from "@/components/platform/home/HomeCapabilityFlow";
 import HomeAudience from "@/components/platform/home/HomeAudience";
 import HomeTrust from "@/components/platform/home/HomeTrust";
 import WorldIntelligenceMap from "@/components/countries/WorldIntelligenceMap";
+import { useTranslation } from "@/lib/i18n/use-translation";
 import {
   cbaiBtnPrimary,
   cbaiBtnSecondary,
@@ -20,6 +23,8 @@ const HOME_EXAMPLES = [
 ] as const;
 
 export default function HomeHero() {
+  const { t } = useTranslation();
+
   return (
     <main className={`home-surface mx-auto max-w-6xl space-y-20 px-4 py-12 sm:px-8 sm:py-16 ${cbaiHeroGlow}`}>
       {/* Hero split */}
@@ -32,16 +37,10 @@ export default function HomeHero() {
               Universal Intelligence Operating System
             </p>
             <h1 className="text-4xl font-semibold leading-[1.1] tracking-tight text-zinc-50 sm:text-5xl lg:text-[3.25rem]">
-              Evidence, connected.
-              <br />
-              <span className="bg-gradient-to-r from-cyan-300 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                Decisions, still human.
-              </span>
+              {t("home.firstScreenMessage")}
             </h1>
             <p className="max-w-xl text-base leading-relaxed text-zinc-400 sm:text-lg">
-              CBAI observes, measures, and connects evidence — then explains options and
-              consequences across research, governance, and economics. The final decision
-              always belongs to you.
+              {t("home.supportingMessage")}
             </p>
           </div>
 
