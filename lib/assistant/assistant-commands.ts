@@ -4,10 +4,25 @@
  * typed input both resolve through this same matcher and land on real, already-existing routes
  * and real catalog lookups; there is no model call, fuzzy AI matching, or fabricated confidence
  * anywhere in this file.
+ *
+ * Multilingual Command Understanding (Global Language Foundation + Multilingual Voice Commands
+ * mission, Phase 9) — English, Uzbek, Russian, and Turkish phrases resolve to the same real
+ * routes. English and Russian are both verb-first ("open Uzbekistan" / "открой Узбекистан"), so a
+ * real prefix match works for parameterized commands. Uzbek and Turkish are agglutinative and
+ * typically object-first with a case suffix on the object ("Oʻzbekistonni och" — Uzbekistan-ACC
+ * open; "Özbekistan'ı aç" — Uzbekistan-ACC open) — a fixed-prefix match cannot reliably strip
+ * those suffixes for arbitrary entity names, so parameterized "open <entity name>" commands for
+ * Uzbek/Turkish use a real (not fabricated) simpler check instead: the input must contain a real
+ * "open" verb keyword AND a real catalog entity name found anywhere in the string. This is
+ * honestly less precise than true grammatical parsing — documented in
+ * docs/voice-command-architecture.md — but it is a real, working match, not a guess.
  */
 
 import { getEntityDetailHref, searchEntities } from "@/lib/global-search";
 import { filterResearchTopics, getResearchTopicPath, RESEARCH_TOPICS } from "@/lib/research/research-topics";
+import { countries } from "@/lib/countries";
+import { companies } from "@/lib/companies";
+import { universities } from "@/lib/universities";
 
 export type AssistantCommand = {
   id: string;
@@ -21,19 +36,34 @@ export const ASSISTANT_COMMANDS: readonly AssistantCommand[] = [
     id: "open-my-work",
     phrase: "Open my work",
     href: "/my-work",
-    keywords: ["my work", "open my work"],
+    keywords: [
+      "my work", "open my work",
+      "mening ishlarim", "ishlarimni och",
+      "моя работа", "открой мою работу", "мои проекты",
+      "çalışmalarım", "çalışmalarımı aç",
+    ],
   },
   {
     id: "open-research",
     phrase: "Open Research",
     href: "/research",
-    keywords: ["open research"],
+    keywords: [
+      "open research",
+      "tadqiqotni och", "tadqiqot",
+      "открой исследования", "исследования",
+      "araştırmayı aç", "araştırma",
+    ],
   },
   {
     id: "continue-research",
     phrase: "Continue research",
     href: "/research/workspace",
-    keywords: ["continue research", "research workspace", "continue my research"],
+    keywords: [
+      "continue research", "research workspace", "continue my research",
+      "tadqiqotni davom ettir",
+      "продолжить исследование",
+      "araştırmaya devam et",
+    ],
   },
   {
     id: "todays-changes",
@@ -45,7 +75,12 @@ export const ASSISTANT_COMMANDS: readonly AssistantCommand[] = [
     id: "open-country-dashboard",
     phrase: "Open country dashboard",
     href: "/countries",
-    keywords: ["country dashboard", "open country", "countries"],
+    keywords: [
+      "country dashboard", "open country", "countries",
+      "davlatlarni och", "davlatlar",
+      "открой страны", "страны",
+      "ülkeleri aç", "ülkeler",
+    ],
   },
   {
     id: "mission-status",
@@ -63,7 +98,12 @@ export const ASSISTANT_COMMANDS: readonly AssistantCommand[] = [
     id: "open-evidence",
     phrase: "Open evidence",
     href: "/knowledge",
-    keywords: ["open evidence", "evidence", "sources"],
+    keywords: [
+      "open evidence", "evidence", "sources",
+      "dalillarni och", "dalillar", "dalillarni qidir",
+      "открой доказательства", "доказательства", "найди доказательства",
+      "kanıtları aç", "kanıtlar", "kanıtları bul",
+    ],
   },
   {
     id: "search-publications",
@@ -81,25 +121,40 @@ export const ASSISTANT_COMMANDS: readonly AssistantCommand[] = [
     id: "open-trust",
     phrase: "Open Trust",
     href: "/trust",
-    keywords: ["open trust", "trust center", "constitution", "methodology"],
+    keywords: [
+      "open trust", "trust center", "constitution", "methodology",
+      "ishonch markazi", "konstitutsiya",
+      "центр доверия", "конституция",
+      "güven merkezi", "anayasa",
+    ],
   },
   {
     id: "open-settings",
     phrase: "Open Settings",
     href: "/settings",
-    keywords: ["open settings", "settings", "configure assistant"],
+    keywords: ["open settings", "settings", "configure assistant", "sozlamalar", "настройки", "ayarlar"],
   },
   {
     id: "open-reports",
     phrase: "Open Reports",
     href: "/analytics",
-    keywords: ["open reports", "reports"],
+    keywords: [
+      "open reports", "reports",
+      "hisobotlarni och", "hisobotlar",
+      "открой отчёты", "отчёты",
+      "raporları aç", "raporlar",
+    ],
   },
   {
     id: "open-companies",
     phrase: "Open company",
     href: "/companies",
-    keywords: ["open company", "open companies", "companies"],
+    keywords: [
+      "open company", "open companies", "companies",
+      "kompaniyalarni och", "kompaniyalar",
+      "открой компании", "компании",
+      "şirketleri aç", "şirketler",
+    ],
   },
   {
     id: "compare-companies",
@@ -111,19 +166,34 @@ export const ASSISTANT_COMMANDS: readonly AssistantCommand[] = [
     id: "generate-report",
     phrase: "Generate report",
     href: "/analytics",
-    keywords: ["generate report", "generate a report", "create report"],
+    keywords: [
+      "generate report", "generate a report", "create report",
+      "hisobot yarat",
+      "создай отчёт", "создать отчёт",
+      "rapor oluştur",
+    ],
   },
   {
     id: "create-project",
     phrase: "Create Project",
     href: "/my-work",
-    keywords: ["create project", "new project", "start a project"],
+    keywords: [
+      "create project", "new project", "start a project",
+      "yangi loyiha yarat", "loyiha yarat",
+      "создай новый проект", "новый проект", "создать проект",
+      "yeni proje oluştur", "proje oluştur",
+    ],
   },
   {
     id: "open-project",
     phrase: "Open Project",
     href: "/my-work",
-    keywords: ["open project", "open projects", "my projects"],
+    keywords: [
+      "open project", "open projects", "my projects",
+      "loyihalarimni och", "mening loyihalarim",
+      "открой мои проекты", "мои проекты",
+      "projelerimi aç", "projelerim",
+    ],
   },
 ] as const;
 
@@ -156,7 +226,7 @@ const PARAMETERIZED_PATTERNS: readonly ParameterizedPattern[] = [
     }),
   },
   {
-    prefixes: ["find country ", "show country "],
+    prefixes: ["find country ", "show country ", "найди страну ", "покажи страну ", "открой страну "],
     resolve: (term) => {
       const href = findEntityHref(term, "country");
       return href
@@ -165,7 +235,7 @@ const PARAMETERIZED_PATTERNS: readonly ParameterizedPattern[] = [
     },
   },
   {
-    prefixes: ["find university ", "show university "],
+    prefixes: ["find university ", "show university ", "найди университет ", "покажи университет "],
     resolve: (term) => {
       const href = findEntityHref(term, "university");
       return href
@@ -174,7 +244,7 @@ const PARAMETERIZED_PATTERNS: readonly ParameterizedPattern[] = [
     },
   },
   {
-    prefixes: ["find company ", "show company "],
+    prefixes: ["find company ", "show company ", "найди компанию ", "покажи компанию "],
     resolve: (term) => {
       const href = findEntityHref(term, "company");
       return href
@@ -183,7 +253,7 @@ const PARAMETERIZED_PATTERNS: readonly ParameterizedPattern[] = [
     },
   },
   {
-    prefixes: ["show research topic ", "open research topic "],
+    prefixes: ["show research topic ", "open research topic ", "найди тему исследования "],
     resolve: (term) => {
       const exact = RESEARCH_TOPICS.find((topic) => topic.topicId === term.toLowerCase().replace(/\s+/g, "-"));
       const fuzzy = exact ? [exact] : filterResearchTopics(RESEARCH_TOPICS, { query: term });
@@ -209,10 +279,51 @@ function resolveParameterizedCommand(normalized: string, original: string): Assi
   return null;
 }
 
+// Uzbek/Turkish "open <entity>" — object-first with a case suffix ("Oʻzbekistonni och",
+// "Özbekistan'ı aç") that a fixed prefix cannot reliably strip for arbitrary names. Real, honest
+// fallback: require a real "open" verb keyword AND a real catalog entity name found anywhere in
+// the input — both conditions are checked against real data, never guessed.
+const OBJECT_FIRST_OPEN_VERBS = ["och", "ochish", "aç"];
+
+function stripDiacriticsLower(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/['’ʻʼ]/g, "");
+}
+
+function resolveObjectFirstOpenCommand(normalized: string): AssistantCommandMatch | null {
+  const hasOpenVerb = OBJECT_FIRST_OPEN_VERBS.some((verb) => normalized.includes(verb));
+  if (!hasOpenVerb) return null;
+
+  const haystack = stripDiacriticsLower(normalized);
+
+  for (const country of countries) {
+    if (haystack.includes(stripDiacriticsLower(country.name))) {
+      return { kind: "parameterized", label: `Open country "${country.name}"`, href: `/countries?country=${country.id}`, term: country.name };
+    }
+  }
+  for (const company of companies) {
+    if (haystack.includes(stripDiacriticsLower(company.name))) {
+      return { kind: "parameterized", label: `Open company "${company.name}"`, href: `/companies?company=${company.id}`, term: company.name };
+    }
+  }
+  for (const university of universities) {
+    if (haystack.includes(stripDiacriticsLower(university.name))) {
+      return { kind: "parameterized", label: `Open university "${university.name}"`, href: `/universities?university=${university.id}`, term: university.name };
+    }
+  }
+  return null;
+}
+
 /**
- * Deterministic resolver: parameterized patterns are checked first (more specific), then the
- * fixed keyword table. Returns null when nothing matches — callers must show an honest
- * "not recognized yet" state with supported alternatives, never a fabricated response.
+ * Deterministic resolver: prefix-style parameterized patterns are checked first (most specific),
+ * then the fixed keyword table (exact, deliberately-crafted phrases — low false-positive risk),
+ * then the object-first Uzbek/Turkish open-command heuristic last, since its 2-3 letter verb
+ * tokens ("och", "aç") are more likely to appear incidentally inside unrelated text. Returns null
+ * when nothing matches — callers must show an honest "not recognized yet" state with supported
+ * alternatives, never a fabricated response.
  */
 export function resolveAssistantCommand(input: string): AssistantCommandMatch | null {
   const trimmed = input.trim();
@@ -229,5 +340,9 @@ export function resolveAssistantCommand(input: string): AssistantCommandMatch | 
       }
     }
   }
+
+  const objectFirstOpen = resolveObjectFirstOpenCommand(normalized);
+  if (objectFirstOpen) return objectFirstOpen;
+
   return null;
 }

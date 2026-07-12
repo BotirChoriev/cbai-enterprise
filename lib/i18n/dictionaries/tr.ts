@@ -1,6 +1,63 @@
 import type { TranslationDictionary } from "@/lib/i18n/dictionary-types";
 
 const tr: TranslationDictionary = {
+  roles: {
+    scientistAcademic: {
+      title: "Bilim İnsanı / Akademisyen",
+      description: "Kanıtları gerçek bir araştırma sorusuna bağlayın ve açık soruları takip edin.",
+      firstAction: "Araştırma Projesi Başlat",
+    },
+    professorResearcher: {
+      title: "Profesör / Araştırmacı",
+      description: "Kanıtları, notları ve açık soruları tek bir yapılandırılmış araştırma alanında düzenleyin.",
+      firstAction: "Araştırma Çalışma Alanını Aç",
+    },
+    student: {
+      title: "Öğrenci",
+      description: "Araştırma konularını keşfedin ve kendi anlayışınızı oluşturmak için kanıtları bağlayın.",
+      firstAction: "Araştırmayı Keşfet",
+    },
+    engineer: {
+      title: "Mühendis / Teknik Uzman",
+      description: "Bir teknolojiyi veya sistemi bağlı kanıtlara ve bilinen sınırlamalara göre değerlendirin.",
+      firstAction: "Teknoloji Değerlendirmesi Başlat",
+    },
+    laboratorySpecialist: {
+      title: "Laboratuvar Uzmanı",
+      description: "Kanıt kümelerini yakından inceleyin ve neyin bağlı, neyin eksik olduğunu takip edin.",
+      firstAction: "Kanıt İncelemesi Başlat",
+    },
+    governmentLeader: {
+      title: "Devlet Yöneticisi / Kamu Yöneticisi",
+      description: "Politika sorularını bağlı ülke ve kurum kanıtlarına göre inceleyin.",
+      firstAction: "Politika Analizi Başlat",
+    },
+    economist: {
+      title: "Ekonomist",
+      description: "Bağlı ülke ve şirket kanıtlarını kullanarak yatırım ve ekonomik soruları analiz edin.",
+      firstAction: "Yatırım Analizi Başlat",
+    },
+    investorBusiness: {
+      title: "Yatırımcı / İşletme",
+      description: "Gerçek bir yatırım sorusunu desteklemek için şirket ve ülke kanıtlarını inceleyin.",
+      firstAction: "Yatırım Analizi Başlat",
+    },
+    legalProfessional: {
+      title: "Hukuk Uzmanı",
+      description: "Kendi çalışmanızda kullanmadan önce kanıt kümelerini ve kaynak durumunu inceleyin.",
+      firstAction: "Kanıt İncelemesi Başlat",
+    },
+    socialSector: {
+      title: "Sosyal Sektör Uzmanı",
+      description: "Ülkeler ve kurumlar hakkındaki kamuya açık bilgileri anlaşılır bir dille keşfedin.",
+      firstAction: "Vatandaş Çalışma Alanını Aç",
+    },
+    generalUser: {
+      title: "Genel Kullanıcı",
+      description: "Ülkeleri, şirketleri ve üniversiteleri arayın, sizin için önemli olanı kaydedin.",
+      firstAction: "Keşfetmeye Başla",
+    },
+  },
   common: {
     loading: "Yükleniyor…",
     save: "Kaydet",

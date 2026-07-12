@@ -69,11 +69,24 @@ function focusBaseHref(focus: RelationshipFocus): string {
   }
 }
 
-const RELATED_EVIDENCE_PHRASES = ["open related evidence", "related evidence", "open evidence"];
+// Multilingual equivalents (Global Language Foundation + Multilingual Voice Commands mission,
+// Phase 9) for the two mission-listed actions this resolver contextualizes: "Find evidence" and
+// "Open country".
+const RELATED_EVIDENCE_PHRASES = [
+  "open related evidence", "related evidence", "open evidence",
+  "dalillarni qidir", "dalillarni och",
+  "найди доказательства", "открой доказательства",
+  "kanıtları bul", "kanıtları aç",
+];
 const RELATED_RESEARCH_PHRASES = ["open related research", "related research"];
 const RELATED_COMPANY_PHRASES = ["open related compan", "related compan"];
 const RELATED_UNIVERSITY_PHRASES = ["open related universit", "related universit"];
-const OPEN_COUNTRY_PHRASES = ["open related country", "related country", "open country"];
+const OPEN_COUNTRY_PHRASES = [
+  "open related country", "related country", "open country",
+  "davlatni och",
+  "открой страну",
+  "ülkeyi aç",
+];
 
 /**
  * Resolves a relationship-aware command against whichever real entity is currently focused.

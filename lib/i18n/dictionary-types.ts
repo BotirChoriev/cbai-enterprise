@@ -9,7 +9,26 @@
  * errors.
  */
 
+export type RoleCardText = {
+  title: string;
+  description: string;
+  firstAction: string;
+};
+
 export type TranslationDictionary = {
+  roles: {
+    scientistAcademic: RoleCardText;
+    professorResearcher: RoleCardText;
+    student: RoleCardText;
+    engineer: RoleCardText;
+    laboratorySpecialist: RoleCardText;
+    governmentLeader: RoleCardText;
+    economist: RoleCardText;
+    investorBusiness: RoleCardText;
+    legalProfessional: RoleCardText;
+    socialSector: RoleCardText;
+    generalUser: RoleCardText;
+  };
   common: {
     loading: string;
     save: string;

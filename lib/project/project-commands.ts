@@ -27,11 +27,28 @@ function matchesAny(normalized: string, phrases: readonly string[]): boolean {
   return phrases.some((phrase) => normalized.includes(phrase));
 }
 
-const CONTINUE_PROJECT_PHRASES = ["continue project"];
-const ADD_EVIDENCE_PHRASES = ["add evidence", "open project evidence"];
-const OPEN_NOTES_PHRASES = ["open notes", "open project notes"];
-const NEXT_STEP_PHRASES = ["open next step", "next step", "what's next", "whats next"];
-const GENERATE_REPORT_PHRASES = ["generate project report"];
+// Multilingual equivalents (Global Language Foundation + Multilingual Voice Commands mission,
+// Phase 9) — English/Russian/Turkish/Uzbek phrases resolve to the same real project actions.
+const CONTINUE_PROJECT_PHRASES = ["continue project", "loyihani davom ettir", "продолжить проект", "projeye devam et"];
+const ADD_EVIDENCE_PHRASES = [
+  "add evidence", "open project evidence",
+  "dalil qo'sh", "dalil qosh",
+  "добавить доказательство",
+  "kanıt ekle",
+];
+const OPEN_NOTES_PHRASES = [
+  "open notes", "open project notes",
+  "eslatmalarni och",
+  "открыть заметки",
+  "notları aç",
+];
+const NEXT_STEP_PHRASES = [
+  "open next step", "next step", "what's next", "whats next",
+  "keyingi qadam",
+  "следующий шаг",
+  "sıradaki adım",
+];
+const GENERATE_REPORT_PHRASES = ["generate project report", "loyiha hisobotini yarat", "создать отчёт по проекту", "proje raporu oluştur"];
 
 /** Resolves project-specific commands against the real most-recently-updated project. */
 export function resolveProjectCommand(rawInput: string): ProjectCommandResult | null {

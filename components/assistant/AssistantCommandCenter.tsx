@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useId, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
@@ -13,8 +13,10 @@ import {
   type RelationshipFocus,
 } from "@/lib/assistant/assistant-relationship-commands";
 import { resolveProjectCommand } from "@/lib/project/project-commands";
+import { resolveLanguageCommand } from "@/lib/i18n/language-command";
 import { getResearchTopicById } from "@/lib/research/research-topics";
 import { getPrimaryEntity } from "@/lib/context";
+import { useTranslation } from "@/lib/i18n/use-translation";
 import Avatar from "@/components/shared/Avatar";
 
 const SUGGESTED_COMMAND_IDS = ["open-my-work", "continue-research", "open-evidence", "open-trust"];
@@ -26,12 +28,14 @@ const SUGGESTED_COMMANDS = ASSISTANT_COMMANDS.filter((command) =>
 // members this component actually reads/calls are declared; everything routes through the same
 // deterministic resolveAssistantCommand() as typed input, never a separate reasoning path.
 type SpeechRecognitionResultLike = { transcript: string };
+type SpeechRecognitionErrorLike = { error: string };
 type SpeechRecognitionLike = {
   lang: string;
   interimResults: boolean;
   maxAlternatives: number;
+  onstart: (() => void) | null;
   onresult: ((event: { results: ArrayLike<ArrayLike<SpeechRecognitionResultLike>> }) => void) | null;
-  onerror: (() => void) | null;
+  onerror: ((event: SpeechRecognitionErrorLike) => void) | null;
   onend: (() => void) | null;
   start: () => void;
   stop: () => void;
@@ -47,13 +51,26 @@ function getSpeechRecognitionConstructor(): SpeechRecognitionConstructor | null 
   return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
 }
 
-export default function AssistantCommandCenter() {
+// Real voice states (Phase 8) — never fabricated, always reflects what the Web Speech API
+// actually reported via onstart/onresult/onerror/onend.
+type VoiceStatus = "idle" | "requesting" | "listening" | "processing" | "permission-denied" | "network-error";
+
+type AssistantCommandCenterProps = {
+  /** "compact" (default) — the persistent Topbar rendering. "prominent" — the first-screen
+   * command bar (Phase 1/8), larger input and mic target. Both share the exact same resolution
+   * logic; only sizing/copy differ. */
+  size?: "compact" | "prominent";
+};
+
+export default function AssistantCommandCenter({ size = "compact" }: AssistantCommandCenterProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { profile, isActive } = useAssistantProfile();
+  const { profile, isActive, updateProfile } = useAssistantProfile();
   const { context, pinEntityToWorkspace } = usePlatformContext();
+  const { t } = useTranslation();
+  const inputId = useId();
   const [input, setInput] = useState("");
-  const [isListening, setIsListening] = useState(false);
+  const [voiceStatus, setVoiceStatus] = useState<VoiceStatus>("idle");
   const [uploadNotice, setUploadNotice] = useState<string | null>(null);
   const [unrecognized, setUnrecognized] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState<string | null>(null);
@@ -104,6 +121,23 @@ export default function AssistantCommandCenter() {
         return;
       }
 
+      // "Change interface/voice language" (Phase 9/10) — a real profile update, confirmed
+      // visibly, never applied silently.
+      const languageMatch = resolveLanguageCommand(trimmed);
+      if (languageMatch) {
+        setUnrecognized(null);
+        setInput("");
+        if (languageMatch.type === "set-interface-language") {
+          updateProfile({ preferredLanguage: languageMatch.code });
+        } else if (languageMatch.type === "set-voice-language") {
+          updateProfile({ speechLanguage: languageMatch.voiceLocale });
+        } else {
+          router.push(languageMatch.href);
+        }
+        setConfirmation(languageMatch.message);
+        return;
+      }
+
       // Relationship-aware commands ("open related research/company/university/evidence", "open
       // country") resolve against whichever real entity is currently focused — real data only,
       // an honest message when nothing is connected. Checked before the pure fixed-phrase table
@@ -143,7 +177,7 @@ export default function AssistantCommandCenter() {
         setUnrecognized(trimmed);
       }
     },
-    [router, focusedEntity, pinEntityToWorkspace, relationshipFocus],
+    [router, focusedEntity, pinEntityToWorkspace, relationshipFocus, updateProfile],
   );
 
   function handleSubmit(event: React.FormEvent) {
@@ -155,8 +189,9 @@ export default function AssistantCommandCenter() {
     const Recognition = getSpeechRecognitionConstructor();
     if (!Recognition) return;
 
-    if (isListening) {
+    if (voiceStatus === "listening" || voiceStatus === "requesting") {
       recognitionRef.current?.stop();
+      setVoiceStatus("idle");
       return;
     }
 
@@ -164,15 +199,35 @@ export default function AssistantCommandCenter() {
     recognition.lang = profile.speechLanguage || "en-US";
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
+    recognition.onstart = () => setVoiceStatus("listening");
     recognition.onresult = (event) => {
       const transcript = event.results[0]?.[0]?.transcript;
-      if (transcript) route(transcript);
+      setVoiceStatus("processing");
+      if (transcript) {
+        // Real, editable transcript (Phase 10): the recognized text is placed in the visible,
+        // editable input — never executed invisibly — before routing. Navigation commands still
+        // route immediately per Phase 10 ("navigation commands may execute immediately with
+        // visible confirmation"); the confirmation banner below is that visible confirmation.
+        setInput(transcript);
+        route(transcript);
+      }
+      setVoiceStatus("idle");
     };
-    recognition.onerror = () => setIsListening(false);
-    recognition.onend = () => setIsListening(false);
+    recognition.onerror = (event) => {
+      if (event.error === "not-allowed" || event.error === "permission-denied" || event.error === "service-not-allowed") {
+        setVoiceStatus("permission-denied");
+      } else if (event.error === "network") {
+        setVoiceStatus("network-error");
+      } else {
+        setVoiceStatus("idle");
+      }
+    };
+    recognition.onend = () => {
+      setVoiceStatus((current) => (current === "listening" || current === "requesting" ? "idle" : current));
+    };
 
     recognitionRef.current = recognition;
-    setIsListening(true);
+    setVoiceStatus("requesting");
     recognition.start();
   }
 
@@ -184,9 +239,19 @@ export default function AssistantCommandCenter() {
   }
 
   const speechSupported = getSpeechRecognitionConstructor() !== null;
+  const isProminent = size === "prominent";
+
+  const voiceStatusLabel: Record<VoiceStatus, string> = {
+    idle: t("assistant.micReady"),
+    requesting: t("assistant.micRequesting"),
+    listening: t("assistant.micListening"),
+    processing: t("assistant.micProcessing"),
+    "permission-denied": t("assistant.micPermissionDenied"),
+    "network-error": t("assistant.micNetworkError"),
+  };
 
   return (
-    <div className="w-full min-w-0 max-w-md">
+    <div className={`w-full min-w-0 ${isProminent ? "max-w-2xl" : "max-w-md"}`}>
       {assistantContext ? (
         <Link
           href={assistantContext.href}
@@ -203,12 +268,12 @@ export default function AssistantCommandCenter() {
         onSubmit={handleSubmit}
         className="relative flex items-center gap-1.5"
       >
-        {isActive ? (
+        {isActive && !isProminent ? (
           <Avatar name={profile.name} avatar={profile.avatar} size="sm" className="shrink-0" />
         ) : null}
         <div className="relative flex-1">
           <svg
-            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500"
+            className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 ${isProminent ? "h-5 w-5" : "h-4 w-4"}`}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -221,13 +286,13 @@ export default function AssistantCommandCenter() {
               d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
             />
           </svg>
-          <label htmlFor="assistant-command-input" className="sr-only">
+          <label htmlFor={inputId} className="sr-only">
             {isActive
               ? `Ask your ${resolveOperatorName(profile)}, or search countries, companies, and universities`
-              : "Search countries, companies, and universities"}
+              : t("home.commandPlaceholder")}
           </label>
           <input
-            id="assistant-command-input"
+            id={inputId}
             name="q"
             type="search"
             value={input}
@@ -236,8 +301,16 @@ export default function AssistantCommandCenter() {
               setUnrecognized(null);
               setConfirmation(null);
             }}
-            placeholder={isListening ? "Listening…" : "Open my work, continue research…"}
-            className="w-full rounded-lg border border-zinc-800 bg-slate-900/80 py-2 pl-10 pr-4 text-sm text-zinc-300 placeholder:text-zinc-600 outline-none transition-colors focus:border-cyan-500/30 focus:ring-1 focus:ring-cyan-500/20"
+            placeholder={
+              voiceStatus === "listening"
+                ? t("home.commandListening")
+                : voiceStatus === "processing"
+                  ? t("home.commandProcessing")
+                  : t("home.commandPlaceholder")
+            }
+            className={`w-full rounded-lg border border-zinc-800 bg-slate-900/80 text-zinc-300 placeholder:text-zinc-600 outline-none transition-colors focus:border-cyan-500/30 focus:ring-1 focus:ring-cyan-500/20 ${
+              isProminent ? "py-3.5 pl-11 pr-4 text-base" : "py-2 pl-10 pr-4 text-sm"
+            }`}
           />
         </div>
 
@@ -247,27 +320,26 @@ export default function AssistantCommandCenter() {
             onClick={handleVoiceClick}
             disabled={!speechSupported}
             aria-disabled={!speechSupported}
-            title={
-              speechSupported
-                ? isListening
-                  ? "Stop voice input"
-                  : "Start voice input"
-                : "Voice input is not supported in this browser"
-            }
-            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border text-zinc-400 transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
-              isListening
+            aria-label={speechSupported ? voiceStatusLabel[voiceStatus] : t("assistant.micUnsupportedBrowser")}
+            title={speechSupported ? voiceStatusLabel[voiceStatus] : t("assistant.micUnsupportedBrowser")}
+            className={`flex shrink-0 items-center justify-center rounded-lg border text-zinc-400 transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+              isProminent ? "h-12 w-12" : "h-9 w-9"
+            } ${
+              voiceStatus === "listening" || voiceStatus === "requesting"
                 ? "border-cyan-500/40 bg-cyan-500/10 text-cyan-300"
-                : "border-zinc-800 bg-slate-900/80 hover:text-zinc-100"
+                : voiceStatus === "permission-denied" || voiceStatus === "network-error"
+                  ? "border-amber-500/40 bg-amber-500/10 text-amber-300"
+                  : "border-zinc-800 bg-slate-900/80 hover:text-zinc-100"
             }`}
           >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <svg className={isProminent ? "h-5 w-5" : "h-4 w-4"} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"
               />
             </svg>
-            <span className="sr-only">Voice input</span>
+            <span className="sr-only">{voiceStatusLabel[voiceStatus]}</span>
           </button>
         ) : null}
 
@@ -279,22 +351,34 @@ export default function AssistantCommandCenter() {
           aria-hidden="true"
           tabIndex={-1}
         />
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          title="Upload — not yet connected"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-800 bg-slate-900/80 text-zinc-400 transition-colors hover:text-zinc-100"
-        >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13"
-            />
-          </svg>
-          <span className="sr-only">Upload</span>
-        </button>
+        {!isProminent ? (
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            title="Upload — not yet connected"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-800 bg-slate-900/80 text-zinc-400 transition-colors hover:text-zinc-100"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13"
+              />
+            </svg>
+            <span className="sr-only">Upload</span>
+          </button>
+        ) : null}
       </form>
+
+      {profile.voiceInputEnabled && !speechSupported ? (
+        <p className="mt-1.5 text-[11px] text-zinc-600">{t("assistant.micUnsupportedBrowser")}</p>
+      ) : null}
+      {voiceStatus === "permission-denied" ? (
+        <p role="alert" className="mt-1.5 text-[11px] text-amber-400">{t("assistant.micPermissionDenied")}</p>
+      ) : null}
+      {voiceStatus === "network-error" ? (
+        <p role="alert" className="mt-1.5 text-[11px] text-amber-400">{t("assistant.micNetworkError")}</p>
+      ) : null}
 
       {uploadNotice ? (
         <p role="status" className="mt-1.5 text-[11px] text-zinc-500">

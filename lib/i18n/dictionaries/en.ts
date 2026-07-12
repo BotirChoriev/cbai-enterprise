@@ -1,6 +1,63 @@
 import type { TranslationDictionary } from "@/lib/i18n/dictionary-types";
 
 const en: TranslationDictionary = {
+  roles: {
+    scientistAcademic: {
+      title: "Scientist / Academic",
+      description: "Connect evidence to a real research question and track open questions as you go.",
+      firstAction: "Start a Research Project",
+    },
+    professorResearcher: {
+      title: "Professor / Researcher",
+      description: "Organize evidence, notes, and open questions in one structured research workspace.",
+      firstAction: "Open Research Workspace",
+    },
+    student: {
+      title: "Student",
+      description: "Explore research topics and connect evidence to build your own understanding.",
+      firstAction: "Explore Research",
+    },
+    engineer: {
+      title: "Engineer / Technical Specialist",
+      description: "Assess a technology or system against connected evidence and known limitations.",
+      firstAction: "Start a Technology Assessment",
+    },
+    laboratorySpecialist: {
+      title: "Laboratory Specialist",
+      description: "Review evidence sets closely and track what's connected versus missing.",
+      firstAction: "Start an Evidence Review",
+    },
+    governmentLeader: {
+      title: "Government Leader / Public Administrator",
+      description: "Review policy questions against connected country and institutional evidence.",
+      firstAction: "Start a Policy Analysis",
+    },
+    economist: {
+      title: "Economist",
+      description: "Analyze investment and economic questions using connected country and company evidence.",
+      firstAction: "Start an Investment Analysis",
+    },
+    investorBusiness: {
+      title: "Investor / Business",
+      description: "Review company and country evidence to support a real investment question.",
+      firstAction: "Start an Investment Analysis",
+    },
+    legalProfessional: {
+      title: "Legal Professional",
+      description: "Review evidence sets and source status before relying on them in your own work.",
+      firstAction: "Start an Evidence Review",
+    },
+    socialSector: {
+      title: "Social-Sector Professional",
+      description: "Explore public information on countries and institutions in clear language.",
+      firstAction: "Open Citizen Workspace",
+    },
+    generalUser: {
+      title: "General User",
+      description: "Search countries, companies, and universities, and save what matters to you.",
+      firstAction: "Start Exploring",
+    },
+  },
   common: {
     loading: "Loading…",
     save: "Save",

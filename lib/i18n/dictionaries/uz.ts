@@ -1,6 +1,63 @@
 import type { TranslationDictionary } from "@/lib/i18n/dictionary-types";
 
 const uz: TranslationDictionary = {
+  roles: {
+    scientistAcademic: {
+      title: "Olim / Akademik",
+      description: "Dalillarni haqiqiy tadqiqot savoliga bog‘lang va ochiq savollarni kuzatib boring.",
+      firstAction: "Tadqiqot loyihasini boshlash",
+    },
+    professorResearcher: {
+      title: "Professor / Tadqiqotchi",
+      description: "Dalillar, eslatmalar va ochiq savollarni bitta tuzilgan tadqiqot muhitida tartibga soling.",
+      firstAction: "Tadqiqot muhitini ochish",
+    },
+    student: {
+      title: "Talaba",
+      description: "Tadqiqot mavzularini o‘rganing va o‘z tushunchangizni shakllantirish uchun dalillarni bog‘lang.",
+      firstAction: "Tadqiqotlarni o‘rganish",
+    },
+    engineer: {
+      title: "Muhandis / Texnik mutaxassis",
+      description: "Texnologiya yoki tizimni ulangan dalillar va ma’lum cheklovlar asosida baholang.",
+      firstAction: "Texnologik baholashni boshlash",
+    },
+    laboratorySpecialist: {
+      title: "Laboratoriya mutaxassisi",
+      description: "Dalillar to‘plamini diqqat bilan ko‘rib chiqing va nima ulanganu nima yetishmasligini kuzating.",
+      firstAction: "Dalillarni ko‘rib chiqishni boshlash",
+    },
+    governmentLeader: {
+      title: "Davlat rahbari / Davlat boshqaruvchisi",
+      description: "Siyosat savollarini ulangan davlat va institutsional dalillar asosida ko‘rib chiqing.",
+      firstAction: "Siyosat tahlilini boshlash",
+    },
+    economist: {
+      title: "Iqtisodchi",
+      description: "Ulangan davlat va kompaniya dalillari asosida investitsiya va iqtisodiy savollarni tahlil qiling.",
+      firstAction: "Investitsiya tahlilini boshlash",
+    },
+    investorBusiness: {
+      title: "Investor / Biznes",
+      description: "Haqiqiy investitsiya savolini qo‘llab-quvvatlash uchun kompaniya va davlat dalillarini ko‘rib chiqing.",
+      firstAction: "Investitsiya tahlilini boshlash",
+    },
+    legalProfessional: {
+      title: "Yurist",
+      description: "O‘z ishingizda ulardan foydalanishdan oldin dalillar to‘plami va manba holatini ko‘rib chiqing.",
+      firstAction: "Dalillarni ko‘rib chiqishni boshlash",
+    },
+    socialSector: {
+      title: "Ijtimoiy soha mutaxassisi",
+      description: "Davlatlar va institutlar haqidagi ommaviy ma’lumotlarni tushunarli tilda o‘rganing.",
+      firstAction: "Fuqarolar muhitini ochish",
+    },
+    generalUser: {
+      title: "Oddiy foydalanuvchi",
+      description: "Davlatlar, kompaniyalar va universitetlarni qidiring va siz uchun muhimini saqlang.",
+      firstAction: "Kashf etishni boshlash",
+    },
+  },
   common: {
     loading: "Yuklanmoqda…",
     save: "Saqlash",
