@@ -5,7 +5,6 @@ import Link from "next/link";
 import type { GatewaySearchResponse, SearchResultGroupId } from "@/lib/search-gateway";
 import {
   buildEntityResultEntry,
-  buildResearchTopicResultEntry,
   buildTopicResultEntry,
   type SearchResultEntry,
 } from "@/lib/search-intelligence-entry";
@@ -18,13 +17,8 @@ type SearchGatewayResultsProps = {
   query: string;
 };
 
-const OPENABLE_GROUP_IDS = new Set(["countries", "companies", "universities"]);
-const TOPIC_GROUP_IDS = new Set<SearchResultGroupId>([
-  "research_topics",
-  "knowledge",
-  "evidence",
-  "future_modules",
-]);
+const OPENABLE_GROUP_IDS = new Set(["countries", "companies", "universities", "research_topics"]);
+const TOPIC_GROUP_IDS = new Set<SearchResultGroupId>(["knowledge", "evidence", "future_modules"]);
 
 const SEARCH_EXAMPLES = [
   { label: "Country", query: "Japan" },
@@ -49,9 +43,7 @@ function collectEntityResults(response: GatewaySearchResponse) {
 
 function collectTopicGroups(response: GatewaySearchResponse) {
   return response.groups.filter(
-    (group) =>
-      TOPIC_GROUP_IDS.has(group.id) &&
-      (group.topics.length > 0 || group.researchTopics.length > 0),
+    (group) => TOPIC_GROUP_IDS.has(group.id) && group.topics.length > 0,
   );
 }
 
@@ -109,11 +101,6 @@ export default function SearchGatewayResults({
         <div key={group.id} className="space-y-3">
           <p className="text-sm text-zinc-500">{group.label}</p>
           <ul className="space-y-2">
-            {group.researchTopics.map((topic) => (
-              <li key={topic.topicId}>
-                <TopicResultCard entry={buildResearchTopicResultEntry(topic)} />
-              </li>
-            ))}
             {group.topics.map((topic) => (
               <li key={topic.id}>
                 <TopicResultCard entry={buildTopicResultEntry(topic)} />

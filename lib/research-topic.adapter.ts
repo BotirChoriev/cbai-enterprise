@@ -15,6 +15,15 @@ const INSUFFICIENT_EVIDENCE_LABEL = "Insufficient Evidence";
 export function toResearchTopicEntity(topic: ResearchTopic): Entity {
   const relationships = buildEntityRelationships("research_topic", topic.topicId);
 
+  // relatedMethods/relatedEvidenceTypes become real tags so they stay searchable through the
+  // universal Entity index — the same haystack filterResearchTopics already searches (topicName,
+  // domain, description, relatedMethods, relatedEvidenceTypes), now carried on the Entity itself
+  // rather than requiring a second, research-specific search path.
+  const tags = [...topic.relatedMethods, ...topic.relatedEvidenceTypes].map((label) => ({
+    id: label,
+    label,
+  }));
+
   return {
     id: topic.topicId,
     type: "research_topic",
@@ -24,7 +33,7 @@ export function toResearchTopicEntity(topic: ResearchTopic): Entity {
     summary: topic.description,
     status: "active",
     scores: { aiScore: 0, investmentScore: 0, riskScore: 0 },
-    tags: [],
+    tags,
     timeline: [],
     aiSummary: INSUFFICIENT_EVIDENCE_LABEL,
     metadata: {

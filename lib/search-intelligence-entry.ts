@@ -8,7 +8,6 @@ import { getEntityTypeLabel } from "@/lib/entity/entity.helpers";
 import { buildPlatformEntityHref } from "@/lib/global-search";
 import type { EvidenceDisplayStatus } from "@/lib/search-gateway";
 import { EVIDENCE_NOT_CONNECTED_LABEL } from "@/lib/platform-home";
-import { getResearchTopicPath, type ResearchTopic } from "@/lib/research/research-topics";
 
 const PLAIN_NEXT_STEP = "Open to see available official information.";
 
@@ -124,6 +123,23 @@ export function buildEntityResultEntry(
     };
   }
 
+  if (entity.type === "research_topic") {
+    return {
+      name: entity.name,
+      type: typeLabel,
+      countryLabel,
+      distinguishingFact,
+      evidenceStatus: "Available now",
+      shortDescription: "Research topic profile with evidence and related organizations.",
+      nextStep: PLAIN_NEXT_STEP,
+      route: href,
+      href,
+      linked: true,
+      showCompare: false,
+      showReports: true,
+    };
+  }
+
   return {
     name: entity.name,
     type: typeLabel,
@@ -160,25 +176,6 @@ export function buildTopicResultEntry(topic: {
     route: topic.connected ? (topic.href ?? topic.route) : topic.route,
     href: topic.href ?? "/search",
     linked: topic.connected,
-    showCompare: false,
-    showReports: false,
-  };
-}
-
-/** Research topic pages always render honestly (real static generation) — always linked. */
-export function buildResearchTopicResultEntry(topic: ResearchTopic): SearchResultEntry {
-  const href = getResearchTopicPath(topic.topicId);
-  return {
-    name: topic.topicName,
-    type: "Research Topic",
-    countryLabel: null,
-    distinguishingFact: topic.domain,
-    evidenceStatus: topic.status === "catalog_available" ? "Available now" : "Evidence unavailable",
-    shortDescription: topic.description,
-    nextStep: "Open to see available research intelligence.",
-    route: href,
-    href,
-    linked: true,
     showCompare: false,
     showReports: false,
   };

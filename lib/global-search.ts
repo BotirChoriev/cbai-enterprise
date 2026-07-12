@@ -4,13 +4,15 @@ import { companies } from "@/lib/companies";
 import { toCompanyEntities } from "@/lib/companies.adapter";
 import { universities } from "@/lib/universities";
 import { toUniversityEntities } from "@/lib/universities.adapter";
+import { RESEARCH_TOPICS, getResearchTopicPath } from "@/lib/research/research-topics";
+import { toResearchTopicEntities } from "@/lib/research-topic.adapter";
 import type { Entity, EntityType } from "@/lib/entity/entity.types";
 import { getEntityTypeLabel } from "@/lib/entity/entity.helpers";
 
 /** Searchable entity types in the global index */
 export type SearchableEntityType = Extract<
   EntityType,
-  "country" | "company" | "university"
+  "country" | "company" | "university" | "research_topic"
 >;
 
 export type EntityTypeFilter = SearchableEntityType | "all";
@@ -51,6 +53,7 @@ export const SEARCHABLE_ENTITY_TYPES: SearchableEntityType[] = [
   "country",
   "company",
   "university",
+  "research_topic",
 ];
 
 const INSUFFICIENT_EVIDENCE = "insufficient evidence";
@@ -61,6 +64,7 @@ export function getAllEntities(): Entity[] {
     ...toCountryEntities(countries),
     ...toCompanyEntities(companies),
     ...toUniversityEntities(universities),
+    ...toResearchTopicEntities(RESEARCH_TOPICS),
   ];
 }
 
@@ -70,6 +74,7 @@ export function getEntityHref(entity: Entity): string {
     country: "/countries",
     company: "/companies",
     university: "/universities",
+    research_topic: "/research",
   };
   return routes[entity.type as SearchableEntityType] ?? "/search";
 }
@@ -79,11 +84,20 @@ export function getEntityDetailHref(entity: Entity, searchQuery?: string): strin
   return buildPlatformEntityHref(entity, { searchQuery });
 }
 
-/** Platform Context–compatible entity href (country, company, university params). */
+/**
+ * Platform Context–compatible entity href. Research topics are routed by path segment
+ * (`/research/[topicId]`), not a query param like country/company/university, so they resolve
+ * directly to their real profile path — the search query is not appended there since the topic
+ * page itself has no `?q=` param to consume.
+ */
 export function buildPlatformEntityHref(
   entity: Entity,
   options?: { searchQuery?: string },
 ): string {
+  if (entity.type === "research_topic") {
+    return getResearchTopicPath(entity.id);
+  }
+
   const params = new URLSearchParams();
 
   switch (entity.type) {
@@ -300,5 +314,6 @@ export function getEntityCounts(): Record<EntityTypeFilter, number> {
     country: all.filter((e) => e.type === "country").length,
     company: all.filter((e) => e.type === "company").length,
     university: all.filter((e) => e.type === "university").length,
+    research_topic: all.filter((e) => e.type === "research_topic").length,
   };
 }

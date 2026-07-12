@@ -37,8 +37,9 @@ test("1. Global Search returns grouped real results for a real research topic", 
   assert.ok(response.hasResults, "microbiology should match the real research catalog");
   const group = response.groups.find((g) => g.id === "research_topics");
   assert.ok(group, "a research_topics group should be present");
-  assert.ok(group!.researchTopics.length > 0, "microbiology should match at least one real topic");
-  assert.equal(group!.researchTopics[0].topicId, "microbiology");
+  assert.ok(group!.entities.length > 0, "microbiology should match at least one real topic");
+  assert.equal(group!.entities[0].entity.type, "research_topic");
+  assert.equal(group!.entities[0].entity.id, "microbiology");
 });
 
 test("2. Global Search groups real entity results by type", () => {
