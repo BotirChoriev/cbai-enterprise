@@ -13,6 +13,7 @@ import {
   type RelationshipFocus,
 } from "@/lib/assistant/assistant-relationship-commands";
 import { getResearchTopicById } from "@/lib/research/research-topics";
+import { getPrimaryEntity } from "@/lib/context";
 import Avatar from "@/components/shared/Avatar";
 
 const SUGGESTED_COMMAND_IDS = ["open-my-work", "continue-research", "open-evidence", "open-trust"];
@@ -58,12 +59,15 @@ export default function AssistantCommandCenter() {
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Phase 5: the Assistant always knows where the user currently is — derived from the same
-  // real page context the platform already tracks, never a separate tracking system and never a
-  // question asked of the user.
+  // The Assistant always knows where the user currently is — derived from the same real Entity
+  // Context the platform already tracks (getPrimaryEntity, the one canonical accessor for
+  // "whichever entity is focused"), never a separate tracking system and never a question asked
+  // of the user.
+  const focusedEntity = getPrimaryEntity(context);
+
   const assistantContext = useMemo(
-    () => resolveAssistantContext(pathname, context.country ?? context.company ?? context.university),
-    [pathname, context.country, context.company, context.university],
+    () => resolveAssistantContext(pathname, focusedEntity),
+    [pathname, focusedEntity],
   );
 
   // The same focus resolveAssistantContext derives, reshaped for the relationship resolver
@@ -74,9 +78,8 @@ export default function AssistantCommandCenter() {
     if (topicMatch && getResearchTopicById(topicMatch[1])) {
       return { kind: "research_topic", id: topicMatch[1] };
     }
-    const focused = context.country ?? context.company ?? context.university;
-    return focused ? { kind: focused.kind, id: focused.id } : null;
-  }, [pathname, context.country, context.company, context.university]);
+    return focusedEntity ? { kind: focusedEntity.kind, id: focusedEntity.id } : null;
+  }, [pathname, focusedEntity]);
 
   const route = useCallback(
     (rawInput: string) => {
@@ -89,10 +92,9 @@ export default function AssistantCommandCenter() {
       // Contextual Operator already shows. Never fabricates something to save.
       const normalized = trimmed.toLowerCase();
       if (["save workspace", "save to workspace", "bookmark", "save company"].some((phrase) => normalized.includes(phrase))) {
-        const focused = context.country ?? context.company ?? context.university;
-        if (focused) {
-          pinEntityToWorkspace(focused);
-          setConfirmation(`Saved "${focused.name}" to your workspace.`);
+        if (focusedEntity) {
+          pinEntityToWorkspace(focusedEntity);
+          setConfirmation(`Saved "${focusedEntity.name}" to your workspace.`);
         } else {
           setConfirmation("Nothing to save yet — open a country, company, or university profile first.");
         }
@@ -127,7 +129,7 @@ export default function AssistantCommandCenter() {
         setUnrecognized(trimmed);
       }
     },
-    [router, context.country, context.company, context.university, pinEntityToWorkspace, relationshipFocus],
+    [router, focusedEntity, pinEntityToWorkspace, relationshipFocus],
   );
 
   function handleSubmit(event: React.FormEvent) {

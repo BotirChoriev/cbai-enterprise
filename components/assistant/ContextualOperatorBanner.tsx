@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import { resolveAssistantContext, type AssistantContextEntity } from "@/lib/assistant/assistant-context";
+import { getPrimaryEntity } from "@/lib/context";
 import Avatar from "@/components/shared/Avatar";
 import { profileSectionHref } from "@/components/shared/entity-profile-path";
 
@@ -49,10 +50,7 @@ export default function ContextualOperatorBanner() {
   const { isActive, profile } = useAssistantProfile();
   const { context } = usePlatformContext();
 
-  const assistantContext = resolveAssistantContext(
-    pathname,
-    context.country ?? context.company ?? context.university,
-  );
+  const assistantContext = resolveAssistantContext(pathname, getPrimaryEntity(context));
 
   if (!assistantContext) return null;
 
