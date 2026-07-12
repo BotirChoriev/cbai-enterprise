@@ -1,5 +1,16 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { platformModules } from "@/lib/navigation";
+
+// Not in primary navigation (confirmed unreachable from any real nav link) and honestly
+// self-describes as inactive — kept reachable by direct URL for the platform module grid it
+// still provides, but excluded from search indexing so it never competes with the real product
+// surfaces for discovery.
+export const metadata: Metadata = {
+  title: "Core",
+  description: "Core inference and agent orchestration are not active in this deployment.",
+  robots: { index: false, follow: true },
+};
 
 export default function CorePage() {
   return (

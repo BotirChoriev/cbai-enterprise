@@ -1,8 +1,17 @@
+import type { Metadata } from "next";
 import PageHeader from "@/components/layout/PageHeader";
 import AgentStats from "@/components/agents/AgentStats";
 import AgentCard from "@/components/agents/AgentCard";
 import AgentActivity from "@/components/agents/AgentActivity";
 import { agents } from "@/lib/agents";
+
+// Not in primary navigation (removed after self-disclosing as non-functional immediately after
+// the click) — kept reachable by direct URL, excluded from search indexing.
+export const metadata: Metadata = {
+  title: "Agents",
+  description: "Planned agent capabilities for this platform — not available yet.",
+  robots: { index: false, follow: true },
+};
 
 export default function AgentsPage() {
   return (
