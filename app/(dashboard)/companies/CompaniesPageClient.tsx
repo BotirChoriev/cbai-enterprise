@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   companies,
   getCompanyCountries,
@@ -15,14 +16,19 @@ import CompanyRelationships from "@/components/companies/CompanyRelationships";
 import EntityOptionalExploration from "@/components/shared/EntityOptionalExploration";
 import { CompanyIntelligencePanel } from "@/components/companies/CompanyIntelligencePanel";
 import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
+import EntityNotFoundNotice from "@/components/system/EntityNotFoundNotice";
 
 export default function CompaniesPageClient() {
   const { context, setCompany, recordEntityView } = usePlatformContext();
+  const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
   const [industry, setIndustry] = useState("All");
   const [country, setCountry] = useState("All");
   const [fallbackId, setFallbackId] = useState(companies[0].id);
   const selectedId = context.company?.id ?? fallbackId;
+  const requestedCompanyId = searchParams.get("company");
+  const requestedCompanyNotFound =
+    Boolean(requestedCompanyId) && !companies.some((c) => c.id === requestedCompanyId);
 
   const industries = useMemo(() => getCompanyIndustries(), []);
   const countries = useMemo(() => getCompanyCountries(), []);
@@ -71,6 +77,14 @@ export default function CompaniesPageClient() {
           Overview, available information, missing information, and reports for each company.
         </p>
       </div>
+
+      {requestedCompanyNotFound && requestedCompanyId ? (
+        <EntityNotFoundNotice
+          requestedId={requestedCompanyId}
+          entityLabel="company"
+          fallbackName={selectedCompany.name}
+        />
+      ) : null}
 
       <ContextualOperatorBanner />
 

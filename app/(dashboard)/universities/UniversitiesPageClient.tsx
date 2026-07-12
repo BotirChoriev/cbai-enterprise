@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   universities,
   getUniversityCountries,
@@ -15,14 +16,19 @@ import UniversityRelationships from "@/components/universities/UniversityRelatio
 import EntityOptionalExploration from "@/components/shared/EntityOptionalExploration";
 import { UniversityIntelligencePanel } from "@/components/universities/UniversityIntelligencePanel";
 import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
+import EntityNotFoundNotice from "@/components/system/EntityNotFoundNotice";
 
 export default function UniversitiesPageClient() {
   const { context, setUniversity, recordEntityView } = usePlatformContext();
+  const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
   const [country, setCountry] = useState("All");
   const [type, setType] = useState("All");
   const [fallbackId, setFallbackId] = useState(universities[0].id);
   const selectedId = context.university?.id ?? fallbackId;
+  const requestedUniversityId = searchParams.get("university");
+  const requestedUniversityNotFound =
+    Boolean(requestedUniversityId) && !universities.some((u) => u.id === requestedUniversityId);
 
   const countries = useMemo(() => getUniversityCountries(), []);
   const types = useMemo(() => getUniversityTypes(), []);
@@ -80,6 +86,14 @@ export default function UniversitiesPageClient() {
           Overview, available information, missing information, and reports for each university.
         </p>
       </div>
+
+      {requestedUniversityNotFound && requestedUniversityId ? (
+        <EntityNotFoundNotice
+          requestedId={requestedUniversityId}
+          entityLabel="university"
+          fallbackName={selectedUniversity.name}
+        />
+      ) : null}
 
       <ContextualOperatorBanner />
 

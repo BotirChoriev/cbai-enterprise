@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import type { CountryRegion } from "@/lib/countries";
 import { countries } from "@/lib/countries";
 import { getCountryRelationships } from "@/lib/countries.adapter";
@@ -13,14 +14,19 @@ import EntityOptionalExploration from "@/components/shared/EntityOptionalExplora
 import { CountryIntelligencePanel } from "@/components/countries/CountryIntelligencePanel";
 import WorldIntelligenceMap from "@/components/countries/WorldIntelligenceMap";
 import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
+import EntityNotFoundNotice from "@/components/system/EntityNotFoundNotice";
 
 export default function CountriesPageClient() {
   const { context, setCountry, recordEntityView } = usePlatformContext();
+  const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
   const [region, setRegion] = useState<CountryRegion | "All">("All");
   const [fallbackId, setFallbackId] = useState(countries[0].id);
   const selectedId = context.country?.id ?? fallbackId;
   const searchQuery = context.searchQuery;
+  const requestedCountryId = searchParams.get("country");
+  const requestedCountryNotFound =
+    Boolean(requestedCountryId) && !countries.some((c) => c.id === requestedCountryId);
 
   const filtered = useMemo(() => {
     return countries.filter((country) => {
@@ -63,6 +69,14 @@ export default function CountriesPageClient() {
           Overview, available information, missing information, and reports for each country.
         </p>
       </div>
+
+      {requestedCountryNotFound && requestedCountryId ? (
+        <EntityNotFoundNotice
+          requestedId={requestedCountryId}
+          entityLabel="country"
+          fallbackName={selectedCountry.name}
+        />
+      ) : null}
 
       <ContextualOperatorBanner />
 

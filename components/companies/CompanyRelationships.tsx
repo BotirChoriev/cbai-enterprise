@@ -35,7 +35,7 @@ export default function CompanyRelationships({ profile }: CompanyRelationshipsPr
         <EntityRelatedPanel
           showHeading={false}
           relationships={relationships}
-          emptyLabel="No verified catalog relationships indexed for this company in the Knowledge Graph."
+          emptyLabel="No verified relationships yet — connections appear once a country, university, or research topic in the catalog references this company. Explore Countries or Universities to see what's already connected."
         />
 
         <div className="border-t border-zinc-800 pt-4">

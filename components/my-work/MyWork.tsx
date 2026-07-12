@@ -84,7 +84,11 @@ function MyWorkContent() {
   if (projectId && !project) {
     return (
       <div className={`${cbaiGlassCard} space-y-2 p-5`}>
-        <p className="text-sm text-zinc-300">Project not found.</p>
+        <p className="text-sm text-zinc-300">This project isn&apos;t available.</p>
+        <p className="text-xs text-zinc-500">
+          Projects are saved to this browser only, so this link may be from another device, or
+          the project may have been removed here. Your real projects are listed below.
+        </p>
         <Link href="/my-work" className="text-xs text-cyan-400 hover:text-cyan-300">
           ← Back to My Work
         </Link>

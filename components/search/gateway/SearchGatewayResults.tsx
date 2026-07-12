@@ -61,7 +61,11 @@ export default function SearchGatewayResults({
     return (
       <div className="space-y-4" role="status">
         <p className="text-sm text-zinc-300">
-          No matching country, company, university, or research topic was found.
+          No matching country, company, university, or research topic was found for &quot;{response.query}&quot;.
+        </p>
+        <p className="text-xs text-zinc-500">
+          Search only matches names already in the local registry — try a shorter term, check the
+          spelling, or start from one of these:
         </p>
         <SearchExamples />
       </div>

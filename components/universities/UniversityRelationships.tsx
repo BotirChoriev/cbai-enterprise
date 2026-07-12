@@ -34,7 +34,7 @@ export default function UniversityRelationships({ profile }: UniversityRelations
         <EntityRelatedPanel
           showHeading={false}
           relationships={relationships}
-          emptyLabel="No verified catalog relationships indexed for this university in the Knowledge Graph."
+          emptyLabel="No verified relationships yet — connections appear once a country, company, or research topic in the catalog references this university. Explore Countries or Companies to see what's already connected."
         />
 
         <div className="border-t border-zinc-800 pt-4">
