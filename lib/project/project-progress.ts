@@ -33,12 +33,11 @@ export type ProjectProgress = {
 };
 
 /**
- * `reportGeneratedProjectIds` is passed in rather than read from storage here — report
- * generation is a real, on-demand render (via buildEntityReport), not a persisted event, so the
- * caller (which just rendered or is about to render the report) is the only honest source for
- * "has a report been generated this session." Defaults to false — never assumed true.
+ * `project.reportGeneratedAt` is a real, persisted timestamp — only ever set by an actual
+ * "Generate report" click (see markProjectReportGenerated) — so report progress survives across
+ * sessions, unlike an ephemeral React flag would.
  */
-export function deriveProjectProgress(project: Project, reportGeneratedThisSession: boolean): ProjectProgress {
+export function deriveProjectProgress(project: Project): ProjectProgress {
   const entities = loadProjectEntities(project.id);
   const notes = loadProjectNotes(project.id);
   const evidence = loadProjectEvidence(project.id);
@@ -49,7 +48,7 @@ export function deriveProjectProgress(project: Project, reportGeneratedThisSessi
     { id: "evidence_added", label: "Evidence added", achieved: evidence.length > 0 },
     { id: "notes_created", label: "Notes created", achieved: notes.length > 0 },
     { id: "entities_linked", label: "Entities linked", achieved: entities.length > 0 },
-    { id: "report_generated", label: "Report generated", achieved: reportGeneratedThisSession },
+    { id: "report_generated", label: "Report generated", achieved: Boolean(project.reportGeneratedAt) },
   ];
 
   return {

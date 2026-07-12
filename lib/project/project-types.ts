@@ -78,6 +78,8 @@ export type Project = {
   status: ProjectStatus;
   researchQuestion?: string;
   objectives?: string;
+  /** Real timestamp of the last time the user generated this project's report — never assumed, only ever set by a real click. */
+  reportGeneratedAt?: string;
   createdAt: string;
   updatedAt: string;
 };

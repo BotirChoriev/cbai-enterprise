@@ -116,6 +116,11 @@ export function updateProject(id: string, patch: Partial<Omit<Project, "id" | "c
   return updated;
 }
 
+/** Real, user-caused event — only ever set by an actual "Generate report" click, never assumed. */
+export function markProjectReportGenerated(id: string): Project | null {
+  return updateProject(id, { reportGeneratedAt: new Date().toISOString() });
+}
+
 // ---------------------------------------------------------------------------
 // Project <-> Entity links (Related Entities, via the Universal Entity Engine)
 // ---------------------------------------------------------------------------

@@ -102,6 +102,9 @@ function buildProjectReport(project: Project): ProjectReport {
     ...notes.map((n): ProjectTimelineEntry => ({ id: `note-${n.noteId}`, description: "Note added", at: n.createdAt })),
     ...tasks.map((t): ProjectTimelineEntry => ({ id: `task-${t.taskId}`, description: `Task added: ${t.title}`, at: t.createdAt })),
     ...evidence.map((e): ProjectTimelineEntry => ({ id: `evidence-${e.evidenceRefId}`, description: `Evidence added: ${e.title}`, at: e.createdAt })),
+    ...(project.reportGeneratedAt
+      ? [{ id: `report-${project.id}`, description: "Report generated", at: project.reportGeneratedAt } satisfies ProjectTimelineEntry]
+      : []),
   ].sort((a, b) => b.at.localeCompare(a.at));
 
   const unresolvedQuestions = openQuestions.filter((q) => !q.resolved);
