@@ -1518,3 +1518,84 @@ demand (`buildEntityReport`), never stored; building report persistence would be
 this mission's "stop building frontend features" directive rules out. No multi-tenant Organization
 model (roles, invites, shared workspaces) — `organization` is a real but plain text field, not a
 new entity.
+
+## 22. Maximum Launch-Blocker Remediation
+
+A repair mission across all prior work, not a feature sprint — reused the Project/Entity/
+Research/Evidence/Search/Command Center/Trust engines exclusively, added zero new architecture.
+Investigated every Phase before writing anything: `find app -iname page.tsx` confirmed there are
+no legacy/duplicate route files anywhere in the repo (every prior mission this session already
+kept the route tree flat and canonical) — the "legacy pages" Phase largely didn't apply, so effort
+went to the real gap found instead: 11 of 22 dashboard pages had no explicit `metadata` export,
+silently falling back to the generic root title.
+
+**A real, verified P0 bug found and fixed**: `OfflineBanner` (built in the Trust & Production
+Polish mission) checked `typeof navigator !== "undefined"` to detect offline status — but modern
+Node ships a global `navigator` object with `onLine` always `undefined`, so `!undefined` evaluates
+`true` and every server render (dev *and* the real production static export) incorrectly rendered
+"You're offline" to every visitor. Confirmed via curl against dev SSR output and the actual
+`out/*.html` files, not assumed — this is exactly the kind of bug this mission's "do not claim
+production readiness without browser evidence" rule exists to catch. Fixed by also requiring
+`typeof window !== "undefined"` (true only in a real browser).
+
+**A second real bug caught during verification, not before shipping**: the first version of the
+Countries world-map disclosure fix had its `open`/summary-label ternary backwards — labeled the
+collapsed state "(open)" and vice versa. Caught by re-checking the raw `<details open="">`
+attribute in curl output against the label text, not by trusting the code read correctly on
+first pass. Corrected before commit.
+
+**Report contradiction removed**: every Country/Company/University profile page said "this
+profile does not open a [type] report directly" immediately beside a working inline "Generate
+report" button — found in the original Product Experience Audit, never fixed until now. Copy
+corrected to state the real relationship between the on-page report and Reports Center.
+
+**Report output activated for real use**: all 5 report types (Country/Company/University/Project/
+Research Topic) gained a real generation timestamp and a real print/export action
+(`ReportPrintButton`, `window.print()` plus `.cbai-print-area`/`.cbai-no-print` CSS that hides all
+chrome). Every modern OS's print dialog offers "Save as PDF," so this honestly satisfies the
+mission's PDF-export requirement without a new dependency or a fabricated export pipeline — no
+dead button was shipped. Project reports gained Objectives/Tasks/Open Questions sections — all
+three were already computed by `buildProjectReport`, never rendered.
+
+**Trust Center accuracy regression found and fixed**: the Privacy and Known Limitations sections
+still said "this platform does not have user accounts" — true when written, false since the
+Authentication + User Platform Foundation mission shipped real local accounts three missions ago.
+Corrected to describe the real account system (hashed/salted, local-only, no cross-device sync).
+Added a real Terms of Use section — a minimum honest statement (as-is, no warranty, not
+professional advice, local data can be lost) rather than inventing liability clauses or a
+jurisdiction this platform has no authority to declare.
+
+**Role surfaces given a real primary action**: Government, Investor, and Citizen previously showed
+real coverage data with no way to act on it. Each gained a real "Start a [Role] Project" entry
+point (`RoleProjectEntry`, reusing `CreateProjectForm` directly) mapped to a real, already-existing
+Project Type (Policy Analysis / Investment Analysis / Evidence Review) — no new role architecture,
+no duplicated engine.
+
+**UX clarity fixes**: `CreateProjectForm`'s Visibility dropdown now disables Team/Public instead of
+erroring after submission; the real per-type description (already in the catalog, never shown) now
+renders under the Project Type selector. Project Home's Related Entities and Bookmarks — two
+silently-overlapping concepts — now have a real star/unlink toggle per linked entity plus a
+one-line distinction, with real `aria-label`s (not just `title`, which isn't reliably announced).
+Saving Research Question/Objectives now shows a real "Saved." confirmation and immediately
+refreshes Dashboard/Guide/Health, which previously required an unrelated action to pick up the
+change.
+
+**Accessibility**: targeted verification, not an exhaustive audit — confirmed `StatusBadge` already
+conveys status via visible text, never color alone; confirmed `cbaiBtnPrimary`/`cbaiBtnSecondary`
+(reused by every new button this mission) already carry real `focus-visible` outlines; added real
+`aria-label`/`aria-pressed` to the new bookmark/unlink icon buttons. Not attempted: a full keyboard-
+navigation sweep, mobile touch-target audit, or the pre-existing `outline-none` pattern used across
+many form inputs codebase-wide (paired with a visible border-color change on focus, but not a
+strict WCAG-ideal focus ring) — fixing that broadly would be exactly the "broad redesign" this
+mission's rules prohibit.
+
+**Auth/Backend**: no new findings — the Authentication + User Platform Foundation mission (three
+missions prior) already completed this investigation and built the real local account system,
+the Supabase-ready `CloudStorageAdapter` interface, and per-user key namespacing for Projects/
+Bookmarks/Recent Activity. This mission's only backend-adjacent work was correcting Trust Center
+copy that had gone stale since that mission shipped.
+
+**Tests**: new `scripts/test-launch-gate.ts` — 17 tests, each tied to a specific verified fix
+above. 17/17 passing, alongside the unchanged 14 + 12 + 15 + 12 + 15 + 12 + 10 + 13 + 14 + 12 + 15
++ 28 + 11 = 183 total — **200 tests overall**. `npm run build` clean, 92 routes (no new routes;
+`/account` was added by the prior mission). Full detail: this section.

@@ -1045,6 +1045,33 @@ New `scripts/test-auth-platform.ts` — 12 tests. `npm run lint` clean, `npm run
 (`/account` is the one new page), 183 total tests passing (12 + 14 + 15 + 12 + 15 + 12 + 10 + 13 +
 14 + 12 + 15 + 28 + 11). Full detail: `docs/product-activation-audit.md` §21.
 
+## v3.23 — Maximum Launch-Blocker Remediation
+
+A repair mission, not a feature sprint — reused every existing engine, added zero new
+architecture. Found and fixed a real, verified P0: `OfflineBanner` incorrectly reported "offline"
+on every server render (dev *and* the real production static export) because modern Node's global
+`navigator.onLine` is always `undefined`; confirmed via curl against actual `out/*.html` files,
+not assumed. Removed a real report-copy contradiction ("this profile does not open a report"
+beside a working "Generate report" button). Activated real report output: every report type
+(Country/Company/University/Project/Research Topic) gained a generation timestamp and a real
+print/export action (`window.print()`, honestly satisfying "PDF export" via the OS print dialog's
+own "Save as PDF" — no new dependency, no dead button). Project reports gained Objectives/Tasks/
+Open Questions sections that were already computed but never rendered.
+
+Found and fixed a real Trust Center accuracy regression: the Privacy and Known Limitations
+sections still said "this platform does not have user accounts," true when written, false since
+the Authentication mission shipped real local accounts. Added a real Terms of Use section (a
+minimum honest statement, not invented legal guarantees). Government/Investor/Citizen each gained
+a real "Start a [Role] Project" entry point reusing the Project Engine directly, mapped to
+already-existing Project Types. `CreateProjectForm` now disables unavailable Visibility options
+instead of erroring after submission, and shows real Project Type descriptions. Project Home now
+distinguishes Linked Entities from Bookmarks with a real toggle, and shows a real "Saved."
+confirmation after saving Research Question/Objectives.
+
+New `scripts/test-launch-gate.ts` — 17 tests, one per verified fix. `npm run lint` clean, `npm run
+build` 92 routes, 200 total tests passing (17 + 12 + 14 + 15 + 12 + 15 + 12 + 10 + 13 + 14 + 12 +
+15 + 28 + 11). Full detail: `docs/product-activation-audit.md` §22.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation

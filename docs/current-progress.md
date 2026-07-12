@@ -782,3 +782,20 @@ out, and there's no real Supabase project in this environment anyway. Built a re
 unconfigured — real scaffolding, never a faked connection. New `/account` page and real-auth-aware
 Topbar/My Work. 12 new tests, 183 total passing. Full detail: `docs/product-activation-audit.md`
 §21.
+
+## Maximum Launch-Blocker Remediation
+
+A repair mission — reused every existing engine, zero new architecture. Found and fixed a real P0:
+`OfflineBanner` incorrectly reported "offline" on every server render (confirmed via curl against
+the real production static export, not assumed) because modern Node's global `navigator.onLine` is
+always `undefined`. Removed a real report-copy contradiction and activated real report output
+(generation timestamps, a real print/export action on all 5 report types honestly satisfying "PDF
+export" via the browser's own print dialog). Found and fixed a real Trust Center accuracy
+regression — Privacy/Known Limitations still claimed "no user accounts," false since the
+Authentication mission shipped three missions ago — and added a real, honest Terms of Use section.
+Government/Investor/Citizen each gained a real "Start a [Role] Project" entry point reusing the
+Project Engine directly. Fixed several verified UX issues: disabled unavailable Visibility options,
+surfaced Project Type descriptions, distinguished Linked Entities from Bookmarks with a real
+toggle, added a real save confirmation for Research Question/Objectives, and stopped forcing a
+full world map open when a country is already selected. 17 new tests, 200 total passing. Full
+detail: `docs/product-activation-audit.md` §22.
