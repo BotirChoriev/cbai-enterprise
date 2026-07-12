@@ -13,7 +13,8 @@
     "test:countries-intelligence": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-countries-intelligence.ts",
     "test:relationship-activation": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-relationship-activation.ts",
     "test:universal-entity-engine": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-universal-entity-engine.ts",
-    "test:platform-core-completion": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-platform-core-completion.ts"
+    "test:platform-core-completion": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-platform-core-completion.ts",
+    "test:research-workspace-activation": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-research-workspace-activation.ts"
   },
   "dependencies": {
     "next": "16.2.10",
