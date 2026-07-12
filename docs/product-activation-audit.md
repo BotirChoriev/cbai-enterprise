@@ -793,3 +793,107 @@ out of scope for this mission. No fabricated Country↔Research or University↔
 was added. `/trust` (the platform-wide methodology center) was not cross-linked with each entity's
 own Trust section — both are already real and honest on their own; unifying them was judged lower
 value than the relationship gaps above and was not attempted.
+
+## 14. Universal Entity Engine (Platform Core)
+
+Response to "CBAI Product Activation — Universal Entity Engine" (priority: Platform Core; a
+progressive refactor, explicitly not a rewrite — every current route had to keep working, byte-
+identical, throughout). Investigated first: `lib/entity/entity.types.ts` already exists — a
+pre-Constitution "Universal Entity Framework" used only by `lib/global-search.ts`'s
+`getAllEntities()` (zeroed-score `Entity` objects feeding search-result cards for
+Country/Company/University). This mission extends that real foundation rather than inventing a
+second, competing one.
+
+**Entity model, additive**: `Entity` gained optional `summary`, `country`, `organization`,
+`relationships`, `reportsAvailable` fields — every existing field, and every existing caller
+(3 adapters + `global-search.ts`), untouched. `EntityType` gained `"research_topic"` (with a real
+module config, icon, and accent color — `lib/entity/entity.icons.ts` and
+`ENTITY_MODULE_CONFIGS` are `Record<EntityType, …>`, so this was a compile-enforced, exhaustive
+addition, not an optional one). New `lib/research-topic.adapter.ts` (`toResearchTopicEntity`) —
+Research topics had never participated in the universal Entity model at all; they now produce a
+fully valid `Entity` (verified by the existing `isValidEntity` runtime guard) for every one of the
+65 real catalog topics.
+
+**Relationship model**: new `lib/entity/entity-relationships.ts` (`buildEntityRelationships`) —
+not a new relationship engine. It normalizes the already-real, already-tested per-module
+relationship functions (`getCountryRelationships`, `getCompanyRelationships`,
+`getUniversityRelationships`, `getRelatedResearchTopics`/`getRelatedCompaniesForTopic`) onto one
+shared vocabulary (`RELATED_TO`, `LOCATED_IN`, `HAS_RESEARCH`, plus the unused-but-reserved
+`PUBLISHED_BY`/`SUPPORTED_BY`/`REFERENCES`/`HAS_REPORT`/`HAS_EVIDENCE`/`BELONGS_TO`/
+`USES_DATASET`/`PART_OF_WORKSPACE` for future entity kinds that need them). Deliberately **not**
+baked into the three existing `toXEntity()` adapters — `entity-relationships.ts` depends on those
+adapters' own relationship functions, so populating `Entity.relationships` inside them would
+create a circular import; it stays an optional field, computed on demand by callers that need it.
+
+**Universal Related Panel**: new `components/shared/EntityRelatedPanel.tsx` — one "Related
+Entities" component, grouped by real target type, replacing the need for a bespoke
+"Related Companies"/"Related Universities"/"Related Research" component per module. Migrated
+`ResearchRelatedCompanies.tsx` onto it (verified via build + a curl content check that the
+rendered heading, note, and every company link are byte-identical to the pre-migration output) —
+the first real, in-production proof that a page can move onto the universal engine without
+changing what the user sees. `CountryRelationships.tsx`/`CompanyRelationships.tsx`/
+`UniversityRelationships.tsx` were **not** migrated in this pass (they combine Knowledge Graph
+edges with linked-entity lists in a way that doesn't map 1:1 onto `EntityRelatedPanel` yet without
+risking a visual regression on three already-correct, tested pages) — left as real, working
+legacy components, not touched.
+
+**Universal Report System**: new `lib/entity/entity-report.ts` (`buildEntityReport(entityType,
+id)`) — one function name, real dispatch. For Country/Company/University it returns the exact
+object `buildCountryReport`/`buildCompanyReport`/`buildUniversityReport` already produced (proven
+byte-identical by two new tests comparing the facade's output against calling the direct builder),
+so it was safe to be the single source of truth going forward. For Research topics — which never
+had a report — it compiles a new, minimal, honest one from the same real data
+`ResearchIntelligenceOverview.tsx` already renders (`buildResearchMission`'s evidence count and
+the shared relationship builder), with no fabricated methodology list or evidence total that
+doesn't exist for research today. Returns `null` for any unresolvable id, across all four kinds —
+never a fabricated report.
+
+**Universal Workspace**: already generic — confirmed, not rebuilt. `pinEntity`/`unpinEntity`/
+`isEntityPinned` (extended to `research_topic` in the prior mission) operate on `kind: EntityKind`
++ `id` alone; no entity-type-specific pin logic exists anywhere. This mission adds no new
+workspace code — it's the one piece of the "Universal Entity Engine" that was already complete.
+
+**Universal Sidebar**: confirmed already unified — `components/layout/Sidebar.tsx` is the single
+platform navigation component; no per-entity-type sidebar implementations were ever found. No
+change needed.
+
+**Command Center migrated onto Entity objects**: `lib/assistant/assistant-relationship-commands.ts`
+was refactored to resolve every "open related X" command through `buildEntityRelationships`
+instead of calling each module's relationship function directly — verified behaviorally identical
+by re-running the prior mission's 14 tests unchanged (14/14 still pass) before adding new ones.
+This is the literal fulfillment of "Assistant commands operate on Entity objects, not individual
+page implementations."
+
+**Universal Header, built but not swapped into a live page**: new
+`components/shared/EntityHeader.tsx` wraps the already-real `EntityOverviewSection` around a
+generic `Entity` object (mapping `entity.metrics` onto the header's `facts` list) — a genuine,
+tested "one header for any entity type." Not inserted into Country/Company/University (their
+existing `EntityOverviewSection` call sites pass richer, bespoke facts — Government, Founded +
+Official website — that a generic `Entity` object doesn't cleanly carry without losing detail) or
+Research (`ResearchTopicHero.tsx` is a stylistically different hero, not a compact overview card;
+swapping it would be a visual redesign, which this mission explicitly forbids). Recorded honestly
+as built-and-tested, not yet live — the responsible choice given "do not redesign the UI."
+
+**Universal Search**: not migrated in this pass. `executeGatewaySearch` already groups results by
+type cleanly (no duplicate results today); forcing Research topics through the same `Entity[]`
+array `searchEntities()` returns for Country/Company/University would require restructuring how
+result groups render, risking the exact duplicate-results regression this mission explicitly warns
+against. `toResearchTopicEntity` exists and is ready for that migration when the group-rendering
+layer is generalized — deliberately deferred, not silently dropped.
+
+**Tests**: new `scripts/test-universal-entity-engine.ts` (`npm run test:universal-entity-engine`)
+— 13 tests covering Entity validity for all four kinds, relationship-builder correctness and
+honesty (never a link to a non-existent entity, honestly empty for unknown ids), report-facade
+byte-identity against the direct builders, the research-topic report's honesty, and the migrated
+Command Center resolver's unchanged behavior. 13/13 passing, alongside the unchanged 14 + 12 + 15
++ 28 + 11 = 80 total — **93 tests overall**.
+
+**Not attempted**: `CountryRelationships.tsx`/`CompanyRelationships.tsx`/
+`UniversityRelationships.tsx` were not migrated onto `EntityRelatedPanel` (real regression risk on
+working pages, deferred). `EntityHeader` was not inserted into any live page (see above). Universal
+Search's group-rendering layer was not restructured. `EntityRelationship`'s
+`PUBLISHED_BY`/`SUPPORTED_BY`/`REFERENCES`/`HAS_REPORT`/`HAS_EVIDENCE`/`BELONGS_TO`/
+`USES_DATASET`/`PART_OF_WORKSPACE` vocabulary members are reserved for future entity kinds
+(Government Institution, Laboratory, Dataset, Patent, Researcher, Investor, Policy, Court, Law,
+Economic Indicator) that don't exist as real catalogs yet — declared honestly, not wired to
+fabricated data.

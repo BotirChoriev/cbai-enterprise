@@ -781,6 +781,38 @@ routes, 80 total tests passing (14 + 12 + 15 + 28 + 11). Zero Platform Core file
 relationship engine — every fix reuses an already-real adapter or component. Full detail:
 `docs/product-activation-audit.md` §13.
 
+## v3.15 — Universal Entity Engine (Platform Core)
+
+Extended the pre-existing `lib/entity/entity.types.ts` "Universal Entity Framework" (previously
+used only by global search) rather than building a second, competing one. `Entity` gained optional
+`summary`/`country`/`organization`/`relationships`/`reportsAvailable` fields — every existing
+field and caller untouched. `EntityType` gained `research_topic`, with a new
+`lib/research-topic.adapter.ts` (`toResearchTopicEntity`) — Research topics now produce a fully
+valid universal `Entity` for the first time.
+
+New `lib/entity/entity-relationships.ts` (`buildEntityRelationships`) normalizes the already-real
+per-module relationship functions onto one shared vocabulary (`RELATED_TO`, `LOCATED_IN`,
+`HAS_RESEARCH`, plus reserved types for future entity kinds) — not a new relationship engine, a
+normalization layer. New `components/shared/EntityRelatedPanel.tsx` consumes it; migrated
+`ResearchRelatedCompanies.tsx` onto it with verified byte-identical output.
+
+New `lib/entity/entity-report.ts` (`buildEntityReport`) is a dispatch facade — proven, via two new
+tests, to return output byte-identical to calling `buildCountryReport`/`buildCompanyReport`/
+`buildUniversityReport` directly, plus a new minimal, honest report for Research topics (which
+never had one). Confirmed the Workspace pin architecture and the main Sidebar were already fully
+universal — no changes needed. Migrated the Command Center's relationship resolver to route
+through `buildEntityRelationships` instead of calling each module's function directly, verified
+behaviorally identical against the prior mission's 14 tests before adding new ones. Built
+`components/shared/EntityHeader.tsx` (one header for any entity type) but did not insert it into
+any live page — Country/Company/University's existing headers carry richer bespoke facts, and
+Research's hero is stylistically different; swapping either would risk exactly the visual
+regression this mission forbade.
+
+New `scripts/test-universal-entity-engine.ts` — 13 tests. `npm run lint` clean, `npm run build` 91
+routes, 93 total tests passing (13 + 14 + 12 + 15 + 28 + 11). Zero Platform Core files touched; no
+rewrite, no routing changes, no visual regressions. Full detail:
+`docs/product-activation-audit.md` §14.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation

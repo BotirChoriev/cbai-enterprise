@@ -621,3 +621,26 @@ focused — one match navigates directly, several open the real listing, zero is
 never a guess. Browser-verified the full graph (Country → Company → Research → Company → Evidence
 → Save → My Work) for USA, Japan, and Germany. 14 new tests, 80 total passing. Full detail:
 `docs/product-activation-audit.md` §13.
+
+## Universal Entity Engine (Platform Core)
+
+A progressive refactor, not a rewrite: extended the pre-existing `lib/entity/entity.types.ts`
+framework (previously used only by global search) instead of building a competing one. `Entity`
+gained optional `summary`/`country`/`organization`/`relationships`/`reportsAvailable` fields,
+additive and backward-compatible; `EntityType` gained `research_topic`, with a new
+`lib/research-topic.adapter.ts` giving Research topics a real universal Entity representation for
+the first time. New `lib/entity/entity-relationships.ts` normalizes every module's already-real
+relationship function onto one shared vocabulary — not a new relationship engine. New
+`components/shared/EntityRelatedPanel.tsx` consumes it; `ResearchRelatedCompanies.tsx` was
+migrated onto it with verified byte-identical output, the first real proof a page can move onto
+the universal engine without changing what the user sees. New `lib/entity/entity-report.ts`
+dispatches to the exact same `buildCountryReport`/`buildCompanyReport`/`buildUniversityReport`
+calls (proven byte-identical by test), plus a new minimal honest report for Research topics.
+Confirmed the Workspace pin architecture and the main Sidebar were already fully universal — no
+changes needed there. Migrated the Command Center's relationship resolver onto
+`buildEntityRelationships`, verified against the prior mission's 14 tests first. Built
+`components/shared/EntityHeader.tsx` but deliberately did not insert it into any live page —
+every existing header already works, and swapping one risked either losing bespoke facts or a
+visual redesign, both explicitly forbidden. Universal Search was not migrated in this pass, for
+the same reason. 13 new tests, 93 total passing. Full detail:
+`docs/product-activation-audit.md` §14.
