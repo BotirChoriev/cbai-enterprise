@@ -799,3 +799,24 @@ surfaced Project Type descriptions, distinguished Linked Entities from Bookmarks
 toggle, added a real save confirmation for Research Question/Objectives, and stopped forcing a
 full world map open when a country is already selected. 17 new tests, 200 total passing. Full
 detail: `docs/product-activation-audit.md` §22.
+
+## Real Supabase Authentication + Cloud Persistence
+
+Converts the device-local-only account system into a real, optional cloud platform, without
+breaking Local Mode or converting existing synchronous stores to unsafe async behavior. Installed
+`@supabase/supabase-js` (browser-only client — this static export has no server to hold a
+service-role key). Real Supabase Auth (sign-up/in/out, session restore, forgot/reset password via
+a new `/reset-password` route, email confirmation status); `AuthProvider` now exposes `accountMode:
+"cloud" | "device-local" | "signed-out"`. Real production schema with UUID keys and typed
+relational tables (`supabase/migrations/`), Row Level Security on all 11 tables (4 own-record
+policies each, statically verified by 2 tests reading the real SQL). Local storage stays the single
+synchronous source of truth; a new localStorage-persisted outbox queues real background cloud
+writes with retry/backoff and visible Saving/Saved/Could-not-save status. Local-to-cloud migration
+and cloud-to-local pull-sync are both idempotent (dedup via `local_id`), never duplicate, never
+delete local data. Found and fixed two real gaps along the way: no report type had ever been
+persisted (now real "Save to My Reports" ownership across all 5 report types) and the Assistant
+profile was one flat key shared by every account on a browser (now real-identity-namespaced and
+cloud-synced). Trust Center corrected again (no longer claims "no server"/"no cross-device sync"),
+gained a real Account Deletion statement. 22 new tests, 222 total passing, 92 routes. Not
+browser-verified against a live Supabase project (none exists in this environment) — see
+`docs/supabase-setup.md`. Full detail: `docs/product-activation-audit.md` §23.

@@ -1599,3 +1599,119 @@ copy that had gone stale since that mission shipped.
 above. 17/17 passing, alongside the unchanged 14 + 12 + 15 + 12 + 15 + 12 + 10 + 13 + 14 + 12 + 15
 + 28 + 11 = 183 total — **200 tests overall**. `npm run build` clean, 92 routes (no new routes;
 `/account` was added by the prior mission). Full detail: this section.
+
+## 23. Real Supabase Authentication + Cloud Persistence
+
+Converts the device-local-only account system (Authentication + User Platform Foundation mission)
+into a real, optional cloud platform — without removing or breaking Local Mode, and without
+converting any of the existing synchronous localStorage stores to unsafe async behavior.
+
+**Phase 1 investigation, before writing anything**: confirmed this app has zero API routes, zero
+middleware, and `output: "export"` in `next.config.ts` — a real static export with no server
+runtime anywhere. Confirmed no Supabase dependency existed yet (`ls node_modules/@supabase` →
+not installed). Confirmed the exact existing storage architecture: every store
+(`project-store.ts`, `context-history.ts`) already routes through two shared choke points
+(`readList`/`writeList` and `writeEntityList`), and both already route through
+`lib/storage/namespaced-key.ts`'s `namespacedKey()` — the same trick the Authentication mission
+used to add per-user ownership by touching 2 files instead of ~30 call sites. This mission reused
+that same choke-point trick twice more: once to add cloud-session precedence to `namespacedKey()`
+itself, and once to hook a real background cloud sync into each store's own mutation functions.
+
+**Architectural decision — local-first, not a rewrite**: Supabase is fundamentally asynchronous;
+localStorage is fundamentally synchronous. Converting every existing reader to `async`/await would
+touch dozens of already-real, already-tested call sites across ~20 files (`ProjectHome.tsx`,
+`MyWork.tsx`, every report view, every workspace) — exactly the "blindly convert synchronous stores
+into unsafe async behavior" this mission's own Phase 1 warns against, and there is no live Supabase
+project in this environment to build or test that rewrite against safely. Instead: local storage
+stays the single synchronous source of truth for every existing reader, unchanged. A new
+localStorage-persisted **outbox** (`lib/supabase/outbox.ts`) queues a real background cloud write
+for every mutation, when a cloud session is active — retried with backoff, exposing real
+Saving/Saved/Could-not-save status, never silently dropped. A new **pull-sync**
+(`lib/supabase/pull-sync.ts`) hydrates a signed-in cloud user's own local cache bucket on sign-in,
+merging by recency so a newer local edit is never silently clobbered. This is the same pattern
+real local-first applications use, and it is the only way to satisfy "reuse existing... do not
+redesign" and "prepare for Supabase" simultaneously without either claim being false.
+
+**Real Supabase Auth activated**: email sign-up, sign-in, sign-out, session restoration via
+`onAuthStateChange` + `getSession()`, forgot/reset password (with a real `/reset-password`
+completion page — the one new static route added), and email-confirmation status. `AuthProvider`
+now exposes `accountMode: "cloud" | "device-local" | "signed-out"` — every surface can be
+explicit about which identity, and which persistence guarantee, is active. `AccountForm` gained a
+Cloud Account tab alongside the pre-existing Device-Local Account tab; neither is silently treated
+as the other.
+
+**Real production schema, not a KV blob**: `supabase/migrations/0001_init_schema.sql` — UUID
+primary keys, real typed relational columns (not one JSON blob), `owner_id`/`created_at`/
+`updated_at` on every user-owned table, and a `local_id` dedup marker + `unique (owner_id,
+local_id)` constraint on every synced table specifically to make the outbox and migration
+idempotent. `0002_rls_policies.sql` enables Row Level Security on all 11 tables with exactly 4
+own-record policies each (select/insert/update/delete), every insert re-verified server-side via
+`with check (auth.uid() = owner_id)` — a payload's claimed `owner_id` is never trusted alone.
+`0003_rls_verification_queries.sql` documents the manual cross-user isolation checks a live
+project needs (this environment has no live project to run them against).
+
+**Cloud Storage Adapter reconciled, not duplicated**: the prior mission's `CloudStorageAdapter`
+(generic key-value `getItem`/`setItem`/`removeItem`) predates this mission's real schema work and
+was designed around a KV shape Phase 5 explicitly rejects ("do not store core relational data as
+one giant JSON blob"). Rather than leaving two competing cloud-storage concepts,
+`lib/storage/storage-provider.ts` now documents the supersession plainly, gained a real
+`LocalStorageAdapter` (closing the literal "implement LocalStorageAdapter" ask), and its
+`SupabaseStorageAdapter` now points callers at the real, active `lib/supabase/` integration instead
+of implying a KV path that doesn't exist.
+
+**Local-to-cloud migration, safe by construction**: `LocalWorkMigrationPrompt` shows real itemized
+counts (projects, notes, tasks, questions, evidence, entity links, bookmarks, reports) before
+asking. "Import to Cloud" uploads additively via the same idempotent `(owner_id, local_id)` upsert
+the outbox uses — retry-safe, no duplicates on a second attempt. "Keep Local for Now" is always
+available and never deletes anything; local data is never deleted by this flow at any point.
+
+**Reports gained real, persisted ownership** — a genuine gap found during this mission: no report
+type had ever been saved anywhere; "Generate report" was (and remains) a pure on-page reveal.
+`lib/reports/reports-store.ts` adds a real "Save to My Reports" index record (kind, entity, title,
+when saved) with a "Save to My Reports" action on all 5 report views and a "Your Saved Reports"
+list in Reports Center. Deliberately never a content snapshot — reopening always renders the live,
+current report, so a saved report can never go stale relative to corrected evidence.
+
+**Assistant profile ownership gap found and fixed**: the Assistant profile
+(`lib/assistant/assistant-storage.ts`) was stored under one flat, unnamespaced key — shared by
+*every* account on the same browser, a real regression the Authentication mission's namespacing
+sweep had missed. Now namespaced like every other store, and syncs to the `profiles` table's
+Assistant-owned fields when a cloud session is active. On cloud sign-in, a real comparison against
+the cloud profile offers to load it only when it actually differs — never a silent overwrite in
+either direction, and no second Assistant-profile system was created.
+
+**Trust Center accuracy regression found and fixed (again)**: Privacy and Known Limitations still
+said "no server," "no cross-device sync" — true before this mission, false after. Corrected to
+describe both account types accurately, and added a real Account Deletion statement (Device-Local:
+clear browser storage; Cloud: no self-service path yet, since this architecture has no server that
+could safely hold the elevated credential such a deletion requires — contact the deployment
+operator instead of a fabricated working "Delete Account" button).
+
+**Security**: confirmed no service-role key exists anywhere in the codebase (`grep -rn
+"SERVICE_ROLE" .` → zero matches) and no path could introduce one — this static-export architecture
+has nowhere a server-role key could be held privately, documented directly in `.env.example` and
+`lib/supabase/client.ts`. Confirmed `.env*` stays gitignored, with an explicit `!.env.example`
+exception so the real, credential-free template ships. Confirmed no raw Postgres/Supabase error
+text reaches the UI (`friendlyAuthError` maps every auth error to a generic message; migration/sync
+failures show counts, never raw messages). Confirmed sign-out clears the real session (both the
+device-local session key and Supabase's own persisted session).
+
+**Static export compatibility**: confirmed, not assumed — `npm run build` was run after every
+batch of changes throughout this mission and continued producing a fully static `out/` (92 routes,
+zero server functions). Real Supabase Auth requires no server component, API route, or middleware
+in this architecture — every call is a real client-side `supabase-js` invocation, the same pattern
+every other piece of interactive state in this app already uses.
+
+**Tests**: new `scripts/test-cloud-platform.ts` — 22 tests covering honest unconfigured/
+unauthenticated behavior across every new cloud entry point, ownership-key precedence, adapter
+selection, outbox no-op safety, migration idempotency/retry-safety, pull-sync safety, no
+credential/service-role leakage, and a static verification that every table both enables RLS and
+defines exactly the 4 policies Phase 6 requires. 22/22 passing, alongside the unchanged 183 + 17 =
+200 — **222 tests overall**. `npm run build` clean, 92 routes (`/reset-password` is the one new
+route).
+
+**Not browser-verified (no live Supabase project in this environment)**: real account creation,
+email confirmation, sign-in, multi-device sync, cross-account isolation under real RLS enforcement,
+and password reset end-to-end. Every claim above about these behaviors is a claim about the code
+that was written and its unit-test coverage — not a claim of live verification. See
+`docs/supabase-setup.md` for exactly what a deployer must do to verify these live.

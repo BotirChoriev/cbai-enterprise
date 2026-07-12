@@ -1072,6 +1072,36 @@ New `scripts/test-launch-gate.ts` — 17 tests, one per verified fix. `npm run l
 build` 92 routes, 200 total tests passing (17 + 12 + 14 + 15 + 12 + 15 + 12 + 10 + 13 + 14 + 12 +
 15 + 28 + 11). Full detail: `docs/product-activation-audit.md` §22.
 
+## v3.24 — Real Supabase Authentication + Cloud Persistence
+
+Converts the device-local-only account system into a real, optional cloud platform. Installed
+`@supabase/supabase-js` (browser-only — this app is a static export with no server to hold a
+service-role key). Real Supabase Auth: sign-up, sign-in, sign-out, session restoration, forgot/
+reset password (new `/reset-password` route), email-confirmation status. `AuthProvider` now exposes
+`accountMode: "cloud" | "device-local" | "signed-out"`.
+
+Real production schema (`supabase/migrations/`): UUID keys, typed relational tables (never a JSON
+blob), `owner_id`/`local_id`/timestamps on every user-owned table, Row Level Security on all 11
+tables with exactly 4 own-record policies each, verified statically by 2 new tests reading the real
+SQL. Local storage stays the single synchronous source of truth for every existing reader — a new
+localStorage-persisted outbox (`lib/supabase/outbox.ts`) queues real background cloud writes with
+retry/backoff and visible Saving/Saved/Could-not-save status instead of converting any existing
+store to unsafe async behavior. Local-to-cloud migration and cloud-to-local pull-sync are both
+idempotent via a `(owner_id, local_id)` dedup key — retry-safe, never duplicates, never deletes
+local data.
+
+Two real gaps found and fixed along the way: no report type had ever been persisted anywhere
+(`lib/reports/reports-store.ts` now adds real "Save to My Reports" ownership across all 5 report
+types), and the Assistant profile was stored under one flat key shared by every account on a
+browser (now real-identity-namespaced, and synced to the cloud `profiles` table). Trust Center's
+Privacy/Known Limitations corrected again (no longer says "no server," "no cross-device sync") and
+gained a real Account Deletion statement.
+
+New `scripts/test-cloud-platform.ts` — 22 tests. `npm run lint`/`build` clean, 92 routes, 222 total
+tests passing. Not browser-verified: real account creation, multi-device sync, and cross-account
+RLS isolation against a live Supabase project — none exists in this environment; see
+`docs/supabase-setup.md`. Full detail: `docs/product-activation-audit.md` §23.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation

@@ -1201,3 +1201,40 @@ ever imports `lib/workspace/` back — confirmed by a full import-graph audit du
 research adapters and the type aliases in `review-workspace-model.ts`,
 `lib/research/evidence/evidence-types.ts`, and `lib/evidence-infrastructure/types.ts` cross the
 Research↔Foundation boundary, and all are additive, non-breaking changes.
+
+## Cloud Persistence Layer (`lib/supabase/`)
+
+Added by the Real Supabase Authentication + Cloud Persistence mission. CBAI is a Next.js static
+export (`output: "export"` in `next.config.ts`) — no server runtime, no API routes, no middleware.
+Every existing store (`lib/project/project-store.ts`, `lib/context/context-history.ts`,
+`lib/reports/reports-store.ts`, `lib/assistant/assistant-storage.ts`) is, and remains, a real
+synchronous `window.localStorage` reader/writer — that is what keeps Local Mode honest and every
+existing call site unchanged. `lib/supabase/` is the one real, asynchronous bridge from those
+synchronous stores to a real Postgres backend, without converting any of them to async:
+
+- `client.ts` — the one Supabase client construction point (browser-only; `null` when
+  `NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_ANON_KEY` are absent).
+- `cloud-auth.ts` / `cloud-profile.ts` — real `supabase.auth` and `profiles`-table operations,
+  wrapped in `components/platform/context/AuthProvider.tsx`'s `accountMode` (`"cloud"` |
+  `"device-local"` | `"signed-out"`).
+- `cloud-session-sync.ts` — a synchronous peek at the Supabase-persisted session, giving
+  synchronous stores the same kind of real, immediate session read `lib/auth/auth-store.ts`'s
+  `getCurrentUserId()` already provides for the device-local account.
+- `cloud-tables.ts` — real, typed per-table CRUD against `supabase/migrations/0001_init_schema.sql`
+  (never a generic key-value blob — see `lib/storage/storage-provider.ts`'s doc comment for why).
+- `outbox.ts` — a localStorage-persisted write queue: every store's mutation enqueues a real
+  background cloud write here (when a cloud session exists) rather than blocking on the network;
+  retries with backoff, exposes real per-record Saving/Saved/Could-not-save status.
+- `migration.ts` / `pull-sync.ts` — one-time local→cloud upload and cloud→local hydration, both
+  keyed on the idempotent `(owner_id, local_id)` pair every table carries specifically for this.
+
+`lib/storage/namespaced-key.ts` is the one existing choke point every store's key already passed
+through for the Authentication + User Platform Foundation mission — it now additionally prefers a
+cloud session over a device-local one, giving a cloud user their own `:cloud:<id>` local cache
+bucket that pull-sync hydrates and the outbox writes through, never mixed with the device-local or
+anonymous buckets.
+
+Dependency direction: `lib/supabase/` depends only on `@supabase/supabase-js` and its own
+`database.types.ts`. `lib/project/`, `lib/context/`, `lib/reports/`, and `lib/assistant/` import
+`lib/supabase/{outbox,cloud-tables,cloud-session-sync}` for sync — `lib/supabase/` never imports
+back into any of them. No Foundation/engine module depends on `lib/supabase/` at all.
