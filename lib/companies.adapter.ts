@@ -116,6 +116,9 @@ export function toCompanyEntity(company: Company): Entity {
         unit: "records",
       },
     ],
+    summary: buildFactualOverview(company),
+    country: company.country,
+    reportsAvailable: true,
   };
 }
 

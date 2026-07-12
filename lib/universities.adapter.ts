@@ -115,6 +115,9 @@ export function toUniversityEntity(university: University): Entity {
         value: relationships.country ?? "Not linked",
       },
     ],
+    summary: buildFactualOverview(university),
+    country: university.country,
+    reportsAvailable: true,
   };
 }
 

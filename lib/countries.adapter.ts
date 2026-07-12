@@ -97,6 +97,8 @@ export function toCountryEntity(country: Country): Entity {
         unit: "records",
       },
     ],
+    summary: buildFactualOverview(country),
+    reportsAvailable: true,
   };
 }
 

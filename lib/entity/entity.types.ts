@@ -7,6 +7,7 @@ export type EntityType =
   | "country"
   | "company"
   | "university"
+  | "research_topic"
   | "government"
   | "investor"
   | "person";
@@ -91,6 +92,49 @@ export type Entity = {
   logo?: string;
   /** Secondary line under the entity name (e.g. location, sector) */
   subtitle?: string;
+
+  /**
+   * Universal Entity Engine fields (Platform Core mission) — additive, optional, populated only
+   * from already-real per-module data. Unsupported fields stay undefined; never fabricated.
+   */
+  /** Short one-line summary, when a module has one beyond `overview`. */
+  summary?: string;
+  /** Real country name, for entities that are located in or headquartered in one. */
+  country?: string;
+  /** Real organization/publisher name, when applicable. */
+  organization?: string;
+  /**
+   * Real cross-entity relationships. Populated on demand via
+   * lib/entity/entity-relationships.ts's buildEntityRelationships(type, id) — deliberately not
+   * baked into the base toXEntity() adapters, since entity-relationships.ts itself depends on
+   * those adapters' relationship functions and baking it in would create a circular import.
+   */
+  relationships?: EntityRelationship[];
+  /** Whether a real report can be generated for this entity via lib/entity/entity-report.ts. */
+  reportsAvailable?: boolean;
+};
+
+/** Universal relationship vocabulary — see lib/entity/entity-relationships.ts for the builder. */
+export type EntityRelationshipType =
+  | "RELATED_TO"
+  | "LOCATED_IN"
+  | "PUBLISHED_BY"
+  | "SUPPORTED_BY"
+  | "REFERENCES"
+  | "HAS_REPORT"
+  | "HAS_EVIDENCE"
+  | "HAS_RESEARCH"
+  | "BELONGS_TO"
+  | "USES_DATASET"
+  | "PART_OF_WORKSPACE";
+
+export type EntityRelationship = {
+  type: EntityRelationshipType;
+  targetType: EntityType;
+  targetId: string;
+  targetName: string;
+  /** Real, navigable link — null when the target has no resolvable profile route. */
+  targetHref: string | null;
 };
 
 /** Props shared by all entity presentation components */
@@ -151,6 +195,11 @@ export const ENTITY_MODULE_CONFIGS: Record<EntityType, EntityModuleConfig> = {
     type: "university",
     label: "University",
     pluralLabel: "Universities",
+  },
+  research_topic: {
+    type: "research_topic",
+    label: "Research Topic",
+    pluralLabel: "Research Topics",
   },
   government: {
     type: "government",
