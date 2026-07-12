@@ -583,3 +583,22 @@ confidence, citation, and publication date instead of omitting them. New real Co
 compiled from already-computed data via a real "Generate report" button. Command Center gained
 `open company`/`compare companies`/`generate report`, plus a real context-aware "save workspace"
 pin action. 15 new tests, 54 total passing. Full detail: `docs/product-activation-audit.md` §11.
+
+## Countries Intelligence Module Activation
+
+Investigated Country↔Research first, before building anything: confirmed no research topic
+references any country, region, or geography anywhere in the catalog, and `Country` has no
+industry-equivalent field the way Company does — so, unlike Company↔Research, no keyword matcher
+was built. The required "Research topics" Country Profile section instead states plainly that no
+verified link exists yet, an honest empty state rather than a forced fabrication. Wired the
+confirmed-dead `SaveToWorkspaceButton` onto Countries (zero prior caller). Added a real
+`officialWebsite` field (real, public government portal URLs for all 6 countries), surfaced as a
+clickable overview fact — "Population" was explicitly not added, since no real figure exists.
+Activated `CountryMethodology`/`CountryTrustSection` (dead, mission-requested); deleted the
+redundant `CountryCoveragePanel`. `CountrySourceCoverage` now shows the same honest
+Publisher/Publication-date/Confidence/Citation fields Companies got. New real Country Report
+(`lib/country-report.ts`) compiled from already-computed data — Overview, Evidence, Research,
+Organizations, Methodology, Trust statement, Limitations — via a real "Generate report" button.
+Command Center, global search (region already indexed via `entity.category`), and bidirectional
+relationship links (already fixed in the Companies mission) all required no further changes. 12 new
+tests, 66 total passing. Full detail: `docs/product-activation-audit.md` §12.

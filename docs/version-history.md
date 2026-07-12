@@ -724,6 +724,30 @@ New `scripts/test-companies-intelligence.ts` — 15 tests. `npm run lint` clean,
 routes, 54 total tests passing (15 + 28 + 11). Zero Platform Core files touched; no new engines, no
 fabricated companies or statistics. Full detail: `docs/product-activation-audit.md` §11.
 
+## v3.13 — Countries Intelligence Module Activation
+
+Investigated Country↔Research before building anything: confirmed no research topic references any
+country, region, or geography, and `Country` has no industry-equivalent field to anchor a keyword
+match the way Company's did — so rather than fabricate one, the required "Research topics" section
+(`CountryRelatedResearch.tsx`) honestly states no verified link exists in the current catalog.
+
+Wired the confirmed-dead `SaveToWorkspaceButton` onto Countries (zero prior caller). Added a real
+`officialWebsite` field (real, public government portal URLs for all 6 countries) surfaced as a
+clickable overview fact. Activated `CountryMethodology.tsx`/`CountryTrustSection.tsx` (confirmed
+dead, mirroring the exact pattern already fixed for Companies). Deleted the confirmed-redundant
+`CountryCoveragePanel.tsx`. `CountrySourceCoverage.tsx` now shows the same honest
+Publisher/Publication-date/Confidence/Citation field set Companies got.
+
+New real Country Report (`lib/country-report.ts`) compiling only already-computed data (Overview,
+Evidence, Research, Organizations, Methodology, Trust statement, Limitations), triggered by a real
+"Generate report" button. Command Center, global search, and bidirectional relationship links all
+required no changes — confirmed already generic across entity kinds from prior missions.
+
+New `scripts/test-countries-intelligence.ts` — 12 tests. `npm run lint` clean, `npm run build` 91
+routes, 66 total tests passing (12 + 15 + 28 + 11). Zero Platform Core files touched; no new
+engines, no fabricated countries, ratings, or geopolitical analysis. Full detail:
+`docs/product-activation-audit.md` §12.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation

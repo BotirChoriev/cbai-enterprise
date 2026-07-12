@@ -643,3 +643,68 @@ ingestion, out of scope); no PDF/CSV export was built (Reports Center already ho
 this Planned); the Company↔Research keyword table covers the 6 seeded industries only — a new
 industry added to the catalog without a matching keyword entry would honestly show "No verified
 data available" rather than silently guessing.
+
+## 12. Countries Intelligence — module-depth activation
+
+Response to "CBAI Product Activation — Countries Intelligence" (target: 10/10 production quality,
+same reuse-first constraints as every prior module mission). No new architecture, no fake
+geopolitical analysis, no invented country ratings or economic values.
+
+**Investigated Country↔Research before building anything**: confirmed, by reading every
+`RESEARCH_TOPICS` entry's `topicName`/`domain`/`description`, that zero topics reference any
+country, region, or geography — unlike Company (which has a real `industry` field to anchor a
+keyword match), `Country` carries no comparable categorical field. Building a keyword matcher here
+would have had no honest anchor on either side, so none was built. Instead, the required "Research
+topics" Country Profile section (`CountryRelatedResearch.tsx`) states plainly that no verified
+country↔research link exists in the current catalog — an honest empty state satisfies the
+mission's own "hide unsupported modules" instruction without fabricating a connection just to fill
+the section.
+
+**Wired the confirmed-dead bookmark UI onto Countries**: `SaveToWorkspaceButton` (built for
+Companies, generic over `ContextEntityRef`) had zero Country caller — added to
+`CountryIntelligencePanel.tsx`, using the same `pinEntityToWorkspace`/`isEntityPinned` architecture
+already live for companies. No new storage model.
+
+**Added a real `officialWebsite` field** to the `Country` catalog (real, publicly-known government
+portal URLs for all 6 countries — usa.gov, gov.cn, gov.uz, bundesregierung.de, u.ae, japan.go.jp)
+and surfaced it as a clickable fact on the overview and in the new report, using the same
+`EntityOverviewFacts.href` mechanism built for Company's `website` field. "Population" was
+explicitly NOT added — the mission requires it "only if real data exists," and no real population
+figure exists anywhere in this catalog.
+
+**Activated `CountryMethodology.tsx`/`CountryTrustSection.tsx`** (confirmed dead, zero callers,
+mirroring the exact pattern found and fixed for Companies) into the Optional Exploration section of
+`CountryIntelligencePanel.tsx`. Deleted the confirmed-redundant `CountryCoveragePanel.tsx` (zero
+importers, superseded by the already-live `EntityEvidenceSection`).
+
+**Honest Evidence detail**: `CountrySourceCoverage.tsx` now shows the same full field set Companies
+got — Publisher (real), Open source link (real), Publication date ("Not available"), Confidence
+("Not assessed"), Citation ("Not available") — rather than the prior name/organization/status-only
+card.
+
+**New real Country Report**: `lib/country-report.ts` (`buildCountryReport`) compiles only
+already-computed real data — Overview, Evidence, Research (honest empty statement), Organizations
+(related companies and universities, both real links resolved via `resolve-entity-link.ts`),
+Methodology, Trust statement, Limitations — from the same `journey`/`coverage` objects the profile
+page already uses. A real "Generate report" button toggles `CountryReportView.tsx` in place,
+mirroring the Company Report pattern exactly; no PDF/export pipeline exists or was implied.
+
+**Command Center, Search, and bidirectional relationship links required no changes**: `open
+country`/`find country`/`compare countries`/`open research`/`open evidence`/`generate report` were
+already in the deterministic phrase table from prior missions; `save workspace` already handles any
+focused entity kind generically. Global search already indexes `entity.category` (a country's
+region), so region search already worked. `CountryRelationships.tsx` was already fixed for
+bidirectional links in the Companies mission (`abcbec0`) — confirmed still correct, not re-touched.
+
+**Tests**: new `scripts/test-countries-intelligence.ts` (`npm run test:countries-intelligence`) —
+12 tests covering the real official-website format, the deleted dead panel, report-field
+traceability, the honest (never-fabricated) research statement, bidirectional link resolution for
+every related company/university and graph relationship, and Command Center coverage for country
+commands. 12/12 passing, alongside the unchanged 15 (companies) + 28 (product-activation) + 11
+(research-slice) = 66 total.
+
+**Not attempted**: no new external evidence sources were connected (out of scope, requires real
+data ingestion); no PDF/CSV export was built (Reports Center already honestly declares this
+Planned); no Country↔Research connection was fabricated — if a real link (e.g. a national research
+funder registry) is ever added to the catalog, `CountryRelatedResearch.tsx` becomes the real place
+to wire it, not before; no Population field was added, since none exists as real data.
