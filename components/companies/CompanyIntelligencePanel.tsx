@@ -22,6 +22,7 @@ import {
 import { getCompanyRelationships } from "@/lib/companies.adapter";
 import CompanyRelatedResearch from "@/components/companies/CompanyRelatedResearch";
 import CompanyMethodology from "@/components/companies/CompanyMethodology";
+import EntityFutureSources from "@/components/shared/EntityFutureSources";
 import CompanyTrustSection from "@/components/companies/CompanyTrustSection";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import CreateProjectFromEntityButton from "@/components/project/CreateProjectFromEntityButton";
@@ -126,6 +127,8 @@ export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligen
         <CompanyIndicatorCoverage indicatorsByDomain={coverage.indicatorsByDomain} />
 
         <CompanySourceCoverage sources={coverage.sources} />
+
+        <EntityFutureSources domainIds={coverage.indicatorsByDomain.map((d) => d.domainId)} />
 
         <CompanyMethodology />
 

@@ -24,6 +24,7 @@ import CountrySourceCoverage from "@/components/countries/CountrySourceCoverage"
 import CountryRelatedResearch from "@/components/countries/CountryRelatedResearch";
 import CountryMethodology from "@/components/countries/CountryMethodology";
 import CountryTrustSection from "@/components/countries/CountryTrustSection";
+import EntityFutureSources from "@/components/shared/EntityFutureSources";
 import { EntityReportsAvailable } from "@/components/shared/EntityDecisionPackagePreview";
 import {
   countConnectedSources,
@@ -146,6 +147,8 @@ export function CountryIntelligencePanel({
         <CountryIndicatorCoverage indicatorsByDomain={coverage.indicatorsByDomain} />
 
         <CountrySourceCoverage sources={coverage.sources} />
+
+        <EntityFutureSources domainIds={coverage.indicatorsByDomain.map((d) => d.domainId)} />
 
         <CountryMethodology />
 

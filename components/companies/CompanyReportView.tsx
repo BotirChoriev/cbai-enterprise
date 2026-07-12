@@ -2,12 +2,28 @@ import Link from "next/link";
 import type { CompanyReport } from "@/lib/company-report";
 import type { ProductStatus } from "@/lib/product-status";
 import StatusBadge from "@/components/shared/StatusBadge";
+import EntityFutureSources from "@/components/shared/EntityFutureSources";
 import { getResearchTopicPath } from "@/lib/research/research-topics";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type CompanyReportViewProps = {
   report: CompanyReport & { dataStatus?: ProductStatus };
 };
+
+function NameList({ names, emptyLabel }: { names: readonly string[]; emptyLabel: string }) {
+  if (names.length === 0) {
+    return <p className="text-sm text-zinc-500">{emptyLabel}</p>;
+  }
+  return (
+    <ul className="flex flex-wrap gap-2">
+      {names.map((name) => (
+        <li key={name} className="rounded-full border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-xs text-zinc-400">
+          {name}
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 /** Real, compiled Company Intelligence Report — every field traces to already-real data; nothing invented. */
 export default function CompanyReportView({ report }: CompanyReportViewProps) {
@@ -56,13 +72,27 @@ export default function CompanyReportView({ report }: CompanyReportViewProps) {
         </dl>
       </div>
 
-      <div className="space-y-2 border-t border-zinc-800/80 pt-4">
+      <div className="space-y-3 border-t border-zinc-800/80 pt-4">
         <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Evidence</p>
         <p className="text-sm text-zinc-400">
           {report.evidence.connectedSources} of {report.evidence.totalSources} official sources
           connected · {report.evidence.connectedIndicators} indicators connected ·{" "}
           {report.evidence.openQuestions} open questions.
         </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600">Connected Evidence</p>
+            <NameList names={report.evidence.connectedSourceNames} emptyLabel="No official sources connected yet." />
+          </div>
+          <div>
+            <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600">Missing Evidence</p>
+            <NameList names={report.evidence.missingSourceNames} emptyLabel="No missing sources — every tracked source is connected." />
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-zinc-800/80 pt-4">
+        <EntityFutureSources domainIds={report.futureDomainIds} />
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">

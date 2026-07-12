@@ -10,6 +10,7 @@ import type { UniversityUserJourney } from "@/lib/university-user-journey";
 import { UNIVERSITY_METHODOLOGY_POINTS } from "@/lib/universities.intelligence";
 import { countConnectedSources } from "@/components/shared/entity-profile-copy";
 import { countryHrefByName, companyHrefByName } from "@/components/shared/resolve-entity-link";
+import type { IndicatorDomainId } from "@/lib/indicator-framework/types";
 
 export type UniversityReportLimitation = string;
 
@@ -30,7 +31,10 @@ export type UniversityReport = {
     totalSources: number;
     connectedIndicators: number;
     openQuestions: number;
+    connectedSourceNames: string[];
+    missingSourceNames: string[];
   };
+  futureDomainIds: readonly IndicatorDomainId[];
   research: string;
   relatedCountry: UniversityReportLink | null;
   relatedCompanies: UniversityReportLink[];
@@ -47,6 +51,8 @@ export function buildUniversityReport(
   const { coverage } = profile;
   const sourceConnectedCount = countConnectedSources(coverage);
   const openQuestions = evidenceGaps.plannedCount + evidenceGaps.missingCount + evidenceGaps.blockedCount;
+  const connectedSourceNames = coverage.sources.filter((s) => s.statusLabel === "Connected").map((s) => s.name);
+  const missingSourceNames = coverage.sources.filter((s) => s.statusLabel !== "Connected").map((s) => s.name);
 
   const countryName = profile.linkedEntities.country;
   const countryHref = countryName ? countryHrefByName(countryName) : null;
@@ -73,7 +79,10 @@ export function buildUniversityReport(
       totalSources: coverage.sources.length,
       connectedIndicators: coverage.evidenceCoverage.connected,
       openQuestions,
+      connectedSourceNames,
+      missingSourceNames,
     },
+    futureDomainIds: coverage.indicatorsByDomain.map((d) => d.domainId),
     research: "No research topics are connected to this university in the current catalog.",
     relatedCountry: countryName ? { name: countryName, href: countryHref } : null,
     relatedCompanies: profile.linkedEntities.companies.map((name) => ({

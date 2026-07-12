@@ -11,6 +11,7 @@ import { COMPANY_METHODOLOGY_POINTS } from "@/lib/companies.intelligence";
 import { countConnectedSources } from "@/components/shared/entity-profile-copy";
 import { getRelatedResearchTopics, type CompanyResearchMatch } from "@/lib/company-research";
 import { countryHrefByName } from "@/components/shared/resolve-entity-link";
+import type { IndicatorDomainId } from "@/lib/indicator-framework/types";
 
 export type CompanyReportLimitation = string;
 
@@ -28,7 +29,10 @@ export type CompanyReport = {
     totalSources: number;
     connectedIndicators: number;
     openQuestions: number;
+    connectedSourceNames: string[];
+    missingSourceNames: string[];
   };
+  futureDomainIds: readonly IndicatorDomainId[];
   research: CompanyResearchMatch[];
   country: { name: string; href: string } | null;
   methodology: typeof COMPANY_METHODOLOGY_POINTS;
@@ -41,6 +45,8 @@ export function buildCompanyReport(company: Company, journey: CompanyUserJourney
   const { coverage } = profile;
   const sourceConnectedCount = countConnectedSources(coverage);
   const openQuestions = evidenceGaps.plannedCount + evidenceGaps.missingCount + evidenceGaps.blockedCount;
+  const connectedSourceNames = coverage.sources.filter((s) => s.statusLabel === "Connected").map((s) => s.name);
+  const missingSourceNames = coverage.sources.filter((s) => s.statusLabel !== "Connected").map((s) => s.name);
 
   const countryName = profile.linkedEntities.relatedCountry;
   const countryHref = countryName ? countryHrefByName(countryName) : null;
@@ -66,7 +72,10 @@ export function buildCompanyReport(company: Company, journey: CompanyUserJourney
       totalSources: coverage.sources.length,
       connectedIndicators: coverage.evidenceCoverage.connected,
       openQuestions,
+      connectedSourceNames,
+      missingSourceNames,
     },
+    futureDomainIds: coverage.indicatorsByDomain.map((d) => d.domainId),
     research: getRelatedResearchTopics(company),
     country: countryName && countryHref ? { name: countryName, href: countryHref } : null,
     methodology: COMPANY_METHODOLOGY_POINTS,

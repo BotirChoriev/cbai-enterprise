@@ -10,6 +10,7 @@ import type { CountryUserJourney } from "@/lib/country-user-journey";
 import { COUNTRY_METHODOLOGY_POINTS } from "@/lib/countries.intelligence";
 import { countConnectedSources } from "@/components/shared/entity-profile-copy";
 import { companyHrefByName, universityHrefByName } from "@/components/shared/resolve-entity-link";
+import type { IndicatorDomainId } from "@/lib/indicator-framework/types";
 
 export type CountryReportLimitation = string;
 
@@ -30,7 +31,12 @@ export type CountryReport = {
     totalSources: number;
     connectedIndicators: number;
     openQuestions: number;
+    /** Real source names, split by real status — never a fabricated breakdown. */
+    connectedSourceNames: string[];
+    missingSourceNames: string[];
   };
+  /** Real indicator domain ids covering this country — resolves to each domain's real "expected next" note. */
+  futureDomainIds: readonly IndicatorDomainId[];
   research: string;
   relatedCompanies: CountryReportLink[];
   relatedUniversities: CountryReportLink[];
@@ -44,6 +50,8 @@ export function buildCountryReport(country: Country, journey: CountryUserJourney
   const { coverage } = profile;
   const sourceConnectedCount = countConnectedSources(coverage);
   const openQuestions = evidenceGaps.plannedCount + evidenceGaps.missingCount + evidenceGaps.blockedCount;
+  const connectedSourceNames = coverage.sources.filter((s) => s.statusLabel === "Connected").map((s) => s.name);
+  const missingSourceNames = coverage.sources.filter((s) => s.statusLabel !== "Connected").map((s) => s.name);
 
   const limitations: CountryReportLimitation[] = [
     "No external evidence sources are connected yet — registry facts and coverage status only.",
@@ -67,7 +75,10 @@ export function buildCountryReport(country: Country, journey: CountryUserJourney
       totalSources: coverage.sources.length,
       connectedIndicators: coverage.evidenceCoverage.connected,
       openQuestions,
+      connectedSourceNames,
+      missingSourceNames,
     },
+    futureDomainIds: coverage.indicatorsByDomain.map((d) => d.domainId),
     research: "No research topics are connected to this country in the current catalog.",
     relatedCompanies: profile.linkedEntities.relatedCompanies.map((name) => ({
       name,

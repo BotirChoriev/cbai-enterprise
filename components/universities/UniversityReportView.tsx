@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { UniversityReport, UniversityReportLink } from "@/lib/university-report";
 import type { ProductStatus } from "@/lib/product-status";
 import StatusBadge from "@/components/shared/StatusBadge";
+import EntityFutureSources from "@/components/shared/EntityFutureSources";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type UniversityReportViewProps = {
@@ -81,13 +82,33 @@ export default function UniversityReportView({ report }: UniversityReportViewPro
         </dl>
       </div>
 
-      <div className="space-y-2 border-t border-zinc-800/80 pt-4">
+      <div className="space-y-3 border-t border-zinc-800/80 pt-4">
         <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Evidence</p>
         <p className="text-sm text-zinc-400">
           {report.evidence.connectedSources} of {report.evidence.totalSources} official sources
           connected · {report.evidence.connectedIndicators} indicators connected ·{" "}
           {report.evidence.openQuestions} open questions.
         </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600">Connected Evidence</p>
+            <LinkList
+              links={report.evidence.connectedSourceNames.map((name) => ({ name, href: null }))}
+              emptyLabel="No official sources connected yet."
+            />
+          </div>
+          <div>
+            <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600">Missing Evidence</p>
+            <LinkList
+              links={report.evidence.missingSourceNames.map((name) => ({ name, href: null }))}
+              emptyLabel="No missing sources — every tracked source is connected."
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-zinc-800/80 pt-4">
+        <EntityFutureSources domainIds={report.futureDomainIds} />
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">

@@ -11,6 +11,8 @@ import IntelligenceContextPanel from "@/components/shared/IntelligenceContextPan
 import UniversityIndicatorCoverage from "@/components/universities/UniversityIndicatorCoverage";
 import UniversitySourceCoverage from "@/components/universities/UniversitySourceCoverage";
 import UniversityMethodology from "@/components/universities/UniversityMethodology";
+import UniversityRelatedResearch from "@/components/universities/UniversityRelatedResearch";
+import EntityFutureSources from "@/components/shared/EntityFutureSources";
 import UniversityTrustSection from "@/components/universities/UniversityTrustSection";
 import EntityEvidenceSection from "@/components/shared/EntityEvidenceSection";
 import EntityCompareSection from "@/components/shared/EntityCompareSection";
@@ -88,6 +90,8 @@ export function UniversityIntelligencePanel({
         showMethodology={false}
       />
 
+      <UniversityRelatedResearch university={university} />
+
       <EntityReportsAvailable reports={journey.reports} entityLabel="university" />
 
       <div className="space-y-4">
@@ -118,6 +122,8 @@ export function UniversityIntelligencePanel({
         <UniversityIndicatorCoverage indicatorsByDomain={coverage.indicatorsByDomain} />
 
         <UniversitySourceCoverage sources={coverage.sources} />
+
+        <EntityFutureSources domainIds={coverage.indicatorsByDomain.map((d) => d.domainId)} />
 
         <UniversityMethodology />
 
