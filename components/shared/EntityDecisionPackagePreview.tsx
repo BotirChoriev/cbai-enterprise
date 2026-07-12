@@ -25,15 +25,16 @@ export function EntityReportsAvailable({ reports, entityLabel }: EntityReportsAv
             Reports
           </h3>
           <p className="mt-0.5 text-sm text-zinc-500">
-            Continue your review in the Reports Center — this profile does not open a{" "}
-            {entityLabel} report directly.
+            This profile&apos;s own report is available directly below (Generate report). Reports
+            Center has {reports.length > 1 ? "more report types" : "other report types"} across
+            profiles.
           </p>
         </div>
         <Link
           href={reportsHref}
           className="inline-flex min-h-10 w-full shrink-0 items-center justify-center rounded-lg bg-zinc-100 px-4 text-sm font-semibold text-zinc-900 transition-colors hover:bg-white sm:w-auto"
         >
-          Open Reports Center →
+          Open Reports Center <span className="sr-only">for this {entityLabel}</span>→
         </Link>
       </div>
     </section>

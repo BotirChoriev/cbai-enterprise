@@ -125,3 +125,27 @@ html.theme-light .home-search-input {
 .cbai-larger-text {
   font-size: 112.5%;
 }
+
+/* Report print view — real browser printing, no new dependency. A user's own "Print" dialog
+   already offers "Save as PDF" as a destination on every modern OS/browser, so this honestly
+   satisfies "PDF export" without a fabricated export pipeline. Only .cbai-print-area content is
+   shown; global chrome (sidebar, topbar, buttons) is hidden. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .cbai-print-area,
+  .cbai-print-area * {
+    visibility: visible;
+  }
+  .cbai-print-area {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    color: #000;
+    background: #fff;
+  }
+  .cbai-no-print {
+    display: none !important;
+  }
+}

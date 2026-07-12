@@ -70,6 +70,7 @@ export type ProjectReport = {
   typeLabel: string;
   description: string;
   researchQuestion: string | null;
+  objectives: string | null;
   notes: readonly ProjectNote[];
   tasks: readonly ProjectTask[];
   openQuestions: readonly ProjectQuestion[];
@@ -126,6 +127,7 @@ function buildProjectReport(project: Project): ProjectReport {
     typeLabel: getProjectTypeLabel(project.type),
     description: project.description,
     researchQuestion: project.researchQuestion?.trim() || null,
+    objectives: project.objectives?.trim() || null,
     notes,
     tasks,
     openQuestions,

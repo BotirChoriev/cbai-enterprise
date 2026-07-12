@@ -2,6 +2,7 @@ import type { ResearchTopicReport } from "@/lib/entity/entity-report";
 import type { ProductStatus } from "@/lib/product-status";
 import StatusBadge from "@/components/shared/StatusBadge";
 import EntityRelatedPanel from "@/components/shared/EntityRelatedPanel";
+import ReportPrintButton from "@/components/shared/ReportPrintButton";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type ResearchTopicReportViewProps = {
@@ -17,7 +18,7 @@ export default function ResearchTopicReportView({ report }: ResearchTopicReportV
   return (
     <section
       aria-labelledby="research-topic-report-heading"
-      className={`${cbaiGlassCard} space-y-6 border-cyan-500/15 p-5 sm:p-6`}
+      className={`${cbaiGlassCard} cbai-print-area space-y-6 border-cyan-500/15 p-5 sm:p-6`}
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
@@ -25,8 +26,12 @@ export default function ResearchTopicReportView({ report }: ResearchTopicReportV
           <h2 id="research-topic-report-heading" className="mt-1 text-lg font-semibold text-zinc-100">
             {report.topicName}
           </h2>
+          <p className="mt-1 text-xs text-zinc-600">Generated {new Date().toLocaleString()}</p>
         </div>
-        {report.dataStatus ? <StatusBadge status={report.dataStatus} /> : null}
+        <div className="flex shrink-0 items-center gap-2">
+          {report.dataStatus ? <StatusBadge status={report.dataStatus} /> : null}
+          <ReportPrintButton />
+        </div>
       </div>
 
       <div className="space-y-2">
