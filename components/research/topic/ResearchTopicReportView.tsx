@@ -3,6 +3,7 @@ import type { ProductStatus } from "@/lib/product-status";
 import StatusBadge from "@/components/shared/StatusBadge";
 import EntityRelatedPanel from "@/components/shared/EntityRelatedPanel";
 import ReportPrintButton from "@/components/shared/ReportPrintButton";
+import SaveReportButton from "@/components/shared/SaveReportButton";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type ResearchTopicReportViewProps = {
@@ -30,6 +31,7 @@ export default function ResearchTopicReportView({ report }: ResearchTopicReportV
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {report.dataStatus ? <StatusBadge status={report.dataStatus} /> : null}
+          <SaveReportButton kind="research_topic" entityId={report.topicId} entityName={report.topicName} title={`${report.topicName} — Research Topic Report`} />
           <ReportPrintButton />
         </div>
       </div>

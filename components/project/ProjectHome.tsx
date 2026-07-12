@@ -20,7 +20,9 @@ import { universities } from "@/lib/universities";
 import { RESEARCH_TOPICS } from "@/lib/research/research-topics";
 import type { ContextEntityRef } from "@/lib/context/context-types";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
+import { useAuth } from "@/components/platform/context/AuthProvider";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
+import SyncStatusBadge from "@/components/shared/SyncStatusBadge";
 import EntityRelatedPanel from "@/components/shared/EntityRelatedPanel";
 import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
 import ProjectGuidePanel from "@/components/project/ProjectGuidePanel";
@@ -42,7 +44,7 @@ const METHODOLOGY_POINTS = [
   { id: "user-created", title: "User-created, not AI-generated", description: "Projects, notes, tasks, and evidence references are created only by the user — never auto-generated or fabricated." },
   { id: "real-links-only", title: "Real entity links only", description: "Related Countries/Companies/Universities/Research topics are only ever real catalog entries the user explicitly linked." },
   { id: "no-score", title: "No project score", description: "CBAI does not compute a fabricated project quality or completion score — progress is a real count of completed real milestones." },
-  { id: "local-only", title: "Local to this device", description: "Projects are stored in this browser only — there is no account system, so nothing here is shared or synced." },
+  { id: "local-only", title: "Storage", description: "Signed into a cloud account, Projects sync across your devices; otherwise they stay in this browser only. Never shared with other users." },
 ];
 
 function LinkEntityForm({ projectId, onLinked }: { projectId: string; onLinked: (entity: ContextEntityRef) => void }) {
@@ -108,6 +110,7 @@ function LinkEntityForm({ projectId, onLinked }: { projectId: string; onLinked: 
 
 export default function ProjectHome({ project: initialProject }: ProjectHomeProps) {
   const { isEntityPinned, pinEntityToWorkspace, unpinEntityFromWorkspace } = usePlatformContext();
+  const { accountMode } = useAuth();
   const [project, setProject] = useState(initialProject);
   const [entities, setEntities] = useState<ContextEntityRef[]>(() => loadProjectEntities(project.id));
   const [evidence, setEvidence] = useState(() => loadProjectEvidence(project.id));
@@ -166,6 +169,7 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
                 {tag}
               </span>
             ))}
+            {accountMode === "cloud" ? <SyncStatusBadge table="projects" localId={project.id} /> : null}
           </div>
         </div>
         <SaveToWorkspaceButton entity={{ kind: "project", id: project.id, name: project.title }} />
@@ -220,6 +224,7 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
               Saved.
             </p>
           ) : null}
+          {accountMode === "cloud" ? <SyncStatusBadge table="projects" localId={project.id} /> : null}
         </div>
       </div>
 

@@ -16,6 +16,8 @@ import Avatar from "@/components/shared/Avatar";
 import CreateProjectForm from "@/components/project/CreateProjectForm";
 import ProjectList from "@/components/project/ProjectList";
 import ProjectHome from "@/components/project/ProjectHome";
+import LocalWorkMigrationPrompt from "@/components/account/LocalWorkMigrationPrompt";
+import PendingSyncNotice from "@/components/shared/PendingSyncNotice";
 import { loadProject } from "@/lib/project/project-store";
 import { PROJECT_TYPES, type ProjectTypeId } from "@/lib/project/project-types";
 import type { ContextEntityRef } from "@/lib/context/context-types";
@@ -85,8 +87,15 @@ function MyWorkContent() {
   const reports = buildReportsCenterModel();
   const { profile, isActive } = useAssistantProfile();
   const { context } = usePlatformContext();
-  const { user, isSignedIn } = useAuth();
+  const { user, isSignedIn, cloudUser, accountMode, cloudSessionRestoring } = useAuth();
   const preferredLanguage = ASSISTANT_LANGUAGES.find((l) => l.code === profile.preferredLanguage);
+
+  // Real loading state — avoids a flash of "not signed in" while a real cloud session is still
+  // being restored from storage (Phase 10). Never shown when cloud accounts aren't configured, so
+  // Local Mode's first paint is unaffected.
+  if (cloudSessionRestoring) {
+    return <div className={`${cbaiGlassCard} p-5 text-sm text-zinc-500`}>Restoring your session…</div>;
+  }
 
   if (projectId && project) {
     return <ProjectHome project={project} />;
@@ -126,10 +135,12 @@ function MyWorkContent() {
             <StatusBadge status="live" className="ml-auto" />
           </div>
           <p className="mt-3 max-w-2xl text-xs text-zinc-500">
-            {isSignedIn
-              ? `Signed in as ${user!.email} — Projects and Bookmarks below belong to your account, saved to this device.`
-              : "Saved to this browser — real projects, research, and evidence entry points below, never fabricated activity or recommendations."}
-            {!isSignedIn ? (
+            {accountMode === "cloud"
+              ? `Signed in with a cloud account as ${cloudUser!.email} — Projects and Bookmarks below sync across every device you sign into.`
+              : isSignedIn
+                ? `Signed in as ${user!.email} — Projects and Bookmarks below belong to your account, saved to this device only.`
+                : "Saved to this browser — real projects, research, and evidence entry points below, never fabricated activity or recommendations."}
+            {!isSignedIn && accountMode !== "cloud" ? (
               <>
                 {" "}
                 <Link href="/account" className="text-cyan-400 hover:text-cyan-300">
@@ -139,6 +150,7 @@ function MyWorkContent() {
               </>
             ) : null}
           </p>
+          {accountMode === "cloud" ? <PendingSyncNotice cloudUserId={cloudUser!.id} /> : null}
         </div>
       ) : (
         <div className={`${cbaiGlassCard} border-cyan-500/15 px-6 py-5`}>
@@ -165,6 +177,8 @@ function MyWorkContent() {
           </div>
         </div>
       )}
+
+      {accountMode === "cloud" ? <LocalWorkMigrationPrompt /> : null}
 
       <CreateProjectForm initialPrimaryEntity={initialPrimaryEntity} initialType={initialType} />
 

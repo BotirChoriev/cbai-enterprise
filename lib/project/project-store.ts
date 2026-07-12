@@ -23,6 +23,8 @@ import type {
 import { PROJECT_TYPES } from "@/lib/project/project-types";
 import type { ContextEntityRef } from "@/lib/context/context-types";
 import { resolveStorageKey } from "@/lib/storage/namespaced-key";
+import { getSyncedCloudUserId } from "@/lib/supabase/cloud-session-sync";
+import { enqueueSync } from "@/lib/supabase/outbox";
 
 const PROJECTS_KEY = "cbai-projects";
 const PROJECT_ENTITIES_KEY = "cbai-project-entities";
@@ -55,6 +57,112 @@ function writeList<T>(key: string, items: readonly T[]): void {
 
 function newId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+// ---------------------------------------------------------------------------
+// Cloud sync (Real Supabase Authentication + Cloud Persistence mission) — every mutation below
+// keeps writing to localStorage exactly as before (Local Mode is unchanged), and additionally
+// enqueues a real background cloud write here whenever a cloud session exists. See
+// lib/supabase/outbox.ts for the queue/retry engine and supabase/migrations/0001_init_schema.sql
+// for the row shapes these payloads match.
+// ---------------------------------------------------------------------------
+
+function syncProjectRow(project: Project): void {
+  const ownerId = getSyncedCloudUserId();
+  if (!ownerId) return;
+  enqueueSync(ownerId, "projects", "upsert", project.id, {
+    owner_id: ownerId,
+    local_id: project.id,
+    title: project.title,
+    project_type: project.type,
+    description: project.description,
+    status: project.status,
+    visibility: project.visibility,
+    primary_entity_kind: project.primaryEntity?.kind ?? null,
+    primary_entity_id: project.primaryEntity?.id ?? null,
+    primary_entity_name: project.primaryEntity?.name ?? null,
+    tags: project.tags,
+    research_question: project.researchQuestion ?? null,
+    objectives: project.objectives ?? null,
+    report_generated_at: project.reportGeneratedAt ?? null,
+  });
+}
+
+function syncEntityLinkRow(link: ProjectEntityLink): void {
+  const ownerId = getSyncedCloudUserId();
+  if (!ownerId) return;
+  const localId = `${link.projectId}:${link.entity.kind}:${link.entity.id}`;
+  enqueueSync(ownerId, "project_entity_links", "upsert", localId, {
+    owner_id: ownerId,
+    local_id: localId,
+    project_id: link.projectId,
+    entity_kind: link.entity.kind,
+    entity_id: link.entity.id,
+    entity_name: link.entity.name,
+    entity_code: link.entity.code ?? null,
+    entity_country_name: link.entity.countryName ?? null,
+  });
+}
+
+function syncDeleteEntityLink(projectId: string, kind: ContextEntityRef["kind"], id: string): void {
+  const ownerId = getSyncedCloudUserId();
+  if (!ownerId) return;
+  enqueueSync(ownerId, "project_entity_links", "delete", `${projectId}:${kind}:${id}`);
+}
+
+function syncNoteRow(note: ProjectNote): void {
+  const ownerId = getSyncedCloudUserId();
+  if (!ownerId) return;
+  enqueueSync(ownerId, "project_notes", "upsert", note.noteId, {
+    owner_id: ownerId,
+    local_id: note.noteId,
+    project_id: note.projectId,
+    body: note.body,
+    linked_evidence_id: note.linkedEvidenceId ?? null,
+    linked_evidence_label: note.linkedEvidenceLabel ?? null,
+    linked_entity_id: note.linkedEntityId ?? null,
+    linked_entity_name: note.linkedEntityName ?? null,
+    linked_entity_type: note.linkedEntityType ?? null,
+  });
+}
+
+function syncTaskRow(task: ProjectTask): void {
+  const ownerId = getSyncedCloudUserId();
+  if (!ownerId) return;
+  enqueueSync(ownerId, "project_tasks", "upsert", task.taskId, {
+    owner_id: ownerId,
+    local_id: task.taskId,
+    project_id: task.projectId,
+    title: task.title,
+    status: task.status,
+  });
+}
+
+function syncQuestionRow(question: ProjectQuestion): void {
+  const ownerId = getSyncedCloudUserId();
+  if (!ownerId) return;
+  enqueueSync(ownerId, "project_questions", "upsert", question.questionId, {
+    owner_id: ownerId,
+    local_id: question.questionId,
+    project_id: question.projectId,
+    question: question.question,
+    resolved: question.resolved,
+    resolved_at: question.resolvedAt ?? null,
+  });
+}
+
+function syncEvidenceRow(evidence: ProjectEvidenceReference): void {
+  const ownerId = getSyncedCloudUserId();
+  if (!ownerId) return;
+  enqueueSync(ownerId, "project_evidence", "upsert", evidence.evidenceRefId, {
+    owner_id: ownerId,
+    local_id: evidence.evidenceRefId,
+    project_id: evidence.projectId,
+    title: evidence.title,
+    source_url: evidence.sourceUrl ?? null,
+    linked_entity_id: evidence.linkedEntityId ?? null,
+    linked_entity_name: evidence.linkedEntityName ?? null,
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -105,6 +213,7 @@ export function createProject(input: CreateProjectInput): Project {
   const project: Project = { ...input, id: newId("project"), createdAt: now, updatedAt: now };
   const all = loadProjects();
   writeList(PROJECTS_KEY, [...all, project]);
+  syncProjectRow(project);
   if (input.primaryEntity) {
     linkEntityToProject(project.id, input.primaryEntity);
   }
@@ -119,6 +228,7 @@ export function updateProject(id: string, patch: Partial<Omit<Project, "id" | "c
   const next = [...all];
   next[index] = updated;
   writeList(PROJECTS_KEY, next);
+  syncProjectRow(updated);
   return updated;
 }
 
@@ -158,13 +268,16 @@ export function linkEntityToProject(projectId: string, entity: ContextEntityRef)
     (link) => link.projectId === projectId && link.entity.kind === entity.kind && link.entity.id === entity.id,
   );
   if (exists) return;
-  writeList(PROJECT_ENTITIES_KEY, [...all, { projectId, entity }]);
+  const link: ProjectEntityLink = { projectId, entity };
+  writeList(PROJECT_ENTITIES_KEY, [...all, link]);
+  syncEntityLinkRow(link);
 }
 
 export function unlinkEntityFromProject(projectId: string, kind: ContextEntityRef["kind"], id: string): void {
   const all = readList(PROJECT_ENTITIES_KEY, isProjectEntityLink);
   const next = all.filter((link) => !(link.projectId === projectId && link.entity.kind === kind && link.entity.id === id));
   writeList(PROJECT_ENTITIES_KEY, next);
+  syncDeleteEntityLink(projectId, kind, id);
 }
 
 /** Reverse lookup — real Projects that link to a given real entity, for that entity's own Related panel. */
@@ -202,6 +315,7 @@ export function saveProjectNote(input: Omit<ProjectNote, "noteId" | "createdAt">
   const all = readList(PROJECT_NOTES_KEY, isProjectNote);
   const note: ProjectNote = { ...input, noteId: newId("pnote"), createdAt: new Date().toISOString() };
   writeList(PROJECT_NOTES_KEY, [...all, note]);
+  syncNoteRow(note);
   return note;
 }
 
@@ -233,6 +347,7 @@ export function createProjectTask(projectId: string, title: string): ProjectTask
   const now = new Date().toISOString();
   const task: ProjectTask = { taskId: newId("task"), projectId, title, status: "todo", createdAt: now, updatedAt: now };
   writeList(PROJECT_TASKS_KEY, [...all, task]);
+  syncTaskRow(task);
   return task;
 }
 
@@ -244,6 +359,7 @@ export function setProjectTaskStatus(taskId: string, status: ProjectTaskStatus):
   const next = [...all];
   next[index] = updated;
   writeList(PROJECT_TASKS_KEY, next);
+  syncTaskRow(updated);
   return updated;
 }
 
@@ -274,6 +390,7 @@ export function createProjectQuestion(projectId: string, question: string): Proj
   const all = readList(PROJECT_QUESTIONS_KEY, isProjectQuestion);
   const record: ProjectQuestion = { questionId: newId("pq"), projectId, question, resolved: false, createdAt: new Date().toISOString() };
   writeList(PROJECT_QUESTIONS_KEY, [...all, record]);
+  syncQuestionRow(record);
   return record;
 }
 
@@ -285,6 +402,7 @@ export function resolveProjectQuestion(questionId: string): ProjectQuestion | nu
   const next = [...all];
   next[index] = updated;
   writeList(PROJECT_QUESTIONS_KEY, next);
+  syncQuestionRow(updated);
   return updated;
 }
 
@@ -314,6 +432,7 @@ export function saveProjectEvidence(input: Omit<ProjectEvidenceReference, "evide
   const all = readList(PROJECT_EVIDENCE_KEY, isProjectEvidenceReference);
   const record: ProjectEvidenceReference = { ...input, evidenceRefId: newId("pev"), createdAt: new Date().toISOString() };
   writeList(PROJECT_EVIDENCE_KEY, [...all, record]);
+  syncEvidenceRow(record);
   return record;
 }
 

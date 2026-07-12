@@ -4,6 +4,7 @@ import type { ProductStatus } from "@/lib/product-status";
 import StatusBadge from "@/components/shared/StatusBadge";
 import EntityFutureSources from "@/components/shared/EntityFutureSources";
 import ReportPrintButton from "@/components/shared/ReportPrintButton";
+import SaveReportButton from "@/components/shared/SaveReportButton";
 import { getResearchTopicPath } from "@/lib/research/research-topics";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
@@ -43,6 +44,7 @@ export default function CompanyReportView({ report }: CompanyReportViewProps) {
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {report.dataStatus ? <StatusBadge status={report.dataStatus} /> : null}
+          <SaveReportButton kind="company" entityId={report.company.id} entityName={report.company.name} title={`${report.company.name} — Company Intelligence Report`} />
           <ReportPrintButton />
         </div>
       </div>

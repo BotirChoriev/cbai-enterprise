@@ -4,6 +4,7 @@ import type { ProductStatus } from "@/lib/product-status";
 import StatusBadge from "@/components/shared/StatusBadge";
 import EntityFutureSources from "@/components/shared/EntityFutureSources";
 import ReportPrintButton from "@/components/shared/ReportPrintButton";
+import SaveReportButton from "@/components/shared/SaveReportButton";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type UniversityReportViewProps = {
@@ -53,6 +54,7 @@ export default function UniversityReportView({ report }: UniversityReportViewPro
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {report.dataStatus ? <StatusBadge status={report.dataStatus} /> : null}
+          <SaveReportButton kind="university" entityId={report.university.id} entityName={report.university.name} title={`${report.university.name} — University Intelligence Report`} />
           <ReportPrintButton />
         </div>
       </div>

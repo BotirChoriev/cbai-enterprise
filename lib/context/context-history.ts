@@ -1,5 +1,7 @@
 import type { ContextEntityRef } from "@/lib/context/context-types";
 import { resolveStorageKey } from "@/lib/storage/namespaced-key";
+import { getSyncedCloudUserId } from "@/lib/supabase/cloud-session-sync";
+import { enqueueSync } from "@/lib/supabase/outbox";
 
 const RECENT_STORAGE_KEY = "cbai-platform-recent-entities";
 const PINNED_STORAGE_KEY = "cbai-platform-pinned-entities";
@@ -62,7 +64,27 @@ export function recordRecentEntity(entity: ContextEntityRef): ContextEntityRef[]
   return next;
 }
 
-/** Pin an entity — architecture hook for future UI. */
+function syncBookmarkRow(entity: ContextEntityRef): void {
+  const ownerId = getSyncedCloudUserId();
+  if (!ownerId) return;
+  enqueueSync(ownerId, "bookmarks", "upsert", `${entity.kind}:${entity.id}`, {
+    owner_id: ownerId,
+    local_id: `${entity.kind}:${entity.id}`,
+    entity_kind: entity.kind,
+    entity_id: entity.id,
+    entity_name: entity.name,
+    entity_code: entity.code ?? null,
+    entity_country_name: entity.countryName ?? null,
+  });
+}
+
+function syncDeleteBookmark(kind: ContextEntityRef["kind"], id: string): void {
+  const ownerId = getSyncedCloudUserId();
+  if (!ownerId) return;
+  enqueueSync(ownerId, "bookmarks", "delete", `${kind}:${id}`);
+}
+
+/** Pin an entity — real Bookmark, synced to the cloud when a cloud session is active. */
 export function pinEntity(entity: ContextEntityRef): ContextEntityRef[] {
   const existing = loadPinnedEntities();
   if (existing.some((item) => item.kind === entity.kind && item.id === entity.id)) {
@@ -70,15 +92,17 @@ export function pinEntity(entity: ContextEntityRef): ContextEntityRef[] {
   }
   const next = [...existing, entity];
   writeEntityList(PINNED_STORAGE_KEY, next);
+  syncBookmarkRow(entity);
   return next;
 }
 
-/** Unpin an entity — architecture hook for future UI. */
+/** Unpin an entity — real Bookmark removal, synced to the cloud when a cloud session is active. */
 export function unpinEntity(kind: ContextEntityRef["kind"], id: string): ContextEntityRef[] {
   const next = loadPinnedEntities().filter(
     (item) => !(item.kind === kind && item.id === id),
   );
   writeEntityList(PINNED_STORAGE_KEY, next);
+  syncDeleteBookmark(kind, id);
   return next;
 }
 

@@ -12,6 +12,7 @@ import {
 import { cbaiPageHeader } from "@/components/brand/brand-classes";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import ReportReadinessSection from "@/components/reports/ReportReadinessSection";
+import SavedReportsSection from "@/components/reports/SavedReportsSection";
 
 function entityProfilePath(entity: ContextEntityRef): string {
   switch (entity.kind) {
@@ -68,6 +69,8 @@ export default function ReportsCenter() {
           </>
         )}
       </div>
+
+      <SavedReportsSection />
 
       <ReportReadinessSection reportTypes={model.reportTypes} />
     </div>

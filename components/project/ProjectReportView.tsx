@@ -4,6 +4,7 @@ import { PROJECT_TASK_STATUS_LABELS } from "@/lib/project/project-types";
 import StatusBadge from "@/components/shared/StatusBadge";
 import EntityRelatedPanel from "@/components/shared/EntityRelatedPanel";
 import ReportPrintButton from "@/components/shared/ReportPrintButton";
+import SaveReportButton from "@/components/shared/SaveReportButton";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type ProjectReportViewProps = {
@@ -33,6 +34,7 @@ export default function ProjectReportView({ report }: ProjectReportViewProps) {
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {report.dataStatus ? <StatusBadge status={report.dataStatus} /> : null}
+          <SaveReportButton kind="project" entityId={report.projectId} entityName={report.title} title={`${report.title} — Project Report`} projectId={report.projectId} />
           <ReportPrintButton />
         </div>
       </div>
