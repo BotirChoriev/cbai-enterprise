@@ -19,7 +19,8 @@
     "test:intelligence-guide": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-intelligence-guide.ts",
     "test:production-readiness": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-production-readiness.ts",
     "test:data-activation": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-data-activation.ts",
-    "test:auth-platform": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-auth-platform.ts"
+    "test:auth-platform": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-auth-platform.ts",
+    "test:launch-gate": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-launch-gate.ts"
   },
   "dependencies": {
     "next": "16.2.10",
