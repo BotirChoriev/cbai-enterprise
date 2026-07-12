@@ -89,22 +89,30 @@ test("7. buildEntityRelationships(research_topic) mirrors getRelatedCompaniesFor
   }
 });
 
-test("8. buildEntityReport(country) is byte-identical to calling buildCountryReport directly", () => {
+test("8. buildEntityReport(country) matches buildCountryReport directly, plus a real dataStatus", () => {
   const journey = buildCountryUserJourney(USA, getCountryRelationships(USA));
   const direct = buildCountryReport(USA, journey);
   const viaFacade = buildEntityReport("country", USA.id);
 
   assert.ok(viaFacade);
-  assert.deepEqual({ ...viaFacade, entityType: undefined }, { ...direct, entityType: undefined });
+  assert.deepEqual(
+    { ...viaFacade, entityType: undefined, dataStatus: undefined },
+    { ...direct, entityType: undefined, dataStatus: undefined },
+  );
+  assert.ok(["live", "partial", "waiting_for_verified_data"].includes(viaFacade.dataStatus));
 });
 
-test("9. buildEntityReport(company) is byte-identical to calling buildCompanyReport directly", () => {
+test("9. buildEntityReport(company) matches buildCompanyReport directly, plus a real dataStatus", () => {
   const journey = buildCompanyUserJourney(APPLE, getCompanyLinkedEntities(APPLE));
   const direct = buildCompanyReport(APPLE, journey);
   const viaFacade = buildEntityReport("company", APPLE.id);
 
   assert.ok(viaFacade);
-  assert.deepEqual({ ...viaFacade, entityType: undefined }, { ...direct, entityType: undefined });
+  assert.deepEqual(
+    { ...viaFacade, entityType: undefined, dataStatus: undefined },
+    { ...direct, entityType: undefined, dataStatus: undefined },
+  );
+  assert.ok(["live", "partial", "waiting_for_verified_data"].includes(viaFacade.dataStatus));
 });
 
 test("10. buildEntityReport(research_topic) compiles a real, honest report — never fabricated methodology", () => {
