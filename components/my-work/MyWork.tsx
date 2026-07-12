@@ -8,6 +8,7 @@ import { buildReportsCenterModel } from "@/lib/reports-center";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
+import { useAuth } from "@/components/platform/context/AuthProvider";
 import RecentEntities from "@/components/platform/context/RecentEntities";
 import PinnedEntities from "@/components/platform/context/PinnedEntities";
 import StatusBadge from "@/components/shared/StatusBadge";
@@ -75,6 +76,7 @@ function MyWorkContent() {
   const reports = buildReportsCenterModel();
   const { profile, isActive } = useAssistantProfile();
   const { context } = usePlatformContext();
+  const { user, isSignedIn } = useAuth();
   const preferredLanguage = ASSISTANT_LANGUAGES.find((l) => l.code === profile.preferredLanguage);
 
   if (projectId && project) {
@@ -98,31 +100,48 @@ function MyWorkContent() {
 
   return (
     <div className="space-y-8">
-      {isActive ? (
+      {isActive || isSignedIn ? (
         <div className={`${cbaiGlassCard} border-cyan-500/15 px-6 py-5`}>
           <div className="flex flex-wrap items-center gap-3">
-            <Avatar name={profile.name} avatar={profile.avatar} />
+            <Avatar name={user?.displayName || profile.name} avatar={profile.avatar} />
             <div>
-              <h2 className="text-lg font-semibold text-zinc-100">{profile.name}&apos;s Work</h2>
+              <h2 className="text-lg font-semibold text-zinc-100">
+                {user?.displayName || profile.name}&apos;s Work
+              </h2>
               <p className="text-xs text-zinc-500">
-                {resolveOperatorName(profile)} · {WORKSPACE_ROLE_LABELS[profile.workspaceRole]}{" "}
-                workspace · {preferredLanguage?.label ?? profile.preferredLanguage}
+                {isActive
+                  ? `${resolveOperatorName(profile)} · ${WORKSPACE_ROLE_LABELS[profile.workspaceRole]} workspace · ${preferredLanguage?.label ?? profile.preferredLanguage}`
+                  : "Local Assistant profile not set up yet"}
               </p>
             </div>
             <StatusBadge status="live" className="ml-auto" />
           </div>
           <p className="mt-3 max-w-2xl text-xs text-zinc-500">
-            Saved to this browser — real projects, research, and evidence entry points below,
-            never fabricated activity or recommendations.
+            {isSignedIn
+              ? `Signed in as ${user!.email} — Projects and Bookmarks below belong to your account, saved to this device.`
+              : "Saved to this browser — real projects, research, and evidence entry points below, never fabricated activity or recommendations."}
+            {!isSignedIn ? (
+              <>
+                {" "}
+                <Link href="/account" className="text-cyan-400 hover:text-cyan-300">
+                  Sign in
+                </Link>{" "}
+                to keep your work separate from others using this browser.
+              </>
+            ) : null}
           </p>
         </div>
       ) : (
         <div className={`${cbaiGlassCard} border-cyan-500/15 px-6 py-5`}>
           <h2 className="text-lg font-semibold text-zinc-100">My Work</h2>
           <p className="mt-1 max-w-2xl text-sm text-zinc-400">
-            CBAI does not yet have accounts or saved sessions, so nothing below is personalized to
-            you. Projects, and the real, working entry points into research and evidence review
-            across the platform, are saved to this browser only — never a fabricated history.
+            Nothing below is personalized to you yet. Projects, and the real, working entry points
+            into research and evidence review across the platform, are saved to this browser only
+            — never a fabricated history.{" "}
+            <Link href="/account" className="text-cyan-400 hover:text-cyan-300">
+              Sign in or create a local account
+            </Link>{" "}
+            to keep your own Projects and Bookmarks separate from anyone else using this browser.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             {ONBOARDING_LINKS.map((link) => (

@@ -1,10 +1,12 @@
 /**
  * Personal Intelligence Assistant — profile model.
  *
- * This is a device-local profile, not a real account: this platform has no authentication or
- * backend session store (static export, confirmed empty grep for auth/login/session code), so a
- * profile here means "saved in this browser," never a fabricated cross-device account. One
- * profile per browser, matching the mission's "each user owns exactly one Assistant."
+ * This is a device-local preference set, deliberately kept separate from the real account system
+ * (lib/auth/) added in the Authentication + User Platform Foundation mission: this profile is how
+ * the Assistant addresses you (name, avatar, language, workspace role), while a real Account is
+ * who owns your Projects and Bookmarks. A signed-in user's profile still lives in this same
+ * device-local key today — profiles are not yet namespaced per-account like Projects/Bookmarks
+ * are, so switching accounts on one device currently means starting the Assistant profile over.
  */
 
 export type WorkspaceRole =
