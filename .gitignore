@@ -32,6 +32,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...except the real, credential-free template — see docs/supabase-setup.md
+!.env.example
 
 # vercel
 .vercel
