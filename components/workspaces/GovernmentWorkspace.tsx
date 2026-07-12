@@ -5,6 +5,7 @@ import { buildGovernmentWorkspace } from "@/lib/workspaces/government";
 import WorkspaceHero from "@/components/workspaces/WorkspaceHero";
 import WorkspaceCoverageGrid from "@/components/workspaces/WorkspaceCoverageGrid";
 import WorkspaceSourceCoverage from "@/components/workspaces/WorkspaceSourceCoverage";
+import RoleProjectEntry from "@/components/workspaces/RoleProjectEntry";
 
 export default function GovernmentWorkspace() {
   const model = useMemo(() => buildGovernmentWorkspace(), []);
@@ -31,6 +32,11 @@ export default function GovernmentWorkspace() {
             detail: `/ ${model.summary.totalSources}`,
           },
         ]}
+      />
+
+      <RoleProjectEntry
+        projectType="policy_analysis"
+        description="Track a real policy question against the governance, public-services, and budget-transparency coverage below — evidence, notes, and a report all stay attached to one project you can return to."
       />
 
       <WorkspaceCoverageGrid

@@ -17,6 +17,7 @@ import CreateProjectForm from "@/components/project/CreateProjectForm";
 import ProjectList from "@/components/project/ProjectList";
 import ProjectHome from "@/components/project/ProjectHome";
 import { loadProject } from "@/lib/project/project-store";
+import { PROJECT_TYPES, type ProjectTypeId } from "@/lib/project/project-types";
 import type { ContextEntityRef } from "@/lib/context/context-types";
 import {
   ASSISTANT_LANGUAGES,
@@ -71,6 +72,14 @@ function MyWorkContent() {
     entityKind && entityId && entityName && validKinds.includes(entityKind)
       ? { kind: entityKind as ContextEntityRef["kind"], id: entityId, name: entityName }
       : undefined;
+
+  // Real "Start a [role] Project" pre-fill, arriving from a Government/Investor/Citizen entry
+  // surface — only a real, recognized Project Type id is accepted; anything else is honestly
+  // ignored, falling back to CreateProjectForm's own default.
+  const projectTypeParam = searchParams.get("projectType");
+  const initialType = PROJECT_TYPES.some((t) => t.id === projectTypeParam)
+    ? (projectTypeParam as ProjectTypeId)
+    : undefined;
 
   const evidence = buildEvidenceExplorerModel();
   const reports = buildReportsCenterModel();
@@ -157,7 +166,7 @@ function MyWorkContent() {
         </div>
       )}
 
-      <CreateProjectForm initialPrimaryEntity={initialPrimaryEntity} />
+      <CreateProjectForm initialPrimaryEntity={initialPrimaryEntity} initialType={initialType} />
 
       <ProjectList />
 

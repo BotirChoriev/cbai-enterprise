@@ -5,6 +5,7 @@ import { buildCitizenWorkspace } from "@/lib/workspaces/citizen";
 import WorkspaceHero from "@/components/workspaces/WorkspaceHero";
 import WorkspaceCoverageGrid from "@/components/workspaces/WorkspaceCoverageGrid";
 import WorkspaceSourceCoverage from "@/components/workspaces/WorkspaceSourceCoverage";
+import RoleProjectEntry from "@/components/workspaces/RoleProjectEntry";
 
 export default function CitizenWorkspace() {
   const model = useMemo(() => buildCitizenWorkspace(), []);
@@ -37,6 +38,11 @@ export default function CitizenWorkspace() {
             detail: `/ ${model.summary.totalSources}`,
           },
         ]}
+      />
+
+      <RoleProjectEntry
+        projectType="evidence_review"
+        description="Review a real public topic against the evidence below in plain language — save what you find, in your own words, to a project you can return to."
       />
 
       <WorkspaceCoverageGrid

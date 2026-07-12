@@ -6,6 +6,7 @@ import WorkspaceHero from "@/components/workspaces/WorkspaceHero";
 import WorkspaceCoverageGrid from "@/components/workspaces/WorkspaceCoverageGrid";
 import WorkspaceSourceCoverage from "@/components/workspaces/WorkspaceSourceCoverage";
 import WorkspaceEntityLinks from "@/components/workspaces/WorkspaceEntityLinks";
+import RoleProjectEntry from "@/components/workspaces/RoleProjectEntry";
 
 export default function InvestorWorkspace() {
   const model = useMemo(() => buildInvestorWorkspace(), []);
@@ -32,6 +33,11 @@ export default function InvestorWorkspace() {
             detail: `/ ${model.summary.totalSources}`,
           },
         ]}
+      />
+
+      <RoleProjectEntry
+        projectType="investment_analysis"
+        description="Track a real investment question against the macro, trade, and infrastructure evidence below — no scores or recommendations, just your own evidence, notes, and a report attached to one project."
       />
 
       <WorkspaceCoverageGrid
