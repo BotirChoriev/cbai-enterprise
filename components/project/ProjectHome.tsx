@@ -10,6 +10,7 @@ import {
   linkEntityToProject,
   unlinkEntityFromProject,
   updateProject,
+  markProjectReportGenerated,
 } from "@/lib/project/project-store";
 import { buildEntityRelationships } from "@/lib/entity/entity-relationships";
 import { buildEntityReport } from "@/lib/entity/entity-report";
@@ -21,11 +22,15 @@ import type { ContextEntityRef } from "@/lib/context/context-types";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import EntityRelatedPanel from "@/components/shared/EntityRelatedPanel";
+import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
+import ProjectGuidePanel from "@/components/project/ProjectGuidePanel";
 import ProjectDashboard from "@/components/project/ProjectDashboard";
+import ProjectHealthPanel from "@/components/project/ProjectHealthPanel";
 import ProjectNotesPanel from "@/components/project/ProjectNotesPanel";
 import ProjectTasksPanel from "@/components/project/ProjectTasksPanel";
 import ProjectOpenQuestionsPanel from "@/components/project/ProjectOpenQuestionsPanel";
 import ProjectEvidencePanel from "@/components/project/ProjectEvidencePanel";
+import ProjectTimelinePanel from "@/components/project/ProjectTimelinePanel";
 import ProjectReportView from "@/components/project/ProjectReportView";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
@@ -105,17 +110,22 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
   const { isEntityPinned } = usePlatformContext();
   const [project, setProject] = useState(initialProject);
   const [entities, setEntities] = useState<ContextEntityRef[]>(() => loadProjectEntities(project.id));
-  const [evidence] = useState(() => loadProjectEvidence(project.id));
+  const [evidence, setEvidence] = useState(() => loadProjectEvidence(project.id));
   const [showReport, setShowReport] = useState(false);
-  const [reportGenerated, setReportGenerated] = useState(false);
   const [researchQuestionDraft, setResearchQuestionDraft] = useState(project.researchQuestion ?? "");
   const [objectivesDraft, setObjectivesDraft] = useState(project.objectives ?? "");
+  // A pure re-render trigger — Dashboard/Guide/Health/Timeline read directly from the store on
+  // every render (no internal caching), so bumping this after any sibling panel's mutation is
+  // enough to keep them honest and current within the same session.
+  const [, bumpRefresh] = useState(0);
+  const refresh = () => bumpRefresh((n) => n + 1);
 
   const relationships = buildEntityRelationships("project", project.id);
 
   function handleUnlink(entity: ContextEntityRef) {
     unlinkEntityFromProject(project.id, entity.kind, entity.id);
     setEntities((current) => current.filter((e) => !(e.kind === entity.kind && e.id === entity.id)));
+    refresh();
   }
 
   function handleSaveQuestionObjectives() {
@@ -124,6 +134,14 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
       objectives: objectivesDraft.trim() || undefined,
     });
     if (updated) setProject(updated);
+  }
+
+  function handleToggleReport() {
+    if (!showReport) {
+      const updated = markProjectReportGenerated(project.id);
+      if (updated) setProject(updated);
+    }
+    setShowReport((current) => !current);
   }
 
   return (
@@ -147,7 +165,13 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
         <SaveToWorkspaceButton entity={{ kind: "project", id: project.id, name: project.title }} />
       </div>
 
-      <ProjectDashboard project={project} reportGeneratedThisSession={reportGenerated} />
+      <ContextualOperatorBanner projectId={project.id} />
+
+      <ProjectGuidePanel project={project} />
+
+      <ProjectDashboard project={project} />
+
+      <ProjectHealthPanel project={project} />
 
       <div className={`${cbaiGlassCard} space-y-3 p-4`}>
         <p className={cbaiSectionEyebrow}>Research Question &amp; Objectives</p>
@@ -186,13 +210,19 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
         </button>
       </div>
 
-      <div className={`${cbaiGlassCard} space-y-3 p-4`}>
+      <div id="project-entities" className={`${cbaiGlassCard} space-y-3 p-4`}>
         <p className={cbaiSectionEyebrow}>Related Entities</p>
-        <LinkEntityForm projectId={project.id} onLinked={(entity) => setEntities((current) => [...current, entity])} />
+        <LinkEntityForm
+          projectId={project.id}
+          onLinked={(entity) => {
+            setEntities((current) => [...current, entity]);
+            refresh();
+          }}
+        />
         <EntityRelatedPanel
           showHeading={false}
           relationships={relationships}
-          emptyLabel="No entities linked to this project yet — link one above."
+          emptyLabel="No entities linked yet. Link a Country, Company, or University this project is about."
         />
         {entities.length > 0 ? (
           <div className="flex flex-wrap gap-2 border-t border-zinc-800/80 pt-2">
@@ -211,13 +241,22 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
         ) : null}
       </div>
 
-      <ProjectEvidencePanel projectId={project.id} relatedEntities={entities} />
+      <ProjectEvidencePanel
+        projectId={project.id}
+        relatedEntities={entities}
+        onAdded={(item) => {
+          setEvidence((current) => [item, ...current]);
+          refresh();
+        }}
+      />
 
-      <ProjectNotesPanel projectId={project.id} evidence={evidence} relatedEntities={entities} />
+      <ProjectNotesPanel projectId={project.id} evidence={evidence} relatedEntities={entities} onAdded={refresh} />
 
-      <ProjectOpenQuestionsPanel projectId={project.id} />
+      <ProjectOpenQuestionsPanel projectId={project.id} onChange={refresh} />
 
-      <ProjectTasksPanel projectId={project.id} />
+      <ProjectTasksPanel projectId={project.id} onChange={refresh} />
+
+      <ProjectTimelinePanel project={project} />
 
       <div className={`${cbaiGlassCard} space-y-2 p-4`}>
         <p className={cbaiSectionEyebrow}>Bookmarks</p>
@@ -239,10 +278,7 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
       <div id="project-report" className="space-y-4">
         <button
           type="button"
-          onClick={() => {
-            setShowReport((current) => !current);
-            setReportGenerated(true);
-          }}
+          onClick={handleToggleReport}
           className="inline-flex items-center gap-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-300 transition-colors hover:border-cyan-500/50"
         >
           {showReport ? "Hide report" : "Generate report"}

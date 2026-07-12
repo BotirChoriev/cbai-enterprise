@@ -9,6 +9,7 @@ import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-clas
 type ProjectEvidencePanelProps = {
   projectId: string;
   relatedEntities: readonly ContextEntityRef[];
+  onAdded?: (item: ProjectEvidenceReference) => void;
 };
 
 /**
@@ -17,7 +18,7 @@ type ProjectEvidencePanelProps = {
  * Entities, satisfied elsewhere by every Country/Company/University/Research topic's own real
  * coverage/evidence sections, unaffected by this panel.
  */
-export default function ProjectEvidencePanel({ projectId, relatedEntities }: ProjectEvidencePanelProps) {
+export default function ProjectEvidencePanel({ projectId, relatedEntities, onAdded }: ProjectEvidencePanelProps) {
   const [evidence, setEvidence] = useState<ProjectEvidenceReference[]>(() => loadProjectEvidence(projectId));
   const [title, setTitle] = useState("");
   const [sourceUrl, setSourceUrl] = useState("");
@@ -40,6 +41,7 @@ export default function ProjectEvidencePanel({ projectId, relatedEntities }: Pro
     setTitle("");
     setSourceUrl("");
     setEntityId("");
+    onAdded?.(record);
   }
 
   return (
@@ -111,7 +113,7 @@ export default function ProjectEvidencePanel({ projectId, relatedEntities }: Pro
           ))}
         </ul>
       ) : (
-        <p className="text-xs text-zinc-600">No evidence added yet.</p>
+        <p className="text-xs text-zinc-600">No Evidence has been added yet. Start by collecting one verified source.</p>
       )}
     </section>
   );

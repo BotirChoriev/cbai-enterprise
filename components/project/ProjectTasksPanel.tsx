@@ -8,6 +8,7 @@ import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-clas
 
 type ProjectTasksPanelProps = {
   projectId: string;
+  onChange?: () => void;
 };
 
 const STATUS_ORDER: readonly ProjectTaskStatus[] = ["todo", "in_progress", "done"];
@@ -18,7 +19,7 @@ function nextStatus(current: ProjectTaskStatus): ProjectTaskStatus | null {
 }
 
 /** Simple, real project task list — Todo / In Progress / Done. No fake assignments — every task is created by the user, never auto-generated. */
-export default function ProjectTasksPanel({ projectId }: ProjectTasksPanelProps) {
+export default function ProjectTasksPanel({ projectId, onChange }: ProjectTasksPanelProps) {
   const [tasks, setTasks] = useState<ProjectTask[]>(() => loadProjectTasks(projectId));
   const [title, setTitle] = useState("");
 
@@ -29,6 +30,7 @@ export default function ProjectTasksPanel({ projectId }: ProjectTasksPanelProps)
     const task = createProjectTask(projectId, trimmed);
     setTasks((current) => [task, ...current]);
     setTitle("");
+    onChange?.();
   }
 
   function handleAdvance(taskId: string, current: ProjectTaskStatus) {
@@ -37,6 +39,7 @@ export default function ProjectTasksPanel({ projectId }: ProjectTasksPanelProps)
     const updated = setProjectTaskStatus(taskId, next);
     if (updated) {
       setTasks((prev) => prev.map((t) => (t.taskId === taskId ? updated : t)));
+      onChange?.();
     }
   }
 
@@ -84,7 +87,7 @@ export default function ProjectTasksPanel({ projectId }: ProjectTasksPanelProps)
           ))}
         </ul>
       ) : (
-        <p className="text-xs text-zinc-600">No tasks yet.</p>
+        <p className="text-xs text-zinc-600">No Tasks yet. Break this project into small, trackable steps.</p>
       )}
     </section>
   );

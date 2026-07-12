@@ -10,6 +10,7 @@ type ProjectNotesPanelProps = {
   projectId: string;
   evidence: readonly ProjectEvidenceReference[];
   relatedEntities: readonly ContextEntityRef[];
+  onAdded?: () => void;
 };
 
 /**
@@ -18,7 +19,7 @@ type ProjectNotesPanelProps = {
  * Evidence, Entities, Reports" (notes are automatically included in the Project Report, which is
  * how they reference a report — see ProjectNote's own doc comment).
  */
-export default function ProjectNotesPanel({ projectId, evidence, relatedEntities }: ProjectNotesPanelProps) {
+export default function ProjectNotesPanel({ projectId, evidence, relatedEntities, onAdded }: ProjectNotesPanelProps) {
   const [notes, setNotes] = useState<ProjectNote[]>(() => loadProjectNotes(projectId));
   const [body, setBody] = useState("");
   const [evidenceRefId, setEvidenceRefId] = useState("");
@@ -45,6 +46,7 @@ export default function ProjectNotesPanel({ projectId, evidence, relatedEntities
     setBody("");
     setEvidenceRefId("");
     setEntityId("");
+    onAdded?.();
   }
 
   return (
@@ -113,7 +115,7 @@ export default function ProjectNotesPanel({ projectId, evidence, relatedEntities
           ))}
         </ul>
       ) : (
-        <p className="text-xs text-zinc-600">No notes recorded yet for this project.</p>
+        <p className="text-xs text-zinc-600">No Notes yet. Document what you learn as you go — notes capture your thinking in your own words.</p>
       )}
     </section>
   );

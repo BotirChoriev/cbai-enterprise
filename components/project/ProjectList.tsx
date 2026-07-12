@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { loadProjects } from "@/lib/project/project-store";
-import { PROJECT_STATUS_LABELS, PROJECT_TYPES } from "@/lib/project/project-types";
+import { PROJECT_STATUS_LABELS, PROJECT_TYPES, type Project } from "@/lib/project/project-types";
+import { resolveProjectGuideStep } from "@/lib/project/project-guide";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
@@ -48,7 +49,7 @@ export default function ProjectList() {
           </p>
           <div className="grid gap-3 sm:grid-cols-2">
             {pinned.map((project) => (
-              <ProjectCard key={project.id} projectId={project.id} title={project.title} typeId={project.type} status={project.status} />
+              <ProjectCard key={project.id} project={project} />
             ))}
           </div>
         </section>
@@ -60,7 +61,7 @@ export default function ProjectList() {
         </p>
         <div className="grid gap-3 sm:grid-cols-2">
           {projects.map((project) => (
-            <ProjectCard key={project.id} projectId={project.id} title={project.title} typeId={project.type} status={project.status} />
+            <ProjectCard key={project.id} project={project} />
           ))}
         </div>
       </section>
@@ -68,18 +69,35 @@ export default function ProjectList() {
   );
 }
 
-function ProjectCard({ projectId, title, typeId, status }: { projectId: string; title: string; typeId: string; status: string }) {
+/**
+ * Project, Project-first (Intelligence Guide Activation mission): Current status, Suggested next
+ * step, Last activity, and a Continue button — the "Continue" link goes straight to the Guide's
+ * real next-step anchor, not just the project's home, reusing resolveProjectGuideStep rather than
+ * a second suggestion mechanism.
+ */
+function ProjectCard({ project }: { project: Project }) {
+  const step = resolveProjectGuideStep(project);
+
   return (
     <div className={`${cbaiGlassCard} space-y-2 p-4`}>
       <div className="flex items-start justify-between gap-2">
-        <Link href={`/my-work?project=${projectId}`} className="text-sm font-semibold text-cyan-400 hover:text-cyan-300">
-          {title}
+        <Link href={`/my-work?project=${project.id}`} className="text-sm font-semibold text-cyan-400 hover:text-cyan-300">
+          {project.title}
         </Link>
-        <SaveToWorkspaceButton entity={{ kind: "project", id: projectId, name: title }} className="shrink-0" />
+        <SaveToWorkspaceButton entity={{ kind: "project", id: project.id, name: project.title }} className="shrink-0" />
       </div>
       <p className="text-xs text-zinc-500">
-        {typeLabel(typeId)} · {PROJECT_STATUS_LABELS[status as keyof typeof PROJECT_STATUS_LABELS] ?? status}
+        {typeLabel(project.type)} · {PROJECT_STATUS_LABELS[project.status]}
       </p>
+      <p className="text-xs text-zinc-400">
+        <span className="text-zinc-600">Suggested next step:</span> {step.suggestion}
+      </p>
+      <div className="flex items-center justify-between gap-2 border-t border-zinc-800/80 pt-2">
+        <p className="text-[11px] text-zinc-600">Last activity: {new Date(project.updatedAt).toLocaleString()}</p>
+        <Link href={step.href} className="shrink-0 text-xs font-medium text-cyan-400 hover:text-cyan-300">
+          Continue →
+        </Link>
+      </div>
     </div>
   );
 }

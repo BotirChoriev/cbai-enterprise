@@ -7,10 +7,11 @@ import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-clas
 
 type ProjectOpenQuestionsPanelProps = {
   projectId: string;
+  onChange?: () => void;
 };
 
 /** Real Open Questions — remain visible until the user marks them resolved. Never auto-resolved. */
-export default function ProjectOpenQuestionsPanel({ projectId }: ProjectOpenQuestionsPanelProps) {
+export default function ProjectOpenQuestionsPanel({ projectId, onChange }: ProjectOpenQuestionsPanelProps) {
   const [questions, setQuestions] = useState<ProjectQuestion[]>(() => loadProjectQuestions(projectId));
   const [text, setText] = useState("");
 
@@ -21,12 +22,14 @@ export default function ProjectOpenQuestionsPanel({ projectId }: ProjectOpenQues
     const question = createProjectQuestion(projectId, trimmed);
     setQuestions((current) => [question, ...current]);
     setText("");
+    onChange?.();
   }
 
   function handleResolve(questionId: string) {
     const updated = resolveProjectQuestion(questionId);
     if (updated) {
       setQuestions((current) => current.map((q) => (q.questionId === questionId ? updated : q)));
+      onChange?.();
     }
   }
 
@@ -70,7 +73,7 @@ export default function ProjectOpenQuestionsPanel({ projectId }: ProjectOpenQues
           ))}
         </ul>
       ) : (
-        <p className="text-xs text-zinc-600">No open questions right now.</p>
+        <p className="text-xs text-zinc-600">No open questions right now — add one whenever something needs resolving.</p>
       )}
 
       {resolved.length > 0 ? (

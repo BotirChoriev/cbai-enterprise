@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import type { Project } from "@/lib/project/project-types";
 import { deriveProjectProgress } from "@/lib/project/project-progress";
 import {
@@ -21,7 +20,6 @@ import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-clas
 
 type ProjectDashboardProps = {
   project: Project;
-  reportGeneratedThisSession: boolean;
 };
 
 function StatCard({ label, value }: { label: string; value: string }) {
@@ -59,16 +57,20 @@ function countMissingEvidence(project: Project): number {
  * Entities, Missing Evidence, Latest Notes, Workspace Status, Report Status. Every field is a
  * pass-through or one-line composition of already-real, already-computed values (the same
  * pattern proven by ResearchWorkspaceDashboard.tsx) — no new engine, never a fabricated value.
+ *
+ * Reads directly from the store on every render (no useState caching) so it reflects sibling
+ * panels' mutations immediately, within the same session — the platform should always know the
+ * real current state, per the Intelligence Guide Activation mission.
  */
-export default function ProjectDashboard({ project, reportGeneratedThisSession }: ProjectDashboardProps) {
+export default function ProjectDashboard({ project }: ProjectDashboardProps) {
   const { isEntityPinned } = usePlatformContext();
-  const [entities] = useState(() => loadProjectEntities(project.id));
-  const [notes] = useState(() => loadProjectNotes(project.id));
-  const [evidence] = useState(() => loadProjectEvidence(project.id));
-  const [questions] = useState(() => loadProjectQuestions(project.id));
-  const [missingEvidence] = useState(() => countMissingEvidence(project));
+  const entities = loadProjectEntities(project.id);
+  const notes = loadProjectNotes(project.id);
+  const evidence = loadProjectEvidence(project.id);
+  const questions = loadProjectQuestions(project.id);
+  const missingEvidence = countMissingEvidence(project);
 
-  const progress = deriveProjectProgress(project, reportGeneratedThisSession);
+  const progress = deriveProjectProgress(project);
   const openQuestions = questions.filter((q) => !q.resolved);
   const pinned = isEntityPinned("project", project.id);
 
@@ -117,7 +119,7 @@ export default function ProjectDashboard({ project, reportGeneratedThisSession }
         <div>
           <p className="text-[10px] uppercase tracking-wider text-zinc-600">Report status</p>
           <p className="mt-1 text-xs text-zinc-400">
-            {reportGeneratedThisSession ? "Generated this session" : "Not generated yet"}
+            {project.reportGeneratedAt ? `Generated ${new Date(project.reportGeneratedAt).toLocaleString()}` : "Not generated yet"}
           </p>
         </div>
         <div>
