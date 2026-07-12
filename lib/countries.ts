@@ -23,6 +23,8 @@ export type Country = {
   capital: string;
   /** Government form label from local registry reference. */
   government: string;
+  /** Official government web portal, when known — real, publicly verifiable, never fabricated. */
+  officialWebsite?: string;
 };
 
 /** Local country registry — reference profiles only, not external API data. */
@@ -34,6 +36,7 @@ export const countries: Country[] = [
     region: "Americas",
     capital: "Washington, D.C.",
     government: "Federal Presidential Constitutional Republic",
+    officialWebsite: "https://www.usa.gov",
   },
   {
     id: "china",
@@ -42,6 +45,7 @@ export const countries: Country[] = [
     region: "Asia",
     capital: "Beijing",
     government: "Single-Party Socialist Republic",
+    officialWebsite: "https://www.gov.cn",
   },
   {
     id: "uzbekistan",
@@ -50,6 +54,7 @@ export const countries: Country[] = [
     region: "Asia",
     capital: "Tashkent",
     government: "Presidential Republic",
+    officialWebsite: "https://www.gov.uz",
   },
   {
     id: "germany",
@@ -58,6 +63,7 @@ export const countries: Country[] = [
     region: "Europe",
     capital: "Berlin",
     government: "Federal Parliamentary Republic",
+    officialWebsite: "https://www.bundesregierung.de",
   },
   {
     id: "uae",
@@ -66,6 +72,7 @@ export const countries: Country[] = [
     region: "Middle East",
     capital: "Abu Dhabi",
     government: "Federal Absolute Monarchy",
+    officialWebsite: "https://u.ae",
   },
   {
     id: "japan",
@@ -74,6 +81,7 @@ export const countries: Country[] = [
     region: "Asia",
     capital: "Tokyo",
     government: "Unitary Parliamentary Constitutional Monarchy",
+    officialWebsite: "https://www.japan.go.jp",
   },
 ];
 
