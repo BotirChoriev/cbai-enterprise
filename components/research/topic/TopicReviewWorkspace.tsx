@@ -4,9 +4,11 @@ import { buildTopicEvidenceReview } from "@/lib/research/evidence/evidence-topic
 import { buildResearchReviewWorkspace } from "@/lib/research/intelligence/review-workspace-engine";
 import { deriveResearchReadiness } from "@/lib/research/readiness/readiness-engine";
 import type { WorkflowResult } from "@/lib/research/workflow/workflow-model";
+import { buildEntityRelationships } from "@/lib/entity/entity-relationships";
 import ResearchMissionWorkspace from "@/components/research/topic/ResearchMissionWorkspace";
 import TopicEvidenceReviewWorkflow from "@/components/research/topic/TopicEvidenceReviewWorkflow";
 import TopicEvidenceSelection from "@/components/research/topic/TopicEvidenceSelection";
+import ResearchNotesPanel from "@/components/research/topic/ResearchNotesPanel";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type TopicReviewWorkspaceProps = {
@@ -96,37 +98,11 @@ export default function TopicReviewWorkspace({ topic, workflow }: TopicReviewWor
         <TopicEvidenceSelection review={evidenceReview} />
       </Suspense>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className={`${cbaiGlassCard} space-y-2 p-4`}>
-          <p className={cbaiSectionEyebrow}>Research notes</p>
-          {workspace.notes.length > 0 ? (
-            <ul className="space-y-1.5">
-              {workspace.notes.map((note) => (
-                <li key={note.noteId} className="text-xs text-zinc-500">
-                  {note.body}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-xs text-zinc-600">No notes yet.</p>
-          )}
-        </div>
-
-        <div className={`${cbaiGlassCard} space-y-2 p-4`}>
-          <p className={cbaiSectionEyebrow}>Findings</p>
-          {workspace.findings.length > 0 ? (
-            <ul className="space-y-1.5">
-              {workspace.findings.map((finding) => (
-                <li key={finding.findingId} className="text-xs text-zinc-500">
-                  {finding.summary}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-xs text-zinc-600">No findings yet.</p>
-          )}
-        </div>
-      </div>
+      <ResearchNotesPanel
+        topicId={topic.topicId}
+        evidenceItems={evidenceReview.evidenceItems}
+        relatedEntities={buildEntityRelationships("research_topic", topic.topicId)}
+      />
 
       <div className={`${cbaiGlassCard} space-y-2 p-4`}>
         <p className={cbaiSectionEyebrow}>Open review questions</p>
