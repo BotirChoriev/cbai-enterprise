@@ -113,6 +113,18 @@ export const ASSISTANT_COMMANDS: readonly AssistantCommand[] = [
     href: "/analytics",
     keywords: ["generate report", "generate a report", "create report"],
   },
+  {
+    id: "create-project",
+    phrase: "Create Project",
+    href: "/my-work",
+    keywords: ["create project", "new project", "start a project"],
+  },
+  {
+    id: "open-project",
+    phrase: "Open Project",
+    href: "/my-work",
+    keywords: ["open project", "open projects", "my projects"],
+  },
 ] as const;
 
 export type AssistantCommandMatch =

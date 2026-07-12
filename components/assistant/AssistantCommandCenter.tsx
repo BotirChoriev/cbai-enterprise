@@ -12,6 +12,7 @@ import {
   resolveRelationshipCommand,
   type RelationshipFocus,
 } from "@/lib/assistant/assistant-relationship-commands";
+import { resolveProjectCommand } from "@/lib/project/project-commands";
 import { getResearchTopicById } from "@/lib/research/research-topics";
 import { getPrimaryEntity } from "@/lib/context";
 import Avatar from "@/components/shared/Avatar";
@@ -115,6 +116,19 @@ export default function AssistantCommandCenter() {
           router.push(relationshipMatch.href);
         }
         setConfirmation(relationshipMatch.message);
+        return;
+      }
+
+      // "Continue project"/"add evidence"/"open notes" operate on the real most-recently-updated
+      // project — the Command Center has no per-page project focus (see project-commands.ts).
+      const projectMatch = resolveProjectCommand(trimmed);
+      if (projectMatch) {
+        setUnrecognized(null);
+        setInput("");
+        if (projectMatch.type === "navigate") {
+          router.push(projectMatch.href);
+        }
+        setConfirmation(projectMatch.message);
         return;
       }
 
