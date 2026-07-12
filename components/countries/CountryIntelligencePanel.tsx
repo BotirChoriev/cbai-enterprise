@@ -4,10 +4,10 @@ import { useState } from "react";
 import type { Country } from "@/lib/countries";
 import type { CountryUserJourney } from "@/lib/country-user-journey";
 import { getCountryTimelineModel } from "@/lib/timeline";
-import { buildCountryReport } from "@/lib/country-report";
+import { buildEntityReport } from "@/lib/entity/entity-report";
 import CountryReportView from "@/components/countries/CountryReportView";
 import EvidenceComparisonPanel from "@/components/evidence-comparison/EvidenceComparisonPanel";
-import EntityOverviewSection from "@/components/shared/EntityOverviewSection";
+import EntityHeader from "@/components/shared/EntityHeader";
 import IntelligenceContextPanel from "@/components/shared/IntelligenceContextPanel";
 import EntityEvidenceSection from "@/components/shared/EntityEvidenceSection";
 import EntityCompareSection from "@/components/shared/EntityCompareSection";
@@ -71,7 +71,7 @@ export function CountryIntelligencePanel({
         />
       </div>
 
-      <EntityOverviewSection
+      <EntityHeader
         name={registryFacts.name}
         entityType="Country"
         country={registryFacts.name}
@@ -124,7 +124,12 @@ export function CountryIntelligencePanel({
         >
           {showReport ? "Hide report" : "Generate report"}
         </button>
-        {showReport ? <CountryReportView report={buildCountryReport(country, journey)} /> : null}
+        {showReport
+          ? (() => {
+              const report = buildEntityReport("country", country.id);
+              return report ? <CountryReportView report={report} /> : null;
+            })()
+          : null}
       </div>
 
       <EntityOptionalExploration>

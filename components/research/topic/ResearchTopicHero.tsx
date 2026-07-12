@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { ResearchTopic } from "@/lib/research/research-topics";
 import { RESEARCH_TOPIC_STATUS_LABELS } from "@/lib/research/research-topics";
+import { toResearchTopicEntity } from "@/lib/research-topic.adapter";
+import EntityHeader from "@/components/shared/EntityHeader";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 function statusBadgeClass(status: ResearchTopic["status"]): string {
@@ -45,16 +47,11 @@ export default function ResearchTopicHero({ topic }: ResearchTopicHeroProps) {
         <p className="max-w-3xl text-base leading-relaxed text-zinc-400">{topic.description}</p>
       </div>
 
-      <section aria-labelledby="topic-overview-heading" className="space-y-2">
-        <h2 id="topic-overview-heading" className="text-lg font-semibold text-zinc-100">
-          Overview
-        </h2>
-        <p className="text-sm leading-relaxed text-zinc-500">
-          This read-only catalog profile describes the research topic, its domain, and the
-          methods and evidence types that will matter when sources are connected. Human review
-          is required before any scientific claim supports a decision.
-        </p>
-      </section>
+      <EntityHeader entity={toResearchTopicEntity(topic)} />
+
+      <p className="text-sm leading-relaxed text-zinc-500">
+        Human review is required before any scientific claim on this topic supports a decision.
+      </p>
     </header>
   );
 }

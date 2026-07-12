@@ -3,10 +3,10 @@
 import { useState } from "react";
 import type { University } from "@/lib/universities";
 import type { UniversityUserJourney } from "@/lib/university-user-journey";
-import { buildUniversityReport } from "@/lib/university-report";
+import { buildEntityReport } from "@/lib/entity/entity-report";
 import UniversityReportView from "@/components/universities/UniversityReportView";
 import EvidenceComparisonPanel from "@/components/evidence-comparison/EvidenceComparisonPanel";
-import EntityOverviewSection from "@/components/shared/EntityOverviewSection";
+import EntityHeader from "@/components/shared/EntityHeader";
 import IntelligenceContextPanel from "@/components/shared/IntelligenceContextPanel";
 import UniversityIndicatorCoverage from "@/components/universities/UniversityIndicatorCoverage";
 import UniversitySourceCoverage from "@/components/universities/UniversitySourceCoverage";
@@ -55,7 +55,7 @@ export function UniversityIntelligencePanel({
         />
       </div>
 
-      <EntityOverviewSection
+      <EntityHeader
         name={registryFacts.name}
         entityType="University"
         country={registryFacts.country}
@@ -96,7 +96,12 @@ export function UniversityIntelligencePanel({
         >
           {showReport ? "Hide report" : "Generate report"}
         </button>
-        {showReport ? <UniversityReportView report={buildUniversityReport(university, journey)} /> : null}
+        {showReport
+          ? (() => {
+              const report = buildEntityReport("university", university.id);
+              return report ? <UniversityReportView report={report} /> : null;
+            })()
+          : null}
       </div>
 
       <EntityOptionalExploration>

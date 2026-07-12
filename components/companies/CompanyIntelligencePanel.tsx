@@ -3,10 +3,10 @@
 import { useState } from "react";
 import type { Company } from "@/lib/companies";
 import type { CompanyUserJourney } from "@/lib/company-user-journey";
-import { buildCompanyReport } from "@/lib/company-report";
+import { buildEntityReport } from "@/lib/entity/entity-report";
 import CompanyReportView from "@/components/companies/CompanyReportView";
 import EvidenceComparisonPanel from "@/components/evidence-comparison/EvidenceComparisonPanel";
-import EntityOverviewSection from "@/components/shared/EntityOverviewSection";
+import EntityHeader from "@/components/shared/EntityHeader";
 import IntelligenceContextPanel from "@/components/shared/IntelligenceContextPanel";
 import CompanyIndicatorCoverage from "@/components/companies/CompanyIndicatorCoverage";
 import CompanySourceCoverage from "@/components/companies/CompanySourceCoverage";
@@ -54,7 +54,7 @@ export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligen
         />
       </div>
 
-      <EntityOverviewSection
+      <EntityHeader
         name={registryFacts.name}
         entityType="Company"
         country={registryFacts.country}
@@ -104,7 +104,12 @@ export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligen
         >
           {showReport ? "Hide report" : "Generate report"}
         </button>
-        {showReport ? <CompanyReportView report={buildCompanyReport(company, journey)} /> : null}
+        {showReport
+          ? (() => {
+              const report = buildEntityReport("company", company.id);
+              return report ? <CompanyReportView report={report} /> : null;
+            })()
+          : null}
       </div>
 
       <EntityOptionalExploration>
