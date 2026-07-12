@@ -1102,6 +1102,46 @@ tests passing. Not browser-verified: real account creation, multi-device sync, a
 RLS isolation against a live Supabase project — none exists in this environment; see
 `docs/supabase-setup.md`. Full detail: `docs/product-activation-audit.md` §23.
 
+## v3.25 — Premium Interface + Global Language Foundation + Multilingual Voice Commands
+
+Migrates the first screen toward the approved concept and activates a real 4-language interface
+(English/Uzbek/Russian/Turkish) plus multilingual voice/text commands — reusing every existing
+engine, never a second Assistant/Command Center/Project Engine. No mockup image was present in
+this conversation; Phase 17's written palette spec served as the actual design reference.
+
+Real i18n foundation: one `TranslationDictionary` shape checked at compile time against all 4
+dictionaries; `useTranslation()` reads the existing `AssistantProfile.preferredLanguage` field
+(inherits its localStorage/cloud-profile persistence for free) rather than a second state system.
+HTML `lang`/`dir` sync post-hydration (real RTL preparation for the still-inactive Arabic entry).
+
+Found and fixed a real bug via the new test suite before it shipped: the mission's own worked
+example, "Oʻzbekistonni och," didn't resolve — the multilingual "open country" matchers checked
+only the English catalog name, and "Oʻzbekiston"/"Узбекистан"/"Özbekistan" are real different
+words, not transliterations. New `lib/i18n/country-names.ts` adds real localized names for all 6
+catalog countries. Multilingual command understanding extends the existing resolvers
+(`assistant-commands.ts`, `assistant-relationship-commands.ts`, `project-commands.ts`) with real
+Uzbek/Russian/Turkish phrases; new `lib/i18n/language-command.ts` resolves "change language"
+commands to a real, visibly-confirmed profile update.
+
+`AssistantCommandCenter` gained a real voice state machine (idle/requesting/listening/processing/
+permission-denied/network-error) driven by actual `SpeechRecognition` events, an honest
+unsupported-browser notice, and a `size="prominent"` variant (via `useId()`) for the new home-page
+command bar. Home page assembled from real pieces: prominent command bar, 11 Role/Work-Context
+cards (3 new `WorkspaceRole` values added: economist, legal, social_sector — no new data model),
+a Projects panel wrapping the existing `ProjectList`, and an Intelligence Feed reading only real
+Project activity and saved Reports (honest empty state otherwise — there is no news source in this
+architecture). Navigation simplified to the approved 7-item primary structure; a real mobile nav
+drawer was added (none existed before). Brand identity refreshed (not replaced): "UNIVERSAL
+INTELLIGENCE" subtitle, light/dark logo variant, new `app/icon.svg`, print-visible report headers.
+
+Found and fixed a real 404 during browser verification: `/reports` (named in the mission's own
+checklist) — added as a real alias for the existing `/analytics` Reports Center.
+
+New `scripts/test-global-interface.ts` — 27 tests, including the country-name bug catch. `npm run
+lint`/`build` clean, 92 routes (`/reports` is the one new route), 249 total tests passing. Not
+browser-verified: live voice recognition against a real microphone/browser. Full detail:
+`docs/product-activation-audit.md` §24.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation

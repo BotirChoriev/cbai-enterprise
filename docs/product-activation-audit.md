@@ -1715,3 +1715,88 @@ email confirmation, sign-in, multi-device sync, cross-account isolation under re
 and password reset end-to-end. Every claim above about these behaviors is a claim about the code
 that was written and its unit-test coverage — not a claim of live verification. See
 `docs/supabase-setup.md` for exactly what a deployer must do to verify these live.
+
+## 24. Premium Interface + Global Language Foundation + Multilingual Voice Commands
+
+Migrates the first-screen interface toward the approved concept, activates a real 4-language
+interface (English/Uzbek/Russian/Turkish), and extends the existing Command Center with
+multilingual voice/text commands — reusing every real engine (Project Engine, Command Center,
+Search, My Work, Reports, Personal Operator, Authentication) rather than duplicating any of them.
+
+**No visual mockup image was present in this conversation** — Phase 17's detailed palette spec
+(deep navy / midnight-blue / cyan / restrained indigo-violet / amber-for-economic-contexts) served
+as the actual design reference; this is stated plainly rather than claiming a visual comparison
+that didn't happen.
+
+**Real i18n foundation, not a fourth hardcoded interface**: `lib/i18n/dictionary-types.ts` defines
+one `TranslationDictionary` shape, checked at compile time against all 4 real dictionaries — a
+missing key in Uzbek/Russian/Turkish is a build error, not a silent gap. `useTranslation()` reads
+the *existing* `AssistantProfile.preferredLanguage` field rather than building a second state
+system, inheriting its localStorage/cloud-profile persistence for free. HTML `lang`/`dir` now sync
+post-hydration (real RTL preparation for the still-inactive Arabic entry).
+
+**Real bug found and fixed by the new test suite before it shipped**: the mission's own worked
+voice-command example, "Oʻzbekistonni och," did not resolve — the Uzbek/Turkish object-first
+matcher and the Russian prefix matcher both checked only the English catalog country name
+("Uzbekistan"), and "Oʻzbekiston"/"Узбекистан"/"Özbekistan" are real, different words, not
+transliterations. Added `lib/i18n/country-names.ts` with real localized names for all 6 catalog
+countries; `scripts/test-global-interface.ts` test 14b guards this going forward.
+
+**Multilingual command understanding extends the existing resolvers**, never a second assistant:
+`assistant-commands.ts`, `assistant-relationship-commands.ts`, and `project-commands.ts` each
+gained real Uzbek/Russian/Turkish phrase equivalents. English/Russian (verb-first) parameterized
+"open &lt;entity&gt;" commands use real prefix matching; Uzbek/Turkish (object-first,
+case-suffixed) use a real, honestly-simpler keyword-plus-catalog-substring check instead —
+documented as a deliberate simplification in `docs/voice-command-architecture.md`, not oversold as
+grammatical parsing. New `lib/i18n/language-command.ts` resolves "change interface/voice language"
+commands to a real profile update, confirmed visibly, never applied silently.
+
+**Real voice state machine**: `AssistantCommandCenter` now tracks idle/requesting/listening/
+processing/permission-denied/network-error from actual `SpeechRecognition` events (`onstart`,
+`onerror` with the real `event.error` value), not an assumed instant transition. Recognized speech
+is placed in the visible, editable input before routing. A `size="prominent"` variant (backed by a
+real `useId()` so two simultaneous mounts never collide) serves the new home-page command bar
+without duplicating any logic.
+
+**Home page assembled from real pieces**: `HomeCommandBar` (the same `AssistantCommandCenter`,
+prominent), `RoleWorkContextCards` (11 personas mapped onto the existing `WorkspaceRole` enum —
+3 new values added: economist, legal, social_sector — and the existing `ProjectTypeId` catalog;
+selecting a card sets one existing profile field, no new data model), `HomeProjectsSection` (wraps
+the existing `ProjectList` — no second project summary), `HomeIntelligenceFeed` (reads only real
+Project activity and saved Reports from this browser; the mission's exact honest empty-state copy
+when there is nothing yet — there is no global "news" source in this architecture, so a feed
+claiming otherwise would be fabricated). `HomeAssistantGreeting` now shows a real neutral welcome
+when signed out (previously rendered nothing) and the translated greeting template when signed in.
+
+**Navigation simplified** to the approved 7-item primary structure (Home/My Work/Search/Explore/
+Reports/Trust/Settings); Government/Investor/Citizen and the advanced Intelligence modules move to
+a real "More" group — still real routes, still one click away, never deleted. A real mobile
+navigation drawer was added (none existed before this mission).
+
+**Brand identity refreshed, not replaced**: the existing `CBAILogo`/`CBAIMark` (a genuinely
+well-formed circular network mark) gained the required "UNIVERSAL INTELLIGENCE" subtitle, a
+light/dark variant, explicit accessible names for icon-only usage, a new `app/icon.svg` favicon,
+and a print-visible CBAI header on all 5 report types (previously invisible once print CSS hides
+the app chrome — a real gap found while working through the "report headers" requirement).
+
+**A real 404 found and fixed during browser verification**: `/reports` (named directly in the
+mission's own Phase 22 checklist) returned 404 — "Reports" has always lived at `/analytics`. Added
+`/reports` as a real alias rendering the same `ReportsCenter`, rather than changing the existing,
+already-linked `/analytics` route.
+
+**Accessibility**: targeted, not exhaustive — semantic `<details>/<summary>` language selector,
+real focus-visible states, voice-status announcements via `role="alert"`/`role="status"`, real
+`useId()`-based labels, RTL preparation, touch-target fixes (two buttons had a CSS-source-order-
+dependent `min-h-8` override that could silently defeat the real 40px `min-h-10` base class —
+found and removed). Not attempted: full keyboard-trap sweep, exhaustive contrast measurement,
+real assistive-technology testing.
+
+**Tests**: new `scripts/test-global-interface.ts` — 27 tests (22 required areas plus a few
+sub-cases), including the real bug found in test 14b. 27/27 passing, alongside the unchanged 222 —
+**249 tests overall**. `npm run build` clean, 92 routes (`/reports` is the one new route).
+`next dev` + curl verification: all Phase-22-listed routes return 200, no console/server errors.
+
+**Not browser-verified**: live voice recognition against a real microphone/browser (permission
+prompts, recognition accuracy for Uzbek speech specifically, real per-browser `onerror` payloads),
+and a visual side-by-side comparison against an actual mockup image (none was provided in this
+conversation). See `docs/voice-browser-compatibility.md` and `docs/known-limitations.md`.

@@ -820,3 +820,34 @@ cloud-synced). Trust Center corrected again (no longer claims "no server"/"no cr
 gained a real Account Deletion statement. 22 new tests, 222 total passing, 92 routes. Not
 browser-verified against a live Supabase project (none exists in this environment) — see
 `docs/supabase-setup.md`. Full detail: `docs/product-activation-audit.md` §23.
+
+## Premium Interface + Global Language Foundation + Multilingual Voice Commands
+
+Migrates the first screen toward the approved concept and activates a real 4-language interface
+(English/Uzbek/Russian/Turkish) plus multilingual voice/text commands, reusing every existing
+engine — no second Assistant, Command Center, Project Engine, Search, My Work, or Reports system.
+No mockup image was present in this conversation; Phase 17's written palette spec (deep navy /
+midnight-blue / cyan / restrained accents) served as the real design reference instead.
+
+Real i18n foundation: one compile-time-checked `TranslationDictionary` shape across all 4
+languages; `useTranslation()` reads the existing `AssistantProfile.preferredLanguage` (inherits its
+persistence for free, no second state system); HTML `lang`/`dir` sync post-hydration. Found and
+fixed a real bug via the new test suite before shipping: multilingual "open country" commands
+checked only the English catalog name, so the mission's own worked Uzbek example never resolved —
+added real localized country names (`lib/i18n/country-names.ts`) for all 6 catalog countries.
+Extended the existing command resolvers with real Uzbek/Russian/Turkish phrases (never a second
+command system); added a real "change language" voice/text command; gave
+`AssistantCommandCenter` a real voice state machine (idle/requesting/listening/processing/
+permission-denied/network-error) driven by actual `SpeechRecognition` events.
+
+Home page assembled from real pieces: prominent command bar, 11 Role/Work-Context cards (3 new
+`WorkspaceRole` values, no new data model), a Projects panel wrapping the existing `ProjectList`,
+and an Intelligence Feed reading only real Project activity and saved Reports (honest empty state
+otherwise). Navigation simplified to the approved 7-item structure; real mobile nav drawer added.
+Brand refreshed (not replaced): "UNIVERSAL INTELLIGENCE" subtitle, light/dark logo variant, new
+`app/icon.svg`, print-visible report headers. Found and fixed a real 404 (`/reports`, named in the
+mission's own checklist) by adding it as a real alias for the existing `/analytics` Reports Center.
+
+27 new tests (`scripts/test-global-interface.ts`), 249 total passing, 92 routes. Not
+browser-verified: live voice recognition against a real microphone/browser. Full detail:
+`docs/product-activation-audit.md` §24.
