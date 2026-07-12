@@ -1,6 +1,11 @@
+"use client";
+
+import { useState } from "react";
 import type { Country } from "@/lib/countries";
 import type { CountryUserJourney } from "@/lib/country-user-journey";
 import { getCountryTimelineModel } from "@/lib/timeline";
+import { buildCountryReport } from "@/lib/country-report";
+import CountryReportView from "@/components/countries/CountryReportView";
 import EvidenceComparisonPanel from "@/components/evidence-comparison/EvidenceComparisonPanel";
 import EntityOverviewSection from "@/components/shared/EntityOverviewSection";
 import IntelligenceContextPanel from "@/components/shared/IntelligenceContextPanel";
@@ -16,12 +21,16 @@ import TimelineMethodology from "@/components/timeline/TimelineMethodology";
 import TimelineHumanReview from "@/components/timeline/TimelineHumanReview";
 import CountryIndicatorCoverage from "@/components/countries/CountryIndicatorCoverage";
 import CountrySourceCoverage from "@/components/countries/CountrySourceCoverage";
+import CountryRelatedResearch from "@/components/countries/CountryRelatedResearch";
+import CountryMethodology from "@/components/countries/CountryMethodology";
+import CountryTrustSection from "@/components/countries/CountryTrustSection";
 import { EntityReportsAvailable } from "@/components/shared/EntityDecisionPackagePreview";
 import {
   countConnectedSources,
   getConnectedAvailableItems,
 } from "@/components/shared/entity-profile-copy";
 import { getCountryRelationships } from "@/lib/countries.adapter";
+import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 
 type CountryIntelligencePanelProps = {
   journey: CountryUserJourney;
@@ -34,6 +43,7 @@ export function CountryIntelligencePanel({
   country,
   searchQuery,
 }: CountryIntelligencePanelProps) {
+  const [showReport, setShowReport] = useState(false);
   const { profile, evidenceGaps, evidenceComparison } = journey;
   const { registryFacts, coverage } = profile;
   const sourceConnectedCount = countConnectedSources(coverage);
@@ -50,6 +60,17 @@ export function CountryIntelligencePanel({
         </p>
       ) : null}
 
+      <div className="flex justify-end">
+        <SaveToWorkspaceButton
+          entity={{
+            kind: "country",
+            id: country.id,
+            name: country.name,
+            code: country.code,
+          }}
+        />
+      </div>
+
       <EntityOverviewSection
         name={registryFacts.name}
         entityType="Country"
@@ -57,7 +78,14 @@ export function CountryIntelligencePanel({
         region={registryFacts.region}
         subtitle={`${registryFacts.code} · ${registryFacts.capital}`}
         availableInformation={registryFacts.sourceLabel}
-        facts={[{ label: "Government", value: registryFacts.government }]}
+        facts={[
+          { label: "Government", value: registryFacts.government },
+          {
+            label: "Official website",
+            value: country.officialWebsite ?? "No verified information available.",
+            href: country.officialWebsite,
+          },
+        ]}
       />
 
       <IntelligenceContextPanel
@@ -84,7 +112,20 @@ export function CountryIntelligencePanel({
 
       <TimelineReadinessPanel model={timelineModel} />
 
+      <CountryRelatedResearch country={country} />
+
       <EntityReportsAvailable reports={journey.reports} entityLabel="country" />
+
+      <div className="space-y-4">
+        <button
+          type="button"
+          onClick={() => setShowReport((current) => !current)}
+          className="inline-flex items-center gap-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-300 transition-colors hover:border-cyan-500/50"
+        >
+          {showReport ? "Hide report" : "Generate report"}
+        </button>
+        {showReport ? <CountryReportView report={buildCountryReport(country, journey)} /> : null}
+      </div>
 
       <EntityOptionalExploration>
         <EntityCompareSection>
@@ -98,6 +139,10 @@ export function CountryIntelligencePanel({
         <CountryIndicatorCoverage indicatorsByDomain={coverage.indicatorsByDomain} />
 
         <CountrySourceCoverage sources={coverage.sources} />
+
+        <CountryMethodology />
+
+        <CountryTrustSection pillars={profile.trustPillars} neutralityNotice={profile.neutralityNotice} />
 
         <div className="space-y-4">
           <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">
