@@ -750,3 +750,20 @@ everywhere they appeared live, including all 65 Research Topic pages. Five real 
 (entity not found, project missing, search empty, relationship missing) now explain what happened,
 why, and what to do next. 15 new tests, 157 total passing. Full detail:
 `docs/product-activation-audit.md` §19.
+
+## Data Activation Layer (EPIC 2)
+
+Maximized real connected information from the existing local catalog only — no fabrication. The
+"obvious" relationships the mission named (Company↔Country, University↔Country, Company↔Research)
+were already fully connected by prior missions; verified this with real counts (190 relationships
+across the catalog) rather than assuming. Country↔Research and University↔Research have no real
+connecting field anywhere in the catalog — confirmed rather than guessed, and University gained
+the same honest "not connected" statement Country already had, instead of a fabricated link. The
+biggest real find: 22 real "expected future" sentences in the indicator domain catalog that were
+never rendered anywhere — now shown as "Expected Future Sources" on every Country/Company/
+University profile and report. Reports gained real per-source Connected/Missing Evidence name
+lists (previously only a count). Search results now show a real "X of Y sources connected" label
+per result instead of a hardcoded "Available now." Compare pages fixed generic "First profile"/
+"Second profile" labels and a misleading "Shared sources" metric that didn't actually mean
+connected evidence. 14 new tests, 171 total passing. Full detail:
+`docs/product-activation-audit.md` §20.

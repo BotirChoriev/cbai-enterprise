@@ -981,6 +981,38 @@ New `scripts/test-production-readiness.ts` — 15 tests. `npm run lint` clean, `
 routes, 157 total tests passing (15 + 12 + 15 + 12 + 10 + 13 + 14 + 12 + 15 + 28 + 11). Full
 detail: `docs/product-activation-audit.md` §19.
 
+## v3.21 — Data Activation Layer (EPIC 2)
+
+Maximized real connected information using only the existing local catalog — no fabrication, no
+scraping, no invented values. Investigated every "obvious" relationship the mission named
+(Company↔Country, University↔Country, Company↔Research, Research↔Company) and confirmed they were
+already fully connected by prior missions' Knowledge Graph work (190 real relationships across the
+catalog). Country↔Research and University↔Research were confirmed to have no real connecting field
+anywhere in the catalog — rather than invent a cross-taxonomy mapping, University gained the same
+honest "not connected" statement Country already had (`UniversityRelatedResearch.tsx`).
+
+The highest-value find: `INDICATOR_DOMAIN_CATALOG`'s real `futureExpansion` field — 22 real,
+domain-specific sentences that existed since the indicator framework was built but were never
+rendered anywhere. New `EntityFutureSources.tsx` surfaces this as "Expected Future Sources" on
+every Country/Company/University profile and report. Reports gained real, per-source
+`connectedSourceNames`/`missingSourceNames` breakdowns (previously only an aggregate count),
+rendered as clearly separated "Connected Evidence"/"Missing Evidence" lists. Search results
+previously showed a hardcoded "Available now" for every result regardless of real coverage — now
+compute a real "X of Y sources connected" label from each entity's already-real coverage profile
+before the user opens it. Compare pages fixed two real, audit-flagged issues: generic "First
+profile"/"Second profile" labels replaced with real entity names, and the misleading "Shared
+sources" metric relabeled "Shared source references" with an explicit caption that it is not a
+claim of available evidence.
+
+Real counts: 6 countries / 8 companies / 8 universities / 64 research topics; every entity has
+exactly 1 of its real sources connected (the local registry itself) — 22 of 182 total
+country+company+university sources, unchanged by this mission since no new source was fabricated
+or connected. The real change is visibility of already-real, previously-hidden data.
+
+New `scripts/test-data-activation.ts` — 14 tests, including a real aggregate-count assertion.
+`npm run lint` clean, `npm run build` 91 routes, 171 total tests passing (14 + 15 + 12 + 15 + 12 +
+10 + 13 + 14 + 12 + 15 + 28 + 11). Full detail: `docs/product-activation-audit.md` §20.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation

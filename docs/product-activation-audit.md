@@ -1376,3 +1376,62 @@ harness has no DOM; these assert against the actual shipped source and the real 
 12 + 15 + 12 + 10 + 13 + 14 + 12 + 15 + 28 + 11 = 142 total — **157 tests overall**. `npm run
 build` clean, 91 routes. Full detail: this section. Zero new features, zero layout changes, zero
 fabricated data.
+
+## 20. Data Activation Layer (EPIC 2)
+
+Response to "maximize the amount of REAL connected information available using the existing local
+catalog" — reuse only, no fabrication, no scraping. Investigated every catalog
+(Countries/Companies/Universities/Research/Evidence/Trust/Reports) before writing anything, and
+found the "obvious" relationships the mission named (Company↔Country, University↔Country,
+Company↔Research, Research↔Company) were **already fully connected** by prior missions' Knowledge
+Graph work — verified by tracing `buildEntityRelationships` through to `graph.builder.ts` and
+confirming real counts (190 relationships across the catalog; every US-based company and
+university resolves a real Country edge; every company with a real industry-keyword match to a
+research topic resolves it bidirectionally). Country↔Research and University↔Research were
+investigated and confirmed to have **no real connecting field anywhere in the catalog** — Country
+has no industry-equivalent categorical field, and no research topic references a country; a prior
+mission had already reached the same conclusion for Country (`CountryRelatedResearch.tsx`'s own
+comment). Rather than invent a cross-taxonomy mapping (indicator domain slugs vs. `ResearchDomainId`
+don't literally match) to manufacture a connection, this stayed honestly unconnected — for
+University, added the same honest "not connected" statement Country already had (parity, not a new
+capability): new `UniversityRelatedResearch.tsx`.
+
+The highest-value real find: `INDICATOR_DOMAIN_CATALOG`'s `futureExpansion` field — 22 real,
+already-written, domain-specific sentences ("Subnational governance and regulatory agency
+indicators.", etc.) that had existed since the indicator framework was built but were **never
+rendered anywhere in the UI**. New `components/shared/EntityFutureSources.tsx` surfaces this real
+data as "Expected Future Sources" on every Country/Company/University profile page and report.
+
+Country/Company/University Reports previously showed only a single aggregate "Evidence" line
+(counts only). `country-report.ts`/`company-report.ts`/`university-report.ts` now also expose the
+real, already-computed per-source name lists split by actual status — `connectedSourceNames`/
+`missingSourceNames` — rendered as two clearly separated lists ("Connected Evidence" / "Missing
+Evidence") in each report view, plus the same real `EntityFutureSources` ("Future Evidence").
+
+Search results previously showed a hardcoded `evidenceStatus: "Available now"` for every single
+result regardless of actual coverage — genuinely misleading for "how much information exists
+before opening." New `resolveCoverageLabel` in `lib/search-intelligence-entry.ts` computes a real
+"X of Y sources connected" (or "X of Y evidence items connected" for research topics) from each
+entity's already-real coverage profile, rendered on every search result card via a new
+`coverageLabel` field.
+
+Compare pages fixed two real, previously-audit-flagged issues: "First profile"/"Second profile"
+generic labels replaced with the real entity names already available in the same component; and
+"Shared sources" (which counted sources *expected* by both profiles, not necessarily connected —
+confirmed by tracing `comparison-builder.ts`'s `collectSources`) relabeled "Shared source
+references" with an explicit caption stating it is not a claim that evidence is available from
+all of them — directly satisfying "never imply unavailable evidence exists."
+
+**Real counts** (computed and asserted by the new test suite, not estimated): 6 countries / 8
+companies / 8 universities / 64 research topics in the catalog; 190 total relationships; every
+entity has exactly 1 of its real sources connected (the local registry itself) — 22 of 182 total
+country+company+university sources. These connected/total ratios did not change (no new source
+was fabricated or connected) — the real change is *visibility*: previously-computed, previously-
+invisible real data (future-expansion notes, per-source connected/missing breakdowns, coverage
+labels, an honest University research statement) is now shown.
+
+**Tests**: new `scripts/test-data-activation.ts` — 14 tests, including a real aggregate-count
+assertion mirroring the mission's own "count connected countries/companies/universities/research/
+relationships" request. 14/14 passing, alongside the unchanged 15 + 12 + 15 + 12 + 10 + 13 + 14 +
+12 + 15 + 28 + 11 = 157 total — **171 tests overall**. `npm run build` clean, 91 routes. Full
+detail: this section. Zero fabricated data; zero new pages; zero new architecture.
