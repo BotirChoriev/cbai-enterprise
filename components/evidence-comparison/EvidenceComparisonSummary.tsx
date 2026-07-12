@@ -26,16 +26,16 @@ export default function EvidenceComparisonSummary({ comparison }: EvidenceCompar
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-4">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-            First profile
+          <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-zinc-600" title={comparison.leftEntityLabel}>
+            {comparison.leftEntityLabel} — connected
           </p>
           <p className="mt-2 font-mono text-2xl font-semibold text-zinc-100">
             {comparison.leftAvailableEvidence.length}
           </p>
         </div>
         <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-4">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-            Second profile
+          <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-zinc-600" title={comparison.rightEntityLabel}>
+            {comparison.rightEntityLabel} — connected
           </p>
           <p className="mt-2 font-mono text-2xl font-semibold text-zinc-100">
             {comparison.rightAvailableEvidence.length}
@@ -51,13 +51,18 @@ export default function EvidenceComparisonSummary({ comparison }: EvidenceCompar
         </div>
         <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-4">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-            Shared sources
+            Shared source references
           </p>
           <p className="mt-2 font-mono text-2xl font-semibold text-zinc-100">
             {comparison.sharedSources.length}
           </p>
         </div>
       </div>
+      <p className="text-xs text-zinc-600">
+        &quot;Connected&quot; counts are official sources actually linked for that profile.
+        &quot;Shared source references&quot; counts sources expected by both profiles — connected
+        or not; it is not a claim that evidence is available from all of them.
+      </p>
     </div>
   );
 }
