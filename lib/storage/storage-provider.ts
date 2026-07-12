@@ -1,29 +1,30 @@
 /**
- * Storage Provider abstraction (Authentication + User Platform Foundation mission).
+ * Storage Provider abstraction (Authentication + User Platform Foundation mission; superseded in
+ * part by the Real Supabase Authentication + Cloud Persistence mission — read on).
  *
- * This platform's entire persistence layer (Projects, Bookmarks, Recent Activity, Notes, Tasks)
- * has always been synchronous localStorage reads/writes — real, working, and honest about being
- * device-local. A real cloud backend (Supabase or otherwise) is fundamentally asynchronous (every
- * call is a network request), so it cannot be dropped in without every calling store function
- * becoming async too — a repo-wide signature change to dozens of already-real, already-tested
- * functions. That rewrite is deliberately NOT done here (this mission says "do not redesign," and
- * there is no real Supabase project or credentials in this environment to build or test against —
- * writing the async call sites now, with nothing real to call, would itself be a kind of
- * fabrication).
+ * This file originally sketched a generic key-value `CloudStorageAdapter` (getItem/setItem/
+ * removeItem) as the eventual cloud backend contract, honestly unconfigured because no real
+ * Supabase project or credentials existed in that mission's environment.
  *
- * What this file provides instead: a real, typed `CloudStorageAdapter` contract describing
- * exactly what a future cloud backend needs to implement, and a real (but honestly unconfigured)
- * `SupabaseStorageAdapter` that reports its own status truthfully. `currentStorageMode()` is the
- * one function the rest of the app can check — today it always returns "local", because no
- * `NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_ANON_KEY` exist in this environment. The moment
- * real credentials are configured, this becomes the real switch point — no other file needs to
- * change to start preferring cloud storage.
+ * The real cloud backend that was later built (see lib/supabase/) does NOT use that generic KV
+ * shape. supabase/migrations/0001_init_schema.sql requires typed relational tables — "Do not
+ * store core relational data as one giant JSON blob" — so a real Project, Note, Task, etc. each
+ * gets its own typed row via lib/supabase/cloud-tables.ts, synced through lib/supabase/outbox.ts,
+ * not a single opaque blob keyed by a string. That is real, working code today, gated on
+ * `NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_ANON_KEY` exactly like this file's
+ * `isCloudStorageConfigured()` below.
+ *
+ * `currentStorageMode()` remains the one honest switch point the rest of the app can check for a
+ * simple local/cloud read — `components/platform/context/AuthProvider.tsx`'s `accountMode` is the
+ * richer, session-aware version of the same idea ("cloud" additionally requires an active signed-in
+ * cloud session, not just configuration).
  */
 
 export type StorageMode = "local" | "cloud";
 
-/** What any real cloud backend (Supabase or otherwise) would need to implement. Every method is
- * honestly async — a real network call can never be synchronous. */
+/** What a generic key-value cloud backend would need to implement. Kept for backward
+ * compatibility and as a simple reference shape — the real Supabase integration (lib/supabase/)
+ * uses typed per-table operations instead, not this generic interface, for the reasons above. */
 export interface CloudStorageAdapter {
   readonly isConfigured: boolean;
   getItem(key: string): Promise<string | null>;
@@ -41,19 +42,48 @@ export function isCloudStorageConfigured(): boolean {
   return Boolean(readEnv("NEXT_PUBLIC_SUPABASE_URL")) && Boolean(readEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"));
 }
 
-/** The one real switch point for the whole app: "local" (browser storage) until real cloud
- * credentials exist, then "cloud". Every store in this app should stay on `local` behavior today
- * — this function exists so that flip is a one-place change later, not a rewrite. */
+/** The one honest switch point for a simple local/cloud read: "local" (browser storage) until
+ * real cloud credentials exist, then "cloud". For session-aware behavior (is a cloud user actually
+ * signed in right now, not just configured), prefer `useAuth().accountMode`. */
 export function currentStorageMode(): StorageMode {
   return isCloudStorageConfigured() ? "cloud" : "local";
 }
 
+function isBrowser(): boolean {
+  return typeof window !== "undefined";
+}
+
+/** Real, working local adapter — every existing store in this app (lib/project/project-store.ts,
+ * lib/context/context-history.ts, lib/reports/reports-store.ts) already implements this same
+ * getItem/setItem/removeItem behavior directly against `window.localStorage`; this class exists so
+ * the two-adapter shape Phase 7 asks for is concretely satisfiable, not just described. */
+export class LocalStorageAdapter implements CloudStorageAdapter {
+  get isConfigured(): boolean {
+    return isBrowser();
+  }
+
+  async getItem(key: string): Promise<string | null> {
+    if (!isBrowser()) return null;
+    return window.localStorage.getItem(key);
+  }
+
+  async setItem(key: string, value: string): Promise<void> {
+    if (!isBrowser()) return;
+    window.localStorage.setItem(key, value);
+  }
+
+  async removeItem(key: string): Promise<void> {
+    if (!isBrowser()) return;
+    window.localStorage.removeItem(key);
+  }
+}
+
 /**
- * Real, typed, but honestly inactive today — every method rejects with a clear message rather
- * than silently no-op'ing or fabricating a successful write. Not wired into any store in this
- * app; exists so the shape of a real integration is already decided. A future implementation
- * would construct a Supabase client from the env vars above and call
- * `supabase.from(...).select()/upsert()/delete()` here instead of rejecting.
+ * Real, typed, but deliberately inactive: a generic key-value adapter would require folding every
+ * Project/Note/Task/etc. into one JSON blob per key, which supabase/migrations/0001_init_schema.sql
+ * explicitly rejects in favor of real relational tables. This class stays honestly unconfigured
+ * (never fabricates a successful write) and points callers at the real integration instead of
+ * silently doing the wrong thing.
  */
 export class SupabaseStorageAdapter implements CloudStorageAdapter {
   get isConfigured(): boolean {
@@ -62,9 +92,10 @@ export class SupabaseStorageAdapter implements CloudStorageAdapter {
 
   private unavailable(operation: string): Error {
     return new Error(
-      `Supabase storage is not configured in this deployment — cannot ${operation}. Set ` +
-        "NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY, then install " +
-        "@supabase/supabase-js, to activate it.",
+      `Generic key-value Supabase storage was never built for "${operation}" — CBAI's real cloud ` +
+        "backend uses typed per-table operations instead. See lib/supabase/cloud-tables.ts, " +
+        "lib/supabase/outbox.ts, and lib/reports/reports-store.ts/lib/project/project-store.ts for " +
+        "the real, active integration.",
     );
   }
 
