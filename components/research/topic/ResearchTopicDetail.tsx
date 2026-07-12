@@ -20,6 +20,7 @@ import EvidenceLifecyclePanel from "@/components/research/topic/EvidenceLifecycl
 import SupportingCounterEvidencePanel from "@/components/research/topic/SupportingCounterEvidencePanel";
 import ResearchWorkspaceActivity from "@/components/research/topic/ResearchWorkspaceActivity";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
+import CreateProjectFromEntityButton from "@/components/project/CreateProjectFromEntityButton";
 import { deriveResearchWorkflow } from "@/lib/research/workflow/workflow-engine";
 import { buildEntityReport } from "@/lib/entity/entity-report";
 import { buildTopicEvidenceReview } from "@/lib/research/evidence/evidence-topic-builder";
@@ -44,7 +45,8 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
     >
       <ResearchTopicHero topic={topic} />
 
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
+        <CreateProjectFromEntityButton entity={{ kind: "research_topic", id: topic.topicId, name: topic.topicName }} />
         <SaveToWorkspaceButton entity={{ kind: "research_topic", id: topic.topicId, name: topic.topicName }} />
       </div>
 

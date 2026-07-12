@@ -31,6 +31,7 @@ import {
 } from "@/components/shared/entity-profile-copy";
 import { getCountryRelationships } from "@/lib/countries.adapter";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
+import CreateProjectFromEntityButton from "@/components/project/CreateProjectFromEntityButton";
 
 type CountryIntelligencePanelProps = {
   journey: CountryUserJourney;
@@ -60,7 +61,8 @@ export function CountryIntelligencePanel({
         </p>
       ) : null}
 
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
+        <CreateProjectFromEntityButton entity={{ kind: "country", id: country.id, name: country.name, code: country.code }} />
         <SaveToWorkspaceButton
           entity={{
             kind: "country",

@@ -24,6 +24,7 @@ import CompanyRelatedResearch from "@/components/companies/CompanyRelatedResearc
 import CompanyMethodology from "@/components/companies/CompanyMethodology";
 import CompanyTrustSection from "@/components/companies/CompanyTrustSection";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
+import CreateProjectFromEntityButton from "@/components/project/CreateProjectFromEntityButton";
 
 type CompanyIntelligencePanelProps = {
   journey: CompanyUserJourney;
@@ -42,7 +43,8 @@ export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligen
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
+        <CreateProjectFromEntityButton entity={{ kind: "company", id: company.id, name: company.name, code: company.icon, countryName: company.country }} />
         <SaveToWorkspaceButton
           entity={{
             kind: "company",
