@@ -951,6 +951,36 @@ routes, 142 total tests passing (12 + 15 + 12 + 10 + 13 + 14 + 12 + 15 + 28 + 11
 Core files touched; no new pages; no new chatbot; nothing removed. Full detail:
 `docs/product-activation-audit.md` §18.
 
+## v3.20 — Trust & Production Polish (EPIC 1)
+
+Response to a browser-based, 7-persona product audit that found real launch blockers: any broken
+URL fell through to the generic Next.js 404; the Trust page and Home footer rendered a literal
+internal dev string (`Build elite-home-final · Final Home Architecture`) to every visitor;
+"Agents" sat in primary navigation promising something that immediately disclosed as
+non-functional after the click; and several live pages used raw engineering words in place of
+product language. No new features, no layout changes — every fix replaces something broken or
+unprofessional with something real.
+
+New `components/system/SystemPageShell.tsx` backs a branded root `app/not-found.tsx`,
+`app/(dashboard)/error.tsx`, `app/error.tsx`, and a deliberately minimal `app/global-error.tsx` —
+each offers Return Home, Go Back, Search, Continue Project (when one exists), and Feedback,
+verified against the real production `out/404.html`, not just `next dev`. `PLATFORM_BUILD`/
+`PLATFORM_EVOLUTION_PHASE` were deleted outright; Trust Center restructured around Methodology,
+Verification Model, Evidence Policy, Data Sources, Known Limitations, and a new Transparency
+Statement. "Agents" removed from primary navigation (self-disclosed as non-functional after the
+click); `/core` and `/workflows` were confirmed already unreachable from any real navigation.
+Engineering words ("Runtime," "Pipeline," "Architecture") replaced with production language on
+every live page they appeared on, including all 65 Research Topic pages' "Pipeline stages run"
+stat label. Five components confirmed completely unreachable from any page were left untouched.
+
+Five real recoverable states — entity not found (new `EntityNotFoundNotice`, wired into
+Countries/Companies/Universities), Project missing, Search empty, and Relationship missing — now
+explain what happened, why, and what to do next instead of a bare "not found."
+
+New `scripts/test-production-readiness.ts` — 15 tests. `npm run lint` clean, `npm run build` 91
+routes, 157 total tests passing (15 + 12 + 15 + 12 + 10 + 13 + 14 + 12 + 15 + 28 + 11). Full
+detail: `docs/product-activation-audit.md` §19.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation

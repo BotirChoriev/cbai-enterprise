@@ -734,3 +734,19 @@ project evidence`. Fixed two real, previously-dead gaps: `ContextualOperatorBann
 mounted on `/my-work` (its "project" case was unreachable), and `ProjectDashboard` cached its
 reads at mount so sibling panels' edits never updated it within the same session — both fixed. 12
 new tests, 142 total passing. Full detail: `docs/product-activation-audit.md` §18.
+
+## Trust & Production Polish (EPIC 1)
+
+Fixed every launch blocker a 7-persona browser audit found, with no new features and no layout
+changes. Any broken URL now gets a real, branded CBAI 404/error page (Return Home, Go Back,
+Search, Continue Project, Feedback) instead of the generic Next.js default — verified against the
+actual production `out/404.html`, not just dev mode. The Trust page and Home footer no longer show
+an internal dev build string; Trust Center is restructured around Methodology, Verification Model,
+Evidence Policy, Data Sources, Known Limitations, and a Transparency Statement. "Agents" was
+removed from primary navigation since it self-disclosed as non-functional immediately after the
+click; `/core` and `/workflows` were confirmed already unreachable from any real navigation.
+Engineering words ("Runtime," "Pipeline," "Architecture") were replaced with production language
+everywhere they appeared live, including all 65 Research Topic pages. Five real recoverable states
+(entity not found, project missing, search empty, relationship missing) now explain what happened,
+why, and what to do next. 15 new tests, 157 total passing. Full detail:
+`docs/product-activation-audit.md` §19.

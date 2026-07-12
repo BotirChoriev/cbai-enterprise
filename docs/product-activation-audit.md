@@ -1306,3 +1306,73 @@ checklist of remaining steps) — Project Health's checklist already covers "wha
 for a user who wants the fuller picture. No new "Activity feed" beyond the existing Timeline panel
 was built — the mission's Timeline example (create → evidence → notes → report) is exactly what the
 Report Engine's real event list already produces.
+
+## 19. Trust & Production Polish (EPIC 1)
+
+Response to a browser-based product audit (7 personas, no code reading) that found real, verified
+launch blockers: any broken URL fell through to the generic, unbranded Next.js 404; the Trust
+page and Home footer rendered a literal internal dev string (`Build elite-home-final · Final Home
+Architecture`) to every visitor; "Agents" sat in primary navigation promising something that
+immediately disclosed as non-functional after the click; and several live pages used raw
+engineering words ("Runtime," "Pipeline," "Architecture") in place of product language. This
+mission fixed exactly those, made zero new features, and changed no layout.
+
+**System pages (Part A)**: new `components/system/SystemPageShell.tsx` — real CBAI branding and
+five recovery actions (Return Home, Go Back, Search, Continue Project when one exists, Feedback) —
+backs a new root `app/not-found.tsx`, `app/(dashboard)/error.tsx`, `app/error.tsx`, and a
+deliberately minimal, dependency-free `app/global-error.tsx` (must assume nothing works, per
+Next's own guidance, since it replaces the root layout on a crash there). Verified against the
+*actual* production static export (`out/404.html`), not just `next dev` — confirmed the real
+production 404 experience changed from a blank, unbranded page to a branded one with a way back.
+The existing research-topic `not-found.tsx` was upgraded onto the same shell. A real
+`OfflineBanner` (genuine `navigator.onLine`/`online`/`offline` events) was added to the dashboard
+layout.
+
+**Trust Center (Part B)**: `PLATFORM_BUILD`/`PLATFORM_EVOLUTION_PHASE` deleted outright — they had
+exactly two consumers (Trust page, Home footer), both fixed. Trust restructured around Methodology,
+Verification Model (the real four-state status legend, quoted from `lib/product-status.ts`, not
+reinvented), Evidence Policy, Data Sources (the real source-organization catalog the platform is
+built to connect to), Known Limitations (a specific, honest statement of what's thin today), Human
+Decision, Privacy, Copyright, and a new Transparency Statement replacing the old Version History
+section. Nothing non-developer was removed — Constitution/Human Decision/Privacy/Copyright stayed.
+
+**Broken routes and non-functional navigation (Parts C/D)**: investigated every nav destination
+before touching anything. "Agents" was the one live primary-nav item that disappointed after a
+click (self-disclosed "no runtime is connected yet") — removed from `primaryNavSections`; the
+route itself is untouched and still honest, just no longer promoted. `/core` and `/workflows` were
+confirmed, via a full-repo grep, to already be unreachable from any real navigation — satisfying
+"never expose broken navigation" without any change. The dev-mode 500 for an unrecognized
+`/research/<slug>` was investigated and found to be an inherent, expected characteristic of
+`output: "export"` (only enumerated `generateStaticParams()` paths get a file; dev tries to
+dynamically render anyway) rather than a fixable bug — the real production behavior for that exact
+case is the branded 404 from Part A, which is the actual fix.
+
+**Production copy (Part E)**: a full grep sweep of `components/` and `app/` for
+Build/Architecture/Internal/Runtime/Adapter/Engine/Developer/Pipeline/Migration in rendered JSX
+text and prop strings found and fixed every live instance — Agent stats/activity copy, the
+Knowledge Graph's "Graph Pipeline" section heading and aria-label, every Research Topic page's
+"Pipeline stages run" stat label (all 65 topics), and `product-status.ts`'s dead-but-real
+`planned` explanation. Five components (`PipelineReadinessPanel`, `SessionRegistrySummaryCard`,
+`RuntimeMetricsGrid`, `SystemSummaryCard`, `SearchRuntimeStatusPanel`) were confirmed completely
+unreachable from any page via full-repo import search and left untouched — dead code a user can
+never see is out of scope for a mission about what users actually experience.
+
+**Error experience (Part F)**: five real recoverable states rewritten to explain what happened,
+why, and what to do next. New `components/system/EntityNotFoundNotice.tsx`, wired into
+Countries/Companies/Universities, reads the raw `?country=`/`?company=`/`?university=` query param
+(safe — already inside `PlatformContextProvider`'s existing Suspense boundary) and shows an honest
+notice when a requested id doesn't resolve, instead of silently substituting a different profile.
+My Work's "Project not found" now explains projects are local-only. Search's empty state names the
+query and explains scope. The three Relationships panels' empty state explains when connections
+appear instead of a bare "none indexed."
+
+**Micro trust (Part G)**: swept for TODO/Placeholder/Lorem/Temporary/Test/Dummy/Sample/Mock/debug
+badges in rendered copy across the same live-page scope as Part E — no live violations found
+beyond the same five already-confirmed-dead components.
+
+**Tests**: new `scripts/test-production-readiness.ts` — 15 static source-inspection tests (this
+harness has no DOM; these assert against the actual shipped source and the real build artifact
+`out/404.html`) covering every fix above. 15/15 passing, alongside the unchanged
+12 + 15 + 12 + 10 + 13 + 14 + 12 + 15 + 28 + 11 = 142 total — **157 tests overall**. `npm run
+build` clean, 91 routes. Full detail: this section. Zero new features, zero layout changes, zero
+fabricated data.
