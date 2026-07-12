@@ -5,6 +5,7 @@ import StatusBadge from "@/components/shared/StatusBadge";
 import EntityFutureSources from "@/components/shared/EntityFutureSources";
 import ReportPrintButton from "@/components/shared/ReportPrintButton";
 import SaveReportButton from "@/components/shared/SaveReportButton";
+import ReportHeaderLogo from "@/components/shared/ReportHeaderLogo";
 import { getResearchTopicPath } from "@/lib/research/research-topics";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
@@ -34,6 +35,7 @@ export default function CompanyReportView({ report }: CompanyReportViewProps) {
       aria-labelledby="company-report-heading"
       className={`${cbaiGlassCard} cbai-print-area space-y-6 border-cyan-500/15 p-5 sm:p-6`}
     >
+      <ReportHeaderLogo />
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <p className={cbaiSectionEyebrow}>Company Intelligence Report</p>

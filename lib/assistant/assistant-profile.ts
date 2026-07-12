@@ -21,7 +21,10 @@ export type WorkspaceRole =
   | "university"
   | "research_center"
   | "government"
-  | "administrator";
+  | "administrator"
+  | "economist"
+  | "legal"
+  | "social_sector";
 
 export const WORKSPACE_ROLE_LABELS: Record<WorkspaceRole, string> = {
   citizen: "Citizen",
@@ -36,6 +39,9 @@ export const WORKSPACE_ROLE_LABELS: Record<WorkspaceRole, string> = {
   research_center: "Research Center",
   government: "Government",
   administrator: "Administrator",
+  economist: "Economist",
+  legal: "Legal Professional",
+  social_sector: "Social-Sector Professional",
 };
 
 export const WORKSPACE_ROLES: readonly WorkspaceRole[] = Object.keys(
@@ -59,6 +65,9 @@ export const ROLE_DEFAULT_WORKSPACE: Record<WorkspaceRole, string> = {
   research_center: "/research",
   government: "/government",
   administrator: "/dashboard",
+  economist: "/investor",
+  legal: "/knowledge",
+  social_sector: "/citizen",
 };
 
 export type AssistantAvatarId =
@@ -87,7 +96,7 @@ export const ASSISTANT_AVATAR_CLASSES: Record<AssistantAvatarId, string> = {
   slate: "bg-slate-500/15 text-slate-300 border-slate-500/30",
 };
 
-export type SupportedLanguageCode = "en";
+export type SupportedLanguageCode = "en" | "uz" | "ru" | "tr";
 
 export type AssistantLanguage = {
   code: string;
@@ -96,16 +105,29 @@ export type AssistantLanguage = {
 };
 
 /**
- * Only English is implemented anywhere in this platform's UI today. The other options are real,
- * storable preferences — honestly marked unavailable rather than silently pretending to work.
+ * Real Global Language Foundation (Real Global Language Foundation + Multilingual Voice Commands
+ * mission). `available: true` means a real, tested translation dictionary AND (where the browser
+ * supports it) a real voice-recognition locale exist for that language today — see
+ * lib/i18n/languages.ts for the full registry (native names, voice-locale codes, per-language
+ * voice support). Every other entry here is a real, storable preference, registered so switching
+ * to it later needs no new architecture — but honestly marked unavailable rather than silently
+ * pretending to work, exactly like every other "planned" surface in this platform.
  */
 export const ASSISTANT_LANGUAGES: AssistantLanguage[] = [
   { code: "en", label: "English", available: true },
-  { code: "uz", label: "Oʻzbek", available: false },
+  { code: "uz", label: "Oʻzbek", available: true },
+  { code: "ru", label: "Русский", available: true },
+  { code: "tr", label: "Türkçe", available: true },
+  { code: "uz-Cyrl", label: "Ўзбек", available: false },
+  { code: "ar", label: "العربية", available: false },
   { code: "es", label: "Español", available: false },
   { code: "fr", label: "Français", available: false },
-  { code: "ar", label: "العربية", available: false },
+  { code: "de", label: "Deutsch", available: false },
   { code: "zh", label: "中文", available: false },
+  { code: "ja", label: "日本語", available: false },
+  { code: "ko", label: "한국어", available: false },
+  { code: "hi", label: "हिन्दी", available: false },
+  { code: "pt", label: "Português", available: false },
 ];
 
 export type NotificationPreferences = {

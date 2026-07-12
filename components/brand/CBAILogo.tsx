@@ -3,9 +3,16 @@ type CBAILogoProps = {
   showTagline?: boolean;
   size?: "sm" | "md" | "lg" | "xl";
   className?: string;
+  /** "dark" (default) — light wordmark text for the deep-navy surfaces used everywhere in this
+   * app. "light" — dark wordmark text for a light-background context (e.g. a printed report
+   * header, or a future light-theme surface). The mark's own gradient (cyan → blue) already reads
+   * clearly on either background, so only the wordmark text color changes. */
+  variant?: "dark" | "light";
 };
 
 const MARK_SIZES = { sm: 28, md: 36, lg: 48, xl: 64 } as const;
+
+const LOGO_ACCESSIBLE_NAME = "CBAI — Universal Intelligence";
 
 function gradientDefs(id: string) {
   return (
@@ -30,8 +37,14 @@ function gradientDefs(id: string) {
   );
 }
 
-/** Premium CBAI mark — geometric C, inner globe, network nodes. */
-function CBAIMark({ size = 36, id = "cbai" }: { size?: number; id?: string }) {
+/**
+ * Premium CBAI mark — a circular intelligence/network symbol: geometric C, inner globe,
+ * 4-node network ring. Standalone/icon-only usages (no adjacent wordmark) should pass
+ * `standalone` so the mark carries its own accessible name — every other usage sits beside the
+ * CBAI wordmark, which already provides the accessible label, so the mark itself stays
+ * `aria-hidden` to avoid announcing the same name twice.
+ */
+function CBAIMark({ size = 36, id = "cbai", standalone = false }: { size?: number; id?: string; standalone?: boolean }) {
   return (
     <svg
       width={size}
@@ -39,7 +52,9 @@ function CBAIMark({ size = 36, id = "cbai" }: { size?: number; id?: string }) {
       viewBox="0 0 64 64"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
+      role={standalone ? "img" : undefined}
+      aria-label={standalone ? LOGO_ACCESSIBLE_NAME : undefined}
+      aria-hidden={standalone ? undefined : true}
       className="shrink-0 drop-shadow-[0_0_6px_rgba(34,211,238,0.2)]"
     >
       {gradientDefs(id)}
@@ -82,14 +97,23 @@ export default function CBAILogo({
   showTagline = true,
   size = "md",
   className = "",
+  variant = "dark",
 }: CBAILogoProps) {
   const markSize = MARK_SIZES[size];
+  const wordmarkGradient =
+    variant === "light"
+      ? "bg-gradient-to-r from-slate-900 via-cyan-700 to-blue-700"
+      : "bg-gradient-to-r from-zinc-50 via-cyan-100 to-blue-200";
+  const taglineColor = variant === "light" ? "text-cyan-700/90" : "text-cyan-400/90";
 
   if (compact) {
     return (
-      <span className={`inline-flex items-center gap-2.5 ${className}`}>
+      <span className={`inline-flex items-center gap-2.5 ${className}`} role="img" aria-label={LOGO_ACCESSIBLE_NAME}>
         <CBAIMark size={markSize} id="cbai-compact" />
-        <span className="bg-gradient-to-r from-cyan-300 to-blue-400 bg-clip-text text-sm font-bold tracking-tight text-transparent">
+        <span
+          aria-hidden="true"
+          className={`${wordmarkGradient} bg-clip-text text-sm font-bold tracking-tight text-transparent`}
+        >
           CBAI
         </span>
       </span>
@@ -97,15 +121,15 @@ export default function CBAILogo({
   }
 
   return (
-    <div className={`flex items-center gap-4 ${className}`}>
+    <div className={`flex items-center gap-4 ${className}`} role="img" aria-label={LOGO_ACCESSIBLE_NAME}>
       <CBAIMark size={markSize} id="cbai-full" />
-      <div className="min-w-0">
-        <p className="bg-gradient-to-r from-zinc-50 via-cyan-100 to-blue-200 bg-clip-text text-lg font-bold tracking-tight text-transparent sm:text-xl">
+      <div aria-hidden="true" className="min-w-0">
+        <p className={`${wordmarkGradient} bg-clip-text text-lg font-bold tracking-tight text-transparent sm:text-xl`}>
           CBAI
         </p>
         {showTagline ? (
-          <p className="text-[11px] font-medium tracking-[0.12em] text-cyan-400/90 uppercase sm:text-xs">
-            Official Evidence Intelligence
+          <p className={`text-[11px] font-medium tracking-[0.12em] ${taglineColor} uppercase sm:text-xs`}>
+            Universal Intelligence
           </p>
         ) : null}
       </div>
@@ -113,4 +137,4 @@ export default function CBAILogo({
   );
 }
 
-export { CBAIMark };
+export { CBAIMark, LOGO_ACCESSIBLE_NAME };

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { primaryNavSections } from "@/lib/navigation";
+import { primaryNavSections, secondaryNavSections } from "@/lib/navigation";
 import NavIcon from "@/components/layout/NavIcon";
 import CBAILogo, { CBAIMark } from "@/components/brand/CBAILogo";
 
@@ -20,14 +20,14 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`flex h-full shrink-0 flex-col border-r border-cyan-500/10 bg-[#050810] transition-all duration-200 ${
+      className={`hidden h-full shrink-0 flex-col border-r border-cyan-500/10 bg-[#050810] transition-all duration-200 md:flex ${
         isHome ? "w-16 opacity-40 hover:opacity-90" : "w-64 opacity-100"
       }`}
     >
       <Link
         href="/"
         className="flex h-16 items-center gap-2.5 border-b border-cyan-500/10 px-4 transition-colors hover:bg-slate-900/50"
-        title="CBAI — Official Evidence Intelligence"
+        title="CBAI — Universal Intelligence"
       >
         {isHome ? (
           <span className="flex justify-center">
@@ -69,6 +69,40 @@ export default function Sidebar() {
             </div>
           </div>
         ))}
+
+        {!isHome ? (
+          <details className="border-t border-zinc-800/60 pt-3">
+            <summary className="mb-2 cursor-pointer list-none px-3 text-[10px] font-medium uppercase tracking-widest text-zinc-600 hover:text-zinc-400">
+              More
+            </summary>
+            {secondaryNavSections.map((section, index) => (
+              <div key={section.title || `secondary-${index}`} className="mb-3">
+                <p className="mb-2 px-3 text-[10px] font-medium uppercase tracking-widest text-zinc-700">
+                  {section.title}
+                </p>
+                <div className="space-y-1">
+                  {section.items.map((item) => {
+                    const isActive = isNavItemActive(pathname, item.href);
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                          isActive
+                            ? "bg-cyan-500/10 text-cyan-400"
+                            : "text-zinc-500 hover:bg-slate-900/80 hover:text-zinc-50"
+                        }`}
+                      >
+                        <NavIcon name={item.icon} />
+                        {item.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </details>
+        ) : null}
       </nav>
 
       {!isHome ? (

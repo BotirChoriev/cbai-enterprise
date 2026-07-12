@@ -32,8 +32,14 @@ export type NavSection = {
 };
 
 /**
- * The universal product IA: HOME, MY WORK, EXPLORE, ECOSYSTEMS, INTELLIGENCE, TRUST. Everything
- * else is contextual (workspace-local nav, tabs, /core's full route grid) rather than primary.
+ * Navigation simplification (Global Language Foundation + Premium Interface mission, Phase 15).
+ * One global navigation source, structured to match the approved information architecture:
+ * Home / My Work / Search (flat, no group header) → Explore (Countries/Companies/Universities/
+ * Research/Evidence) → Reports / Trust / Settings (flat). `secondaryNavSections` below holds the
+ * real, working Ecosystems (Government/Investor/Citizen) and advanced Intelligence
+ * (Dashboard/Reasoning/Knowledge Graph/Governance) modules — still real routes, still one click
+ * away (Sidebar renders them in a collapsed "More" disclosure), just no longer competing with the
+ * 7 primary items for attention. Nothing was deleted or made unreachable.
  */
 export const primaryNavSections: NavSection[] = [
   {
@@ -51,17 +57,17 @@ export const primaryNavSections: NavSection[] = [
         icon: "my-work",
         description: "Continue research, evidence reviews, and reports in progress.",
       },
-    ],
-  },
-  {
-    title: "Explore",
-    items: [
       {
         label: "Search",
         href: "/search",
         icon: "search",
         description: "Search countries, companies, and universities.",
       },
+    ],
+  },
+  {
+    title: "Explore",
+    items: [
       {
         label: "Countries",
         href: "/countries",
@@ -81,31 +87,49 @@ export const primaryNavSections: NavSection[] = [
         description: "University profiles with official information and reports.",
       },
       {
-        label: "Evidence",
-        href: "/knowledge",
-        icon: "knowledge",
-        description: "Official source status across profiles.",
-      },
-      {
         label: "Research",
         href: "/research",
         icon: "research",
         description: "Explore scientific topics, labs, experiments, and evidence.",
       },
       {
-        label: "Research Workspace",
-        href: "/research/workspace",
-        icon: "research",
-        description: "Structured research workspace for knowledge organization and evidence review.",
+        label: "Evidence",
+        href: "/knowledge",
+        icon: "knowledge",
+        description: "Official source status across profiles.",
       },
+    ],
+  },
+  {
+    title: "",
+    items: [
       {
         label: "Reports",
         href: "/analytics",
         icon: "analytics",
         description: "Available report types by profile scope.",
       },
+      {
+        label: "Trust",
+        href: "/trust",
+        icon: "trust",
+        description: "Constitution, methodology, evidence policy, and version history.",
+      },
+      {
+        label: "Settings",
+        href: "/settings",
+        icon: "settings",
+        description: "Assistant, accessibility, and account preferences.",
+      },
     ],
   },
+];
+
+/**
+ * Real, working modules kept out of the primary 7-item list so they don't clutter it — every
+ * route here is unchanged and fully functional; this only affects where it's discoverable from.
+ */
+export const secondaryNavSections: NavSection[] = [
   {
     title: "Ecosystems",
     items: [
@@ -156,23 +180,22 @@ export const primaryNavSections: NavSection[] = [
         icon: "ai-control",
         description: "Platform rules, standards, and review process.",
       },
-    ],
-  },
-  {
-    title: "",
-    items: [
       {
-        label: "Trust",
-        href: "/trust",
-        icon: "trust",
-        description: "Constitution, methodology, evidence policy, and version history.",
+        label: "Research Workspace",
+        href: "/research/workspace",
+        icon: "research",
+        description: "Structured research workspace for knowledge organization and evidence review.",
       },
     ],
   },
 ];
 
-/** Flat navigation list for module grids and legacy consumers. */
-export const mainNav: NavItem[] = primaryNavSections.flatMap((section) => section.items);
+/** Flat navigation list for module grids and legacy consumers — primary + secondary combined, so
+ * `/core`'s full route grid still shows every real module even though Sidebar only renders
+ * `primaryNavSections` prominently. */
+export const mainNav: NavItem[] = [...primaryNavSections, ...secondaryNavSections].flatMap(
+  (section) => section.items,
+);
 
 /** Platform modules excluding the home route. */
 export const platformModules: NavItem[] = mainNav.filter(

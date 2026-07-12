@@ -5,6 +5,7 @@ import StatusBadge from "@/components/shared/StatusBadge";
 import EntityRelatedPanel from "@/components/shared/EntityRelatedPanel";
 import ReportPrintButton from "@/components/shared/ReportPrintButton";
 import SaveReportButton from "@/components/shared/SaveReportButton";
+import ReportHeaderLogo from "@/components/shared/ReportHeaderLogo";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type ProjectReportViewProps = {
@@ -23,6 +24,7 @@ export default function ProjectReportView({ report }: ProjectReportViewProps) {
       aria-labelledby="project-report-heading"
       className={`${cbaiGlassCard} cbai-print-area space-y-6 border-cyan-500/15 p-5 sm:p-6`}
     >
+      <ReportHeaderLogo />
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <p className={cbaiSectionEyebrow}>Project Report</p>

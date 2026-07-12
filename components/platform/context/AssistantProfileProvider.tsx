@@ -67,6 +67,14 @@ export function AssistantProfileProvider({ children }: { children: ReactNode }) 
     root.classList.toggle("cbai-larger-text", profile.accessibility.largerText);
   }, [profile.accessibility]);
 
+  // Real HTML lang sync (Global Language Foundation mission) — server/static markup always ships
+  // lang="en" (there is no per-request locale to render server-side in a static export); this
+  // reflects the real client-side preference once it's known, exactly like the accessibility
+  // classes above, and never causes a hydration mismatch since it runs after hydration completes.
+  useEffect(() => {
+    document.documentElement.lang = profile.preferredLanguage || "en";
+  }, [profile.preferredLanguage]);
+
   const updateProfile = useCallback((patch: Partial<AssistantProfile>) => {
     const current = getSnapshot();
     const next: AssistantProfile = {

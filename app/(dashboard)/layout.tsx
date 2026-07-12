@@ -1,9 +1,10 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { usePathname } from "next/navigation";
 import Sidebar from "@/components/layout/Sidebar";
 import Topbar from "@/components/layout/Topbar";
+import MobileNavDrawer from "@/components/layout/MobileNavDrawer";
 import { PlatformContextProvider } from "@/components/platform/context/PlatformContextProvider";
 import { AssistantProfileProvider } from "@/components/platform/context/AssistantProfileProvider";
 import { AuthProvider } from "@/components/platform/context/AuthProvider";
@@ -17,6 +18,7 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#050810]">
@@ -27,7 +29,8 @@ export default function DashboardLayout({
             <AssistantProfileProvider>
               <PlatformContextProvider>
                 <OfflineBanner />
-                <Topbar />
+                <MobileNavDrawer open={isMobileNavOpen} onClose={() => setIsMobileNavOpen(false)} />
+                <Topbar onMenuClick={() => setIsMobileNavOpen(true)} />
                 <main className="flex-1 overflow-y-auto">
                   <div
                     className={
