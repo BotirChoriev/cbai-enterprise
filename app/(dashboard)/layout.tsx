@@ -7,6 +7,7 @@ import Topbar from "@/components/layout/Topbar";
 import { PlatformContextProvider } from "@/components/platform/context/PlatformContextProvider";
 import { AssistantProfileProvider } from "@/components/platform/context/AssistantProfileProvider";
 import PlatformContextHeaderSlot from "@/components/platform/context/PlatformContextHeaderSlot";
+import OfflineBanner from "@/components/system/OfflineBanner";
 
 export default function DashboardLayout({
   children,
@@ -23,6 +24,7 @@ export default function DashboardLayout({
         <Suspense fallback={null}>
           <AssistantProfileProvider>
             <PlatformContextProvider>
+              <OfflineBanner />
               <Topbar />
               <main className="flex-1 overflow-y-auto">
                 <div
