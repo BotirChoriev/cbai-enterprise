@@ -15,9 +15,15 @@ import ResearchCockpit from "@/components/research/topic/ResearchCockpit";
 import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
 import ResearchRelatedCompanies from "@/components/research/topic/ResearchRelatedCompanies";
 import ResearchTopicReportView from "@/components/research/topic/ResearchTopicReportView";
+import ResearchWorkspaceDashboard from "@/components/research/topic/ResearchWorkspaceDashboard";
+import EvidenceLifecyclePanel from "@/components/research/topic/EvidenceLifecyclePanel";
+import SupportingCounterEvidencePanel from "@/components/research/topic/SupportingCounterEvidencePanel";
+import ResearchWorkspaceActivity from "@/components/research/topic/ResearchWorkspaceActivity";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import { deriveResearchWorkflow } from "@/lib/research/workflow/workflow-engine";
 import { buildEntityReport } from "@/lib/entity/entity-report";
+import { buildTopicEvidenceReview } from "@/lib/research/evidence/evidence-topic-builder";
+import { buildResearchMission } from "@/lib/research-mission/research-mission-builder";
 import { cbaiHeroGlow } from "@/components/brand/brand-classes";
 
 type ResearchTopicDetailProps = {
@@ -28,6 +34,9 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
   const [activeTab, setActiveTab] = useState<TopicTabId>("overview");
   const [showReport, setShowReport] = useState(false);
   const workflow = deriveResearchWorkflow(topic.topicId);
+  const evidenceReview = buildTopicEvidenceReview(topic.topicId);
+  const mission = buildResearchMission({ missionId: topic.topicId });
+  const evidenceSummary = mission.workspaceContract?.evidenceSummary;
 
   return (
     <div
@@ -40,6 +49,8 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
       </div>
 
       <ContextualOperatorBanner />
+
+      <ResearchWorkspaceDashboard topic={topic} />
 
       <ResearchCockpit topic={topic} workflow={workflow} />
 
@@ -56,7 +67,18 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
 
       <ResearchRelatedCompanies topic={topic} />
 
-      <div className="space-y-4">
+      {evidenceSummary ? (
+        <SupportingCounterEvidencePanel
+          supportingEvidence={evidenceSummary.supportingEvidence}
+          counterEvidence={evidenceSummary.conflictingEvidence}
+        />
+      ) : null}
+
+      {evidenceReview ? (
+        <EvidenceLifecyclePanel topicId={topic.topicId} evidenceItems={evidenceReview.evidenceItems} />
+      ) : null}
+
+      <div id="generate-report" className="space-y-4">
         <button
           type="button"
           onClick={() => setShowReport((current) => !current)}
@@ -73,6 +95,8 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
       </div>
 
       <TopicReviewWorkspace topic={topic} workflow={workflow} />
+
+      <ResearchWorkspaceActivity topicId={topic.topicId} />
 
       <ResearchLandscape topic={topic} variant="topic" embedded />
 
