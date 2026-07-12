@@ -17,7 +17,7 @@ type SearchGatewayResultsProps = {
   query: string;
 };
 
-const OPENABLE_GROUP_IDS = new Set(["countries", "companies", "universities", "research_topics"]);
+const OPENABLE_GROUP_IDS = new Set(["countries", "companies", "universities", "research_topics", "projects"]);
 const TOPIC_GROUP_IDS = new Set<SearchResultGroupId>(["knowledge", "evidence", "future_modules"]);
 
 const SEARCH_EXAMPLES = [
@@ -169,6 +169,14 @@ function EntityMatchCard({ entry, matchedLabel }: EntityMatchCardProps) {
             className="inline-flex min-h-9 items-center rounded-lg border border-zinc-700 bg-zinc-900 px-3.5 text-xs font-medium text-cyan-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
           >
             Open reports →
+          </Link>
+        ) : null}
+        {entry.createProjectHref ? (
+          <Link
+            href={entry.createProjectHref}
+            className="inline-flex min-h-9 items-center rounded-lg border border-orange-500/30 bg-orange-500/10 px-3.5 text-xs font-medium text-orange-300 transition-colors hover:border-orange-500/50"
+          >
+            Create Project →
           </Link>
         ) : null}
       </div>

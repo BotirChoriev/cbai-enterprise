@@ -13,6 +13,7 @@ export type SearchResultGroupId =
   | "companies"
   | "universities"
   | "research_topics"
+  | "projects"
   | "knowledge"
   | "evidence"
   | "future_modules";
@@ -520,6 +521,7 @@ const GROUP_LABELS: Record<SearchResultGroupId, string> = {
   companies: "Companies",
   universities: "Universities",
   research_topics: "Research Topics",
+  projects: "Projects",
   knowledge: "Knowledge",
   evidence: "Evidence",
   future_modules: "Future Modules",
@@ -620,6 +622,12 @@ export function executeGatewaySearch(query: string): GatewaySearchResponse {
       entities: entityResults
         .filter((result) => result.entity.type === "research_topic")
         .slice(0, MAX_RESEARCH_TOPIC_RESULTS),
+      topics: [],
+    },
+    {
+      id: "projects" as const,
+      label: GROUP_LABELS.projects,
+      entities: entityResults.filter((result) => result.entity.type === "project"),
       topics: [],
     },
     {

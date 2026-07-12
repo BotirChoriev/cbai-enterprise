@@ -24,7 +24,14 @@ export type SearchResultEntry = {
   linked: boolean;
   showCompare: boolean;
   showReports: boolean;
+  /** Real "Create Project from this entity" link — null when this result isn't a linkable entity. */
+  createProjectHref: string | null;
 };
+
+function createProjectHref(entity: Entity): string {
+  const params = new URLSearchParams({ entityKind: entity.type, entityId: entity.id, entityName: entity.name });
+  return `/my-work?${params.toString()}`;
+}
 
 function resolveCountryLabel(entity: Entity): string | null {
   if (entity.type === "country") {
@@ -86,6 +93,7 @@ export function buildEntityResultEntry(
       linked: true,
       showCompare: true,
       showReports: true,
+      createProjectHref: createProjectHref(entity),
     };
   }
 
@@ -103,6 +111,7 @@ export function buildEntityResultEntry(
       linked: true,
       showCompare: true,
       showReports: true,
+      createProjectHref: createProjectHref(entity),
     };
   }
 
@@ -120,6 +129,7 @@ export function buildEntityResultEntry(
       linked: true,
       showCompare: true,
       showReports: true,
+      createProjectHref: createProjectHref(entity),
     };
   }
 
@@ -137,6 +147,25 @@ export function buildEntityResultEntry(
       linked: true,
       showCompare: false,
       showReports: true,
+      createProjectHref: createProjectHref(entity),
+    };
+  }
+
+  if (entity.type === "project") {
+    return {
+      name: entity.name,
+      type: typeLabel,
+      countryLabel: null,
+      distinguishingFact,
+      evidenceStatus: "Available now",
+      shortDescription: "Project workspace with notes, evidence, and linked entities.",
+      nextStep: "Open to continue this project.",
+      route: href,
+      href,
+      linked: true,
+      showCompare: false,
+      showReports: true,
+      createProjectHref: null,
     };
   }
 
@@ -153,6 +182,7 @@ export function buildEntityResultEntry(
     linked: false,
     showCompare: false,
     showReports: false,
+    createProjectHref: null,
   };
 }
 
@@ -178,6 +208,7 @@ export function buildTopicResultEntry(topic: {
     linked: topic.connected,
     showCompare: false,
     showReports: false,
+    createProjectHref: null,
   };
 }
 

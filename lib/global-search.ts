@@ -6,13 +6,15 @@ import { universities } from "@/lib/universities";
 import { toUniversityEntities } from "@/lib/universities.adapter";
 import { RESEARCH_TOPICS, getResearchTopicPath } from "@/lib/research/research-topics";
 import { toResearchTopicEntities } from "@/lib/research-topic.adapter";
+import { loadProjects } from "@/lib/project/project-store";
+import { toProjectEntities } from "@/lib/project/project.adapter";
 import type { Entity, EntityType } from "@/lib/entity/entity.types";
 import { getEntityTypeLabel } from "@/lib/entity/entity.helpers";
 
 /** Searchable entity types in the global index */
 export type SearchableEntityType = Extract<
   EntityType,
-  "country" | "company" | "university" | "research_topic"
+  "country" | "company" | "university" | "research_topic" | "project"
 >;
 
 export type EntityTypeFilter = SearchableEntityType | "all";
@@ -54,17 +56,23 @@ export const SEARCHABLE_ENTITY_TYPES: SearchableEntityType[] = [
   "company",
   "university",
   "research_topic",
+  "project",
 ];
 
 const INSUFFICIENT_EVIDENCE = "insufficient evidence";
 
-/** Unified entity index — all modules normalized via adapters */
+/**
+ * Unified entity index — all modules normalized via adapters. Projects come from real local
+ * storage (empty during static generation/SSR, real once client-side — same as every other
+ * localStorage-backed store in this platform), so this function is safe to call anywhere.
+ */
 export function getAllEntities(): Entity[] {
   return [
     ...toCountryEntities(countries),
     ...toCompanyEntities(companies),
     ...toUniversityEntities(universities),
     ...toResearchTopicEntities(RESEARCH_TOPICS),
+    ...toProjectEntities(loadProjects()),
   ];
 }
 
@@ -75,6 +83,7 @@ export function getEntityHref(entity: Entity): string {
     company: "/companies",
     university: "/universities",
     research_topic: "/research",
+    project: "/my-work",
   };
   return routes[entity.type as SearchableEntityType] ?? "/search";
 }
@@ -96,6 +105,9 @@ export function buildPlatformEntityHref(
 ): string {
   if (entity.type === "research_topic") {
     return getResearchTopicPath(entity.id);
+  }
+  if (entity.type === "project") {
+    return `/my-work?project=${entity.id}`;
   }
 
   const params = new URLSearchParams();
@@ -315,5 +327,6 @@ export function getEntityCounts(): Record<EntityTypeFilter, number> {
     company: all.filter((e) => e.type === "company").length,
     university: all.filter((e) => e.type === "university").length,
     research_topic: all.filter((e) => e.type === "research_topic").length,
+    project: all.filter((e) => e.type === "project").length,
   };
 }
