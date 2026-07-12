@@ -14,7 +14,7 @@ export default function GraphPipeline() {
     <div
       className="overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-950/50 p-6"
       role="img"
-      aria-label="Graph pipeline from Entity through Decision Intelligence"
+      aria-label="How the knowledge graph connects Entity through Decision Intelligence"
     >
       <svg
         viewBox={`0 0 320 ${totalHeight}`}

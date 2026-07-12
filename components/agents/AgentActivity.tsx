@@ -11,7 +11,7 @@ export default function AgentActivity() {
       />
       <CardContent>
         <p className="text-sm text-zinc-500">
-          No agent activity is available — agent runtime is not connected to this platform yet.
+          No agent activity is available — this capability is not active on this platform yet.
         </p>
       </CardContent>
     </Card>

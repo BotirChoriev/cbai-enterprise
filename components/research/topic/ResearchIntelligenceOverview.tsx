@@ -90,7 +90,7 @@ export default function ResearchIntelligenceOverview({ topicId }: ResearchIntell
           <dd className="mt-0.5 text-xs font-medium text-zinc-200">{researchQuestions.questions.length}</dd>
         </div>
         <div className="rounded-md border border-zinc-800/80 bg-slate-950/50 px-2.5 py-1">
-          <dt className="text-[9px] font-medium uppercase tracking-wider text-zinc-600">Pipeline stages run</dt>
+          <dt className="text-[9px] font-medium uppercase tracking-wider text-zinc-600">Analysis steps run</dt>
           <dd className="mt-0.5 text-xs font-medium text-zinc-200">{activityTimeline.pipelineTrace.length}</dd>
         </div>
       </dl>

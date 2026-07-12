@@ -97,7 +97,7 @@ export default function GraphPage() {
         <GraphPersonas />
       </HomeSection>
 
-      <HomeSection id="graph-pipeline" title="Graph Pipeline">
+      <HomeSection id="graph-pipeline" title="How It Works">
         <GraphPipeline />
       </HomeSection>
 

@@ -156,12 +156,6 @@ export const primaryNavSections: NavSection[] = [
         icon: "ai-control",
         description: "Platform rules, standards, and review process.",
       },
-      {
-        label: "Agents",
-        href: "/agents",
-        icon: "agents",
-        description: "Agent capabilities defined on this platform.",
-      },
     ],
   },
   {

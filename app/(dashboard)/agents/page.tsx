@@ -9,7 +9,7 @@ export default function AgentsPage() {
     <div className="space-y-8">
       <PageHeader
         title="AI Agents"
-        description="Agent capabilities defined on this platform — no runtime is connected yet."
+        description="Planned agent capabilities for this platform — not available yet."
       />
 
       <AgentStats />

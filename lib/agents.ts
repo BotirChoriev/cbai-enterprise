@@ -13,7 +13,7 @@ export type Agent = {
   availability: AgentAvailability;
 };
 
-export const AGENT_RUNTIME_NOT_CONNECTED_LABEL = "Runtime Not Connected";
+export const AGENT_RUNTIME_NOT_CONNECTED_LABEL = "Not Yet Available";
 
 export const agents: Agent[] = [
   {

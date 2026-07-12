@@ -28,9 +28,9 @@ export default function AgentStats() {
         }
       />
       <StatCard
-        label="Runtime Status"
+        label="Availability Status"
         value={AGENT_RUNTIME_NOT_CONNECTED_LABEL}
-        change="No live agent execution is connected to this platform"
+        change="No agent tasks run automatically on this platform yet"
         changeType="neutral"
         icon={
           <svg
