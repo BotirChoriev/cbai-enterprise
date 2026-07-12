@@ -1,10 +1,5 @@
 import Link from "next/link";
-import {
-  HOME_FOOTER,
-  PLATFORM_BUILD,
-  PLATFORM_EVOLUTION_PHASE,
-  PLATFORM_VERSION,
-} from "@/lib/platform-home";
+import { HOME_FOOTER, PLATFORM_VERSION } from "@/lib/platform-home";
 
 // The full constitution, methodology, evidence policy, and version history live at /trust — this
 // footer stays a short mission statement plus one link, not a second copy of that page.
@@ -31,9 +26,7 @@ export default function HomeFooter() {
 
       <div className="mt-10 flex flex-col gap-1 border-t border-zinc-800 pt-6 text-xs text-zinc-600 sm:flex-row sm:justify-between">
         <p>CBAI Evidence Intelligence Platform</p>
-        <p>
-          Version {PLATFORM_VERSION} · Build {PLATFORM_BUILD} · {PLATFORM_EVOLUTION_PHASE}
-        </p>
+        <p>Version {PLATFORM_VERSION}</p>
       </div>
     </footer>
   );

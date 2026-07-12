@@ -22,8 +22,6 @@ export type TrustPillar = {
 
 export const EVIDENCE_NOT_CONNECTED_LABEL = "Evidence Source Not Connected";
 export const PLATFORM_VERSION = "0.1.0";
-export const PLATFORM_BUILD = "elite-home-final";
-export const PLATFORM_EVOLUTION_PHASE = "Final Home Architecture";
 
 export const TRUST_PILLARS: TrustPillar[] = [
   {

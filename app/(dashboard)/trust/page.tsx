@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import PageHeader from "@/components/layout/PageHeader";
-import { HOME_FOOTER, PLATFORM_VERSION, PLATFORM_BUILD, PLATFORM_EVOLUTION_PHASE, TRUST_PILLARS } from "@/lib/platform-home";
+import { HOME_FOOTER, PLATFORM_VERSION, TRUST_PILLARS } from "@/lib/platform-home";
+import { PRODUCT_STATUS_LABELS, PRODUCT_STATUS_EXPLANATIONS } from "@/lib/product-status";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 export const metadata: Metadata = {
   title: "Trust",
-  description: "Constitution, methodology, evidence policy, and version history.",
+  description: "Methodology, verification model, evidence policy, data sources, and known limitations.",
 };
 
 function findPillar(id: string) {
@@ -20,6 +21,23 @@ function findPillar(id: string) {
 const humanDecisionPillar = findPillar("humans-decide");
 const evidenceFirstPillar = findPillar("sources-before-conclusions");
 const uncertaintyPillar = findPillar("uncertainty-visible");
+
+const VERIFICATION_STATUSES = ["live", "partial", "waiting_for_verified_data", "preview"] as const;
+
+const DATA_SOURCE_CATEGORIES = [
+  { name: "United Nations", scope: "Country-level institutional and treaty reporting." },
+  { name: "World Bank Group", scope: "Country and economic indicators." },
+  { name: "International Monetary Fund", scope: "Financial and macroeconomic reporting." },
+  { name: "World Health Organization", scope: "Health system coverage." },
+  { name: "UNESCO", scope: "Education and research statistics." },
+  { name: "International Labour Organization", scope: "Labour market statistics." },
+  { name: "International Telecommunication Union", scope: "Digital connectivity statistics." },
+  { name: "OECD", scope: "Economic co-operation and development data." },
+  { name: "Open Contracting Partnership", scope: "Public procurement transparency." },
+  { name: "National statistical authorities", scope: "Per-country official statistics." },
+  { name: "Government procurement authorities", scope: "Per-country procurement disclosure." },
+  { name: "Ministries of finance and audit institutions", scope: "Per-country budget transparency." },
+] as const;
 
 type TrustSection = {
   id: string;
@@ -42,9 +60,28 @@ const sections: TrustSection[] = [
     body: [HOME_FOOTER.methodology],
   },
   {
+    id: "verification-model",
+    title: "Verification Model",
+    body: [
+      "Every profile and topic on this platform carries one of four honest labels, always shown as a full sentence, never a bare word or color alone:",
+      ...VERIFICATION_STATUSES.map(
+        (status) => `${PRODUCT_STATUS_LABELS[status]} — ${PRODUCT_STATUS_EXPLANATIONS[status]}`,
+      ),
+    ],
+  },
+  {
     id: "evidence-policy",
     title: "Evidence Policy",
     body: [HOME_FOOTER.evidencePolicy, evidenceFirstPillar.description, uncertaintyPillar.description],
+  },
+  {
+    id: "data-sources",
+    title: "Data Sources",
+    body: [
+      "Official sources this platform is built to connect to, by category:",
+      ...DATA_SOURCE_CATEGORIES.map((source) => `${source.name} — ${source.scope}`),
+      "A source only counts as connected once real, verifiable data from it is linked to a profile — never assumed from the category alone.",
+    ],
   },
   {
     id: "human-decision",
@@ -59,7 +96,7 @@ const sections: TrustSection[] = [
     title: "Privacy",
     body: [
       "This platform does not have user accounts, sign-in, or session tracking today — there is no personal data to collect, store, or share.",
-      "A complete privacy policy is a placeholder pending legal review, required before any account or personalization system is introduced.",
+      "A complete privacy policy will be published ahead of any account or personalization system, once legal review is complete.",
     ],
   },
   {
@@ -71,10 +108,21 @@ const sections: TrustSection[] = [
     ],
   },
   {
-    id: "version-history",
-    title: "Version History",
+    id: "known-limitations",
+    title: "Known Limitations",
     body: [
-      `Version ${PLATFORM_VERSION} · Build ${PLATFORM_BUILD} · ${PLATFORM_EVOLUTION_PHASE}.`,
+      "Coverage today is intentionally shown as it really is, not as it will eventually be: most profiles have only a small number of official sources connected so far, and the remaining gaps are labeled individually rather than hidden.",
+      "There are no accounts, sign-in, or cross-device sync yet — Projects, notes, and saved work stay on the device that created them.",
+      "Governance, Investor, and Citizen workspaces, and the Knowledge Graph and Reasoning views, share the same evidence core and are still early — treat their current depth as a preview of the intended experience, not the finished one.",
+    ],
+  },
+  {
+    id: "transparency-statement",
+    title: "Transparency Statement",
+    body: [
+      HOME_FOOTER.transparency,
+      "There is no support or contact channel connected yet. Until one exists, the most reliable way to judge the platform is to check what a profile or report actually shows against the sources it cites.",
+      `Version ${PLATFORM_VERSION}.`,
     ],
   },
 ];
