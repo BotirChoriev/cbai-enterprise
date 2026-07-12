@@ -1,6 +1,8 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { buildEvidenceExplorerModel } from "@/lib/evidence-explorer";
 import { buildReportsCenterModel } from "@/lib/reports-center";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
@@ -10,6 +12,11 @@ import RecentEntities from "@/components/platform/context/RecentEntities";
 import PinnedEntities from "@/components/platform/context/PinnedEntities";
 import StatusBadge from "@/components/shared/StatusBadge";
 import Avatar from "@/components/shared/Avatar";
+import CreateProjectForm from "@/components/project/CreateProjectForm";
+import ProjectList from "@/components/project/ProjectList";
+import ProjectHome from "@/components/project/ProjectHome";
+import { loadProject } from "@/lib/project/project-store";
+import type { ContextEntityRef } from "@/lib/context/context-types";
 import {
   ASSISTANT_LANGUAGES,
   WORKSPACE_ROLE_LABELS,
@@ -47,12 +54,43 @@ const ONBOARDING_LINKS = [
   { label: "Open Trust Center", href: "/trust" },
 ] as const;
 
-export default function MyWork() {
+function MyWorkContent() {
+  const searchParams = useSearchParams();
+  const projectId = searchParams.get("project");
+  const project = projectId ? loadProject(projectId) : null;
+
+  // Real "Create Project from this entity" pre-fill, arriving from a Country/Company/
+  // University/Research profile or a Search result — never a fabricated default. Only a real,
+  // recognized entity kind is accepted; anything else is honestly ignored.
+  const entityKind = searchParams.get("entityKind");
+  const entityId = searchParams.get("entityId");
+  const entityName = searchParams.get("entityName");
+  const validKinds: readonly string[] = ["country", "company", "university", "research_topic"];
+  const initialPrimaryEntity: ContextEntityRef | undefined =
+    entityKind && entityId && entityName && validKinds.includes(entityKind)
+      ? { kind: entityKind as ContextEntityRef["kind"], id: entityId, name: entityName }
+      : undefined;
+
   const evidence = buildEvidenceExplorerModel();
   const reports = buildReportsCenterModel();
   const { profile, isActive } = useAssistantProfile();
   const { context } = usePlatformContext();
   const preferredLanguage = ASSISTANT_LANGUAGES.find((l) => l.code === profile.preferredLanguage);
+
+  if (projectId && project) {
+    return <ProjectHome project={project} />;
+  }
+
+  if (projectId && !project) {
+    return (
+      <div className={`${cbaiGlassCard} space-y-2 p-5`}>
+        <p className="text-sm text-zinc-300">Project not found.</p>
+        <Link href="/my-work" className="text-xs text-cyan-400 hover:text-cyan-300">
+          ← Back to My Work
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -70,8 +108,8 @@ export default function MyWork() {
             <StatusBadge status="live" className="ml-auto" />
           </div>
           <p className="mt-3 max-w-2xl text-xs text-zinc-500">
-            Saved to this browser — real research and evidence entry points below, never
-            fabricated activity or recommendations.
+            Saved to this browser — real projects, research, and evidence entry points below,
+            never fabricated activity or recommendations.
           </p>
         </div>
       ) : (
@@ -79,8 +117,8 @@ export default function MyWork() {
           <h2 className="text-lg font-semibold text-zinc-100">My Work</h2>
           <p className="mt-1 max-w-2xl text-sm text-zinc-400">
             CBAI does not yet have accounts or saved sessions, so nothing below is personalized to
-            you. These are the real, working entry points into research and evidence review
-            across the platform — never a fabricated history.
+            you. Projects, and the real, working entry points into research and evidence review
+            across the platform, are saved to this browser only — never a fabricated history.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             {ONBOARDING_LINKS.map((link) => (
@@ -95,6 +133,10 @@ export default function MyWork() {
           </div>
         </div>
       )}
+
+      <CreateProjectForm initialPrimaryEntity={initialPrimaryEntity} />
+
+      <ProjectList />
 
       <section aria-labelledby="my-work-continue-heading" className="space-y-3">
         <p className={cbaiSectionEyebrow} id="my-work-continue-heading">
@@ -137,30 +179,6 @@ export default function MyWork() {
       </section>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <section aria-labelledby="my-work-missions-heading" className={`${cbaiGlassCard} space-y-2 p-5`}>
-          <p className={cbaiSectionEyebrow} id="my-work-missions-heading">
-            Recent Missions
-          </p>
-          <p className="text-xs text-zinc-500">
-            No missions are shown here — sign-in and mission history are not connected yet. Open
-            the{" "}
-            <Link href="/research" className="text-cyan-400 hover:text-cyan-300">
-              Research Catalog
-            </Link>{" "}
-            to start a real mission.
-          </p>
-        </section>
-
-        <section aria-labelledby="my-work-research-heading" className={`${cbaiGlassCard} space-y-2 p-5`}>
-          <p className={cbaiSectionEyebrow} id="my-work-research-heading">
-            Recent Research
-          </p>
-          <p className="text-xs text-zinc-500">
-            No recent research is shown here — sign-in and browsing history are not connected
-            yet. Every research topic remains reachable from the Research Catalog at any time.
-          </p>
-        </section>
-
         <section
           aria-labelledby="my-work-evidence-reviews-heading"
           className={`${cbaiGlassCard} space-y-2 p-5`}
@@ -186,5 +204,13 @@ export default function MyWork() {
         </section>
       </div>
     </div>
+  );
+}
+
+export default function MyWork() {
+  return (
+    <Suspense fallback={<div className="text-sm text-zinc-500">Loading…</div>}>
+      <MyWorkContent />
+    </Suspense>
   );
 }
