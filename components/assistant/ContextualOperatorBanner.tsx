@@ -33,7 +33,7 @@ function resolveContextualActions(context: AssistantContextEntity): ContextualAc
     case "research_topic":
       return [
         { label: "Continue workspace", href: "/research/workspace" },
-        { label: "Open evidence", href: "/knowledge" },
+        { label: "Open evidence", href: profileSectionHref(context.href, "evidence") },
         { label: "Review questions", href: "/research/review" },
       ];
   }

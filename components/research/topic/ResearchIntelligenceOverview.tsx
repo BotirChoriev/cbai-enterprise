@@ -96,7 +96,7 @@ export default function ResearchIntelligenceOverview({ topicId }: ResearchIntell
       </dl>
 
       <div className="grid gap-5 lg:grid-cols-2">
-        <div className="space-y-4">
+        <div id="evidence" className="space-y-4">
           <div>
             <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">Evidence status</p>
             {evidenceSummary.evidence.length > 0 ? (

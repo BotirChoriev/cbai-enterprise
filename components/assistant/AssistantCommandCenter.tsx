@@ -8,6 +8,11 @@ import { usePlatformContext } from "@/components/platform/context/PlatformContex
 import { ASSISTANT_COMMANDS, resolveAssistantCommand } from "@/lib/assistant/assistant-commands";
 import { resolveAssistantContext } from "@/lib/assistant/assistant-context";
 import { resolveOperatorName } from "@/lib/assistant/assistant-profile";
+import {
+  resolveRelationshipCommand,
+  type RelationshipFocus,
+} from "@/lib/assistant/assistant-relationship-commands";
+import { getResearchTopicById } from "@/lib/research/research-topics";
 import Avatar from "@/components/shared/Avatar";
 
 const SUGGESTED_COMMAND_IDS = ["open-my-work", "continue-research", "open-evidence", "open-trust"];
@@ -61,6 +66,18 @@ export default function AssistantCommandCenter() {
     [pathname, context.country, context.company, context.university],
   );
 
+  // The same focus resolveAssistantContext derives, reshaped for the relationship resolver
+  // (which needs a real catalog id, not just a display href) — a research topic path takes
+  // priority, exactly mirroring resolveAssistantContext's own precedence.
+  const relationshipFocus = useMemo<RelationshipFocus | null>(() => {
+    const topicMatch = /^\/research\/([^/]+)$/.exec(pathname);
+    if (topicMatch && getResearchTopicById(topicMatch[1])) {
+      return { kind: "research_topic", id: topicMatch[1] };
+    }
+    const focused = context.country ?? context.company ?? context.university;
+    return focused ? { kind: focused.kind, id: focused.id } : null;
+  }, [pathname, context.country, context.company, context.university]);
+
   const route = useCallback(
     (rawInput: string) => {
       const trimmed = rawInput.trim();
@@ -84,6 +101,21 @@ export default function AssistantCommandCenter() {
         return;
       }
 
+      // Relationship-aware commands ("open related research/company/university/evidence", "open
+      // country") resolve against whichever real entity is currently focused — real data only,
+      // an honest message when nothing is connected. Checked before the pure fixed-phrase table
+      // so it can supersede the generic, context-blind "open evidence" entry with a real anchor.
+      const relationshipMatch = resolveRelationshipCommand(trimmed, relationshipFocus);
+      if (relationshipMatch) {
+        setUnrecognized(null);
+        setInput("");
+        if (relationshipMatch.type === "navigate") {
+          router.push(relationshipMatch.href);
+        }
+        setConfirmation(relationshipMatch.message);
+        return;
+      }
+
       const match = resolveAssistantCommand(trimmed);
       if (match) {
         setUnrecognized(null);
@@ -95,7 +127,7 @@ export default function AssistantCommandCenter() {
         setUnrecognized(trimmed);
       }
     },
-    [router, context.country, context.company, context.university, pinEntityToWorkspace],
+    [router, context.country, context.company, context.university, pinEntityToWorkspace, relationshipFocus],
   );
 
   function handleSubmit(event: React.FormEvent) {
