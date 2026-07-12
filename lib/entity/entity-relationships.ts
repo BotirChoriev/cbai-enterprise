@@ -27,6 +27,8 @@ import { getRelatedResearchTopics, getRelatedCompaniesForTopic } from "@/lib/com
 import { getResearchTopicById, getResearchTopicPath } from "@/lib/research/research-topics";
 import { companyHrefByName, hrefForEntity, type LinkableEntityType } from "@/components/shared/resolve-entity-link";
 import type { EntityRelationship } from "@/lib/entity/entity.types";
+import { loadProjectEntities, getProjectsLinkedToEntity } from "@/lib/project/project-store";
+import type { ContextEntityRef } from "@/lib/context/context-types";
 
 const VERIFIED_LABEL = "Verified local catalog";
 
@@ -44,16 +46,43 @@ function fromGraphRelationships(
   }));
 }
 
+/** Real hrefs for a ContextEntityRef across every kind Project links can point at. */
+function contextEntityHref(entity: ContextEntityRef): string | null {
+  switch (entity.kind) {
+    case "country":
+    case "company":
+    case "university":
+      return hrefForEntity(entity.kind, entity.name);
+    case "research_topic":
+      return getResearchTopicPath(entity.id);
+    case "project":
+      return `/my-work?project=${entity.id}`;
+  }
+}
+
+/** Real Projects that link to this entity — reverse direction, so any entity can see its Projects. */
+function projectBacklinks(kind: "country" | "company" | "university" | "research_topic", id: string): EntityRelationship[] {
+  return getProjectsLinkedToEntity(kind, id).map(
+    (project): EntityRelationship => ({
+      type: "PART_OF_WORKSPACE",
+      targetType: "project",
+      targetId: project.id,
+      targetName: project.title,
+      targetHref: `/my-work?project=${project.id}`,
+    }),
+  );
+}
+
 /** Real cross-entity relationships for any supported entity kind, in the shared vocabulary. */
 export function buildEntityRelationships(
-  kind: "country" | "company" | "university" | "research_topic",
+  kind: "country" | "company" | "university" | "research_topic" | "project",
   id: string,
 ): EntityRelationship[] {
   switch (kind) {
     case "country": {
       const country = countries.find((c) => c.id === id);
       if (!country) return [];
-      return fromGraphRelationships(buildCountryCoverageProfile(country).graphRelationships);
+      return [...fromGraphRelationships(buildCountryCoverageProfile(country).graphRelationships), ...projectBacklinks("country", id)];
     }
     case "company": {
       const company = companies.find((c) => c.id === id);
@@ -68,23 +97,35 @@ export function buildEntityRelationships(
           targetHref: getResearchTopicPath(match.topic.topicId),
         }),
       );
-      return [...graph, ...research];
+      return [...graph, ...research, ...projectBacklinks("company", id)];
     }
     case "university": {
       const university = universities.find((u) => u.id === id);
       if (!university) return [];
-      return fromGraphRelationships(buildUniversityCoverageProfile(university).graphRelationships);
+      return [...fromGraphRelationships(buildUniversityCoverageProfile(university).graphRelationships), ...projectBacklinks("university", id)];
     }
     case "research_topic": {
       const topic = getResearchTopicById(id);
       if (!topic) return [];
-      return getRelatedCompaniesForTopic(topic).map(
+      const companyMatches = getRelatedCompaniesForTopic(topic).map(
         (match): EntityRelationship => ({
           type: "RELATED_TO",
           targetType: "company",
           targetId: match.company.id,
           targetName: match.company.name,
           targetHref: companyHrefByName(match.company.name),
+        }),
+      );
+      return [...companyMatches, ...projectBacklinks("research_topic", id)];
+    }
+    case "project": {
+      return loadProjectEntities(id).map(
+        (entity): EntityRelationship => ({
+          type: "RELATED_TO",
+          targetType: entity.kind,
+          targetId: entity.id,
+          targetName: entity.name,
+          targetHref: contextEntityHref(entity),
         }),
       );
     }

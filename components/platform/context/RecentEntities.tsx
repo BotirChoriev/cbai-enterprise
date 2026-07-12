@@ -19,10 +19,13 @@ function entityRoute(kind: "country" | "company" | "university"): string {
   }
 }
 
-/** Research topics are routed by path segment, not the query-param focus system — see PinnedEntities.tsx. */
+/** Research topics/Projects are routed by path segment/query flag, not the query-param focus system — see PinnedEntities.tsx. */
 function entityHref(entity: ContextEntityRef, context: Parameters<typeof snapshotWithEntityFocus>[0]): string {
   if (entity.kind === "research_topic") {
     return getResearchTopicPath(entity.id);
+  }
+  if (entity.kind === "project") {
+    return `/my-work?project=${entity.id}`;
   }
   return buildContextualHref(entityRoute(entity.kind), snapshotWithEntityFocus(context, entity));
 }

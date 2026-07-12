@@ -22,13 +22,17 @@ function entityRoute(kind: "country" | "company" | "university"): string {
 }
 
 /**
- * Research topics are routed by path segment (`/research/[topicId]`), not the
- * country/company/university query-param focus system — so a pinned research topic gets a
- * direct link instead of going through buildContextualHref/snapshotWithEntityFocus.
+ * Research topics and Projects are routed by path segment/query flag (`/research/[topicId]`,
+ * `/my-work?project=id`), not the country/company/university query-param focus system — so a
+ * pinned one of either gets a direct link instead of going through
+ * buildContextualHref/snapshotWithEntityFocus.
  */
 function entityHref(entity: ContextEntityRef, context: Parameters<typeof snapshotWithEntityFocus>[0]): string {
   if (entity.kind === "research_topic") {
     return getResearchTopicPath(entity.id);
+  }
+  if (entity.kind === "project") {
+    return `/my-work?project=${entity.id}`;
   }
   return buildContextualHref(entityRoute(entity.kind), snapshotWithEntityFocus(context, entity));
 }

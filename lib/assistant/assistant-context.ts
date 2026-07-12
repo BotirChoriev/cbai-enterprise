@@ -7,9 +7,10 @@
 
 import type { ContextEntityRef } from "@/lib/context";
 import { getResearchTopicById, getResearchTopicPath } from "@/lib/research/research-topics";
+import { loadProject } from "@/lib/project/project-store";
 
 export type AssistantContextEntity = {
-  kind: "country" | "company" | "university" | "research_topic";
+  kind: "country" | "company" | "university" | "research_topic" | "project";
   name: string;
   href: string;
 };
@@ -22,18 +23,27 @@ function entityHref(entity: ContextEntityRef): string {
 
 /**
  * Resolves the current Assistant context. Research topic pages take priority when the pathname
- * is an exact topic route (a real research topic id) — otherwise falls back to whichever entity
- * PlatformContext has focused (country, then company, then university).
+ * is an exact topic route (a real research topic id); an open Project (`/my-work?project=id`)
+ * takes priority next — otherwise falls back to whichever entity PlatformContext has focused
+ * (country, then company, then university).
  */
 export function resolveAssistantContext(
   pathname: string,
   platformEntity: ContextEntityRef | null,
+  projectId?: string | null,
 ): AssistantContextEntity | null {
   const topicMatch = /^\/research\/([^/]+)$/.exec(pathname);
   if (topicMatch) {
     const topic = getResearchTopicById(topicMatch[1]);
     if (topic) {
       return { kind: "research_topic", name: topic.topicName, href: getResearchTopicPath(topic.topicId) };
+    }
+  }
+
+  if (pathname === "/my-work" && projectId) {
+    const project = loadProject(projectId);
+    if (project) {
+      return { kind: "project", name: project.title, href: `/my-work?project=${project.id}` };
     }
   }
 

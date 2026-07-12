@@ -37,6 +37,12 @@ function resolveContextualActions(context: AssistantContextEntity): ContextualAc
         { label: "Open evidence", href: profileSectionHref(context.href, "evidence") },
         { label: "Review questions", href: "/research/review" },
       ];
+    case "project":
+      return [
+        { label: "Open notes", href: profileSectionHref(context.href, "project-notes") },
+        { label: "Add evidence", href: profileSectionHref(context.href, "project-evidence") },
+        { label: "Generate report", href: profileSectionHref(context.href, "project-report") },
+      ];
   }
 }
 

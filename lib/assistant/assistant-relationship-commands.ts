@@ -21,7 +21,8 @@ export type RelationshipFocus =
   | { kind: "country"; id: string }
   | { kind: "company"; id: string }
   | { kind: "university"; id: string }
-  | { kind: "research_topic"; id: string };
+  | { kind: "research_topic"; id: string }
+  | { kind: "project"; id: string };
 
 export type RelationshipCommandResult =
   | { type: "navigate"; href: string; message: string }
@@ -63,6 +64,8 @@ function focusBaseHref(focus: RelationshipFocus): string {
       return `/universities?university=${focus.id}`;
     case "research_topic":
       return getResearchTopicPath(focus.id);
+    case "project":
+      return `/my-work?project=${focus.id}`;
   }
 }
 
@@ -104,6 +107,9 @@ export function resolveRelationshipCommand(
       }
       return { type: "navigate", href: "/research", message: `Opening Research (${matches.length} related topics).` };
     }
+    if (focus?.kind === "project") {
+      return pickTarget(relationshipsOfType(focus, "research_topic"), "/research", "research topics");
+    }
     if (focus?.kind === "country" || focus?.kind === "university") {
       return { type: "message", message: "No verified research connection exists for this entity yet." };
     }
@@ -111,14 +117,14 @@ export function resolveRelationshipCommand(
   }
 
   if (matchesAny(normalized, RELATED_COMPANY_PHRASES)) {
-    if (focus?.kind === "country" || focus?.kind === "university" || focus?.kind === "research_topic") {
+    if (focus?.kind === "country" || focus?.kind === "university" || focus?.kind === "research_topic" || focus?.kind === "project") {
       return pickTarget(relationshipsOfType(focus, "company"), "/companies", "companies");
     }
     return { type: "message", message: "No related companies connected yet." };
   }
 
   if (matchesAny(normalized, RELATED_UNIVERSITY_PHRASES)) {
-    if (focus?.kind === "country" || focus?.kind === "company") {
+    if (focus?.kind === "country" || focus?.kind === "company" || focus?.kind === "project") {
       return pickTarget(relationshipsOfType(focus, "university"), "/universities", "universities");
     }
     return { type: "message", message: "No related universities connected yet." };
@@ -131,6 +137,9 @@ export function resolveRelationshipCommand(
       return target && target.targetHref
         ? { type: "navigate", href: target.targetHref, message: `Opening ${target.targetName}.` }
         : { type: "message", message: "No related country connected yet." };
+    }
+    if (focus?.kind === "project") {
+      return pickTarget(relationshipsOfType(focus, "country"), "/countries", "countries");
     }
     if (focus?.kind === "country") {
       return { type: "message", message: "Already viewing a country." };

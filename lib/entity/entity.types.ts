@@ -8,6 +8,7 @@ export type EntityType =
   | "company"
   | "university"
   | "research_topic"
+  | "project"
   | "government"
   | "investor"
   | "person";
@@ -204,6 +205,11 @@ export const ENTITY_MODULE_CONFIGS: Record<EntityType, EntityModuleConfig> = {
     type: "research_topic",
     label: "Research Topic",
     pluralLabel: "Research Topics",
+  },
+  project: {
+    type: "project",
+    label: "Project",
+    pluralLabel: "Projects",
   },
   government: {
     type: "government",

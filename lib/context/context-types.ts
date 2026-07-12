@@ -6,12 +6,13 @@
 export const PLATFORM_CONTEXT_VERSION = "1.0.0" as const;
 
 /**
- * "research_topic" participates only in the flat recent/pinned entity lists (Save to workspace,
- * My Work) — it is never resolved through the URL-param country/company/university focus system
- * below (research topics are routed by path segment, `/research/[topicId]`, not query param), so
- * it is deliberately absent from PlatformContextSnapshot's country/company/university fields.
+ * "research_topic" and "project" participate only in the flat recent/pinned entity lists (Save
+ * to workspace, My Work) — neither is ever resolved through the URL-param country/company/
+ * university focus system below (research topics are routed by path segment,
+ * `/research/[topicId]`; projects by `/my-work?project=id`), so both are deliberately absent from
+ * PlatformContextSnapshot's country/company/university fields.
  */
-export type EntityKind = "country" | "company" | "university" | "research_topic";
+export type EntityKind = "country" | "company" | "university" | "research_topic" | "project";
 
 export type WorkspaceId = "government" | "investor" | "citizen";
 
