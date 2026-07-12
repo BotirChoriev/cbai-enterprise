@@ -1,41 +1,31 @@
-import Link from "next/link";
 import type { ResearchTopic } from "@/lib/research/research-topics";
-import { getRelatedCompaniesForTopic } from "@/lib/company-research";
-import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { buildEntityRelationships } from "@/lib/entity/entity-relationships";
+import EntityRelatedPanel from "@/components/shared/EntityRelatedPanel";
+import { cbaiGlassCard } from "@/components/brand/brand-classes";
 
 type ResearchRelatedCompaniesProps = {
   topic: ResearchTopic;
 };
 
-/** Real companies related by subject matter (industry keyword match) — closes the Company → Research → Company loop. */
+/**
+ * Real companies related by subject matter (industry keyword match) — closes the Company →
+ * Research → Company loop. Migrated onto the Universal Entity Engine's relationship builder and
+ * EntityRelatedPanel (Platform Core mission); same visual output, now sourced from the shared
+ * relationship vocabulary instead of a bespoke render.
+ */
 export default function ResearchRelatedCompanies({ topic }: ResearchRelatedCompaniesProps) {
-  const matches = getRelatedCompaniesForTopic(topic);
+  const relationships = buildEntityRelationships("research_topic", topic.topicId);
 
-  if (matches.length === 0) return null;
+  if (relationships.length === 0) return null;
 
   return (
-    <section aria-labelledby="research-related-companies-heading" className={`${cbaiGlassCard} space-y-3 p-4`}>
-      <div>
-        <p className={cbaiSectionEyebrow} id="research-related-companies-heading">
-          Related Companies
-        </p>
-        <p className="mt-1 text-xs text-zinc-600">
-          Companies related by subject matter to this topic&apos;s domain — not a sponsorship or
-          funding claim.
-        </p>
-      </div>
-      <ul className="flex flex-wrap gap-2">
-        {matches.map((match) => (
-          <li key={match.company.id}>
-            <Link
-              href={`/companies?company=${match.company.id}`}
-              className="inline-flex items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-900/60 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:border-cyan-500/30 hover:text-cyan-300"
-            >
-              {match.company.name}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </section>
+    <div className={`${cbaiGlassCard} p-4`}>
+      <EntityRelatedPanel
+        title="Related Companies"
+        relationships={relationships}
+        emptyLabel="No companies related to this topic yet."
+        note="Companies related by subject matter to this topic's domain — not a sponsorship or funding claim."
+      />
+    </div>
   );
 }
