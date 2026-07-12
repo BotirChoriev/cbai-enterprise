@@ -17,7 +17,8 @@
     "test:research-workspace-activation": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-research-workspace-activation.ts",
     "test:project-engine": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-project-engine.ts",
     "test:intelligence-guide": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-intelligence-guide.ts",
-    "test:production-readiness": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-production-readiness.ts"
+    "test:production-readiness": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-production-readiness.ts",
+    "test:data-activation": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-data-activation.ts"
   },
   "dependencies": {
     "next": "16.2.10",
