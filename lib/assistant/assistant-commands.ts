@@ -23,6 +23,7 @@ import { filterResearchTopics, getResearchTopicPath, RESEARCH_TOPICS } from "@/l
 import { countries } from "@/lib/countries";
 import { companies } from "@/lib/companies";
 import { universities } from "@/lib/universities";
+import { allNameFormsForCountry, COUNTRY_LOCALIZED_NAMES } from "@/lib/i18n/country-names";
 
 export type AssistantCommand = {
   id: string;
@@ -217,6 +218,21 @@ function findEntityHref(term: string, entityType: "country" | "company" | "unive
   return top ? getEntityDetailHref(top.entity) : null;
 }
 
+/** Real localized-name fallback for countries — `searchEntities` only indexes the English
+ * catalog name, so "открой страну Узбекистан" would otherwise fall through to a generic search
+ * even though the country is real and connected. Checked before that generic fallback. */
+function findCountryHrefByLocalizedName(term: string): { href: string; name: string } | null {
+  const normalizedTerm = term.trim().toLowerCase();
+  for (const country of countries) {
+    const localized = COUNTRY_LOCALIZED_NAMES[country.id];
+    if (!localized) continue;
+    if ([localized.uz, localized.ru, localized.tr].some((form) => form.toLowerCase() === normalizedTerm)) {
+      return { href: `/countries?country=${country.id}`, name: country.name };
+    }
+  }
+  return null;
+}
+
 const PARAMETERIZED_PATTERNS: readonly ParameterizedPattern[] = [
   {
     prefixes: ["search evidence for "],
@@ -229,9 +245,10 @@ const PARAMETERIZED_PATTERNS: readonly ParameterizedPattern[] = [
     prefixes: ["find country ", "show country ", "найди страну ", "покажи страну ", "открой страну "],
     resolve: (term) => {
       const href = findEntityHref(term, "country");
-      return href
-        ? { label: `Open country "${term}"`, href }
-        : { label: `Search for country "${term}"`, href: `/search?q=${encodeURIComponent(term)}` };
+      if (href) return { label: `Open country "${term}"`, href };
+      const localized = findCountryHrefByLocalizedName(term);
+      if (localized) return { label: `Open country "${localized.name}"`, href: localized.href };
+      return { label: `Search for country "${term}"`, href: `/search?q=${encodeURIComponent(term)}` };
     },
   },
   {
@@ -299,8 +316,12 @@ function resolveObjectFirstOpenCommand(normalized: string): AssistantCommandMatc
 
   const haystack = stripDiacriticsLower(normalized);
 
+  // Countries are checked against every real localized name form (see
+  // lib/i18n/country-names.ts), not just the English catalog name — "Oʻzbekiston" and
+  // "Özbekistan" are real, different words, not transliterations of "Uzbekistan".
   for (const country of countries) {
-    if (haystack.includes(stripDiacriticsLower(country.name))) {
+    const nameForms = allNameFormsForCountry(country.id, country.name);
+    if (nameForms.some((form) => haystack.includes(stripDiacriticsLower(form)))) {
       return { kind: "parameterized", label: `Open country "${country.name}"`, href: `/countries?country=${country.id}`, term: country.name };
     }
   }

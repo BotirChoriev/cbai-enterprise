@@ -21,7 +21,8 @@
     "test:data-activation": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-data-activation.ts",
     "test:auth-platform": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-auth-platform.ts",
     "test:launch-gate": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-launch-gate.ts",
-    "test:cloud-platform": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-cloud-platform.ts"
+    "test:cloud-platform": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-cloud-platform.ts",
+    "test:global-interface": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-global-interface.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.2",
