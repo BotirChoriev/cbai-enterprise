@@ -262,7 +262,7 @@ test("18. Home project panel reuses the real ProjectList — no second project-s
 // 19. Existing + new routes remain functional (file-existence, same discipline as launch-gate)
 // ---------------------------------------------------------------------------
 
-test("19. Every canonical route's page.tsx exists, including the one new route this mission added", () => {
+test("19. Every canonical route's page.tsx exists, including the routes this mission added", () => {
   const routes = [
     "app/(dashboard)/page.tsx",
     "app/(dashboard)/my-work/page.tsx",
@@ -272,6 +272,7 @@ test("19. Every canonical route's page.tsx exists, including the one new route t
     "app/(dashboard)/universities/page.tsx",
     "app/(dashboard)/research/page.tsx",
     "app/(dashboard)/knowledge/page.tsx",
+    "app/(dashboard)/reports/page.tsx",
     "app/(dashboard)/analytics/page.tsx",
     "app/(dashboard)/trust/page.tsx",
     "app/(dashboard)/settings/page.tsx",
