@@ -65,3 +65,11 @@ export function resolveVoiceLocale(interfaceLanguageCode: string): string {
   const definition = getLanguageDefinition(interfaceLanguageCode);
   return definition.voiceLocale ?? "en-US";
 }
+
+/** Real right-to-left preparation (Phase 18/accessibility) — no RTL language is `active` yet, but
+ * the HTML `dir` attribute is wired to this now so activating Arabic later needs no new plumbing. */
+const RTL_LANGUAGE_CODES = new Set(["ar"]);
+
+export function isRtlLanguage(code: string): boolean {
+  return RTL_LANGUAGE_CODES.has(code);
+}

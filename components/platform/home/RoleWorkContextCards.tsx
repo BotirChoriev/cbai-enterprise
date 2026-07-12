@@ -66,7 +66,7 @@ function RoleCard({
         <Link
           href={role.firstActionHref}
           onClick={onSelect}
-          className={`${cbaiBtnSecondary} min-h-8 px-3 py-1.5 text-xs`}
+          className={`${cbaiBtnSecondary} px-3 text-xs`}
         >
           {t(`${namespaceKey}.firstAction`)}
         </Link>

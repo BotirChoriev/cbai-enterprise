@@ -19,6 +19,7 @@ import {
   loadAssistantProfile,
   saveAssistantProfile,
 } from "@/lib/assistant/assistant-storage";
+import { isRtlLanguage } from "@/lib/i18n/languages";
 
 type AssistantProfileValue = {
   profile: AssistantProfile;
@@ -67,12 +68,15 @@ export function AssistantProfileProvider({ children }: { children: ReactNode }) 
     root.classList.toggle("cbai-larger-text", profile.accessibility.largerText);
   }, [profile.accessibility]);
 
-  // Real HTML lang sync (Global Language Foundation mission) — server/static markup always ships
-  // lang="en" (there is no per-request locale to render server-side in a static export); this
-  // reflects the real client-side preference once it's known, exactly like the accessibility
+  // Real HTML lang/dir sync (Global Language Foundation mission) — server/static markup always
+  // ships lang="en" (there is no per-request locale to render server-side in a static export);
+  // this reflects the real client-side preference once it's known, exactly like the accessibility
   // classes above, and never causes a hydration mismatch since it runs after hydration completes.
+  // `dir` is real RTL preparation (Phase 18) — no active language is RTL today, but activating one
+  // later needs no new plumbing.
   useEffect(() => {
     document.documentElement.lang = profile.preferredLanguage || "en";
+    document.documentElement.dir = isRtlLanguage(profile.preferredLanguage) ? "rtl" : "ltr";
   }, [profile.preferredLanguage]);
 
   const updateProfile = useCallback((patch: Partial<AssistantProfile>) => {

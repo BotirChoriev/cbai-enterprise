@@ -58,7 +58,7 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
             type="button"
             onClick={onClose}
             aria-label="Close navigation"
-            className="rounded-md p-2 text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-400"
+            className="flex h-11 w-11 items-center justify-center rounded-md text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-400"
           >
             <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className="h-5 w-5">
               <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />

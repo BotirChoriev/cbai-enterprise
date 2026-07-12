@@ -19,7 +19,7 @@ export default function HomeProjectsSection() {
         <p className={cbaiSectionEyebrow} id="home-projects-heading">
           {t("home.projectsHeading")}
         </p>
-        <Link href="/my-work" className={`${cbaiBtnSecondary} min-h-8 px-3 py-1.5 text-xs`}>
+        <Link href="/my-work" className={`${cbaiBtnSecondary} px-3 text-xs`}>
           + {t("home.newProject")}
         </Link>
       </div>
