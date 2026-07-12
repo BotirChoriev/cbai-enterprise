@@ -17,22 +17,30 @@ import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-clas
 type CreateProjectFormProps = {
   /** Pre-fills the primary entity when arriving from an entity profile — real, never fabricated. */
   initialPrimaryEntity?: ContextEntityRef;
+  /** Pre-selects a real Project Type — e.g. arriving from a role entry surface (Government ->
+   * Policy Analysis). Falls back to the first catalog type when omitted or invalid. */
+  initialType?: ProjectTypeId;
   onCreated?: (projectId: string) => void;
 };
 
 const REAL_VISIBILITY_OPTIONS: readonly ProjectVisibility[] = ["private", "team", "public"];
 const REAL_STATUS_OPTIONS: readonly ProjectStatus[] = ["active", "paused", "completed", "archived"];
 
+function isProjectTypeId(value: string | undefined): value is ProjectTypeId {
+  return PROJECT_TYPES.some((t) => t.id === value);
+}
+
 /**
  * Real Project creation — the only required fields are Title, Project Type, Description,
  * Visibility, and Status per the mission; Primary Entity and Tags are optional. Visibility only
- * has one real, working value ("Private" — this device only, no account system exists); Team and
- * Public are shown honestly as Planned, not offered as if they work.
+ * has one real, working value ("Private" — this device only): a real local account system exists
+ * (lib/auth/), but there is still no cloud backend to share a Team/Public project through, so
+ * those options are disabled rather than offered as if they work.
  */
-export default function CreateProjectForm({ initialPrimaryEntity, onCreated }: CreateProjectFormProps) {
+export default function CreateProjectForm({ initialPrimaryEntity, initialType, onCreated }: CreateProjectFormProps) {
   const router = useRouter();
   const [title, setTitle] = useState("");
-  const [type, setType] = useState<ProjectTypeId>(PROJECT_TYPES[0].id);
+  const [type, setType] = useState<ProjectTypeId>(isProjectTypeId(initialType) ? initialType : PROJECT_TYPES[0].id);
   const [description, setDescription] = useState("");
   const [tagsInput, setTagsInput] = useState("");
   const [visibility, setVisibility] = useState<ProjectVisibility>("private");
@@ -119,6 +127,9 @@ export default function CreateProjectForm({ initialPrimaryEntity, onCreated }: C
                 </option>
               ))}
             </select>
+            <p className="mt-1 text-[11px] text-zinc-600">
+              {PROJECT_TYPES.find((t) => t.id === type)?.description}
+            </p>
           </div>
 
           <div>
@@ -179,7 +190,7 @@ export default function CreateProjectForm({ initialPrimaryEntity, onCreated }: C
               className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200"
             >
               {REAL_VISIBILITY_OPTIONS.map((v) => (
-                <option key={v} value={v}>
+                <option key={v} value={v} disabled={v !== "private"}>
                   {PROJECT_VISIBILITY_LABELS[v]}
                 </option>
               ))}

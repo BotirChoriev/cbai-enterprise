@@ -107,13 +107,14 @@ function LinkEntityForm({ projectId, onLinked }: { projectId: string; onLinked: 
 }
 
 export default function ProjectHome({ project: initialProject }: ProjectHomeProps) {
-  const { isEntityPinned } = usePlatformContext();
+  const { isEntityPinned, pinEntityToWorkspace, unpinEntityFromWorkspace } = usePlatformContext();
   const [project, setProject] = useState(initialProject);
   const [entities, setEntities] = useState<ContextEntityRef[]>(() => loadProjectEntities(project.id));
   const [evidence, setEvidence] = useState(() => loadProjectEvidence(project.id));
   const [showReport, setShowReport] = useState(false);
   const [researchQuestionDraft, setResearchQuestionDraft] = useState(project.researchQuestion ?? "");
   const [objectivesDraft, setObjectivesDraft] = useState(project.objectives ?? "");
+  const [questionObjectivesSaved, setQuestionObjectivesSaved] = useState(false);
   // A pure re-render trigger — Dashboard/Guide/Health/Timeline read directly from the store on
   // every render (no internal caching), so bumping this after any sibling panel's mutation is
   // enough to keep them honest and current within the same session.
@@ -133,7 +134,12 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
       researchQuestion: researchQuestionDraft.trim() || undefined,
       objectives: objectivesDraft.trim() || undefined,
     });
-    if (updated) setProject(updated);
+    if (updated) {
+      setProject(updated);
+      refresh();
+      setQuestionObjectivesSaved(true);
+      window.setTimeout(() => setQuestionObjectivesSaved(false), 3000);
+    }
   }
 
   function handleToggleReport() {
@@ -201,13 +207,20 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
             className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-cyan-500/30"
           />
         </div>
-        <button
-          type="button"
-          onClick={handleSaveQuestionObjectives}
-          className="rounded-md border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-[11px] font-medium text-cyan-300 hover:border-cyan-500/50"
-        >
-          Save
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleSaveQuestionObjectives}
+            className="rounded-md border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-[11px] font-medium text-cyan-300 hover:border-cyan-500/50"
+          >
+            Save
+          </button>
+          {questionObjectivesSaved ? (
+            <p role="status" className="text-[11px] text-emerald-400">
+              Saved.
+            </p>
+          ) : null}
+        </div>
       </div>
 
       <div id="project-entities" className={`${cbaiGlassCard} space-y-3 p-4`}>
@@ -225,18 +238,47 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
           emptyLabel="No entities linked yet. Link a Country, Company, or University this project is about."
         />
         {entities.length > 0 ? (
-          <div className="flex flex-wrap gap-2 border-t border-zinc-800/80 pt-2">
-            {entities.map((entity) => (
-              <button
-                key={`${entity.kind}-${entity.id}`}
-                type="button"
-                onClick={() => handleUnlink(entity)}
-                title={`Unlink ${entity.name}`}
-                className="rounded-full border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-[11px] text-zinc-500 hover:border-red-500/30 hover:text-red-400"
-              >
-                Unlink {entity.name} ×
-              </button>
-            ))}
+          <div className="space-y-1.5 border-t border-zinc-800/80 pt-2">
+            <p className="text-[10px] text-zinc-600">
+              Linked entities belong to this project. Bookmarking is separate — it saves an entity
+              to your workspace everywhere, not just here.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {entities.map((entity) => {
+                const pinned = isEntityPinned(entity.kind, entity.id);
+                return (
+                  <div
+                    key={`${entity.kind}-${entity.id}`}
+                    className="flex items-center gap-1 rounded-full border border-zinc-800 bg-zinc-900/60 pl-2.5 pr-1 py-1 text-[11px] text-zinc-400"
+                  >
+                    <span>{entity.name}</span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        pinned
+                          ? unpinEntityFromWorkspace(entity.kind, entity.id)
+                          : pinEntityToWorkspace(entity)
+                      }
+                      aria-label={pinned ? `Remove ${entity.name} bookmark` : `Bookmark ${entity.name}`}
+                      aria-pressed={pinned}
+                      title={pinned ? `Remove ${entity.name} bookmark` : `Bookmark ${entity.name}`}
+                      className={`rounded-full px-1.5 py-0.5 ${pinned ? "text-cyan-300" : "text-zinc-600 hover:text-cyan-300"}`}
+                    >
+                      <span aria-hidden="true">{pinned ? "★" : "☆"}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleUnlink(entity)}
+                      aria-label={`Unlink ${entity.name}`}
+                      title={`Unlink ${entity.name}`}
+                      className="rounded-full px-1.5 py-0.5 text-zinc-600 hover:text-red-400"
+                    >
+                      <span aria-hidden="true">×</span>
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         ) : null}
       </div>
@@ -271,7 +313,10 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
               ))}
           </ul>
         ) : (
-          <p className="text-xs text-zinc-600">None of this project&apos;s linked entities are bookmarked yet.</p>
+          <p className="text-xs text-zinc-600">
+            None of this project&apos;s linked entities are bookmarked yet — use the ☆ next to a
+            linked entity above to bookmark it.
+          </p>
         )}
       </div>
 
