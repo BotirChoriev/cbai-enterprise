@@ -2,6 +2,11 @@
  * Project Engine — real local persistence, following the exact pattern already proven by
  * lib/context/context-history.ts and lib/research/research-workspace-store.ts (isBrowser guard,
  * one JSON blob per localStorage key, sanitize-on-read, never throws).
+ *
+ * Every key is now real-user-namespaced (Authentication + User Platform Foundation mission) via
+ * resolveStorageKey — a signed-in user's Projects live under their own key; signed out, everyone
+ * shares the same `:local` bucket every existing user's data already migrates into automatically.
+ * No shape change, no duplicated storage — only the raw key string differs.
  */
 
 import type {
@@ -17,6 +22,7 @@ import type {
 } from "@/lib/project/project-types";
 import { PROJECT_TYPES } from "@/lib/project/project-types";
 import type { ContextEntityRef } from "@/lib/context/context-types";
+import { resolveStorageKey } from "@/lib/storage/namespaced-key";
 
 const PROJECTS_KEY = "cbai-projects";
 const PROJECT_ENTITIES_KEY = "cbai-project-entities";
@@ -32,7 +38,7 @@ function isBrowser(): boolean {
 function readList<T>(key: string, isValid: (value: unknown) => value is T): T[] {
   if (!isBrowser()) return [];
   try {
-    const raw = window.localStorage.getItem(key);
+    const raw = window.localStorage.getItem(resolveStorageKey(key));
     if (!raw) return [];
     const parsed: unknown = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
@@ -44,7 +50,7 @@ function readList<T>(key: string, isValid: (value: unknown) => value is T): T[] 
 
 function writeList<T>(key: string, items: readonly T[]): void {
   if (!isBrowser()) return;
-  window.localStorage.setItem(key, JSON.stringify(items));
+  window.localStorage.setItem(resolveStorageKey(key), JSON.stringify(items));
 }
 
 function newId(prefix: string): string {

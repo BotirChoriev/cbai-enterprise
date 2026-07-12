@@ -1,4 +1,5 @@
 import type { ContextEntityRef } from "@/lib/context/context-types";
+import { resolveStorageKey } from "@/lib/storage/namespaced-key";
 
 const RECENT_STORAGE_KEY = "cbai-platform-recent-entities";
 const PINNED_STORAGE_KEY = "cbai-platform-pinned-entities";
@@ -34,19 +35,21 @@ function parseEntityList(raw: string | null): ContextEntityRef[] {
 
 function writeEntityList(key: string, entities: readonly ContextEntityRef[]): void {
   if (!isBrowser()) return;
-  window.localStorage.setItem(key, JSON.stringify(entities));
+  window.localStorage.setItem(resolveStorageKey(key), JSON.stringify(entities));
 }
 
-/** Load recently viewed entities from local storage — architecture-backed, no fake entries. */
+/** Load recently viewed entities from local storage — architecture-backed, no fake entries.
+ * Real-user-namespaced (Authentication + User Platform Foundation mission): a signed-in user sees
+ * only their own recent activity. */
 export function loadRecentEntities(): ContextEntityRef[] {
   if (!isBrowser()) return [];
-  return parseEntityList(window.localStorage.getItem(RECENT_STORAGE_KEY));
+  return parseEntityList(window.localStorage.getItem(resolveStorageKey(RECENT_STORAGE_KEY)));
 }
 
-/** Load pinned entities — architecture only; empty until user pinning ships. */
+/** Load pinned entities (Bookmarks) — real-user-namespaced, same as loadRecentEntities. */
 export function loadPinnedEntities(): ContextEntityRef[] {
   if (!isBrowser()) return [];
-  return parseEntityList(window.localStorage.getItem(PINNED_STORAGE_KEY));
+  return parseEntityList(window.localStorage.getItem(resolveStorageKey(PINNED_STORAGE_KEY)));
 }
 
 /** Record an entity view in recent history — deduplicated, capped. */
