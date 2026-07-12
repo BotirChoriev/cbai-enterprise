@@ -715,3 +715,22 @@ every page). Search gained a real "Create Project from this entity" action on ev
 Country/Company/University/Research profile page and every openable search result card,
 pre-filling the real entity as Primary Entity. 15 new tests, 130 total passing. Full detail:
 `docs/product-activation-audit.md` §17.
+
+## Intelligence Guide Activation
+
+The Assistant now guides a Project rather than just hosting it. `resolveProjectGuideStep`
+(`lib/project/project-guide.ts`) is a pure function over real Project state — Research Question,
+Objectives, Evidence, Related Entities, Notes, then Report — that always resolves to exactly one
+real suggestion, phrased softly ("Suggested Next Step" / "Continue" / "Ready When You Are," never
+"required" or "mandatory"). Report generation became a real, persisted event
+(`Project.reportGeneratedAt`, set only by an actual click) rather than an ephemeral session flag,
+so Progress, the Guide, the new Project Health panel, and the Report Engine's own timeline all now
+agree across page reloads. Project Health surfaces eight real signals as booleans and counts —
+deliberately never a score or percentage. Every empty state across Evidence/Notes/Tasks/Related
+Entities now teaches instead of just reporting absence. My Work project cards show real status,
+the real Guide suggestion, real last-activity, and a Continue button that deep-links straight to
+the suggested step. Command Center gained `open next step`/`generate project report`/`open
+project evidence`. Fixed two real, previously-dead gaps: `ContextualOperatorBanner` was never
+mounted on `/my-work` (its "project" case was unreachable), and `ProjectDashboard` cached its
+reads at mount so sibling panels' edits never updated it within the same session — both fixed. 12
+new tests, 142 total passing. Full detail: `docs/product-activation-audit.md` §18.

@@ -1212,3 +1212,97 @@ fabricated capability. Project Timeline in the report reuses the same real creat
 timestamps `ResearchWorkspaceActivity.tsx` already established for Research topics — no new
 timeline engine was built for Projects specifically.
 states render correctly server-side.
+
+## 18. Intelligence Guide Activation
+
+Response to "CBAI Product Activation — Intelligence Guide Activation" (priority: Maximum; the
+Assistant becomes an Intelligence Guide, reusing the Project Engine, Entity Engine, Assistant,
+Context Engine, Workspace Engine, My Work, Reports, and Universal Search — explicitly not a second
+chatbot, not conversational AI, and never a fabricated recommendation).
+
+**The Guide is a pure function, not a model call.** New `lib/project/project-guide.ts`
+(`resolveProjectGuideStep`) checks exactly the mission's order — Research Question, Objectives,
+Evidence, Related Entities, Notes, Report — against a Project's own real fields and its real
+Evidence/Entity/Notes stores, returning the first real gap. Nothing is inferred, scored, or
+generated; an identical Project always resolves to an identical suggestion. Tone is deliberately
+soft everywhere it's rendered: "Suggested Next Step" / "Continue" / "Available Action" / "Ready
+When You Are," never "must," "required," or "mandatory" (verified by an automated test that scans
+the resolved suggestion text for those words).
+
+**Report generation became a real, persisted event.** The prior mission's `deriveProjectProgress`
+took a `reportGeneratedThisSession: boolean` the caller had to remember to pass — real for the
+current tab, but silently wrong on a page reload or in a second tab (a genuine progress-fabrication
+risk the Guide's "no Report yet" check would have inherited). `Project` gained a real
+`reportGeneratedAt?: string` field, set only by an actual "Generate report" click
+(`markProjectReportGenerated`, `lib/project/project-store.ts`) — `deriveProjectProgress`, the new
+Guide, the new Project Health panel, and the Report Engine's own timeline (a new "Report generated"
+entry) all now read this one honest, cross-session source instead of four independent proxies.
+
+**Project Health is eight real signals, never a score.** New `lib/project/project-health.ts`
+(`deriveProjectHealth`) returns booleans for Question/Objectives/Report and real counts for
+Evidence/Notes/Entity links/Tasks (done vs. total)/Open questions — rendered by
+`ProjectHealthPanel.tsx` as a checklist with real counts next to each row, deliberately never
+collapsed into a percentage or composite score, matching the mission's explicit "Never invent
+percentages."
+
+**Project Timeline is a real panel now, not only buried inside the report.** New
+`ProjectTimelinePanel.tsx` surfaces the Report Engine's already-real `timeline` field (project
+created → evidence added → notes written → tasks added → report generated, sorted by real
+timestamp) directly on Project Home — reusing `buildEntityReport("project", id)`, not a second
+timeline engine. An empty project shows a real, empty, teaching state rather than a placeholder
+event.
+
+**Smart empty states, project-wide.** Every "nothing here yet" message in Evidence/Notes/Tasks was
+rewritten to teach rather than just report absence, e.g. Evidence: "No Evidence has been added yet.
+Start by collecting one verified source." (the mission's own example, applied literally); Notes:
+"No Notes yet. Document what you learn as you go — notes capture your thinking in your own words.";
+Tasks: "No Tasks yet. Break this project into small, trackable steps."; Related Entities: "No
+entities linked yet. Link a Country, Company, or University this project is about."
+
+**My Work project cards now show Current status, Suggested next step, Last activity, and a
+Continue button**, per the mission's literal list — `ProjectCard` (in `ProjectList.tsx`) takes the
+real `Project` object and calls the same `resolveProjectGuideStep` the Guide panel and Command
+Center use (one resolver, three surfaces). The Continue button deep-links straight to the
+suggestion's real anchor (e.g. `#project-evidence`), not just the project's home — clicking
+"Continue" takes the user directly to the next real, actionable field.
+
+**Command Center gained `open next step` / `generate project report` / `open project evidence`.**
+Investigated the existing relationship resolver first and found it already owns the bare `open
+evidence` phrase unconditionally (`assistant-relationship-commands.ts`'s `RELATED_EVIDENCE_PHRASES`,
+checked before the project resolver) — reusing that exact phrase for Projects would have been dead
+code, so the new phrases are deliberately distinct and non-colliding, documented in
+`project-commands.ts`. `open next step` reuses `resolveProjectGuideStep` against the real
+most-recently-updated project (same honest interpretation of "current project" the Project Engine
+Activation mission already established for `continue project`/`add evidence`/`open notes`).
+
+**Fixed a real, previously-dead wiring gap.** `ContextualOperatorBanner`'s `"project"` case (three
+action chips: Open notes / Add evidence / Generate report) was built in the Project Engine
+Activation mission but never actually reachable — the banner was never mounted on `/my-work`, and
+even where it *is* mounted (Country/Company/University/Research pages), `resolveAssistantContext`
+was never called with a `projectId`, the one argument that unlocks the `"project"` branch. Fixed by
+mounting `<ContextualOperatorBanner projectId={project.id} />` on Project Home (which already has
+the real id from its own `useSearchParams()` read) and adding a fourth, dynamic "Open Next Step"
+chip computed from the same Guide resolver — without adding `useSearchParams()` to the banner
+itself, so the Suspense-boundary risk the prior mission avoided for the *global* Command Center is
+still avoided here.
+
+**Fixed a real same-session staleness bug.** `ProjectDashboard` previously cached its reads
+(`useState(() => loadProjectEntities(...))` etc.) at mount, so adding evidence or a note in a
+sibling panel never updated the Dashboard's counts without a full page reload — a real risk to this
+mission's primary goal ("the platform should always know the NEXT BEST REAL ACTION"). Converted
+Dashboard, Guide, Health, and Timeline to read directly from the store on every render (no
+caching), and every mutating panel (Evidence/Notes/Tasks/Open Questions) now calls a shared
+`refresh` callback after a real write, so the Guide's suggestion and Health's counts update
+immediately as the user works — not just on reload.
+
+**Tests**: new `scripts/test-intelligence-guide.ts` (`npm run test:intelligence-guide`) — 12 tests
+covering the Guide's exact ordering, its never-orders-language guarantee, the persisted
+`reportGeneratedAt` field's effect on Progress and Health, honest SSR behavior for the three new
+Command Center phrases, and href construction. 12/12 passing, alongside the unchanged
+15 + 12 + 10 + 13 + 14 + 12 + 15 + 28 + 11 = 130 total — **142 tests overall**.
+
+**Not attempted**: the Guide only ever surfaces one step at a time (the mission's own design, not a
+checklist of remaining steps) — Project Health's checklist already covers "what else is missing"
+for a user who wants the fuller picture. No new "Activity feed" beyond the existing Timeline panel
+was built — the mission's Timeline example (create → evidence → notes → report) is exactly what the
+Report Engine's real event list already produces.

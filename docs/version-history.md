@@ -913,6 +913,44 @@ New `scripts/test-project-engine.ts` — 15 tests. `npm run lint` clean, `npm ru
 130 total tests passing (15 + 12 + 10 + 13 + 14 + 12 + 15 + 28 + 11). Zero Platform Core files
 touched; no new pages; nothing removed. Full detail: `docs/product-activation-audit.md` §17.
 
+## v3.19 — Intelligence Guide Activation
+
+The Assistant becomes an Intelligence Guide: a pure function over real Project state that always
+knows one real "next best action," never a second chatbot and never a fabricated recommendation.
+New `lib/project/project-guide.ts` (`resolveProjectGuideStep`) checks Research Question →
+Objectives → Evidence → Related Entities → Notes → Report, exactly the mission's order, and
+returns the first real gap — phrased only as "Suggested Next Step"/"Continue"/"Available
+Action"/"Ready When You Are," never "must"/"required"/"mandatory."
+
+`Project` gained a real persisted `reportGeneratedAt` field (`markProjectReportGenerated`),
+replacing the prior mission's ephemeral session-only report flag. Progress, the new Guide, the new
+Project Health panel, and the Report Engine's timeline (a new real "Report generated" event) all
+now read this one honest, cross-session source instead of four independent proxies.
+
+New `lib/project/project-health.ts` (`deriveProjectHealth`) surfaces eight real signals —
+Question/Objectives/Report as booleans, Evidence/Notes/Entity links/Tasks/Open Questions as real
+counts — deliberately never collapsed into a fabricated score or percentage. New
+`ProjectTimelinePanel.tsx` surfaces the Report Engine's already-real timeline directly on Project
+Home, not buried inside the report. Every "nothing here yet" empty state across Evidence/Notes/
+Tasks/Related Entities was rewritten to teach, per the mission's own example ("No Evidence has been
+added yet. Start by collecting one verified source.").
+
+My Work project cards now show real status, the real Guide suggestion, real last-activity, and a
+Continue button that deep-links straight to the suggested step's anchor — reusing
+`resolveProjectGuideStep`, the same resolver the Guide panel and Command Center use. Command Center
+gained `open next step`/`generate project report`/`open project evidence`, deliberately distinct
+from the relationship resolver's existing bare `open evidence` phrase so nothing was silently
+shadowed. Fixed two real, previously-dead gaps: `ContextualOperatorBanner` was never mounted on
+`/my-work` and never received a `projectId` (its "project" action case had been unreachable since
+it was built), and `ProjectDashboard` cached its reads at mount, so sibling panels' real mutations
+never updated it within the same session — both fixed, directly serving this mission's primary
+goal that the platform always know the current real state.
+
+New `scripts/test-intelligence-guide.ts` — 12 tests. `npm run lint` clean, `npm run build` 91
+routes, 142 total tests passing (12 + 15 + 12 + 10 + 13 + 14 + 12 + 15 + 28 + 11). Zero Platform
+Core files touched; no new pages; no new chatbot; nothing removed. Full detail:
+`docs/product-activation-audit.md` §18.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation
