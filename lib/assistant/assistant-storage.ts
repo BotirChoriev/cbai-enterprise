@@ -91,5 +91,6 @@ export function clearAssistantProfile(): void {
 }
 
 export const ASSISTANT_PROFILE_ARCHITECTURE_NOTE =
-  "The Assistant profile is saved to this browser only — this platform has no accounts, " +
-  "authentication, or cross-device sync. Nothing here is a fabricated user record.";
+  "The Assistant profile is saved to this browser only, separately from the real local account " +
+  "system (lib/auth/) — there is no cross-device sync for either. Nothing here is a fabricated " +
+  "user record.";

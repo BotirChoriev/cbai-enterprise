@@ -95,8 +95,19 @@ const sections: TrustSection[] = [
     id: "privacy",
     title: "Privacy",
     body: [
-      "This platform does not have user accounts, sign-in, or session tracking today — there is no personal data to collect, store, or share.",
-      "A complete privacy policy will be published ahead of any account or personalization system, once legal review is complete.",
+      "A real local account is available (email, password, display name, organization) — the password is hashed and salted with your browser's own cryptography before it is stored, and every account, Project, and Bookmark stays in this browser's local storage only. Nothing is sent to a server, because this platform has none yet.",
+      "There is no cross-device sync, no analytics, no tracking script, and no third party ever receives this data.",
+      "A complete privacy policy will be published ahead of any real cloud-backed account or personalization system, once legal review is complete.",
+    ],
+  },
+  {
+    id: "terms-of-use",
+    title: "Terms of Use",
+    body: [
+      "This is a minimum, honest statement of real current behavior — not a substitute for a lawyer-drafted Terms of Service, which will be published before any commercial or cloud-backed launch.",
+      "CBAI is provided as-is, with no warranty of accuracy, completeness, or fitness for a particular purpose. Evidence-based information is not professional, legal, financial, or medical advice.",
+      "You are responsible for verifying any information before relying on it for a real decision — the Human Decision principle above applies to your use of this platform, not only to what it produces.",
+      "Local accounts and locally stored data may be lost if this browser's storage is cleared; there is no backup or recovery today.",
     ],
   },
   {
@@ -112,7 +123,7 @@ const sections: TrustSection[] = [
     title: "Known Limitations",
     body: [
       "Coverage today is intentionally shown as it really is, not as it will eventually be: most profiles have only a small number of official sources connected so far, and the remaining gaps are labeled individually rather than hidden.",
-      "There are no accounts, sign-in, or cross-device sync yet — Projects, notes, and saved work stay on the device that created them.",
+      "Local accounts exist (email/password, hashed and salted on-device), but there is no server to verify them, no cross-device sync, and no account recovery — Projects, notes, and saved work stay on the device that created them.",
       "Governance, Investor, and Citizen workspaces, and the Knowledge Graph and Reasoning views, share the same evidence core and are still early — treat their current depth as a preview of the intended experience, not the finished one.",
     ],
   },
