@@ -665,3 +665,28 @@ path was removed outright, after first closing a real recall gap (real tags from
 evidence-types) so nothing was lost in the switch. Command Center's triplicated inline focus-
 resolution chain was replaced with the existing, previously underused `getPrimaryEntity(context)`
 accessor. 10 new tests, 103 total passing. Full detail: `docs/product-activation-audit.md` §15.
+
+## Research Workspace Activation
+
+Investigated first: `/research/workspace` (Command Center's "Continue workspace" target) turned
+out to be a genuinely separate, honestly-labeled read-only topic switcher — not the same system as
+`lib/research-workspace/`'s real Contract. The actual real, data-rich workspace already lived on
+the topic-detail route, where `TopicReviewWorkspace.tsx` already rendered "Research notes,"
+"Findings," and "Open review questions" headings, always empty because no persistence existed
+anywhere in the platform. Open Questions were already real and live. Counter Evidence
+(`evidenceSummary.conflictingEvidence`, computed by the Reasoning Engine from real `contradicts`
+relationships) was already in the Contract but silently dropped and never rendered.
+
+New `lib/research/research-workspace-store.ts` — real localStorage Notes/Findings persistence,
+following the exact `context-history.ts` pattern; every note optionally links to a real Evidence
+item or related Entity. New Evidence Lifecycle (Collected → Reviewed → Linked → Compared →
+Referenced → Included in Report → Archived) — confirmed no existing status vocabulary matched
+this, so it's genuinely new, applied over real catalog evidence, advancing one stage at a time,
+never skipped or auto-completed. New `SupportingCounterEvidencePanel.tsx` surfaces the real,
+previously-dropped Counter Evidence with equal visual weight against Supporting Evidence. New
+`ResearchWorkspaceDashboard.tsx` composes Current Question/Progress/Evidence Summary/Missing
+Evidence/Recent Notes/Related Reports/Workspace Status entirely from already-computed real
+sources — zero new engines. New `ResearchWorkspaceActivity.tsx`, a real single-user activity feed
+from real note/finding/lifecycle timestamps. `ResearchTopicReport` gained real `question`/
+`supportingEvidence`/`counterEvidence`/`notes` fields. 12 new tests, 115 total passing. Full
+detail: `docs/product-activation-audit.md` §16.

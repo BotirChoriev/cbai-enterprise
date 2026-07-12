@@ -992,3 +992,119 @@ universal `Entity` type itself — they still live in each module's own `registr
 through `EntityHeader` verbatim. Unifying that fully would mean extending `Entity` with per-kind
 fact schemas, a real but separate migration not attempted here to avoid touching working fact
 displays without a concrete need.
+
+## 16. Research Workspace Activation
+
+Response to "CBAI Product Activation — Research Workspace Activation" (priority: highest; make
+Research Workspace the primary working environment, reusing the Universal Entity/Workspace/
+Report/Relationship Engines rather than building new architecture). Investigated first, via a
+dedicated Explore pass over `lib/research-workspace/`, `lib/research-mission/`,
+`lib/research/evidence/`, `lib/research/review/`, `lib/research/intelligence/`, and every
+`components/research/topic/*.tsx` file, before writing anything.
+
+**Key finding that shaped everything**: `/research/workspace` (the route Command Center's
+"Continue workspace" already links to) is a genuinely separate, honestly-labeled read-only topic
+switcher (`WORKSPACE_SHELL_NOTICE`: *"This is a read-only workspace shell..."*) — a different
+system from `lib/research-workspace/`'s real Contract. The actual real, data-rich "research
+workspace" already lived on the real topic-detail route (`/research/[topicId]`, via
+`TopicReviewWorkspace.tsx`), which already rendered "Research notes," "Findings," and "Open review
+questions" headings — always empty, because `lib/research/intelligence/review-workspace-model.ts`'s
+`ResearchNote`/`ResearchFinding` types existed as *"architecture for a future build … no
+persistence exists anywhere in this platform yet"* (verbatim doc comment). Open Questions were
+already real and live (`buildOpenQuestions`, derived from real evidence-gap state) — not a gap.
+`EvidenceCenterSection.supportingEvidence`/`.conflictingEvidence` (the real, Reasoning-Engine-
+computed Counter Evidence, from actual `contradicts` relationships, never inferred) was already
+computed inside `ResearchWorkspaceContract` but silently dropped by `research-mission-builder.ts`
+and never rendered by any component. This mission's job was almost entirely: add the one missing
+piece (persistence) and surface the one already-computed-but-dropped piece (counter evidence) —
+not build a parallel workspace.
+
+**Real persistence, following the established pattern**: new
+`lib/research/research-workspace-store.ts` mirrors `lib/context/context-history.ts`'s exact shape
+(isBrowser guard, one JSON blob per localStorage key, sanitize-on-read, never throws) — the same
+pattern already proven by two real stores in this codebase, not a third competing shape. Provides
+real `saveResearchNote`/`loadResearchNotes` and `saveResearchFinding`/`loadResearchFindings`, each
+note/finding belonging to Research (topicId), Workspace (implicit), and optionally a real linked
+Evidence item or related Entity (never fabricated — the link dropdowns are populated only from
+real catalog data already computed for the page).
+
+**Evidence Lifecycle — genuinely new, since no existing type matched it**: confirmed via the
+investigation that `EvidenceStatus` (draft/verified/disputed/deprecated/archived, in
+`lib/research/evidence/`) and `VerificationStatus` (not_started/verification_pending/verified/
+failed/not_applicable, in `lib/foundation/`) are both real but neither matches the mission's
+requested Collected→Reviewed→Linked→Compared→Referenced→Included in Report→Archived vocabulary.
+New `EvidenceLifecycleStage` (7 values) + `advanceEvidenceLifecycle`, applied over real evidence
+items already in the catalog (`TopicEvidenceCatalogItem`, from the already-real
+`buildTopicEvidenceReview`). Every item starts honestly at "Collected" (true of anything already
+catalogued) with no persisted record; `EvidenceLifecyclePanel.tsx` only ever advances one stage at
+a time via an explicit "Mark as {next stage}" action — stages can never be skipped or
+auto-completed, and the full 7-stage track is always visible so an unadvanced stage reads as
+exactly that, never hidden.
+
+**Counter Evidence surfaced, not reinvented**: new `SupportingCounterEvidencePanel.tsx` renders
+`mission.workspaceContract.evidenceSummary.supportingEvidence`/`.conflictingEvidence` directly —
+real data that existed in the Contract since the Universal Entity Engine mission but was never
+wired to any UI. Both columns render with equal visual weight; the counter-evidence empty state
+explicitly states absence-of-evidence is not evidence-of-absence.
+
+**Research Dashboard — one new composition, zero new engines**: new
+`ResearchWorkspaceDashboard.tsx` assembles Current Question (`buildResearchMission`'s mission
+center), Current Progress (`deriveResearchReadiness`'s real milestone counts — already wired
+elsewhere in `TopicReviewWorkspace.tsx`, reused not re-derived), Evidence Summary and Missing
+Evidence (`deriveEvidenceGapIntelligence`, the same real engine `TopicReviewWorkspace`/
+`ResearchCockpit` already call), Recent Notes (the new real store), Related Reports (a real anchor
+link to the topic's own Generate Report section), and Workspace Status (the real
+`isEntityPinned("research_topic", …)` check, same architecture as `SaveToWorkspaceButton`). Every
+field is either a direct pass-through of an already-computed value or a one-line composition —
+nothing here is a new derivation.
+
+**Workspace Activity**: new `ResearchWorkspaceActivity.tsx` — a real chronological feed built only
+from the user's own actions (notes, findings, evidence-lifecycle changes), each carrying a real
+timestamp from the new store. No fabricated "collaboration" or "team activity" — this platform has
+no multi-user session model, so the feed is honestly single-user.
+
+**Saved Drafts**: interpreted as the persisted Notes/Findings themselves, surfaced in the
+Dashboard's "Recent notes" and the Report's "Research Notes" section — a genuinely new, separate
+"drafts" data model was deliberately not built, since it would duplicate the Notes store for no
+real functional difference (confirmed via the investigation that no "Draft"/"SavedDraft" concept
+exists anywhere in the codebase to extend or collide with).
+
+**Related Countries/Companies/Universities**: unchanged from the Universal Entity Engine mission —
+`buildEntityRelationships("research_topic", id)` still only ever resolves real Company
+relationships (industry-keyword match); Country/University groups are honestly absent, since no
+real signal connects a research topic to either (confirmed again, not re-litigated).
+
+**Report finished**: `ResearchTopicReport` (in `lib/entity/entity-report.ts`) gained `question`
+(real, from the mission center), `supportingEvidence`/`counterEvidence` (real, from the Contract),
+and `notes` (real, from the new store) — `ResearchTopicReportView.tsx` renders all three new
+sections. The report now genuinely uses Question, Evidence, Notes, Entities (via
+`EntityRelatedPanel`), Trust, and Limitations, as the mission asked — Timeline was evaluated and
+left out honestly: `researchTimeline.events` is real but the Contract's own builder documents it
+as *"currently latent (topic timelines are always empty today)"* for every real topic, so including
+it would only ever render an empty section with no information value beyond what "Timeline: not yet
+available" already conveys implicitly by its absence — not a fabrication risk, a genuine
+information-density judgment call, noted here for transparency rather than silently dropped.
+
+**Workspace continuity verified, not rebuilt**: "Continue later / Bookmark / Return from My Work"
+already worked end-to-end via the `pinEntity`/`SaveToWorkspaceButton` architecture (extended to
+`research_topic` in the Platform Relationship Activation mission) — confirmed still functioning,
+no changes needed.
+
+**Tests**: new `scripts/test-research-workspace-activation.ts`
+(`npm run test:research-workspace-activation`) — 12 tests covering the exact 7-stage lifecycle
+vocabulary, SSR-safety (honest emptiness, never throws) for notes/findings/lifecycle outside a
+browser, and the report's real question/supporting-evidence/counter-evidence/notes wiring against
+`buildResearchMission`'s own output (not a hand-typed expectation). 12/12 passing, alongside the
+unchanged 10 + 13 + 14 + 12 + 15 + 28 + 11 = 103 total — **115 tests overall**.
+
+**Not attempted**: `/research/workspace`'s separate topic-switcher shell was left completely
+unchanged — it's honestly labeled read-only and conflating it with the real per-topic workspace
+risked exactly the kind of confusing dual-system UI this mission's "reuse, don't build page
+features" instruction warned against. `lib/research/review/`'s full peer/methodology/ethics review
+domain (confirmed dead — placeholder page only) was not activated; it models a heavier,
+multi-reviewer workflow this single-user platform has no real data for yet. Real round-trip
+persistence (save then reload) could not be exercised inside the Node test harness (no
+`localStorage`/DOM in this environment, matching the honest SSR case every store function already
+handles) — verified instead via code review of the identical, already-proven
+`context-history.ts` pattern, plus curl-based confirmation that the create-forms and honest-empty
+states render correctly server-side.

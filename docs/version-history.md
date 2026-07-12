@@ -847,6 +847,43 @@ New `scripts/test-platform-core-completion.ts` — 10 tests. `npm run lint` clea
 91 routes, 103 total tests passing (10 + 13 + 14 + 12 + 15 + 28 + 11). Zero Platform Core files
 touched; no working functionality removed. Full detail: `docs/product-activation-audit.md` §15.
 
+## v3.17 — Research Workspace Activation
+
+Investigated first: `/research/workspace` (Command Center's "Continue workspace" target) is a
+genuinely separate, honestly-labeled read-only topic switcher — not the same system as
+`lib/research-workspace/`'s real Contract. The actual real, data-rich workspace already lived on
+the real topic-detail route, where `TopicReviewWorkspace.tsx` already rendered "Research notes,"
+"Findings," and "Open review questions" headings — always empty, because no persistence existed
+anywhere in the platform for notes/findings. Open Questions were already real and live. Counter
+Evidence (`evidenceSummary.conflictingEvidence`, computed by the Reasoning Engine from real
+`contradicts` relationships) was already in the Contract but silently dropped and never rendered.
+
+New `lib/research/research-workspace-store.ts` — real localStorage persistence for Notes and
+Findings, following the exact pattern already proven by `context-history.ts` (isBrowser guard,
+JSON blob per key, sanitize-on-read). Every note belongs to Research, Workspace, and optionally a
+real linked Evidence item or related Entity.
+
+New Evidence Lifecycle (Collected → Reviewed → Linked → Compared → Referenced → Included in
+Report → Archived) — confirmed no existing status vocabulary matched this, so it's genuinely new,
+applied over real evidence items already in the catalog. Stages only ever advance one step at a
+time via an explicit action — never skipped, never auto-completed.
+
+New `SupportingCounterEvidencePanel.tsx` surfaces the real, previously-dropped Counter Evidence
+alongside Supporting Evidence with equal visual weight. New `ResearchWorkspaceDashboard.tsx`
+composes Current Question/Progress/Evidence Summary/Missing Evidence/Recent Notes/Related
+Reports/Workspace Status entirely from already-computed real sources — zero new engines. New
+`ResearchWorkspaceActivity.tsx` — a real, single-user activity feed from real note/finding/
+lifecycle timestamps.
+
+`ResearchTopicReport` gained real `question`, `supportingEvidence`/`counterEvidence`, and `notes`
+fields, rendered by `ResearchTopicReportView.tsx` — the report now genuinely uses Question,
+Evidence, Notes, Entities, Trust, and Limitations.
+
+New `scripts/test-research-workspace-activation.ts` — 12 tests. `npm run lint` clean, `npm run
+build` 91 routes, 115 total tests passing (12 + 10 + 13 + 14 + 12 + 15 + 28 + 11). Zero Platform
+Core files touched; `/research/workspace`'s separate shell left unchanged. Full detail:
+`docs/product-activation-audit.md` §16.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation
