@@ -360,13 +360,54 @@ function resolveObjectFirstOpenCommand(normalized: string): AssistantCommandMatc
   return null;
 }
 
+// Real bare-name fallback (found via actual browser testing: typing a plain entity name like
+// "Japan" — the single most natural first action for a "type a command" box — produced only an
+// honest "not recognized" message, even though the country is real). Checked last, only after
+// every real command phrase and verb-prefixed pattern has already failed to match, so it can never
+// shadow an intentional command.
+//
+// Deliberately an EXACT (case/diacritic-insensitive) name match, not searchEntities()'s fuzzy
+// token-relevance ranking — real browser-testing regressions showed that ranking returns a
+// low-confidence top result for almost any multi-word input (e.g. "please forecast the stock
+// market for me" ranked a real research topic above nothing at all), which would fabricate a
+// destination for input that was never actually referring to that entity. An exact name match
+// keeps this fallback honest: it only ever fires when the input truly *is* a real catalog name,
+// never a guess. A partial/fuzzy name still correctly falls through to the honest "not recognized"
+// message, which already offers a real /search link — the right place for fuzzy matching.
+function resolveBareEntityNameCommand(trimmed: string): AssistantCommandMatch | null {
+  if (trimmed.length < 2) return null;
+  const normalized = stripDiacriticsLower(trimmed);
+
+  for (const country of countries) {
+    if (allNameFormsForCountry(country.id, country.name).some((form) => stripDiacriticsLower(form) === normalized)) {
+      return { kind: "parameterized", label: `Open ${country.name}`, href: `/countries?country=${country.id}`, term: country.name };
+    }
+  }
+  for (const company of companies) {
+    if (stripDiacriticsLower(company.name) === normalized) {
+      return { kind: "parameterized", label: `Open ${company.name}`, href: `/companies?company=${company.id}`, term: company.name };
+    }
+  }
+  for (const university of universities) {
+    if (stripDiacriticsLower(university.name) === normalized) {
+      return { kind: "parameterized", label: `Open ${university.name}`, href: `/universities?university=${university.id}`, term: university.name };
+    }
+  }
+  for (const topic of RESEARCH_TOPICS) {
+    if (stripDiacriticsLower(topic.topicName) === normalized) {
+      return { kind: "parameterized", label: `Open ${topic.topicName}`, href: getResearchTopicPath(topic.topicId), term: topic.topicName };
+    }
+  }
+  return null;
+}
+
 /**
  * Deterministic resolver: prefix-style parameterized patterns are checked first (most specific),
  * then the fixed keyword table (exact, deliberately-crafted phrases — low false-positive risk),
- * then the object-first Uzbek/Turkish open-command heuristic last, since its 2-3 letter verb
- * tokens ("och", "aç") are more likely to appear incidentally inside unrelated text. Returns null
- * when nothing matches — callers must show an honest "not recognized yet" state with supported
- * alternatives, never a fabricated response.
+ * then the object-first Uzbek/Turkish open-command heuristic, then finally a bare entity-name
+ * match (lowest priority — only when literally nothing else understood the input). Returns null
+ * when nothing matches at all — callers must show an honest "not recognized yet" state with
+ * supported alternatives, never a fabricated response.
  */
 export function resolveAssistantCommand(input: string): AssistantCommandMatch | null {
   const trimmed = input.trim();
@@ -386,6 +427,9 @@ export function resolveAssistantCommand(input: string): AssistantCommandMatch | 
 
   const objectFirstOpen = resolveObjectFirstOpenCommand(normalized);
   if (objectFirstOpen) return objectFirstOpen;
+
+  const bareEntityName = resolveBareEntityNameCommand(trimmed);
+  if (bareEntityName) return bareEntityName;
 
   return null;
 }
