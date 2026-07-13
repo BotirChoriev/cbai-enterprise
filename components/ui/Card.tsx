@@ -1,16 +1,17 @@
+import { cbaiGlassCard } from "@/components/brand/brand-classes";
+
 type CardProps = {
   children: React.ReactNode;
   className?: string;
 };
 
+// Platform Completion mission, Phase 1/2: this used to be a second, visually-different card
+// system (`border-zinc-800 bg-zinc-900/50`, no blur, no glow) alongside `cbaiGlassCard` — used by
+// ~30 files (Methodology/Trust sections across Country/Company/University and elsewhere). Rather
+// than touch every call site, this one file now renders the exact same shared token, so every
+// existing `<Card>` usage automatically gets the one real card style used everywhere else.
 export function Card({ children, className = "" }: CardProps) {
-  return (
-    <div
-      className={`rounded-xl border border-zinc-800 bg-zinc-900/50 ${className}`}
-    >
-      {children}
-    </div>
-  );
+  return <div className={`${cbaiGlassCard} ${className}`}>{children}</div>;
 }
 
 type CardHeaderProps = {
@@ -21,7 +22,7 @@ type CardHeaderProps = {
 
 export function CardHeader({ title, description, action }: CardHeaderProps) {
   return (
-    <div className="flex items-start justify-between gap-4 border-b border-zinc-800 px-5 py-4">
+    <div className="flex items-start justify-between gap-4 border-b border-zinc-800/80 px-5 py-4">
       <div>
         <h3 className="text-sm font-semibold text-zinc-50">{title}</h3>
         {description && (

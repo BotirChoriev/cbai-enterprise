@@ -10,6 +10,14 @@ type IntelligenceContextPanelProps = {
   openQuestionsCount: number;
 };
 
+// Platform Completion mission, Phase 2: the "Evidence" stat used to duplicate what
+// EntityEvidenceSection already shows in more detail immediately below this panel on every
+// Country/Company/University page (a connected/total breakdown, not just a bare count) — the same
+// number rendered by two different widgets back to back. Removed here rather than there, since
+// EntityEvidenceSection's version is the more complete one. `evidenceConnectedCount`/
+// `evidenceTotalCount` are still accepted (used for the real status badge below) — only the
+// redundant tile is gone.
+
 function Stat({ label, value }: { label: string; value: number }) {
   return (
     <div className="rounded-lg border border-zinc-800/80 bg-slate-950/50 px-3 py-2">
@@ -41,9 +49,8 @@ export default function IntelligenceContextPanel({
         </p>
         <StatusBadge status={status} />
       </div>
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+      <div className="grid grid-cols-3 gap-2">
         <Stat label="Related entities" value={relatedEntityCount} />
-        <Stat label="Evidence" value={evidenceConnectedCount} />
         <Stat label="Reports" value={reportsCount} />
         <Stat label="Open questions" value={openQuestionsCount} />
       </div>

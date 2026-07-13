@@ -1,6 +1,7 @@
 import type { UniversityIntelligenceProfile } from "@/lib/universities.intelligence";
 import { buildEntityRelationships } from "@/lib/entity/entity-relationships";
 import EntityRelatedPanel from "@/components/shared/EntityRelatedPanel";
+import { cbaiGlassCard } from "@/components/brand/brand-classes";
 
 type UniversityRelationshipsProps = {
   profile: UniversityIntelligenceProfile;
@@ -30,7 +31,7 @@ export default function UniversityRelationships({ profile }: UniversityRelations
         </p>
       </div>
 
-      <div className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-950 p-6">
+      <div className={`${cbaiGlassCard} space-y-4 p-6`}>
         <EntityRelatedPanel
           showHeading={false}
           relationships={relationships}

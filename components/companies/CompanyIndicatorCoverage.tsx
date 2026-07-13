@@ -3,6 +3,7 @@ import {
   coverageStatusClass,
   resolveSourceDisplayName,
 } from "@/lib/companies.coverage";
+import { cbaiGlassCard } from "@/components/brand/brand-classes";
 
 type CompanyIndicatorCoverageProps = {
   indicatorsByDomain: CompanyCoverageProfile["indicatorsByDomain"];
@@ -30,7 +31,7 @@ export default function CompanyIndicatorCoverage({
         {indicatorsByDomain.map((group) => (
           <div
             key={group.domainId}
-            className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950"
+            className={`${cbaiGlassCard} overflow-hidden`}
           >
             <div className="border-b border-zinc-800 px-5 py-3">
               <h4 className="text-sm font-semibold text-zinc-200">{group.domainTitle}</h4>

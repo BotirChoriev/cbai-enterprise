@@ -1,5 +1,6 @@
 import type { University } from "@/lib/universities";
 import UniversityCard from "@/components/universities/UniversityCard";
+import EmptyState from "@/components/shared/EmptyState";
 
 type UniversityListProps = {
   universities: University[];
@@ -13,13 +14,7 @@ export default function UniversityList({
   onSelect,
 }: UniversityListProps) {
   if (universities.length === 0) {
-    return (
-      <div className="rounded-xl border border-dashed border-zinc-800 px-5 py-12 text-center">
-        <p className="text-sm text-zinc-500">
-          No universities match your filters.
-        </p>
-      </div>
-    );
+    return <EmptyState variant="dashed" message="No universities match your filters." />;
   }
 
   return (

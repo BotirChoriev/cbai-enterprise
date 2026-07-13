@@ -1,5 +1,6 @@
 import type { Company } from "@/lib/companies";
 import CompanyCard from "@/components/companies/CompanyCard";
+import EmptyState from "@/components/shared/EmptyState";
 
 type CompanyListProps = {
   companies: Company[];
@@ -13,11 +14,7 @@ export default function CompanyList({
   onSelect,
 }: CompanyListProps) {
   if (companies.length === 0) {
-    return (
-      <div className="rounded-xl border border-dashed border-zinc-800 px-5 py-12 text-center">
-        <p className="text-sm text-zinc-500">No companies match your filters.</p>
-      </div>
-    );
+    return <EmptyState variant="dashed" message="No companies match your filters." />;
   }
 
   return (

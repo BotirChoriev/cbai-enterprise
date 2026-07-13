@@ -1,5 +1,6 @@
 import type { CountrySourceCoverageItem } from "@/lib/countries.coverage";
 import { coverageStatusClass } from "@/lib/countries.coverage";
+import { cbaiGlassCard } from "@/components/brand/brand-classes";
 
 type CountrySourceCoverageProps = {
   sources: readonly CountrySourceCoverageItem[];
@@ -47,7 +48,7 @@ export default function CountrySourceCoverage({ sources }: CountrySourceCoverage
         </p>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
+      <div className={`${cbaiGlassCard} overflow-hidden`}>
         <ul className="divide-y divide-zinc-800">
           {sources.map((source) => (
             <li key={source.id} className="space-y-3 px-5 py-4">

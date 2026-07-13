@@ -1,5 +1,6 @@
 import type { UniversitySourceCoverageItem } from "@/lib/universities.coverage";
 import { coverageStatusClass } from "@/lib/universities.coverage";
+import { cbaiGlassCard } from "@/components/brand/brand-classes";
 
 type UniversitySourceCoverageProps = {
   sources: readonly UniversitySourceCoverageItem[];
@@ -47,7 +48,7 @@ export default function UniversitySourceCoverage({ sources }: UniversitySourceCo
         </p>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
+      <div className={`${cbaiGlassCard} overflow-hidden`}>
         <ul className="divide-y divide-zinc-800">
           {sources.map((source) => (
             <li key={source.id} className="space-y-3 px-5 py-4">

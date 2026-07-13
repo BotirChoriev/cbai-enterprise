@@ -1,6 +1,7 @@
 import type { CountryIntelligenceProfile } from "@/lib/countries.intelligence";
 import { buildEntityRelationships } from "@/lib/entity/entity-relationships";
 import EntityRelatedPanel from "@/components/shared/EntityRelatedPanel";
+import { cbaiGlassCard } from "@/components/brand/brand-classes";
 
 type CountryRelationshipsProps = {
   profile: CountryIntelligenceProfile;
@@ -31,7 +32,7 @@ export default function CountryRelationships({ profile }: CountryRelationshipsPr
         </p>
       </div>
 
-      <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-6">
+      <div className={`${cbaiGlassCard} p-6`}>
         <EntityRelatedPanel
           showHeading={false}
           relationships={relationships}

@@ -11,6 +11,7 @@ import IntelligenceContextPanel from "@/components/shared/IntelligenceContextPan
 import CompanyIndicatorCoverage from "@/components/companies/CompanyIndicatorCoverage";
 import CompanySourceCoverage from "@/components/companies/CompanySourceCoverage";
 import EntityEvidenceSection from "@/components/shared/EntityEvidenceSection";
+import GenerateReportToggleButton from "@/components/shared/GenerateReportToggleButton";
 import EntityCompareSection from "@/components/shared/EntityCompareSection";
 import EntityOptionalExploration from "@/components/shared/EntityOptionalExploration";
 import EvidenceGapPanel from "@/components/evidence-gap/EvidenceGapPanel";
@@ -100,13 +101,7 @@ export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligen
       <EntityReportsAvailable reports={journey.reports} entityLabel="company" />
 
       <div className="space-y-4">
-        <button
-          type="button"
-          onClick={() => setShowReport((current) => !current)}
-          className="inline-flex items-center gap-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-300 transition-colors hover:border-cyan-500/50"
-        >
-          {showReport ? "Hide report" : "Generate report"}
-        </button>
+        <GenerateReportToggleButton showReport={showReport} onClick={() => setShowReport((current) => !current)} />
         {showReport
           ? (() => {
               const report = buildEntityReport("company", company.id);

@@ -23,6 +23,7 @@ import { usePlatformContext } from "@/components/platform/context/PlatformContex
 import { useAuth } from "@/components/platform/context/AuthProvider";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import SyncStatusBadge from "@/components/shared/SyncStatusBadge";
+import GenerateReportToggleButton from "@/components/shared/GenerateReportToggleButton";
 import EntityRelatedPanel from "@/components/shared/EntityRelatedPanel";
 import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
 import ProjectGuidePanel from "@/components/project/ProjectGuidePanel";
@@ -326,13 +327,7 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
       </div>
 
       <div id="project-report" className="space-y-4">
-        <button
-          type="button"
-          onClick={handleToggleReport}
-          className="inline-flex items-center gap-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-300 transition-colors hover:border-cyan-500/50"
-        >
-          {showReport ? "Hide report" : "Generate report"}
-        </button>
+        <GenerateReportToggleButton showReport={showReport} onClick={handleToggleReport} />
         {showReport
           ? (() => {
               const report = buildEntityReport("project", project.id);

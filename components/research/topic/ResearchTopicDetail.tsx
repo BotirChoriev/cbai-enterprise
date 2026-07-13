@@ -15,6 +15,7 @@ import ResearchCockpit from "@/components/research/topic/ResearchCockpit";
 import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
 import ResearchRelatedCompanies from "@/components/research/topic/ResearchRelatedCompanies";
 import ResearchTopicReportView from "@/components/research/topic/ResearchTopicReportView";
+import GenerateReportToggleButton from "@/components/shared/GenerateReportToggleButton";
 import ResearchWorkspaceDashboard from "@/components/research/topic/ResearchWorkspaceDashboard";
 import EvidenceLifecyclePanel from "@/components/research/topic/EvidenceLifecyclePanel";
 import SupportingCounterEvidencePanel from "@/components/research/topic/SupportingCounterEvidencePanel";
@@ -81,13 +82,7 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
       ) : null}
 
       <div id="generate-report" className="space-y-4">
-        <button
-          type="button"
-          onClick={() => setShowReport((current) => !current)}
-          className="inline-flex items-center gap-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-300 transition-colors hover:border-cyan-500/50"
-        >
-          {showReport ? "Hide report" : "Generate report"}
-        </button>
+        <GenerateReportToggleButton showReport={showReport} onClick={() => setShowReport((current) => !current)} />
         {showReport
           ? (() => {
               const report = buildEntityReport("research_topic", topic.topicId);

@@ -1,6 +1,7 @@
 "use client";
 
 import type { UniversityType } from "@/lib/universities";
+import { cbaiGlassCard } from "@/components/brand/brand-classes";
 
 type UniversityFiltersProps = {
   search: string;
@@ -26,7 +27,7 @@ export default function UniversityFilters({
   resultCount,
 }: UniversityFiltersProps) {
   return (
-    <div className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-950 p-4">
+    <div className={`${cbaiGlassCard} space-y-4 p-4`}>
       <div className="relative">
         <svg
           className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500"
