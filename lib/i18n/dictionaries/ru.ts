@@ -128,6 +128,7 @@ const ru: TranslationDictionary = {
     feedYourProjectActivity: "Ваша активность по проекту",
     feedYourSavedReports: "Ваши сохранённые отчёты",
     feedSavedReport: "Сохранённый отчёт",
+    feedEvidenceAndEntities: "{evidence} доказательств · {entities} связанных объектов",
   },
   project: {
     createProject: "Создать проект",

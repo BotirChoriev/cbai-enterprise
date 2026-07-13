@@ -104,6 +104,7 @@ export type TranslationDictionary = {
     feedYourProjectActivity: string;
     feedYourSavedReports: string;
     feedSavedReport: string;
+    feedEvidenceAndEntities: string;
   };
   project: {
     createProject: string;

@@ -128,6 +128,7 @@ const uz: TranslationDictionary = {
     feedYourProjectActivity: "Sizning loyiha faoliyatingiz",
     feedYourSavedReports: "Saqlangan hisobotlaringiz",
     feedSavedReport: "Saqlangan hisobot",
+    feedEvidenceAndEntities: "{evidence} dalil · {entities} bog‘liq obyekt",
   },
   project: {
     createProject: "Loyiha yaratish",

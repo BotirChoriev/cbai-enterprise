@@ -128,6 +128,7 @@ const en: TranslationDictionary = {
     feedYourProjectActivity: "Your project activity",
     feedYourSavedReports: "Your saved reports",
     feedSavedReport: "Saved report",
+    feedEvidenceAndEntities: "{evidence} evidence · {entities} related entities",
   },
   project: {
     createProject: "Create Project",

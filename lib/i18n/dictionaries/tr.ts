@@ -128,6 +128,7 @@ const tr: TranslationDictionary = {
     feedYourProjectActivity: "Proje etkinliğiniz",
     feedYourSavedReports: "Kaydedilen raporlarınız",
     feedSavedReport: "Kaydedilen rapor",
+    feedEvidenceAndEntities: "{evidence} kanıt · {entities} ilişkili varlık",
   },
   project: {
     createProject: "Proje Oluştur",
