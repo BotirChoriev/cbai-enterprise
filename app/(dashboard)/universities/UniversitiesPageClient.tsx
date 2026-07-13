@@ -114,6 +114,11 @@ export default function UniversitiesPageClient() {
             universities={filtered}
             selectedId={selectedUniversity.id}
             onSelect={handleSelectUniversity}
+            onClearFilters={() => {
+              setSearch("");
+              setCountry("All");
+              setType("All");
+            }}
           />
         </div>
 

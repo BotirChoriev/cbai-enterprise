@@ -70,6 +70,16 @@ export default function ResearchTopicCatalog({ initialQuery = "" }: ResearchTopi
         <div className={`${cbaiGlassCard} px-5 py-8 text-center`}>
           <p className="text-sm text-zinc-400">No research topics match your filter.</p>
           <p className="mt-1 text-xs text-zinc-600">Try a different domain or search term.</p>
+          <button
+            type="button"
+            onClick={() => {
+              setFilterQuery("");
+              setSelectedDomain("all");
+            }}
+            className="mt-4 inline-flex min-h-9 items-center rounded-lg border border-zinc-700 bg-zinc-900 px-3.5 text-xs font-medium text-cyan-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
+          >
+            Clear filters
+          </button>
         </div>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">

@@ -46,7 +46,7 @@ function resolveContextualActions(context: AssistantContextEntity): ContextualAc
       return [
         { label: "Continue workspace", href: "/research/workspace" },
         { label: "Open evidence", href: profileSectionHref(context.href, "evidence") },
-        { label: "Review questions", href: "/research/review" },
+        { label: "Review questions", href: profileSectionHref(context.href, "review") },
       ];
     case "project": {
       const guideAction = projectGuideAction(context);

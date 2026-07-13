@@ -81,6 +81,26 @@ export default function SearchGatewayResults({
 
   const results = collectEntityResults(response);
 
+  // Real edge case, not hypothetical: `response.hasResults` is true whenever any group exists at
+  // all (lib/search-gateway.ts), but a "knowledge"/"evidence"/"future_modules" group can exist
+  // with zero real topics inside it — filtered out by collectTopicGroups' own `topics.length > 0`
+  // check. When that's the only group and there are also no entity results, the two lists below
+  // are both empty and this component would otherwise render nothing at all. Same honest fallback
+  // as the `!response.hasResults` case above, not a silent blank area.
+  if (results.length === 0 && topicGroups.length === 0) {
+    return (
+      <div className="space-y-4" role="status">
+        <p className="text-sm text-zinc-300">
+          No open-able profile or connected topic was found for &quot;{response.query}&quot;.
+        </p>
+        <p className="text-xs text-zinc-500">
+          Try a shorter term, check the spelling, or start from one of these:
+        </p>
+        <SearchExamples />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {results.length > 0 ? (

@@ -105,6 +105,11 @@ export default function CompaniesPageClient() {
             companies={filtered}
             selectedId={selectedCompany.id}
             onSelect={handleSelectCompany}
+            onClearFilters={() => {
+              setSearch("");
+              setIndustry("All");
+              setCountry("All");
+            }}
           />
         </div>
 

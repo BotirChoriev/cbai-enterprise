@@ -44,11 +44,6 @@ const continueLinks = [
     href: "/knowledge",
     detail: "Review official source status across profiles.",
   },
-  {
-    label: "Research Review",
-    href: "/research/review",
-    detail: "Review a topic's evidence, decisions, and reviewer status.",
-  },
 ] as const;
 
 const ONBOARDING_LINKS = [

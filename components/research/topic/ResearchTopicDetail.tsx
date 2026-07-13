@@ -91,7 +91,9 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
           : null}
       </div>
 
-      <TopicReviewWorkspace topic={topic} workflow={workflow} />
+      <div id="review">
+        <TopicReviewWorkspace topic={topic} workflow={workflow} />
+      </div>
 
       <ResearchWorkspaceActivity topicId={topic.topicId} />
 
