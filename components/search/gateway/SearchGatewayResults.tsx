@@ -11,6 +11,8 @@ import {
 import { profileSectionHref } from "@/components/shared/entity-profile-path";
 import type { Entity } from "@/lib/entity/entity.types";
 import TopicResultCard from "@/components/search/gateway/SearchResultCard";
+import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
+import VoiceSummaryButton from "@/components/shared/VoiceSummaryButton";
 
 type SearchGatewayResultsProps = {
   response: GatewaySearchResponse;
@@ -144,6 +146,9 @@ type EntityMatchCardProps = {
 
 function EntityMatchCard({ entry, matchedLabel }: EntityMatchCardProps) {
   const showCountryInHeader = entry.type !== "Country" && entry.countryLabel;
+  const voiceSummaryText = [entry.name, entry.type, entry.distinguishingFact, entry.coverageLabel, entry.nextStep]
+    .filter((part): part is string => Boolean(part))
+    .join(". ");
 
   return (
     <article className="rounded-lg bg-zinc-900/50 px-4 py-3">
@@ -207,6 +212,8 @@ function EntityMatchCard({ entry, matchedLabel }: EntityMatchCardProps) {
             Create Project →
           </Link>
         ) : null}
+        {entry.entityRef ? <SaveToWorkspaceButton entity={entry.entityRef} /> : null}
+        <VoiceSummaryButton text={voiceSummaryText} />
       </div>
     </article>
   );

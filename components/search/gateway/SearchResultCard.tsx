@@ -3,6 +3,7 @@ import type { SearchResultEntry } from "@/lib/search-intelligence-entry";
 import { isUnavailableRoute } from "@/lib/search-intelligence-entry";
 import StatusBadge from "@/components/shared/StatusBadge";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
+import VoiceSummaryButton from "@/components/shared/VoiceSummaryButton";
 import type { ProductStatus } from "@/lib/product-status";
 
 const cardShell = "rounded-lg bg-zinc-900/50 px-4 py-3 transition-colors hover:bg-zinc-900/80";
@@ -19,16 +20,22 @@ type SearchResultCardProps = {
 };
 
 /**
- * Universal Search result card (Platform Completion mission, Phase 5) — every result now shows
- * type, summary, a real action (Open / Save / Add to Project), and coverage, not just a bare
- * "Open profile" link. `createProjectHref`/`entityRef` were already computed by
- * lib/search-intelligence-entry.ts but never rendered here — no new data, just real, existing
- * data finally surfaced. "Related entities per result" was deliberately left out: computing a
- * relationship set for every row of a results list is real added cost for a list that can be long;
- * related entities remain one click away on the entity's own profile.
+ * Universal Search result card (Platform Completion mission, Phase 5; Voice Summary added in the
+ * Platform Activation mission) — every result now shows type, summary, and coverage, plus real
+ * actions: Open / Save / Add to Project / Voice Summary. `createProjectHref`/`entityRef` were
+ * already computed by lib/search-intelligence-entry.ts but never rendered here — no new data, just
+ * real, existing data finally surfaced. Voice Summary reads back only text already visible on this
+ * card — never a generated summary. "Preview" is this card's own inline description/coverage text,
+ * already visible before opening the profile — no separate preview affordance is needed. "Related
+ * entities per result" was deliberately left out: computing a relationship set for every row of a
+ * results list is real added cost for a list that can be long; related entities remain one click
+ * away on the entity's own profile.
  */
 export default function SearchResultCard({ entry }: SearchResultCardProps) {
   const disabled = !entry.linked || isUnavailableRoute(entry.route);
+  const voiceSummaryText = [entry.name, entry.type, entry.shortDescription, entry.coverageLabel, entry.nextStep]
+    .filter((part): part is string => Boolean(part))
+    .join(". ");
 
   return (
     <div className={disabled ? cardStatic : cardShell}>
@@ -69,6 +76,7 @@ export default function SearchResultCard({ entry }: SearchResultCardProps) {
                 + Add to Project
               </Link>
             ) : null}
+            <VoiceSummaryButton text={voiceSummaryText} className="!px-2.5 !py-1 !text-[11px]" />
           </div>
         </>
       )}
