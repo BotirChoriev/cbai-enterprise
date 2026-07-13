@@ -4,8 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   PROJECT_TYPES,
-  PROJECT_STATUS_LABELS,
-  PROJECT_VISIBILITY_LABELS,
   type ProjectTypeId,
   type ProjectStatus,
   type ProjectVisibility,
@@ -14,6 +12,12 @@ import { createProject } from "@/lib/project/project-store";
 import type { ContextEntityRef } from "@/lib/context/context-types";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import {
+  translateProjectTypeLabel,
+  translateProjectTypeDescription,
+  translateProjectStatus,
+  translateProjectVisibility,
+} from "@/lib/i18n/project-translation";
 
 type CreateProjectFormProps = {
   /** Pre-fills the primary entity when arriving from an entity profile — real, never fabricated. */
@@ -125,12 +129,12 @@ export default function CreateProjectForm({ initialPrimaryEntity, initialType, o
             >
               {PROJECT_TYPES.map((option) => (
                 <option key={option.id} value={option.id}>
-                  {option.label}
+                  {translateProjectTypeLabel(t, option.id)}
                 </option>
               ))}
             </select>
             <p className="mt-1 text-[11px] text-zinc-600">
-              {PROJECT_TYPES.find((option) => option.id === type)?.description}
+              {translateProjectTypeDescription(t, type)}
             </p>
           </div>
 
@@ -146,7 +150,7 @@ export default function CreateProjectForm({ initialPrimaryEntity, initialType, o
             >
               {REAL_STATUS_OPTIONS.map((s) => (
                 <option key={s} value={s}>
-                  {PROJECT_STATUS_LABELS[s]}
+                  {translateProjectStatus(t, s)}
                 </option>
               ))}
             </select>
@@ -193,7 +197,7 @@ export default function CreateProjectForm({ initialPrimaryEntity, initialType, o
             >
               {REAL_VISIBILITY_OPTIONS.map((v) => (
                 <option key={v} value={v} disabled={v !== "private"}>
-                  {PROJECT_VISIBILITY_LABELS[v]}
+                  {translateProjectVisibility(t, v)}
                 </option>
               ))}
             </select>

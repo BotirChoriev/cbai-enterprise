@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import type { ProjectTypeId } from "@/lib/project/project-types";
-import { getProjectTypeLabel } from "@/lib/project/project-types";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import { translateProjectTypeLabel } from "@/lib/i18n/project-translation";
 import { cbaiBtnPrimary, cbaiGlassCard } from "@/components/brand/brand-classes";
 
 type RoleProjectEntryProps = {
@@ -15,15 +18,16 @@ type RoleProjectEntryProps = {
  * exists and what is limited; this is where that turns into real, saved, continuable work.
  */
 export default function RoleProjectEntry({ projectType, description }: RoleProjectEntryProps) {
-  const label = getProjectTypeLabel(projectType);
+  const { t } = useTranslation();
+  const label = translateProjectTypeLabel(t, projectType);
   return (
     <div className={`${cbaiGlassCard} flex flex-wrap items-center justify-between gap-4 p-5`}>
       <div>
-        <p className="text-sm font-semibold text-zinc-100">Start a {label}</p>
+        <p className="text-sm font-semibold text-zinc-100">{t("project.catalog.startA", { label })}</p>
         <p className="mt-1 max-w-xl text-sm text-zinc-500">{description}</p>
       </div>
       <Link href={`/my-work?projectType=${projectType}`} className={cbaiBtnPrimary}>
-        Start {label} →
+        {t("project.catalog.start", { label })} →
       </Link>
     </div>
   );

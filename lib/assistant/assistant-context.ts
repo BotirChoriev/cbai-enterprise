@@ -5,7 +5,7 @@
  * tracking system, no question asked of the user — pure derivation from existing state.
  */
 
-import type { ContextEntityRef } from "@/lib/context";
+import type { PrimaryEntityRef } from "@/lib/context";
 import { getResearchTopicById, getResearchTopicPath } from "@/lib/research/research-topics";
 import { loadProject } from "@/lib/project/project-store";
 
@@ -15,7 +15,7 @@ export type AssistantContextEntity = {
   href: string;
 };
 
-function entityHref(entity: ContextEntityRef): string {
+function entityHref(entity: PrimaryEntityRef): string {
   const params = new URLSearchParams({ [entity.kind]: entity.id });
   const base = entity.kind === "country" ? "/countries" : entity.kind === "company" ? "/companies" : "/universities";
   return `${base}?${params.toString()}`;
@@ -29,7 +29,7 @@ function entityHref(entity: ContextEntityRef): string {
  */
 export function resolveAssistantContext(
   pathname: string,
-  platformEntity: ContextEntityRef | null,
+  platformEntity: PrimaryEntityRef | null,
   projectId?: string | null,
 ): AssistantContextEntity | null {
   const topicMatch = /^\/research\/([^/]+)$/.exec(pathname);

@@ -7,7 +7,7 @@ import type {
   WorkspaceId,
 } from "@/lib/context/context-types";
 import { CONTEXT_PARAM_KEYS } from "@/lib/context/context-types";
-import { serializeContextToParams } from "@/lib/context/context-builder";
+import { serializeContextToParams, getPrimaryEntity } from "@/lib/context/context-builder";
 
 export type PlatformModuleId =
   | "home"
@@ -180,7 +180,7 @@ export function buildContextualHref(
   return buildHref(path, snapshot);
 }
 
-function entityPrimaryModules(kind: ContextEntityRef["kind"]): PlatformModuleId[] {
+function entityPrimaryModules(kind: "country" | "company" | "university"): PlatformModuleId[] {
   switch (kind) {
     case "country":
       return [
@@ -196,19 +196,13 @@ function entityPrimaryModules(kind: ContextEntityRef["kind"]): PlatformModuleId[
       return ["companies", "countries", "investor", "evidence", "reports", "reasoning"];
     case "university":
       return ["universities", "countries", "evidence", "reports", "reasoning", "graph"];
-    case "research_topic":
-    case "project":
-      // Never reached in practice — neither is ever stored in
-      // snapshot.country/company/university (see EntityKind), so this switch's caller never
-      // passes this kind. Present for type exhaustiveness only.
-      return ["evidence", "reports"];
   }
 }
 
 export function buildRelatedModules(
   snapshot: PlatformContextSnapshot,
 ): RelatedModuleLink[] {
-  const primary = snapshot.country ?? snapshot.company ?? snapshot.university;
+  const primary = getPrimaryEntity(snapshot);
 
   if (!primary) {
     return [
@@ -289,7 +283,7 @@ export function buildContextBreadcrumbs(
   currentModuleLabel: string,
 ): ContextBreadcrumbSegment[] {
   const crumbs: ContextBreadcrumbSegment[] = [];
-  const primary = snapshot.country ?? snapshot.company ?? snapshot.university;
+  const primary = getPrimaryEntity(snapshot);
 
   if (primary) {
     const entityModule =
@@ -329,7 +323,7 @@ export function buildContextHeaderModel(
   snapshot: PlatformContextSnapshot,
   currentModuleLabel: string,
 ): PlatformContextHeaderModel {
-  const primary = snapshot.country ?? snapshot.company ?? snapshot.university;
+  const primary = getPrimaryEntity(snapshot);
 
   return {
     primaryEntity: primary,

@@ -23,6 +23,7 @@ export {
   parseContextParams,
   resolveEntityRef,
   serializeContextToParams,
+  type PrimaryEntityRef,
 } from "@/lib/context/context-builder";
 
 export {

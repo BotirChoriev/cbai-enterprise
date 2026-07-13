@@ -46,8 +46,13 @@ function fromGraphRelationships(
   }));
 }
 
+/** The real kinds a Project can link as a "Related Entity" — every EntityKind except "evidence"
+ * (Evidence bookmarking is a separate, cross-project reference; see
+ * lib/context/context-types.ts), which is also exactly EntityType's overlap with EntityKind. */
+type LinkedEntityKind = "country" | "company" | "university" | "research_topic" | "project";
+
 /** Real hrefs for a ContextEntityRef across every kind Project links can point at. */
-function contextEntityHref(entity: ContextEntityRef): string | null {
+function contextEntityHref(entity: ContextEntityRef & { kind: LinkedEntityKind }): string | null {
   switch (entity.kind) {
     case "country":
     case "company":
@@ -58,6 +63,14 @@ function contextEntityHref(entity: ContextEntityRef): string | null {
     case "project":
       return `/my-work?project=${entity.id}`;
   }
+}
+
+/** loadProjectEntities returns the real "Related Entities" a user has explicitly linked to this
+ * project — never "evidence". Filtered defensively rather than assumed, matching the same real
+ * guard lib/supabase/migration.ts applies before writing to the identically-scoped
+ * project_entity_links table. */
+function isLinkedProjectEntity(entity: ContextEntityRef): entity is ContextEntityRef & { kind: LinkedEntityKind } {
+  return entity.kind !== "evidence";
 }
 
 /** Real Projects that link to this entity — reverse direction, so any entity can see its Projects. */
@@ -119,15 +132,17 @@ export function buildEntityRelationships(
       return [...companyMatches, ...projectBacklinks("research_topic", id)];
     }
     case "project": {
-      return loadProjectEntities(id).map(
-        (entity): EntityRelationship => ({
-          type: "RELATED_TO",
-          targetType: entity.kind,
-          targetId: entity.id,
-          targetName: entity.name,
-          targetHref: contextEntityHref(entity),
-        }),
-      );
+      return loadProjectEntities(id)
+        .filter(isLinkedProjectEntity)
+        .map(
+          (entity): EntityRelationship => ({
+            type: "RELATED_TO",
+            targetType: entity.kind,
+            targetId: entity.id,
+            targetName: entity.name,
+            targetHref: contextEntityHref(entity),
+          }),
+        );
     }
   }
 }

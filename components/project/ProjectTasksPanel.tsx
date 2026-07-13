@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import type { ProjectTask, ProjectTaskStatus } from "@/lib/project/project-types";
-import { PROJECT_TASK_STATUS_LABELS } from "@/lib/project/project-types";
 import { loadProjectTasks, createProjectTask, setProjectTaskStatus } from "@/lib/project/project-store";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import { translateProjectTaskStatus } from "@/lib/i18n/project-translation";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type ProjectTasksPanelProps = {
@@ -20,6 +21,7 @@ function nextStatus(current: ProjectTaskStatus): ProjectTaskStatus | null {
 
 /** Simple, real project task list — Todo / In Progress / Done. No fake assignments — every task is created by the user, never auto-generated. */
 export default function ProjectTasksPanel({ projectId, onChange }: ProjectTasksPanelProps) {
+  const { t } = useTranslation();
   const [tasks, setTasks] = useState<ProjectTask[]>(() => loadProjectTasks(projectId));
   const [title, setTitle] = useState("");
 
@@ -46,21 +48,21 @@ export default function ProjectTasksPanel({ projectId, onChange }: ProjectTasksP
   return (
     <section id="project-tasks" aria-labelledby="project-tasks-heading" className={`${cbaiGlassCard} space-y-3 p-4`}>
       <p className={cbaiSectionEyebrow} id="project-tasks-heading">
-        Tasks
+        {t("project.tasks.heading")}
       </p>
 
       <form onSubmit={handleAdd} className="flex gap-2">
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="New task…"
+          placeholder={t("project.tasks.newTaskPlaceholder")}
           className="flex-1 rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-1.5 text-xs text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-cyan-500/30"
         />
         <button
           type="submit"
           className="rounded-md border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-[11px] font-medium text-cyan-300 hover:border-cyan-500/50"
         >
-          Add task
+          {t("project.tasks.addTask")}
         </button>
       </form>
 
@@ -71,7 +73,7 @@ export default function ProjectTasksPanel({ projectId, onChange }: ProjectTasksP
               <span className={task.status === "done" ? "text-zinc-500 line-through" : "text-zinc-300"}>{task.title}</span>
               <div className="flex shrink-0 items-center gap-2">
                 <span className="rounded-md border border-zinc-800 px-2 py-0.5 text-[10px] uppercase tracking-wider text-zinc-500">
-                  {PROJECT_TASK_STATUS_LABELS[task.status]}
+                  {translateProjectTaskStatus(t, task.status)}
                 </span>
                 {task.status !== "done" ? (
                   <button
@@ -79,7 +81,7 @@ export default function ProjectTasksPanel({ projectId, onChange }: ProjectTasksP
                     onClick={() => handleAdvance(task.taskId, task.status)}
                     className="text-[10px] text-cyan-400 hover:underline"
                   >
-                    Mark {PROJECT_TASK_STATUS_LABELS[nextStatus(task.status)!]}
+                    {t("project.tasks.markAs", { status: translateProjectTaskStatus(t, nextStatus(task.status)!) })}
                   </button>
                 ) : null}
               </div>
@@ -87,7 +89,7 @@ export default function ProjectTasksPanel({ projectId, onChange }: ProjectTasksP
           ))}
         </ul>
       ) : (
-        <p className="text-xs text-zinc-600">No Tasks yet. Break this project into small, trackable steps.</p>
+        <p className="text-xs text-zinc-600">{t("project.tasks.noTasksYet")}</p>
       )}
     </section>
   );

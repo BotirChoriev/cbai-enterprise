@@ -15,6 +15,11 @@ export type RoleCardText = {
   firstAction: string;
 };
 
+export type ProjectTypeCopy = {
+  label: string;
+  description: string;
+};
+
 export type TranslationDictionary = {
   roles: {
     scientistAcademic: RoleCardText;
@@ -96,6 +101,9 @@ export type TranslationDictionary = {
     feedOpenCountries: string;
     quickActions: string;
     newProject: string;
+    feedYourProjectActivity: string;
+    feedYourSavedReports: string;
+    feedSavedReport: string;
   };
   project: {
     createProject: string;
@@ -112,6 +120,42 @@ export type TranslationDictionary = {
       paused: string;
       completed: string;
       archived: string;
+    };
+    visibility: {
+      private: string;
+      team: string;
+      public: string;
+    };
+    taskStatus: {
+      todo: string;
+      inProgress: string;
+      done: string;
+    };
+    tasks: {
+      heading: string;
+      newTaskPlaceholder: string;
+      addTask: string;
+      noTasksYet: string;
+      markAs: string;
+    };
+    types: {
+      researchProject: ProjectTypeCopy;
+      countryAnalysis: ProjectTypeCopy;
+      companyAnalysis: ProjectTypeCopy;
+      universityStudy: ProjectTypeCopy;
+      policyAnalysis: ProjectTypeCopy;
+      investmentAnalysis: ProjectTypeCopy;
+      technologyAssessment: ProjectTypeCopy;
+      evidenceReview: ProjectTypeCopy;
+    };
+    catalog: {
+      recentProjects: string;
+      pinnedProjects: string;
+      noProjectsCreatedYet: string;
+      suggestedNextStep: string;
+      continueAction: string;
+      startA: string;
+      start: string;
     };
     form: {
       heading: string;

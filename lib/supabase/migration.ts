@@ -15,6 +15,12 @@ import { loadProjects, loadProjectEntities, loadProjectNotes, loadProjectTasks, 
 import { loadPinnedEntities } from "@/lib/context/context-history";
 import { loadReports } from "@/lib/reports/reports-store";
 import { upsertCloudRow, type CloudWriteResult } from "@/lib/supabase/cloud-tables";
+import type { ContextEntityRef } from "@/lib/context/context-types";
+import type { EntityKindValue } from "@/lib/supabase/database.types";
+
+function isLinkableEntity(entity: ContextEntityRef): entity is ContextEntityRef & { kind: EntityKindValue } {
+  return entity.kind !== "evidence";
+}
 
 export type MigrationSummary = {
   projects: number;
@@ -135,7 +141,12 @@ export async function migrateLocalWorkToCloud(ownerId: string): Promise<Migratio
     );
     if (ok) summary.projects += 1;
 
-    for (const entity of loadProjectEntities(project.id)) {
+    // "evidence" is a valid ContextEntityRef kind (Evidence bookmarking) but never a valid
+    // project_entity_links kind — loadProjectEntities should never actually produce one (evidence
+    // is only ever added via the separate bookmark flow below), but this filter is the same real
+    // safety net the database's own CHECK constraint provides, kept in sync rather than relying on
+    // the constraint alone to reject a bad row after the fact.
+    for (const entity of loadProjectEntities(project.id).filter(isLinkableEntity)) {
       const localId = `${project.id}:${entity.kind}:${entity.id}`;
       const linkOk = await track(
         summary.failures,

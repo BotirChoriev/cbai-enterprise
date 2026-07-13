@@ -9,6 +9,8 @@ import {
   EVIDENCE_LIFECYCLE_LABELS,
   type EvidenceLifecycleStage,
 } from "@/lib/research/research-workspace-store";
+import { toEvidenceEntityRef } from "@/lib/research/evidence/evidence-bookmark";
+import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type EvidenceLifecyclePanelProps = {
@@ -85,15 +87,18 @@ export default function EvidenceLifecyclePanel({ topicId, evidenceItems }: Evide
             <li key={item.evidenceItemId} className={`${cbaiGlassCard} space-y-2 p-3`}>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm text-zinc-200">{item.label}</p>
-                {!isFinal ? (
-                  <button
-                    type="button"
-                    onClick={() => handleAdvance(item.evidenceItemId)}
-                    className="shrink-0 rounded-md border border-zinc-700 bg-zinc-900 px-2.5 py-1 text-[11px] font-medium text-cyan-400 hover:border-zinc-600"
-                  >
-                    Mark as {EVIDENCE_LIFECYCLE_LABELS[EVIDENCE_LIFECYCLE_STAGES[EVIDENCE_LIFECYCLE_STAGES.indexOf(stage) + 1]]}
-                  </button>
-                ) : null}
+                <div className="flex shrink-0 items-center gap-2">
+                  <SaveToWorkspaceButton entity={toEvidenceEntityRef(item)} className="!px-2.5 !py-1 !text-[11px]" />
+                  {!isFinal ? (
+                    <button
+                      type="button"
+                      onClick={() => handleAdvance(item.evidenceItemId)}
+                      className="shrink-0 rounded-md border border-zinc-700 bg-zinc-900 px-2.5 py-1 text-[11px] font-medium text-cyan-400 hover:border-zinc-600"
+                    >
+                      Mark as {EVIDENCE_LIFECYCLE_LABELS[EVIDENCE_LIFECYCLE_STAGES[EVIDENCE_LIFECYCLE_STAGES.indexOf(stage) + 1]]}
+                    </button>
+                  ) : null}
+                </div>
               </div>
               <StageTrack stage={stage} />
             </li>

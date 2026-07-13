@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { Project } from "@/lib/project/project-types";
-import { PROJECT_STATUS_LABELS } from "@/lib/project/project-types";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import { translateProjectStatus } from "@/lib/i18n/project-translation";
 import {
   loadProjectEntities,
   loadProjectEvidence,
@@ -112,6 +113,7 @@ function LinkEntityForm({ projectId, onLinked }: { projectId: string; onLinked: 
 export default function ProjectHome({ project: initialProject }: ProjectHomeProps) {
   const { isEntityPinned, pinEntityToWorkspace, unpinEntityFromWorkspace } = usePlatformContext();
   const { accountMode } = useAuth();
+  const { t } = useTranslation();
   const [project, setProject] = useState(initialProject);
   const [entities, setEntities] = useState<ContextEntityRef[]>(() => loadProjectEntities(project.id));
   const [evidence, setEvidence] = useState(() => loadProjectEvidence(project.id));
@@ -164,7 +166,7 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
           <h1 className="mt-2 text-2xl font-semibold text-zinc-50">{project.title}</h1>
           <p className="mt-1 text-sm text-zinc-500">{project.description}</p>
           <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
-            <span className="rounded-md border border-zinc-800 px-2 py-0.5 uppercase tracking-wider">{PROJECT_STATUS_LABELS[project.status]}</span>
+            <span className="rounded-md border border-zinc-800 px-2 py-0.5 uppercase tracking-wider">{translateProjectStatus(t, project.status)}</span>
             {project.tags.map((tag) => (
               <span key={tag} className="rounded-full border border-zinc-800 px-2 py-0.5">
                 {tag}

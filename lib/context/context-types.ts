@@ -6,13 +6,21 @@
 export const PLATFORM_CONTEXT_VERSION = "1.0.0" as const;
 
 /**
- * "research_topic" and "project" participate only in the flat recent/pinned entity lists (Save
- * to workspace, My Work) — neither is ever resolved through the URL-param country/company/
- * university focus system below (research topics are routed by path segment,
- * `/research/[topicId]`; projects by `/my-work?project=id`), so both are deliberately absent from
+ * "research_topic", "project", and "evidence" participate only in the flat recent/pinned entity
+ * lists (Save to workspace, My Work) — none of the three is ever resolved through the URL-param
+ * country/company/university focus system below (research topics are routed by path segment,
+ * `/research/[topicId]`; projects by `/my-work?project=id`; evidence has no detail page of its
+ * own and resolves back to its owning research topic — see
+ * lib/research/evidence/evidence-bookmark.ts), so all three are deliberately absent from
  * PlatformContextSnapshot's country/company/university fields.
+ *
+ * "evidence" bookmarks a real, catalog-backed `TopicEvidenceCatalogItem` (stable id
+ * `topic-evidence:{topicId}:{slug}`) — a general "saved for later" reference, deliberately
+ * distinct from a Project's own linked evidence (`ProjectEvidenceReference` /
+ * `project_evidence` table), which represents evidence a user has explicitly attached to one
+ * specific project's own report, not a cross-project personal bookmark.
  */
-export type EntityKind = "country" | "company" | "university" | "research_topic" | "project";
+export type EntityKind = "country" | "company" | "university" | "research_topic" | "project" | "evidence";
 
 export type WorkspaceId = "government" | "investor" | "citizen";
 

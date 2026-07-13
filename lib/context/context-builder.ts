@@ -68,8 +68,9 @@ export function resolveEntityRef(
       return resolveUniversityRef(id);
     case "research_topic":
     case "project":
-      // Research topics and Projects are never resolved through the URL-param focus system —
-      // see EntityKind.
+    case "evidence":
+      // Research topics, Projects, and Evidence are never resolved through the URL-param focus
+      // system — see EntityKind.
       return null;
   }
 }
@@ -116,10 +117,15 @@ export function buildPlatformContext(
   };
 }
 
+/** The real kinds `snapshot.country`/`company`/`university` are ever populated with —
+ * resolveCountryRef/resolveCompanyRef/resolveUniversityRef above are the only place those three
+ * PlatformContextSnapshot fields are ever set, and each always sets its own literal `kind`. */
+export type PrimaryEntityRef = ContextEntityRef & { kind: "country" | "company" | "university" };
+
 export function getPrimaryEntity(
   snapshot: PlatformContextSnapshot,
-): ContextEntityRef | null {
-  return snapshot.country ?? snapshot.company ?? snapshot.university;
+): PrimaryEntityRef | null {
+  return (snapshot.country ?? snapshot.company ?? snapshot.university) as PrimaryEntityRef | null;
 }
 
 export function serializeContextToParams(

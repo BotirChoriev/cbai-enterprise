@@ -11,6 +11,7 @@ import { usePlatformContext } from "@/components/platform/context/PlatformContex
 import { useAuth } from "@/components/platform/context/AuthProvider";
 import RecentEntities from "@/components/platform/context/RecentEntities";
 import PinnedEntities from "@/components/platform/context/PinnedEntities";
+import SavedEvidence from "@/components/my-work/SavedEvidence";
 import StatusBadge from "@/components/shared/StatusBadge";
 import Avatar from "@/components/shared/Avatar";
 import CreateProjectForm from "@/components/project/CreateProjectForm";
@@ -243,8 +244,10 @@ function MyWorkContent() {
           <p className={cbaiSectionEyebrow} id="my-work-saved-heading">
             Saved Work
           </p>
-          <PinnedEntities entities={context.pinnedEntities} />
+          <PinnedEntities entities={context.pinnedEntities.filter((entity) => entity.kind !== "evidence")} />
         </section>
+
+        <SavedEvidence entities={context.pinnedEntities.filter((entity) => entity.kind === "evidence")} />
       </div>
     </div>
   );

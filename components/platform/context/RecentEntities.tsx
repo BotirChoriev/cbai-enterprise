@@ -3,6 +3,7 @@ import { buildContextualHref, snapshotWithEntityFocus, type ContextEntityRef } f
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import { RECENT_ENTITIES_ARCHITECTURE_NOTE } from "@/lib/context";
 import { getResearchTopicPath } from "@/lib/research/research-topics";
+import { evidenceItemHref } from "@/lib/research/evidence/evidence-bookmark";
 
 type RecentEntitiesProps = {
   entities: readonly ContextEntityRef[];
@@ -19,13 +20,19 @@ function entityRoute(kind: "country" | "company" | "university"): string {
   }
 }
 
-/** Research topics/Projects are routed by path segment/query flag, not the query-param focus system — see PinnedEntities.tsx. */
+/** Research topics/Projects/Evidence are routed by path segment/query flag/owning-topic, not the
+ * query-param focus system — see PinnedEntities.tsx. In practice this list never actually contains
+ * an "evidence" entry (recordEntityView, which populates Recent, is never called for a bookmark
+ * action), but this stays correct for any real ContextEntityRef kind. */
 function entityHref(entity: ContextEntityRef, context: Parameters<typeof snapshotWithEntityFocus>[0]): string {
   if (entity.kind === "research_topic") {
     return getResearchTopicPath(entity.id);
   }
   if (entity.kind === "project") {
     return `/my-work?project=${entity.id}`;
+  }
+  if (entity.kind === "evidence") {
+    return evidenceItemHref(entity.id);
   }
   return buildContextualHref(entityRoute(entity.kind), snapshotWithEntityFocus(context, entity));
 }

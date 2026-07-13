@@ -1,6 +1,9 @@
+"use client";
+
 import type { ProjectReport } from "@/lib/entity/entity-report";
 import type { ProductStatus } from "@/lib/product-status";
-import { PROJECT_TASK_STATUS_LABELS } from "@/lib/project/project-types";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import { translateProjectTaskStatus } from "@/lib/i18n/project-translation";
 import StatusBadge from "@/components/shared/StatusBadge";
 import EntityRelatedPanel from "@/components/shared/EntityRelatedPanel";
 import ReportPrintButton from "@/components/shared/ReportPrintButton";
@@ -19,6 +22,7 @@ type ProjectReportViewProps = {
  * buildEntityReport universal facade every other entity type uses.
  */
 export default function ProjectReportView({ report }: ProjectReportViewProps) {
+  const { t } = useTranslation();
   return (
     <section
       id="project-report"
@@ -101,7 +105,7 @@ export default function ProjectReportView({ report }: ProjectReportViewProps) {
           <ul className="space-y-1">
             {report.tasks.map((task) => (
               <li key={task.taskId} className="text-sm text-zinc-400">
-                {task.title} — <span className="text-zinc-600">{PROJECT_TASK_STATUS_LABELS[task.status]}</span>
+                {task.title} — <span className="text-zinc-600">{translateProjectTaskStatus(t, task.status)}</span>
               </li>
             ))}
           </ul>

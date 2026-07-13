@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { ROLE_WORK_CONTEXTS, type RoleWorkContext } from "@/lib/assistant/role-work-contexts";
-import { getProjectTypeLabel } from "@/lib/project/project-types";
+import { translateProjectTypeLabel } from "@/lib/i18n/project-translation";
 import { cbaiGlassCard, cbaiSectionEyebrow, cbaiBtnSecondary } from "@/components/brand/brand-classes";
 
 /**
@@ -61,7 +61,7 @@ function RoleCard({
         ) : null}
       </div>
       <p className="text-xs leading-relaxed text-zinc-500">{t(`${namespaceKey}.description`)}</p>
-      <p className="text-[11px] text-zinc-600">{getProjectTypeLabel(role.primaryProjectType)}</p>
+      <p className="text-[11px] text-zinc-600">{translateProjectTypeLabel(t, role.primaryProjectType)}</p>
       <div className="mt-auto flex items-center gap-2 pt-1">
         <Link
           href={role.firstActionHref}

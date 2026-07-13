@@ -59,7 +59,9 @@ function slugify(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-function buildEvidenceItemId(topicId: string, slug: string): string {
+/** The deterministic evidence item id shape — exported so callers (bookmark parsing, tests) never
+ * need to re-derive or guess it independently. */
+export function buildEvidenceItemId(topicId: string, slug: string): string {
   return `topic-evidence:${topicId}:${slug}`;
 }
 

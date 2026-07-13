@@ -103,9 +103,9 @@ test("10. CreateProjectForm accepts a real initialType and disables unavailable 
   assert.ok(content.includes('disabled={v !== "private"}'));
 });
 
-test("11. CreateProjectForm surfaces the real Project Type description, not just the label", () => {
+test("11. CreateProjectForm surfaces the real, translated Project Type description, not just the label", () => {
   const content = read("components/project/CreateProjectForm.tsx");
-  assert.ok(content.includes("PROJECT_TYPES.find((option) => option.id === type)?.description"));
+  assert.ok(content.includes("translateProjectTypeDescription(t, type)"));
 });
 
 test("12. ProjectHome distinguishes Linked entities from Bookmarks and allows bookmarking directly", () => {

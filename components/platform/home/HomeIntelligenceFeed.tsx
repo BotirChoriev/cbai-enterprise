@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import { loadProjects } from "@/lib/project/project-store";
 import { loadReports } from "@/lib/reports/reports-store";
-import { getProjectTypeLabel } from "@/lib/project/project-types";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { translateProjectTypeLabel } from "@/lib/i18n/project-translation";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type FeedItem = {
@@ -26,14 +26,17 @@ type FeedItem = {
  */
 export default function HomeIntelligenceFeed() {
   const { t } = useTranslation();
-  const [items] = useState<FeedItem[]>(() => {
+  // Re-derived whenever the interface language changes (not a one-time useState) — category/
+  // sourceLabel are real translated strings, so a language switch must not leave this feed
+  // showing stale text from whichever language was active when the component first mounted.
+  const items = useMemo<FeedItem[]>(() => {
     const projectItems: FeedItem[] = loadProjects()
       .slice(0, 4)
       .map((project) => ({
         id: `project-${project.id}`,
-        category: getProjectTypeLabel(project.type),
+        category: translateProjectTypeLabel(t, project.type),
         title: project.title,
-        sourceLabel: "Your project activity",
+        sourceLabel: t("home.feedYourProjectActivity"),
         date: project.updatedAt,
         href: `/my-work?project=${project.id}`,
       }));
@@ -42,15 +45,15 @@ export default function HomeIntelligenceFeed() {
       .slice(0, 4)
       .map((report) => ({
         id: `report-${report.id}`,
-        category: "Saved report",
+        category: t("home.feedSavedReport"),
         title: report.title,
-        sourceLabel: "Your saved reports",
+        sourceLabel: t("home.feedYourSavedReports"),
         date: report.generatedAt,
         href: report.kind === "project" ? `/my-work?project=${report.projectId ?? report.entityId}#project-report` : "/analytics",
       }));
 
     return [...projectItems, ...reportItems].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 6);
-  });
+  }, [t]);
 
   return (
     <section aria-labelledby="home-feed-heading" className={`${cbaiGlassCard} space-y-3 p-5`}>

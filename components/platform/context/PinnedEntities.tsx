@@ -5,6 +5,7 @@ import { buildContextualHref, snapshotWithEntityFocus, type ContextEntityRef } f
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import { PINNED_ENTITIES_ARCHITECTURE_NOTE } from "@/lib/context";
 import { getResearchTopicPath } from "@/lib/research/research-topics";
+import { evidenceItemHref } from "@/lib/research/evidence/evidence-bookmark";
 
 type PinnedEntitiesProps = {
   entities: readonly ContextEntityRef[];
@@ -22,10 +23,13 @@ function entityRoute(kind: "country" | "company" | "university"): string {
 }
 
 /**
- * Research topics and Projects are routed by path segment/query flag (`/research/[topicId]`,
- * `/my-work?project=id`), not the country/company/university query-param focus system — so a
- * pinned one of either gets a direct link instead of going through
- * buildContextualHref/snapshotWithEntityFocus.
+ * Research topics, Projects, and Evidence are routed by path segment/query flag/owning-topic
+ * (`/research/[topicId]`, `/my-work?project=id`, evidenceItemHref()), not the country/company/
+ * university query-param focus system — so a pinned one of any of the three gets a direct link
+ * instead of going through buildContextualHref/snapshotWithEntityFocus. In practice this
+ * component only ever renders non-"evidence" bookmarks (see components/my-work/SavedEvidence.tsx
+ * for the dedicated, distinct Evidence bookmark surface), but this stays fully generic and
+ * correct for any real ContextEntityRef kind.
  */
 function entityHref(entity: ContextEntityRef, context: Parameters<typeof snapshotWithEntityFocus>[0]): string {
   if (entity.kind === "research_topic") {
@@ -33,6 +37,9 @@ function entityHref(entity: ContextEntityRef, context: Parameters<typeof snapsho
   }
   if (entity.kind === "project") {
     return `/my-work?project=${entity.id}`;
+  }
+  if (entity.kind === "evidence") {
+    return evidenceItemHref(entity.id);
   }
   return buildContextualHref(entityRoute(entity.kind), snapshotWithEntityFocus(context, entity));
 }

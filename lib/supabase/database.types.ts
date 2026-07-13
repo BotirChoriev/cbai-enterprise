@@ -16,6 +16,10 @@ export type ProjectStatusValue = "active" | "paused" | "completed" | "archived";
 export type ProjectVisibilityValue = "private" | "team" | "public";
 export type ProjectTaskStatusValue = "todo" | "in_progress" | "done";
 export type EntityKindValue = "country" | "company" | "university" | "research_topic" | "project";
+/** bookmarks also allows "evidence" — a general saved reference to a real, catalog-backed
+ * TopicEvidenceCatalogItem, deliberately not a valid project_entity_links kind (evidence is never
+ * a project's "Related Entity" the way country/company/university/research_topic/project are). */
+export type BookmarkKindValue = EntityKindValue | "evidence";
 export type ReportKindValue = "project" | "country" | "company" | "university" | "research_topic";
 
 export type ProfileRow = {
@@ -131,7 +135,7 @@ export type BookmarkRow = {
   id: string;
   owner_id: string;
   local_id: string | null;
-  entity_kind: EntityKindValue;
+  entity_kind: BookmarkKindValue;
   entity_id: string;
   entity_name: string;
   entity_code: string | null;

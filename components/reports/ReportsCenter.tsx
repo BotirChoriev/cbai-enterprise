@@ -7,14 +7,14 @@ import {
   buildContextualHref,
   getPrimaryEntity,
   PLATFORM_MODULES,
-  type ContextEntityRef,
+  type PrimaryEntityRef,
 } from "@/lib/context";
 import { cbaiPageHeader } from "@/components/brand/brand-classes";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import ReportReadinessSection from "@/components/reports/ReportReadinessSection";
 import SavedReportsSection from "@/components/reports/SavedReportsSection";
 
-function entityProfilePath(entity: ContextEntityRef): string {
+function entityProfilePath(entity: PrimaryEntityRef): string {
   switch (entity.kind) {
     case "country":
       return PLATFORM_MODULES.countries.path;
@@ -22,12 +22,6 @@ function entityProfilePath(entity: ContextEntityRef): string {
       return PLATFORM_MODULES.companies.path;
     case "university":
       return PLATFORM_MODULES.universities.path;
-    case "research_topic":
-    case "project":
-      // Never reached in practice — getPrimaryEntity only ever returns
-      // context.country/company/university (research topics and projects are never stored
-      // there; see EntityKind). Present for type exhaustiveness only.
-      return PLATFORM_MODULES.reports.path;
   }
 }
 

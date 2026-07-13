@@ -1,4 +1,5 @@
 import type { Evidence } from "@/lib/foundation/foundation-model";
+import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type SupportingCounterEvidencePanelProps = {
@@ -14,7 +15,13 @@ function EvidenceColumn({ title, items, emptyLabel }: { title: string; items: re
         <ul className="space-y-2">
           {items.map((item) => (
             <li key={item.evidenceId} className="text-xs text-zinc-400">
-              <p className="text-zinc-300">{item.label}</p>
+              <div className="flex items-start justify-between gap-2">
+                <p className="text-zinc-300">{item.label}</p>
+                <SaveToWorkspaceButton
+                  entity={{ kind: "evidence", id: item.evidenceId, name: item.label }}
+                  className="!px-2 !py-0.5 !text-[10px]"
+                />
+              </div>
               <p className="mt-0.5 text-[10px] text-zinc-600">Status: {item.status}</p>
               {item.note ? <p className="mt-0.5 text-[10px] text-zinc-600">{item.note}</p> : null}
             </li>
