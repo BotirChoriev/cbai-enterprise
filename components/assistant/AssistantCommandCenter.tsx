@@ -17,7 +17,7 @@ import { resolveLanguageCommand } from "@/lib/i18n/language-command";
 import { getResearchTopicById } from "@/lib/research/research-topics";
 import { getPrimaryEntity } from "@/lib/context";
 import { useTranslation } from "@/lib/i18n/use-translation";
-import Avatar from "@/components/shared/Avatar";
+import OperatorFigure, { type OperatorFigureState } from "@/components/shared/OperatorFigure";
 
 const SUGGESTED_COMMAND_IDS = ["open-my-work", "continue-research", "open-evidence", "open-trust"];
 const SUGGESTED_COMMANDS = ASSISTANT_COMMANDS.filter((command) =>
@@ -250,6 +250,16 @@ export default function AssistantCommandCenter({ size = "compact" }: AssistantCo
     "network-error": t("assistant.micNetworkError"),
   };
 
+  // Real Operator visual state (Platform Activation mission, Mission 5) — driven only by the
+  // actual Web Speech API status and the actual confirmation banner, never a decorative loop.
+  const operatorFigureState: OperatorFigureState = confirmation
+    ? "success"
+    : voiceStatus === "listening" || voiceStatus === "requesting"
+      ? "listening"
+      : voiceStatus === "processing"
+        ? "thinking"
+        : "idle";
+
   return (
     <div className={`w-full min-w-0 ${isProminent ? "max-w-2xl" : "max-w-md"}`}>
       {assistantContext ? (
@@ -268,8 +278,12 @@ export default function AssistantCommandCenter({ size = "compact" }: AssistantCo
         onSubmit={handleSubmit}
         className="relative flex items-center gap-1.5"
       >
-        {isActive && !isProminent ? (
-          <Avatar name={profile.name} avatar={profile.avatar} size="sm" className="shrink-0" />
+        {isActive ? (
+          <OperatorFigure
+            state={operatorFigureState}
+            size={isProminent ? 44 : 32}
+            className="shrink-0"
+          />
         ) : null}
         <div className="relative flex-1">
           <svg

@@ -205,7 +205,10 @@ const en: TranslationDictionary = {
   },
   assistant: {
     greetingSignedOut: "Welcome to CBAI.",
-    greetingReturning: "Welcome back, {name}. What would you like to work on today?",
+    greetingReturning: "Welcome, {name}. I am your CBAI Operator. What would you like to work on today?",
+    timeOfDayMorning: "Good morning",
+    timeOfDayAfternoon: "Good afternoon",
+    timeOfDayEvening: "Good evening",
     micReady: "Microphone ready",
     micRequesting: "Requesting microphone permission…",
     micListening: "Listening…",

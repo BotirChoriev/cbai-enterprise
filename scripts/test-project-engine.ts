@@ -17,7 +17,7 @@ import {
 } from "@/lib/project/project-store";
 import { PROJECT_TYPES, getProjectTypeLabel } from "@/lib/project/project-types";
 import { toProjectEntity } from "@/lib/project/project.adapter";
-import { deriveProjectProgress } from "@/lib/project/project-progress";
+import { deriveProjectHealth } from "@/lib/project/project-health";
 import { buildEntityRelationships } from "@/lib/entity/entity-relationships";
 import { buildEntityReport } from "@/lib/entity/entity-report";
 import { buildPlatformEntityHref } from "@/lib/global-search";
@@ -115,7 +115,7 @@ test("8. buildPlatformEntityHref routes a project entity to /my-work?project=id,
   assert.equal(buildPlatformEntityHref(entity), `/my-work?project=${project.id}`);
 });
 
-test("9. deriveProjectProgress calculates only from real completed work — never a fabricated percentage", () => {
+test("9. deriveProjectHealth calculates only from real completed work — never a fabricated percentage", () => {
   const bareProject = createProject({
     title: "Bare Project",
     type: "research_project",
@@ -124,12 +124,14 @@ test("9. deriveProjectProgress calculates only from real completed work — neve
     visibility: "private",
     status: "active",
   });
-  const progress = deriveProjectProgress(bareProject);
-  assert.equal(progress.totalCount, 6);
+  const health = deriveProjectHealth(bareProject);
+  assert.ok(!("percentage" in health));
+  assert.ok(!("score" in health));
   // Outside a browser, notes/entities/evidence honestly load as empty, and researchQuestion/
-  // objectives were never set — every milestone must be false, not a default-true fabrication.
-  assert.equal(progress.completedCount, 0);
-  assert.ok(progress.milestones.every((m) => m.achieved === false));
+  // objectives were never set — every signal must be false/zero, not a default-true fabrication.
+  assert.equal(health.questionExists, false);
+  assert.equal(health.objectivesExist, false);
+  assert.equal(health.evidenceCount, 0);
 
   const projectWithQuestion = createProject({
     title: "Project With Question",
@@ -140,10 +142,7 @@ test("9. deriveProjectProgress calculates only from real completed work — neve
     visibility: "private",
     status: "active",
   });
-  const progressWithQuestion = deriveProjectProgress(projectWithQuestion);
-  const questionMilestone = progressWithQuestion.milestones.find((m) => m.id === "question_defined");
-  assert.equal(questionMilestone?.achieved, true);
-  assert.equal(progressWithQuestion.completedCount, 1);
+  assert.equal(deriveProjectHealth(projectWithQuestion).questionExists, true);
 });
 
 test("10. Command Center resolves \"create project\" and \"open project\" to the real My Work route", () => {

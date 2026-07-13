@@ -12,6 +12,7 @@ import {
 import { countries } from "@/lib/countries";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import Avatar from "@/components/shared/Avatar";
+import ThemeToggle from "@/components/shared/ThemeToggle";
 
 const inputClass =
   "w-full rounded-lg border border-zinc-800 bg-slate-900/80 px-3 py-2 text-sm text-zinc-200 outline-none transition-colors focus:border-cyan-500/30 focus:ring-1 focus:ring-cyan-500/20";
@@ -239,6 +240,17 @@ export default function AssistantSettingsForm() {
             {label}
           </label>
         ))}
+      </section>
+
+      <section aria-labelledby="assistant-theme-heading" className={`${cbaiGlassCard} space-y-3 p-5`}>
+        <p className={cbaiSectionEyebrow} id="assistant-theme-heading">
+          Interface Theme
+        </p>
+        <p className="text-xs text-zinc-500">
+          System follows your device&apos;s real light/dark preference. Light and Deep are an explicit
+          override, saved to this profile.
+        </p>
+        <ThemeToggle />
       </section>
 
       <section

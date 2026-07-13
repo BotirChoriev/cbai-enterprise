@@ -205,7 +205,10 @@ const uz: TranslationDictionary = {
   },
   assistant: {
     greetingSignedOut: "CBAI’ga xush kelibsiz.",
-    greetingReturning: "Assalomu alaykum, {name}. Bugun qanday ishni davom ettiramiz?",
+    greetingReturning: "Assalomu alaykum, {name}. Men sizning CBAI Operatoringizman. Bugun qanday ishni davom ettiramiz?",
+    timeOfDayMorning: "Xayrli tong",
+    timeOfDayAfternoon: "Xayrli kun",
+    timeOfDayEvening: "Xayrli kech",
     micReady: "Mikrofon tayyor",
     micRequesting: "Mikrofon uchun ruxsat so‘ralmoqda…",
     micListening: "Tinglanmoqda…",

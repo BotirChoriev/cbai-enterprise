@@ -205,7 +205,10 @@ const ru: TranslationDictionary = {
   },
   assistant: {
     greetingSignedOut: "Добро пожаловать в CBAI.",
-    greetingReturning: "Здравствуйте, {name}. Над чем вы хотите поработать сегодня?",
+    greetingReturning: "Здравствуйте, {name}. Я ваш оператор CBAI. Над чем вы хотите поработать сегодня?",
+    timeOfDayMorning: "Доброе утро",
+    timeOfDayAfternoon: "Добрый день",
+    timeOfDayEvening: "Добрый вечер",
     micReady: "Микрофон готов",
     micRequesting: "Запрашивается разрешение на микрофон…",
     micListening: "Слушаю…",

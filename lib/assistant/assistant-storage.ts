@@ -2,6 +2,7 @@ import {
   createEmptyAssistantProfile,
   type AssistantProfile,
   type WorkspaceRole,
+  type ThemeMode,
   WORKSPACE_ROLES,
   ASSISTANT_AVATARS,
 } from "@/lib/assistant/assistant-profile";
@@ -10,6 +11,7 @@ import { getSyncedCloudUserId } from "@/lib/supabase/cloud-session-sync";
 import { upsertCloudProfile } from "@/lib/supabase/cloud-profile";
 
 const ASSISTANT_STORAGE_KEY = "cbai-assistant-profile";
+const THEME_MODES: readonly ThemeMode[] = ["system", "light", "dark"];
 
 function isBrowser(): boolean {
   return typeof window !== "undefined";
@@ -17,6 +19,10 @@ function isBrowser(): boolean {
 
 function isWorkspaceRole(value: unknown): value is WorkspaceRole {
   return typeof value === "string" && (WORKSPACE_ROLES as string[]).includes(value);
+}
+
+function isThemeMode(value: unknown): value is ThemeMode {
+  return typeof value === "string" && (THEME_MODES as string[]).includes(value);
 }
 
 function sanitizeProfile(raw: unknown): AssistantProfile {
@@ -68,6 +74,7 @@ function sanitizeProfile(raw: unknown): AssistantProfile {
       highContrast: Boolean(candidate.accessibility?.highContrast),
       largerText: Boolean(candidate.accessibility?.largerText),
     },
+    themeMode: isThemeMode(candidate.themeMode) ? candidate.themeMode : fallback.themeMode,
   };
 }
 

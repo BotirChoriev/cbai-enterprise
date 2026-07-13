@@ -19,7 +19,6 @@ import assert from "node:assert/strict";
 import { createProject, markProjectReportGenerated, loadProject } from "@/lib/project/project-store";
 import { resolveProjectGuideStep } from "@/lib/project/project-guide";
 import { deriveProjectHealth } from "@/lib/project/project-health";
-import { deriveProjectProgress } from "@/lib/project/project-progress";
 import { resolveProjectCommand } from "@/lib/project/project-commands";
 
 function bareProject() {
@@ -83,14 +82,12 @@ test("4. resolveProjectGuideStep follows the mission's exact order — Question,
   assert.equal(resolveProjectGuideStep(withReport).id, "collect_evidence");
 });
 
-test("5. deriveProjectProgress's report_generated milestone reflects the real persisted field, never a session flag", () => {
+test("5. deriveProjectHealth's questionExists reflects the real persisted field, never a session flag", () => {
   const project = bareProject();
-  const before = deriveProjectProgress(project);
-  assert.equal(before.milestones.find((m) => m.id === "report_generated")?.achieved, false);
+  assert.equal(deriveProjectHealth(project).questionExists, false);
 
-  const withReport = { ...project, reportGeneratedAt: new Date().toISOString() };
-  const after = deriveProjectProgress(withReport);
-  assert.equal(after.milestones.find((m) => m.id === "report_generated")?.achieved, true);
+  const withQuestion = { ...project, researchQuestion: "Does this work?" };
+  assert.equal(deriveProjectHealth(withQuestion).questionExists, true);
 });
 
 test("6. deriveProjectHealth reports real counts and booleans — never a fabricated percentage or score", () => {

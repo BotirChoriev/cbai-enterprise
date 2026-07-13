@@ -177,6 +177,9 @@ export type TranslationDictionary = {
   assistant: {
     greetingSignedOut: string;
     greetingReturning: string;
+    timeOfDayMorning: string;
+    timeOfDayAfternoon: string;
+    timeOfDayEvening: string;
     micReady: string;
     micRequesting: string;
     micListening: string;

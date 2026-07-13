@@ -2,8 +2,8 @@
  * Intelligence Guide — the platform's one real "next best action" for a Project (Intelligence
  * Guide Activation mission). A pure function over already-real, already-persisted Project state:
  * no model call, no reasoning engine, no fabricated task. Checked in exactly the mission's order —
- * Research Question, Objectives, Evidence, Related Entities, Notes, Report — the same six real
- * signals lib/project/project-progress.ts already tracks, reused here rather than duplicated.
+ * Research Question, Objectives, Evidence, Related Entities, Notes, Report — six of the same real
+ * signals lib/project/project-health.ts already tracks, reused here rather than duplicated.
  *
  * The Guide only ever suggests, never orders: no step is phrased as "required" or "must."
  */

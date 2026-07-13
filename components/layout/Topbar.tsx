@@ -4,6 +4,7 @@ import Link from "next/link";
 import AssistantCommandCenter from "@/components/assistant/AssistantCommandCenter";
 import AccountMenu from "@/components/assistant/AccountMenu";
 import LanguageSelector from "@/components/i18n/LanguageSelector";
+import ThemeToggle from "@/components/shared/ThemeToggle";
 import { CBAIMark } from "@/components/brand/CBAILogo";
 import { useTranslation } from "@/lib/i18n/use-translation";
 
@@ -58,6 +59,7 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
         >
           {t("navigation.trust")}
         </Link>
+        <ThemeToggle className="hidden sm:inline-flex" />
         <LanguageSelector compact />
         <AccountMenu />
       </div>

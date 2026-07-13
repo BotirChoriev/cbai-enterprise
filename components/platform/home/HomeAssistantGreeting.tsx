@@ -4,11 +4,18 @@ import Link from "next/link";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import { useTranslation } from "@/lib/i18n/use-translation";
-import Avatar from "@/components/shared/Avatar";
+import OperatorFigure from "@/components/shared/OperatorFigure";
 import StatusBadge from "@/components/shared/StatusBadge";
 import { WORKSPACE_ROLE_LABELS, resolveOperatorName } from "@/lib/assistant/assistant-profile";
 import { resolveNextStep } from "@/lib/assistant/assistant-next-step";
+import { resolveTimeOfDay } from "@/lib/assistant/time-of-day";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+
+const TIME_OF_DAY_KEYS = {
+  morning: "assistant.timeOfDayMorning",
+  afternoon: "assistant.timeOfDayAfternoon",
+  evening: "assistant.timeOfDayEvening",
+} as const;
 
 const SECONDARY_ACTIONS = [
   { label: "Open My Work", href: "/my-work" },
@@ -42,6 +49,7 @@ export default function HomeAssistantGreeting() {
   }
 
   const nextStep = resolveNextStep(profile, context.recentEntities[0] ?? null);
+  const timeOfDay = resolveTimeOfDay(profile.timezone);
 
   return (
     <section
@@ -49,8 +57,11 @@ export default function HomeAssistantGreeting() {
       className={`${cbaiGlassCard} mx-auto mt-8 max-w-6xl space-y-5 p-6 sm:p-8`}
     >
       <div className="flex flex-wrap items-center gap-4">
-        <Avatar name={profile.name} avatar={profile.avatar} size="lg" />
+        <OperatorFigure state="idle" size={72} />
         <div className="min-w-0 flex-1">
+          {timeOfDay ? (
+            <p className={cbaiSectionEyebrow}>{t(TIME_OF_DAY_KEYS[timeOfDay])}</p>
+          ) : null}
           <h1 id="home-assistant-greeting-heading" className="text-xl font-semibold text-zinc-50 sm:text-2xl">
             {t("assistant.greetingReturning", { name: profile.name })}
           </h1>

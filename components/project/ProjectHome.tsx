@@ -29,7 +29,6 @@ import EntityRelatedPanel from "@/components/shared/EntityRelatedPanel";
 import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
 import ProjectGuidePanel from "@/components/project/ProjectGuidePanel";
 import ProjectDashboard from "@/components/project/ProjectDashboard";
-import ProjectHealthPanel from "@/components/project/ProjectHealthPanel";
 import ProjectNotesPanel from "@/components/project/ProjectNotesPanel";
 import ProjectTasksPanel from "@/components/project/ProjectTasksPanel";
 import ProjectOpenQuestionsPanel from "@/components/project/ProjectOpenQuestionsPanel";
@@ -185,8 +184,6 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
       <ProjectGuidePanel project={project} />
 
       <ProjectDashboard project={project} />
-
-      <ProjectHealthPanel project={project} />
 
       <div className={`${cbaiGlassCard} space-y-3 p-4`}>
         <p className={cbaiSectionEyebrow}>Research Question &amp; Objectives</p>

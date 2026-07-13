@@ -1,12 +1,10 @@
 "use client";
 
 import type { Project } from "@/lib/project/project-types";
-import { deriveProjectProgress } from "@/lib/project/project-progress";
+import { deriveProjectHealth } from "@/lib/project/project-health";
 import {
   loadProjectEntities,
   loadProjectNotes,
-  loadProjectEvidence,
-  loadProjectQuestions,
 } from "@/lib/project/project-store";
 import { countries } from "@/lib/countries";
 import { companies } from "@/lib/companies";
@@ -27,6 +25,21 @@ function StatCard({ label, value }: { label: string; value: string }) {
     <div className={`${cbaiGlassCard} p-3`}>
       <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">{label}</p>
       <p className="mt-1 text-sm font-semibold text-zinc-100">{value}</p>
+    </div>
+  );
+}
+
+function HealthRow({ label, achieved, detail }: { label: string; achieved: boolean; detail: string }) {
+  return (
+    <div className="flex items-start justify-between gap-3 text-xs">
+      <div className="flex items-start gap-2">
+        <span
+          aria-hidden="true"
+          className={`mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full ${achieved ? "bg-emerald-400" : "bg-zinc-700"}`}
+        />
+        <span className={achieved ? "text-zinc-300" : "text-zinc-500"}>{label}</span>
+      </div>
+      <span className="shrink-0 text-zinc-600">{detail}</span>
     </div>
   );
 }
@@ -53,10 +66,12 @@ function countMissingEvidence(project: Project): number {
 }
 
 /**
- * Real Project Dashboard — Progress, Recent Activity, Evidence Summary, Open Questions, Related
- * Entities, Missing Evidence, Latest Notes, Workspace Status, Report Status. Every field is a
- * pass-through or one-line composition of already-real, already-computed values (the same
- * pattern proven by ResearchWorkspaceDashboard.tsx) — no new engine, never a fabricated value.
+ * Real Project Dashboard — the one consolidated status surface for a project (Platform Activation
+ * mission; previously split across this Dashboard's own Progress/Evidence/Open-questions stat
+ * cards and a separate ProjectHealthPanel showing the same underlying signals as a checklist).
+ * Health/Progress checklist, Missing Evidence, Latest Notes, Workspace Status, and Report Status
+ * now live in exactly one place. Every field is a pass-through or one-line composition of
+ * already-real, already-computed values — no new engine, never a fabricated value.
  *
  * Reads directly from the store on every render (no useState caching) so it reflects sibling
  * panels' mutations immediately, within the same session — the platform should always know the
@@ -64,14 +79,9 @@ function countMissingEvidence(project: Project): number {
  */
 export default function ProjectDashboard({ project }: ProjectDashboardProps) {
   const { isEntityPinned } = usePlatformContext();
-  const entities = loadProjectEntities(project.id);
   const notes = loadProjectNotes(project.id);
-  const evidence = loadProjectEvidence(project.id);
-  const questions = loadProjectQuestions(project.id);
   const missingEvidence = countMissingEvidence(project);
-
-  const progress = deriveProjectProgress(project);
-  const openQuestions = questions.filter((q) => !q.resolved);
+  const health = deriveProjectHealth(project);
   const pinned = isEntityPinned("project", project.id);
 
   return (
@@ -80,52 +90,40 @@ export default function ProjectDashboard({ project }: ProjectDashboardProps) {
         Project Dashboard
       </p>
 
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <StatCard label="Progress" value={`${progress.completedCount}/${progress.totalCount} milestones`} />
-        <StatCard label="Evidence added" value={String(evidence.length)} />
+      <div className="grid grid-cols-3 gap-2">
         <StatCard label="Missing evidence" value={String(missingEvidence)} />
-        <StatCard label="Open questions" value={String(openQuestions.length)} />
+        <StatCard label="Tasks done" value={`${health.tasksDoneCount}/${health.tasksCount}`} />
+        <StatCard label="Open questions" value={String(health.openQuestionsCount)} />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <p className="mb-1.5 text-[10px] uppercase tracking-wider text-zinc-600">Latest notes</p>
-          {notes.length > 0 ? (
-            <ul className="space-y-1">
-              {notes.slice(0, 3).map((note) => (
-                <li key={note.noteId} className="text-xs text-zinc-500">
-                  {note.body.length > 80 ? `${note.body.slice(0, 80)}…` : note.body}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-xs text-zinc-600">No notes recorded yet.</p>
-          )}
-        </div>
-
-        <div>
-          <p className="mb-1.5 text-[10px] uppercase tracking-wider text-zinc-600">Related entities</p>
-          <p className="text-xs text-zinc-500">
-            {entities.length > 0 ? `${entities.length} entities linked.` : "No entities linked yet."}
-          </p>
-        </div>
+      <div className="space-y-1.5 border-t border-zinc-800/80 pt-3">
+        <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600">Real signals only — never a fabricated score or percentage</p>
+        <HealthRow label="Research question" achieved={health.questionExists} detail={health.questionExists ? "Defined" : "Not yet defined"} />
+        <HealthRow label="Objectives" achieved={health.objectivesExist} detail={health.objectivesExist ? "Defined" : "Not yet defined"} />
+        <HealthRow label="Evidence" achieved={health.evidenceCount > 0} detail={`${health.evidenceCount} added`} />
+        <HealthRow label="Notes" achieved={health.notesCount > 0} detail={`${health.notesCount} added`} />
+        <HealthRow label="Related entities" achieved={health.entityLinksCount > 0} detail={`${health.entityLinksCount} linked`} />
+        <HealthRow label="Report" achieved={health.reportGenerated} detail={health.reportGenerated ? "Generated" : "Not generated yet"} />
       </div>
 
-      <div className="grid grid-cols-2 gap-4 border-t border-zinc-800/80 pt-3 sm:grid-cols-3">
-        <div>
-          <p className="text-[10px] uppercase tracking-wider text-zinc-600">Workspace status</p>
-          <p className="mt-1 text-xs text-zinc-400">{pinned ? "Saved to workspace" : "Not saved yet"}</p>
-        </div>
-        <div>
-          <p className="text-[10px] uppercase tracking-wider text-zinc-600">Report status</p>
-          <p className="mt-1 text-xs text-zinc-400">
-            {project.reportGeneratedAt ? `Generated ${new Date(project.reportGeneratedAt).toLocaleString()}` : "Not generated yet"}
-          </p>
-        </div>
-        <div>
-          <p className="text-[10px] uppercase tracking-wider text-zinc-600">Status</p>
-          <p className="mt-1 text-xs text-zinc-400 capitalize">{project.status}</p>
-        </div>
+      <div className="border-t border-zinc-800/80 pt-3">
+        <p className="mb-1.5 text-[10px] uppercase tracking-wider text-zinc-600">Latest notes</p>
+        {notes.length > 0 ? (
+          <ul className="space-y-1">
+            {notes.slice(0, 3).map((note) => (
+              <li key={note.noteId} className="text-xs text-zinc-500">
+                {note.body.length > 80 ? `${note.body.slice(0, 80)}…` : note.body}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-xs text-zinc-600">No notes recorded yet.</p>
+        )}
+      </div>
+
+      <div className="border-t border-zinc-800/80 pt-3">
+        <p className="text-[10px] uppercase tracking-wider text-zinc-600">Workspace status</p>
+        <p className="mt-1 text-xs text-zinc-400">{pinned ? "Saved to workspace" : "Not saved yet"}</p>
       </div>
     </section>
   );

@@ -142,6 +142,10 @@ export type AccessibilitySettings = {
   largerText: boolean;
 };
 
+/** "system" (default) follows the OS/browser's real `prefers-color-scheme` — never assumed dark
+ * or light without checking. "light"/"dark" are an explicit, saved user override. */
+export type ThemeMode = "system" | "light" | "dark";
+
 export const DEFAULT_OPERATOR_NAME = "CBAI Operator";
 
 export type AssistantProfile = {
@@ -160,6 +164,7 @@ export type AssistantProfile = {
   organization: string;
   notifications: NotificationPreferences;
   accessibility: AccessibilitySettings;
+  themeMode: ThemeMode;
 };
 
 function browserTimezone(): string {
@@ -193,6 +198,7 @@ export function createEmptyAssistantProfile(): AssistantProfile {
       highContrast: false,
       largerText: false,
     },
+    themeMode: "system",
   };
 }
 

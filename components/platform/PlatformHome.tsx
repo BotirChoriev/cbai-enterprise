@@ -9,6 +9,8 @@ import HomeIntelligenceFeed from "@/components/platform/home/HomeIntelligenceFee
 import HomeRecentActivity from "@/components/platform/home/HomeRecentActivity";
 import HomeTrust from "@/components/platform/home/HomeTrust";
 import LanguageSelector from "@/components/i18n/LanguageSelector";
+import EntryExperience from "@/components/platform/entry/EntryExperience";
+import CBAILogo from "@/components/brand/CBAILogo";
 
 // The first screen, scoped to exactly the approved 8 sections (Platform Completion mission,
 // Phase 7) — Greeting, Voice, Projects, Role cards, Intelligence Feed, Recent activity, Quick
@@ -21,9 +23,13 @@ import LanguageSelector from "@/components/i18n/LanguageSelector";
 export default function PlatformHome() {
   return (
     <div className="home-page min-h-full bg-[#050810] pb-20">
-      {/* Language selector, prominent in the top section of the first page (Phase 5), in
-          addition to its permanent spot in the global header. */}
-      <div className="mx-auto flex max-w-6xl justify-end px-4 pt-4 sm:px-8">
+      <EntryExperience />
+
+      {/* CBAI identity layer (Mission 9.A) alongside the language selector, prominent in the top
+          section of the first page (Phase 5), in addition to its permanent spot in the global
+          header. */}
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 pt-4 sm:px-8">
+        <CBAILogo size="sm" showTagline className="hidden sm:flex" />
         <LanguageSelector />
       </div>
 

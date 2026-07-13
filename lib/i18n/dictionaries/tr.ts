@@ -205,7 +205,10 @@ const tr: TranslationDictionary = {
   },
   assistant: {
     greetingSignedOut: "CBAI'ye hoş geldiniz.",
-    greetingReturning: "Hoş geldiniz, {name}. Bugün ne üzerinde çalışmak istersiniz?",
+    greetingReturning: "Hoş geldiniz, {name}. Ben CBAI Operatörünüzüm. Bugün ne üzerinde çalışmak istersiniz?",
+    timeOfDayMorning: "Günaydın",
+    timeOfDayAfternoon: "Tünaydın",
+    timeOfDayEvening: "İyi akşamlar",
     micReady: "Mikrofon hazır",
     micRequesting: "Mikrofon izni isteniyor…",
     micListening: "Dinleniyor…",
