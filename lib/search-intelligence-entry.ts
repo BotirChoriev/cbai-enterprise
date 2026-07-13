@@ -7,6 +7,7 @@ import type { Entity } from "@/lib/entity/entity.types";
 import { getEntityTypeLabel } from "@/lib/entity/entity.helpers";
 import { buildPlatformEntityHref } from "@/lib/global-search";
 import type { EvidenceDisplayStatus } from "@/lib/search-gateway";
+import type { ContextEntityRef } from "@/lib/context/context-types";
 import { EVIDENCE_NOT_CONNECTED_LABEL } from "@/lib/platform-home";
 import { countries } from "@/lib/countries";
 import { companies } from "@/lib/companies";
@@ -36,6 +37,9 @@ export type SearchResultEntry = {
   /** Real "X of Y sources connected" (or evidence-connected) count — so how much information
    * exists is visible before opening the profile. Null only for kinds with no coverage model. */
   coverageLabel: string | null;
+  /** Real entity reference for the same "Save to workspace" action every entity profile page
+   * already exposes — null when this result isn't a saveable/pinnable entity kind. */
+  entityRef: ContextEntityRef | null;
 };
 
 /** Real, already-computed coverage counts — never a fabricated summary. */
@@ -140,6 +144,7 @@ export function buildEntityResultEntry(
       showReports: true,
       createProjectHref: createProjectHref(entity),
       coverageLabel,
+      entityRef: { kind: "country", id: entity.id, name: entity.name },
     };
   }
 
@@ -159,6 +164,7 @@ export function buildEntityResultEntry(
       showReports: true,
       createProjectHref: createProjectHref(entity),
       coverageLabel,
+      entityRef: { kind: "company", id: entity.id, name: entity.name },
     };
   }
 
@@ -178,6 +184,7 @@ export function buildEntityResultEntry(
       showReports: true,
       createProjectHref: createProjectHref(entity),
       coverageLabel,
+      entityRef: { kind: "university", id: entity.id, name: entity.name },
     };
   }
 
@@ -197,6 +204,7 @@ export function buildEntityResultEntry(
       showReports: true,
       createProjectHref: createProjectHref(entity),
       coverageLabel,
+      entityRef: { kind: "research_topic", id: entity.id, name: entity.name },
     };
   }
 
@@ -216,6 +224,7 @@ export function buildEntityResultEntry(
       showReports: true,
       createProjectHref: null,
       coverageLabel: null,
+      entityRef: { kind: "project", id: entity.id, name: entity.name },
     };
   }
 
@@ -234,6 +243,7 @@ export function buildEntityResultEntry(
     showReports: false,
     createProjectHref: null,
     coverageLabel: null,
+    entityRef: null,
   };
 }
 
@@ -261,6 +271,7 @@ export function buildTopicResultEntry(topic: {
     showReports: false,
     createProjectHref: null,
     coverageLabel: null,
+    entityRef: null,
   };
 }
 
