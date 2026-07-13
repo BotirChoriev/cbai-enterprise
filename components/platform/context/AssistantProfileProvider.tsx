@@ -43,8 +43,16 @@ function getSnapshot(): AssistantProfile {
   return cachedSnapshot;
 }
 
+// A real, verified bug (found via actual browser testing — React logged "The result of
+// getServerSnapshot should be cached to avoid an infinite loop"): calling
+// createEmptyAssistantProfile() fresh on every invocation returns a new object reference each
+// time, which useSyncExternalStore treats as "the store is constantly changing." The empty
+// profile is always the same immutable value, so it's cached exactly once, the same way
+// getSnapshot's own cachedSnapshot already is.
+const emptyServerSnapshot: AssistantProfile = createEmptyAssistantProfile();
+
 function getServerSnapshot(): AssistantProfile {
-  return createEmptyAssistantProfile();
+  return emptyServerSnapshot;
 }
 
 function subscribe(listener: () => void): () => void {
