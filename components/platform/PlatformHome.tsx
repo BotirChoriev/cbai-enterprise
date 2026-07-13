@@ -34,6 +34,15 @@ export default function PlatformHome() {
 
       <HomeAssistantGreeting />
 
+      {/* A deliberate break between the arrival moment and the workspace below it — the contrast
+          this page was missing: one uncluttered moment, then "here is what you can do," clearly
+          two different kinds of content rather than one undifferentiated stack of cards. */}
+      <div className="mx-auto mt-16 flex max-w-6xl items-center gap-4 px-4 sm:mt-24 sm:px-8" aria-hidden="true">
+        <span className="h-px flex-1 bg-zinc-800/60" />
+        <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-zinc-600">Your workspace</span>
+        <span className="h-px flex-1 bg-zinc-800/60" />
+      </div>
+
       <div className="mx-auto mt-8 max-w-6xl space-y-8 px-4 sm:px-8">
         <HomeProjectsSection />
         <RoleWorkContextCards />

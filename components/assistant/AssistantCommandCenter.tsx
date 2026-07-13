@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useId, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
@@ -61,9 +61,16 @@ type AssistantCommandCenterProps = {
    * command bar (Phase 1/8), larger input and mic target. Both share the exact same resolution
    * logic; only sizing/copy differ. */
   size?: "compact" | "prominent";
+  /** Hides this instance's own inline orb — for the one case (the homepage hero) where a much
+   * larger orb already represents the Operator immediately above this input; a second, smaller
+   * orb right next to it would read as two competing Operators, not one. */
+  hideOrb?: boolean;
+  /** Reports this instance's real, derived Operator state up to a parent that wants to drive a
+   * larger orb from the same live voice/confirmation state, instead of duplicating the orb. */
+  onOrbStateChange?: (state: OperatorOrbState) => void;
 };
 
-export default function AssistantCommandCenter({ size = "compact" }: AssistantCommandCenterProps) {
+export default function AssistantCommandCenter({ size = "compact", hideOrb = false, onOrbStateChange }: AssistantCommandCenterProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { profile, isActive, updateProfile } = useAssistantProfile();
@@ -272,6 +279,10 @@ export default function AssistantCommandCenter({ size = "compact" }: AssistantCo
           ? "thinking"
           : "idle";
 
+  useEffect(() => {
+    onOrbStateChange?.(operatorOrbState);
+  }, [operatorOrbState, onOrbStateChange]);
+
   return (
     <div className={`w-full min-w-0 ${isProminent ? "max-w-2xl" : "max-w-md"}`}>
       {assistantContext ? (
@@ -290,8 +301,8 @@ export default function AssistantCommandCenter({ size = "compact" }: AssistantCo
         onSubmit={handleSubmit}
         className="relative flex items-center gap-1.5"
       >
-        <OperatorOrb state={operatorOrbState} size={isProminent ? 44 : 32} className="shrink-0" />
-        <div className="relative flex-1">
+        {!hideOrb ? <OperatorOrb state={operatorOrbState} size={isProminent ? 44 : 32} className="shrink-0" /> : null}
+        <div className={`relative flex-1 ${isProminent ? "order-2" : ""}`}>
           <svg
             className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 ${isProminent ? "h-5 w-5" : "h-4 w-4"}`}
             fill="none"
@@ -342,17 +353,21 @@ export default function AssistantCommandCenter({ size = "compact" }: AssistantCo
             aria-disabled={!speechSupported}
             aria-label={speechSupported ? voiceStatusLabel[voiceStatus] : t("assistant.micUnsupportedBrowser")}
             title={speechSupported ? voiceStatusLabel[voiceStatus] : t("assistant.micUnsupportedBrowser")}
-            className={`flex shrink-0 items-center justify-center rounded-lg border text-zinc-400 transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
-              isProminent ? "h-12 w-12" : "h-9 w-9"
+            className={`flex shrink-0 items-center justify-center border text-zinc-400 transition-all disabled:cursor-not-allowed disabled:opacity-40 ${
+              isProminent ? "order-1 h-14 w-14 rounded-full" : "h-9 w-9 rounded-lg"
             } ${
               voiceStatus === "listening" || voiceStatus === "requesting"
-                ? "border-cyan-500/40 bg-cyan-500/10 text-cyan-300"
+                ? isProminent
+                  ? "scale-105 border-cyan-400/60 bg-cyan-500/20 text-cyan-200 shadow-[0_0_24px_-4px_rgba(34,211,238,0.5)]"
+                  : "border-cyan-500/40 bg-cyan-500/10 text-cyan-300"
                 : voiceStatus === "permission-denied" || voiceStatus === "network-error"
                   ? "border-amber-500/40 bg-amber-500/10 text-amber-300"
-                  : "border-zinc-800 bg-slate-900/80 hover:text-zinc-100"
+                  : isProminent
+                    ? "border-transparent bg-[#005810] text-white shadow-[0_8px_24px_-8px_rgba(0,88,16,0.6)] hover:bg-[#00470d]"
+                    : "border-zinc-800 bg-slate-900/80 hover:text-zinc-100"
             }`}
           >
-            <svg className={isProminent ? "h-5 w-5" : "h-4 w-4"} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <svg className={isProminent ? "h-6 w-6" : "h-4 w-4"} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

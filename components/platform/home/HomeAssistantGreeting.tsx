@@ -5,13 +5,13 @@ import Link from "next/link";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import { useTranslation } from "@/lib/i18n/use-translation";
-import OperatorOrb from "@/components/shared/OperatorOrb";
+import OperatorOrb, { type OperatorOrbState } from "@/components/shared/OperatorOrb";
 import StatusBadge from "@/components/shared/StatusBadge";
 import AssistantCommandCenter from "@/components/assistant/AssistantCommandCenter";
 import { WORKSPACE_ROLE_LABELS, resolveOperatorName } from "@/lib/assistant/assistant-profile";
 import { resolveNextStep } from "@/lib/assistant/assistant-next-step";
 import { resolveTimeOfDay } from "@/lib/assistant/time-of-day";
-import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 const TIME_OF_DAY_KEYS = {
   morning: "assistant.timeOfDayMorning",
@@ -47,60 +47,65 @@ export default function HomeAssistantGreeting() {
     return () => window.clearTimeout(timer);
   }, []);
 
+  // The command bar below reports its own real, live voice/confirmation state up here — one orb,
+  // one Operator, reacting to real interaction rather than two independent presences on screen.
+  const [liveOrbState, setLiveOrbState] = useState<OperatorOrbState>("idle");
+  const orbState = isGreeting ? "greeting" : liveOrbState;
+
   const nextStep = resolveNextStep(profile, context.recentEntities[0] ?? null);
   const timeOfDay = resolveTimeOfDay(profile.timezone);
 
+  // This is deliberately NOT a card among cards. It's the arrival moment — the one place on the
+  // page allowed to be this large, this open, and this quiet around it. Everything below the
+  // command bar (next step, shortcuts) stays real and present but visually demoted, so the
+  // contrast between "you just arrived" and "here is your workspace" is unmistakable.
   return (
-    <section
-      aria-labelledby="home-assistant-greeting-heading"
-      className={`${cbaiGlassCard} mx-auto mt-8 max-w-6xl space-y-5 p-6 sm:p-8`}
-    >
-      <div className="flex flex-wrap items-center gap-4">
-        <OperatorOrb state={isGreeting ? "greeting" : "idle"} size={72} />
-        <div className="min-w-0 flex-1">
-          {isActive && timeOfDay ? (
-            <p className={cbaiSectionEyebrow}>{t(TIME_OF_DAY_KEYS[timeOfDay])}</p>
-          ) : null}
-          <h1 id="home-assistant-greeting-heading" className="text-xl font-semibold text-zinc-50 sm:text-2xl">
-            {isActive ? t("assistant.greetingReturning", { name: profile.name }) : t("assistant.greetingSignedOut")}
-          </h1>
-          <p className="mt-0.5 text-sm text-zinc-400">
-            {isActive
-              ? `Your ${resolveOperatorName(profile)} is ready — ${WORKSPACE_ROLE_LABELS[profile.workspaceRole]} workspace.`
-              : "Your CBAI Operator is ready — speak or type to begin."}
-          </p>
-        </div>
-        {isActive ? <StatusBadge status="live" /> : null}
+    <section aria-labelledby="home-assistant-greeting-heading" className="mx-auto flex max-w-4xl flex-col items-center gap-8 px-4 pb-4 pt-6 text-center sm:pt-10">
+      <OperatorOrb state={orbState} size={132} />
+
+      <div className="space-y-4">
+        {isActive && timeOfDay ? <p className={cbaiSectionEyebrow}>{t(TIME_OF_DAY_KEYS[timeOfDay])}</p> : null}
+        <h1
+          id="home-assistant-greeting-heading"
+          className="text-4xl font-semibold tracking-tight text-zinc-50 sm:text-5xl md:text-6xl"
+        >
+          {isActive ? t("assistant.greetingReturning", { name: profile.name }) : t("assistant.greetingSignedOut")}
+        </h1>
+        <p className="mx-auto max-w-xl text-base text-zinc-400 sm:text-lg">
+          {isActive
+            ? `Your ${resolveOperatorName(profile)} is ready — ${WORKSPACE_ROLE_LABELS[profile.workspaceRole]} workspace.`
+            : "Your CBAI Operator is ready — speak or type to begin."}
+        </p>
+        {isActive ? (
+          <div className="flex justify-center">
+            <StatusBadge status="live" />
+          </div>
+        ) : null}
       </div>
 
-      <div className="flex justify-center border-y border-zinc-800/80 py-6">
-        <AssistantCommandCenter size="prominent" />
+      <div className="w-full max-w-2xl">
+        <AssistantCommandCenter size="prominent" hideOrb onOrbStateChange={setLiveOrbState} />
       </div>
 
       <Link
         href={nextStep.href}
-        className="flex items-center justify-between gap-3 rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-5 py-4 transition-colors hover:border-cyan-500/50 hover:bg-cyan-500/15"
+        className="inline-flex items-center gap-2 text-sm text-zinc-500 transition-colors hover:text-cyan-300"
       >
-        <div>
-          <p className={cbaiSectionEyebrow}>{t("project.nextStep")}</p>
-          <p className="mt-1 text-sm font-medium text-zinc-100">{nextStep.label}</p>
-        </div>
-        <span className="shrink-0 text-cyan-300">→</span>
+        <span className={cbaiSectionEyebrow}>{t("project.nextStep")}</span>
+        <span className="text-zinc-300">{nextStep.label}</span>
+        <span aria-hidden="true">→</span>
       </Link>
 
-      <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className={cbaiSectionEyebrow}>Shortcuts</p>
-        <div className="flex flex-wrap gap-2">
-          {SECONDARY_ACTIONS.map((action) => (
-            <Link
-              key={action.href}
-              href={action.href}
-              className="rounded-full border border-zinc-800 bg-zinc-900/40 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:text-zinc-100"
-            >
-              {action.label}
-            </Link>
-          ))}
-        </div>
+      <div className="flex flex-wrap justify-center gap-2 pt-2">
+        {SECONDARY_ACTIONS.map((action) => (
+          <Link
+            key={action.href}
+            href={action.href}
+            className="rounded-full border border-zinc-800/60 bg-zinc-900/20 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-700 hover:text-zinc-200"
+          >
+            {action.label}
+          </Link>
+        ))}
       </div>
     </section>
   );

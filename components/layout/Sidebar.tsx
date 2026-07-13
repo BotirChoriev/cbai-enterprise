@@ -23,8 +23,10 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`hidden h-full shrink-0 flex-col border-r border-cyan-500/10 bg-[#050810] transition-all duration-200 md:flex ${
-        isHome ? "w-16 opacity-40 hover:opacity-90" : "w-64 opacity-100"
+      className={`hidden h-full shrink-0 flex-col bg-[#050810] transition-all duration-300 md:flex ${
+        isHome
+          ? "w-16 border-r border-transparent opacity-[0.22] hover:border-cyan-500/10 hover:opacity-90"
+          : "w-64 border-r border-cyan-500/10 opacity-100"
       }`}
     >
       <Link

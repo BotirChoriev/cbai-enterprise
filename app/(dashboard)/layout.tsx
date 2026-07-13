@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import Sidebar from "@/components/layout/Sidebar";
 import Topbar from "@/components/layout/Topbar";
@@ -19,6 +19,24 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const isHome = pathname === "/";
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  // Topbar renders transparent on Home so it doesn't compete with the arrival hero. Topbar and
+  // <main> are non-overlapping flex siblings (verified: header's bottom edge meets main's top
+  // edge exactly, no stacking), so this isn't fixing a rendering bug — it's a deliberate cue that
+  // the arrival moment has ended once the user scrolls into the real workspace below it, the same
+  // "transparent at the top, solid once scrolled" pattern most premium landing pages use. Tracked
+  // here (the one place with both <main> and <Topbar> as siblings) from a real scroll offset.
+  const [isScrolled, setIsScrolled] = useState(false);
+  const scrollRafRef = useRef<number | null>(null);
+
+  function handleMainScroll(event: React.UIEvent<HTMLElement>) {
+    if (!isHome) return;
+    const target = event.currentTarget;
+    if (scrollRafRef.current !== null) return;
+    scrollRafRef.current = window.requestAnimationFrame(() => {
+      setIsScrolled(target.scrollTop > 24);
+      scrollRafRef.current = null;
+    });
+  }
 
   return (
     <AuthProvider>
@@ -30,8 +48,8 @@ export default function DashboardLayout({
               <PlatformContextProvider>
                 <OfflineBanner />
                 <MobileNavDrawer open={isMobileNavOpen} onClose={() => setIsMobileNavOpen(false)} />
-                <Topbar onMenuClick={() => setIsMobileNavOpen(true)} />
-                <main className="flex-1 overflow-y-auto">
+                <Topbar onMenuClick={() => setIsMobileNavOpen(true)} transparent={isHome && !isScrolled} />
+                <main className="flex-1 overflow-y-auto" onScroll={handleMainScroll}>
                   <div
                     className={
                       isHome

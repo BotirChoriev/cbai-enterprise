@@ -11,13 +11,17 @@ import { useTranslation } from "@/lib/i18n/use-translation";
 
 type TopbarProps = {
   onMenuClick?: () => void;
+  /** True only on Home, above the scroll threshold — a transparent, quiet header for the arrival
+   * moment, solidifying once the user scrolls into the real workspace below it (see the layout's
+   * onScroll handler) — a deliberate transition cue, driven by real scroll position. */
+  transparent?: boolean;
 };
 
 // One persistent Command Center, part of the workspace chrome on every route — never a floating
 // overlay, never hidden. Routes typed, spoken, and searched input to the same real destinations.
 // Global header (Phase 3): logo (mobile only — Sidebar already shows it on desktop), universal
 // search access, language selector, account/avatar, New Project action, Help/Trust access.
-export default function Topbar({ onMenuClick }: TopbarProps) {
+export default function Topbar({ onMenuClick, transparent = false }: TopbarProps) {
   const { t } = useTranslation();
   const pathname = usePathname();
   // The homepage already carries one prominent Operator + command bar (HomeAssistantGreeting) —
@@ -26,7 +30,13 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
   const isHome = pathname === "/";
 
   return (
-    <header className="flex h-14 min-w-0 shrink-0 items-center gap-2 border-b border-cyan-500/10 bg-slate-950/90 px-3 backdrop-blur-md sm:gap-3 sm:px-6">
+    <header
+      className={`flex h-14 min-w-0 shrink-0 items-center gap-2 px-3 transition-colors duration-300 sm:gap-3 sm:px-6 ${
+        transparent
+          ? "border-b border-transparent bg-transparent"
+          : "border-b border-cyan-500/10 bg-slate-950/90 backdrop-blur-md"
+      }`}
+    >
       {onMenuClick ? (
         <button
           type="button"
@@ -46,7 +56,11 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
 
       {!isHome ? <AssistantCommandCenter /> : <div className="flex-1" />}
 
-      <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2.5">
+      <div
+        className={`ml-auto flex shrink-0 items-center gap-1.5 transition-opacity duration-300 sm:gap-2.5 ${
+          transparent ? "opacity-50 hover:opacity-100 focus-within:opacity-100" : "opacity-100"
+        }`}
+      >
         <Link
           href="/search"
           className="hidden shrink-0 text-sm font-medium text-cyan-400 transition-colors hover:text-cyan-300 sm:inline-flex"
@@ -55,13 +69,17 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
         </Link>
         <Link
           href="/my-work"
-          className="hidden shrink-0 rounded-lg border border-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors hover:border-cyan-500/30 hover:text-cyan-300 lg:inline-flex"
+          className={`hidden shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors lg:inline-flex ${
+            transparent ? "border border-transparent hover:border-cyan-500/30 hover:text-cyan-300" : "border border-zinc-800 hover:border-cyan-500/30 hover:text-cyan-300"
+          }`}
         >
           + {t("home.newProject")}
         </Link>
         <Link
           href="/trust"
-          className="hidden shrink-0 rounded-lg border border-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors hover:border-cyan-500/30 hover:text-cyan-300 lg:inline-flex"
+          className={`hidden shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors lg:inline-flex ${
+            transparent ? "border border-transparent hover:border-cyan-500/30 hover:text-cyan-300" : "border border-zinc-800 hover:border-cyan-500/30 hover:text-cyan-300"
+          }`}
         >
           {t("navigation.trust")}
         </Link>

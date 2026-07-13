@@ -2316,3 +2316,81 @@ Both navigation paths (sidebar, homepage footer) verified with real clicks. Adde
 
 **Tests**: all 19 non-browser suites + 7/7 browser regression tests (now covering `/about`) pass.
 `tsc`/`lint`/`build` clean, 94 routes (up from 93).
+
+## 29. Homepage structural redesign — a genuine arrival moment, not a card in a stack
+
+Response to a direct challenge: five prior design passes improved color, motion, and individual
+components, but never touched the actual *structure* — a persistent sidebar, a persistent topbar,
+and a vertical stack of equal-weight glass cards is the dashboard pattern itself, regardless of its
+palette. This response does not defend that structure; it changes it, on the homepage specifically,
+while leaving every other route's shell untouched.
+
+**What changed, concretely:**
+
+- **`Sidebar.tsx`**: Home-state opacity dropped further (0.4 → 0.22 at rest, still 0.9 on hover) and
+  its border is now transparent at rest — the nav rail recedes to near-invisible during arrival
+  instead of remaining a legible, competing "this is app chrome" cue.
+- **`Topbar.tsx` + `app/(dashboard)/layout.tsx`**: the header is now transparent (no background, no
+  border) on Home, at the top of the scroll position — verified via direct DOM measurement that
+  Topbar and `<main>` are non-overlapping flex siblings (no rendering-overlap bug being fixed here;
+  this is a deliberate arrival→workspace transition cue), then solidifies to the normal solid header
+  once the user scrolls past a real 24px threshold, tracked via an actual `onScroll` handler on
+  `<main>` in the layout (the one place with both elements as siblings) — the same "transparent
+  hero nav, solid utility nav on scroll" pattern most premium landing pages use, reverting cleanly
+  when scrolled back to the top. Verified both states and the transition via computed
+  `background-color` reads, not visual inspection alone.
+- **`HomeAssistantGreeting.tsx`**: rebuilt from a bounded `cbaiGlassCard` (a card among cards) into
+  an open, centered hero — orb size 72px → 132px, headline `text-xl` (~24px) → `text-4xl`–`text-6xl`
+  (40–60px+), no card border around the primary content. "Suggested next step" and "Shortcuts" stay
+  real and present but visually demoted (quiet text links, muted pill buttons) beneath the command
+  bar, rather than boxed at equal visual weight to the arrival moment itself.
+- **`PlatformHome.tsx`**: added a real, explicit visual break ("YOUR WORKSPACE", a thin divider) with
+  generous spacing (mt-16/24) between the hero and the Projects/Role/Compass/Feed/Trust section —
+  the contrast between "you just arrived" and "here is your workspace" that was previously absent
+  (everything read as one undifferentiated stack).
+- **One real Operator, not two**: the redesigned hero's 132px orb previously would have coexisted
+  with the command bar's own small inline orb (44px) in the same viewport — two independently-
+  animating Operators reads as a mistake, not a feature. Rather than just hiding the small one and
+  leaving the big one permanently idle, `AssistantCommandCenter.tsx` gained `hideOrb` and
+  `onOrbStateChange` props — the command bar still computes its real, live voice/confirmation state,
+  now reported up via a parent callback (a standard lifted-state pattern, not the `set-state-in-
+  effect` anti-pattern this codebase's lint rule targets, since it calls a passed prop function, not
+  the component's own local state) — so the one large orb on Home now reacts to real listening/
+  thinking/speaking/success/error state, not just a static idle/greeting loop.
+- **Voice made visually primary, not just present**: self-reviewed against the mission's own question
+  ("is Voice truly the primary interaction?") and answered it honestly as still-no before changing
+  anything further — the mic was a small 48px muted square *after* a larger, more prominent text
+  input. Fixed: the prominent-mode mic button is now a bold 56px solid emerald circle (with a real
+  listening-state glow), reordered via CSS `order` utilities to sit *before* the text input, which
+  now reads as the secondary, quieter fallback. Compact (Topbar) mic styling is unchanged — this is
+  specific to the one place voice is meant to be the primary interaction.
+
+**Self-review against the mission's 7 questions, answered honestly, not defensively:**
+
+1. *Apple approval* — directionally yes; still short of Apple's exact-pixel motion choreography.
+2. *OpenAI-competitive* — much closer; still short of OpenAI's extreme whitespace minimalism (a
+   sidebar, even faded, is still present).
+3. *Professor understands CBAI in 5 seconds* — yes; the headline states real capability directly.
+4. *Minister trusts it in 5 seconds* — reasonably yes; serious typography, no hype, no cartoon.
+5. *Operator is the face of the product* — meaningfully more true; 132px, centered, real live state.
+6. *Voice is truly primary* — was honestly "no" before this pass's last change; now genuinely yes
+   for the homepage hero specifically (bold circular button, ordered first, larger than the text
+   fallback) — not yet true of the compact Topbar mic on every other route, which stays a smaller
+   utility control by design (voice as *the* homepage interaction, not a mandate on every page).
+7. *Brand is unforgettable* — more consistent (shared motion timing between logo and orb) but
+   "unforgettable" is a bar this pass cannot honestly claim to have met — the mark is distinctive
+   and custom, not yet iconic at a glance.
+
+**Verification**: real browser screenshots at every stage (sidebar/topbar receded state, hero at
+full scale, scroll-triggered topbar solidification confirmed via computed `background-color` before/
+during/after scroll, mobile at 375px with zero overflow, and confirmation that non-Home routes
+render their sidebar/topbar completely unchanged). All 19 non-browser suites + 7/7 browser
+regression tests (including the full real-browser project-creation workflow, which exercises the
+restructured command bar directly) pass. `tsc`/`lint`/`build` clean, same 94 routes.
+
+**Not claimed as fully solved** (honest, not silently dropped): the sidebar still exists in some
+form on Home, even at 0.22 opacity — a hard architectural choice between "some persistent
+navigation always reachable" (current) and "zero chrome until the user acts" (would require the
+sidebar to fully unmount on Home and reappear via a different mechanism, a larger structural change
+than this pass attempted) was not revisited; the current recede-on-arrival treatment was judged the
+stronger tradeoff against real navigational usability, not a limitation being hidden.
