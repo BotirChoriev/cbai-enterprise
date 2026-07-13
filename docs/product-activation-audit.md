@@ -2158,3 +2158,54 @@ as not-yet-attempted above.
 **Tests**: all 19 non-browser suites re-verified, zero regressions. `npm run test:browser-regression`
 7/7 passing. `npx tsc --noEmit` clean. `npm run lint` clean (same one pre-existing, unrelated
 warning). `npm run build` clean, 93 routes.
+
+### 27.2 Third issuance — expanded Operator state vocabulary, brand motion, no persona pivot
+
+Mission reissued a third time with expanded scope (Design System 5.0, unified motion language,
+brand/logo treatment) and, notably, more insistent "professional woman / human" language for the
+Operator than either prior issuance. Given this directly pushed against the standing abstract-orb
+decision (§26/§27), it was surfaced explicitly rather than silently re-decided either way — the user
+reconfirmed the abstract orb, with "human/natural/executive presence" read as direction for the
+orb's *behavior*, not its appearance.
+
+**Operator state vocabulary expanded** (`OperatorOrb.tsx`, `globals.css`) from 5 states to 7,
+covering the mission's full list via honest aliasing (searching→thinking, generating→speaking,
+confirmation→success — no new visual was invented for a distinction that wasn't real):
+
+- **`greeting`** (new): a real, one-shot "just arrived" bloom on mount, settling to idle after
+  1.3s — the same `setTimeout`-in-effect pattern already established by `EntryExperience.tsx` in
+  this codebase. `HomeAssistantGreeting` now visibly welcomes the user instead of starting silent.
+- **`error`** (new): a real gap found and fixed — `AssistantCommandCenter`'s voice
+  permission-denied/network-error states already showed honest text, but the orb stayed "idle"
+  through them. Now shows an honest, non-alarming amber pulse (deliberately not the harsh red that
+  would clash with the palette or read as "broken"), driven only by the real Web Speech API error,
+  never simulated.
+
+Both states verified in a real browser via a `data-operator-state` timeline read at multiple
+timestamps (confirming `greeting` at t≈200ms, `idle` by t≈1500ms) — the first attempt at this
+verification produced a false negative from a test-script timing bug (cumulative wait miscalculation
+put every check past the 1.3s window), caught and corrected before concluding the feature worked.
+
+**Brand motion** (`CBAILogo.tsx`, `globals.css`): the CBAI mark had zero motion anywhere — a real
+gap against "signature animation" and "one unified motion language." Added a slow glow-breathe using
+the *exact same* keyframe timing as the Operator orb's idle state (4.5s ease-in-out) — a deliberate
+choice so the logo and Operator read as one motion identity, not two coincidentally-similar-colored
+but independently-timed pieces of chrome. Respects `.cbai-reduced-motion`.
+
+**Final sitewide color sweep**: confirmed no remaining off-brand CTA colors (the two prior orange-CTA
+fixes were the only real instances; two remaining `orange-` usages in the evidence workspace are a
+legitimate "deprecated" status color, left unchanged).
+
+**Tests**: all 19 non-browser suites + 7/7 browser regression tests pass (including the zero-
+console-error route sweep, confirming the new `useEffect` introduced no hydration issue). `tsc`/
+`lint`/`build` clean, 93 routes.
+
+**Scope still not attempted** (honestly out of reach across three issuances so far): a literal
+Design System 5.0 audit of every remaining primitive (tables, dialogs/modals — this platform has
+none yet to audit — forms beyond what Settings/My Work already use); a full micro-interaction pass
+covering hover/loading/saving states on every button and action, not just the Operator/voice path;
+a structural differentiation pass explicitly benchmarking against ChatGPT/Claude/Notion/Bloomberg
+layouts side-by-side (the sidebar+topbar+content shell is a common, functional pattern shared by
+most serious software — reinventing page chrome purely to look different from category-standard
+patterns risks harming usability for a cosmetic goal, and was not attempted without a more specific,
+scoped design decision).

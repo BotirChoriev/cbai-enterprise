@@ -63,7 +63,7 @@ function CBAIMark({ size = 36, id = "cbai", standalone = false }: { size?: numbe
       className="shrink-0 drop-shadow-[0_0_6px_rgba(0,88,16,0.25)]"
     >
       {gradientDefs(id)}
-      <circle cx="32" cy="32" r="30" fill={`url(#${id}-glow)`} />
+      <circle className="cbai-mark-glow" cx="32" cy="32" r="30" fill={`url(#${id}-glow)`} />
       {/* Geometric C */}
       <path
         d="M44 18C38 12 28 10 20 14C10 20 8 34 14 44C18 50 26 54 34 52"

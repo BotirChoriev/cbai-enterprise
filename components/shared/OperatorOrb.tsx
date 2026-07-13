@@ -1,4 +1,4 @@
-export type OperatorOrbState = "idle" | "listening" | "speaking" | "thinking" | "success";
+export type OperatorOrbState = "idle" | "greeting" | "listening" | "speaking" | "thinking" | "success" | "error";
 
 type OperatorOrbProps = {
   state?: OperatorOrbState;
@@ -8,10 +8,12 @@ type OperatorOrbProps = {
 
 const STATE_LABELS: Record<OperatorOrbState, string> = {
   idle: "CBAI Operator — ready",
+  greeting: "CBAI Operator — welcoming you",
   listening: "CBAI Operator — listening",
   speaking: "CBAI Operator — speaking",
   thinking: "CBAI Operator — thinking",
   success: "CBAI Operator — confirmed",
+  error: "CBAI Operator — something needs attention",
 };
 
 /**
@@ -56,6 +58,10 @@ export default function OperatorOrb({ state = "idle", size = 96, className = "" 
           <stop offset="0%" stopColor="#f3d38a" />
           <stop offset="100%" stopColor="#c6952f" />
         </linearGradient>
+        <linearGradient id="orb-error" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#fbbf24" />
+          <stop offset="100%" stopColor="#d97706" />
+        </linearGradient>
       </defs>
 
       {/* Ambient glow — soft, breathing halo behind the core */}
@@ -82,6 +88,9 @@ export default function OperatorOrb({ state = "idle", size = 96, className = "" 
 
       {/* Confirmation flash — hidden unless state=success */}
       <circle className="cbai-orb-flash" cx="48" cy="48" r="27" stroke="url(#orb-gold)" strokeWidth="2.5" fill="none" opacity="0" />
+
+      {/* Error ring — honest, non-alarming amber cue; hidden unless state=error */}
+      <circle className="cbai-orb-error" cx="48" cy="48" r="40" stroke="url(#orb-error)" strokeWidth="2" fill="none" opacity="0" />
     </svg>
   );
 }

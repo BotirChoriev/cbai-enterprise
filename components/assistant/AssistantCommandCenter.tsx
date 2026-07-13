@@ -258,15 +258,19 @@ export default function AssistantCommandCenter({ size = "compact" }: AssistantCo
     "network-error": t("assistant.micNetworkError"),
   };
 
-  // Real Operator visual state (Platform Activation mission, Mission 5) — driven only by the
-  // actual Web Speech API status and the actual confirmation banner, never a decorative loop.
+  // Real Operator visual state — driven only by the actual Web Speech API status and the actual
+  // confirmation banner, never a decorative loop. permission-denied/network-error already had
+  // real, honest text below the input; the orb previously stayed "idle" through them, which is
+  // the one gap here — a real error now gets a real (non-alarming) visual cue too.
   const operatorOrbState: OperatorOrbState = confirmation
     ? "success"
-    : voiceStatus === "listening" || voiceStatus === "requesting"
-      ? "listening"
-      : voiceStatus === "processing"
-        ? "thinking"
-        : "idle";
+    : voiceStatus === "permission-denied" || voiceStatus === "network-error"
+      ? "error"
+      : voiceStatus === "listening" || voiceStatus === "requesting"
+        ? "listening"
+        : voiceStatus === "processing"
+          ? "thinking"
+          : "idle";
 
   return (
     <div className={`w-full min-w-0 ${isProminent ? "max-w-2xl" : "max-w-md"}`}>

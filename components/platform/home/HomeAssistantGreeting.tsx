@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
@@ -36,6 +37,16 @@ export default function HomeAssistantGreeting() {
   const { context } = usePlatformContext();
   const { t } = useTranslation();
 
+  // A real, one-shot "just arrived" moment — the Operator visibly welcomes the user on mount, then
+  // settles into idle, rather than starting in idle as if nothing happened. Same setTimeout-in-
+  // effect pattern EntryExperience.tsx already uses; harmless under reduced motion (the CSS simply
+  // renders no animation, state still flips after the timer with no visible transition).
+  const [isGreeting, setIsGreeting] = useState(true);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setIsGreeting(false), 1300);
+    return () => window.clearTimeout(timer);
+  }, []);
+
   const nextStep = resolveNextStep(profile, context.recentEntities[0] ?? null);
   const timeOfDay = resolveTimeOfDay(profile.timezone);
 
@@ -45,7 +56,7 @@ export default function HomeAssistantGreeting() {
       className={`${cbaiGlassCard} mx-auto mt-8 max-w-6xl space-y-5 p-6 sm:p-8`}
     >
       <div className="flex flex-wrap items-center gap-4">
-        <OperatorOrb state="idle" size={72} />
+        <OperatorOrb state={isGreeting ? "greeting" : "idle"} size={72} />
         <div className="min-w-0 flex-1">
           {isActive && timeOfDay ? (
             <p className={cbaiSectionEyebrow}>{t(TIME_OF_DAY_KEYS[timeOfDay])}</p>
