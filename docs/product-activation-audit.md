@@ -2209,3 +2209,55 @@ layouts side-by-side (the sidebar+topbar+content shell is a common, functional p
 most serious software — reinventing page chrome purely to look different from category-standard
 patterns risks harming usability for a cosmetic goal, and was not attempted without a more specific,
 scoped design decision).
+
+### 27.3 Fourth issuance — genuine multi-iteration critique cycle
+
+Mission reissued as an explicit iterative design loop ("never stop after the first successful
+implementation"). Ran three real iterations, each a fresh critical pass with new browser evidence,
+not a repeat of prior findings.
+
+**Iteration 1** — found and fixed two real, concrete bugs:
+1. `ThemeToggle.tsx` was supposed to hide below the `sm` breakpoint (`Topbar.tsx` passed
+   `className="hidden sm:inline-flex"`), but the component hardcoded its own `inline-flex` base
+   class, which won the CSS cascade over the passed `hidden` utility regardless of caller intent —
+   the three theme buttons rendered on every mobile viewport, never actually hiding. Fixed by
+   replacing the fragile className-collision pattern with an explicit `hideOnMobile` boolean prop
+   (verified: 6 crowded topbar icons → 4 well-spaced ones on a 375px viewport).
+2. `ContextualOperatorBanner.tsx` repeated a project's exact title twice in a row on
+   `ProjectHome` — the H1 immediately followed by "You are viewing {same title}." Fixed by
+   special-casing the `project` context kind to say "Quick actions for this project." instead,
+   after confirming (by re-checking Country/Company/University pages) that this banner is *not*
+   redundant elsewhere — those pages have a generic H1 ("Countries"), so the banner is genuinely
+   the first confirmation of which entity is showing.
+
+**Iteration 2** — re-verified iteration 1's fixes with fresh screenshots, then deliberately
+re-examined areas already believed fixed rather than only new ground (Universities detail,
+Countries detail) to check for the same duplicate-banner pattern elsewhere — confirmed absent, not
+assumed. Investigated an apparent styling anomaly on the "Create Project" button across two
+screenshots; zoomed in and read its actual computed class — confirmed correct, a false alarm from
+screenshot compression at small scale, not a real defect.
+
+**Iteration 3** — checked whether "Generate report" (and similar actions) needed a loading/
+processing indicator per the mission's micro-interaction ask; confirmed report generation is real,
+synchronous, local computation with no actual latency to represent — inventing a fake loading spinner
+for an instant honest operation would itself be a form of fabricated behavior, which this platform's
+own constitution forbids, so none was added. Force-set the orb's new `error` state via direct DOM
+manipulation (real permission-denied requires actual OS-level mic permission UI, unavailable
+headlessly) to visually confirm it reads as a distinct, honest, non-alarming amber pulse — visually
+distinct from both idle and the gold success flash. Confirmed the Settings page's per-user "Avatar"
+picker (colored initials) is intentionally separate from the Operator orb (`Avatar.tsx` represents
+the human user; `OperatorOrb.tsx` represents the Operator character) — correct existing architecture,
+not a conflict to resolve.
+
+**Why iteration stopped after 3 rounds**: by iteration 3, every newly-examined screen either (a) was
+already correct on inspection, or (b) turned out to be a false alarm on closer investigation (the
+"Create Project" styling, the report-loading-state question). No new, concrete, fixable defect
+surfaced in iteration 3 that wasn't already addressed — the remaining candidates identified across
+all three issuances of this mission (literal Design System 5.0 audit of non-existent components,
+full micro-interaction catalog, page-shell reinvention) are large, genuinely subjective design
+initiatives, not bugs a critical pass can "find." Continuing to iterate without new concrete findings
+would mean re-styling already-correct screens on aesthetic preference alone, which is a different
+kind of work than this loop's own "review, criticize, verify" cycle is built to surface.
+
+**Tests**: all 19 non-browser suites + 7/7 browser regression tests pass (including the mobile
+overflow test, which now also covers the ThemeToggle fix). `tsc`/`lint`/`build` clean, 93 routes.

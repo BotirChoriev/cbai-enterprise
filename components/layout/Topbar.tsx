@@ -65,7 +65,7 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
         >
           {t("navigation.trust")}
         </Link>
-        <ThemeToggle className="hidden sm:inline-flex" />
+        <ThemeToggle hideOnMobile />
         <LanguageSelector compact />
         <AccountMenu />
       </div>

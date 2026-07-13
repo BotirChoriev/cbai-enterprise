@@ -51,14 +51,24 @@ const THEME_OPTIONS: readonly { mode: ThemeMode; label: string; icon: React.Reac
  * Reuses the existing AssistantProfile (`themeMode`) rather than a second, parallel theme store —
  * the same profile that already persists signed-out locally and signed-in via cloud profile sync.
  */
-export default function ThemeToggle({ className = "" }: { className?: string }) {
+export default function ThemeToggle({
+  className = "",
+  hideOnMobile = false,
+}: {
+  className?: string;
+  /** True hides this control below the `sm` breakpoint. A boolean prop rather than a passed
+   * `"hidden sm:inline-flex"` className — the display utility must live in exactly one place, or
+   * the base `inline-flex` this component needs for its own layout wins the cascade regardless of
+   * what a caller passes in (a real bug this fixed: the control never actually hid on mobile). */
+  hideOnMobile?: boolean;
+}) {
   const { profile, updateProfile } = useAssistantProfile();
 
   return (
     <div
       role="radiogroup"
       aria-label="Interface theme"
-      className={`inline-flex items-center gap-0.5 rounded-lg border border-zinc-800 bg-zinc-900/60 p-0.5 ${className}`}
+      className={`${hideOnMobile ? "hidden sm:inline-flex" : "inline-flex"} items-center gap-0.5 rounded-lg border border-zinc-800 bg-zinc-900/60 p-0.5 ${className}`}
     >
       {THEME_OPTIONS.map((option) => {
         const isActive = profile.themeMode === option.mode;

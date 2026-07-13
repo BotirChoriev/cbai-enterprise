@@ -80,13 +80,23 @@ export default function ContextualOperatorBanner({ projectId }: { projectId?: st
   if (!assistantContext) return null;
 
   const actions = resolveContextualActions(assistantContext);
+  // A project's own page already shows its title as the immediately-preceding H1 — repeating the
+  // exact same name one line below it is pure noise, not real wayfinding (unlike Country/Company/
+  // University/Research pages, whose H1 is a generic page label, so this sentence is genuinely the
+  // first confirmation of "what you're looking at" there).
+  const leadText =
+    assistantContext.kind === "project" ? (
+      "Quick actions for this project."
+    ) : (
+      <>
+        You are viewing <span className="font-medium text-zinc-100">{assistantContext.name}</span>.
+      </>
+    );
 
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-lg border border-zinc-800/80 bg-zinc-950/60 px-4 py-2.5 text-sm">
       {isActive ? <Avatar name={profile.name} avatar={profile.avatar} size="sm" /> : null}
-      <p className="text-zinc-300">
-        You are viewing <span className="font-medium text-zinc-100">{assistantContext.name}</span>.
-      </p>
+      <p className="text-zinc-300">{leadText}</p>
       <div className="ml-auto flex flex-wrap gap-2">
         {actions.map((action) => (
           <Link
