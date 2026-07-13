@@ -388,6 +388,21 @@ html:not(.theme-dark) [class*="backdrop-blur"] {
   animation: none !important;
 }
 
+/* Living Intelligence Network (homepage) — the exact same 4.5s idle timing as the Operator orb
+   and the CBAI mark, so the "network breathes" moment reads as the same living system, not a
+   fourth, unrelated animation. */
+@keyframes cbai-globe-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.92; }
+  50% { transform: scale(1.015); opacity: 1; }
+}
+.cbai-globe-breathe {
+  transform-origin: center;
+  animation: cbai-globe-breathe 4.5s ease-in-out infinite;
+}
+.cbai-reduced-motion .cbai-globe-breathe {
+  animation: none !important;
+}
+
 /* Report print view — real browser printing, no new dependency. A user's own "Print" dialog
    already offers "Save as PDF" as a destination on every modern OS/browser, so this honestly
    satisfies "PDF export" without a fabricated export pipeline. Only .cbai-print-area content is

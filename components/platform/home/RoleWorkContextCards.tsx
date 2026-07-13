@@ -17,10 +17,13 @@ export default function RoleWorkContextCards() {
   const { t } = useTranslation();
 
   return (
-    <section aria-labelledby="home-role-contexts-heading" className="space-y-3">
-      <p className={cbaiSectionEyebrow} id="home-role-contexts-heading">
-        {t("home.workContextsHeading")}
-      </p>
+    <section aria-labelledby="home-role-contexts-heading" className="space-y-6">
+      <div className="space-y-2 text-center">
+        <p className={cbaiSectionEyebrow}>{t("home.workContextsHeading")}</p>
+        <h2 id="home-role-contexts-heading" className="cbai-display text-2xl text-zinc-50 sm:text-3xl">
+          However you work, CBAI understands the shape of it.
+        </h2>
+      </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {ROLE_WORK_CONTEXTS.map((role) => (
           <RoleCard

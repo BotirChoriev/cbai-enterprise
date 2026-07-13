@@ -2,6 +2,7 @@
 
 import HomeFooter from "@/components/platform/home/HomeFooter";
 import HomeAssistantGreeting from "@/components/platform/home/HomeAssistantGreeting";
+import HomeIntelligenceGlobe from "@/components/platform/home/HomeIntelligenceGlobe";
 import RoleWorkContextCards from "@/components/platform/home/RoleWorkContextCards";
 import HomeProjectsSection from "@/components/platform/home/HomeProjectsSection";
 import HomeIntelligenceFeed from "@/components/platform/home/HomeIntelligenceFeed";
@@ -11,14 +12,13 @@ import EntryExperience from "@/components/platform/entry/EntryExperience";
 import CBAILogo from "@/components/brand/CBAILogo";
 import IntelligenceCompass from "@/components/platform/home/IntelligenceCompass";
 
-// The first screen (Platform Completion mission, Phase 7; extended with the Intelligence Compass
-// in the Platform Activation mission) — Identity, Operator + Voice (one unified hero in
-// HomeAssistantGreeting — the prominent command bar lives inside that section, not as a second,
-// separate widget), Projects, Role cards, the Compass, Intelligence Feed, Recent activity, and
-// Trust. The marketing/explanation content this page previously carried (Ecosystems, World
-// Intelligence Map, Capability Flow, Audience) was not deleted — Ecosystems/Capability
-// Flow/Audience moved to /dashboard ("what is available today"), and the World Intelligence Map
-// was already duplicated on /countries, so removing it here loses no real capability.
+// The first screen — a deliberate hierarchy, not a stack of equal-weight cards: (1-3) Identity +
+// Operator + Voice as one unified hero (HomeAssistantGreeting — the prominent command bar lives
+// inside that section, never a second, separate widget), (4) the Living Intelligence Network —
+// the real evidence catalog given its own visual moment on Home itself, not just on /countries,
+// (5) Role entry, (6) Current Intelligence (Compass + Feed + Recent activity), (7) Projects, (8)
+// Trust. The marketing/explanation content this page previously carried (Ecosystems, Capability
+// Flow, Audience) was not deleted — moved to /dashboard ("what is available today").
 export default function PlatformHome() {
   return (
     <div className="home-page min-h-full bg-[#050810] pb-20">
@@ -34,7 +34,7 @@ export default function PlatformHome() {
 
       <HomeAssistantGreeting />
 
-      {/* A deliberate break between the arrival moment and the workspace below it — the contrast
+      {/* A deliberate break between the arrival moment and everything below it — the contrast
           this page was missing: one uncluttered moment, then "here is what you can do," clearly
           two different kinds of content rather than one undifferentiated stack of cards. */}
       <div className="mx-auto mt-16 flex max-w-6xl items-center gap-4 px-4 sm:mt-24 sm:px-8" aria-hidden="true">
@@ -43,14 +43,18 @@ export default function PlatformHome() {
         <span className="h-px flex-1 bg-zinc-800/60" />
       </div>
 
-      <div className="mx-auto mt-8 max-w-6xl space-y-8 px-4 sm:px-8">
-        <HomeProjectsSection />
+      <div className="mt-12 sm:mt-16">
+        <HomeIntelligenceGlobe />
+      </div>
+
+      <div className="mx-auto mt-16 max-w-6xl space-y-8 px-4 sm:px-8">
         <RoleWorkContextCards />
         <IntelligenceCompass />
         <div className="grid gap-6 lg:grid-cols-2">
           <HomeIntelligenceFeed />
           <HomeRecentActivity />
         </div>
+        <HomeProjectsSection />
         <HomeTrust />
       </div>
 
