@@ -68,24 +68,25 @@ export function AssistantProfileProvider({ children }: { children: ReactNode }) 
     root.classList.toggle("cbai-larger-text", profile.accessibility.largerText);
   }, [profile.accessibility]);
 
-  // Real Light/Deep Intelligence Mode (Platform Activation mission) — "system" genuinely follows
-  // the OS/browser's own prefers-color-scheme via a live matchMedia listener, re-applied whenever
-  // the OS preference changes while the tab is open; "light"/"dark" are an explicit, saved
-  // override. Never defaults to assuming dark without checking.
+  // Real Light/Deep Intelligence Mode (Design System 4.0 mission) — the calm Intelligence palette
+  // is the real default (no class needed); "Deep" is the explicit alternative (html.theme-dark).
+  // "system" genuinely follows the OS/browser's own prefers-color-scheme via a live matchMedia
+  // listener, re-applied whenever the OS preference changes while the tab is open; "light"/"dark"
+  // are an explicit, saved override. Never defaults to assuming dark without checking.
   useEffect(() => {
     const root = document.documentElement;
 
     if (profile.themeMode === "light") {
-      root.classList.add("theme-light");
+      root.classList.remove("theme-dark");
       return;
     }
     if (profile.themeMode === "dark") {
-      root.classList.remove("theme-light");
+      root.classList.add("theme-dark");
       return;
     }
 
-    const media = window.matchMedia("(prefers-color-scheme: light)");
-    const applySystemTheme = () => root.classList.toggle("theme-light", media.matches);
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const applySystemTheme = () => root.classList.toggle("theme-dark", media.matches);
     applySystemTheme();
     media.addEventListener("change", applySystemTheme);
     return () => media.removeEventListener("change", applySystemTheme);

@@ -55,9 +55,9 @@ export default function OperatorFigure({ state = "idle", size = 96, className = 
     >
       <defs>
         <linearGradient id={gradId} x1="10%" y1="0%" x2="90%" y2="100%">
-          <stop offset="0%" stopColor="#22d3ee" />
-          <stop offset="60%" stopColor="#0ea5e9" />
-          <stop offset="100%" stopColor="#6366f1" />
+          <stop offset="0%" stopColor="#2fbf71" />
+          <stop offset="60%" stopColor="#0a7a1f" />
+          <stop offset="100%" stopColor="#005810" />
         </linearGradient>
       </defs>
 
@@ -93,15 +93,15 @@ export default function OperatorFigure({ state = "idle", size = 96, className = 
 
       {/* Eyes — the only "face" affordance, deliberately minimal and abstract */}
       <g className="cbai-operator-eyes">
-        <circle cx="41.5" cy="37" r="2.1" fill="#22d3ee" />
-        <circle cx="54.5" cy="37" r="2.1" fill="#22d3ee" />
+        <circle cx="41.5" cy="37" r="2.1" fill="#005810" />
+        <circle cx="54.5" cy="37" r="2.1" fill="#005810" />
       </g>
 
       {/* Mouth — a simple arc that widens slightly while speaking */}
       <path
         className="cbai-operator-mouth"
         d="M41 45.5c2.2 2 9.8 2 14 0"
-        stroke="#22d3ee"
+        stroke="#005810"
         strokeWidth="1.6"
         strokeLinecap="round"
         fill="none"
@@ -109,16 +109,18 @@ export default function OperatorFigure({ state = "idle", size = 96, className = 
 
       {/* Thinking dots — hidden unless state=thinking */}
       <g className="cbai-operator-thinking-dots" opacity="0">
-        <circle cx="70" cy="24" r="2" fill="#a5b4fc" />
-        <circle cx="76" cy="18" r="1.5" fill="#a5b4fc" />
-        <circle cx="64" cy="16" r="1.5" fill="#a5b4fc" />
+        <circle cx="70" cy="24" r="2" fill="#6d28d9" />
+        <circle cx="76" cy="18" r="1.5" fill="#6d28d9" />
+        <circle cx="64" cy="16" r="1.5" fill="#6d28d9" />
       </g>
 
-      {/* Success check — hidden unless state=success */}
+      {/* Success check — hidden unless state=success. Backing circle uses the real active card
+          color (CSS custom property, valid in an SVG presentation attribute) so it reads correctly
+          against either the default light Intelligence surface or the explicit Deep theme. */}
       <g className="cbai-operator-success" opacity="0">
-        <circle cx="72" cy="24" r="10" fill="#050810" />
-        <circle cx="72" cy="24" r="10" stroke="#34d399" strokeWidth="1.5" fill="none" />
-        <path d="M67.5 24l3 3 6-6.5" stroke="#34d399" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        <circle cx="72" cy="24" r="10" fill="var(--card)" />
+        <circle cx="72" cy="24" r="10" stroke="#2fbf71" strokeWidth="1.5" fill="none" />
+        <path d="M67.5 24l3 3 6-6.5" stroke="#2fbf71" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
       </g>
     </svg>
   );

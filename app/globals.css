@@ -1,32 +1,37 @@
 @import "tailwindcss";
 
+/* CBAI Design System 4.0 — the calm "Intelligence" palette is the real default product identity
+   now, not an optional light mode: Apple-precision, Bloomberg-professional, NASA-reliable. The
+   previous dark navy/cyan look survives only as the explicit "Deep" theme choice (html.theme-dark
+   below), for users who prefer it — never the default a new visitor sees. */
 :root {
+  --background: #f6f8fa;
+  --surface: #eef4f2;
+  --card: #ffffff;
+  --foreground: #1f2422;
+  --border: #d7e4da;
+  --muted: #5b6670;
+  --accent: #005810;
+  --accent-muted: rgba(0, 88, 16, 0.1);
+  --trust: #2fbf71;
+  --intelligence: #6d28d9;
+  --warning: #b45309;
+  --error: #c94f4f;
+}
+
+html.theme-dark {
   --background: #050810;
-  --foreground: #fafafa;
   --surface: #0c1220;
+  --card: #0c1220;
+  --foreground: #fafafa;
   --border: #1e293b;
   --muted: #94a3b8;
   --accent: #22d3ee;
   --accent-muted: rgba(34, 211, 238, 0.12);
-  /* Layered premium palette (Platform Activation mission) — cyan stays the primary interaction
-     accent everywhere it already is; these three are real, named additions used for their own
-     distinct meaning, never interchangeably: emerald = trust/verified, violet = intelligence/
-     analysis, amber = caution/limitation. Deep intelligence navy/blue-green remains the dark-mode
-     foundation (--background/--surface above). */
   --trust: #10b981;
   --intelligence: #8b5cf6;
   --warning: #d97706;
-}
-
-html.theme-light {
-  --background: #fafafa;
-  --foreground: #0f172a;
-  --surface: #ffffff;
-  --border: #e2e8f0;
-  --muted: #64748b;
-  --trust: #059669;
-  --intelligence: #7c3aed;
-  --warning: #b45309;
+  --error: #ef4444;
 }
 
 @theme inline {
@@ -44,9 +49,16 @@ body {
 
 /* Premium glass surface */
 .cbai-glass {
-  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  background: color-mix(in srgb, var(--card) 90%, transparent);
   border: 1px solid color-mix(in srgb, var(--accent) 14%, var(--border));
   backdrop-filter: blur(14px);
+  box-shadow:
+    0 0 48px -16px color-mix(in srgb, var(--accent) 20%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+html.theme-dark .cbai-glass {
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
   box-shadow:
     0 0 48px -16px rgba(34, 211, 238, 0.14),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
@@ -76,111 +88,119 @@ body {
   font-size: clamp(1.25rem, 2.5vw, 1.5rem);
   font-weight: 600;
   letter-spacing: -0.02em;
-  color: #fafafa;
+  color: var(--foreground);
 }
 
 .home-section-description {
   font-size: 1rem;
   line-height: 1.65;
-  color: #94a3b8;
+  color: var(--muted);
 }
 
 .home-surface {
   background: transparent;
 }
 
-html.theme-light .home-section-title {
-  color: var(--foreground);
-}
-
-html.theme-light .home-section-description {
-  color: var(--muted);
-}
-
 .home-search-input {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
-html.theme-light .home-search-input {
-  background: color-mix(in srgb, var(--surface) 90%, transparent);
-  color: var(--foreground);
-  border-color: var(--border);
-}
-
-/* Site-wide Light Intelligence Mode (Platform Activation mission) — a first-class light palette,
-   not an inverted afterthought: real pearl/mist surfaces, dark navy text, and re-tuned cyan accent
-   contrast (cyan-400 reads clearly on deep navy but fails contrast on a white surface, so light
-   mode uses a deeper cyan for text/icons while keeping the same accent identity). Implemented as
-   overrides of the exact Tailwind utility classes already used across every route, rather than a
-   per-component rewrite — one real palette, applied everywhere at once. */
-html.theme-light [class*="bg-zinc-950"],
-html.theme-light [class*="bg-zinc-900"],
-html.theme-light [class*="bg-slate-950"],
-html.theme-light [class*="bg-slate-900"] {
+/* CBAI Design System 4.0 — the calm Intelligence palette (Design System 4.0 mission). This is the
+   real, default product identity: pearl/mist surfaces, deep charcoal text, deep forest-green
+   accent replacing cyan everywhere it appeared. Implemented as overrides of the exact Tailwind
+   utility classes already used across every route (same technique proven in the Platform
+   Activation mission's light mode), scoped to "not explicitly in Deep mode" — so this applies by
+   default and to an explicit "Light" choice alike, while html.theme-dark (unscoped, using
+   Tailwind's own built-in dark/cyan utility values with zero extra CSS) preserves the previous
+   dark navy/cyan look for anyone who chooses it. */
+html:not(.theme-dark) [class*="bg-zinc-950"],
+html:not(.theme-dark) [class*="bg-zinc-900"],
+html:not(.theme-dark) [class*="bg-slate-950"],
+html:not(.theme-dark) [class*="bg-slate-900"] {
   background-color: #ffffff;
 }
 
-html.theme-light [class*="bg-zinc-800"] {
-  background-color: #f1f5f9;
+/* The global shell (Sidebar/Topbar/MobileNavDrawer/page-level layout wrappers) uses the literal
+   arbitrary-value class bg-[#050810] rather than a Tailwind palette color, so it needs its own
+   override — the page's real Main Background, not a card white. No escaping is needed here: the
+   attribute selector matches the literal class-attribute substring, not a CSS class selector. */
+html:not(.theme-dark) [class*="bg-[#050810]"] {
+  background-color: #f6f8fa;
 }
 
-html.theme-light [class~="bg-zinc-600"] {
-  background-color: #94a3b8;
+html:not(.theme-dark) [class*="bg-zinc-800"] {
+  background-color: #eef4f2;
 }
 
-html.theme-light [class~="text-zinc-50"],
-html.theme-light [class~="text-zinc-100"] {
-  color: #0f172a;
+html:not(.theme-dark) [class~="bg-zinc-600"] {
+  background-color: #8fa39a;
 }
 
-html.theme-light [class~="text-zinc-200"],
-html.theme-light [class~="text-zinc-300"] {
-  color: #1e293b;
+html:not(.theme-dark) [class~="text-zinc-50"],
+html:not(.theme-dark) [class~="text-zinc-100"] {
+  color: #1f2422;
 }
 
-html.theme-light [class~="text-zinc-400"] {
-  color: #475569;
+html:not(.theme-dark) [class~="text-zinc-200"],
+html:not(.theme-dark) [class~="text-zinc-300"] {
+  color: #2e3532;
 }
 
-html.theme-light [class~="text-zinc-500"] {
-  color: #64748b;
+html:not(.theme-dark) [class~="text-zinc-400"] {
+  color: #445049;
 }
 
-html.theme-light [class~="text-zinc-600"],
-html.theme-light [class~="text-zinc-700"] {
-  color: #64748b;
+html:not(.theme-dark) [class~="text-zinc-500"] {
+  color: #5b6670;
 }
 
-html.theme-light [class*="border-zinc-800"],
-html.theme-light [class*="border-zinc-700"] {
-  border-color: #e2e8f0;
+html:not(.theme-dark) [class~="text-zinc-600"],
+html:not(.theme-dark) [class~="text-zinc-700"] {
+  color: #5b6670;
 }
 
-html.theme-light [class~="border-zinc-600"] {
-  border-color: #cbd5e1;
+html:not(.theme-dark) [class*="border-zinc-800"],
+html:not(.theme-dark) [class*="border-zinc-700"] {
+  border-color: #d7e4da;
 }
 
-html.theme-light [class~="text-cyan-200"],
-html.theme-light [class~="text-cyan-300"],
-html.theme-light [class~="text-cyan-400"],
-html.theme-light [class*="text-cyan-400/"] {
-  color: #0e7490;
+html:not(.theme-dark) [class~="border-zinc-600"] {
+  border-color: #b9ccbe;
 }
 
-html.theme-light [class*="border-cyan-500/"],
-html.theme-light [class*="border-cyan-400/"] {
-  border-color: rgba(14, 116, 144, 0.28);
+/* Cyan → deep forest green: the accent identity swap at the center of Design System 4.0. Broad
+   substring matches (not enumerated exact tokens) so every real opacity/shade variant in the
+   codebase (text-cyan-300/80, bg-cyan-400/70, border-cyan-400/40, ...) is covered by construction,
+   not by keeping this list in sync with every component by hand. */
+html:not(.theme-dark) [class*="text-cyan-"] {
+  color: #005810;
 }
 
-html.theme-light [class*="bg-cyan-500/"] {
-  background-color: rgba(14, 116, 144, 0.08);
+html:not(.theme-dark) [class*="border-cyan-"] {
+  border-color: rgba(0, 88, 16, 0.28);
 }
 
-/* Backdrop blur "glass" panels look muddy against a white page background without a visible
-   boundary — a real, deliberate light-mode-only shadow, not present in dark mode. */
-html.theme-light .cbai-glass,
-html.theme-light [class*="backdrop-blur"] {
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 8px 24px -12px rgba(15, 23, 42, 0.12);
+html:not(.theme-dark) [class*="bg-cyan-"] {
+  background-color: rgba(0, 88, 16, 0.08);
+}
+
+/* Primary buttons (cbaiBtnPrimary: bg-zinc-100 + text-slate-950) become a real, confident solid
+   accent action rather than a flat light-gray button indistinguishable from the page. */
+html:not(.theme-dark) [class*="bg-zinc-100"] {
+  background-color: #005810;
+}
+html:not(.theme-dark) [class*="bg-zinc-100"][class*="text-slate-950"] {
+  color: #ffffff;
+}
+html:not(.theme-dark) [class~="hover:bg-white"]:hover {
+  background-color: #00470d;
+}
+
+/* Backdrop blur "glass" panels look muddy against a light page background without a visible
+   boundary — a real, deliberate light-palette-only shadow, not present in Deep mode. */
+html:not(.theme-dark) .cbai-glass,
+html:not(.theme-dark) [class*="backdrop-blur"] {
+  box-shadow: 0 1px 2px rgba(31, 36, 34, 0.05), 0 8px 24px -12px rgba(31, 36, 34, 0.1);
 }
 
 .sr-only {
