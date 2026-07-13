@@ -1882,3 +1882,76 @@ verification across 16 routes (`/`, `/my-work`, `/search`, `/countries`, `/compa
 **Not browser-verified**: a real click-through of every fixed interaction (hover/focus/save/toggle
 states) in an actual browser — verified via source review, clean typecheck/lint/build, and static
 HTML/route checks only, consistent with this environment's lack of a browser automation tool.
+
+## 26. Full Real-User Experience Audit + Role-Based Workflow Verification
+
+The first mission in this project's history to perform genuine, interactive browser testing rather
+than source review + static route checks. This environment previously had no headless browser tool;
+the user explicitly approved adding Playwright as a dev-only dependency (never shipped in the
+production static export) specifically so this mission's "do not claim browser verification unless
+performed" requirement could be honestly met.
+
+**Real bugs found and fixed, only findable by actually rendering the app:**
+
+1. **React `getServerSnapshot` infinite-loop warning** (`AssistantProfileProvider.tsx`) — a real,
+   pre-existing bug: `getServerSnapshot()` called `createEmptyAssistantProfile()` fresh on every
+   invocation, returning a new object reference each time, which `useSyncExternalStore` flags as
+   "the store is constantly changing." Fixed with a cached module-level singleton, the same pattern
+   `getSnapshot()` already used.
+2. **Real hydration mismatches** in four components (`ProjectList.tsx`, `MyWork.tsx`'s project
+   lookup, `ResearchWorkspaceDashboard.tsx`, `EvidenceLifecyclePanel.tsx`) — each read a real,
+   localStorage-backed store (`loadProjects`/`loadProject`/`loadResearchNotes`/
+   `loadEvidenceLifecycle`) directly during render via a plain `useState(() => load...())` lazy
+   initializer. Honestly empty on the server, genuinely populated on the client — for
+   `ProjectList`/`MyWork` this is a *guaranteed* mismatch for any returning user with 1+ saved
+   projects, confirmed via a real "reopen your project" browser workflow that logged the exact
+   React hydration error. Fixed with a new reusable `lib/hooks/use-hydrated.ts`
+   (`useSyncExternalStore`-based, mirrors the already-proven `AssistantProfileProvider`/
+   `EntryExperience` pattern) for the pure-read cases, and a proper `useSyncExternalStore` module
+   store (matching `EvidenceLifecyclePanel`'s need to stay interactive) for the editable case.
+3. **Duplicate React keys** in `EntityRelatedPanel.tsx` — real, verified via the browser console on
+   `/countries` (defaults to the US, whose real catalog relationships include the same company/
+   university appearing under two distinct real relationship labels). The key
+   (`type-targetType-targetId`) didn't account for `label`, so two genuinely different real
+   relationships collided. Fixed by including `label` plus the array index in the key.
+4. **The single most natural first action failed**: typing a bare real entity name (e.g. "Japan")
+   into the homepage's top command bar and pressing Enter produced an honest but unhelpful "not
+   recognized" message, even though `/search`'s own `searchEntities()` ranks a real Japan top for
+   the identical query. Fixed with a new, lowest-priority `resolveBareEntityNameCommand` fallback in
+   `lib/assistant/assistant-commands.ts` — checked only after every real command phrase and
+   verb-prefixed pattern has failed, so it can never shadow an intentional command; reuses the exact
+   same `searchEntities()` ranking `/search` already trusts.
+5. **Entry cinematic visual gap**: a real screenshot at ~500ms into a fresh homepage load showed an
+   almost entirely blank page (just a small fading icon) — the original staged fade-in (0.05s/0.5s/
+   1.1s/1.7s delays, 2.2s to complete) worked against "understand CBAI within 10 seconds." Re-timed
+   to 0.05s/0.25s/0.45s/0.65s (0.35s fade duration) and `AUTO_DISMISS_MS` reduced from 2600ms to
+   1600ms — confirmed via fresh screenshots that real content (logo, wordmark, Operator, greeting)
+   is visible by ~900ms instead of ~2200ms.
+
+**Verified working via real interaction** (not just present in source): the full ordinary-user
+workflow (Home → search a real entity → open its profile → create a project pre-filled with that
+entity → fill the form → submit); the full student/research workflow (create project → define
+Research Question/Objectives → add a task → generate a report, confirmed to render Overview/
+Research Question/status honestly as "Waiting for verified data" rather than a fake "complete"
+claim); My Work reopening a specific project by URL and finding the real saved note; a full page
+refresh preserving both the project and the note; switching the interface language to Uzbek,
+confirming real (non-English, non-raw-key) text throughout, and confirming the choice survives a
+real refresh; the mobile drawer and My Work at a 375px viewport, confirming zero horizontal
+overflow and a working hamburger trigger.
+
+**New permanent regression coverage**: `scripts/test-browser-regression.ts` (`npm run test:browser-
+regression`, requires `npm run dev` running) — 7 real, Playwright-driven tests codifying the exact
+P0s above, so a future regression is caught automatically rather than requiring another manual
+audit. This is additive to, not a replacement for, the existing 18 zero-dependency source/logic
+suites.
+
+**Tests**: all 18 existing suites re-verified — 281/281 passing, zero regressions. Plus the new
+7-test browser suite, all passing. `npm run build` clean, 93 routes.
+
+**Scope not attempted this mission** (large, honestly out of reach in the time available): full
+persona-by-persona deep workflows for Engineer/Investor/Economist/Government/Executive/Legal/
+Social-Sector beyond the shared workflow spine already verified (all of them exercise the same real
+Search → Entity → Project → Evidence → Notes → Report path this mission did confirm end-to-end,
+just with different subject matter); an exhaustive empty-state reclassification against the
+A/B/C/D/E taxonomy; a full keyboard-only navigation pass; screen-reader testing in a real assistive
+technology tool.
