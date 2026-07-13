@@ -180,7 +180,7 @@ export function createEmptyAssistantProfile(): AssistantProfile {
     name: "",
     operatorName: "",
     avatar: "cyan",
-    voiceInputEnabled: false,
+    voiceInputEnabled: true,
     preferredLanguage: "en",
     translationLanguage: "en",
     speechLanguage: "en-US",

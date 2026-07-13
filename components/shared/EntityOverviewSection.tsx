@@ -17,6 +17,11 @@ type EntityOverviewSectionProps = {
   subtitle?: string;
   availableInformation: string;
   facts?: readonly EntityOverviewFacts[];
+  /** False when the page's own hero already showed this exact name as its heading — avoids a
+   * literal name-shown-twice-in-a-row (Research topic pages, whose ResearchTopicHero already
+   * renders a full h1/domain/status/description above this section). Default true preserves the
+   * existing Country/Company/University behavior, where this is the only place the name appears. */
+  showName?: boolean;
 };
 
 export default function EntityOverviewSection({
@@ -27,6 +32,7 @@ export default function EntityOverviewSection({
   subtitle,
   availableInformation,
   facts = [],
+  showName = true,
 }: EntityOverviewSectionProps) {
   return (
     <EntityProfileSection
@@ -36,10 +42,14 @@ export default function EntityOverviewSection({
     >
       <div className="rounded-lg bg-zinc-900/50 px-4 py-4 sm:px-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h2 className="text-xl font-semibold text-zinc-50 sm:text-2xl">{name}</h2>
-            {subtitle ? <p className="mt-1 text-sm text-zinc-500">{subtitle}</p> : null}
-          </div>
+          {showName ? (
+            <div>
+              <h2 className="text-xl font-semibold text-zinc-50 sm:text-2xl">{name}</h2>
+              {subtitle ? <p className="mt-1 text-sm text-zinc-500">{subtitle}</p> : null}
+            </div>
+          ) : (
+            <div />
+          )}
           <ShareButton className="shrink-0" />
         </div>
         <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">

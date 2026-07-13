@@ -245,7 +245,7 @@ const tr: TranslationDictionary = {
     signedOut: "Oturum Kapalı",
   },
   assistant: {
-    greetingSignedOut: "CBAI'ye hoş geldiniz.",
+    greetingSignedOut: "Hoş geldiniz. Ben CBAI Operatörünüzüm — bana her şeyi sorabilirsiniz veya nereden başlayacağımı söyleyin.",
     greetingReturning: "Hoş geldiniz, {name}. Ben CBAI Operatörünüzüm. Bugün ne üzerinde çalışmak istersiniz?",
     timeOfDayMorning: "Günaydın",
     timeOfDayAfternoon: "Tünaydın",

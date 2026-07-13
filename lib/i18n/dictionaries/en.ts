@@ -245,7 +245,7 @@ const en: TranslationDictionary = {
     signedOut: "Signed Out",
   },
   assistant: {
-    greetingSignedOut: "Welcome to CBAI.",
+    greetingSignedOut: "Welcome. I am your CBAI Operator — ask me anything, or tell me where to begin.",
     greetingReturning: "Welcome, {name}. I am your CBAI Operator. What would you like to work on today?",
     timeOfDayMorning: "Good morning",
     timeOfDayAfternoon: "Good afternoon",

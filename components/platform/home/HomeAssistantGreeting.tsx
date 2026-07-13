@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import { useTranslation } from "@/lib/i18n/use-translation";
-import OperatorFigure from "@/components/shared/OperatorFigure";
+import OperatorOrb from "@/components/shared/OperatorOrb";
 import StatusBadge from "@/components/shared/StatusBadge";
+import AssistantCommandCenter from "@/components/assistant/AssistantCommandCenter";
 import { WORKSPACE_ROLE_LABELS, resolveOperatorName } from "@/lib/assistant/assistant-profile";
 import { resolveNextStep } from "@/lib/assistant/assistant-next-step";
 import { resolveTimeOfDay } from "@/lib/assistant/time-of-day";
@@ -35,19 +36,6 @@ export default function HomeAssistantGreeting() {
   const { context } = usePlatformContext();
   const { t } = useTranslation();
 
-  if (!isActive) {
-    return (
-      <section
-        aria-labelledby="home-assistant-greeting-heading"
-        className={`${cbaiGlassCard} mx-auto mt-8 max-w-6xl p-6 text-center sm:p-8`}
-      >
-        <h1 id="home-assistant-greeting-heading" className="text-xl font-semibold text-zinc-50 sm:text-2xl">
-          {t("assistant.greetingSignedOut")}
-        </h1>
-      </section>
-    );
-  }
-
   const nextStep = resolveNextStep(profile, context.recentEntities[0] ?? null);
   const timeOfDay = resolveTimeOfDay(profile.timezone);
 
@@ -57,20 +45,25 @@ export default function HomeAssistantGreeting() {
       className={`${cbaiGlassCard} mx-auto mt-8 max-w-6xl space-y-5 p-6 sm:p-8`}
     >
       <div className="flex flex-wrap items-center gap-4">
-        <OperatorFigure state="idle" size={72} />
+        <OperatorOrb state="idle" size={72} />
         <div className="min-w-0 flex-1">
-          {timeOfDay ? (
+          {isActive && timeOfDay ? (
             <p className={cbaiSectionEyebrow}>{t(TIME_OF_DAY_KEYS[timeOfDay])}</p>
           ) : null}
           <h1 id="home-assistant-greeting-heading" className="text-xl font-semibold text-zinc-50 sm:text-2xl">
-            {t("assistant.greetingReturning", { name: profile.name })}
+            {isActive ? t("assistant.greetingReturning", { name: profile.name }) : t("assistant.greetingSignedOut")}
           </h1>
           <p className="mt-0.5 text-sm text-zinc-400">
-            Your {resolveOperatorName(profile)} is ready — {WORKSPACE_ROLE_LABELS[profile.workspaceRole]}{" "}
-            workspace.
+            {isActive
+              ? `Your ${resolveOperatorName(profile)} is ready — ${WORKSPACE_ROLE_LABELS[profile.workspaceRole]} workspace.`
+              : "Your CBAI Operator is ready — speak or type to begin."}
           </p>
         </div>
-        <StatusBadge status="live" />
+        {isActive ? <StatusBadge status="live" /> : null}
+      </div>
+
+      <div className="flex justify-center border-y border-zinc-800/80 py-6">
+        <AssistantCommandCenter size="prominent" />
       </div>
 
       <Link
@@ -85,7 +78,7 @@ export default function HomeAssistantGreeting() {
       </Link>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className={cbaiSectionEyebrow}>{t("home.quickActions")}</p>
+        <p className={cbaiSectionEyebrow}>Shortcuts</p>
         <div className="flex flex-wrap gap-2">
           {SECONDARY_ACTIONS.map((action) => (
             <Link

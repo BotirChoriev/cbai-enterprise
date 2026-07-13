@@ -47,7 +47,7 @@ export default function ResearchTopicHero({ topic }: ResearchTopicHeroProps) {
         <p className="max-w-3xl text-base leading-relaxed text-zinc-400">{topic.description}</p>
       </div>
 
-      <EntityHeader entity={toResearchTopicEntity(topic)} />
+      <EntityHeader entity={toResearchTopicEntity(topic)} showName={false} />
 
       <p className="text-sm leading-relaxed text-zinc-500">
         Human review is required before any scientific claim on this topic supports a decision.

@@ -5,7 +5,7 @@
    previous dark navy/cyan look survives only as the explicit "Deep" theme choice (html.theme-dark
    below), for users who prefer it — never the default a new visitor sees. */
 :root {
-  --background: #f6f8fa;
+  --background: #f8f6f1;
   --surface: #eef4f2;
   --card: #ffffff;
   --foreground: #1f2422;
@@ -17,6 +17,10 @@
   --intelligence: #6d28d9;
   --warning: #b45309;
   --error: #c94f4f;
+  --navy-deep: #0b1f3a;
+  --gold: #c6952f;
+  --gold-soft: #f3d38a;
+  --titanium: #767f7c;
 }
 
 html.theme-dark {
@@ -125,7 +129,15 @@ html:not(.theme-dark) [class*="bg-slate-900"] {
    override — the page's real Main Background, not a card white. No escaping is needed here: the
    attribute selector matches the literal class-attribute substring, not a CSS class selector. */
 html:not(.theme-dark) [class*="bg-[#050810]"] {
-  background-color: #f6f8fa;
+  background-color: #f8f6f1;
+}
+
+/* The entry cinematic is a deliberate exception to the light-palette override: a brief, dramatic
+   Deep Navy reveal moment (not a page background), present in every theme, that then opens into
+   the real product underneath. Real "Deep Navy" support color from the palette brief, used exactly
+   where a dark moment is intentional rather than sprinkled arbitrarily. */
+.cbai-entry-backdrop {
+  background: radial-gradient(circle at 50% 40%, #10294a 0%, var(--navy-deep) 60%, #071527 100%);
 }
 
 html:not(.theme-dark) [class*="bg-zinc-800"] {
@@ -251,88 +263,78 @@ html:not(.theme-dark) [class*="backdrop-blur"] {
 .cbai-entry-stage-3 { animation-delay: 0.45s; }
 .cbai-entry-stage-4 { animation-delay: 0.65s; }
 
-/* CBAI Operator motion states (Platform Activation mission) — subtle by default, purposeful, and
-   entirely disabled under .cbai-reduced-motion (the real, saved accessibility preference already
-   applied platform-wide). See components/shared/OperatorFigure.tsx. */
-@keyframes cbai-operator-breathe {
+/* CBAI Operator Orb motion states — a real, always-present abstract signature (never a face, never
+   gendered), subtle by default, purposeful, and entirely disabled under .cbai-reduced-motion (the
+   real, saved accessibility preference already applied platform-wide). See
+   components/shared/OperatorOrb.tsx. */
+@keyframes cbai-orb-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.22; }
+  50% { transform: scale(1.08); opacity: 0.34; }
+}
+@keyframes cbai-orb-core-breathe {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.015); }
+  50% { transform: scale(1.03); }
 }
-@keyframes cbai-operator-blink {
-  0%, 92%, 100% { transform: scaleY(1); }
-  95% { transform: scaleY(0.15); }
+@keyframes cbai-orb-ring-tighten {
+  0% { opacity: 0.3; stroke-width: 1.5; r: 40; }
+  50% { opacity: 0.85; stroke-width: 2.5; r: 36; }
+  100% { opacity: 0.3; stroke-width: 1.5; r: 40; }
 }
-@keyframes cbai-operator-ring-pulse {
-  0% { opacity: 0.25; stroke-width: 1.5; }
-  50% { opacity: 0.7; stroke-width: 2.5; }
-  100% { opacity: 0.25; stroke-width: 1.5; }
-}
-@keyframes cbai-operator-ring-spin {
+@keyframes cbai-orb-sweep-spin {
+  from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
-@keyframes cbai-operator-mouth-speak {
-  0%, 100% { transform: scaleY(1); }
-  50% { transform: scaleY(1.8); }
+@keyframes cbai-orb-speaking-pulse {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.06); }
+  50% { transform: scale(0.98); }
+  75% { transform: scale(1.04); }
 }
-@keyframes cbai-operator-dot-orbit {
-  0%, 100% { opacity: 0.4; transform: translateY(0); }
-  50% { opacity: 1; transform: translateY(-2px); }
-}
-@keyframes cbai-operator-pop-in {
-  0% { opacity: 0; transform: scale(0.5); }
-  100% { opacity: 1; transform: scale(1); }
+@keyframes cbai-orb-flash {
+  0% { opacity: 0; stroke-width: 1; r: 22; }
+  35% { opacity: 1; stroke-width: 3; r: 30; }
+  100% { opacity: 0; stroke-width: 1; r: 34; }
 }
 
-.cbai-operator-figure .cbai-operator-body,
-.cbai-operator-figure .cbai-operator-head {
+.cbai-operator-orb .cbai-orb-glow,
+.cbai-operator-orb .cbai-orb-core,
+.cbai-operator-orb .cbai-orb-ring,
+.cbai-operator-orb .cbai-orb-sweep,
+.cbai-operator-orb .cbai-orb-flash {
   transform-origin: 48px 48px;
   transform-box: fill-box;
 }
 
-.cbai-operator-figure[data-operator-state="idle"] .cbai-operator-head {
-  animation: cbai-operator-breathe 4.5s ease-in-out infinite;
+/* Idle — slow soft pulse, emerald glow */
+.cbai-operator-orb[data-operator-state="idle"] .cbai-orb-glow {
+  animation: cbai-orb-breathe 4.5s ease-in-out infinite;
+}
+.cbai-operator-orb[data-operator-state="idle"] .cbai-orb-core {
+  animation: cbai-orb-core-breathe 4.5s ease-in-out infinite;
 }
 
-.cbai-operator-figure .cbai-operator-eyes {
-  transform-origin: center;
-  transform-box: fill-box;
-  animation: cbai-operator-blink 5.5s ease-in-out infinite;
+/* Listening — brighter ring, tightens toward the mic */
+.cbai-operator-orb[data-operator-state="listening"] .cbai-orb-ring {
+  animation: cbai-orb-ring-tighten 1.4s ease-in-out infinite;
 }
 
-.cbai-operator-figure[data-operator-state="listening"] .cbai-operator-ring {
-  animation: cbai-operator-ring-pulse 1.6s ease-in-out infinite;
-}
-
-.cbai-operator-figure[data-operator-state="thinking"] .cbai-operator-ring {
-  transform-origin: center;
-  transform-box: fill-box;
-  animation: cbai-operator-ring-spin 3s linear infinite;
-}
-
-.cbai-operator-figure[data-operator-state="thinking"] .cbai-operator-thinking-dots {
+/* Thinking — slow rotating gradient sweep */
+.cbai-operator-orb[data-operator-state="thinking"] .cbai-orb-sweep {
   opacity: 1;
-}
-.cbai-operator-figure[data-operator-state="thinking"] .cbai-operator-thinking-dots circle:nth-child(1) {
-  animation: cbai-operator-dot-orbit 1.2s ease-in-out infinite;
-}
-.cbai-operator-figure[data-operator-state="thinking"] .cbai-operator-thinking-dots circle:nth-child(2) {
-  animation: cbai-operator-dot-orbit 1.2s ease-in-out 0.15s infinite;
-}
-.cbai-operator-figure[data-operator-state="thinking"] .cbai-operator-thinking-dots circle:nth-child(3) {
-  animation: cbai-operator-dot-orbit 1.2s ease-in-out 0.3s infinite;
+  animation: cbai-orb-sweep-spin 2.4s linear infinite;
 }
 
-.cbai-operator-figure[data-operator-state="speaking"] .cbai-operator-mouth {
-  transform-origin: center;
-  transform-box: fill-box;
-  animation: cbai-operator-mouth-speak 0.5s ease-in-out infinite;
+/* Speaking — rhythmic pulse synced to output */
+.cbai-operator-orb[data-operator-state="speaking"] .cbai-orb-core {
+  animation: cbai-orb-speaking-pulse 0.9s ease-in-out infinite;
 }
 
-.cbai-operator-figure[data-operator-state="success"] .cbai-operator-success {
-  animation: cbai-operator-pop-in 0.35s ease-out forwards;
+/* Confirming — brief gold flash, settles to idle */
+.cbai-operator-orb[data-operator-state="success"] .cbai-orb-flash {
+  animation: cbai-orb-flash 0.9s ease-out forwards;
 }
 
-.cbai-reduced-motion .cbai-operator-figure * {
+.cbai-reduced-motion .cbai-operator-orb * {
   animation: none !important;
 }
 

@@ -2015,3 +2015,108 @@ a full pass; Russian/Turkish were exercised only via the voice-command spot-chec
 A/B/C/D/E empty-state taxonomy document; screen-reader testing in a real assistive-technology tool
 (VoiceOver/NVDA/JAWS) — the keyboard-only pass verified focus order and accessible names via computed
 DOM properties, which is a real, honest proxy but not the same as live AT output.
+
+## 27. Premium Intelligence Operating System — Creative Direction Pass
+
+Response to a CPO/Creative-Director-framed mission: transform the first impression, brand identity,
+Operator, and voice experience into something that reads as a premium Intelligence Operating System
+rather than a dashboard — using only the existing architecture (no new modules, no new features).
+Audited the **live deployed site** (`https://cbai-enterprise.pages.dev/`) with real Playwright
+browser sessions first, before any source review, per the mission's own "use it like a real person"
+instruction.
+
+**Real, verified findings on the live site (not from source reading):**
+
+1. The Operator (`OperatorFigure`, now `OperatorOrb`) only rendered when a local profile was
+   already active — meaning every first-time visitor, by construction, saw zero Operator presence:
+   just a bare "Welcome to CBAI." text card. This alone accounted for most of the "dashboard
+   feeling" complaint, since the Operator is the platform's stated "soul."
+2. Voice was not a primary interaction — the mic button only rendered when
+   `profile.voiceInputEnabled` was true, which defaulted to `false` and was gated behind an
+   unchecked Settings checkbox. Zero mic-related elements existed anywhere in the DOM by default.
+3. `AssistantCommandCenter` (the "type or speak a command" bar) was mounted twice, simultaneously,
+   on the homepage — once compact in the global Topbar, once "prominent" in a separate
+   `HomeCommandBar` card directly below the greeting — a literal duplicate the code's own comment
+   said shouldn't exist ("not a second, separate quick-actions widget"), but did.
+4. Two independent, fully functional language selectors (each with its own "Search languages…"
+   box) rendered simultaneously on the homepage — Topbar's persistent one, plus a second one in
+   `PlatformHome`'s identity row.
+5. On every Country/Company/University profile, the list/filter column (`xl:col-span-4`) was
+   markedly shorter than the detail panel (`xl:col-span-8`) in a non-sticky grid — scrolling any
+   real profile left a multi-thousand-pixel blank void on the left for most of the page.
+6. A country/company/university's "Missing information" section rendered every non-available
+   indicator as a full card, unpaginated — confirmed 22+ near-identical cards on the United States
+   alone, each repeating the same three-line boilerplate.
+7. Research topic pages showed the entity name twice in a row — `ResearchTopicHero`'s own `<h1>`,
+   immediately followed by `EntityHeader`'s `<h2>` repeating the identical name.
+8. `CreateProjectFromEntityButton` used `orange-500` styling — rendered as a pale salmon that reads
+   as a warning/disabled state, not a confident primary action, on every entity page.
+9. The entry cinematic was still markedly slow on the live deployment (near-blank through ~1.5s) —
+   confirms the timing fix from §26 had not yet been deployed to production at audit time.
+
+**A real product-values decision, put to the user rather than assumed:** the mission asked for a
+"professional female AI operator" persona. This directly conflicts with a constraint already
+established in this codebase's history (no photorealistic or demographic avatar imagery — see
+`OperatorFigure`'s original design rationale). Given the choice between an abstract living presence,
+an illustrated gendered persona, or the status quo, the user chose the abstract direction — the
+Operator remains genderless and faceless by design, expressing "alive" purely through motion and
+light, not through a fabricated identity.
+
+**Fixes implemented, all verified in a real local browser (not claimed from source alone):**
+
+- `OperatorFigure.tsx` → `OperatorOrb.tsx`: replaced the abstract humanoid-bust illustration with a
+  pure light/orb signature (radial-gradient core, presence ring, gradient sweep, gold confirmation
+  flash) with five real CSS-driven states (idle/listening/thinking/speaking/success), matching the
+  approved direction exactly. Disabled under `.cbai-reduced-motion` like its predecessor.
+- Removed the `isActive` gate hiding the Operator from `AssistantCommandCenter` and
+  `HomeAssistantGreeting` — the orb and a real greeting now render for every visitor, signed-in or
+  not; `HomeAssistantGreeting`'s two previously-separate render branches were merged into one.
+- `lib/assistant/assistant-profile.ts`: `voiceInputEnabled` default flipped `false → true` — the
+  mic button is now visible by default (still a real, honest, reversible Settings toggle). Fixed a
+  real hydration mismatch this surfaced (`speechSupported`'s browser-API check now gated behind the
+  existing `useHydrated()` hook, matching this codebase's established pattern).
+- Merged `HomeCommandBar` into `HomeAssistantGreeting` as one unified hero (Operator + real greeting
+  + command bar/mic + next step + shortcuts); deleted the now-fully-redundant `HomeCommandBar.tsx`.
+  `Topbar` now hides its own command bar specifically on `/` (mirroring `Sidebar`'s existing
+  `isHome` collapse pattern), since the homepage hero already owns it there.
+  `PlatformHome`'s duplicate `LanguageSelector` was removed (Topbar's persistent one remains).
+- `greetingSignedOut` (all 4 active languages) rewritten from "Welcome to CBAI." to a real,
+  present-tense Operator line ("I am your CBAI Operator — ask me anything, or tell me where to
+  begin."), matching the voice already used for the signed-in greeting.
+- Countries/Companies/Universities: the list column is now `xl:sticky` with its own scroll region
+  (`xl:items-start` on the grid, `xl:self`-equivalent via sticky), eliminating the blank-void bug —
+  confirmed via a real scrolled screenshot at the same position that was previously blank.
+- `EvidenceGapPanel`: shows the first 5 missing-information cards, the rest behind one real
+  `<details>` disclosure ("Show all N missing items") — same real data, zero hidden/dropped,
+  matching the app's existing disclosure convention rather than inventing a new pattern.
+- `EntityOverviewSection`/`EntityHeader` gained an optional `showName` prop (default `true`,
+  preserving Country/Company/University exactly); `ResearchTopicHero` passes `showName={false}`
+  since its own hero already shows the name — the literal double-heading is gone.
+- `CreateProjectFromEntityButton`: orange → the same cyan/emerald accent every other primary action
+  on the platform already uses.
+- `app/globals.css`: warmer background (`#f6f8fa → #f8f6f1`), added real Deep Navy / Gold / Titanium
+  tokens from the palette brief; the entry cinematic now uses a dedicated `.cbai-entry-backdrop`
+  (Deep Navy radial gradient) instead of being swept into the light-mode override, giving the "wow"
+  moment a deliberate dark, dramatic reveal that opens into the real light product beneath it —
+  matching how premium product reveals (not just an inverted page background) actually work.
+
+**Verification**: real local browser re-audit after every change (screenshots + console/pageerror
+capture), not claimed from source. Found and fixed one real regression self-caused by this pass (the
+hydration mismatch above) before it reached the test suite. All 19 non-browser suites pass
+(zero regressions). `npm run test:browser-regression` — fixed one test-script assumption broken by
+the real DOM change (a `input[type="search"]` locator became ambiguous once a second real search
+input, the language selector's, existed earlier in document order; retargeted to `input[name="q"]`)
+— 7/7 passing after the fix. `npx tsc --noEmit` clean. `npm run lint` clean (one pre-existing,
+unrelated warning). `npm run build` clean, 93 routes. Mobile (390px) re-verified with zero console
+errors and zero horizontal overflow.
+
+**Scope not attempted this pass** (honestly out of reach in the time available, not silently
+dropped): a full Design System audit of every remaining component (icons/shadows/radii/forms/
+dialogs) beyond the tokens and components this pass actually touched; deepening the World
+Intelligence Map beyond its existing accessible grid into a richer "living network" visual; Role
+Experience differentiation beyond what `RoleWorkContextCards`/`resolveNextStep` already provide
+per-role; a full micro-interaction catalog audit (hover/loading/saving states across every
+component); Trust Center visual-hierarchy redesign (content was already honest; only reformatted
+where duplicated elsewhere). These are real, sizeable design passes in their own right — attempting
+all of them in the same pass as the Operator/voice/identity rework risked a rushed, unverified result
+across a much larger surface than could be honestly re-tested in one session.

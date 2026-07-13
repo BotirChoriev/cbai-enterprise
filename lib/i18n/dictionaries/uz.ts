@@ -245,7 +245,7 @@ const uz: TranslationDictionary = {
     signedOut: "Tizimga kirilmagan",
   },
   assistant: {
-    greetingSignedOut: "CBAI’ga xush kelibsiz.",
+    greetingSignedOut: "Xush kelibsiz. Men sizning CBAI Operatoringizman — istalgan savolni bering yoki qayerdan boshlashni ayting.",
     greetingReturning: "Assalomu alaykum, {name}. Men sizning CBAI Operatoringizman. Bugun qanday ishni davom ettiramiz?",
     timeOfDayMorning: "Xayrli tong",
     timeOfDayAfternoon: "Xayrli kun",

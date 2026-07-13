@@ -245,7 +245,7 @@ const ru: TranslationDictionary = {
     signedOut: "Вы не вошли",
   },
   assistant: {
-    greetingSignedOut: "Добро пожаловать в CBAI.",
+    greetingSignedOut: "Добро пожаловать. Я ваш оператор CBAI — спросите меня о чём угодно или скажите, с чего начать.",
     greetingReturning: "Здравствуйте, {name}. Я ваш оператор CBAI. Над чем вы хотите поработать сегодня?",
     timeOfDayMorning: "Доброе утро",
     timeOfDayAfternoon: "Добрый день",

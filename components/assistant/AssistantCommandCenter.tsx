@@ -17,7 +17,8 @@ import { resolveLanguageCommand } from "@/lib/i18n/language-command";
 import { getResearchTopicById } from "@/lib/research/research-topics";
 import { getPrimaryEntity } from "@/lib/context";
 import { useTranslation } from "@/lib/i18n/use-translation";
-import OperatorFigure, { type OperatorFigureState } from "@/components/shared/OperatorFigure";
+import { useHydrated } from "@/lib/hooks/use-hydrated";
+import OperatorOrb, { type OperatorOrbState } from "@/components/shared/OperatorOrb";
 
 const SUGGESTED_COMMAND_IDS = ["open-my-work", "continue-research", "open-evidence", "open-trust"];
 const SUGGESTED_COMMANDS = ASSISTANT_COMMANDS.filter((command) =>
@@ -238,7 +239,14 @@ export default function AssistantCommandCenter({ size = "compact" }: AssistantCo
     event.target.value = "";
   }
 
-  const speechSupported = getSpeechRecognitionConstructor() !== null;
+  // getSpeechRecognitionConstructor() reads a real browser-only API — honestly absent during the
+  // server's pre-render pass, which would otherwise disagree with the client's real capability on
+  // the very first paint now that the mic button is visible by default. useHydrated() keeps the
+  // server and the client's first render byte-identical (button starts as "checking", never a
+  // false "unsupported"), then the real capability appears in the next commit, same pattern as
+  // every other browser-only read in this codebase.
+  const hydrated = useHydrated();
+  const speechSupported = hydrated && getSpeechRecognitionConstructor() !== null;
   const isProminent = size === "prominent";
 
   const voiceStatusLabel: Record<VoiceStatus, string> = {
@@ -252,7 +260,7 @@ export default function AssistantCommandCenter({ size = "compact" }: AssistantCo
 
   // Real Operator visual state (Platform Activation mission, Mission 5) — driven only by the
   // actual Web Speech API status and the actual confirmation banner, never a decorative loop.
-  const operatorFigureState: OperatorFigureState = confirmation
+  const operatorOrbState: OperatorOrbState = confirmation
     ? "success"
     : voiceStatus === "listening" || voiceStatus === "requesting"
       ? "listening"
@@ -278,13 +286,7 @@ export default function AssistantCommandCenter({ size = "compact" }: AssistantCo
         onSubmit={handleSubmit}
         className="relative flex items-center gap-1.5"
       >
-        {isActive ? (
-          <OperatorFigure
-            state={operatorFigureState}
-            size={isProminent ? 44 : 32}
-            className="shrink-0"
-          />
-        ) : null}
+        <OperatorOrb state={operatorOrbState} size={isProminent ? 44 : 32} className="shrink-0" />
         <div className="relative flex-1">
           <svg
             className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 ${isProminent ? "h-5 w-5" : "h-4 w-4"}`}

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import AssistantCommandCenter from "@/components/assistant/AssistantCommandCenter";
 import AccountMenu from "@/components/assistant/AccountMenu";
 import LanguageSelector from "@/components/i18n/LanguageSelector";
@@ -18,6 +19,11 @@ type TopbarProps = {
 // search access, language selector, account/avatar, New Project action, Help/Trust access.
 export default function Topbar({ onMenuClick }: TopbarProps) {
   const { t } = useTranslation();
+  const pathname = usePathname();
+  // The homepage already carries one prominent Operator + command bar (HomeAssistantGreeting) —
+  // showing the compact one here too would be the exact literal duplication this platform's
+  // design system is meant to avoid, so it steps aside there and reappears on every other route.
+  const isHome = pathname === "/";
 
   return (
     <header className="flex h-14 min-w-0 shrink-0 items-center gap-2 border-b border-cyan-500/10 bg-slate-950/90 px-3 backdrop-blur-md sm:gap-3 sm:px-6">
@@ -38,7 +44,7 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
         <CBAIMark size={26} />
       </Link>
 
-      <AssistantCommandCenter />
+      {!isHome ? <AssistantCommandCenter /> : <div className="flex-1" />}
 
       <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2.5">
         <Link

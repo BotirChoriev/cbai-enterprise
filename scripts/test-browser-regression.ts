@@ -60,7 +60,7 @@ if (!serverUp) {
     const page = await browser.newPage();
     await page.goto(BASE + "/", { waitUntil: "networkidle" });
     await page.waitForTimeout(2400);
-    const topSearch = page.locator('input[type="search"]').first();
+    const topSearch = page.locator('input[name="q"]').first();
     await topSearch.fill("Japan");
     await topSearch.press("Enter");
     await page.waitForTimeout(1000);

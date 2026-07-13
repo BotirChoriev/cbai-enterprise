@@ -88,8 +88,8 @@ export default function CompaniesPageClient() {
 
       <ContextualOperatorBanner />
 
-      <div className="grid gap-6 xl:grid-cols-12">
-        <div className="space-y-4 xl:col-span-4">
+      <div className="grid gap-6 xl:grid-cols-12 xl:items-start">
+        <div className="space-y-4 xl:sticky xl:top-6 xl:col-span-4 xl:max-h-[calc(100vh-3rem)] xl:overflow-y-auto">
           <CompanyFilters
             search={search}
             industry={industry}

@@ -6,6 +6,8 @@ type EntityHeaderFromEntityProps = {
   entity: Entity;
   /** Override the facts derived from entity.metrics, for callers with a richer bespoke set. */
   facts?: readonly EntityOverviewFacts[];
+  /** False when the page's own hero already shows this entity's name — see EntityOverviewSection. */
+  showName?: boolean;
 };
 
 type EntityHeaderExplicitProps = {
@@ -17,6 +19,7 @@ type EntityHeaderExplicitProps = {
   subtitle?: string;
   availableInformation: string;
   facts?: readonly EntityOverviewFacts[];
+  showName?: boolean;
 };
 
 type EntityHeaderProps = EntityHeaderFromEntityProps | EntityHeaderExplicitProps;
@@ -36,7 +39,7 @@ type EntityHeaderProps = EntityHeaderFromEntityProps | EntityHeaderExplicitProps
  */
 export default function EntityHeader(props: EntityHeaderProps) {
   if (props.entity) {
-    const { entity, facts } = props;
+    const { entity, facts, showName } = props;
     const derivedFacts =
       facts ??
       entity.metrics.map((metric) => ({
@@ -52,11 +55,12 @@ export default function EntityHeader(props: EntityHeaderProps) {
         subtitle={entity.subtitle}
         availableInformation={entity.aiSummary}
         facts={derivedFacts}
+        showName={showName}
       />
     );
   }
 
-  const { name, entityType, country, region, subtitle, availableInformation, facts } = props;
+  const { name, entityType, country, region, subtitle, availableInformation, facts, showName } = props;
   return (
     <EntityOverviewSection
       name={name}
@@ -66,6 +70,7 @@ export default function EntityHeader(props: EntityHeaderProps) {
       subtitle={subtitle}
       availableInformation={availableInformation}
       facts={facts}
+      showName={showName}
     />
   );
 }

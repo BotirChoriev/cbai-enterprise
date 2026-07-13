@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import CBAILogo, { CBAIMark } from "@/components/brand/CBAILogo";
-import OperatorFigure from "@/components/shared/OperatorFigure";
+import OperatorOrb from "@/components/shared/OperatorOrb";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { useTranslation } from "@/lib/i18n/use-translation";
 
@@ -80,7 +80,7 @@ export default function EntryExperience() {
       type="button"
       onClick={() => setDismissed(true)}
       aria-label="Skip entry animation"
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-6 bg-[#050810] text-left"
+      className="cbai-entry-backdrop fixed inset-0 z-[100] flex flex-col items-center justify-center gap-6 text-left"
     >
       <span className="cbai-entry-stage cbai-entry-stage-1">
         <CBAIMark size={64} standalone />
@@ -89,7 +89,7 @@ export default function EntryExperience() {
         <CBAILogo size="lg" showTagline />
       </span>
       <span className="cbai-entry-stage cbai-entry-stage-3">
-        <OperatorFigure state="idle" size={56} />
+        <OperatorOrb state="idle" size={56} />
       </span>
       <span className="cbai-entry-stage cbai-entry-stage-4 text-sm text-zinc-400">
         {isActive ? t("home.commandPlaceholder") : t("assistant.greetingSignedOut")}
