@@ -7,7 +7,7 @@ import { useAssistantProfile } from "@/components/platform/context/AssistantProf
 import { useTranslation } from "@/lib/i18n/use-translation";
 
 const SESSION_KEY = "cbai-entry-experience-shown";
-const AUTO_DISMISS_MS = 2600;
+const AUTO_DISMISS_MS = 1600;
 
 function isReducedMotion(): boolean {
   return (

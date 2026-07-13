@@ -233,20 +233,23 @@ html:not(.theme-dark) [class*="backdrop-blur"] {
   font-size: 112.5%;
 }
 
-/* CBAI Entry Cinematic (Platform Activation mission, Mission 3) — a short, staged fade-in.
-   Never runs at all when reduced motion is preferred (EntryExperience.tsx skips mounting). */
+/* CBAI Entry Cinematic (Platform Activation mission, Mission 3; re-timed in the Full Real-User
+   Experience Audit mission after real browser testing showed the original 2.2s stagger left the
+   screen almost entirely blank — just a small fading icon — for the first ~1.5 seconds, directly
+   working against "the user must understand CBAI within 10 seconds"). Never runs at all when
+   reduced motion is preferred (EntryExperience.tsx skips mounting). */
 @keyframes cbai-entry-fade-up {
   0% { opacity: 0; transform: translateY(8px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 .cbai-entry-stage {
   opacity: 0;
-  animation: cbai-entry-fade-up 0.5s ease-out forwards;
+  animation: cbai-entry-fade-up 0.35s ease-out forwards;
 }
 .cbai-entry-stage-1 { animation-delay: 0.05s; }
-.cbai-entry-stage-2 { animation-delay: 0.5s; }
-.cbai-entry-stage-3 { animation-delay: 1.1s; }
-.cbai-entry-stage-4 { animation-delay: 1.7s; }
+.cbai-entry-stage-2 { animation-delay: 0.25s; }
+.cbai-entry-stage-3 { animation-delay: 0.45s; }
+.cbai-entry-stage-4 { animation-delay: 0.65s; }
 
 /* CBAI Operator motion states (Platform Activation mission) — subtle by default, purposeful, and
    entirely disabled under .cbai-reduced-motion (the real, saved accessibility preference already
