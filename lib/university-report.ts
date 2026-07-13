@@ -11,6 +11,7 @@ import { UNIVERSITY_METHODOLOGY_POINTS } from "@/lib/universities.intelligence";
 import { countConnectedSources } from "@/components/shared/entity-profile-copy";
 import { countryHrefByName, companyHrefByName } from "@/components/shared/resolve-entity-link";
 import type { IndicatorDomainId } from "@/lib/indicator-framework/types";
+import { getProjectsLinkedToEntity } from "@/lib/project/project-store";
 
 export type UniversityReportLimitation = string;
 
@@ -38,6 +39,9 @@ export type UniversityReport = {
   research: string;
   relatedCountry: UniversityReportLink | null;
   relatedCompanies: UniversityReportLink[];
+  /** Real Projects that link to this university, via the same Project Engine relationship every
+   * entity type shares — never a separate, fabricated project summary. */
+  linkedProjects: UniversityReportLink[];
   methodology: typeof UNIVERSITY_METHODOLOGY_POINTS;
   trustStatement: string;
   limitations: UniversityReportLimitation[];
@@ -88,6 +92,10 @@ export function buildUniversityReport(
     relatedCompanies: profile.linkedEntities.companies.map((name) => ({
       name,
       href: companyHrefByName(name),
+    })),
+    linkedProjects: getProjectsLinkedToEntity("university", university.id).map((project) => ({
+      name: project.title,
+      href: `/my-work?project=${project.id}`,
     })),
     methodology: UNIVERSITY_METHODOLOGY_POINTS,
     trustStatement: profile.neutralityNotice,

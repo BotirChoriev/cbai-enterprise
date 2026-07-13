@@ -11,6 +11,7 @@ import { COUNTRY_METHODOLOGY_POINTS } from "@/lib/countries.intelligence";
 import { countConnectedSources } from "@/components/shared/entity-profile-copy";
 import { companyHrefByName, universityHrefByName } from "@/components/shared/resolve-entity-link";
 import type { IndicatorDomainId } from "@/lib/indicator-framework/types";
+import { getProjectsLinkedToEntity } from "@/lib/project/project-store";
 
 export type CountryReportLimitation = string;
 
@@ -40,6 +41,9 @@ export type CountryReport = {
   research: string;
   relatedCompanies: CountryReportLink[];
   relatedUniversities: CountryReportLink[];
+  /** Real Projects that link to this country, via the same Project Engine relationship every
+   * entity type shares — never a separate, fabricated project summary. */
+  linkedProjects: CountryReportLink[];
   methodology: typeof COUNTRY_METHODOLOGY_POINTS;
   trustStatement: string;
   limitations: CountryReportLimitation[];
@@ -87,6 +91,10 @@ export function buildCountryReport(country: Country, journey: CountryUserJourney
     relatedUniversities: profile.linkedEntities.universities.map((name) => ({
       name,
       href: universityHrefByName(name),
+    })),
+    linkedProjects: getProjectsLinkedToEntity("country", country.id).map((project) => ({
+      name: project.title,
+      href: `/my-work?project=${project.id}`,
     })),
     methodology: COUNTRY_METHODOLOGY_POINTS,
     trustStatement: profile.neutralityNotice,

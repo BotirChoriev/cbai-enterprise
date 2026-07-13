@@ -6,6 +6,7 @@ import EntityRelatedPanel from "@/components/shared/EntityRelatedPanel";
 import ReportPrintButton from "@/components/shared/ReportPrintButton";
 import SaveReportButton from "@/components/shared/SaveReportButton";
 import ReportHeaderLogo from "@/components/shared/ReportHeaderLogo";
+import ReportHonestyStatement from "@/components/shared/ReportHonestyStatement";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type ProjectReportViewProps = {
@@ -145,6 +146,8 @@ export default function ProjectReportView({ report }: ProjectReportViewProps) {
         <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Trust Statement</p>
         <p className="text-sm text-zinc-400">{report.trustStatement}</p>
       </div>
+
+      <ReportHonestyStatement />
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
         <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Limitations</p>

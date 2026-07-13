@@ -6,6 +6,7 @@ import EntityFutureSources from "@/components/shared/EntityFutureSources";
 import ReportPrintButton from "@/components/shared/ReportPrintButton";
 import SaveReportButton from "@/components/shared/SaveReportButton";
 import ReportHeaderLogo from "@/components/shared/ReportHeaderLogo";
+import ReportHonestyStatement from "@/components/shared/ReportHonestyStatement";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type UniversityReportViewProps = {
@@ -140,6 +141,10 @@ export default function UniversityReportView({ report }: UniversityReportViewPro
             <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600">Related companies</p>
             <LinkList links={report.relatedCompanies} emptyLabel="No related companies in the current catalog." />
           </div>
+          <div>
+            <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600">Projects</p>
+            <LinkList links={report.linkedProjects} emptyLabel="No projects link to this university yet." />
+          </div>
         </div>
       </div>
 
@@ -158,6 +163,8 @@ export default function UniversityReportView({ report }: UniversityReportViewPro
         <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Trust Statement</p>
         <p className="text-sm text-zinc-400">{report.trustStatement}</p>
       </div>
+
+      <ReportHonestyStatement />
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
         <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Limitations</p>

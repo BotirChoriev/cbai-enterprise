@@ -22,6 +22,7 @@ import type { ContextEntityRef } from "@/lib/context/context-types";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import { useAuth } from "@/components/platform/context/AuthProvider";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
+import ShareButton from "@/components/shared/ShareButton";
 import SyncStatusBadge from "@/components/shared/SyncStatusBadge";
 import GenerateReportToggleButton from "@/components/shared/GenerateReportToggleButton";
 import EntityRelatedPanel from "@/components/shared/EntityRelatedPanel";
@@ -173,7 +174,10 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
             {accountMode === "cloud" ? <SyncStatusBadge table="projects" localId={project.id} /> : null}
           </div>
         </div>
-        <SaveToWorkspaceButton entity={{ kind: "project", id: project.id, name: project.title }} />
+        <div className="flex shrink-0 items-center gap-2">
+          <SaveToWorkspaceButton entity={{ kind: "project", id: project.id, name: project.title }} />
+          <ShareButton />
+        </div>
       </div>
 
       <ContextualOperatorBanner projectId={project.id} />

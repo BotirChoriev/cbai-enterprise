@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ResearchTopicReport } from "@/lib/entity/entity-report";
 import type { ProductStatus } from "@/lib/product-status";
 import StatusBadge from "@/components/shared/StatusBadge";
@@ -5,11 +6,38 @@ import EntityRelatedPanel from "@/components/shared/EntityRelatedPanel";
 import ReportPrintButton from "@/components/shared/ReportPrintButton";
 import SaveReportButton from "@/components/shared/SaveReportButton";
 import ReportHeaderLogo from "@/components/shared/ReportHeaderLogo";
+import ReportHonestyStatement from "@/components/shared/ReportHonestyStatement";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type ResearchTopicReportViewProps = {
   report: ResearchTopicReport & { dataStatus?: ProductStatus };
 };
+
+function LinkList({ links, emptyLabel }: { links: readonly { name: string; href: string | null }[]; emptyLabel: string }) {
+  if (links.length === 0) {
+    return <p className="text-sm text-zinc-500">{emptyLabel}</p>;
+  }
+  return (
+    <ul className="flex flex-wrap gap-2">
+      {links.map((link) =>
+        link.href ? (
+          <li key={link.name}>
+            <Link
+              href={link.href}
+              className="rounded-full border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-xs text-zinc-400 hover:text-cyan-300"
+            >
+              {link.name}
+            </Link>
+          </li>
+        ) : (
+          <li key={link.name} className="rounded-full border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-xs text-zinc-500">
+            {link.name}
+          </li>
+        ),
+      )}
+    </ul>
+  );
+}
 
 /**
  * Real, compiled Research Topic Report — the fourth entity type to gain a report, via the same
@@ -89,9 +117,16 @@ export default function ResearchTopicReportView({ report }: ResearchTopicReportV
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Projects</p>
+        <LinkList links={report.linkedProjects} emptyLabel="No projects link to this research topic yet." />
+      </div>
+
+      <div className="space-y-2 border-t border-zinc-800/80 pt-4">
         <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Trust Statement</p>
         <p className="text-sm text-zinc-400">{report.trustStatement}</p>
       </div>
+
+      <ReportHonestyStatement />
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
         <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Limitations</p>

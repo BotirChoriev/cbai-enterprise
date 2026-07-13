@@ -12,8 +12,10 @@ import { countConnectedSources } from "@/components/shared/entity-profile-copy";
 import { getRelatedResearchTopics, type CompanyResearchMatch } from "@/lib/company-research";
 import { countryHrefByName } from "@/components/shared/resolve-entity-link";
 import type { IndicatorDomainId } from "@/lib/indicator-framework/types";
+import { getProjectsLinkedToEntity } from "@/lib/project/project-store";
 
 export type CompanyReportLimitation = string;
+export type CompanyReportLink = { name: string; href: string | null };
 
 export type CompanyReport = {
   company: Company;
@@ -35,6 +37,9 @@ export type CompanyReport = {
   futureDomainIds: readonly IndicatorDomainId[];
   research: CompanyResearchMatch[];
   country: { name: string; href: string } | null;
+  /** Real Projects that link to this company, via the same Project Engine relationship every
+   * entity type shares — never a separate, fabricated project summary. */
+  linkedProjects: CompanyReportLink[];
   methodology: typeof COMPANY_METHODOLOGY_POINTS;
   trustStatement: string;
   limitations: CompanyReportLimitation[];
@@ -78,6 +83,10 @@ export function buildCompanyReport(company: Company, journey: CompanyUserJourney
     futureDomainIds: coverage.indicatorsByDomain.map((d) => d.domainId),
     research: getRelatedResearchTopics(company),
     country: countryName && countryHref ? { name: countryName, href: countryHref } : null,
+    linkedProjects: getProjectsLinkedToEntity("company", company.id).map((project) => ({
+      name: project.title,
+      href: `/my-work?project=${project.id}`,
+    })),
     methodology: COMPANY_METHODOLOGY_POINTS,
     trustStatement: profile.neutralityNotice,
     limitations,

@@ -38,6 +38,7 @@ import {
   loadProjectTasks,
   loadProjectQuestions,
   loadProjectEvidence,
+  getProjectsLinkedToEntity,
 } from "@/lib/project/project-store";
 import type { ProjectNote, ProjectTask, ProjectQuestion, ProjectEvidenceReference } from "@/lib/project/project-types";
 
@@ -54,6 +55,9 @@ export type ResearchTopicReport = {
   /** Real, persisted user notes for this topic — empty until the user writes one. */
   notes: readonly PersistedResearchNote[];
   relationships: EntityRelationship[];
+  /** Real Projects that link to this research topic, via the same Project Engine relationship
+   * every entity type shares — never a separate, fabricated project summary. */
+  linkedProjects: { name: string; href: string | null }[];
   trustStatement: string;
   limitations: string[];
 };
@@ -174,6 +178,10 @@ function buildResearchTopicReport(topicId: string): ResearchTopicReport | null {
     counterEvidence: contract?.evidenceSummary.conflictingEvidence ?? [],
     notes,
     relationships: buildEntityRelationships("research_topic", topicId),
+    linkedProjects: getProjectsLinkedToEntity("research_topic", topicId).map((project) => ({
+      name: project.title,
+      href: `/my-work?project=${project.id}`,
+    })),
     trustStatement: RESEARCH_TRUST_STATEMENT,
     limitations,
   };
