@@ -51,7 +51,9 @@ function RoleCard({
   const namespaceKey = `roles.${role.id}`;
 
   return (
-    <div className={`${cbaiGlassCard} flex flex-col gap-2.5 p-4 ${isSelected ? "border-cyan-500/40" : ""}`}>
+    <div
+      className={`${cbaiGlassCard} flex flex-col gap-2.5 p-4 transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-16px_rgba(0,88,16,0.3)] ${isSelected ? "border-cyan-500/40" : ""}`}
+    >
       <div className="flex items-start justify-between gap-2">
         <h3 className="text-sm font-semibold text-zinc-100">{t(`${namespaceKey}.title`)}</h3>
         {isSelected ? (

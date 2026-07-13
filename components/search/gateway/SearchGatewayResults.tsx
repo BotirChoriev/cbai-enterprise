@@ -207,7 +207,7 @@ function EntityMatchCard({ entry, matchedLabel }: EntityMatchCardProps) {
         {entry.createProjectHref ? (
           <Link
             href={entry.createProjectHref}
-            className="inline-flex min-h-9 items-center rounded-lg border border-orange-500/30 bg-orange-500/10 px-3.5 text-xs font-medium text-orange-300 transition-colors hover:border-orange-500/50"
+            className="inline-flex min-h-9 items-center rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3.5 text-xs font-medium text-cyan-300 transition-colors hover:border-cyan-500/50"
           >
             Create Project →
           </Link>

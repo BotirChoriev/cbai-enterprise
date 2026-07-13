@@ -161,15 +161,16 @@ export default function TrustPage() {
       </nav>
 
       <div className="space-y-6">
-        {sections.map((section) => (
+        {sections.map((section, index) => (
           <section
             key={section.id}
             id={section.id}
             aria-labelledby={`${section.id}-heading`}
-            className={`${cbaiGlassCard} space-y-3 p-6 scroll-mt-20`}
+            className={`${cbaiGlassCard} relative space-y-3 overflow-hidden p-6 pl-8 scroll-mt-20`}
           >
+            <span aria-hidden="true" className="absolute inset-y-0 left-0 w-[3px] bg-[#005810] opacity-60" />
             <div>
-              <p className={cbaiSectionEyebrow}>Trust</p>
+              <p className={cbaiSectionEyebrow}>{String(index + 1).padStart(2, "0")}</p>
               <h2 id={`${section.id}-heading`} className="mt-1 text-lg font-semibold text-zinc-100">
                 {section.title}
               </h2>

@@ -2120,3 +2120,41 @@ component); Trust Center visual-hierarchy redesign (content was already honest; 
 where duplicated elsewhere). These are real, sizeable design passes in their own right — attempting
 all of them in the same pass as the Operator/voice/identity rework risked a rushed, unverified result
 across a much larger surface than could be honestly re-tested in one session.
+
+### 27.1 Second issuance — World, Role, Search, and Trust polish
+
+The mission was reissued verbatim; continued rather than restarted, picking up the sections named
+as not-yet-attempted above.
+
+- **World Intelligence Map** (`WorldIntelligenceMap.tsx`): added a purely decorative abstract
+  network texture (constellation dots/lines, zero geographic or data claim — same "abstract, never
+  fabricated" principle as the Operator orb) and gave each country tile real depth (status-colored
+  accent bar, lift-on-hover, matching shadow language) — the flat, identical-bordered-box feel is
+  gone without inventing fake connections or a canvas map this architecture has no data to back.
+- **Role Experience**: confirmed already substantively real (11 distinct roles — Scientist/Academic,
+  Professor/Researcher, Student, Engineer, Laboratory Specialist, Government Leader, Economist,
+  Investor/Business, Legal Professional, Social Sector, General User — each with its own translated
+  title/description/first-action/destination via `resolveNextStep`/`ROLE_WORK_CONTEXTS`), so no
+  data/copy changes were needed; gave `RoleCard` the same premium hover/depth treatment as the World
+  Map tiles for visual consistency.
+- **Search experience**: found and fixed a second, separate instance of the same orange
+  "Create Project" CTA bug (`SearchGatewayResults.tsx`) that the previous pass's grep missed because
+  it lived in a different component than `CreateProjectFromEntityButton.tsx`. Verified the Command
+  Center and the `/search` page's own gateway search are working as designed (different tools —
+  direct-command routing vs. full grouped results — not a bug), confirmed via a real submit-and-read
+  test after an initial test-script mistake (grabbing the wrong of two same-`name="q"` inputs).
+- **Trust page**: removed a real, repeated noise pattern — every one of the 10 sections repeated the
+  word "Trust" as its eyebrow label, on the Trust page itself. Replaced with a numbered sequence
+  (01–10) plus a left accent bar per section, giving real visual rhythm without adding a single new
+  UI pattern.
+- **False alarm, investigated and ruled out**: a `fullPage` Playwright screenshot of `/countries`
+  showed an apparent multi-thousand-pixel blank void. Investigated directly (DOM height query,
+  ancestor/computed-style inspection, then a real scroll-through at 800px steps) and confirmed this
+  is a Playwright `fullPage`-capture artifact specific to `position: sticky` elements (the list
+  column's new sticky positioning from the previous pass) — real scrolling shows fully continuous,
+  correctly rendered content with the sticky list staying visible throughout. Not a product bug;
+  documented here rather than silently "fixed" against a symptom that didn't exist for real users.
+
+**Tests**: all 19 non-browser suites re-verified, zero regressions. `npm run test:browser-regression`
+7/7 passing. `npx tsc --noEmit` clean. `npm run lint` clean (same one pre-existing, unrelated
+warning). `npm run build` clean, 93 routes.
