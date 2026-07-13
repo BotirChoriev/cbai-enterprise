@@ -51,6 +51,18 @@ body {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
+/* The CBAI display face — statement-scale headlines only (the arrival hero, About's section
+   headlines, the manifesto). A real, deliberate typographic signature: editorial warmth where a
+   claim is being made, clean geometric sans everywhere a control is being operated. This single
+   pairing is doing real identity work — most dashboard software uses one sans for everything, so
+   the moment a display serif appears is, by itself, a recognizable "this is CBAI" cue. */
+.cbai-display {
+  font-family: var(--font-display), Georgia, serif;
+  font-variation-settings: "opsz" 72, "SOFT" 60, "WONK" 1;
+  font-weight: 480;
+  letter-spacing: -0.01em;
+}
+
 /* Premium glass surface */
 .cbai-glass {
   background: color-mix(in srgb, var(--card) 90%, transparent);

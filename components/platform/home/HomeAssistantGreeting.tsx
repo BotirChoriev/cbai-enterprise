@@ -60,52 +60,77 @@ export default function HomeAssistantGreeting() {
   // command bar (next step, shortcuts) stays real and present but visually demoted, so the
   // contrast between "you just arrived" and "here is your workspace" is unmistakable.
   return (
-    <section aria-labelledby="home-assistant-greeting-heading" className="mx-auto flex max-w-4xl flex-col items-center gap-8 px-4 pb-4 pt-6 text-center sm:pt-10">
-      <OperatorOrb state={orbState} size={132} />
-
-      <div className="space-y-4">
-        {isActive && timeOfDay ? <p className={cbaiSectionEyebrow}>{t(TIME_OF_DAY_KEYS[timeOfDay])}</p> : null}
-        <h1
-          id="home-assistant-greeting-heading"
-          className="text-4xl font-semibold tracking-tight text-zinc-50 sm:text-5xl md:text-6xl"
-        >
-          {isActive ? t("assistant.greetingReturning", { name: profile.name }) : t("assistant.greetingSignedOut")}
-        </h1>
-        <p className="mx-auto max-w-xl text-base text-zinc-400 sm:text-lg">
-          {isActive
-            ? `Your ${resolveOperatorName(profile)} is ready — ${WORKSPACE_ROLE_LABELS[profile.workspaceRole]} workspace.`
-            : "Your CBAI Operator is ready — speak or type to begin."}
-        </p>
-        {isActive ? (
-          <div className="flex justify-center">
-            <StatusBadge status="live" />
-          </div>
-        ) : null}
-      </div>
-
-      <div className="w-full max-w-2xl">
-        <AssistantCommandCenter size="prominent" hideOrb onOrbStateChange={setLiveOrbState} />
-      </div>
-
-      <Link
-        href={nextStep.href}
-        className="inline-flex items-center gap-2 text-sm text-zinc-500 transition-colors hover:text-cyan-300"
+    <section aria-labelledby="home-assistant-greeting-heading" className="relative mx-auto flex max-w-4xl flex-col items-center gap-8 overflow-hidden px-4 pb-4 pt-6 text-center sm:pt-10">
+      {/* The same connected-knowledge network language as the World Map and the About manifesto,
+          radiating from behind the Operator here — one visual system, not three unrelated
+          decorations. No geography, no fabricated data; a real, deliberate brand motif. */}
+      <svg
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-0 z-0 h-auto w-[560px] -translate-x-1/2 text-[#005810] opacity-[0.12] sm:w-[900px]"
+        viewBox="0 0 900 560"
+        fill="none"
       >
-        <span className={cbaiSectionEyebrow}>{t("project.nextStep")}</span>
-        <span className="text-zinc-300">{nextStep.label}</span>
-        <span aria-hidden="true">→</span>
-      </Link>
+        <g stroke="currentColor" strokeWidth="1.25">
+          <path d="M450 260 L180 120 L60 300 L220 480 L450 260 L720 380 L840 180 L620 60 L450 260" />
+          <path d="M180 120 L620 60" />
+          <path d="M60 300 L840 180" />
+          <path d="M220 480 L720 380" />
+        </g>
+        <g fill="currentColor">
+          <circle cx="450" cy="260" r="4" />
+          <circle cx="180" cy="120" r="3" /><circle cx="60" cy="300" r="2.5" />
+          <circle cx="220" cy="480" r="3" /><circle cx="720" cy="380" r="3" />
+          <circle cx="840" cy="180" r="2.5" /><circle cx="620" cy="60" r="3" />
+        </g>
+      </svg>
 
-      <div className="flex flex-wrap justify-center gap-2 pt-2">
-        {SECONDARY_ACTIONS.map((action) => (
-          <Link
-            key={action.href}
-            href={action.href}
-            className="rounded-full border border-zinc-800/60 bg-zinc-900/20 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-700 hover:text-zinc-200"
+      <div className="relative z-10 flex flex-col items-center gap-8">
+        <OperatorOrb state={orbState} size={132} />
+
+        <div className="space-y-4">
+          {isActive && timeOfDay ? <p className={cbaiSectionEyebrow}>{t(TIME_OF_DAY_KEYS[timeOfDay])}</p> : null}
+          <h1
+            id="home-assistant-greeting-heading"
+            className="cbai-display text-4xl text-zinc-50 sm:text-5xl md:text-6xl"
           >
-            {action.label}
-          </Link>
-        ))}
+            {isActive ? t("assistant.greetingReturning", { name: profile.name }) : t("assistant.greetingSignedOut")}
+          </h1>
+          <p className="mx-auto max-w-xl text-base text-zinc-400 sm:text-lg">
+            {isActive
+              ? `Your ${resolveOperatorName(profile)} is ready — ${WORKSPACE_ROLE_LABELS[profile.workspaceRole]} workspace.`
+              : "Your CBAI Operator is ready — speak or type to begin."}
+          </p>
+          {isActive ? (
+            <div className="flex justify-center">
+              <StatusBadge status="live" />
+            </div>
+          ) : null}
+        </div>
+
+        <div className="w-full max-w-2xl">
+          <AssistantCommandCenter size="prominent" hideOrb onOrbStateChange={setLiveOrbState} />
+        </div>
+
+        <Link
+          href={nextStep.href}
+          className="inline-flex items-center gap-2 text-sm text-zinc-500 transition-colors hover:text-cyan-300"
+        >
+          <span className={cbaiSectionEyebrow}>{t("project.nextStep")}</span>
+          <span className="text-zinc-300">{nextStep.label}</span>
+          <span aria-hidden="true">→</span>
+        </Link>
+
+        <div className="flex flex-wrap justify-center gap-2 pt-2">
+          {SECONDARY_ACTIONS.map((action) => (
+            <Link
+              key={action.href}
+              href={action.href}
+              className="rounded-full border border-zinc-800/60 bg-zinc-900/20 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-700 hover:text-zinc-200"
+            >
+              {action.label}
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   );

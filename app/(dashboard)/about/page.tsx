@@ -182,7 +182,7 @@ export default function AboutPage() {
         <div className="relative flex flex-col items-start gap-6">
           <OperatorOrb state="idle" size={64} />
           <p className={cbaiSectionEyebrow}>Who we are</p>
-          <h1 className="max-w-3xl text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl md:text-5xl">
+          <h1 className="cbai-display max-w-3xl text-3xl text-zinc-50 sm:text-4xl md:text-5xl">
             Access to information has stopped being the hard part.
           </h1>
           <p className="max-w-2xl text-lg leading-relaxed text-zinc-400">
@@ -198,7 +198,7 @@ export default function AboutPage() {
       {/* SECTION 2 — What is CBAI */}
       <section aria-labelledby="about-what-heading" className={`${cbaiGlassCard} space-y-6 p-8 sm:p-12`}>
         <p className={cbaiSectionEyebrow} id="about-what-heading">What is CBAI</p>
-        <h2 className="max-w-3xl text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl">
+        <h2 className="max-w-3xl cbai-display text-2xl text-zinc-50 sm:text-3xl">
           CBAI is an Intelligence Operating System — it connects evidence, tracks what is known and
           what is missing, and helps people reach clearer, better-supported decisions across research,
           economics, and governance.
@@ -216,7 +216,7 @@ export default function AboutPage() {
       {/* SECTION 3 — Why CBAI exists */}
       <section aria-labelledby="about-why-heading" className={`${cbaiGlassCard} space-y-6 p-8 sm:p-12`}>
         <p className={cbaiSectionEyebrow} id="about-why-heading">Why CBAI exists</p>
-        <h2 className="max-w-2xl text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl">
+        <h2 className="max-w-2xl cbai-display text-2xl text-zinc-50 sm:text-3xl">
           The problem was never too little information. It was too much of it, disconnected.
         </h2>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -244,7 +244,7 @@ export default function AboutPage() {
       {/* SECTION 4 — Our philosophy: 12 real principles */}
       <section aria-labelledby="about-philosophy-heading" className={`${cbaiGlassCard} space-y-6 p-8 sm:p-12`}>
         <p className={cbaiSectionEyebrow} id="about-philosophy-heading">Our philosophy</p>
-        <h2 className="max-w-2xl text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl">
+        <h2 className="max-w-2xl cbai-display text-2xl text-zinc-50 sm:text-3xl">
           Twelve principles CBAI holds itself to — not slogans, working rules.
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -262,7 +262,7 @@ export default function AboutPage() {
       {/* SECTION 5 — What makes CBAI different: concept comparisons, not competitor names */}
       <section aria-labelledby="about-different-heading" className={`${cbaiGlassCard} space-y-6 p-8 sm:p-12`}>
         <p className={cbaiSectionEyebrow} id="about-different-heading">What makes CBAI different</p>
-        <h2 className="max-w-2xl text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl">
+        <h2 className="max-w-2xl cbai-display text-2xl text-zinc-50 sm:text-3xl">
           Not a better version of what exists. A different category of tool.
         </h2>
         <div className="space-y-3">
@@ -282,7 +282,7 @@ export default function AboutPage() {
       {/* SECTION 6 — Who CBAI serves */}
       <section aria-labelledby="about-audience-heading" className={`${cbaiGlassCard} space-y-6 p-8 sm:p-12`}>
         <p className={cbaiSectionEyebrow} id="about-audience-heading">Who CBAI serves</p>
-        <h2 className="max-w-2xl text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl">
+        <h2 className="max-w-2xl cbai-display text-2xl text-zinc-50 sm:text-3xl">
           Different work. The same standard of evidence.
         </h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -298,7 +298,7 @@ export default function AboutPage() {
       {/* SECTION 7 — How CBAI works: a real visual flow */}
       <section aria-labelledby="about-workflow-heading" className={`${cbaiGlassCard} space-y-8 p-8 sm:p-12`}>
         <p className={cbaiSectionEyebrow} id="about-workflow-heading">How CBAI works</p>
-        <h2 className="max-w-2xl text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl">
+        <h2 className="max-w-2xl cbai-display text-2xl text-zinc-50 sm:text-3xl">
           Five real stages. No step skipped, no step fabricated.
         </h2>
         <div className="flex flex-col gap-0 sm:flex-row sm:items-stretch">
@@ -326,7 +326,7 @@ export default function AboutPage() {
       {/* SECTION 8 — The three intelligence ecosystems */}
       <section aria-labelledby="about-ecosystems-heading" className={`${cbaiGlassCard} space-y-6 p-8 sm:p-12`}>
         <p className={cbaiSectionEyebrow} id="about-ecosystems-heading">The three intelligence ecosystems</p>
-        <h2 className="max-w-2xl text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl">
+        <h2 className="max-w-2xl cbai-display text-2xl text-zinc-50 sm:text-3xl">
           Research, economics, and governance — one evidence core underneath all three.
         </h2>
         <div className="grid gap-4 lg:grid-cols-3">
@@ -355,7 +355,7 @@ export default function AboutPage() {
       {/* SECTION 9 — Trust: the most important section */}
       <section aria-labelledby="about-trust-heading" className={`${cbaiGlassCard} space-y-6 p-8 sm:p-12`}>
         <p className={cbaiSectionEyebrow} id="about-trust-heading">Trust</p>
-        <h2 className="max-w-2xl text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl">
+        <h2 className="max-w-2xl cbai-display text-2xl text-zinc-50 sm:text-3xl">
           What CBAI does. What CBAI refuses to do. Stated plainly, not implied.
         </h2>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -392,7 +392,7 @@ export default function AboutPage() {
       {/* SECTION 10 — Our vision */}
       <section aria-labelledby="about-vision-heading" className={`${cbaiGlassCard} space-y-6 p-8 sm:p-12`}>
         <p className={cbaiSectionEyebrow} id="about-vision-heading">Our vision</p>
-        <h2 className="max-w-2xl text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl">
+        <h2 className="max-w-2xl cbai-display text-2xl text-zinc-50 sm:text-3xl">
           A world where understanding keeps pace with information.
         </h2>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -434,7 +434,7 @@ export default function AboutPage() {
           <p className="text-[10px] font-medium uppercase tracking-[0.3em] text-[#6fe3a4]">
             The CBAI Manifesto
           </p>
-          <h2 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+          <h2 className="cbai-display text-2xl text-white sm:text-3xl">
             What we believe.
           </h2>
           <ul className="space-y-4 text-left sm:columns-2 sm:gap-x-10">
@@ -452,7 +452,7 @@ export default function AboutPage() {
         <div className="mx-auto flex justify-center">
           <OperatorOrb state="greeting" size={56} />
         </div>
-        <h2 id="about-closing-heading" className="mx-auto max-w-2xl text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl">
+        <h2 id="about-closing-heading" className="mx-auto max-w-2xl cbai-display text-2xl text-zinc-50 sm:text-3xl">
           The future will not belong to those with the most information. It will belong to those who
           understand it.
         </h2>

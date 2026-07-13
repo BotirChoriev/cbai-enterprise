@@ -14,7 +14,7 @@ export default function PageHeader({
   return (
     <div className={`${cbaiPageHeader} flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between`}>
       <div>
-        <h1 className="text-xl font-semibold tracking-tight text-zinc-50 sm:text-2xl">
+        <h1 className="cbai-display text-xl text-zinc-50 sm:text-2xl">
           {title}
         </h1>
         {description && (

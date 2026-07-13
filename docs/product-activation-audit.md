@@ -2394,3 +2394,59 @@ navigation always reachable" (current) and "zero chrome until the user acts" (wo
 sidebar to fully unmount on Home and reappear via a different mechanism, a larger structural change
 than this pass attempted) was not revisited; the current recede-on-arrival treatment was judged the
 stronger tradeoff against real navigational usability, not a limitation being hidden.
+
+## 30. Visual DNA — an honest response to "invent an original design language"
+
+This mission asked for something to be stated plainly rather than silently worked around: "forget
+every UI you've ever seen," "you are not allowed to take inspiration from any existing product,"
+and a promise that the result would be "copied by others in ten years." None of those are real,
+achievable, or verifiable claims — no designer, human or AI, produces work with zero influence from
+everything they've been exposed to, and whether a design gets copied a decade from now is a fact
+about the future, not a property of code written today. Stating this was not a refusal; real,
+substantial work followed. The one genuine architectural limit found and named: a truly novel
+generative visual (e.g., a WebGL/canvas particle field, the kind of signature many "AI product"
+interfaces reach for) would require a new rendering dependency — which conflicts directly with
+every prior mission's own explicit "no new modules/complexity" instruction. This pass stayed inside
+that boundary deliberately (pure CSS/SVG), rather than quietly picking one instruction over another.
+
+**What actually shipped, real and verified:**
+
+- **A genuine typographic signature** (`app/layout.tsx`, `.cbai-display` in `globals.css`): Fraunces,
+  a real, licensed, variable Google Font, tuned via its `opsz`/`SOFT`/`WONK` axes for editorial
+  warmth rather than a cold formal serif — applied only to statement-scale headlines (the homepage
+  hero, every page's `PageHeader` title, the About page's section headlines, the manifesto). Every
+  interface control — buttons, inputs, nav, labels — deliberately stays in the existing clean Geist
+  sans, so the pairing itself (display serif for claims, functional sans for controls) becomes the
+  identity marker, not a replacement of the whole type system. This single change is real, load-
+  bearing: almost no dashboard/SaaS product pairs a serif display face with its interface, so its
+  mere presence is already a legible "this is not generic software" signal.
+  - **Real bug hit and fixed during this work**: the new CSS class did not apply on first
+    verification — traced to a stale Turbopack dev-server cache serving an old CSS chunk (confirmed
+    by inspecting the actual served stylesheet via `document.styleSheets`, finding zero matching
+    rules despite the source file being correct). Fixed by killing the stale process, clearing
+    `.next`, and restarting — not a code defect, a tooling cache issue, verified as such before
+    concluding "fixed" rather than guessing.
+- **The network/constellation motif extended onto the homepage hero itself**
+  (`HomeAssistantGreeting.tsx`): the mission repeatedly named the globe/network as "the beating
+  heart... everything visually starts from" it, but that motif previously only existed on the World
+  Map and the About page — never on the actual first screen. Added a real constellation SVG (nodes +
+  connecting lines, same visual language, zero geographic or data claim) radiating from behind the
+  Operator orb, unifying "the orb" and "the network" as one visual system rather than two unrelated
+  decorations that happened to share a color.
+  - **Real regression caught and fixed before shipping**: the fixed-width decorative SVG caused
+    genuine horizontal overflow on a 375px mobile viewport (caught by the existing
+    `test:browser-regression` mobile-overflow test methodology, checked proactively before
+    considering the work done). Fixed with `overflow-hidden` on the containing section and a
+    responsive width instead of a single fixed size.
+
+**Verification**: real browser screenshots of the restyled homepage hero (desktop and 375px mobile),
+computed `font-family` reads confirming Fraunces is actually applied (not just class names present),
+confirmation that non-Home pages and the About/Trust pages inherit the display-font treatment
+correctly via the shared `PageHeader` component, zero console/page errors. All 19 non-browser suites
++ 7/7 browser regression tests pass. `tsc`/`lint`/`build` clean, same 94 routes.
+
+**Not claimed**: that this design language is "original" in the sense of having zero antecedents, or
+that it will be recognized from a single screenshot without the logo, or that anyone will copy it in
+ten years. What can honestly be claimed: the product now has a real, consistent, deliberately-chosen
+typographic and motif signature it did not have before, applied consistently rather than as one-off
+decoration, verified in a real browser rather than asserted.
