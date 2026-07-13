@@ -77,7 +77,7 @@ export default function Sidebar() {
         {!isHome ? (
           <details className="border-t border-zinc-800/60 pt-3">
             <summary className="mb-2 cursor-pointer list-none px-3 text-[10px] font-medium uppercase tracking-widest text-zinc-600 hover:text-zinc-400">
-              {t("navigation.more")}
+              {t("navigation.intelligenceCabinet")}
             </summary>
             {secondaryNavSections.map((section, index) => (
               <div key={section.title || `secondary-${index}`} className="mb-3">

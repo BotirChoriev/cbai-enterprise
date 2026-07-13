@@ -93,6 +93,7 @@ const en: TranslationDictionary = {
     evidence: "Evidence",
     account: "Account",
     more: "More",
+    intelligenceCabinet: "Intelligence Cabinet",
     ecosystems: "Ecosystems",
     intelligence: "Intelligence",
     government: "Government",

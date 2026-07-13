@@ -93,6 +93,7 @@ const tr: TranslationDictionary = {
     evidence: "Kanıtlar",
     account: "Hesap",
     more: "Daha fazla",
+    intelligenceCabinet: "İstihbarat Kabini",
     ecosystems: "Ekosistemler",
     intelligence: "İstihbarat",
     government: "Devlet",

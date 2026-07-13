@@ -11,15 +11,16 @@ import HomeTrust from "@/components/platform/home/HomeTrust";
 import LanguageSelector from "@/components/i18n/LanguageSelector";
 import EntryExperience from "@/components/platform/entry/EntryExperience";
 import CBAILogo from "@/components/brand/CBAILogo";
+import IntelligenceCompass from "@/components/platform/home/IntelligenceCompass";
 
-// The first screen, scoped to exactly the approved 8 sections (Platform Completion mission,
-// Phase 7) — Greeting, Voice, Projects, Role cards, Intelligence Feed, Recent activity, Quick
-// actions (delivered inline by the Greeting's own real "Suggested next step"/"Available actions"
-// — not a second, separate quick-actions widget), and Trust. Nothing else. The marketing/
-// explanation content this page previously carried (Ecosystems, World Intelligence Map,
-// Capability Flow, Audience) was not deleted — Ecosystems/Capability Flow/Audience moved to
-// /dashboard ("what is available today"), and the World Intelligence Map was already duplicated
-// on /countries, so removing it here loses no real capability.
+// The first screen (Platform Completion mission, Phase 7; extended with the Intelligence Compass
+// in the Platform Activation mission) — Identity, Greeting, Voice, Projects, Role cards, the
+// Compass, Intelligence Feed, Recent activity, Quick actions (delivered inline by the Greeting's
+// own real "Suggested next step"/"Available actions" — not a second, separate quick-actions
+// widget), and Trust. The marketing/explanation content this page previously carried (Ecosystems,
+// World Intelligence Map, Capability Flow, Audience) was not deleted — Ecosystems/Capability
+// Flow/Audience moved to /dashboard ("what is available today"), and the World Intelligence Map
+// was already duplicated on /countries, so removing it here loses no real capability.
 export default function PlatformHome() {
   return (
     <div className="home-page min-h-full bg-[#050810] pb-20">
@@ -39,6 +40,7 @@ export default function PlatformHome() {
         <HomeCommandBar />
         <HomeProjectsSection />
         <RoleWorkContextCards />
+        <IntelligenceCompass />
         <div className="grid gap-6 lg:grid-cols-2">
           <HomeIntelligenceFeed />
           <HomeRecentActivity />

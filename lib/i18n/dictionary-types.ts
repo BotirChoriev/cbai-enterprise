@@ -64,6 +64,7 @@ export type TranslationDictionary = {
     evidence: string;
     account: string;
     more: string;
+    intelligenceCabinet: string;
     ecosystems: string;
     intelligence: string;
     government: string;

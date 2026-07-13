@@ -158,6 +158,28 @@ export const ASSISTANT_COMMANDS: readonly AssistantCommand[] = [
     ],
   },
   {
+    id: "open-universities",
+    phrase: "Open university",
+    href: "/universities",
+    keywords: [
+      "open university", "open universities", "universities",
+      "universitetlarni och", "universitetlar",
+      "открой университеты", "университеты",
+      "üniversiteleri aç", "üniversiteler",
+    ],
+  },
+  {
+    id: "open-search",
+    phrase: "Search intelligence",
+    href: "/search",
+    keywords: [
+      "search intelligence", "open search",
+      "qidiruvni och", "qidiruv",
+      "открой поиск", "поиск",
+      "aramayı aç", "arama",
+    ],
+  },
+  {
     id: "compare-companies",
     phrase: "Compare companies",
     href: "/companies",

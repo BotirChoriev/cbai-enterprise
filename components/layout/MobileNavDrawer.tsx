@@ -98,7 +98,7 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
 
         <details className="mt-2 border-t border-zinc-800/80 pt-3">
           <summary className="cursor-pointer px-2 pb-2 text-[10px] font-medium uppercase tracking-widest text-zinc-600">
-            {t("navigation.more")}
+            {t("navigation.intelligenceCabinet")}
           </summary>
           {secondaryNavSections.map((section, index) => (
             <div key={section.title || `secondary-${index}`} className="mb-3">

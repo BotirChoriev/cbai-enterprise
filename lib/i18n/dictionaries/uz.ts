@@ -93,6 +93,7 @@ const uz: TranslationDictionary = {
     evidence: "Dalillar",
     account: "Hisob",
     more: "Ko‘proq",
+    intelligenceCabinet: "Intellekt kabineti",
     ecosystems: "Ekotizimlar",
     intelligence: "Intellekt",
     government: "Davlat",

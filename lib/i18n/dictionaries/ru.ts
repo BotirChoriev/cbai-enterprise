@@ -93,6 +93,7 @@ const ru: TranslationDictionary = {
     evidence: "Доказательства",
     account: "Аккаунт",
     more: "Ещё",
+    intelligenceCabinet: "Кабинет интеллекта",
     ecosystems: "Экосистемы",
     intelligence: "Интеллект",
     government: "Государство",
