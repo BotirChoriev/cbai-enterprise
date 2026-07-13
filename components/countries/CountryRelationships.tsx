@@ -36,7 +36,11 @@ export default function CountryRelationships({ profile }: CountryRelationshipsPr
         <EntityRelatedPanel
           showHeading={false}
           relationships={relationships}
-          emptyLabel="No verified relationships yet — connections appear once a company, university, or research topic in the catalog references this country. Explore Companies or Universities to see what's already connected."
+          emptyLabel="No verified relationships yet — connections appear once a company, university, or research topic in the catalog references this country."
+          emptyActions={[
+            { label: "Explore Companies", href: "/companies" },
+            { label: "Explore Universities", href: "/universities" },
+          ]}
         />
       </div>
     </section>

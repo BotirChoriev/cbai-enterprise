@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ResearchTopic } from "@/lib/research/research-topics";
 import { getResearchTopicById } from "@/lib/research/research-topics";
 import { getCrossTopicDiscoveriesForTopic } from "@/lib/research/discovery/discovery-query";
@@ -46,8 +47,14 @@ export default function CrossTopicDiscovery({
       </div>
 
       {discoveries.length === 0 ? (
-        <div className={`${cbaiGlassCard} p-4 text-xs text-zinc-500`}>
-          No related topics found from catalog metadata for this topic.
+        <div className={`${cbaiGlassCard} space-y-2 p-4`}>
+          <p className="text-xs text-zinc-500">No related topics found from catalog metadata for this topic.</p>
+          <Link
+            href="/research"
+            className="inline-flex items-center text-xs font-medium text-cyan-400 hover:text-cyan-300"
+          >
+            Browse the full Research catalog →
+          </Link>
         </div>
       ) : (
         <div

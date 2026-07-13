@@ -61,9 +61,17 @@ export default function SavedEvidence({ entities }: SavedEvidenceProps) {
           })}
         </ul>
       ) : (
-        <p className="text-xs text-zinc-600">
-          No evidence saved yet. Bookmark evidence from any research topic to see it here.
-        </p>
+        <div className="space-y-2">
+          <p className="text-xs text-zinc-600">
+            No evidence saved yet. Bookmark evidence from any research topic to see it here.
+          </p>
+          <Link
+            href="/research"
+            className="inline-flex items-center rounded-full border border-zinc-800 bg-zinc-900/60 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:border-cyan-500/30 hover:text-cyan-300"
+          >
+            Explore Research Topics →
+          </Link>
+        </div>
       )}
     </section>
   );

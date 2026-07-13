@@ -165,6 +165,12 @@ export default function CompanyReportView({ report }: CompanyReportViewProps) {
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
         <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Projects</p>
         <LinkList links={report.linkedProjects} emptyLabel="No projects link to this company yet." />
+        <Link
+          href={`/my-work?entityKind=company&entityId=${report.company.id}&entityName=${encodeURIComponent(report.company.name)}`}
+          className="mt-1.5 inline-flex text-xs font-medium text-cyan-400 hover:text-cyan-300"
+        >
+          + Create a project for {report.company.name} →
+        </Link>
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">

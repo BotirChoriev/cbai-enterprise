@@ -140,6 +140,12 @@ export default function CountryReportView({ report }: CountryReportViewProps) {
           <div>
             <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600">Projects</p>
             <LinkList links={report.linkedProjects} emptyLabel="No projects link to this country yet." />
+            <Link
+              href={`/my-work?entityKind=country&entityId=${report.country.id}&entityName=${encodeURIComponent(report.country.name)}`}
+              className="mt-1.5 inline-flex text-xs font-medium text-cyan-400 hover:text-cyan-300"
+            >
+              + Create a project for {report.country.name} →
+            </Link>
           </div>
         </div>
       </div>

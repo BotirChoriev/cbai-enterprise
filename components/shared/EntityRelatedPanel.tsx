@@ -11,6 +11,9 @@ type EntityRelatedPanelProps = {
   note?: string;
   /** Set false when the caller already renders its own section heading around this panel. */
   showHeading?: boolean;
+  /** Real, already-existing routes to offer when there are genuinely no relationships yet — never
+   * a dead end with text alone. */
+  emptyActions?: readonly { label: string; href: string }[];
 };
 
 const GROUP_ORDER: readonly EntityType[] = [
@@ -99,6 +102,7 @@ export default function EntityRelatedPanel({
   emptyLabel,
   note,
   showHeading = true,
+  emptyActions,
 }: EntityRelatedPanelProps) {
   const groups = groupByType(relationships);
 
@@ -111,6 +115,19 @@ export default function EntityRelatedPanel({
           </p>
         ) : null}
         <p className="text-sm text-zinc-500">{emptyLabel}</p>
+        {emptyActions && emptyActions.length > 0 ? (
+          <div className="flex flex-wrap gap-2 pt-1">
+            {emptyActions.map((action) => (
+              <Link
+                key={action.href}
+                href={action.href}
+                className="inline-flex items-center rounded-full border border-zinc-800 bg-zinc-900/60 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:border-cyan-500/30 hover:text-cyan-300"
+              >
+                {action.label} →
+              </Link>
+            ))}
+          </div>
+        ) : null}
       </section>
     );
   }
