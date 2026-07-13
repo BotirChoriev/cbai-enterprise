@@ -2261,3 +2261,58 @@ kind of work than this loop's own "review, criticize, verify" cycle is built to 
 
 **Tests**: all 19 non-browser suites + 7/7 browser regression tests pass (including the mobile
 overflow test, which now also covers the ThemeToggle fix). `tsc`/`lint`/`build` clean, 93 routes.
+
+## 28. About — the CBAI founding document
+
+Response to a distinct mission: not a UX/visual pass, but writing and building a real `/about` page
+— a founding document explaining what CBAI is, why it exists, and the principles it holds itself to.
+Explicitly required grounding in the actual, current product rather than aspirational marketing
+copy — verified before writing a single sentence.
+
+**Fact-checked against real source before writing**: the research topic catalog, country/company/
+university catalog sizes, the real `government`/`investor`/`citizen` workspace domain coverage
+(`lib/workspaces/*.ts`), and — unexpectedly — confirmed that the root layout's own SEO metadata
+(`app/layout.tsx`) already frames CBAI exactly as "research, governance, and economics" intelligence,
+unprompted, which grounded the page's central "three intelligence ecosystems" framing in something
+that already existed rather than something invented for this page. Catalog sizes are deliberately
+never cited as hard numbers in the page copy itself — real counts are small (a working, honest
+catalog, not a massive production database) and numbers age; the copy describes the real
+architecture and principle instead, consistent with the "timeless, not marketing" brief.
+
+**Built as `app/(dashboard)/about/page.tsx`** — inside the same dashboard shell every other page
+uses (sidebar, topbar, `cbaiGlassCard`/`cbaiSectionEyebrow` tokens), not a separate marketing layout,
+matching this whole project's "no page feels independent" standard even for its most narrative page.
+Twelve sections plus a manifesto, all real content:
+
+- Purpose-first opening (never company history), an Operator orb as the page's living signature.
+- A plain-language "what is CBAI" statement, fact-checked against the real Search/Evidence/
+  Projects/Reports/Trust architecture — no capability named that isn't real and shipped.
+- Twelve real philosophy principles, extending (not replacing) the existing 8 `TRUST_PILLARS` in
+  `lib/platform-home.ts` with 4 more in the same voice, rather than inventing a disconnected new set.
+- A concept-comparison section (Search→Intelligence, Documents→Evidence, etc.) — deliberately no
+  competitor names, per the brief.
+- Twelve real audiences, mapped onto the actual `ROLE_WORK_CONTEXTS` roles already live in the
+  product (Release 5), not a wishlist of personas the platform doesn't actually serve.
+- A real 5-step visual workflow (Search → Evidence → Projects → Reports → Better Understanding)
+  with real CTAs into `/search` and `/my-work`.
+- The three intelligence ecosystems as real linked cards into `/research`, `/companies`, `/government`.
+- A Trust section stating plainly what CBAI does and does not do, linking through to the full
+  `/trust` page rather than duplicating its content.
+- A visually distinct manifesto — a deep-navy, network-textured panel, deliberately different from
+  every other section's card treatment, for the one moment on the page meant to be memorable rather
+  than explanatory. Twenty real, grounded statements, no invented claims.
+- A closing statement plus real CTAs back into the product (`/`, `/trust`).
+
+**Discoverability**: added to the sidebar's third nav group (alongside Reports/Trust/Settings, a
+new `about` icon in `NavIcon.tsx`) and linked from `HomeFooter.tsx` ("Read our story →", alongside
+the existing "Visit Trust Center →" link) — real, permanent discoverability, not an orphaned route.
+
+**Verification**: real browser scroll-through (this app's actual scroll container is an inner
+`<main>`, not `document.body`, so `fullPage` screenshots don't capture it — a known quirk from
+earlier in this session, worked around the same way) confirmed every section, the manifesto's
+mobile single-column collapse, zero horizontal overflow at 375px, and zero console/page errors.
+Both navigation paths (sidebar, homepage footer) verified with real clicks. Added `/about` to
+`scripts/test-browser-regression.ts`'s route sweep for permanent regression coverage.
+
+**Tests**: all 19 non-browser suites + 7/7 browser regression tests (now covering `/about`) pass.
+`tsc`/`lint`/`build` clean, 94 routes (up from 93).

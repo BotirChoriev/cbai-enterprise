@@ -23,7 +23,8 @@ export type NavItem = {
     | "government"
     | "investor"
     | "citizen"
-    | "trust";
+    | "trust"
+    | "about";
 };
 
 export type NavSection = {
@@ -120,6 +121,12 @@ export const primaryNavSections: NavSection[] = [
         href: "/settings",
         icon: "settings",
         description: "Assistant, accessibility, and account preferences.",
+      },
+      {
+        label: "About",
+        href: "/about",
+        icon: "about",
+        description: "What CBAI is, why it exists, and the principles it holds itself to.",
       },
     ],
   },

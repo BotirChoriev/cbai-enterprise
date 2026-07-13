@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { HOME_FOOTER, PLATFORM_VERSION } from "@/lib/platform-home";
 
-// The full constitution, methodology, evidence policy, and version history live at /trust — this
-// footer stays a short mission statement plus one link, not a second copy of that page.
+// The full constitution, methodology, evidence policy, and version history live at /trust, and the
+// full founding story lives at /about — this footer stays a short mission statement plus links to
+// each, not a second copy of either page.
 export default function HomeFooter() {
   return (
     <footer className="home-surface rounded-2xl border border-zinc-800 px-8 py-10 sm:px-10">
@@ -16,12 +17,14 @@ export default function HomeFooter() {
           </p>
         </div>
 
-        <Link
-          href="/trust"
-          className="inline-flex shrink-0 text-sm font-medium text-cyan-400 hover:text-cyan-300"
-        >
-          Visit Trust Center →
-        </Link>
+        <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
+          <Link href="/about" className="inline-flex text-sm font-medium text-cyan-400 hover:text-cyan-300">
+            Read our story →
+          </Link>
+          <Link href="/trust" className="inline-flex text-sm font-medium text-cyan-400 hover:text-cyan-300">
+            Visit Trust Center →
+          </Link>
+        </div>
       </div>
 
       <div className="mt-10 flex flex-col gap-1 border-t border-zinc-800 pt-6 text-xs text-zinc-600 sm:flex-row sm:justify-between">

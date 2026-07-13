@@ -40,7 +40,7 @@ if (!serverUp) {
   test("1. Every core route renders with zero console/page errors (real hydration-mismatch and duplicate-key regression guard)", async () => {
     const routes = [
       "/", "/my-work", "/search", "/countries", "/companies", "/universities",
-      "/research", "/research/microbiology", "/knowledge", "/reports", "/trust", "/settings",
+      "/research", "/research/microbiology", "/knowledge", "/reports", "/trust", "/settings", "/about",
     ];
     for (const route of routes) {
       const page = await browser.newPage();
