@@ -21,12 +21,12 @@ export default function DashboardLayout({
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#050810]">
-      <Sidebar />
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <Suspense fallback={null}>
-          <AuthProvider>
-            <AssistantProfileProvider>
+    <AuthProvider>
+      <AssistantProfileProvider>
+        <div className="flex h-screen overflow-hidden bg-[#050810]">
+          <Sidebar />
+          <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+            <Suspense fallback={null}>
               <PlatformContextProvider>
                 <OfflineBanner />
                 <MobileNavDrawer open={isMobileNavOpen} onClose={() => setIsMobileNavOpen(false)} />
@@ -44,10 +44,10 @@ export default function DashboardLayout({
                   </div>
                 </main>
               </PlatformContextProvider>
-            </AssistantProfileProvider>
-          </AuthProvider>
-        </Suspense>
-      </div>
-    </div>
+            </Suspense>
+          </div>
+        </div>
+      </AssistantProfileProvider>
+    </AuthProvider>
   );
 }

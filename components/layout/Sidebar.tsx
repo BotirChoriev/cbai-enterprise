@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { primaryNavSections, secondaryNavSections } from "@/lib/navigation";
 import NavIcon from "@/components/layout/NavIcon";
 import CBAILogo, { CBAIMark } from "@/components/brand/CBAILogo";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import { translateNavLabel, translateNavSectionTitle } from "@/lib/i18n/nav-translation";
 
 function isNavItemActive(pathname: string, href: string): boolean {
   if (href === "/") {
@@ -16,6 +18,7 @@ function isNavItemActive(pathname: string, href: string): boolean {
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { t } = useTranslation();
   const isHome = pathname === "/" || pathname === "/search";
 
   return (
@@ -43,18 +46,19 @@ export default function Sidebar() {
           <div key={section.title || `section-${index}`}>
             {!isHome && section.title ? (
               <p className="mb-2 px-3 text-[10px] font-medium uppercase tracking-widest text-zinc-600">
-                {section.title}
+                {translateNavSectionTitle(t, section.title)}
               </p>
             ) : null}
             <div className="space-y-1">
               {section.items.map((item) => {
                 const isActive = isNavItemActive(pathname, item.href);
+                const label = translateNavLabel(t, item.href, item.label);
 
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    title={isHome ? item.label : undefined}
+                    title={isHome ? label : undefined}
                     className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                       isActive
                         ? "bg-cyan-500/10 text-cyan-400"
@@ -62,7 +66,7 @@ export default function Sidebar() {
                     } ${isHome ? "justify-center px-2" : ""}`}
                   >
                     <NavIcon name={item.icon} />
-                    {!isHome ? item.label : null}
+                    {!isHome ? label : null}
                   </Link>
                 );
               })}
@@ -73,12 +77,12 @@ export default function Sidebar() {
         {!isHome ? (
           <details className="border-t border-zinc-800/60 pt-3">
             <summary className="mb-2 cursor-pointer list-none px-3 text-[10px] font-medium uppercase tracking-widest text-zinc-600 hover:text-zinc-400">
-              More
+              {t("navigation.more")}
             </summary>
             {secondaryNavSections.map((section, index) => (
               <div key={section.title || `secondary-${index}`} className="mb-3">
                 <p className="mb-2 px-3 text-[10px] font-medium uppercase tracking-widest text-zinc-700">
-                  {section.title}
+                  {translateNavSectionTitle(t, section.title)}
                 </p>
                 <div className="space-y-1">
                   {section.items.map((item) => {
@@ -94,7 +98,7 @@ export default function Sidebar() {
                         }`}
                       >
                         <NavIcon name={item.icon} />
-                        {item.label}
+                        {translateNavLabel(t, item.href, item.label)}
                       </Link>
                     );
                   })}
@@ -108,15 +112,13 @@ export default function Sidebar() {
       {!isHome ? (
         <div className="border-t border-cyan-500/10 p-4">
           <div className="rounded-xl border border-cyan-500/10 bg-slate-950/60 p-3 backdrop-blur-sm">
-            <p className="text-xs font-medium text-zinc-300">Start with Search</p>
-            <p className="mt-1 text-xs text-zinc-500">
-              Find a profile, review available information, and open reports.
-            </p>
+            <p className="text-xs font-medium text-zinc-300">{t("navigation.startWithSearch")}</p>
+            <p className="mt-1 text-xs text-zinc-500">{t("navigation.startWithSearchBody")}</p>
             <Link
               href="/search"
               className="mt-3 inline-flex text-xs font-medium text-cyan-400 hover:text-cyan-300"
             >
-              Open Search →
+              {t("navigation.openSearch")} →
             </Link>
           </div>
         </div>

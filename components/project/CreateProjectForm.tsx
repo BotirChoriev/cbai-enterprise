@@ -13,6 +13,7 @@ import {
 import { createProject } from "@/lib/project/project-store";
 import type { ContextEntityRef } from "@/lib/context/context-types";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type CreateProjectFormProps = {
   /** Pre-fills the primary entity when arriving from an entity profile — real, never fabricated. */
@@ -39,6 +40,7 @@ function isProjectTypeId(value: string | undefined): value is ProjectTypeId {
  */
 export default function CreateProjectForm({ initialPrimaryEntity, initialType, onCreated }: CreateProjectFormProps) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [title, setTitle] = useState("");
   const [type, setType] = useState<ProjectTypeId>(isProjectTypeId(initialType) ? initialType : PROJECT_TYPES[0].id);
   const [description, setDescription] = useState("");
@@ -52,11 +54,11 @@ export default function CreateProjectForm({ initialPrimaryEntity, initialType, o
     const trimmedTitle = title.trim();
     const trimmedDescription = description.trim();
     if (!trimmedTitle || !trimmedDescription) {
-      setError("Title and Description are required.");
+      setError(t("project.form.requiredError"));
       return;
     }
     if (visibility !== "private") {
-      setError("Team and Public visibility are Planned — not available yet. Choose Private to continue.");
+      setError(t("project.form.visibilityError"));
       return;
     }
 
@@ -87,11 +89,11 @@ export default function CreateProjectForm({ initialPrimaryEntity, initialType, o
     <section aria-labelledby="create-project-heading" className={`${cbaiGlassCard} space-y-4 p-4 sm:p-5`}>
       <div>
         <p className={cbaiSectionEyebrow} id="create-project-heading">
-          New Project
+          {t("project.form.heading")}
         </p>
         {initialPrimaryEntity ? (
           <p className="mt-1 text-xs text-zinc-500">
-            Primary entity: <span className="text-zinc-300">{initialPrimaryEntity.name}</span>
+            {t("project.form.primaryEntityLabel")}: <span className="text-zinc-300">{initialPrimaryEntity.name}</span>
           </p>
         ) : null}
       </div>
@@ -99,13 +101,13 @@ export default function CreateProjectForm({ initialPrimaryEntity, initialType, o
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
           <label htmlFor="project-title" className="text-xs text-zinc-500">
-            Title
+            {t("project.form.titleLabel")}
           </label>
           <input
             id="project-title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Project title"
+            placeholder={t("project.form.titlePlaceholder")}
             className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-cyan-500/30"
           />
         </div>
@@ -113,7 +115,7 @@ export default function CreateProjectForm({ initialPrimaryEntity, initialType, o
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
             <label htmlFor="project-type" className="text-xs text-zinc-500">
-              Project Type
+              {t("project.form.typeLabel")}
             </label>
             <select
               id="project-type"
@@ -121,20 +123,20 @@ export default function CreateProjectForm({ initialPrimaryEntity, initialType, o
               onChange={(e) => setType(e.target.value as ProjectTypeId)}
               className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200"
             >
-              {PROJECT_TYPES.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.label}
+              {PROJECT_TYPES.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.label}
                 </option>
               ))}
             </select>
             <p className="mt-1 text-[11px] text-zinc-600">
-              {PROJECT_TYPES.find((t) => t.id === type)?.description}
+              {PROJECT_TYPES.find((option) => option.id === type)?.description}
             </p>
           </div>
 
           <div>
             <label htmlFor="project-status" className="text-xs text-zinc-500">
-              Status
+              {t("project.form.statusLabel")}
             </label>
             <select
               id="project-status"
@@ -153,14 +155,14 @@ export default function CreateProjectForm({ initialPrimaryEntity, initialType, o
 
         <div>
           <label htmlFor="project-description" className="text-xs text-zinc-500">
-            Description
+            {t("project.form.descriptionLabel")}
           </label>
           <textarea
             id="project-description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
-            placeholder="What is this project about?"
+            placeholder={t("project.form.descriptionPlaceholder")}
             className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-cyan-500/30"
           />
         </div>
@@ -168,20 +170,20 @@ export default function CreateProjectForm({ initialPrimaryEntity, initialType, o
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
             <label htmlFor="project-tags" className="text-xs text-zinc-500">
-              Tags (comma-separated, optional)
+              {t("project.form.tagsLabel")}
             </label>
             <input
               id="project-tags"
               value={tagsInput}
               onChange={(e) => setTagsInput(e.target.value)}
-              placeholder="e.g. semiconductors, policy"
+              placeholder={t("project.form.tagsPlaceholder")}
               className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-cyan-500/30"
             />
           </div>
 
           <div>
             <label htmlFor="project-visibility" className="text-xs text-zinc-500">
-              Visibility
+              {t("project.form.visibilityLabel")}
             </label>
             <select
               id="project-visibility"
@@ -204,7 +206,7 @@ export default function CreateProjectForm({ initialPrimaryEntity, initialType, o
           type="submit"
           className="rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-300 hover:border-cyan-500/50"
         >
-          Create Project
+          {t("project.form.submit")}
         </button>
       </form>
     </section>

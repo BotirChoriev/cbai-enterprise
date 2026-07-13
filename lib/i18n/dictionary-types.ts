@@ -64,6 +64,19 @@ export type TranslationDictionary = {
     evidence: string;
     account: string;
     more: string;
+    ecosystems: string;
+    intelligence: string;
+    government: string;
+    investor: string;
+    citizen: string;
+    dashboard: string;
+    reasoning: string;
+    knowledgeGraph: string;
+    governance: string;
+    researchWorkspace: string;
+    startWithSearch: string;
+    startWithSearchBody: string;
+    openSearch: string;
   };
   home: {
     heroTitle: string;
@@ -98,6 +111,22 @@ export type TranslationDictionary = {
       paused: string;
       completed: string;
       archived: string;
+    };
+    form: {
+      heading: string;
+      primaryEntityLabel: string;
+      titleLabel: string;
+      titlePlaceholder: string;
+      typeLabel: string;
+      statusLabel: string;
+      descriptionLabel: string;
+      descriptionPlaceholder: string;
+      tagsLabel: string;
+      tagsPlaceholder: string;
+      visibilityLabel: string;
+      submit: string;
+      requiredError: string;
+      visibilityError: string;
     };
   };
   research: {

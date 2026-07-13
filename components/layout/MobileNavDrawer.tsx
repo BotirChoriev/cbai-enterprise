@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { primaryNavSections, secondaryNavSections } from "@/lib/navigation";
 import NavIcon from "@/components/layout/NavIcon";
 import CBAILogo from "@/components/brand/CBAILogo";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import { translateNavLabel, translateNavSectionTitle } from "@/lib/i18n/nav-translation";
 
 function isNavItemActive(pathname: string, href: string): boolean {
   if (href === "/") return pathname === "/";
@@ -26,6 +28,7 @@ type MobileNavDrawerProps = {
  */
 export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps) {
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!open) return;
@@ -70,7 +73,7 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
           <div key={section.title || `primary-${index}`} className="mb-4">
             {section.title ? (
               <p className="mb-1.5 px-2 text-[10px] font-medium uppercase tracking-widest text-zinc-600">
-                {section.title}
+                {translateNavSectionTitle(t, section.title)}
               </p>
             ) : null}
             <div className="space-y-1">
@@ -86,7 +89,7 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
                   }`}
                 >
                   <NavIcon name={item.icon} />
-                  {item.label}
+                  {translateNavLabel(t, item.href, item.label)}
                 </Link>
               ))}
             </div>
@@ -95,12 +98,12 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
 
         <details className="mt-2 border-t border-zinc-800/80 pt-3">
           <summary className="cursor-pointer px-2 pb-2 text-[10px] font-medium uppercase tracking-widest text-zinc-600">
-            More
+            {t("navigation.more")}
           </summary>
           {secondaryNavSections.map((section, index) => (
             <div key={section.title || `secondary-${index}`} className="mb-3">
               <p className="mb-1.5 px-2 text-[10px] font-medium uppercase tracking-widest text-zinc-700">
-                {section.title}
+                {translateNavSectionTitle(t, section.title)}
               </p>
               <div className="space-y-1">
                 {section.items.map((item) => (
@@ -115,7 +118,7 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
                     }`}
                   >
                     <NavIcon name={item.icon} />
-                    {item.label}
+                    {translateNavLabel(t, item.href, item.label)}
                   </Link>
                 ))}
               </div>
