@@ -44,10 +44,12 @@ test("1. CBAI logo/mark is wired into every required surface", () => {
   const topbar = readSource("components/layout/Topbar.tsx");
   const drawer = readSource("components/layout/MobileNavDrawer.tsx");
   const shell = readSource("components/system/SystemPageShell.tsx"); // loading/error pages
-  const home = readSource("components/platform/home/HomeHero.tsx");
   const reportLogo = readSource("components/shared/ReportHeaderLogo.tsx");
 
-  for (const source of [sidebar, topbar, drawer, shell, home]) {
+  // The persistent shell (Sidebar desktop / Topbar mobile) carries the logo on every route
+  // including "/" — the home page's own content no longer duplicates it (Platform Completion
+  // mission, Phase 2: one logo instance per screen, not a second copy inside page content).
+  for (const source of [sidebar, topbar, drawer, shell]) {
     assert.match(source, /CBAILogo|CBAIMark/);
   }
   assert.match(reportLogo, /CBAIMark/);

@@ -1,14 +1,23 @@
 "use client";
 
-import HomeHero from "@/components/platform/home/HomeHero";
 import HomeFooter from "@/components/platform/home/HomeFooter";
 import HomeAssistantGreeting from "@/components/platform/home/HomeAssistantGreeting";
 import HomeCommandBar from "@/components/platform/home/HomeCommandBar";
 import RoleWorkContextCards from "@/components/platform/home/RoleWorkContextCards";
 import HomeProjectsSection from "@/components/platform/home/HomeProjectsSection";
 import HomeIntelligenceFeed from "@/components/platform/home/HomeIntelligenceFeed";
+import HomeRecentActivity from "@/components/platform/home/HomeRecentActivity";
+import HomeTrust from "@/components/platform/home/HomeTrust";
 import LanguageSelector from "@/components/i18n/LanguageSelector";
 
+// The first screen, scoped to exactly the approved 8 sections (Platform Completion mission,
+// Phase 7) — Greeting, Voice, Projects, Role cards, Intelligence Feed, Recent activity, Quick
+// actions (delivered inline by the Greeting's own real "Suggested next step"/"Available actions"
+// — not a second, separate quick-actions widget), and Trust. Nothing else. The marketing/
+// explanation content this page previously carried (Ecosystems, World Intelligence Map,
+// Capability Flow, Audience) was not deleted — Ecosystems/Capability Flow/Audience moved to
+// /dashboard ("what is available today"), and the World Intelligence Map was already duplicated
+// on /countries, so removing it here loses no real capability.
 export default function PlatformHome() {
   return (
     <div className="home-page min-h-full bg-[#050810] pb-20">
@@ -22,15 +31,16 @@ export default function PlatformHome() {
 
       <div className="mx-auto mt-8 max-w-6xl space-y-8 px-4 sm:px-8">
         <HomeCommandBar />
+        <HomeProjectsSection />
         <RoleWorkContextCards />
         <div className="grid gap-6 lg:grid-cols-2">
-          <HomeProjectsSection />
           <HomeIntelligenceFeed />
+          <HomeRecentActivity />
         </div>
+        <HomeTrust />
       </div>
 
-      <HomeHero />
-      <div className="mx-auto max-w-6xl px-4 sm:px-8">
+      <div className="mx-auto mt-8 max-w-6xl px-4 sm:px-8">
         <HomeFooter />
       </div>
     </div>
