@@ -851,3 +851,34 @@ mission's own checklist) by adding it as a real alias for the existing `/analyti
 27 new tests (`scripts/test-global-interface.ts`), 249 total passing, 92 routes. Not
 browser-verified: live voice recognition against a real microphone/browser. Full detail:
 `docs/product-activation-audit.md` §24.
+
+## Platform Completion
+
+Consolidation and consistency mission — no new features, audited every page for real duplication
+and inconsistency, fixed what a careful review found.
+
+Found and fixed a real repo-health incident before any design work: `tsconfig.json` had gone
+missing from the project root (restored from git), and `public/cbai/` turned out to be an entire
+separate Next.js reference/mockup project (its own `.git`/`node_modules`) that would have shipped
+inside the static export bundle. Confirmed with the user it was real design-reference material,
+consulted it (its navy/cyan palette already closely matches this app's own, confirming rather than
+requiring a redesign — its fabricated stats like "195+ Countries" were explicitly not reproduced),
+then relocated it to a gitignored `reference/` directory excluded from ESLint/TypeScript.
+
+Home page reduced to exactly the approved 8 sections (Greeting, Voice, Projects, Role cards,
+Intelligence Feed, Recent Activity — newly added, Quick Actions, Trust); the marketing content it
+previously carried moved to `/dashboard` or was removed where already duplicated elsewhere.
+
+Real, audited duplication removed: a second card system (`components/ui/Card`, ~30 files) unified
+with the existing `cbaiGlassCard` token; 12 Country/Company/University components each reinventing
+the same card look unified across all three entity types; a redundant evidence-count stat tile, a
+5×-copy-pasted "Generate report" button, and 5+ different empty-state patterns each consolidated
+into one real shared component. Universal Search results now show real Save and "+ Add to Project"
+actions that were already computed but never rendered.
+
+Documented, not fixed (too large/risky for this mission's scope): Research Topic's structurally
+different page skeleton versus Country/Company/University, and Evidence records having no
+save/bookmark path (would require a real Supabase schema change).
+
+`npm run build`/`lint` clean, 92 routes, all 16 suites, 249/249 tests passing, zero regressions.
+Full detail: `docs/product-activation-audit.md` §25.

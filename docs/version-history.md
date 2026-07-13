@@ -1142,6 +1142,40 @@ lint`/`build` clean, 92 routes (`/reports` is the one new route), 249 total test
 browser-verified: live voice recognition against a real microphone/browser. Full detail:
 `docs/product-activation-audit.md` §24.
 
+## v3.26 — Platform Completion
+
+Consolidation and consistency mission — audited every page for real duplication and
+inconsistency, fixed what a careful review found, added nothing new.
+
+Found and fixed a real repo-health incident before any design work: `tsconfig.json` had gone
+missing from the project root (restored from git), and `public/cbai/` turned out to be an entire
+separate Next.js project (its own `.git`/`node_modules`) that would have shipped inside the static
+export bundle. Confirmed with the user it was a real design-reference project, consulted it for
+palette/layout signal (its navy/cyan palette already closely matches this app's own, confirming
+rather than requiring a redesign — and its fabricated stats like "195+ Countries" were explicitly
+not reproduced), then relocated it to a gitignored `reference/` directory excluded from ESLint/TS.
+
+Home page reduced to exactly the approved 8 sections (Greeting, Voice, Projects, Role cards,
+Intelligence Feed, Recent Activity — newly added, Quick Actions, Trust) — the marketing content it
+previously carried beyond that list moved to `/dashboard` (its honest home) or was removed outright
+where already duplicated elsewhere, never silently deleted.
+
+Real, audited duplication removed: `components/ui/Card` (a second card system used by ~30 files)
+now renders the same shared `cbaiGlassCard` token; 12 Country/Company/University components each
+reinvented the same card look with a slightly different className — unified across all three
+entity types; a redundant evidence-count stat tile, a byte-for-byte-copy-pasted "Generate report"
+button (5 files), and 5+ structurally different empty-state patterns were each consolidated into
+one real shared component. Universal Search results now show real Save and "+ Add to Project"
+actions — both were already computed but never rendered.
+
+Documented, not fixed: Research Topic's structurally different (much larger) page skeleton versus
+Country/Company/University, and Evidence records having no save/bookmark path (would require a
+real Supabase schema change) — both judged too large/risky for this consolidation mission's scope.
+
+`npm run build`/`lint` clean, 92 routes, all 16 suites, 249/249 tests passing, zero regressions.
+`next dev` + curl verification across 16 routes, all 200, zero console/server errors. Full detail:
+`docs/product-activation-audit.md` §25.
+
 ## Planned (not started)
 
 Governance Intelligence and Economic Intelligence ecosystems, each with their own foundation

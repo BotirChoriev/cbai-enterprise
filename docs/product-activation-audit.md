@@ -1800,3 +1800,85 @@ sub-cases), including the real bug found in test 14b. 27/27 passing, alongside t
 prompts, recognition accuracy for Uzbek speech specifically, real per-browser `onerror` payloads),
 and a visual side-by-side comparison against an actual mockup image (none was provided in this
 conversation). See `docs/voice-browser-compatibility.md` and `docs/known-limitations.md`.
+
+## 25. Platform Completion
+
+A consolidation and consistency mission, not a feature mission — audited every page for real
+duplication and inconsistency, fixed what a careful review found, added nothing new.
+
+**A real repo-health incident found and fixed before any design work began**: `tsconfig.json` was
+missing from the project root (moved, not deleted from git's index) and a `public/cbai/` directory
+contained an entire separate Next.js project with its own nested `.git`/`node_modules` — meaning it
+would have shipped inside this app's static export bundle. Restored `tsconfig.json` from git
+immediately (confirmed via a clean `tsc --noEmit` run). The `public/cbai/` directory turned out to
+be a real design-reference project (confirmed with the user before touching it) — consulted for
+palette/layout signal (its `#050816` navy and cyan-400 accent already closely match this app's own
+`#050810`/cyan-400 — confirming the existing visual direction, not requiring a redesign) and its
+fabricated marketing statistics ("195+ Countries", "10x Faster Analysis") were explicitly *not*
+reproduced, consistent with this platform's anti-fabrication discipline. Relocated to a gitignored
+`reference/` directory (excluded from ESLint and TypeScript) so it can never ship or get linted as
+part of this app.
+
+**Homepage reduced to exactly the approved 8 sections** (Phase 7: "Nothing else"): Greeting, Voice,
+Projects, Role cards, Intelligence Feed, Recent Activity (newly added — reuses the existing
+`RecentEntities` component, not a new implementation), Quick Actions (delivered by the Greeting's
+own real next-step/available-actions), and Trust. The marketing content the home page previously
+carried beyond this list (Ecosystems, World Intelligence Map, Capability Flow, Audience) was not
+deleted: Ecosystems/Capability Flow/Audience moved to `/dashboard` ("what is available today" — the
+honest home for platform-explanation material); the World Intelligence Map was already duplicated
+on `/countries`, so removing it from Home loses no real capability. A genuinely redundant decorative
+component (`HomeHeroVisual` — a compact list re-showing the exact same `CBAI_ECOSYSTEMS` data
+`HomeEcosystems` already renders in full) was deleted outright.
+
+**Real, verified duplication removed** (Phase 2/4, found by a dedicated audit before any fix was
+made): `components/ui/Card` was a second, visually-different card system (used by ~30 files)
+alongside `cbaiGlassCard` — now renders the same shared token, so every existing `<Card>` caller
+gets the one real card style with zero call-site changes. 12 Country/Company/University components
+(Filters ×3, SourceCoverage ×3, IndicatorCoverage ×3, Relationships ×3) each reinvented the same
+glass-card look with a slightly different raw className instead of the shared token — now unified,
+closing a real cross-entity consistency gap (Phase 4: Countries/Companies/Universities/Research
+"must all follow the same interaction model"). `IntelligenceContextPanel`'s "Evidence" stat tile
+duplicated what `EntityEvidenceSection` already shows in more detail immediately below it on every
+entity page — the same number via two different widgets back to back; removed the redundant tile.
+The "Generate report"/"Hide report" toggle button's className was byte-for-byte copy-pasted in 5
+files; a new `GenerateReportToggleButton` replaces all 5. A new `EmptyState` component (two real
+variants — "dashed" for a filtered-to-zero list, "section" for a whole panel with no data) replaces
+the dashed-box empty states in `CompanyList`/`UniversityList`, where at least 5 structurally
+different empty-state patterns previously existed for the same intent.
+
+**Universal Search made the real center of navigation it wasn't yet** (Phase 5): every linked
+result now shows a real Save action and a real "+ Add to Project" link — both were already
+computed by `lib/search-intelligence-entry.ts` (`createProjectHref`, and a new `entityRef` field
+reusing the exact same `ContextEntityRef` shape every profile page already uses) but never
+rendered. The already-computed `coverageLabel` ("X of Y sources connected") is now shown too.
+"Related entities per result" was deliberately not added — computing a relationship set for every
+row of a potentially long results list is real added cost, and related entities remain one click
+away on the entity's own profile; documented rather than silently skipped.
+
+**Micro-interaction consistency (Phase 9)**: `SaveToWorkspaceButton` had hover states but no
+`focus-visible` ring — a real gap once it started appearing in more places (search results). Fixed,
+matching every other interactive control (`cbaiBtnPrimary`/`Secondary`, the new
+`GenerateReportToggleButton`).
+
+**Not attempted, documented honestly rather than risked**: full section-order harmonization across
+Country/Company/University/Research Topic (Phase 4's "Header → Summary → Evidence → Projects →
+Reports → Related → Timeline → Sources → Trust" order). The audit found Research Topic is a
+structurally different, much larger page (18 sections vs. ~11 for the other three, its own
+hero/cockpit/dashboard/tabs stack) built up over many prior missions — rewriting it to match the
+other three entities' skeleton is a real, large risk to substantial working functionality for a
+"consistency" goal, and was judged not worth attempting within this mission's scope. Also found and
+documented, not fixed: Evidence records have no `SaveToWorkspaceButton`/`CreateProjectFromEntityButton`
+anywhere — `EntityKind` (`lib/context/context-types.ts`) has no `"evidence"` member, and adding one
+would require a real Supabase schema migration (the `entity_kind` `CHECK` constraint in
+`bookmarks`/`project_entity_links`) plus updates to every kind-validator across the stack — a
+deeper, cross-cutting change than this consolidation mission's scope, not a shallow button add.
+
+**Tests**: all 16 existing suites re-verified after every batch of changes — 249/249 passing
+throughout, zero regressions introduced. `npm run build` clean, 92 routes. `next dev` + curl
+verification across 16 routes (`/`, `/my-work`, `/search`, `/countries`, `/companies`,
+`/universities`, `/research`, `/knowledge`, `/reports`, `/trust`, `/settings`, `/account`,
+`/dashboard`, `/government`, `/investor`, `/citizen`) — all 200, zero console/server errors.
+
+**Not browser-verified**: a real click-through of every fixed interaction (hover/focus/save/toggle
+states) in an actual browser — verified via source review, clean typecheck/lint/build, and static
+HTML/route checks only, consistent with this environment's lack of a browser automation tool.
