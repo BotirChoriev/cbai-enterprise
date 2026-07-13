@@ -64,7 +64,7 @@ export default function SearchResultCard({ entry }: SearchResultCardProps) {
             {entry.createProjectHref ? (
               <Link
                 href={entry.createProjectHref}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-2.5 py-1 text-[11px] font-medium text-cyan-300 transition-colors hover:border-cyan-500/50"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-2.5 py-1 text-[11px] font-medium text-cyan-300 transition-colors hover:border-cyan-500/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400"
               >
                 + Add to Project
               </Link>
