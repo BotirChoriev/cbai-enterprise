@@ -31,6 +31,7 @@ export default function Sidebar() {
         href="/"
         className="flex h-16 items-center gap-2.5 border-b border-cyan-500/10 px-4 transition-colors hover:bg-slate-900/50"
         title="CBAI — Universal Intelligence"
+        aria-label="CBAI — Universal Intelligence, go to homepage"
       >
         {isHome ? (
           <span className="flex justify-center">
@@ -59,6 +60,7 @@ export default function Sidebar() {
                     key={item.href}
                     href={item.href}
                     title={isHome ? label : undefined}
+                    aria-label={isHome ? label : undefined}
                     className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                       isActive
                         ? "bg-cyan-500/10 text-cyan-400"

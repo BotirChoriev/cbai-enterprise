@@ -1955,3 +1955,63 @@ Search → Entity → Project → Evidence → Notes → Report path this missio
 just with different subject matter); an exhaustive empty-state reclassification against the
 A/B/C/D/E taxonomy; a full keyboard-only navigation pass; screen-reader testing in a real assistive
 technology tool.
+
+### 26.1 Second issuance — Voice/Operator, Investor, Government, and keyboard-only passes
+
+This mission was reissued verbatim; treated as "continue and deepen," not a new request. Work this
+issuance used the same real-Playwright-browser discipline established above, targeted at stages left
+open by the first issuance.
+
+**Voice and Operator audit (Stage 12)**: a pure-logic matrix tested all 13 required voice/command
+phrases ("Create project," "Continue project," "Open My Work," "Search intelligence," "Open
+country/company/university/research," "Find evidence," "Open reports," "Generate report," "Open
+Trust Center," "Change language") across all 4 active languages (English/Uzbek/Russian/Turkish) — 52
+of 52 combinations resolved correctly. A real-browser spot-check typed 5 non-English commands
+directly into the homepage command bar: 4 produced correct navigation ("hisobot yarat" → `/analytics`,
+"открой доказательства" → `/knowledge`, "üniversiteleri aç" → `/universities`, "ishonch markazi" →
+`/trust`); the 5th ("продолжить проект", Russian "continue project") appeared to fail (stayed on
+homepage) but was investigated and confirmed **correct, honest behavior, not a bug**:
+`resolveProjectCommand` returns the honest message "No projects yet — create one from My Work first."
+rather than fabricating a navigation, because that isolated Playwright browser context genuinely had
+zero saved projects. Confirmed by reading the actual rendered confirmation text.
+
+**Investor audit (Stage 6)**: full real-browser workflow — search "Apple" → company profile (no
+fabricated AI/Risk/Investment score text found) → related entities and Evidence sections present with
+real "sources connected" honesty text → create an Investment Analysis project → generate report (real
+"Not assessed" confidence language present, no fabricated "Buy"/"Strong Buy"/"Recommended Investment"
+text anywhere) → reopened correctly from My Work. Zero console errors, zero bugs found.
+
+**Government analyst audit (Stage 8)**: full real-browser workflow — open Japan's country profile →
+Institutions and Evidence sections present, honest "Not assessed"/"not yet" language confirmed, no
+fabricated "sources verified" counts → create a Policy Analysis project → generate report → reopened
+correctly from My Work. Zero console errors, zero bugs found.
+
+**Keyboard-only accessibility pass (Stage 20, not attempted in the first issuance)**: found and fixed
+one real, confirmed accessibility bug. On the homepage, `components/layout/Sidebar.tsx` collapses to
+an icon-only rail (`isHome` state) and passed each nav item's label only via a `title` attribute, with
+no visible text and no `aria-label` — real screen readers do not reliably announce `title` on links,
+so the 12 primary navigation items (logo, Home, My Work, Search, Countries, Companies, Universities,
+Research, Evidence, Reports, Trust, Settings) had no dependable accessible name in this state. Fixed
+by adding a real `aria-label` (matching the existing `title` text) to the logo link and to each
+collapsed nav item, verified via a real browser read of every sidebar link's computed `aria-label`.
+Tab-order and focus-visible indicators were also checked directly (15-stop real focus sweep) and found
+already correct — every focusable element showed a real visible focus ring; no changes needed there.
+(A separate concern raised by the initial keyboard-sweep script — "My Work unreachable via 30 Tabs" —
+was traced to a test-script bug, not a product bug: the script matched on `textContent`, which is
+empty for these icon-only links; a follow-up check confirmed My Work is reachable at the 3rd real Tab
+stop.)
+
+**Tests**: all 19 non-browser suites re-verified (up from 18 — `test:real-user-audit` added in the
+first issuance), zero regressions. `npm run test:browser-regression` (7 tests) re-verified passing
+after the Sidebar fix. `npm run lint` clean (one pre-existing, unrelated warning in
+`evidence-navigation-builder.ts`, not touched this issuance). `npx tsc --noEmit` clean. `npm run
+build` clean, 93 routes.
+
+**Scope still not attempted** (large, honestly out of reach in the time available across both
+issuances): Engineer/Economist/Executive/Legal/Social-Sector persona-specific workflows beyond the
+shared Search → Entity → Project → Evidence → Notes → Report spine already verified for Ordinary
+user/Student/Professor/Investor/Government; a full Russian/Turkish core-workflow pass (only Uzbek got
+a full pass; Russian/Turkish were exercised only via the voice-command spot-check); a formal
+A/B/C/D/E empty-state taxonomy document; screen-reader testing in a real assistive-technology tool
+(VoiceOver/NVDA/JAWS) — the keyboard-only pass verified focus order and accessible names via computed
+DOM properties, which is a real, honest proxy but not the same as live AT output.
