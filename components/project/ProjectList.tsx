@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { loadProjects } from "@/lib/project/project-store";
 import type { Project } from "@/lib/project/project-types";
 import { resolveProjectGuideStep } from "@/lib/project/project-guide";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
+import { useHydrated } from "@/lib/hooks/use-hydrated";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { translateProjectTypeLabel, translateProjectStatus } from "@/lib/i18n/project-translation";
@@ -15,9 +15,16 @@ import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-clas
  * My Work, Project-first: Recent Projects (every real project, most recently updated first) and
  * Pinned Projects (via the same pinEntity/SaveToWorkspaceButton architecture every other entity
  * kind already uses). Honestly empty until the user creates the first project.
+ *
+ * Real hydration-mismatch fix (found via actual browser testing): loadProjects() is honestly
+ * empty on the server, so a plain useState(() => loadProjects()) lazy initializer rendered the
+ * empty state server-side but the real project list client-side — a genuine, guaranteed structural
+ * mismatch for any returning user with 1+ saved projects. Gated on useHydrated() so the server and
+ * the client's first render match exactly; the real list appears in the very next commit.
  */
 export default function ProjectList() {
-  const [projects] = useState(() => loadProjects());
+  const hydrated = useHydrated();
+  const projects = hydrated ? loadProjects() : [];
   const { context } = usePlatformContext();
   const { t } = useTranslation();
   const pinnedProjectIds = new Set(

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useSyncExternalStore } from "react";
 import type { TopicEvidenceCatalogItem } from "@/lib/research/evidence/evidence-topic-builder";
 import {
   loadEvidenceLifecycle,
@@ -8,6 +8,7 @@ import {
   EVIDENCE_LIFECYCLE_STAGES,
   EVIDENCE_LIFECYCLE_LABELS,
   type EvidenceLifecycleStage,
+  type EvidenceLifecycleRecord,
 } from "@/lib/research/research-workspace-store";
 import { toEvidenceEntityRef } from "@/lib/research/evidence/evidence-bookmark";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
@@ -17,6 +18,39 @@ type EvidenceLifecyclePanelProps = {
   topicId: string;
   evidenceItems: readonly TopicEvidenceCatalogItem[];
 };
+
+// Real hydration-mismatch fix (found via actual browser testing): mirrors the same
+// useSyncExternalStore + cached-snapshot pattern already proven elsewhere in this app
+// (AssistantProfileProvider, EntryExperience) — loadEvidenceLifecycle() is honestly empty on the
+// server, so the plain useState(() => loadEvidenceLifecycle(topicId)) this used to be produced a
+// real structural mismatch (the "Mark as X" button present/absent) for any topic where the user
+// had actually advanced a stage. A per-topicId cache keeps getSnapshot's return value referentially
+// stable between calls (required by useSyncExternalStore itself) until a real advance invalidates it.
+const EMPTY_RECORDS: Record<string, EvidenceLifecycleRecord> = {};
+const snapshotCache = new Map<string, Record<string, EvidenceLifecycleRecord>>();
+const listeners = new Set<() => void>();
+
+function getSnapshot(topicId: string): Record<string, EvidenceLifecycleRecord> {
+  if (!snapshotCache.has(topicId)) {
+    snapshotCache.set(topicId, loadEvidenceLifecycle(topicId));
+  }
+  return snapshotCache.get(topicId)!;
+}
+
+function getServerSnapshot(): Record<string, EvidenceLifecycleRecord> {
+  return EMPTY_RECORDS;
+}
+
+function subscribe(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+function commitAdvance(topicId: string, evidenceId: string, updated: EvidenceLifecycleRecord): void {
+  const current = getSnapshot(topicId);
+  snapshotCache.set(topicId, { ...current, [evidenceId]: updated });
+  listeners.forEach((listener) => listener());
+}
 
 function StageTrack({ stage }: { stage: EvidenceLifecycleStage }) {
   const currentIndex = EVIDENCE_LIFECYCLE_STAGES.indexOf(stage);
@@ -48,12 +82,12 @@ function StageTrack({ stage }: { stage: EvidenceLifecycleStage }) {
  * stages only ever advance forward one step at a time — never skipped, never auto-completed.
  */
 export default function EvidenceLifecyclePanel({ topicId, evidenceItems }: EvidenceLifecyclePanelProps) {
-  const [records, setRecords] = useState(() => loadEvidenceLifecycle(topicId));
+  const records = useSyncExternalStore(subscribe, () => getSnapshot(topicId), getServerSnapshot);
 
   function handleAdvance(evidenceId: string) {
     const updated = advanceEvidenceLifecycle(topicId, evidenceId);
     if (updated) {
-      setRecords((current) => ({ ...current, [evidenceId]: updated }));
+      commitAdvance(topicId, evidenceId, updated);
     }
   }
 

@@ -8,6 +8,7 @@ import { deriveResearchReadiness } from "@/lib/research/readiness/readiness-engi
 import { deriveEvidenceGapIntelligence } from "@/lib/research/intelligence/intelligence-engine";
 import { loadResearchNotes } from "@/lib/research/research-workspace-store";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
+import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { profileSectionHref } from "@/components/shared/entity-profile-path";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
@@ -38,7 +39,12 @@ export default function ResearchWorkspaceDashboard({ topic }: ResearchWorkspaceD
   const [mission] = useState(() => buildResearchMission({ missionId: topic.topicId }));
   const [readiness] = useState(() => deriveResearchReadiness(topic.topicId));
   const [intelligence] = useState(() => deriveEvidenceGapIntelligence(topic.topicId));
-  const [recentNotes] = useState(() => loadResearchNotes(topic.topicId).slice(0, 3));
+  // Real hydration-mismatch fix (found via actual browser testing): unlike mission/readiness/
+  // intelligence above (pure catalog computations, identical on server and client),
+  // loadResearchNotes reads real localStorage — honestly empty server-side, so the conditional
+  // <ul>/<p> swap below produced a real structural mismatch for any topic with saved notes.
+  const hydrated = useHydrated();
+  const recentNotes = hydrated ? loadResearchNotes(topic.topicId).slice(0, 3) : [];
 
   const question = mission.workspaceContract?.missionSummary.missionCenter.question.question ?? topic.description;
   const openTasksCount =

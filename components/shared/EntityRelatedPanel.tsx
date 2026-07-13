@@ -153,13 +153,20 @@ export default function EntityRelatedPanel({
                 {getEntityTypePluralLabel(group.targetType)}
               </p>
               <ul className={useRows ? "space-y-2" : "flex flex-wrap gap-2"}>
-                {group.items.map((item) =>
-                  useRows ? (
-                    <RelationshipRow key={`${item.type}-${item.targetType}-${item.targetId}`} item={item} />
+                {group.items.map((item, index) => {
+                  // Real bug found via actual browser testing: the same real target (e.g. a
+                  // company) can legitimately appear twice with two different real relationship
+                  // labels (e.g. "Headquartered in" and a separate real edge) — both are honest,
+                  // distinct relationships that must both render, but a key built from
+                  // type/targetType/targetId alone collided for them. `label` (when present) plus
+                  // the array index guarantee a unique key without dropping either real row.
+                  const key = `${item.type}-${item.targetType}-${item.targetId}-${item.label ?? ""}-${index}`;
+                  return useRows ? (
+                    <RelationshipRow key={key} item={item} />
                   ) : (
-                    <RelationshipPill key={`${item.type}-${item.targetType}-${item.targetId}`} item={item} />
-                  ),
-                )}
+                    <RelationshipPill key={key} item={item} />
+                  );
+                })}
               </ul>
             </div>
           );

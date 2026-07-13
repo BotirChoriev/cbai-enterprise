@@ -21,6 +21,7 @@ import LocalWorkMigrationPrompt from "@/components/account/LocalWorkMigrationPro
 import CloudProfileImportPrompt from "@/components/account/CloudProfileImportPrompt";
 import PendingSyncNotice from "@/components/shared/PendingSyncNotice";
 import { loadProject } from "@/lib/project/project-store";
+import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { PROJECT_TYPES, type ProjectTypeId } from "@/lib/project/project-types";
 import type { ContextEntityRef } from "@/lib/context/context-types";
 import {
@@ -58,7 +59,15 @@ const ONBOARDING_LINKS = [
 function MyWorkContent() {
   const searchParams = useSearchParams();
   const projectId = searchParams.get("project");
-  const project = projectId ? loadProject(projectId) : null;
+  // Real hydration-mismatch fix (found via actual browser testing): loadProject() is honestly
+  // empty on the server (no window/localStorage), so reading it directly during render produced a
+  // different DOM structure server-side (no real project) than client-side (the real project),
+  // logged as a genuine React hydration error every time a user reopened a project — the single
+  // most core "return to your work" step this platform has. Gating on useHydrated() guarantees the
+  // server and the client's first render match exactly; the real project appears in the very next
+  // commit, automatically, once useSyncExternalStore detects the real client snapshot.
+  const hydrated = useHydrated();
+  const project = hydrated && projectId ? loadProject(projectId) : null;
 
   // Real "Create Project from this entity" pre-fill, arriving from a Country/Company/
   // University/Research profile or a Search result — never a fabricated default. Only a real,
@@ -96,6 +105,14 @@ function MyWorkContent() {
 
   if (projectId && project) {
     return <ProjectHome project={project} />;
+  }
+
+  // Real "still hydrating" state — distinct from "genuinely not found" below. Without this,
+  // reopening a real project would flash a misleading "This project isn't available" message for
+  // the brief window before useHydrated() flips true, since `project` is honestly null in both
+  // cases until then.
+  if (projectId && !hydrated) {
+    return null;
   }
 
   if (projectId && !project) {
