@@ -160,9 +160,10 @@ export default function AssistantSettingsForm() {
           </label>
         </div>
         <p className="text-xs text-zinc-600">
-          Only English is implemented in this platform&apos;s interface today. The other language
-          options are saved preferences, honestly marked unavailable rather than silently doing
-          nothing.
+          English, Oʻzbek, Русский, and Türkçe are fully implemented in this platform&apos;s
+          interface today. The other language options above are saved preferences, honestly
+          marked unavailable rather than silently doing nothing. Voice recognition (speech-to-text)
+          currently supports English only, regardless of your interface language.
         </p>
       </section>
 
