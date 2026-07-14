@@ -32,8 +32,11 @@ function cardOpacityClass(status: EcosystemStatus): string {
   }
 }
 
-function EcosystemIcon({ id }: { id: EcosystemIconId }) {
-  const shared = "h-10 w-10 shrink-0 rounded-lg border border-cyan-500/15 bg-cyan-500/5 p-2 text-cyan-400";
+function EcosystemIcon({ id, size = "sm" }: { id: EcosystemIconId; size?: "sm" | "lg" }) {
+  const shared =
+    size === "lg"
+      ? "h-16 w-16 shrink-0 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3.5 text-emerald-400"
+      : "h-10 w-10 shrink-0 rounded-lg border border-cyan-500/15 bg-cyan-500/5 p-2 text-cyan-400";
 
   switch (id) {
     case "public":
@@ -72,15 +75,19 @@ function EcosystemIcon({ id }: { id: EcosystemIconId }) {
   }
 }
 
+// Asymmetric, not a grid of equal-weight cards: the one ecosystem that is genuinely most built
+// (CBAI_ECOSYSTEMS' real `flagship` flag, not an editorial choice invented for this layout) gets
+// a wide, featured treatment; the rest sit beneath it as a quieter, honestly-secondary row. A
+// uniform grid would visually claim all four are equally mature, which would not be true.
 export default function HomeEcosystems() {
+  const flagship = CBAI_ECOSYSTEMS.find((e) => e.flagship) ?? CBAI_ECOSYSTEMS[0];
+  const rest = CBAI_ECOSYSTEMS.filter((e) => e.id !== flagship.id);
+
   return (
     <section aria-labelledby="home-ecosystems-heading" className="space-y-8">
       <div className="space-y-3 text-center sm:text-left">
         <p className={cbaiSectionEyebrow}>CBAI Ecosystems</p>
-        <h2
-          id="home-ecosystems-heading"
-          className="text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl"
-        >
+        <h2 id="home-ecosystems-heading" className="cbai-display text-3xl text-zinc-50 sm:text-4xl">
           One Intelligence Core, three ecosystems
         </h2>
         <p className="max-w-2xl text-sm leading-relaxed text-zinc-400 sm:text-base">
@@ -90,64 +97,61 @@ export default function HomeEcosystems() {
         </p>
       </div>
 
-      <ul className="grid gap-5 sm:grid-cols-2">
-        {CBAI_ECOSYSTEMS.map((ecosystem) => (
+      <article
+        className={`${cbaiGlassCard} ${cardOpacityClass(flagship.status)} grid gap-8 p-7 sm:p-10 lg:grid-cols-[auto_1fr_auto] lg:items-center`}
+      >
+        <EcosystemIcon id={flagship.id} size="lg" />
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <h3 className="cbai-display text-2xl text-zinc-50 sm:text-3xl">{flagship.title}</h3>
+            <span className="shrink-0 rounded-md border border-emerald-400/40 bg-emerald-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-300">
+              Flagship
+            </span>
+            <span className={`shrink-0 rounded-md border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${statusBadgeClass(flagship.status)}`}>
+              {ECOSYSTEM_STATUS_LABELS[flagship.status]}
+            </span>
+          </div>
+          <p className="mt-3 max-w-2xl text-base leading-relaxed text-zinc-300">{flagship.valueSentence}</p>
+          <ul className="mt-5 flex flex-wrap gap-x-6 gap-y-2">
+            {flagship.bullets.map((bullet) => (
+              <li key={bullet} className="flex items-start gap-2 text-sm text-zinc-400">
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.7)]" aria-hidden="true" />
+                {bullet}
+              </li>
+            ))}
+          </ul>
+        </div>
+        {flagship.href ? (
+          <Link
+            href={flagship.href}
+            className="inline-flex shrink-0 items-center justify-center rounded-lg bg-[#005810] px-5 py-3 text-sm font-semibold text-white shadow-[0_8px_24px_-8px_rgba(0,88,16,0.6)] transition-colors hover:bg-[#00470d] lg:self-center"
+          >
+            {flagship.ctaLabel ?? "Open →"}
+          </Link>
+        ) : null}
+      </article>
+
+      <ul className="grid gap-4 sm:grid-cols-3">
+        {rest.map((ecosystem) => (
           <li key={ecosystem.id}>
-            <article
-              className={`${cbaiGlassCard} ${cardOpacityClass(ecosystem.status)} flex h-full flex-col p-6`}
-            >
-              <div className="flex items-start gap-4">
-                <EcosystemIcon id={ecosystem.id} />
+            <article className={`${cbaiGlassCard} ${cardOpacityClass(ecosystem.status)} flex h-full flex-col gap-3 p-5`}>
+              <div className="flex items-start gap-3">
+                <EcosystemIcon id={ecosystem.id} size="sm" />
                 <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-start justify-between gap-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-base font-semibold text-zinc-50">{ecosystem.title}</h3>
-                      {ecosystem.flagship ? (
-                        <span className="shrink-0 rounded-md border border-cyan-400/40 bg-cyan-400/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-cyan-300">
-                          Flagship
-                        </span>
-                      ) : null}
-                    </div>
-                    <span
-                      className={`shrink-0 rounded-md border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${statusBadgeClass(ecosystem.status)}`}
-                    >
-                      {ECOSYSTEM_STATUS_LABELS[ecosystem.status]}
-                    </span>
-                  </div>
-                  <p className="mt-2 text-sm leading-relaxed text-zinc-300">
-                    {ecosystem.valueSentence}
-                  </p>
+                  <h3 className="text-sm font-semibold text-zinc-50">{ecosystem.title}</h3>
+                  <span className={`mt-1 inline-block rounded-md border px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider ${statusBadgeClass(ecosystem.status)}`}>
+                    {ECOSYSTEM_STATUS_LABELS[ecosystem.status]}
+                  </span>
                 </div>
               </div>
-
-              <ul className="mt-5 space-y-2 border-t border-cyan-500/10 pt-4">
-                {ecosystem.bullets.map((bullet) => (
-                  <li key={bullet} className="flex items-start gap-2.5 text-sm text-zinc-400">
-                    <span
-                      className={`mt-1.5 h-1 w-1 shrink-0 rounded-full ${
-                        ecosystem.status === "available-today"
-                          ? "bg-cyan-400 shadow-[0_0_6px_rgba(34,211,238,0.8)]"
-                          : "bg-zinc-600"
-                      }`}
-                      aria-hidden="true"
-                    />
-                    {bullet}
-                  </li>
-                ))}
-              </ul>
-
+              <p className="text-xs leading-relaxed text-zinc-400">{ecosystem.valueSentence}</p>
               {ecosystem.href && ecosystem.status === "available-today" ? (
-                <Link
-                  href={ecosystem.href}
-                  className="mt-5 inline-flex text-sm font-semibold text-cyan-400 transition-colors hover:text-cyan-300"
-                >
+                <Link href={ecosystem.href} className="mt-auto inline-flex text-xs font-semibold text-cyan-400 transition-colors hover:text-cyan-300">
                   {ecosystem.ctaLabel ?? "Open →"}
                 </Link>
               ) : (
-                <p className="mt-5 text-xs text-zinc-600">
-                  {ecosystem.status === "future-workspace"
-                    ? "Planned as a future workspace."
-                    : "In active development — not fully available yet."}
+                <p className="mt-auto text-[11px] text-zinc-600">
+                  {ecosystem.status === "future-workspace" ? "Planned as a future workspace." : "In active development — not fully available yet."}
                 </p>
               )}
             </article>
