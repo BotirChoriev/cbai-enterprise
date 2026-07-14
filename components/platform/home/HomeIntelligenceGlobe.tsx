@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { buildWorldIntelligenceMap } from "@/lib/world-map";
 import { PRODUCT_STATUS_DOT_CLASSES } from "@/lib/product-status";
-import { cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 const STATUS_FILL: Record<string, string> = {
   "bg-emerald-400": "#34d399",
@@ -16,87 +15,112 @@ const STATUS_FILL: Record<string, string> = {
   "bg-zinc-500": "#71717a",
 };
 
+// Design Bible Part IX.9.3: node weight reflects real evidence density, never a purely aesthetic
+// choice. "live" (a fully connected, real-data country) reads as the most present node on the
+// network; "planned"/"not_connected" read as the quietest — a real signal drawn from the same
+// ProductStatus every country profile already honestly discloses, never an invented number.
+const STATUS_WEIGHT: Record<string, number> = {
+  live: 1,
+  partial: 0.82,
+  waiting_for_verified_data: 0.68,
+  preview: 0.6,
+  restricted: 0.55,
+  not_connected: 0.42,
+  planned: 0.42,
+};
+
 /**
- * The Living Intelligence network — the homepage's own visual heart, not a copy of the full
- * World Intelligence Map's filterable browser (that stays real and unduplicated on /countries).
- * This is a curated, radial view of the same real catalog, arranged around one real evidence
- * core — real country names, real connected-source status, zero fabricated coordinates or
- * geography (this repository has no map/geo-data library; a radial layout makes no geographic
- * claim, unlike a hand-approximated world shape would). Breathes via one slow, shared animation
- * timing already used by the Operator orb and the CBAI mark — one motion language, not a fourth.
+ * The Living Intelligence Network — the emotional centerpiece of the homepage (Design Bible Part
+ * IX), not a diagram tucked below a divider. A curated, radial view of the real catalog around
+ * one evidence core — real country names, real connected-source status, zero fabricated
+ * coordinates or geography (this repository has no map/geo-data library; a radial layout makes no
+ * geographic claim, unlike a hand-approximated world shape would). Breathes via the same slow,
+ * shared 4.5s rhythm already used by the Operator orb and the CBAI mark (Design Bible Part VI.6.1)
+ * — one motion language across the whole product, not a fourth invented for this one visual.
  */
 export default function HomeIntelligenceGlobe() {
   const allCountries = useMemo(() => buildWorldIntelligenceMap().flatMap((group) => group.countries), []);
   const regionCount = useMemo(() => new Set(allCountries.map((c) => c.country.region)).size, [allCountries]);
+  const [hovered, setHovered] = useState<string | null>(null);
 
-  const radius = 130;
-  const center = 160;
+  const radius = 220;
+  const center = 240;
   const nodes = allCountries.map((entry, index) => {
     const angle = (index / allCountries.length) * Math.PI * 2 - Math.PI / 2;
+    const weight = STATUS_WEIGHT[entry.status] ?? 0.5;
     const x = center + radius * Math.cos(angle);
     const y = center + radius * Math.sin(angle);
     const fill = STATUS_FILL[PRODUCT_STATUS_DOT_CLASSES[entry.status]] ?? "#52525b";
-    return { ...entry, x, y, fill };
+    return { ...entry, x, y, fill, weight };
   });
 
   return (
-    <section aria-labelledby="home-globe-heading" className="mx-auto max-w-4xl px-4 text-center sm:px-8">
-      <p className={cbaiSectionEyebrow} id="home-globe-heading">Living Intelligence Network</p>
-      <h2 className="cbai-display mt-2 text-2xl text-zinc-50 sm:text-3xl">
-        One evidence core. Every country connected to it.
-      </h2>
-      <p className="mx-auto mt-2 max-w-xl text-sm text-zinc-500">
-        {allCountries.length} countries across {regionCount} regions, each with a real, honestly-labeled evidence
-        status — never a fabricated score.
-      </p>
+    <div className="relative mx-auto flex w-full max-w-[640px] items-center justify-center lg:mx-0 lg:max-w-none">
+      {/* Ambient glow — light radiating from the core outward (Design Bible Part III.3.4), the
+          same reasoning as the Operator orb's own light: it brings its own, never a borrowed
+          drop-shadow. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle,rgba(47,191,113,0.16),transparent_68%)] sm:h-[520px] sm:w-[520px]"
+      />
 
-      <div className="mt-8 flex justify-center">
-        <svg
-          className="cbai-globe-breathe h-auto w-full max-w-[320px] text-[#2fbf71]"
-          viewBox="0 0 320 320"
-          fill="none"
-          role="img"
-          aria-label={`Living intelligence network: ${allCountries.length} countries connected to one evidence core`}
-        >
-          <circle cx={center} cy={center} r={radius} stroke="currentColor" strokeWidth="1" opacity="0.15" />
-          {nodes.map((node) => (
-            <line
-              key={`line-${node.country.id}`}
-              x1={center}
-              y1={center}
-              x2={node.x}
-              y2={node.y}
-              stroke="currentColor"
-              strokeWidth="1"
-              opacity="0.25"
-            />
-          ))}
-          <circle cx={center} cy={center} r="10" fill="currentColor" opacity="0.9" />
-          <circle cx={center} cy={center} r="16" stroke="currentColor" strokeWidth="1" opacity="0.35" />
-          {nodes.map((node) => (
-            <g key={node.country.id}>
-              <circle cx={node.x} cy={node.y} r="5" fill={node.fill} />
-              <circle cx={node.x} cy={node.y} r="9" stroke={node.fill} strokeWidth="1" opacity="0.4" />
-            </g>
-          ))}
-        </svg>
-      </div>
-
-      <div className="mx-auto -mt-4 flex max-w-md flex-wrap justify-center gap-x-4 gap-y-1.5">
+      <svg
+        className="cbai-globe-breathe relative h-auto w-full max-w-[420px] text-[#2fbf71] sm:max-w-[500px]"
+        viewBox="0 0 480 480"
+        fill="none"
+        role="img"
+        aria-label={`Living Intelligence Network: ${allCountries.length} countries across ${regionCount} regions, connected to one real evidence core`}
+      >
+        <circle cx={center} cy={center} r={radius} stroke="currentColor" strokeWidth="1" opacity="0.12" />
+        <circle cx={center} cy={center} r={radius * 0.62} stroke="currentColor" strokeWidth="1" opacity="0.08" />
         {nodes.map((node) => (
-          <Link
-            key={node.country.id}
-            href={node.href}
-            className="text-xs text-zinc-500 transition-colors hover:text-emerald-300"
-          >
-            {node.country.name}
-          </Link>
+          <line
+            key={`line-${node.country.id}`}
+            x1={center}
+            y1={center}
+            x2={node.x}
+            y2={node.y}
+            stroke="currentColor"
+            strokeWidth="1"
+            opacity={hovered === node.country.id ? 0.55 : 0.16 + node.weight * 0.14}
+          />
         ))}
-      </div>
+        <circle cx={center} cy={center} r="14" fill="currentColor" opacity="0.95" />
+        <circle cx={center} cy={center} r="22" stroke="currentColor" strokeWidth="1" opacity="0.4" />
+        <circle cx={center} cy={center} r="30" stroke="currentColor" strokeWidth="1" opacity="0.2" />
+        {nodes.map((node) => {
+          const r = 3 + node.weight * 4.5;
+          const isHovered = hovered === node.country.id;
+          return (
+            <g
+              key={node.country.id}
+              className="cursor-pointer"
+              onMouseEnter={() => setHovered(node.country.id)}
+              onMouseLeave={() => setHovered((current) => (current === node.country.id ? null : current))}
+            >
+              <circle cx={node.x} cy={node.y} r={r + 9} fill="transparent" />
+              <circle cx={node.x} cy={node.y} r={isHovered ? r * 1.35 : r} fill={node.fill} opacity={isHovered ? 1 : 0.85 + node.weight * 0.15} />
+              <circle cx={node.x} cy={node.y} r={r + 5} stroke={node.fill} strokeWidth="1" opacity={isHovered ? 0.6 : 0.3} />
+            </g>
+          );
+        })}
+      </svg>
 
-      <Link href="/countries" className="mt-6 inline-flex text-sm font-medium text-cyan-400 hover:text-cyan-300">
-        Explore the full World Intelligence Map →
-      </Link>
-    </section>
+      {hovered ? (
+        <Link
+          href={nodes.find((n) => n.country.id === hovered)?.href ?? "/countries"}
+          className="absolute bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-emerald-500/30 bg-[#050810]/90 px-3.5 py-1.5 text-xs font-medium text-emerald-300 shadow-lg backdrop-blur-sm lg:bottom-6"
+        >
+          {nodes.find((n) => n.country.id === hovered)?.country.name} →
+        </Link>
+      ) : (
+        <Link
+          href="/countries"
+          className="absolute bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-medium text-zinc-500 transition-colors hover:text-emerald-300 lg:bottom-6"
+        >
+          {allCountries.length} countries · {regionCount} regions · one evidence core →
+        </Link>
+      )}
+    </div>
   );
 }

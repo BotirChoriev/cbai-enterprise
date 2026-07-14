@@ -404,6 +404,37 @@ html:not(.theme-dark) [class*="backdrop-blur"] {
   animation: none !important;
 }
 
+/* Homepage hero entrance (Design Bible Part VI: motion signals a real state change — here, the
+   real "you have just arrived" moment) — a single, non-repeating fade + rise, never a loop.
+   Guarded by both the app's own saved reduced-motion preference and the raw OS media query, so it
+   never depends on a visitor having found the accessibility setting first. */
+@keyframes cbai-hero-fade-up {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.cbai-hero-reveal {
+  animation: cbai-hero-fade-up 0.6s ease-out both;
+}
+.cbai-hero-reveal-delayed {
+  animation: cbai-hero-fade-up 0.7s ease-out 0.15s both;
+}
+.cbai-reduced-motion .cbai-hero-reveal-delayed {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cbai-hero-reveal-delayed {
+    animation: none !important;
+  }
+}
+.cbai-reduced-motion .cbai-hero-reveal {
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cbai-hero-reveal {
+    animation: none !important;
+  }
+}
+
 /* Report print view — real browser printing, no new dependency. A user's own "Print" dialog
    already offers "Save as PDF" as a destination on every modern OS/browser, so this honestly
    satisfies "PDF export" without a fabricated export pipeline. Only .cbai-print-area content is
