@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { platformModules } from "@/lib/navigation";
+import { cbaiPageHeader } from "@/components/brand/brand-classes";
 
 // Not in primary navigation (confirmed unreachable from any real nav link) and honestly
 // self-describes as inactive — kept reachable by direct URL for the platform module grid it
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
 export default function CorePage() {
   return (
     <div className="space-y-8">
-      <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-6 py-5">
+      <div className={cbaiPageHeader}>
         <h1 className="cbai-display text-2xl text-zinc-50">CBAI Core</h1>
         <p className="mt-1 max-w-2xl text-sm text-zinc-500">
           Core inference and agent orchestration are not active in this deployment. Use the

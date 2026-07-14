@@ -1,3 +1,5 @@
+import { cbaiPageHeader } from "@/components/brand/brand-classes";
+
 type WorkspaceHeroProps = {
   versionLabel: string;
   title: string;
@@ -19,7 +21,7 @@ export default function WorkspaceHero({
 }: WorkspaceHeroProps) {
   return (
     <>
-      <div className="relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 px-6 py-5">
+      <div className={`relative overflow-hidden ${cbaiPageHeader}`}>
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-sky-500/5 to-violet-500/5"

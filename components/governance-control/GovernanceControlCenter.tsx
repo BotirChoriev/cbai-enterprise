@@ -7,13 +7,14 @@ import {
   GovernancePrinciplesSection,
   GovernanceValidationFlow,
 } from "@/components/governance-control/GovernanceSections";
+import { cbaiPageHeader } from "@/components/brand/brand-classes";
 
 export default function GovernanceControlCenter() {
   const model = useMemo(() => buildGovernanceControlModel(), []);
 
   return (
     <div className="space-y-10">
-      <div className="relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 px-6 py-5">
+      <div className={cbaiPageHeader}>
         <div className="relative">
           <h1 className="cbai-display text-2xl text-zinc-50">Governance</h1>
           <p className="mt-1 max-w-3xl text-sm text-zinc-500">
