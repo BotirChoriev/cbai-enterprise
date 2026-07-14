@@ -50,9 +50,7 @@ export default function ResearchLandscape({
         ) : null}
       </div>
 
-      <div
-        className={`${cbaiGlassCard} relative overflow-hidden bg-gradient-to-b from-slate-950/80 via-slate-950/60 to-slate-950/90 p-4 sm:p-6`}
-      >
+      <div className={`${cbaiGlassCard} relative overflow-hidden p-4 sm:p-6`}>
         <div
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.08),transparent_65%)]"
           aria-hidden="true"

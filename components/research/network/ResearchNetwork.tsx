@@ -258,9 +258,7 @@ export default function ResearchNetwork() {
         </div>
 
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_min(380px,34%)]">
-          <div
-            className={`${cbaiGlassCard} relative overflow-hidden bg-gradient-to-b from-slate-950/90 to-slate-950/70 p-2 sm:p-4`}
-          >
+          <div className={`${cbaiGlassCard} relative overflow-hidden p-2 sm:p-4`}>
             <div
               className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.06),transparent_70%)]"
               aria-hidden="true"

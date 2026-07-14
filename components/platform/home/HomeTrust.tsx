@@ -1,12 +1,15 @@
 import { HomeTrustIcon } from "@/components/platform/home/HomeModuleIcon";
 import { TRUST_PILLARS } from "@/lib/platform-home";
+import { cbaiGlassCard } from "@/components/brand/brand-classes";
 
+// Real, verified fix: this section previously used a raw bg-gradient-to-b from-zinc-900/to-zinc-950
+// utility, which the site-wide light/dark theme override never covers (it targets plain bg-zinc-*
+// utilities, not gradient from-*/to-* stops) — the one section on Home that silently stayed dark
+// while every surrounding section correctly switched to the light palette. cbaiGlassCard already
+// resolves correctly in both themes; no ad-hoc gradient is needed here.
 export default function HomeTrust() {
   return (
-    <section
-      aria-labelledby="home-trust-heading"
-      className="rounded-2xl border border-zinc-800 bg-gradient-to-b from-zinc-900/40 to-zinc-950/80 p-8 sm:p-10"
-    >
+    <section aria-labelledby="home-trust-heading" className={`${cbaiGlassCard} p-8 sm:p-10`}>
       <div className="mb-8 flex items-center gap-3">
         <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900 text-sky-400">
           <HomeTrustIcon className="h-6 w-6" />
