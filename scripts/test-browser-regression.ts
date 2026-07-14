@@ -41,6 +41,10 @@ if (!serverUp) {
     const routes = [
       "/", "/my-work", "/search", "/countries", "/companies", "/universities",
       "/research", "/research/microbiology", "/knowledge", "/reports", "/trust", "/settings", "/about",
+      // /graph regression guard (baseline audit): EntityNode.tsx previously fed entity.icon (a text
+      // badge, e.g. "AAPL"/"MIT"/"US") into an SVG <path d>, throwing a real, reproducible parse
+      // error for every real country/company/university node — confirmed live before the fix.
+      "/graph",
     ];
     for (const route of routes) {
       const page = await browser.newPage();

@@ -25,7 +25,11 @@ export default function EntityNode({
 }: EntityNodeProps) {
   const accent = NODE_TYPE_COLORS[node.type] ?? "#71717a";
   const half = GRAPH_LAYOUT.nodeSize / 2;
-  const iconPath = node.entity.icon ?? entityTypeIconPaths[node.type];
+  // entity.icon is documented as "short code or initials" (a text badge, e.g. "AAPL" — already
+  // shown below via getEntityInitials) — never an SVG path. Feeding it into <path d> was a real,
+  // reproducible bug: every real country/company/university code broke SVG parsing in the browser
+  // (confirmed live on /graph). The type-level icon is the only real SVG path source here.
+  const iconPath = entityTypeIconPaths[node.type];
 
   const opacity = dimmed ? 0.25 : 1;
   const scale = selected ? 1.12 : connected ? 1.05 : 1;
