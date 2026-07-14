@@ -1,7 +1,7 @@
 import type { ResearchNetworkNode } from "@/lib/research/network/network-types";
 import { RESEARCH_NETWORK_STATUS_LABELS } from "@/lib/research/network/network-types";
 
-const DOMAIN_COLORS: Record<string, string> = {
+export const DOMAIN_COLORS: Record<string, string> = {
   "life-sciences": "#22d3ee",
   medicine: "#34d399",
   agriculture: "#84cc16",
