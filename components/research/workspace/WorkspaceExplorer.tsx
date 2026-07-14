@@ -64,7 +64,7 @@ export default function WorkspaceExplorer({
         </Link>
         <div>
           <p className={cbaiSectionEyebrow}>Research Workspace</p>
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-100">
+          <h1 className="cbai-display text-2xl text-zinc-100">
             Research Workspace
           </h1>
           <p className="mt-1 max-w-3xl text-sm text-zinc-500">{WORKSPACE_SHELL_NOTICE}</p>

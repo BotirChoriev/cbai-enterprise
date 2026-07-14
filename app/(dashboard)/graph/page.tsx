@@ -50,7 +50,7 @@ export default function GraphPage() {
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-400/90">
           {GRAPH_PLATFORM.eyebrow}
         </p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl">
+        <h1 className="cbai-display mt-3 text-3xl text-zinc-50 sm:text-4xl">
           {GRAPH_PLATFORM.headline}
         </h1>
         <p className="mt-3 max-w-3xl text-base leading-relaxed text-zinc-400">

@@ -41,7 +41,7 @@ export default function HomeAudience() {
         <p className={cbaiSectionEyebrow}>Who CBAI serves</p>
         <h2
           id="home-audience-heading"
-          className="text-2xl font-semibold tracking-tight text-zinc-50 sm:text-3xl"
+          className="cbai-display text-2xl text-zinc-50 sm:text-3xl"
         >
           Built for the universal process of knowledge
         </h2>

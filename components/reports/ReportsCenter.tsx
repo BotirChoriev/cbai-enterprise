@@ -39,7 +39,7 @@ export default function ReportsCenter() {
             <p className="text-[10px] font-medium uppercase tracking-widest text-cyan-400">
               Continuing review for
             </p>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-50">
+            <h1 className="cbai-display mt-1 text-2xl text-zinc-50">
               {entity.name}
             </h1>
             <p className="mt-2 max-w-2xl text-sm text-zinc-500">
@@ -56,7 +56,7 @@ export default function ReportsCenter() {
           </>
         ) : (
           <>
-            <h1 className="text-2xl font-semibold tracking-tight text-zinc-50">Reports</h1>
+            <h1 className="cbai-display text-2xl text-zinc-50">Reports</h1>
             <p className="mt-1 max-w-2xl text-sm text-zinc-500">
               What you can open today — official information required for each report type.
             </p>

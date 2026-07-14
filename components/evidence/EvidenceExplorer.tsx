@@ -12,7 +12,7 @@ export default function EvidenceExplorer() {
   return (
     <div className="space-y-10">
       <div className={cbaiPageHeader}>
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-50">Evidence</h1>
+        <h1 className="cbai-display text-2xl text-zinc-50">Evidence</h1>
         <p className="mt-1 max-w-3xl text-sm text-zinc-500">
           Official source status and available information across country, company, and university
           profiles.

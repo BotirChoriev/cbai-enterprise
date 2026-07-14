@@ -18,6 +18,30 @@ function read(relativePath: string): string {
   return readFileSync(join(ROOT, relativePath), "utf8");
 }
 
+const SKIP_DIRS = new Set(["node_modules", ".next", ".git", "out", ".audit-scripts"]);
+const SOURCE_EXT = new Set([".ts", ".tsx", ".css"]);
+
+/** Walks app/components/lib and returns the relative path of every file whose content matches
+ * `pattern` — the shared engine behind every whole-codebase regression guard in this file. */
+function scanSourceFiles(pattern: RegExp, dirs: readonly string[] = ["app", "components", "lib"]): string[] {
+  const offenders: string[] = [];
+  function walk(dir: string) {
+    for (const entry of readdirSync(dir)) {
+      if (SKIP_DIRS.has(entry)) continue;
+      const full = join(dir, entry);
+      const stat = statSync(full);
+      if (stat.isDirectory()) {
+        walk(full);
+      } else if (SOURCE_EXT.has(entry.slice(entry.lastIndexOf(".")))) {
+        const content = readFileSync(full, "utf8");
+        if (pattern.test(content)) offenders.push(full.replace(ROOT + "/", ""));
+      }
+    }
+  }
+  for (const dir of dirs) walk(join(ROOT, dir));
+  return offenders;
+}
+
 test("1. OfflineBanner never reports offline from a server render (no `window`) — real fix for a real SSR bug", () => {
   const content = read("components/system/OfflineBanner.tsx");
   assert.match(content, /typeof window !== "undefined" && typeof navigator !== "undefined"/);
@@ -174,27 +198,41 @@ test("18. CBAI has no red — Design Bible Part III.3.1, a permanent regression 
   // means alarm. Walks every real source file (excluding node_modules/.next/scratch) so a future
   // change can't silently reintroduce red/rose Tailwind classes or hex values.
   const RED_PATTERN = /(?:^|[^-\w])(?:red|rose)-\d{3}\b|#(?:ef4444|dc2626|f87171|b91c1c|c94f4f|fca5a5|f43f5e|e11d48|fb7185)\b/i;
-  const SKIP_DIRS = new Set(["node_modules", ".next", ".git", "out", ".audit-scripts"]);
-  const SOURCE_EXT = new Set([".ts", ".tsx", ".css"]);
+  const offenders = scanSourceFiles(RED_PATTERN);
+  assert.deepEqual(offenders, [], `red/rose color usage found in: ${offenders.join(", ")}`);
+});
+
+test("19. Every page-title <h1> uses the CBAI serif display voice — Design Bible Part IV: one typographic voice for statement-scale truth, never blurred with working text", () => {
+  // A prior audit (CBAI Product Transformation, system-consistency mission) found that roughly a
+  // dozen major pages — Countries, Companies, Universities, Research, every research topic page,
+  // Governance, Evidence, Reports, Reasoning, the Knowledge Graph, and every role workspace — had
+  // each hand-copied a plain bold-sans heading instead of the shared serif token, so the exact
+  // same UI role (a page title) rendered in two different typefaces depending on which page you
+  // were on. Regression guard: any <h1> styled with font-semibold but missing cbai-display is a
+  // real, user-visible identity inconsistency, not a style nitpick.
+  const H1_PATTERN = /<h1\s+className="[^"]*font-semibold[^"]*"/g;
   const offenders: string[] = [];
 
   function walk(dir: string) {
     for (const entry of readdirSync(dir)) {
       if (SKIP_DIRS.has(entry)) continue;
       const full = join(dir, entry);
-      const stat = statSync(full);
-      if (stat.isDirectory()) {
+      if (statSync(full).isDirectory()) {
         walk(full);
-      } else if (SOURCE_EXT.has(entry.slice(entry.lastIndexOf(".")))) {
-        const content = readFileSync(full, "utf8");
-        if (RED_PATTERN.test(content)) offenders.push(full.replace(ROOT + "/", ""));
+        continue;
+      }
+      if (!entry.endsWith(".tsx")) continue;
+      const content = readFileSync(full, "utf8");
+      const matches = content.match(H1_PATTERN) ?? [];
+      for (const match of matches) {
+        if (!match.includes("cbai-display")) offenders.push(`${full.replace(ROOT + "/", "")}: ${match}`);
       }
     }
   }
 
-  for (const dir of ["app", "components", "lib"]) {
+  for (const dir of ["app", "components"]) {
     walk(join(ROOT, dir));
   }
 
-  assert.deepEqual(offenders, [], `red/rose color usage found in: ${offenders.join(", ")}`);
+  assert.deepEqual(offenders, [], `page-title <h1> missing cbai-display found in:\n${offenders.join("\n")}`);
 });

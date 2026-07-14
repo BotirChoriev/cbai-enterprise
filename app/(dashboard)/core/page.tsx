@@ -16,7 +16,7 @@ export default function CorePage() {
   return (
     <div className="space-y-8">
       <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-6 py-5">
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-50">CBAI Core</h1>
+        <h1 className="cbai-display text-2xl text-zinc-50">CBAI Core</h1>
         <p className="mt-1 max-w-2xl text-sm text-zinc-500">
           Core inference and agent orchestration are not active in this deployment. Use the
           modules below for live registry intelligence.

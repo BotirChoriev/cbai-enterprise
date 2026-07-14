@@ -163,7 +163,7 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
           <Link href="/my-work" className="text-xs text-cyan-400 hover:text-cyan-300">
             ← My Work
           </Link>
-          <h1 className="mt-2 text-2xl font-semibold text-zinc-50">{project.title}</h1>
+          <h1 className="cbai-display mt-2 text-2xl text-zinc-50">{project.title}</h1>
           <p className="mt-1 text-sm text-zinc-500">{project.description}</p>
           <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
             <span className="rounded-md border border-zinc-800 px-2 py-0.5 uppercase tracking-wider">{translateProjectStatus(t, project.status)}</span>

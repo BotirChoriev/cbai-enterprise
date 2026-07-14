@@ -16,7 +16,7 @@ export default function ResearchHero({ query = "" }: ResearchHeroProps) {
     <header className="space-y-6">
       <div className="space-y-3">
         <p className={cbaiSectionEyebrow}>CBAI Ecosystem · In development</p>
-        <h1 className="text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl">
+        <h1 className="cbai-display text-3xl text-zinc-50 sm:text-4xl">
           {RESEARCH_HOME.title}
         </h1>
         <p className="max-w-2xl text-base leading-relaxed text-zinc-400 sm:text-lg">

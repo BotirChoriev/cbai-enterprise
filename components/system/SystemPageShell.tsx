@@ -40,7 +40,7 @@ export default function SystemPageShell({ eyebrow, title, message, onRetry }: Sy
 
       <div className={`${cbaiGlassCard} w-full max-w-lg space-y-4 p-8`}>
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-400/90">{eyebrow}</p>
-        <h1 className="text-xl font-semibold text-zinc-100">{title}</h1>
+        <h1 className="cbai-display text-xl text-zinc-100">{title}</h1>
         <p className="text-sm leading-relaxed text-zinc-400">{message}</p>
 
         <div className="flex flex-wrap items-center justify-center gap-2 pt-2">

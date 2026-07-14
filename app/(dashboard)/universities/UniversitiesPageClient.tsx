@@ -81,7 +81,7 @@ export default function UniversitiesPageClient() {
   return (
     <div className="space-y-6">
       <div className="rounded-xl border border-cyan-500/10 bg-slate-950/50 px-6 py-5 backdrop-blur-sm">
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-50">Universities</h1>
+        <h1 className="cbai-display text-2xl text-zinc-50">Universities</h1>
         <p className="mt-1 max-w-3xl text-sm text-zinc-500">
           Overview, available information, missing information, and reports for each university.
         </p>
