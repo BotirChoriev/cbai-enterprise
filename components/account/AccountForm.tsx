@@ -425,8 +425,15 @@ function LocalSignedOutView() {
 }
 
 export default function AccountForm() {
-  const { isSignedIn, isCloudSignedIn } = useAuth();
-  const [tab, setTab] = useState<AccountTab>("cloud");
+  const { isSignedIn, isCloudSignedIn, isCloudConfigured } = useAuth();
+  // Default to whichever tab actually works in this deployment. Previously this always opened on
+  // "cloud" — in a deployment with no Supabase project connected (real, honest, and currently the
+  // case in production), that put a real-looking sign-in form in front of every new visitor, with
+  // the "not configured" notice easy to miss above the Email/Password fields. A user could submit
+  // real credentials into a form that was never going to work. isCloudConfigured is a build-time
+  // env-var check (identical on server and client — see lib/supabase/client.ts), so this is safe
+  // to use directly as the initial state with no hydration risk.
+  const [tab, setTab] = useState<AccountTab>(isCloudConfigured ? "cloud" : "local");
 
   return (
     <div className="space-y-4">

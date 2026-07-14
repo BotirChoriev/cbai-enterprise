@@ -145,6 +145,23 @@ if (!serverUp) {
     await page.close();
   });
 
+  test("6. Account page defaults to the tab that actually works in this deployment (regression: previously always opened on Cloud Account, putting a real-looking sign-in form in front of every visitor even when no Supabase project is connected)", async () => {
+    const page = await browser.newPage();
+    await page.goto(BASE + "/account", { waitUntil: "networkidle" });
+    await page.waitForTimeout(800);
+    const bodyText = await page.locator("body").innerText();
+    // "Stays on this device only" is real copy unique to the Device-Local form body — unlike the
+    // page's static header text (present regardless of tab), this only renders when that tab is
+    // actually active, so it's a genuine regression guard, not a string that would pass either way.
+    // This dev environment has no NEXT_PUBLIC_SUPABASE_* configured, so the default tab must be
+    // Device-Local — the same real check (isCloudConfigured) the component itself uses.
+    assert.ok(
+      bodyText.includes("Stays on this device only"),
+      "Cloud is unconfigured here, so the page must default to the Device-Local view, not Cloud",
+    );
+    await page.close();
+  });
+
   test("teardown", async () => {
     await browser.close();
   });
