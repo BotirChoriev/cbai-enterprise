@@ -60,7 +60,7 @@ function CBAIMark({ size = 36, id = "cbai", standalone = false }: { size?: numbe
       role={standalone ? "img" : undefined}
       aria-label={standalone ? LOGO_ACCESSIBLE_NAME : undefined}
       aria-hidden={standalone ? undefined : true}
-      className="shrink-0 drop-shadow-[0_0_6px_rgba(0,88,16,0.25)]"
+      className="shrink-0"
     >
       {gradientDefs(id)}
       <circle className="cbai-mark-glow" cx="32" cy="32" r="30" fill={`url(#${id}-glow)`} />
