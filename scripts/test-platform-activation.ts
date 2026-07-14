@@ -112,8 +112,8 @@ test("9. \"Search intelligence\" / \"Open search\" resolves in all 4 languages �
   assert.equal(resolveAssistantCommand("aramayı aç")?.href, "/search");
 });
 
-test("10. OperatorFigure is an original abstract SVG illustration, never a photorealistic image reference", () => {
-  const content = read("components/shared/OperatorFigure.tsx");
+test("10. OperatorOrb is an original abstract SVG illustration, never a photorealistic image reference", () => {
+  const content = read("components/shared/OperatorOrb.tsx");
   assert.match(content, /<svg/);
   assert.doesNotMatch(content, /\.(png|jpg|jpeg|webp)/i);
   assert.doesNotMatch(content, /<img/);
@@ -121,17 +121,17 @@ test("10. OperatorFigure is an original abstract SVG illustration, never a photo
   assert.match(content, /abstract/i);
 });
 
-test("11. OperatorFigure motion states are real CSS, fully disabled under the saved reduced-motion preference", () => {
+test("11. OperatorOrb motion states are real CSS, fully disabled under the saved reduced-motion preference", () => {
   const css = read("app/globals.css");
-  assert.match(css, /cbai-operator-figure\[data-operator-state="listening"\]/);
-  assert.match(css, /cbai-operator-figure\[data-operator-state="thinking"\]/);
-  assert.match(css, /cbai-operator-figure\[data-operator-state="speaking"\]/);
-  assert.match(css, /\.cbai-reduced-motion \.cbai-operator-figure \* \{\s*animation: none/);
+  assert.match(css, /cbai-operator-orb\[data-operator-state="listening"\]/);
+  assert.match(css, /cbai-operator-orb\[data-operator-state="thinking"\]/);
+  assert.match(css, /cbai-operator-orb\[data-operator-state="speaking"\]/);
+  assert.match(css, /\.cbai-reduced-motion \.cbai-operator-orb \* \{\s*animation: none/);
 });
 
 test("12. AssistantCommandCenter drives the Operator's visual state from the real Web Speech API status, never a decorative loop", () => {
   const content = read("components/assistant/AssistantCommandCenter.tsx");
-  assert.match(content, /operatorFigureState/);
+  assert.match(content, /operatorOrbState/);
   assert.match(content, /voiceStatus === "listening"/);
 });
 

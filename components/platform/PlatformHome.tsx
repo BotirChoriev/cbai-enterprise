@@ -4,6 +4,7 @@ import HomeFooter from "@/components/platform/home/HomeFooter";
 import HomeAssistantGreeting from "@/components/platform/home/HomeAssistantGreeting";
 import HomeIntelligenceGlobe from "@/components/platform/home/HomeIntelligenceGlobe";
 import RoleWorkContextCards from "@/components/platform/home/RoleWorkContextCards";
+import HomeEcosystems from "@/components/platform/home/HomeEcosystems";
 import HomeProjectsSection from "@/components/platform/home/HomeProjectsSection";
 import HomeIntelligenceFeed from "@/components/platform/home/HomeIntelligenceFeed";
 import HomeRecentActivity from "@/components/platform/home/HomeRecentActivity";
@@ -16,9 +17,13 @@ import IntelligenceCompass from "@/components/platform/home/IntelligenceCompass"
 // Operator + Voice as one unified hero (HomeAssistantGreeting — the prominent command bar lives
 // inside that section, never a second, separate widget), (4) the Living Intelligence Network —
 // the real evidence catalog given its own visual moment on Home itself, not just on /countries,
-// (5) Role entry, (6) Current Intelligence (Compass + Feed + Recent activity), (7) Projects, (8)
-// Trust. The marketing/explanation content this page previously carried (Ecosystems, Capability
-// Flow, Audience) was not deleted — moved to /dashboard ("what is available today").
+// (5) Role entry, (6) Ecosystem entrances (Research/Governance/Economic/Public Intelligence — real
+// status per ecosystem, reusing the exact same HomeEcosystems component /dashboard already used;
+// a prior mission removed this from Home to reduce first-screen density, a later mission asked for
+// ecosystem entrances to be visible on Home specifically — restored, not rebuilt, as secondary,
+// below-the-fold content consistent with both instructions), (7) Current Intelligence (Compass +
+// Feed + Recent activity), (8) Projects, (9) Trust. Capability Flow/Audience content stays on
+// /dashboard only — that content is redundant with what's now on Home, not complementary to it.
 export default function PlatformHome() {
   return (
     <div className="home-page min-h-full bg-[#050810] pb-20">
@@ -47,8 +52,12 @@ export default function PlatformHome() {
         <HomeIntelligenceGlobe />
       </div>
 
-      <div className="mx-auto mt-16 max-w-6xl space-y-8 px-4 sm:px-8">
+      <div className="mx-auto mt-16 max-w-6xl space-y-16 px-4 sm:px-8">
         <RoleWorkContextCards />
+        <HomeEcosystems />
+      </div>
+
+      <div className="mx-auto mt-16 max-w-6xl space-y-8 px-4 sm:px-8">
         <IntelligenceCompass />
         <div className="grid gap-6 lg:grid-cols-2">
           <HomeIntelligenceFeed />
