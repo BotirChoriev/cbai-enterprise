@@ -280,7 +280,7 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
                       onClick={() => handleUnlink(entity)}
                       aria-label={`Unlink ${entity.name}`}
                       title={`Unlink ${entity.name}`}
-                      className="rounded-full px-1.5 py-0.5 text-zinc-600 hover:text-red-400"
+                      className="rounded-full px-1.5 py-0.5 text-zinc-600 hover:text-amber-400"
                     >
                       <span aria-hidden="true">×</span>
                     </button>

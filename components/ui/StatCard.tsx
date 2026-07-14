@@ -17,7 +17,7 @@ export default function StatCard({
 }: StatCardProps) {
   const changeColors = {
     positive: "text-emerald-400",
-    negative: "text-red-400",
+    negative: "text-amber-400",
     neutral: "text-zinc-500",
   };
 

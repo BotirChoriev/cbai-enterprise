@@ -15,7 +15,7 @@ function stageAccent(stage: WorkflowStage): string {
     case "evidence_ready_for_review":
       return "border-cyan-500/25 bg-cyan-500/5 text-cyan-300";
     case "review_required":
-      return "border-rose-500/25 bg-rose-500/5 text-rose-300";
+      return "border-amber-600/30 bg-amber-600/10 text-amber-500";
     case "monitoring_required":
       return "border-emerald-500/25 bg-emerald-500/5 text-emerald-300";
     case "unknown":

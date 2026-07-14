@@ -204,7 +204,7 @@ export default function CreateProjectForm({ initialPrimaryEntity, initialType, o
           </div>
         </div>
 
-        {error ? <p className="text-xs text-red-400">{error}</p> : null}
+        {error ? <p className="text-xs text-amber-400">{error}</p> : null}
 
         <button
           type="submit"

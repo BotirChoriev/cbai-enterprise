@@ -7,7 +7,7 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { PROJECT_TYPES } from "@/lib/project/project-types";
@@ -167,4 +167,34 @@ test("17. Every real route has exactly one page.tsx — no duplicate/legacy rout
     assert.ok(existsSync(join(ROOT, `app/(dashboard)/${route}/page.tsx`)), `missing canonical route: ${route}`);
   }
   assert.ok(existsSync(join(ROOT, "app/(dashboard)/page.tsx")), "missing root dashboard page");
+});
+
+test("18. CBAI has no red — Design Bible Part III.3.1, a permanent regression guard", () => {
+  // Every honest error, warning, and limitation is expressed in amber, never in the color that
+  // means alarm. Walks every real source file (excluding node_modules/.next/scratch) so a future
+  // change can't silently reintroduce red/rose Tailwind classes or hex values.
+  const RED_PATTERN = /(?:^|[^-\w])(?:red|rose)-\d{3}\b|#(?:ef4444|dc2626|f87171|b91c1c|c94f4f|fca5a5|f43f5e|e11d48|fb7185)\b/i;
+  const SKIP_DIRS = new Set(["node_modules", ".next", ".git", "out", ".audit-scripts"]);
+  const SOURCE_EXT = new Set([".ts", ".tsx", ".css"]);
+  const offenders: string[] = [];
+
+  function walk(dir: string) {
+    for (const entry of readdirSync(dir)) {
+      if (SKIP_DIRS.has(entry)) continue;
+      const full = join(dir, entry);
+      const stat = statSync(full);
+      if (stat.isDirectory()) {
+        walk(full);
+      } else if (SOURCE_EXT.has(entry.slice(entry.lastIndexOf(".")))) {
+        const content = readFileSync(full, "utf8");
+        if (RED_PATTERN.test(content)) offenders.push(full.replace(ROOT + "/", ""));
+      }
+    }
+  }
+
+  for (const dir of ["app", "components", "lib"]) {
+    walk(join(ROOT, dir));
+  }
+
+  assert.deepEqual(offenders, [], `red/rose color usage found in: ${offenders.join(", ")}`);
 });

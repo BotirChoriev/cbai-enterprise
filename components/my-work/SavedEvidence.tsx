@@ -52,7 +52,7 @@ export default function SavedEvidence({ entities }: SavedEvidenceProps) {
                   type="button"
                   onClick={() => unpinEntityFromWorkspace("evidence", entity.id)}
                   title={`Remove "${entity.name}" from saved evidence`}
-                  className="shrink-0 rounded px-1.5 py-0.5 text-xs text-zinc-600 hover:text-red-400"
+                  className="shrink-0 rounded px-1.5 py-0.5 text-xs text-zinc-600 hover:text-amber-400"
                 >
                   Remove
                 </button>

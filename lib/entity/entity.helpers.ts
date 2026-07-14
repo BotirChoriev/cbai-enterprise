@@ -17,7 +17,7 @@ export function getScoreColor(score: number, inverted = false): string {
   if (effective >= 80) return "text-emerald-400";
   if (effective >= 60) return "text-sky-400";
   if (effective >= 40) return "text-amber-400";
-  return "text-red-400";
+  return "text-amber-600";
 }
 
 /** Background bar color for score progress indicators */
@@ -26,7 +26,7 @@ export function getScoreBarColor(score: number, inverted = false): string {
   if (effective >= 80) return "bg-emerald-500";
   if (effective >= 60) return "bg-sky-500";
   if (effective >= 40) return "bg-amber-500";
-  return "bg-red-500";
+  return "bg-amber-600";
 }
 
 /** Status badge styling */

@@ -38,7 +38,7 @@ export const EDGE_TYPE_CONFIG: EdgeTypeConfig[] = [
   {
     type: "competitor",
     label: "Competitor",
-    color: "#f87171",
+    color: "#d97706",
     strokeDasharray: "6 3",
     active: false,
   },

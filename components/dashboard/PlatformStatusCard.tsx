@@ -17,9 +17,9 @@ const healthStyles: Record<
     text: "text-amber-400",
   },
   blocked: {
-    dot: "bg-red-400",
+    dot: "bg-amber-600",
     label: "Blocked",
-    text: "text-red-400",
+    text: "text-amber-600",
   },
 };
 

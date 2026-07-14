@@ -66,7 +66,7 @@ export default function PinnedEntities({ entities }: PinnedEntitiesProps) {
                 type="button"
                 onClick={() => unpinEntityFromWorkspace(entity.kind, entity.id)}
                 title={`Remove ${entity.name} from workspace`}
-                className="rounded px-1 text-zinc-600 hover:text-red-400"
+                className="rounded px-1 text-zinc-600 hover:text-amber-400"
               >
                 ×
               </button>

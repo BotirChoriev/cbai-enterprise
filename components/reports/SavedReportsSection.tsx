@@ -63,7 +63,7 @@ export default function SavedReportsSection() {
                 deleteReport(report.id);
                 setReports(loadReports());
               }}
-              className="text-xs text-zinc-500 hover:text-red-400"
+              className="text-xs text-zinc-500 hover:text-amber-400"
             >
               Delete
             </button>

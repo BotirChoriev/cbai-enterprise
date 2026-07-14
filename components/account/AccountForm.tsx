@@ -222,7 +222,7 @@ function CloudSignedOutView() {
           </button>
         ) : null}
 
-        {error ? <p className="text-xs text-red-400">{error}</p> : null}
+        {error ? <p className="text-xs text-amber-400">{error}</p> : null}
         {notice ? <p className="text-xs text-emerald-400">{notice}</p> : null}
 
         <button type="submit" disabled={isSubmitting} className={`${cbaiBtnPrimary} disabled:opacity-50`}>
@@ -412,7 +412,7 @@ function LocalSignedOutView() {
           </div>
         ) : null}
 
-        {error ? <p className="text-xs text-red-400">{error}</p> : null}
+        {error ? <p className="text-xs text-amber-400">{error}</p> : null}
 
         <button type="submit" disabled={isSubmitting} className={`${cbaiBtnPrimary} disabled:opacity-50`}>
           {isSubmitting ? "Please wait…" : mode === "sign-in" ? "Sign In" : "Create Account"}

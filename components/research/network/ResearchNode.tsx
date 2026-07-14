@@ -11,7 +11,7 @@ const DOMAIN_COLORS: Record<string, string> = {
   engineering: "#60a5fa",
   "computer-science": "#818cf8",
   "economics-policy": "#f472b6",
-  "social-sciences": "#fb7185",
+  "social-sciences": "#e879f9",
 };
 
 type ResearchNodeProps = {

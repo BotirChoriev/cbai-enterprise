@@ -27,7 +27,7 @@ export const entityTypeAccents: Record<EntityType, string> = {
   university: "text-violet-400 bg-violet-500/10 border-violet-500/20",
   government: "text-amber-400 bg-amber-500/10 border-amber-500/20",
   investor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
-  person: "text-rose-400 bg-rose-500/10 border-rose-500/20",
+  person: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20",
   research_topic: "text-teal-400 bg-teal-500/10 border-teal-500/20",
   project: "text-orange-400 bg-orange-500/10 border-orange-500/20",
 };
@@ -51,7 +51,7 @@ export const tagVariantStyles: Record<string, string> = {
   accent: "border-sky-500/20 bg-sky-500/10 text-sky-400",
   success: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
   warning: "border-amber-500/20 bg-amber-500/10 text-amber-400",
-  danger: "border-red-500/20 bg-red-500/10 text-red-400",
+  danger: "border-amber-600/30 bg-amber-600/10 text-amber-500",
 };
 
 /** Timeline event type color classes */

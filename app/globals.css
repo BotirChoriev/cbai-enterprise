@@ -3,7 +3,9 @@
 /* CBAI Design System 4.0 — the calm "Intelligence" palette is the real default product identity
    now, not an optional light mode: Apple-precision, Bloomberg-professional, NASA-reliable. The
    previous dark navy/cyan look survives only as the explicit "Deep" theme choice (html.theme-dark
-   below), for users who prefer it — never the default a new visitor sees. */
+   below), for users who prefer it — never the default a new visitor sees.
+   Design Bible Part III.3.1: "CBAI has no red." --error intentionally equals --warning — every
+   honest error and limitation is expressed in amber, never in the color that means alarm. */
 :root {
   --background: #f8f6f1;
   --surface: #eef4f2;
@@ -16,7 +18,7 @@
   --trust: #2fbf71;
   --intelligence: #6d28d9;
   --warning: #b45309;
-  --error: #c94f4f;
+  --error: #b45309;
   --navy-deep: #0b1f3a;
   --gold: #c6952f;
   --gold-soft: #f3d38a;
@@ -35,7 +37,7 @@ html.theme-dark {
   --trust: #10b981;
   --intelligence: #8b5cf6;
   --warning: #d97706;
-  --error: #ef4444;
+  --error: #d97706;
 }
 
 @theme inline {

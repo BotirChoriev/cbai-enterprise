@@ -72,7 +72,7 @@ export default function AccountMenu() {
               signOut();
               window.location.href = "/";
             }}
-            className="block w-full rounded-md px-2 py-1.5 text-left text-sm text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-red-300"
+            className="block w-full rounded-md px-2 py-1.5 text-left text-sm text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-amber-300"
           >
             Sign Out
           </button>

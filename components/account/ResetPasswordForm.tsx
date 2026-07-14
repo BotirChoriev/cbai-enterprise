@@ -112,7 +112,7 @@ export default function ResetPasswordForm() {
           />
         </div>
 
-        {error ? <p className="text-xs text-red-400">{error}</p> : null}
+        {error ? <p className="text-xs text-amber-400">{error}</p> : null}
 
         <button type="submit" disabled={isSubmitting} className={`${cbaiBtnPrimary} disabled:opacity-50`}>
           {isSubmitting ? "Saving…" : "Set New Password"}
