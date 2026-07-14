@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
-import CBAILogo, { CBAIMark } from "@/components/brand/CBAILogo";
+import CBAILogo from "@/components/brand/CBAILogo";
 import OperatorOrb from "@/components/shared/OperatorOrb";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { useTranslation } from "@/lib/i18n/use-translation";
@@ -82,19 +82,20 @@ export default function EntryExperience() {
       aria-label="Skip entry animation"
       className="cbai-entry-backdrop fixed inset-0 z-[100] flex flex-col items-center justify-center gap-6 text-left"
     >
+      {/* Design Bible Part II.2.2/2.9: full identity strength — mark plus wordtype — presented
+          exactly once, at the entrance moment, never alongside a second, separate mark instance.
+          A prior version faded in a standalone mark first and then the full lockup beside it,
+          leaving two logo presentations on screen at once for most of the cinematic. */}
       <span className="cbai-entry-stage cbai-entry-stage-1">
-        <CBAIMark size={64} standalone />
-      </span>
-      <span className="cbai-entry-stage cbai-entry-stage-2">
         <CBAILogo size="lg" showTagline />
       </span>
-      <span className="cbai-entry-stage cbai-entry-stage-3">
+      <span className="cbai-entry-stage cbai-entry-stage-2">
         <OperatorOrb state="idle" size={56} />
       </span>
-      <span className="cbai-entry-stage cbai-entry-stage-4 text-sm text-zinc-400">
+      <span className="cbai-entry-stage cbai-entry-stage-3 text-sm text-zinc-400">
         {isActive ? t("home.commandPlaceholder") : t("assistant.greetingSignedOut")}
       </span>
-      <span className="cbai-entry-stage cbai-entry-stage-4 text-xs text-zinc-600">
+      <span className="cbai-entry-stage cbai-entry-stage-3 text-xs text-zinc-600">
         Tap anywhere or press Escape to skip
       </span>
     </button>

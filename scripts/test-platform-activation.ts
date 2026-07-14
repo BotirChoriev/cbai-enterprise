@@ -142,6 +142,11 @@ test("13. Entry Experience is genuinely skippable and respects reduced motion �
   assert.match(content, /sessionStorage/);
   // Server snapshot is always "don't show" — the real homepage beneath it is never gated on this.
   assert.match(content, /getServerSnapshot[\s\S]{0,40}return false/);
+  // Design Bible Part II.2.2/2.9: full identity strength presented exactly once. A prior version
+  // faded in a standalone CBAIMark alongside the full CBAILogo lockup, leaving two logo
+  // presentations on screen at once for most of the cinematic — regression guard.
+  assert.doesNotMatch(content, /CBAIMark/);
+  assert.match(content, /<CBAILogo size="lg" showTagline \/>/);
 });
 
 test("14. ThemeToggle is wired into both the global Topbar and Settings, not a single hidden control", () => {

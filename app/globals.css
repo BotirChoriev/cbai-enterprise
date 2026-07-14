@@ -273,9 +273,8 @@ html:not(.theme-dark) [class*="backdrop-blur"] {
   animation: cbai-entry-fade-up 0.35s ease-out forwards;
 }
 .cbai-entry-stage-1 { animation-delay: 0.05s; }
-.cbai-entry-stage-2 { animation-delay: 0.25s; }
-.cbai-entry-stage-3 { animation-delay: 0.45s; }
-.cbai-entry-stage-4 { animation-delay: 0.65s; }
+.cbai-entry-stage-2 { animation-delay: 0.3s; }
+.cbai-entry-stage-3 { animation-delay: 0.55s; }
 
 /* CBAI Operator Orb motion states — a real, always-present abstract signature (never a face, never
    gendered), subtle by default, purposeful, and entirely disabled under .cbai-reduced-motion (the
