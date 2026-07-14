@@ -172,3 +172,21 @@ test("17. Homepage identity: the CBAI logo appears on the first screen itself, n
   assert.match(home, /<EntryExperience/);
   assert.match(home, /<IntelligenceCompass/);
 });
+
+test("18. CBAI Ecosystem entrances are visible on Home itself, not only /dashboard", () => {
+  const home = read("components/platform/PlatformHome.tsx");
+  assert.match(home, /<HomeEcosystems/);
+});
+
+test("19. Every role card's suggested command is a real phrase resolveAssistantCommand() actually resolves, in every language — never an invented example", async () => {
+  const { resolveAssistantCommand } = await import("@/lib/assistant/assistant-commands");
+  const { ROLE_WORK_CONTEXTS } = await import("@/lib/assistant/role-work-contexts");
+  for (const dict of [en, uz, ru, tr]) {
+    for (const role of ROLE_WORK_CONTEXTS) {
+      const roleCopy = (dict.roles as Record<string, { sampleCommand: string }>)[role.id];
+      assert.ok(roleCopy.sampleCommand.length > 0, `${role.id} is missing a sampleCommand`);
+      const match = resolveAssistantCommand(roleCopy.sampleCommand);
+      assert.ok(match, `"${roleCopy.sampleCommand}" (${role.id}) does not resolve to any real command`);
+    }
+  }
+});

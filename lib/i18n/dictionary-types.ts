@@ -13,6 +13,10 @@ export type RoleCardText = {
   title: string;
   description: string;
   firstAction: string;
+  /** A real, working Operator command phrase for this role — must be a phrase that
+   * resolveAssistantCommand() actually resolves (see lib/assistant/assistant-commands.ts),
+   * never an invented example. */
+  sampleCommand: string;
 };
 
 export type ProjectTypeCopy = {
@@ -46,6 +50,7 @@ export type TranslationDictionary = {
     open: string;
     viewAll: string;
     viewAllCapabilities: string;
+    tryCommand: string;
     learnMore: string;
     generate: string;
     delete: string;

@@ -67,6 +67,14 @@ function RoleCard({
       </div>
       <p className="text-xs leading-relaxed text-zinc-500">{t(`${namespaceKey}.description`)}</p>
       <p className="text-[11px] text-zinc-600">{translateProjectTypeLabel(t, role.primaryProjectType)}</p>
+      {/* Real, verified Operator command (Phase 8) — every sampleCommand value is a phrase
+          resolveAssistantCommand() actually resolves (checked in lib/i18n/dictionaries/*.ts),
+          never an invented example. Illustrative text only, not itself a live control — the real
+          command bar is the one input, never duplicated per card. */}
+      <p className="text-[11px] text-zinc-600">
+        <span className="text-zinc-700">{t("common.tryCommand")}: </span>
+        <span className="italic text-cyan-400/80">&quot;{t(`${namespaceKey}.sampleCommand`)}&quot;</span>
+      </p>
       <div className="mt-auto flex items-center gap-2 pt-1">
         <Link
           href={role.firstActionHref}
