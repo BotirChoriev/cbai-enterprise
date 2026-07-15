@@ -19,9 +19,17 @@ function statusBadgeClass(topic: ResearchTopic["status"]): string {
 
 type ResearchTopicCardProps = {
   topic: ResearchTopic;
+  methodsLabel?: string;
+  evidenceLabel?: string;
+  actionLabel?: string;
 };
 
-export default function ResearchTopicCard({ topic }: ResearchTopicCardProps) {
+export default function ResearchTopicCard({
+  topic,
+  methodsLabel = "Methods",
+  evidenceLabel = "Evidence types",
+  actionLabel = "Open topic",
+}: ResearchTopicCardProps) {
   const topicPath = getResearchTopicPath(topic.topicId);
 
   return (
@@ -44,11 +52,11 @@ export default function ResearchTopicCard({ topic }: ResearchTopicCardProps) {
 
       <dl className="mt-4 space-y-3 border-t border-cyan-500/10 pt-4 text-sm">
         <div>
-          <dt className="text-xs text-zinc-600">Methods</dt>
+          <dt className="text-xs text-zinc-600">{methodsLabel}</dt>
           <dd className="mt-1 text-zinc-400">{topic.relatedMethods.join(" · ")}</dd>
         </div>
         <div>
-          <dt className="text-xs text-zinc-600">Evidence types</dt>
+          <dt className="text-xs text-zinc-600">{evidenceLabel}</dt>
           <dd className="mt-1 text-zinc-400">{topic.relatedEvidenceTypes.join(" · ")}</dd>
         </div>
         <div>
@@ -61,7 +69,7 @@ export default function ResearchTopicCard({ topic }: ResearchTopicCardProps) {
         href={topicPath}
         className="mt-5 inline-flex min-h-10 w-full items-center justify-center rounded-lg border border-cyan-500/25 bg-cyan-500/10 px-4 text-sm font-medium text-cyan-300 transition-colors hover:border-cyan-500/40 hover:bg-cyan-500/15 hover:text-cyan-200"
       >
-        Open topic →
+        {actionLabel} →
       </Link>
     </article>
   );

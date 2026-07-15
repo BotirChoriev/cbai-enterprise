@@ -7,6 +7,7 @@ import WorkspaceCoverageGrid from "@/components/workspaces/WorkspaceCoverageGrid
 import WorkspaceSourceCoverage from "@/components/workspaces/WorkspaceSourceCoverage";
 import WorkspaceEntityLinks from "@/components/workspaces/WorkspaceEntityLinks";
 import RoleProjectEntry from "@/components/workspaces/RoleProjectEntry";
+import InvestorLedger from "@/components/workspaces/InvestorLedger";
 
 export default function InvestorWorkspace() {
   const model = useMemo(() => buildInvestorWorkspace(), []);
@@ -18,6 +19,8 @@ export default function InvestorWorkspace() {
         title={model.hero.title}
         subtitle={model.hero.subtitle}
         description={model.hero.description}
+        accentClassName="text-indigo-400"
+        motif={<InvestorLedger domains={model.investmentEvidenceMap} />}
         metrics={[
           {
             label: "Evidence domains",

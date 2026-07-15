@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import type { Country } from "@/lib/countries";
 import type { CountryUserJourney } from "@/lib/country-user-journey";
 import { getCountryTimelineModel } from "@/lib/timeline";
@@ -47,6 +48,7 @@ export function CountryIntelligencePanel({
   searchQuery,
 }: CountryIntelligencePanelProps) {
   const [showReport, setShowReport] = useState(false);
+  const { context } = usePlatformContext();
   const { profile, evidenceGaps, evidenceComparison } = journey;
   const { registryFacts, coverage } = profile;
   const sourceConnectedCount = countConnectedSources(coverage);
@@ -54,6 +56,37 @@ export function CountryIntelligencePanel({
   const relationships = getCountryRelationships(country);
   const relatedEntityCount = relationships.relatedCompanies.length + relationships.universities.length;
   const openQuestionsCount = evidenceGaps.plannedCount + evidenceGaps.missingCount + evidenceGaps.blockedCount;
+
+  // Governance Intelligence and Economic Intelligence read the same country registry through two
+  // different working orders — not different colors, a different sequence of the same real
+  // sections. A government analyst opens the institutional timeline before anything else; an
+  // economic analyst opens comparables and indicator coverage before anything else. Everyone
+  // else (no workspace, or the Citizen lens) gets the original evidence-first order untouched.
+  const lens = context.workspace === "government" || context.workspace === "investor" ? context.workspace : null;
+
+  const institutionalRecord = (
+    <div className="space-y-4">
+      <TimelineReadinessPanel model={timelineModel} />
+      <TimelineCoverage model={timelineModel} />
+      <TimelineEvidenceGap model={timelineModel} />
+    </div>
+  );
+
+  const comparablesAndCoverage = (
+    <div className="space-y-6">
+      <EntityCompareSection
+        heading="Comparables"
+        description="Benchmark this country against others in the registry before reading the full profile."
+      >
+        <EvidenceComparisonPanel
+          entityType="country"
+          leftLegacyId={country.id}
+          initialModel={evidenceComparison}
+        />
+      </EntityCompareSection>
+      <CountryIndicatorCoverage indicatorsByDomain={coverage.indicatorsByDomain} />
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -114,7 +147,34 @@ export function CountryIntelligencePanel({
         showMethodology={false}
       />
 
-      <TimelineReadinessPanel model={timelineModel} />
+      {lens ? (
+        <div
+          className={`rounded-xl border px-5 py-4 ${
+            lens === "government"
+              ? "border-teal-500/25 bg-teal-500/5"
+              : "border-indigo-500/25 bg-indigo-500/5"
+          }`}
+        >
+          <p
+            className={`text-[10px] font-semibold uppercase tracking-widest ${
+              lens === "government" ? "text-teal-300" : "text-indigo-300"
+            }`}
+          >
+            {lens === "government"
+              ? "Governance Intelligence — institutional record first"
+              : "Economic Intelligence — comparables first"}
+          </p>
+          <p className="mt-1 text-sm text-zinc-400">
+            {lens === "government"
+              ? "Entered from the Government workspace — the evidence timeline and institutional coverage below come before the narrative profile."
+              : "Entered from the Investor workspace — comparables and indicator coverage below come before the narrative profile."}
+          </p>
+        </div>
+      ) : null}
+
+      {lens === "government" ? institutionalRecord : null}
+      {lens === "investor" ? comparablesAndCoverage : null}
+      {!lens ? <TimelineReadinessPanel model={timelineModel} /> : null}
 
       <CountryRelatedResearch country={country} />
 
@@ -131,15 +191,7 @@ export function CountryIntelligencePanel({
       </div>
 
       <EntityOptionalExploration>
-        <EntityCompareSection>
-          <EvidenceComparisonPanel
-            entityType="country"
-            leftLegacyId={country.id}
-            initialModel={evidenceComparison}
-          />
-        </EntityCompareSection>
-
-        <CountryIndicatorCoverage indicatorsByDomain={coverage.indicatorsByDomain} />
+        {lens !== "investor" ? comparablesAndCoverage : null}
 
         <CountrySourceCoverage sources={coverage.sources} />
 
@@ -153,8 +205,9 @@ export function CountryIntelligencePanel({
           <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">
             Timeline detail
           </p>
-          <TimelineCoverage model={timelineModel} />
-          <TimelineEvidenceGap model={timelineModel} />
+          {lens === "investor" ? <TimelineReadinessPanel model={timelineModel} /> : null}
+          {lens !== "government" ? <TimelineCoverage model={timelineModel} /> : null}
+          {lens !== "government" ? <TimelineEvidenceGap model={timelineModel} /> : null}
           <TimelineSources model={timelineModel} />
           <TimelineMethodology model={timelineModel} />
           <TimelineHumanReview model={timelineModel} />

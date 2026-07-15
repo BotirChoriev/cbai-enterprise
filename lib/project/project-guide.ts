@@ -10,6 +10,8 @@
 
 import type { Project } from "@/lib/project/project-types";
 import { loadProjectEntities, loadProjectNotes, loadProjectEvidence } from "@/lib/project/project-store";
+import en from "@/lib/i18n/dictionaries/en";
+import { translate, interpolate } from "@/lib/i18n/translate";
 
 export type ProjectGuideStepId =
   | "add_question"
@@ -27,14 +29,28 @@ export type ProjectGuideStep = {
   href: string;
 };
 
-export function resolveProjectGuideStep(project: Project): ProjectGuideStep {
+export type ProjectGuideTranslator = (path: string, vars?: Record<string, string>) => string;
+
+/** Default translator — the real English dictionary, so every existing caller that doesn't pass
+ * a live `t()` (ProjectList, ProjectGuidePanel, ContextualOperatorBanner, project-commands,
+ * scripts/test-intelligence-guide.ts) keeps getting the exact same English strings this function
+ * always returned, unchanged. */
+const defaultTranslate: ProjectGuideTranslator = (path, vars) => {
+  const raw = translate(en, path);
+  return vars ? interpolate(raw, vars) : raw;
+};
+
+export function resolveProjectGuideStep(
+  project: Project,
+  t: ProjectGuideTranslator = defaultTranslate,
+): ProjectGuideStep {
   const base = `/my-work?project=${project.id}`;
 
   if (!project.researchQuestion?.trim()) {
     return {
       id: "add_question",
-      suggestion: "Add your Research Question",
-      detail: "A clear question focuses everything else you add to this project.",
+      suggestion: t("projectGuide.addQuestionSuggestion"),
+      detail: t("projectGuide.addQuestionDetail"),
       href: `${base}#project-question`,
     };
   }
@@ -42,8 +58,8 @@ export function resolveProjectGuideStep(project: Project): ProjectGuideStep {
   if (!project.objectives?.trim()) {
     return {
       id: "define_objectives",
-      suggestion: "Define Project Objectives",
-      detail: "Objectives describe what this project needs to accomplish.",
+      suggestion: t("projectGuide.defineObjectivesSuggestion"),
+      detail: t("projectGuide.defineObjectivesDetail"),
       href: `${base}#project-objectives`,
     };
   }
@@ -51,8 +67,8 @@ export function resolveProjectGuideStep(project: Project): ProjectGuideStep {
   if (loadProjectEvidence(project.id).length === 0) {
     return {
       id: "collect_evidence",
-      suggestion: "Collect your first Evidence",
-      detail: "Start by adding one verified source.",
+      suggestion: t("projectGuide.collectEvidenceSuggestion"),
+      detail: t("projectGuide.collectEvidenceDetail"),
       href: `${base}#project-evidence`,
     };
   }
@@ -60,8 +76,8 @@ export function resolveProjectGuideStep(project: Project): ProjectGuideStep {
   if (loadProjectEntities(project.id).length === 0) {
     return {
       id: "link_entity",
-      suggestion: "Link a related Country, Company or University",
-      detail: "Connect this project to the real entities it's about.",
+      suggestion: t("projectGuide.linkEntitySuggestion"),
+      detail: t("projectGuide.linkEntityDetail"),
       href: `${base}#project-entities`,
     };
   }
@@ -69,8 +85,8 @@ export function resolveProjectGuideStep(project: Project): ProjectGuideStep {
   if (loadProjectNotes(project.id).length === 0) {
     return {
       id: "document_findings",
-      suggestion: "Document your findings",
-      detail: "Notes capture what you've learned so far, in your own words.",
+      suggestion: t("projectGuide.documentFindingsSuggestion"),
+      detail: t("projectGuide.documentFindingsDetail"),
       href: `${base}#project-notes`,
     };
   }
@@ -78,16 +94,16 @@ export function resolveProjectGuideStep(project: Project): ProjectGuideStep {
   if (!project.reportGeneratedAt) {
     return {
       id: "generate_report",
-      suggestion: "Generate your first Report",
-      detail: "Assemble everything you've gathered so far into one real report.",
+      suggestion: t("projectGuide.generateReportSuggestion"),
+      detail: t("projectGuide.generateReportDetail"),
       href: `${base}#project-report`,
     };
   }
 
   return {
     id: "ready",
-    suggestion: "Every guided milestone is complete",
-    detail: "Keep adding evidence, notes, and tasks whenever you're ready to continue.",
+    suggestion: t("projectGuide.readySuggestion"),
+    detail: t("projectGuide.readyDetail"),
     href: base,
   };
 }

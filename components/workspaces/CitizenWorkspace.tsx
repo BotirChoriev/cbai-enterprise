@@ -6,6 +6,7 @@ import WorkspaceHero from "@/components/workspaces/WorkspaceHero";
 import WorkspaceCoverageGrid from "@/components/workspaces/WorkspaceCoverageGrid";
 import WorkspaceSourceCoverage from "@/components/workspaces/WorkspaceSourceCoverage";
 import RoleProjectEntry from "@/components/workspaces/RoleProjectEntry";
+import CitizenTopicWheel from "@/components/workspaces/CitizenTopicWheel";
 
 export default function CitizenWorkspace() {
   const model = useMemo(() => buildCitizenWorkspace(), []);
@@ -17,6 +18,8 @@ export default function CitizenWorkspace() {
         title={model.hero.title}
         subtitle={model.hero.subtitle}
         description={model.hero.description}
+        accentClassName="text-[#e2a878]"
+        motif={<CitizenTopicWheel topics={model.topics} />}
         metrics={[
           {
             label: "Citizen topics",

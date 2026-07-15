@@ -13,12 +13,10 @@ import EntryExperience from "@/components/platform/entry/EntryExperience";
 import CBAILogo from "@/components/brand/CBAILogo";
 import IntelligenceCompass from "@/components/platform/home/IntelligenceCompass";
 
-// The first screen — one unified, asymmetric hero (identity + Operator + voice command on one
-// side, the Living Intelligence Network large and co-equal on the other), not a narrow centered
-// column stacked above a separate "network" section reached by scrolling. This directly
-// implements the Design Bible's Part IX law that the Globe is the emotional centerpiece, not
-// decoration reached after a divider — and Part X's homepage timeline, which asks the first
-// screen to communicate identity, evidence, and an invitation to act within one glance. Below the
+// The first screen is one environment, not a widget beside a card. The console (identity,
+// Operator, voice) sits in front of the real six-domain Intelligence Network, which bleeds past
+// the console's own edge rather than being boxed beside it in a clean 50/50 grid split — you are
+// meant to read this as "standing inside the network," not "text next to a diagram." Below the
 // hero: (5) Role entry, (6) Ecosystem entrances (Research/Governance/Economic/Public Intelligence
 // — real status per ecosystem, reusing the exact same HomeEcosystems component /dashboard already
 // used), (7) Current Intelligence (Compass + Feed + Recent activity), (8) Projects, (9) Trust.
@@ -37,14 +35,30 @@ export default function PlatformHome() {
         <CBAILogo size="sm" showTagline className="hidden sm:flex" />
       </div>
 
-      <div className="mx-auto grid max-w-7xl items-center gap-16 px-4 pb-4 pt-8 sm:px-8 sm:pt-12 lg:grid-cols-[1fr_1.15fr] lg:gap-10 lg:pt-16">
-        <HomeAssistantGreeting />
-        <div className="cbai-hero-reveal-delayed">
-          <HomeIntelligenceGlobe />
+      {/* overflow-x-hidden lives on this outer, full-bleed wrapper — not on the max-w-7xl
+          container inside it — so the Intelligence Network can genuinely bleed past its own
+          column edge on wide screens without ever producing a horizontal scrollbar. */}
+      <div className="relative overflow-x-hidden">
+        <div className="relative mx-auto max-w-7xl px-4 pb-4 pt-8 sm:px-8 sm:pt-12 lg:pt-16">
+          <div className="relative z-10 max-w-xl lg:max-w-lg">
+            <HomeAssistantGreeting />
+          </div>
+
+          <div className="cbai-hero-reveal-delayed relative z-0 mt-14 h-[420px] w-full lg:absolute lg:inset-y-[-8%] lg:right-[-14%] lg:z-0 lg:mt-0 lg:h-auto lg:w-[82%]">
+            <HomeIntelligenceGlobe />
+          </div>
         </div>
       </div>
 
-      <div className="mx-auto mt-20 max-w-6xl space-y-16 px-4 sm:mt-28 sm:px-8">
+      {/* Real work continuity comes immediately after the hero's own "next step" link — before
+          role selection or ecosystem entrances — because "what was I already doing" outranks
+          "what kind of user am I" the moment real projects exist. Same real ProjectList as
+          before, just promoted; still honestly empty for a first-time visitor. */}
+      <div className="mx-auto mt-16 max-w-6xl px-4 sm:mt-20 sm:px-8">
+        <HomeProjectsSection />
+      </div>
+
+      <div className="mx-auto mt-16 max-w-6xl space-y-16 px-4 sm:mt-20 sm:px-8">
         <RoleWorkContextCards />
         <HomeEcosystems />
       </div>
@@ -55,7 +69,6 @@ export default function PlatformHome() {
           <HomeIntelligenceFeed />
           <HomeRecentActivity />
         </div>
-        <HomeProjectsSection />
         <HomeTrust />
       </div>
 

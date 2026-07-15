@@ -3,7 +3,9 @@
 import { useMemo, useState } from "react";
 import ResearchDomainFilter from "@/components/research/ResearchDomainFilter";
 import ResearchTopicCard from "@/components/research/ResearchTopicCard";
+import ResearchDomainMotif from "@/components/research/ResearchDomainMotif";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { getResearchDomainLens } from "@/lib/research/domain-lens";
 import {
   filterResearchTopics,
   getResearchTopicCountByDomain,
@@ -30,18 +32,46 @@ export default function ResearchTopicCatalog({ initialQuery = "" }: ResearchTopi
     [filterQuery, selectedDomain],
   );
 
+  const lens = getResearchDomainLens(selectedDomain);
+  const domainTopics = useMemo(
+    () => (selectedDomain === "all" ? [] : RESEARCH_TOPICS.filter((t) => t.domainId === selectedDomain)),
+    [selectedDomain],
+  );
+
   return (
     <section aria-labelledby="research-catalog-heading" className="space-y-6">
-      <div className="space-y-2">
-        <p className={cbaiSectionEyebrow}>Research topics catalog</p>
-        <h2 id="research-catalog-heading" className="text-2xl font-semibold text-zinc-50">
-          Browse research domains and topics
-        </h2>
-        <p className="max-w-2xl text-sm leading-relaxed text-zinc-400">
-          Structured read-only catalog with detail pages for each research topic. No live
-          databases, publications, or researcher profiles are connected.
-        </p>
-      </div>
+      {lens.ecosystemLabel ? (
+        <div className={`${cbaiGlassCard} relative overflow-hidden p-6`}>
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0"
+            style={{ background: `radial-gradient(ellipse at top right, ${lens.accent.glow}, transparent 60%)` }}
+          />
+          <div className="relative grid items-center gap-8 lg:grid-cols-[1.05fr_1fr]">
+            <div>
+              <p className={`text-[10px] font-medium uppercase tracking-widest ${lens.accent.text}`}>
+                {lens.ecosystemLabel}
+              </p>
+              <h2 id="research-catalog-heading" className="cbai-display mt-2 text-2xl text-zinc-50">
+                {lens.ecosystemLabel}
+              </h2>
+              <p className="mt-2 max-w-xl text-sm leading-relaxed text-zinc-400">{lens.atmosphere}</p>
+            </div>
+            <ResearchDomainMotif topics={domainTopics} lineColor={lens.accent.line} />
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          <p className={cbaiSectionEyebrow}>Research topics catalog</p>
+          <h2 id="research-catalog-heading" className="text-2xl font-semibold text-zinc-50">
+            Browse research domains and topics
+          </h2>
+          <p className="max-w-2xl text-sm leading-relaxed text-zinc-400">
+            Structured read-only catalog with detail pages for each research topic. No live
+            databases, publications, or researcher profiles are connected.
+          </p>
+        </div>
+      )}
 
       <div className={`${cbaiGlassCard} space-y-4 p-4`}>
         <label htmlFor="catalog-filter" className="sr-only">
@@ -85,7 +115,12 @@ export default function ResearchTopicCatalog({ initialQuery = "" }: ResearchTopi
         <ul className="grid gap-4 sm:grid-cols-2">
           {filteredTopics.map((topic) => (
             <li key={topic.topicId}>
-              <ResearchTopicCard topic={topic} />
+              <ResearchTopicCard
+                topic={topic}
+                methodsLabel={lens.methodsLabel}
+                evidenceLabel={lens.evidenceLabel}
+                actionLabel={lens.actionLabel}
+              />
             </li>
           ))}
         </ul>

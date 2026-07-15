@@ -6,6 +6,7 @@ import WorkspaceHero from "@/components/workspaces/WorkspaceHero";
 import WorkspaceCoverageGrid from "@/components/workspaces/WorkspaceCoverageGrid";
 import WorkspaceSourceCoverage from "@/components/workspaces/WorkspaceSourceCoverage";
 import RoleProjectEntry from "@/components/workspaces/RoleProjectEntry";
+import GovernmentGrid from "@/components/workspaces/GovernmentGrid";
 
 export default function GovernmentWorkspace() {
   const model = useMemo(() => buildGovernmentWorkspace(), []);
@@ -17,6 +18,8 @@ export default function GovernmentWorkspace() {
         title={model.hero.title}
         subtitle={model.hero.subtitle}
         description={model.hero.description}
+        accentClassName="text-teal-400"
+        motif={<GovernmentGrid domains={model.governanceCoverage} />}
         metrics={[
           {
             label: "Domains tracked",

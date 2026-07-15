@@ -5,6 +5,7 @@ import Link from "next/link";
 import { loadProjects, loadProjectEvidence, loadProjectEntities } from "@/lib/project/project-store";
 import { loadReports } from "@/lib/reports/reports-store";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { translateProjectTypeLabel } from "@/lib/i18n/project-translation";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
@@ -35,10 +36,16 @@ type FeedItem = {
  */
 export default function HomeIntelligenceFeed() {
   const { t } = useTranslation();
+  // Real hydration-mismatch guard (the same fix ProjectList.tsx already documents, applied here
+  // too — found via actual browser testing: creating a project and returning to Home triggered a
+  // real "server rendered `<div>`, client rendered `<ul>`" mismatch, because loadProjects() was
+  // read unconditionally in a useMemo with no server/client parity check).
+  const hydrated = useHydrated();
   // Re-derived whenever the interface language changes (not a one-time useState) — category/
   // sourceLabel are real translated strings, so a language switch must not leave this feed
   // showing stale text from whichever language was active when the component first mounted.
   const items = useMemo<FeedItem[]>(() => {
+    if (!hydrated) return [];
     const projectItems: FeedItem[] = loadProjects()
       .slice(0, 4)
       .map((project) => {
@@ -70,7 +77,7 @@ export default function HomeIntelligenceFeed() {
       }));
 
     return [...projectItems, ...reportItems].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 6);
-  }, [t]);
+  }, [t, hydrated]);
 
   return (
     <section aria-labelledby="home-feed-heading" className={`${cbaiGlassCard} space-y-3 p-5`}>

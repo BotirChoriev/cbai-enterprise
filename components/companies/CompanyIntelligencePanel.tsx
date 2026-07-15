@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import type { Company } from "@/lib/companies";
 import type { CompanyUserJourney } from "@/lib/company-user-journey";
 import { buildEntityReport } from "@/lib/entity/entity-report";
@@ -35,6 +36,7 @@ type CompanyIntelligencePanelProps = {
 
 export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligencePanelProps) {
   const [showReport, setShowReport] = useState(false);
+  const { context } = usePlatformContext();
   const { profile, evidenceGaps, evidenceComparison } = journey;
   const { registryFacts, coverage } = profile;
   const sourceConnectedCount = countConnectedSources(coverage);
@@ -42,6 +44,28 @@ export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligen
   const relatedEntityCount =
     (relationships.headquartersCountry ? 1 : 0) + relationships.universities.length;
   const openQuestionsCount = evidenceGaps.plannedCount + evidenceGaps.missingCount + evidenceGaps.blockedCount;
+
+  // Economic Intelligence reads this same company registry with comparables and indicator
+  // coverage promoted before the narrative profile — the same real sections as the default
+  // order, just sequenced the way an economic analyst actually works: benchmark first, read
+  // the profile second. No workspace (or the Citizen lens) keeps the original order untouched.
+  const isEconomicLens = context.workspace === "investor";
+
+  const comparablesAndCoverage = (
+    <div className="space-y-6">
+      <EntityCompareSection
+        heading="Comparables"
+        description="Benchmark this company against others in the registry before reading the full profile."
+      >
+        <EvidenceComparisonPanel
+          entityType="company"
+          leftLegacyId={company.id}
+          initialModel={evidenceComparison}
+        />
+      </EntityCompareSection>
+      <CompanyIndicatorCoverage indicatorsByDomain={coverage.indicatorsByDomain} />
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -96,6 +120,21 @@ export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligen
         showMethodology={false}
       />
 
+      {isEconomicLens ? (
+        <>
+          <div className="rounded-xl border border-indigo-500/25 bg-indigo-500/5 px-5 py-4">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-indigo-300">
+              Economic Intelligence — comparables first
+            </p>
+            <p className="mt-1 text-sm text-zinc-400">
+              Entered from the Investor workspace — comparables and indicator coverage below come
+              before the narrative profile.
+            </p>
+          </div>
+          {comparablesAndCoverage}
+        </>
+      ) : null}
+
       <CompanyRelatedResearch company={company} />
 
       <EntityReportsAvailable reports={journey.reports} entityLabel="company" />
@@ -111,15 +150,7 @@ export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligen
       </div>
 
       <EntityOptionalExploration>
-        <EntityCompareSection>
-          <EvidenceComparisonPanel
-            entityType="company"
-            leftLegacyId={company.id}
-            initialModel={evidenceComparison}
-          />
-        </EntityCompareSection>
-
-        <CompanyIndicatorCoverage indicatorsByDomain={coverage.indicatorsByDomain} />
+        {!isEconomicLens ? comparablesAndCoverage : null}
 
         <CompanySourceCoverage sources={coverage.sources} />
 

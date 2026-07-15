@@ -110,6 +110,22 @@ export type TranslationDictionary = {
     feedYourSavedReports: string;
     feedSavedReport: string;
     feedEvidenceAndEntities: string;
+    destOpenMyWork: string;
+    destSearchIntelligence: string;
+    destExploreCountries: string;
+    destReviewEvidence: string;
+    destExploreResearch: string;
+    destExploreCompanies: string;
+    destExploreUniversities: string;
+    destResearchWorkspace: string;
+    destReviewStandards: string;
+    destInvestorWorkspace: string;
+    destReviewInstitutions: string;
+    destGovernmentWorkspace: string;
+    destOpenReports: string;
+    destOpenDashboard: string;
+    destOpenTrust: string;
+    destCitizenWorkspace: string;
   };
   project: {
     createProject: string;
@@ -228,6 +244,13 @@ export type TranslationDictionary = {
   assistant: {
     greetingSignedOut: string;
     greetingReturning: string;
+    operatorReadyWorkspace: string;
+    operatorReadySignedOut: string;
+    nextStepCompleteSetup: string;
+    nextStepContinueViewing: string;
+    nextStepOpenWorkspace: string;
+    continuingEyebrow: string;
+    continuingEntitySubtitle: string;
     timeOfDayMorning: string;
     timeOfDayAfternoon: string;
     timeOfDayEvening: string;
@@ -249,6 +272,46 @@ export type TranslationDictionary = {
     notFound: string;
     couldNotSave: string;
     tryAgain: string;
+  };
+  /** Translated mirror of lib/project/project-guide.ts's 7 real guide steps — previously
+   * English-only because the step text only ever lived buried inside a small card (ProjectList).
+   * BUILD-009's continuity-first homepage promotes this same real text to the primary headline,
+   * so it now needs to be real in every language, not just English. */
+  projectGuide: {
+    addQuestionSuggestion: string;
+    addQuestionDetail: string;
+    defineObjectivesSuggestion: string;
+    defineObjectivesDetail: string;
+    collectEvidenceSuggestion: string;
+    collectEvidenceDetail: string;
+    linkEntitySuggestion: string;
+    linkEntityDetail: string;
+    documentFindingsSuggestion: string;
+    documentFindingsDetail: string;
+    generateReportSuggestion: string;
+    generateReportDetail: string;
+    readySuggestion: string;
+    readyDetail: string;
+  };
+  /** Translated mirror of lib/assistant/assistant-profile.ts WORKSPACE_ROLE_LABELS — one real
+   * label per WorkspaceRole, used anywhere that label is shown to the user (e.g. the homepage
+   * greeting subtitle), instead of the English-only Record previously read from directly. */
+  workspaceRoles: {
+    citizen: string;
+    student: string;
+    researcher: string;
+    professor: string;
+    academic: string;
+    engineer: string;
+    investor: string;
+    company: string;
+    university: string;
+    research_center: string;
+    government: string;
+    administrator: string;
+    economist: string;
+    legal: string;
+    social_sector: string;
   };
 };
 

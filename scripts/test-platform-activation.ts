@@ -178,22 +178,28 @@ test("17. Homepage identity: the CBAI logo appears on the first screen itself, n
   assert.match(home, /<IntelligenceCompass/);
 });
 
-test("21. Homepage hero: the Living Intelligence Network is one co-equal asymmetric hero with the Operator greeting, not a separate section reached after a divider", () => {
+test("21. Homepage hero: the Living Intelligence Network is one environment with the Operator console, not a separate section reached after a divider", () => {
   const home = read("components/platform/PlatformHome.tsx");
-  // The greeting and the globe render inside one shared grid container, never split by a
-  // "Your workspace" hairline divider between two independently-centered sections.
-  assert.match(home, /lg:grid-cols-\[1fr_1\.15fr\]/);
+  // The greeting and the network render inside the same overflow-guarded hero wrapper, never
+  // split by a "Your workspace" hairline divider between two independently-centered sections.
+  assert.match(home, /overflow-x-hidden/);
   assert.doesNotMatch(home, /Your workspace/);
   const greetingIndex = home.indexOf("<HomeAssistantGreeting");
   const globeIndex = home.indexOf("<HomeIntelligenceGlobe");
   assert.ok(greetingIndex > -1 && globeIndex > -1, "both hero components must render");
-  assert.ok(globeIndex - greetingIndex < 200, "greeting and globe must be direct siblings in the same hero grid");
+  assert.ok(globeIndex - greetingIndex < 400, "greeting and network must be direct siblings in the same hero wrapper");
 
-  // The Globe itself is now hero-scale (Design Bible Part IX: emotional centerpiece, not a small
-  // diagram) and node weight reflects real ProductStatus data, never a fabricated number.
+  // BUILD-009: the Network now represents all six real intelligence domains (Research,
+  // Governance, Countries, Companies, Universities, Evidence), each hub sized by its own real
+  // registered count from buildIntelligenceHubs() — never a single "Countries only" diagram, and
+  // never a fabricated number.
   const globe = read("components/platform/home/HomeIntelligenceGlobe.tsx");
-  assert.match(globe, /viewBox="0 0 480 480"/);
-  assert.match(globe, /STATUS_WEIGHT/);
+  assert.match(globe, /buildIntelligenceHubs/);
+  assert.match(globe, /totalIntelligenceItems/);
+  const network = read("lib/platform/intelligence-network.ts");
+  for (const domain of ["research", "governance", "countries", "companies", "universities", "evidence"]) {
+    assert.match(network, new RegExp(`id: "${domain}"`));
+  }
 });
 
 test("18. CBAI Ecosystem entrances are visible on Home itself, not only /dashboard", () => {

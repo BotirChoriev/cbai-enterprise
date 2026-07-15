@@ -1,11 +1,17 @@
+"use client";
+
 import Link from "next/link";
 import type { WorkspaceEntityLink } from "@/lib/workspaces";
+import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
+import { buildContextualHref } from "@/lib/context";
 
 type WorkspaceEntityLinksProps = {
   links: readonly WorkspaceEntityLink[];
 };
 
 export default function WorkspaceEntityLinks({ links }: WorkspaceEntityLinksProps) {
+  const { context } = usePlatformContext();
+
   return (
     <section className="space-y-4" aria-labelledby="workspace-entity-links-heading">
       <div>
@@ -16,7 +22,9 @@ export default function WorkspaceEntityLinks({ links }: WorkspaceEntityLinksProp
           Entity Links
         </h2>
         <p className="mt-1 text-sm text-zinc-500">
-          Navigate to entity intelligence routes — registry facts and coverage status only.
+          Navigate to entity intelligence routes — registry facts and coverage status only. This
+          workspace&apos;s working order carries over: the entity page opens with comparables and
+          coverage first, not the narrative profile.
         </p>
       </div>
 
@@ -29,7 +37,7 @@ export default function WorkspaceEntityLinks({ links }: WorkspaceEntityLinksProp
             <div className="flex items-start justify-between gap-3">
               <h3 className="text-sm font-semibold text-zinc-100">{link.label}</h3>
               <Link
-                href={link.route}
+                href={buildContextualHref(link.route, context)}
                 className="shrink-0 text-xs text-cyan-400 underline-offset-2 hover:underline"
               >
                 Open

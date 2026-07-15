@@ -2,125 +2,130 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { buildWorldIntelligenceMap } from "@/lib/world-map";
-import { PRODUCT_STATUS_DOT_CLASSES } from "@/lib/product-status";
+import { buildIntelligenceHubs, totalIntelligenceItems } from "@/lib/platform/intelligence-network";
 
-const STATUS_FILL: Record<string, string> = {
-  "bg-emerald-400": "#34d399",
-  "bg-cyan-400": "#22d3ee",
-  "bg-amber-400": "#fbbf24",
-  "bg-violet-400": "#a78bfa",
-  "bg-orange-400": "#fb923c",
-  "bg-zinc-600": "#52525b",
-  "bg-zinc-500": "#71717a",
-};
+const HUB_MIN_RADIUS = 15;
+const HUB_SCALE = 3.1;
 
-// Design Bible Part IX.9.3: node weight reflects real evidence density, never a purely aesthetic
-// choice. "live" (a fully connected, real-data country) reads as the most present node on the
-// network; "planned"/"not_connected" read as the quietest — a real signal drawn from the same
-// ProductStatus every country profile already honestly discloses, never an invented number.
-const STATUS_WEIGHT: Record<string, number> = {
-  live: 1,
-  partial: 0.82,
-  waiting_for_verified_data: 0.68,
-  preview: 0.6,
-  restricted: 0.55,
-  not_connected: 0.42,
-  planned: 0.42,
-};
+function hubRadius(count: number): number {
+  return HUB_MIN_RADIUS + Math.sqrt(count) * HUB_SCALE;
+}
 
 /**
- * The Living Intelligence Network — the emotional centerpiece of the homepage (Design Bible Part
- * IX), not a diagram tucked below a divider. A curated, radial view of the real catalog around
- * one evidence core — real country names, real connected-source status, zero fabricated
- * coordinates or geography (this repository has no map/geo-data library; a radial layout makes no
- * geographic claim, unlike a hand-approximated world shape would). Breathes via the same slow,
- * shared 4.5s rhythm already used by the Operator orb and the CBAI mark (Design Bible Part VI.6.1)
- * — one motion language across the whole product, not a fourth invented for this one visual.
+ * The Living Intelligence Network — not a Countries diagram wearing the platform's name. Six real
+ * domains (Research, Governance, Countries, Companies, Universities, Evidence), one real evidence
+ * core, each hub sized by its own real registered count (never invented, never rounded up — a
+ * PlatformHome bug this replaces: the previous version drew only Countries, which quietly told
+ * every visitor CBAI is a country database). Meant to be rendered as an ambient field behind the
+ * console (see PlatformHome.tsx), not a boxed widget beside it — this is the room the console
+ * sits inside, so it fills whatever container it's given rather than centering itself in one.
+ * Breathes on the same shared 4.5s rhythm as the Operator orb and CBAI mark (Design Bible Part
+ * VI.6.1) — one motion language, not a second one invented for this visual.
  */
 export default function HomeIntelligenceGlobe() {
-  const allCountries = useMemo(() => buildWorldIntelligenceMap().flatMap((group) => group.countries), []);
-  const regionCount = useMemo(() => new Set(allCountries.map((c) => c.country.region)).size, [allCountries]);
-  const [hovered, setHovered] = useState<string | null>(null);
+  const hubs = useMemo(() => buildIntelligenceHubs(), []);
+  const total = useMemo(() => totalIntelligenceItems(hubs), [hubs]);
+  const [active, setActive] = useState<string | null>(null);
 
-  const radius = 220;
-  const center = 240;
-  const nodes = allCountries.map((entry, index) => {
-    const angle = (index / allCountries.length) * Math.PI * 2 - Math.PI / 2;
-    const weight = STATUS_WEIGHT[entry.status] ?? 0.5;
+  const size = 640;
+  const center = size / 2;
+  const radius = size * 0.34;
+  const nodes = hubs.map((hub, index) => {
+    const angle = (index / hubs.length) * Math.PI * 2 - Math.PI / 2;
     const x = center + radius * Math.cos(angle);
     const y = center + radius * Math.sin(angle);
-    const fill = STATUS_FILL[PRODUCT_STATUS_DOT_CLASSES[entry.status]] ?? "#52525b";
-    return { ...entry, x, y, fill, weight };
+    return { ...hub, x, y, r: hubRadius(hub.count) };
   });
 
+  const activeNode = nodes.find((n) => n.id === active) ?? null;
+
   return (
-    <div className="relative mx-auto flex w-full max-w-[640px] items-center justify-center lg:mx-0 lg:max-w-none">
-      {/* Ambient glow — light radiating from the core outward (Design Bible Part III.3.4), the
-          same reasoning as the Operator orb's own light: it brings its own, never a borrowed
-          drop-shadow. */}
+    <div className="relative h-full w-full">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle,rgba(47,191,113,0.16),transparent_68%)] sm:h-[520px] sm:w-[520px]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(47,191,113,0.14),transparent_65%)]"
       />
 
       <svg
-        className="cbai-globe-breathe relative h-auto w-full max-w-[420px] text-[#2fbf71] sm:max-w-[500px]"
-        viewBox="0 0 480 480"
+        aria-hidden="true"
+        className="cbai-globe-breathe pointer-events-none absolute inset-0 h-full w-full text-[#2fbf71]"
+        viewBox={`0 0 ${size} ${size}`}
+        preserveAspectRatio="xMidYMid meet"
         fill="none"
-        role="img"
-        aria-label={`Living Intelligence Network: ${allCountries.length} countries across ${regionCount} regions, connected to one real evidence core`}
       >
-        <circle cx={center} cy={center} r={radius} stroke="currentColor" strokeWidth="1" opacity="0.12" />
-        <circle cx={center} cy={center} r={radius * 0.62} stroke="currentColor" strokeWidth="1" opacity="0.08" />
+        <circle cx={center} cy={center} r={radius} stroke="currentColor" strokeWidth="1" opacity="0.1" />
         {nodes.map((node) => (
           <line
-            key={`line-${node.country.id}`}
+            key={`line-${node.id}`}
             x1={center}
             y1={center}
             x2={node.x}
             y2={node.y}
             stroke="currentColor"
             strokeWidth="1"
-            opacity={hovered === node.country.id ? 0.55 : 0.16 + node.weight * 0.14}
+            opacity={active === node.id ? 0.6 : 0.18}
           />
         ))}
-        <circle cx={center} cy={center} r="14" fill="currentColor" opacity="0.95" />
-        <circle cx={center} cy={center} r="22" stroke="currentColor" strokeWidth="1" opacity="0.4" />
-        <circle cx={center} cy={center} r="30" stroke="currentColor" strokeWidth="1" opacity="0.2" />
-        {nodes.map((node) => {
-          const r = 3 + node.weight * 4.5;
-          const isHovered = hovered === node.country.id;
-          return (
-            <g
-              key={node.country.id}
-              className="cursor-pointer"
-              onMouseEnter={() => setHovered(node.country.id)}
-              onMouseLeave={() => setHovered((current) => (current === node.country.id ? null : current))}
-            >
-              <circle cx={node.x} cy={node.y} r={r + 9} fill="transparent" />
-              <circle cx={node.x} cy={node.y} r={isHovered ? r * 1.35 : r} fill={node.fill} opacity={isHovered ? 1 : 0.85 + node.weight * 0.15} />
-              <circle cx={node.x} cy={node.y} r={r + 5} stroke={node.fill} strokeWidth="1" opacity={isHovered ? 0.6 : 0.3} />
-            </g>
-          );
-        })}
+        <circle cx={center} cy={center} r="16" fill="currentColor" opacity="0.95" />
+        <circle cx={center} cy={center} r="26" stroke="currentColor" strokeWidth="1" opacity="0.4" />
+        <circle cx={center} cy={center} r="36" stroke="currentColor" strokeWidth="1" opacity="0.2" />
+        {nodes.map((node) => (
+          <circle
+            key={`dot-${node.id}`}
+            cx={node.x}
+            cy={node.y}
+            r={node.r}
+            fill="currentColor"
+            opacity={active === node.id ? 1 : 0.22}
+            stroke="currentColor"
+            strokeWidth="1"
+          />
+        ))}
       </svg>
 
-      {hovered ? (
-        <Link
-          href={nodes.find((n) => n.country.id === hovered)?.href ?? "/countries"}
-          className="absolute bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-emerald-500/30 bg-[#050810]/90 px-3.5 py-1.5 text-xs font-medium text-emerald-300 shadow-lg backdrop-blur-sm lg:bottom-6"
-        >
-          {nodes.find((n) => n.country.id === hovered)?.country.name} →
-        </Link>
-      ) : (
-        <Link
-          href="/countries"
-          className="absolute bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-medium text-zinc-500 transition-colors hover:text-emerald-300 lg:bottom-6"
-        >
-          {allCountries.length} countries · {regionCount} regions · one evidence core →
-        </Link>
-      )}
+      {/* Real, focusable, keyboard-reachable hub links — never SVG-only click targets. Positioned
+          to match the decorative line art above via the same angle math, but semantically
+          independent of it (the graphic could be removed entirely and every destination would
+          still be reachable). */}
+      <nav aria-label="Intelligence domains" className="absolute inset-0">
+        {nodes.map((node) => (
+          <Link
+            key={node.id}
+            href={node.href}
+            onMouseEnter={() => setActive(node.id)}
+            onMouseLeave={() => setActive((current) => (current === node.id ? null : current))}
+            onFocus={() => setActive(node.id)}
+            onBlur={() => setActive((current) => (current === node.id ? null : current))}
+            className="group absolute flex -translate-x-1/2 flex-col items-center rounded-full text-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-400"
+            style={{ left: `${(node.x / size) * 100}%`, top: `${(node.y / size) * 100}%` }}
+          >
+            {/* Label is always legible at rest — "what surrounds me" must not require a hover to
+                answer — and simply brightens on hover/focus rather than appearing from nothing. */}
+            <span
+              className="whitespace-nowrap rounded-full bg-[#050810]/0 px-2 py-0.5 text-[11px] font-medium text-zinc-400 transition-colors group-hover:bg-[#050810]/80 group-hover:text-emerald-300 group-focus-visible:bg-[#050810]/80 group-focus-visible:text-emerald-300"
+              style={{ marginTop: `${(node.r / size) * 100 + 3}%` }}
+            >
+              {node.label}
+              <span className="ml-1 text-zinc-600 group-hover:text-emerald-400/80 group-focus-visible:text-emerald-400/80">
+                {node.count}
+              </span>
+            </span>
+            <span className="sr-only"> — {node.count} real {node.unit}</span>
+          </Link>
+        ))}
+      </nav>
+
+      <div className="absolute bottom-0 left-1/2 w-full -translate-x-1/2 px-2 text-center lg:bottom-4">
+        {activeNode ? (
+          <p className="text-xs font-medium text-emerald-300">
+            {activeNode.label} · {activeNode.count} real {activeNode.unit} →
+          </p>
+        ) : (
+          <p className="text-xs font-medium text-zinc-500">
+            {total} real items connected across {hubs.length} intelligence domains →
+          </p>
+        )}
+      </div>
     </div>
   );
 }

@@ -162,6 +162,41 @@ if (!serverUp) {
     await page.close();
   });
 
+  test("7. Home becomes a real 'Continuing' console once a real project exists — zero hydration errors, not just an empty greeting (BUILD-009 continuity-first homepage)", async () => {
+    const page = await browser.newPage();
+    const errors: string[] = [];
+    page.on("pageerror", (err) => errors.push(err.message.split("\n")[0]));
+
+    await page.goto(BASE + "/my-work", { waitUntil: "networkidle" });
+    await page.waitForTimeout(500);
+    await page.locator("#project-title").fill("Continuity Regression Project");
+    await page.locator("#project-description").fill("Created to verify Home resumes real work honestly.");
+    await page.locator('button:has-text("Create Project")').click();
+    await page.waitForTimeout(1000);
+
+    // The real bug this guards: loadProjects() was read unconditionally in HomeIntelligenceFeed
+    // (and, before the fix, inside resolveNextStep too), so the server's empty-project render
+    // never matched the client's real one the instant a project existed — a genuine "server
+    // rendered <div>, client rendered <ul>" hydration error, only visible by actually creating a
+    // project and then loading Home in the same session, not by loading Home fresh.
+    await page.goto(BASE + "/", { waitUntil: "networkidle" });
+    await page.waitForTimeout(700);
+    const bodyText = await page.locator("body").innerText();
+    assert.ok(
+      bodyText.includes("Continuity Regression Project"),
+      "Home must show the real project as the primary 'Continuing' state, not a generic greeting",
+    );
+    assert.deepEqual(errors, [], `Home with a real project produced page errors: ${JSON.stringify(errors)}`);
+
+    // Must also survive a real refresh (the exact scenario that first surfaced the bug — hydration
+    // mismatches only throw once, on the render right after real data first appears).
+    await page.reload({ waitUntil: "networkidle" });
+    await page.waitForTimeout(600);
+    assert.deepEqual(errors, [], `Reloading Home with a real project produced page errors: ${JSON.stringify(errors)}`);
+
+    await page.close();
+  });
+
   test("teardown", async () => {
     await browser.close();
   });
