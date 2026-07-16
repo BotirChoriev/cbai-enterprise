@@ -15,6 +15,7 @@ export default function InvestorWorkspace() {
   return (
     <div className="space-y-10">
       <WorkspaceHero
+        embedded
         versionLabel="Investor Workspace"
         title={model.hero.title}
         subtitle={model.hero.subtitle}

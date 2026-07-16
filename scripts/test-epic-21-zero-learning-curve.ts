@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { USER_GOALS, resolveGoalRoute, deriveContextualGoals } from "@/lib/intelligence-os/intelligence-gateway";
-import { resolveProgressiveDisclosure } from "@/lib/intelligence-os/progressive-disclosure";
+import { resolveProgressiveDisclosure, shouldShowGlobalMissionBar } from "@/lib/intelligence-os/progressive-disclosure";
 import { deriveFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
 import { listSimplicityMetrics } from "@/lib/intelligence-os/simplicity-metrics";
 import { derivePrimaryEvidenceStates } from "@/lib/intelligence-os/evidence-primary-states";
@@ -209,4 +209,21 @@ test("22. Phase 2 — route-aware chrome reduces cognitive load", () => {
   assert.match(companion, /showCompanionDetail/);
   const gateway = readSource("components/gateway/IntelligenceGatewayEntry.tsx");
   assert.match(gateway, /showGatewayGoalChips/);
+});
+
+test("23. Entity explore routes — page companion hides duplicate global bar", () => {
+  const disclosure = readSource("lib/intelligence-os/progressive-disclosure.ts");
+  assert.match(disclosure, /ENTITY_EXPLORE_ROUTES/);
+  assert.equal(shouldShowGlobalMissionBar("/countries"), false);
+  assert.equal(shouldShowGlobalMissionBar("/companies"), false);
+  assert.equal(shouldShowGlobalMissionBar("/universities"), false);
+  assert.equal(shouldShowGlobalMissionBar("/my-work"), true);
+});
+
+test("24. Entity explore routes — companion purpose keys in all languages", () => {
+  for (const dict of [en, uz, ru, tr]) {
+    assert.ok(dict.zeroLearningCurve.routeCountriesPurpose);
+    assert.ok(dict.zeroLearningCurve.routeCompaniesPurpose);
+    assert.ok(dict.zeroLearningCurve.routeUniversitiesPurpose);
+  }
 });

@@ -124,6 +124,7 @@ export function resolveProgressiveDisclosure(mode: UserDensityMode): Progressive
 const REFERENCE_ROUTES = new Set(["/trust", "/about", "/settings", "/account"]);
 const INTENT_ROUTES = new Set(["/search"]);
 const COMPANION_ROUTES = new Set(["/knowledge", "/reasoning", "/graph", "/reports", "/research"]);
+const ENTITY_EXPLORE_ROUTES = new Set(["/countries", "/companies", "/universities"]);
 const WORKFLOW_CONTINUITY_ROUTES = new Set(["/knowledge", "/reasoning", "/graph", "/reports"]);
 
 function routeBase(pathname: string): string {
@@ -138,7 +139,7 @@ export function isReferenceRoute(pathname: string): boolean {
 /** Routes with page-level mission companion — hide duplicate orientation chrome. */
 export function hasPageMissionCompanion(pathname: string): boolean {
   const base = routeBase(pathname);
-  if (COMPANION_ROUTES.has(base)) return true;
+  if (COMPANION_ROUTES.has(base) || ENTITY_EXPLORE_ROUTES.has(base)) return true;
   return base.startsWith("/research/");
 }
 

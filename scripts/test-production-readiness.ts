@@ -45,10 +45,11 @@ test("1. lib/platform-home.ts no longer exports an internal build tag or evoluti
   assert.equal(content.includes('PLATFORM_VERSION = "0.1.0"'), true);
 });
 
-test("2. HomeFooter no longer renders the internal build string", () => {
-  const content = read("components/platform/home/HomeFooter.tsx");
-  assert.equal(content.includes("PLATFORM_BUILD"), false);
-  assert.equal(content.includes("elite-home-final"), false);
+test("2. Home canvas no longer exposes internal build strings (orphaned HomeFooter removed)", () => {
+  assert.equal(existsSync("components/platform/home/HomeFooter.tsx"), false);
+  const canvas = read("components/canvas/IntelligenceCanvas.tsx");
+  assert.equal(canvas.includes("PLATFORM_BUILD"), false);
+  assert.equal(canvas.includes("elite-home-final"), false);
 });
 
 test("3. Trust Center contains the required non-developer sections and nothing developer-oriented", () => {

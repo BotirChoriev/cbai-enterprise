@@ -1826,6 +1826,9 @@ export type TranslationDictionary = {
     routeReportsPurpose: string;
     routeMyWorkPurpose: string;
     routeSearchPurpose: string;
+    routeCountriesPurpose: string;
+    routeCompaniesPurpose: string;
+    routeUniversitiesPurpose: string;
     routeTrustPurpose: string;
     routeResearchPurpose: string;
     routeSettingsPurpose: string;

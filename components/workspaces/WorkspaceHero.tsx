@@ -1,11 +1,13 @@
 import type { ReactNode } from "react";
-import { cbaiPageHeader } from "@/components/brand/brand-classes";
+import { cbaiMineralPanel, cbaiPageHeader, cbaiPageStack, cbaiStatCell } from "@/components/brand/brand-classes";
 
 type WorkspaceHeroProps = {
   versionLabel: string;
   title: string;
   subtitle: string;
   description: string;
+  /** When true, omit page header chrome — parent shell already provides the h1. */
+  embedded?: boolean;
   /** Room-specific accent for the eyebrow label — falls back to the shared cyan chrome. */
   accentClassName?: string;
   /** A bespoke, real-data-driven visual for this room. When present, the hero becomes a
@@ -23,11 +25,46 @@ export default function WorkspaceHero({
   title,
   subtitle,
   description,
+  embedded = false,
   accentClassName,
   motif,
   metrics,
 }: WorkspaceHeroProps) {
   const eyebrowClass = accentClassName ?? "text-teal-400";
+
+  if (embedded) {
+    return (
+      <div className={cbaiPageStack}>
+        <div className={`relative overflow-hidden ${cbaiMineralPanel}`}>
+          <div className={motif ? "relative grid items-center gap-8 lg:grid-cols-[1.05fr_1fr]" : "relative"}>
+            <div>
+              <p className="text-sm text-zinc-400">{subtitle}</p>
+              <p className="mt-2 max-w-3xl text-sm text-zinc-500">{description}</p>
+            </div>
+            {motif}
+          </div>
+        </div>
+
+        {metrics && metrics.length > 0 ? (
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {metrics.map((metric) => (
+              <div key={metric.label} className={cbaiStatCell}>
+                <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
+                  {metric.label}
+                </p>
+                <p className="mt-1 text-xl font-semibold text-zinc-100">
+                  {metric.value}
+                  {metric.detail ? (
+                    <span className="text-sm font-normal text-zinc-500"> {metric.detail}</span>
+                  ) : null}
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : null}
+      </div>
+    );
+  }
 
   return (
     <>
@@ -54,10 +91,7 @@ export default function WorkspaceHero({
       {metrics && metrics.length > 0 && (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {metrics.map((metric) => (
-            <div
-              key={metric.label}
-              className="rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3"
-            >
+            <div key={metric.label} className={cbaiStatCell}>
               <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
                 {metric.label}
               </p>

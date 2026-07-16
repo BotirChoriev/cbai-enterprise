@@ -246,17 +246,15 @@ test("16. All 11 role/work-context cards map to real WorkspaceRole and ProjectTy
 // 17-18. Intelligence feed and project panels use only real data — never fabricated
 // ---------------------------------------------------------------------------
 
-test("17. Intelligence Feed's real data sources are honestly empty outside a browser (no fake records)", () => {
+test("17. Canvas knowledge stream uses real project data — no fabricated records", () => {
   assert.deepEqual(loadProjects(), []);
   assert.deepEqual(loadReports(), []);
-  const feedSource = readSource("components/platform/home/HomeIntelligenceFeed.tsx");
-  assert.match(feedSource, /loadProjects/);
-  assert.match(feedSource, /loadReports/);
-  assert.match(feedSource, /feedEmptyTitle/); // the exact honest empty-state copy key
+  const streamSource = readSource("components/canvas/CanvasKnowledgeStream.tsx");
+  assert.match(streamSource, /loadProjects/);
 });
 
-test("18. Home project panel reuses the real ProjectList — no second project-summary implementation", () => {
-  const source = readSource("components/platform/home/HomeProjectsSection.tsx");
+test("18. My Work reuses the real ProjectList — no second project-summary implementation", () => {
+  const source = readSource("components/my-work/MyWork.tsx");
   assert.match(source, /import ProjectList from "@\/components\/project\/ProjectList"/);
 });
 

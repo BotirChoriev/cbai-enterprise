@@ -202,8 +202,7 @@ test("15. Every core Project UI surface reads labels through the real translatio
     "components/project/ProjectHome.tsx",
     "components/project/ProjectTasksPanel.tsx",
     "components/project/ProjectReportView.tsx",
-    "components/platform/home/RoleWorkContextCards.tsx",
-    "components/platform/home/HomeIntelligenceFeed.tsx",
+    "components/my-work/MyWork.tsx",
     "components/workspaces/RoleProjectEntry.tsx",
   ];
   for (const path of surfaces) {

@@ -14,6 +14,7 @@ export default function CitizenWorkspace() {
   return (
     <div className="space-y-10">
       <WorkspaceHero
+        embedded
         versionLabel="Citizen Workspace"
         title={model.hero.title}
         subtitle={model.hero.subtitle}

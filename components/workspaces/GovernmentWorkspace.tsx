@@ -14,6 +14,7 @@ export default function GovernmentWorkspace() {
   return (
     <div className="space-y-10">
       <WorkspaceHero
+        embedded
         versionLabel={`Government Workspace`}
         title={model.hero.title}
         subtitle={model.hero.subtitle}
