@@ -157,6 +157,15 @@ const tr: TranslationDictionary = {
     destOpenDashboard: "Panoyu Aç",
     destOpenTrust: "Güveni Aç",
     destCitizenWorkspace: "Vatandaş Çalışma Alanı",
+    operatingEnvironmentLabel: "İstihbarat Operasyon Ortamı",
+    intelligenceSessionLabel: "Mevcut istihbarat oturumu",
+    intelligenceSessionActive: "Oturum aktif",
+    roleSectionHeadline: "Nasıl çalışırsanız çalışın, CBAI bunun yapısını anlar.",
+    compassHeading: "İstihbarat Pusulası",
+    trustHomeHeading: "CBAI güveni nasıl kazanır",
+    trustHomeSubtitle: "Slogan değil, ürün mekaniği — kanıtların öneriye nasıl dönüştüğü.",
+    entrySkipHint: "Atlamak için herhangi bir yere dokunun veya Escape tuşuna basın",
+    entrySkipAriaLabel: "Giriş animasyonunu atla",
   },
   project: {
     createProject: "Proje Oluştur",
@@ -263,6 +272,44 @@ const tr: TranslationDictionary = {
     humanDecision: "İnsan Kararı",
     privacy: "Gizlilik",
     knownLimitations: "Bilinen Sınırlamalar",
+    pillars: {
+      sourcesBeforeConclusions: {
+        title: "Sonuçlardan önce kaynaklar",
+        description:
+          "Herhangi bir sonuç sunulmadan önce kanıtlar bağlanır ve incelenir — asla tersi değil.",
+      },
+      uncertaintyVisible: {
+        title: "Belirsizlik görünür",
+        description:
+          "Kanıt yetersiz olduğunda bu doğrudan belirtilir — asla bir puanın arkasında gizlenmez.",
+      },
+      explainableRecommendations: {
+        title: "Öneriler açıklanabilir",
+        description: "Her öneri, onu üreten kanıt ve akıl yürütmeye kadar izlenebilir.",
+      },
+      comparableAlternatives: {
+        title: "Alternatifler karşılaştırılabilir",
+        description: "Seçenekler yan yana sunulur, asla tek zorunlu cevap olarak değil.",
+      },
+      consequencesShown: {
+        title: "Sonuçlar gösterilir",
+        description: "Olası sonuçlar ve sınırlamalar her seçenekle birlikte açıklanır.",
+      },
+      aiNeverTheSource: {
+        title: "Yapay zeka asla kaynak değildir",
+        description:
+          "CBAI kanıtları bağlar ve açıklar — asla gerçek üretmez veya alıntı olarak işlev görmez.",
+      },
+      historyPreserved: {
+        title: "Geçmiş korunur",
+        description:
+          "Araştırma ve kanıt değişiklikleri korunur, üzerine yazılmaz — bağlam asla kaybolmaz.",
+      },
+      humansDecide: {
+        title: "İnsanlar karar verir",
+        description: "Nihai yargı ve sorumluluk her zaman CBAI kullanan insanlara aittir.",
+      },
+    },
   },
   account: {
     signIn: "Giriş Yap",
@@ -297,6 +344,20 @@ const tr: TranslationDictionary = {
     micTextFallback: "Komutunuzu yazın",
     commandUnderstood: "Komut anlaşıldı.",
     editTranscript: "Göndermeden önce düzenle",
+    contextualViewingEntity: "{name} görüntülüyorsunuz.",
+    contextualProjectActions: "Bu proje için hızlı eylemler.",
+    openEvidence: "Kanıtları aç",
+    viewReports: "Raporları görüntüle",
+    exploreUniversities: "Üniversiteleri keşfet",
+    relatedUniversities: "İlgili üniversiteler",
+    relatedCompanies: "İlgili şirketler",
+    continueWorkspace: "Çalışma alanına devam et",
+    reviewQuestions: "Soruları incele",
+    openNotes: "Notları aç",
+    addEvidence: "Kanıt ekle",
+    generateReport: "Rapor oluştur",
+    readyWhenYouAre: "Hazır olduğunuzda",
+    openNextStep: "Sonraki adımı aç: {suggestion}",
   },
   errors: {
     generic: "Bir şeyler ters gitti. Lütfen tekrar deneyin.",

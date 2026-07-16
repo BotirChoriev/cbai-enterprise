@@ -126,6 +126,15 @@ export type TranslationDictionary = {
     destOpenDashboard: string;
     destOpenTrust: string;
     destCitizenWorkspace: string;
+    operatingEnvironmentLabel: string;
+    intelligenceSessionLabel: string;
+    intelligenceSessionActive: string;
+    roleSectionHeadline: string;
+    compassHeading: string;
+    trustHomeHeading: string;
+    trustHomeSubtitle: string;
+    entrySkipHint: string;
+    entrySkipAriaLabel: string;
   };
   project: {
     createProject: string;
@@ -232,6 +241,16 @@ export type TranslationDictionary = {
     humanDecision: string;
     privacy: string;
     knownLimitations: string;
+    pillars: {
+      sourcesBeforeConclusions: { title: string; description: string };
+      uncertaintyVisible: { title: string; description: string };
+      explainableRecommendations: { title: string; description: string };
+      comparableAlternatives: { title: string; description: string };
+      consequencesShown: { title: string; description: string };
+      aiNeverTheSource: { title: string; description: string };
+      historyPreserved: { title: string; description: string };
+      humansDecide: { title: string; description: string };
+    };
   };
   account: {
     signIn: string;
@@ -266,6 +285,20 @@ export type TranslationDictionary = {
     micTextFallback: string;
     commandUnderstood: string;
     editTranscript: string;
+    contextualViewingEntity: string;
+    contextualProjectActions: string;
+    openEvidence: string;
+    viewReports: string;
+    exploreUniversities: string;
+    relatedUniversities: string;
+    relatedCompanies: string;
+    continueWorkspace: string;
+    reviewQuestions: string;
+    openNotes: string;
+    addEvidence: string;
+    generateReport: string;
+    readyWhenYouAre: string;
+    openNextStep: string;
   };
   errors: {
     generic: string;

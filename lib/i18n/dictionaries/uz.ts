@@ -157,6 +157,15 @@ const uz: TranslationDictionary = {
     destOpenDashboard: "Boshqaruv panelini ochish",
     destOpenTrust: "Ishonchni ochish",
     destCitizenWorkspace: "Fuqaro ish maydoni",
+    operatingEnvironmentLabel: "Intellektual operatsion muhit",
+    intelligenceSessionLabel: "Joriy intellektual sessiya",
+    intelligenceSessionActive: "Sessiya faol",
+    roleSectionHeadline: "Qanday ishlashingizdan qat’i nazar, CBAI uning shaklini tushunadi.",
+    compassHeading: "Intellektual kompas",
+    trustHomeHeading: "CBAI qanday ishonch qozonadi",
+    trustHomeSubtitle: "Shior emas, mahsulot mexanikasi — dalil qanday tavsiyaga aylanadi.",
+    entrySkipHint: "O‘tkazib yuborish uchun istalgan joyni bosing yoki Escape tugmasini bosing",
+    entrySkipAriaLabel: "Kirish animatsiyasini o‘tkazib yuborish",
   },
   project: {
     createProject: "Loyiha yaratish",
@@ -263,6 +272,44 @@ const uz: TranslationDictionary = {
     humanDecision: "Inson qarori",
     privacy: "Maxfiylik",
     knownLimitations: "Ma’lum cheklovlar",
+    pillars: {
+      sourcesBeforeConclusions: {
+        title: "Xulosa oldidan manbalar",
+        description:
+          "Har qanday xulosa berilishidan oldin dalillar bog‘lanadi va ko‘rib chiqiladi — hech qachon aksincha emas.",
+      },
+      uncertaintyVisible: {
+        title: "Noaniqlik ko‘rinadi",
+        description:
+          "Dalillar yetarli bo‘lmaganda, bu to‘g‘ridan-to‘g‘ri aytiladi — hech qachon ball ortida yashirilmaydi.",
+      },
+      explainableRecommendations: {
+        title: "Tavsiyalar tushuntiriladi",
+        description: "Har bir tavsiya uni hosil qilgan dalil va mantiqga qaytadi.",
+      },
+      comparableAlternatives: {
+        title: "Alternativalarni solishtirish mumkin",
+        description: "Variantlar yonma-yon taqdim etiladi, hech qachon yagona majburiy javob sifatida emas.",
+      },
+      consequencesShown: {
+        title: "Oqibatlar ko‘rsatiladi",
+        description: "Mumkin bo‘lgan natijalar va cheklovlar har bir variant bilan tushuntiriladi.",
+      },
+      aiNeverTheSource: {
+        title: "SI hech qachon manba emas",
+        description:
+          "CBAI dalillarni bog‘laydi va tushuntiradi — hech qachon faktlarni yaratmaydi yoki iqtibos sifatida ishlamaydi.",
+      },
+      historyPreserved: {
+        title: "Tarix saqlanadi",
+        description:
+          "Tadqiqot va dalil o‘zgarishlari saqlanadi, ustiga yozilmaydi — kontekst hech qachon yo‘qolmaydi.",
+      },
+      humansDecide: {
+        title: "Insonlar qaror qiladi",
+        description: "Yakuniy hukm va mas’uliyat doimo CBAI’dan foydalanuvchi odamlarga tegishli.",
+      },
+    },
   },
   account: {
     signIn: "Kirish",
@@ -297,6 +344,20 @@ const uz: TranslationDictionary = {
     micTextFallback: "Buyruqni yozib yuborish",
     commandUnderstood: "Buyruq tushunildi.",
     editTranscript: "Yuborishdan oldin tahrirlash",
+    contextualViewingEntity: "Siz {name} ni ko‘rib chiqmoqdasiz.",
+    contextualProjectActions: "Ushbu loyiha uchun tezkor amallar.",
+    openEvidence: "Dalillarni ochish",
+    viewReports: "Hisobotlarni ko‘rish",
+    exploreUniversities: "Universitetlarni o‘rganish",
+    relatedUniversities: "Bog‘liq universitetlar",
+    relatedCompanies: "Bog‘liq kompaniyalar",
+    continueWorkspace: "Ish maydonini davom ettirish",
+    reviewQuestions: "Savollarni ko‘rib chiqish",
+    openNotes: "Qaydlarni ochish",
+    addEvidence: "Dalil qo‘shish",
+    generateReport: "Hisobot yaratish",
+    readyWhenYouAre: "Tayyor bo‘lsangiz, davom eting",
+    openNextStep: "Keyingi qadamni ochish: {suggestion}",
   },
   errors: {
     generic: "Nimadir noto‘g‘ri ketdi. Qayta urinib ko‘ring.",

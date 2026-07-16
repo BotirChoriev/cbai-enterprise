@@ -157,6 +157,15 @@ const ru: TranslationDictionary = {
     destOpenDashboard: "Открыть панель управления",
     destOpenTrust: "Открыть Доверие",
     destCitizenWorkspace: "Гражданское рабочее пространство",
+    operatingEnvironmentLabel: "Среда интеллектуальной работы",
+    intelligenceSessionLabel: "Текущая интеллектуальная сессия",
+    intelligenceSessionActive: "Сессия активна",
+    roleSectionHeadline: "Как бы вы ни работали, CBAI понимает форму вашей работы.",
+    compassHeading: "Интеллектуальный компас",
+    trustHomeHeading: "Как CBAI заслуживает доверия",
+    trustHomeSubtitle: "Механика продукта, а не лозунг — как доказательства становятся рекомендацией.",
+    entrySkipHint: "Нажмите в любом месте или Escape, чтобы пропустить",
+    entrySkipAriaLabel: "Пропустить вступительную анимацию",
   },
   project: {
     createProject: "Создать проект",
@@ -263,6 +272,44 @@ const ru: TranslationDictionary = {
     humanDecision: "Решение человека",
     privacy: "Конфиденциальность",
     knownLimitations: "Известные ограничения",
+    pillars: {
+      sourcesBeforeConclusions: {
+        title: "Источники перед выводами",
+        description:
+          "Доказательства подключаются и проверяются до любого вывода — никогда наоборот.",
+      },
+      uncertaintyVisible: {
+        title: "Неопределённость видна",
+        description:
+          "Когда доказательств недостаточно, это прямо указывается — никогда не скрывается за оценкой.",
+      },
+      explainableRecommendations: {
+        title: "Рекомендации объяснимы",
+        description: "Каждая рекомендация прослеживается до доказательств и рассуждений, которые её породили.",
+      },
+      comparableAlternatives: {
+        title: "Альтернативы можно сравнить",
+        description: "Варианты представлены рядом, а не как единственный навязанный ответ.",
+      },
+      consequencesShown: {
+        title: "Последствия показаны",
+        description: "Возможные исходы и ограничения объясняются вместе с каждым вариантом.",
+      },
+      aiNeverTheSource: {
+        title: "ИИ никогда не источник",
+        description:
+          "CBAI связывает и объясняет доказательства — никогда не создаёт факты и не выступает цитатой.",
+      },
+      historyPreserved: {
+        title: "История сохраняется",
+        description:
+          "Изменения исследований и доказательств сохраняются, а не перезаписываются — контекст не теряется.",
+      },
+      humansDecide: {
+        title: "Решают люди",
+        description: "Окончательное суждение и ответственность всегда принадлежат людям, использующим CBAI.",
+      },
+    },
   },
   account: {
     signIn: "Войти",
@@ -297,6 +344,20 @@ const ru: TranslationDictionary = {
     micTextFallback: "Ввести команду текстом",
     commandUnderstood: "Команда распознана.",
     editTranscript: "Изменить перед отправкой",
+    contextualViewingEntity: "Вы просматриваете {name}.",
+    contextualProjectActions: "Быстрые действия для этого проекта.",
+    openEvidence: "Открыть доказательства",
+    viewReports: "Просмотреть отчёты",
+    exploreUniversities: "Изучить университеты",
+    relatedUniversities: "Связанные университеты",
+    relatedCompanies: "Связанные компании",
+    continueWorkspace: "Продолжить рабочее пространство",
+    reviewQuestions: "Просмотреть вопросы",
+    openNotes: "Открыть заметки",
+    addEvidence: "Добавить доказательства",
+    generateReport: "Создать отчёт",
+    readyWhenYouAre: "Готовы, когда вы готовы",
+    openNextStep: "Открыть следующий шаг: {suggestion}",
   },
   errors: {
     generic: "Что-то пошло не так. Попробуйте ещё раз.",

@@ -157,6 +157,15 @@ const en: TranslationDictionary = {
     destOpenDashboard: "Open Dashboard",
     destOpenTrust: "Open Trust",
     destCitizenWorkspace: "Citizen Workspace",
+    operatingEnvironmentLabel: "Intelligence Operating Environment",
+    intelligenceSessionLabel: "Current intelligence session",
+    intelligenceSessionActive: "Session active",
+    roleSectionHeadline: "However you work, CBAI understands the shape of it.",
+    compassHeading: "Intelligence Compass",
+    trustHomeHeading: "How CBAI earns trust",
+    trustHomeSubtitle: "Product mechanics, not a slogan — this is how evidence becomes a recommendation.",
+    entrySkipHint: "Tap anywhere or press Escape to skip",
+    entrySkipAriaLabel: "Skip entry animation",
   },
   project: {
     createProject: "Create Project",
@@ -263,6 +272,45 @@ const en: TranslationDictionary = {
     humanDecision: "Human Decision",
     privacy: "Privacy",
     knownLimitations: "Known Limitations",
+    pillars: {
+      sourcesBeforeConclusions: {
+        title: "Sources Before Conclusions",
+        description:
+          "Evidence is connected and reviewed before any conclusion is presented — never the reverse.",
+      },
+      uncertaintyVisible: {
+        title: "Uncertainty Is Visible",
+        description:
+          "When evidence is insufficient, that is stated directly — never hidden behind a score.",
+      },
+      explainableRecommendations: {
+        title: "Recommendations Are Explainable",
+        description:
+          "Every recommendation traces back to the evidence and reasoning that produced it.",
+      },
+      comparableAlternatives: {
+        title: "Alternatives Can Be Compared",
+        description: "Options are presented side by side, never as a single forced answer.",
+      },
+      consequencesShown: {
+        title: "Consequences Are Shown",
+        description: "Possible outcomes and limitations are explained alongside every option.",
+      },
+      aiNeverTheSource: {
+        title: "AI Is Never The Source",
+        description:
+          "CBAI connects and explains evidence — it never originates facts or acts as a citation.",
+      },
+      historyPreserved: {
+        title: "History Is Preserved",
+        description:
+          "Research and evidence changes are kept, not overwritten, so context is never lost.",
+      },
+      humansDecide: {
+        title: "Humans Decide",
+        description: "Final judgment and responsibility always belong to the people using CBAI.",
+      },
+    },
   },
   account: {
     signIn: "Sign In",
@@ -297,6 +345,20 @@ const en: TranslationDictionary = {
     micTextFallback: "Type your command instead",
     commandUnderstood: "Command understood.",
     editTranscript: "Edit before sending",
+    contextualViewingEntity: "You are viewing {name}.",
+    contextualProjectActions: "Quick actions for this project.",
+    openEvidence: "Open evidence",
+    viewReports: "View reports",
+    exploreUniversities: "Explore universities",
+    relatedUniversities: "Related universities",
+    relatedCompanies: "Related companies",
+    continueWorkspace: "Continue workspace",
+    reviewQuestions: "Review questions",
+    openNotes: "Open notes",
+    addEvidence: "Add evidence",
+    generateReport: "Generate report",
+    readyWhenYouAre: "Ready when you are",
+    openNextStep: "Open Next Step: {suggestion}",
   },
   errors: {
     generic: "Something went wrong. Please try again.",
