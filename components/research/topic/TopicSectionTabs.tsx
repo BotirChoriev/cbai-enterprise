@@ -8,17 +8,10 @@ import KnowledgeTimeline from "@/components/research/timeline/KnowledgeTimeline"
 import ResearchEvidenceReadiness from "@/components/research/topic/ResearchEvidenceReadiness";
 import OpenResearchQuestions from "@/components/research/topic/OpenResearchQuestions";
 import NegativeResultsOverview from "@/components/research/topic/NegativeResultsOverview";
-import { cbaiGlassCard } from "@/components/brand/brand-classes";
+import { cbaiChip, cbaiChipActive, cbaiGlassCard } from "@/components/brand/brand-classes";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 export type TopicTabId = "overview" | "notebook" | "graph" | "timeline" | "evidence";
-
-const TABS: { id: TopicTabId; label: string }[] = [
-  { id: "overview", label: "Overview" },
-  { id: "notebook", label: "Notebook" },
-  { id: "graph", label: "Graph" },
-  { id: "timeline", label: "Timeline" },
-  { id: "evidence", label: "Evidence" },
-];
 
 type TopicSectionTabsProps = {
   topic: ResearchTopic;
@@ -31,18 +24,28 @@ export default function TopicSectionTabs({
   activeTab,
   onTabChange,
 }: TopicSectionTabsProps) {
+  const { t } = useTranslation();
+
+  const tabs: { id: TopicTabId; labelKey: string }[] = [
+    { id: "overview", labelKey: "zeroLearningCurve.topicTabOverview" },
+    { id: "notebook", labelKey: "zeroLearningCurve.topicTabNotebook" },
+    { id: "graph", labelKey: "zeroLearningCurve.topicTabGraph" },
+    { id: "timeline", labelKey: "zeroLearningCurve.topicTabTimeline" },
+    { id: "evidence", labelKey: "zeroLearningCurve.topicTabEvidence" },
+  ];
+
   return (
     <section aria-labelledby="topic-section-tabs-heading" className="space-y-4">
       <h2 id="topic-section-tabs-heading" className="sr-only">
-        Topic workspace
+        {t("zeroLearningCurve.topicWorkspaceSr")}
       </h2>
 
       <div
         className={`${cbaiGlassCard} flex flex-wrap gap-1 p-1`}
         role="tablist"
-        aria-label="Topic sections"
+        aria-label={t("zeroLearningCurve.topicSectionsAria")}
       >
-        {TABS.map((tab) => {
+        {tabs.map((tab) => {
           const selected = activeTab === tab.id;
           return (
             <button
@@ -53,13 +56,9 @@ export default function TopicSectionTabs({
               aria-controls={`topic-panel-${tab.id}`}
               id={`topic-tab-${tab.id}`}
               onClick={() => onTabChange(tab.id)}
-              className={`rounded-md px-3 py-2 text-xs font-medium transition-colors ${
-                selected
-                  ? "bg-teal-500/15 text-teal-300"
-                  : "text-zinc-500 hover:bg-zinc-900/60 hover:text-zinc-300"
-              }`}
+              className={selected ? cbaiChipActive : cbaiChip}
             >
-              {tab.label}
+              {t(tab.labelKey)}
             </button>
           );
         })}

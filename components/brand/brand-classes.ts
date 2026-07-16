@@ -53,6 +53,15 @@ export const cbaiEmptyDashed =
 
 export const cbaiStatCell = "rounded-lg border border-zinc-800/80 bg-zinc-950/40 px-3 py-2";
 
+/** Graph and explorer panels — mineral surface with standard padding. */
+export const cbaiGraphPanel = `${cbaiMineralSurface} ${cbaiPanelPadding}`;
+
+export const cbaiIconBtn =
+  `inline-flex min-h-9 min-w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900 text-sm text-zinc-300 ${cbaiTransition} hover:border-zinc-600 disabled:cursor-not-allowed disabled:opacity-40 ${cbaiFocusRing}`;
+
+export const cbaiIconBtnSm =
+  `inline-flex min-h-9 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900 px-2 text-[10px] font-medium uppercase tracking-wider text-zinc-400 ${cbaiTransition} hover:border-zinc-600 ${cbaiFocusRing}`;
+
 /* ── Buttons ───────────────────────────────────────────────────────────── */
 
 export const cbaiBtnPrimary =

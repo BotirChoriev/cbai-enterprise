@@ -10,6 +10,8 @@ import { filterNodesBySearch } from "@/lib/graph/graph.builder";
 import { GRAPH_LAYOUT, GRAPH_ZOOM } from "@/lib/graph/graph.mock";
 import EntityNode from "@/components/graph/EntityNode";
 import RelationshipEdge from "@/components/graph/RelationshipEdge";
+import { cbaiMineralSurface, cbaiIconBtn, cbaiIconBtnSm } from "@/components/brand/brand-classes";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type GraphCanvasProps = {
   graph: KnowledgeGraph;
@@ -28,6 +30,7 @@ export default function GraphCanvas({
   typeFilter,
   selection,
 }: GraphCanvasProps) {
+  const { t } = useTranslation();
   const [zoom, setZoom] = useState<number>(GRAPH_ZOOM.default);
 
   const searchMatches = useMemo(
@@ -69,26 +72,28 @@ export default function GraphCanvas({
   const canvasHeight = GRAPH_LAYOUT.centerY * 2 + 80;
 
   return (
-    <div className="relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
+    <div className={`relative overflow-hidden ${cbaiMineralSurface}`}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 px-4 py-3">
         <div>
-          <h3 className="text-sm font-semibold text-zinc-50">Evidence Relationships</h3>
+          <h3 className="text-sm font-semibold text-zinc-50">{t("graphUi.evidenceRelationships")}</h3>
           <p className="text-[10px] text-zinc-600">
-            Select a node to focus · Pan via scroll · {graph.nodes.length} registry
-            nodes · {graph.edges.length} verified edges
+            {t("graphUi.canvasHint", {
+              nodes: String(graph.nodes.length),
+              edges: String(graph.edges.length),
+            })}
           </p>
         </div>
         <div
           className="flex items-center gap-1"
           role="group"
-          aria-label="Graph zoom controls"
+          aria-label={t("graphUi.zoomControlsAria")}
         >
           <button
             type="button"
             onClick={() => adjustZoom(-GRAPH_ZOOM.step)}
             disabled={zoom <= GRAPH_ZOOM.min}
-            className="min-h-9 min-w-9 rounded-lg border border-zinc-800 bg-zinc-900 text-sm text-zinc-300 transition-colors hover:border-zinc-600 disabled:opacity-40"
-            aria-label="Zoom out"
+            className={cbaiIconBtn}
+            aria-label={t("graphUi.zoomOut")}
           >
             −
           </button>
@@ -99,17 +104,17 @@ export default function GraphCanvas({
             type="button"
             onClick={() => adjustZoom(GRAPH_ZOOM.step)}
             disabled={zoom >= GRAPH_ZOOM.max}
-            className="min-h-9 min-w-9 rounded-lg border border-zinc-800 bg-zinc-900 text-sm text-zinc-300 transition-colors hover:border-zinc-600 disabled:opacity-40"
-            aria-label="Zoom in"
+            className={cbaiIconBtn}
+            aria-label={t("graphUi.zoomIn")}
           >
             +
           </button>
           <button
             type="button"
             onClick={() => setZoom(GRAPH_ZOOM.default)}
-            className="min-h-9 rounded-lg border border-zinc-800 bg-zinc-900 px-2 text-[10px] font-medium uppercase tracking-wider text-zinc-400 transition-colors hover:border-zinc-600"
+            className={cbaiIconBtnSm}
           >
-            Reset
+            {t("graphUi.zoomReset")}
           </button>
         </div>
       </div>

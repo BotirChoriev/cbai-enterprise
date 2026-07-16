@@ -101,6 +101,12 @@ export const EVIDENCE_PULSE_UZ = {
   outdated: "Eskirgan",
   unverified: "Tasdiqlanmagan",
   limitation: "Cheklov",
+  limitationNoProject: "Loyiha bog'lang yoki dalil qo'shing.",
+  limitationNoRefs: "Faqat sizning manbalaringiz — hech narsa uydurilmaydi.",
+  limitationConflicting: "Qaror qilishdan oldin zid manbalarni ko'rib chiqing.",
+  limitationOutdated: "Ba'zi manbalar yangilanishi kerak bo'lishi mumkin.",
+  limitationUnverified: "Mumkin bo'lsa, manba URL larini qo'shing.",
+  limitationDeviceLocal: "Bu qurilmada saqlangan — jonli tekshiruv ulanmagan.",
 } as const;
 
 export const SYSTEM_AWAKENING_UZ = {

@@ -1,3 +1,5 @@
+"use client";
+
 import { Suspense } from "react";
 import type { ResearchTopic } from "@/lib/research/research-topics";
 import { buildTopicEvidenceReview } from "@/lib/research/evidence/evidence-topic-builder";
@@ -10,6 +12,7 @@ import TopicEvidenceReviewWorkflow from "@/components/research/topic/TopicEviden
 import TopicEvidenceSelection from "@/components/research/topic/TopicEvidenceSelection";
 import ResearchNotesPanel from "@/components/research/topic/ResearchNotesPanel";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type TopicReviewWorkspaceProps = {
   topic: ResearchTopic;
@@ -24,6 +27,7 @@ type TopicReviewWorkspaceProps = {
 // the parent and shared with ResearchCockpit, which already surfaces the recommended next
 // action — this component only adds the actions that are still unavailable.
 export default function TopicReviewWorkspace({ topic, workflow }: TopicReviewWorkspaceProps) {
+  const { t } = useTranslation();
   const evidenceReview = buildTopicEvidenceReview(topic.topicId);
   const workspace = buildResearchReviewWorkspace(topic.topicId);
   const readiness = deriveResearchReadiness(topic.topicId);
@@ -35,13 +39,12 @@ export default function TopicReviewWorkspace({ topic, workflow }: TopicReviewWor
   return (
     <section aria-labelledby="topic-review-workspace-heading" className="space-y-6">
       <div>
-        <p className={cbaiSectionEyebrow}>Research review workspace</p>
+        <p className={cbaiSectionEyebrow}>{t("zeroLearningCurve.reviewWorkspaceEyebrow")}</p>
         <h2 id="topic-review-workspace-heading" className="text-xl font-semibold text-zinc-100">
-          Review {topic.topicName}
+          {t("zeroLearningCurve.reviewWorkspaceTitle", { name: topic.topicName })}
         </h2>
         <p className="mt-1 text-sm text-zinc-500">
-          Mission, current state, evidence, notes, findings, and open questions in one flow —
-          derived only from current platform state.
+          {t("zeroLearningCurve.reviewWorkspaceLead")}
         </p>
       </div>
 
@@ -49,7 +52,7 @@ export default function TopicReviewWorkspace({ topic, workflow }: TopicReviewWor
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className={`${cbaiGlassCard} space-y-2 p-4`}>
-          <p className={cbaiSectionEyebrow}>Completed milestones</p>
+          <p className={cbaiSectionEyebrow}>{t("zeroLearningCurve.reviewCompletedMilestones")}</p>
           {readiness.completedMilestones.length > 0 ? (
             <ul className="space-y-1.5">
               {readiness.completedMilestones.map((milestone) => (
@@ -63,12 +66,12 @@ export default function TopicReviewWorkspace({ topic, workflow }: TopicReviewWor
               ))}
             </ul>
           ) : (
-            <p className="text-xs text-zinc-600">No milestones completed yet.</p>
+            <p className="text-xs text-zinc-600">{t("zeroLearningCurve.reviewNoMilestonesCompleted")}</p>
           )}
         </div>
 
         <div className={`${cbaiGlassCard} space-y-2 p-4`}>
-          <p className={cbaiSectionEyebrow}>Remaining milestones</p>
+          <p className={cbaiSectionEyebrow}>{t("zeroLearningCurve.reviewRemainingMilestones")}</p>
           {readiness.remainingMilestones.length > 0 ? (
             <ul className="space-y-1.5">
               {readiness.remainingMilestones.map((milestone) => (
@@ -82,7 +85,7 @@ export default function TopicReviewWorkspace({ topic, workflow }: TopicReviewWor
               ))}
             </ul>
           ) : (
-            <p className="text-xs text-zinc-600">All tracked milestones are complete.</p>
+            <p className="text-xs text-zinc-600">{t("zeroLearningCurve.reviewAllMilestonesComplete")}</p>
           )}
         </div>
       </div>
@@ -105,7 +108,7 @@ export default function TopicReviewWorkspace({ topic, workflow }: TopicReviewWor
       />
 
       <div className={`${cbaiGlassCard} space-y-2 p-4`}>
-        <p className={cbaiSectionEyebrow}>Open review questions</p>
+        <p className={cbaiSectionEyebrow}>{t("zeroLearningCurve.reviewOpenQuestions")}</p>
         {workspace.openQuestions.length > 0 ? (
           <ul className="space-y-1.5">
             {workspace.openQuestions.map((question) => (
@@ -119,12 +122,12 @@ export default function TopicReviewWorkspace({ topic, workflow }: TopicReviewWor
             ))}
           </ul>
         ) : (
-          <p className="text-xs text-zinc-600">No open review questions right now.</p>
+          <p className="text-xs text-zinc-600">{t("zeroLearningCurve.reviewNoOpenQuestions")}</p>
         )}
       </div>
 
       <div className={`${cbaiGlassCard} space-y-2 p-4`}>
-        <p className={cbaiSectionEyebrow}>Not yet available</p>
+        <p className={cbaiSectionEyebrow}>{t("zeroLearningCurve.reviewNotAvailable")}</p>
         <ul className="space-y-1.5">
           {workflow.unavailableActions.map((unavailable) => (
             <li key={unavailable.action} className="text-xs text-zinc-500">

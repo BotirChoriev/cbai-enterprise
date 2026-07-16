@@ -101,6 +101,12 @@ export const EVIDENCE_PULSE_TR = {
   outdated: "Güncel değil",
   unverified: "Doğrulanmamış",
   limitation: "Sınırlama",
+  limitationNoProject: "Bir proje bağlayın veya kanıt ekleyin.",
+  limitationNoRefs: "Yalnızca sizin referanslarınız — hiçbir şey uydurulmaz.",
+  limitationConflicting: "Karar vermeden önce çelişkili kaynakları inceleyin.",
+  limitationOutdated: "Bazı kaynakların yenilenmesi gerekebilir.",
+  limitationUnverified: "Mümkünse kaynak URL'leri ekleyin.",
+  limitationDeviceLocal: "Bu cihazda kayıtlı — canlı doğrulama bağlı değil.",
 } as const;
 
 export const SYSTEM_AWAKENING_TR = {

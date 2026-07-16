@@ -3,6 +3,7 @@
 import { ACTIVE_EDGE_TYPE_CONFIG, NODE_TYPE_COLORS } from "@/lib/graph/graph.mock";
 import type { GraphNodeType } from "@/lib/graph/graph.types";
 import { GRAPH_ENTITY_TYPES, GRAPH_RELATIONSHIP_TYPES } from "@/lib/graph/graph-platform";
+import { cbaiGraphPanel } from "@/components/brand/brand-classes";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { getDictionary } from "@/lib/i18n/translate";
 import { translateGraphEntityTypes } from "@/lib/i18n/graph-ui-translation";
@@ -16,7 +17,7 @@ export default function GraphLegend() {
   const futureRelationshipCount = GRAPH_RELATIONSHIP_TYPES.filter((type) => !type.active).length;
 
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
+    <div className={cbaiGraphPanel}>
       <h3 className="mb-3 text-sm font-semibold text-zinc-50">{t("graphUi.legend")}</h3>
 
       <div className="mb-4">

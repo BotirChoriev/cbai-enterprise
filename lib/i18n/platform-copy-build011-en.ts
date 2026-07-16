@@ -101,6 +101,12 @@ export const EVIDENCE_PULSE_EN = {
   outdated: "Outdated",
   unverified: "Unverified",
   limitation: "Limitation",
+  limitationNoProject: "Link a project or add evidence to begin.",
+  limitationNoRefs: "Your references only — nothing is fabricated.",
+  limitationConflicting: "Review conflicting sources before you decide.",
+  limitationOutdated: "Some sources may need refresh.",
+  limitationUnverified: "Add source URLs where you can.",
+  limitationDeviceLocal: "Saved on this device — live verification not connected.",
 } as const;
 
 export const SYSTEM_AWAKENING_EN = {

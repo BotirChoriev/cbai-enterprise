@@ -7,6 +7,8 @@ import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import { deriveFirstMinuteAction, translateFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
+import { getDictionary } from "@/lib/i18n/translate";
+import { translateEvidencePulseLimitation } from "@/lib/i18n/evidence-pulse-translation";
 import { loadProjects, loadProjectQuestions } from "@/lib/project/project-store";
 import IntelligenceGatewayEntry from "@/components/gateway/IntelligenceGatewayEntry";
 import MissionCreationFlow from "@/components/mission/MissionCreationFlow";
@@ -25,7 +27,7 @@ import EvidenceJourneyPanel from "@/components/evidence/EvidenceJourneyPanel";
 import { cbaiBtnPrimary, cbaiOperatingShell } from "@/components/brand/brand-classes";
 
 export default function IntelligenceCanvas() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const hydrated = useHydrated();
   const { mission, evidencePulse, humanImpact, refreshMissionContext } = useMissionContext();
   const disclosure = useProgressiveDisclosure();
@@ -34,6 +36,9 @@ export default function IntelligenceCanvas() {
 
   const pulse = evidencePulse;
   const impact = humanImpact;
+  const pulseLimitation = pulse
+    ? translateEvidencePulseLimitation(getDictionary(language), pulse.limitationKey)
+    : undefined;
   const project =
     hydrated && mission?.projectId ? loadProjects().find((p) => p.id === mission.projectId) : null;
   const questionCount = hydrated && project ? loadProjectQuestions(project.id).length : 0;
@@ -127,7 +132,7 @@ export default function IntelligenceCanvas() {
               kind="evidence"
               label={t("intelligenceCanvas.centerEvidence")}
               value={pulse?.label ?? t("evidencePulse.missing")}
-              detail={pulse ? `${t("evidencePulse.limitation")}: ${pulse.limitation}` : undefined}
+              detail={pulseLimitation ? `${t("evidencePulse.limitation")}: ${pulseLimitation}` : undefined}
               href={mission?.projectId ? `/my-work${projectQuery}#project-evidence` : "/knowledge"}
               status={
                 !pulse || pulse.state === "missing"

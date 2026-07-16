@@ -4,6 +4,7 @@ import type { ReportTypeDefinition } from "@/lib/reports-center";
 import { translatedReportStatusClass } from "@/lib/i18n/reports-center-translation";
 import { getDictionary } from "@/lib/i18n/translate";
 import Link from "next/link";
+import { cbaiGraphPanel } from "@/components/brand/brand-classes";
 import { useTranslation } from "@/lib/i18n/use-translation";
 
 type ReportReadinessSectionProps = {
@@ -36,7 +37,7 @@ export default function ReportReadinessSection({
         {reportTypes.map((report) => (
           <div
             key={report.id}
-            className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 sm:p-5"
+            className={cbaiGraphPanel}
           >
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">

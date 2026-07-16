@@ -1108,6 +1108,11 @@ export type TranslationDictionary = {
     sourceAdapterCountry: string;
     sourceAdapterCompany: string;
     sourceAdapterUniversity: string;
+    canvasHint: string;
+    zoomControlsAria: string;
+    zoomOut: string;
+    zoomIn: string;
+    zoomReset: string;
   };
   aboutPage: {
     title: string;
@@ -1343,6 +1348,12 @@ export type TranslationDictionary = {
     outdated: string;
     unverified: string;
     limitation: string;
+    limitationNoProject: string;
+    limitationNoRefs: string;
+    limitationConflicting: string;
+    limitationOutdated: string;
+    limitationUnverified: string;
+    limitationDeviceLocal: string;
   };
   systemAwakening: {
     skipAria: string;
@@ -1812,6 +1823,24 @@ export type TranslationDictionary = {
     routeSettingsPurpose: string;
     routeAccountPurpose: string;
     routeAboutPurpose: string;
+    topicTabOverview: string;
+    topicTabNotebook: string;
+    topicTabGraph: string;
+    topicTabTimeline: string;
+    topicTabEvidence: string;
+    topicSectionsAria: string;
+    topicWorkspaceSr: string;
+    reviewWorkspaceEyebrow: string;
+    reviewWorkspaceTitle: string;
+    reviewWorkspaceLead: string;
+    reviewCompletedMilestones: string;
+    reviewRemainingMilestones: string;
+    reviewNoMilestonesCompleted: string;
+    reviewNoMilestonesRemaining: string;
+    reviewAllMilestonesComplete: string;
+    reviewOpenQuestions: string;
+    reviewNoOpenQuestions: string;
+    reviewNotAvailable: string;
   };
 };
 

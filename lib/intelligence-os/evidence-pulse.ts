@@ -15,11 +15,21 @@ export type EvidencePulseState =
   | "outdated"
   | "unverified";
 
+export type EvidencePulseLimitationKey =
+  | "noProject"
+  | "noRefs"
+  | "conflicting"
+  | "outdated"
+  | "unverified"
+  | "deviceLocal";
+
 export type EvidencePulseReading = {
   readonly state: EvidencePulseState;
   readonly label: string;
   readonly count: number;
+  /** @deprecated Prefer limitationKey + i18n in UI. Kept for scripts and tooltips. */
   readonly limitation: string;
+  readonly limitationKey: EvidencePulseLimitationKey;
   readonly consensus: ReturnType<typeof deriveEvidenceRuntime>["consensus"];
   readonly conflictCount: number;
   readonly outdatedCount: number;
@@ -36,7 +46,8 @@ export function deriveEvidencePulse(mission: Mission | null): EvidencePulseReadi
       state: "missing",
       label: "No project linked to this mission",
       count: 0,
-      limitation: "Link a project or add evidence to begin the evidence pulse.",
+      limitation: "Link a project or add evidence to begin.",
+      limitationKey: "noProject",
       consensus: "none",
       conflictCount: 0,
       outdatedCount: 0,
@@ -49,7 +60,8 @@ export function deriveEvidencePulse(mission: Mission | null): EvidencePulseReadi
       state: "missing",
       label: mission?.evidenceMissing || "No evidence linked yet",
       count: 0,
-      limitation: "Evidence refs are user-authored — nothing is fabricated.",
+      limitation: "Your references only — nothing is fabricated.",
+      limitationKey: "noRefs",
       consensus: "none",
       conflictCount: 0,
       outdatedCount: 0,
@@ -64,7 +76,8 @@ export function deriveEvidencePulse(mission: Mission | null): EvidencePulseReadi
       state: "conflicting",
       label: `${conflictCount} potential conflict${conflictCount === 1 ? "" : "s"} among ${refs.length} reference${refs.length === 1 ? "" : "s"}`,
       count: refs.length,
-      limitation: "Review conflicting sources before drawing conclusions — human judgment required.",
+      limitation: "Review conflicting sources before you decide.",
+      limitationKey: "conflicting",
       consensus: runtime.consensus,
       conflictCount,
       outdatedCount,
@@ -76,7 +89,8 @@ export function deriveEvidencePulse(mission: Mission | null): EvidencePulseReadi
       state: "outdated",
       label: `${outdatedCount} reference${outdatedCount === 1 ? "" : "s"} older than one year`,
       count: refs.length,
-      limitation: "Evidence may need refresh — verify sources remain current.",
+      limitation: "Some sources may need refresh.",
+      limitationKey: "outdated",
       consensus: runtime.consensus,
       conflictCount,
       outdatedCount,
@@ -89,7 +103,8 @@ export function deriveEvidencePulse(mission: Mission | null): EvidencePulseReadi
       state: "unverified",
       label: `${refs.length} reference${refs.length === 1 ? "" : "s"} without verified source URLs`,
       count: refs.length,
-      limitation: "Source URLs enable verification — add them where available.",
+      limitation: "Add source URLs where you can.",
+      limitationKey: "unverified",
       consensus: runtime.consensus,
       conflictCount,
       outdatedCount,
@@ -105,6 +120,7 @@ export function deriveEvidencePulse(mission: Mission | null): EvidencePulseReadi
       label: parts.join(" · "),
       count: refs.length,
       limitation: runtime.limitation,
+      limitationKey: "deviceLocal",
       consensus: runtime.consensus,
       conflictCount,
       outdatedCount,
@@ -116,6 +132,7 @@ export function deriveEvidencePulse(mission: Mission | null): EvidencePulseReadi
     label: `${refs.length} evidence reference${refs.length === 1 ? "" : "s"} linked`,
     count: refs.length,
     limitation: runtime.limitation,
+    limitationKey: "deviceLocal",
     consensus: runtime.consensus,
     conflictCount,
     outdatedCount,

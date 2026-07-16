@@ -5,6 +5,7 @@ import { getEntityTypeLabel } from "@/lib/entity/entity.helpers";
 import { buildEntityGraphEvidenceSummary } from "@/lib/graph/graph.evidence";
 import KnowledgeLayersDisclosure from "@/components/knowledge/KnowledgeLayersDisclosure";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { cbaiGraphPanel } from "@/components/brand/brand-classes";
 import Link from "next/link";
 import { getDictionary } from "@/lib/i18n/translate";
 
@@ -41,7 +42,7 @@ export default function GraphEntityPanel({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
+      <div className={cbaiGraphPanel}>
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-zinc-50">{t("graphUi.entityDetails")}</h2>
           {selectedNode ? (
@@ -67,7 +68,7 @@ export default function GraphEntityPanel({
         )}
       </div>
 
-      <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
+      <div className={cbaiGraphPanel}>
         <label
           htmlFor="graph-search"
           className="mb-1.5 block text-[10px] font-medium uppercase tracking-widest text-zinc-600"

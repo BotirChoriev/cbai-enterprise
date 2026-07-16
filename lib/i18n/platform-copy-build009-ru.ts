@@ -405,4 +405,9 @@ export const GRAPH_UI_BUILD009_RU = {
   sourceAdapterCountry: "Адаптер страны",
   sourceAdapterCompany: "Адаптер компании",
   sourceAdapterUniversity: "Адаптер университета",
+  canvasHint: "Выберите узел · Прокрутка для панорамы · {nodes} узлов · {edges} связей",
+  zoomControlsAria: "Масштаб графа",
+  zoomOut: "Уменьшить",
+  zoomIn: "Увеличить",
+  zoomReset: "Сброс",
 } as const;

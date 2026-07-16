@@ -2,6 +2,8 @@
 
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { cbaiMineralSurface, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { translateEvidencePulseLimitation } from "@/lib/i18n/evidence-pulse-translation";
+import { getDictionary } from "@/lib/i18n/translate";
 import { deriveEvidencePulse } from "@/lib/intelligence-os/evidence-pulse";
 import type { Mission } from "@/lib/intelligence-os/mission.types";
 import type { EvidencePulseState } from "@/lib/intelligence-os/evidence-pulse";
@@ -25,8 +27,9 @@ const STATE_RING: Record<EvidencePulseState, string> = {
 };
 
 export default function EvidencePulsePanel({ mission }: { mission: Mission | null }) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const pulse = deriveEvidencePulse(mission);
+  const limitation = translateEvidencePulseLimitation(getDictionary(language), pulse.limitationKey);
 
   return (
     <section className={`${cbaiMineralSurface} flex gap-4 p-5`} aria-labelledby="evidence-pulse-heading">
@@ -42,7 +45,7 @@ export default function EvidencePulsePanel({ mission }: { mission: Mission | nul
           {t(`evidencePulse.${STATE_KEYS[pulse.state]}`)} · {pulse.label}
         </h2>
         <p className="text-xs text-zinc-500">
-          {t("evidencePulse.limitation")}: {pulse.limitation}
+          {t("evidencePulse.limitation")}: {limitation}
         </p>
       </div>
     </section>

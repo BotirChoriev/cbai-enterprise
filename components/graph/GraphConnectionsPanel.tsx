@@ -7,9 +7,8 @@ import EntityIcon from "@/components/entity/EntityIcon";
 import { buildEntityGraphEvidenceSummary } from "@/lib/graph/graph.evidence";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { getDictionary } from "@/lib/i18n/translate";
-import {
-  translateGraphEvidenceStatus,
-} from "@/lib/i18n/graph-ui-translation";
+import { cbaiGraphPanel } from "@/components/brand/brand-classes";
+import { translateGraphEvidenceStatus } from "@/lib/i18n/graph-ui-translation";
 
 type GraphConnectionsPanelProps = {
   selectedNode: GraphNode | null;
@@ -27,7 +26,7 @@ export default function GraphConnectionsPanel({
 
   if (!selectedNode) {
     return (
-      <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
+      <div className={cbaiGraphPanel}>
         <h2 className="text-sm font-semibold text-zinc-50">{t("graphUi.connectedEntities")}</h2>
         <p className="mt-3 text-xs leading-relaxed text-zinc-500">{t("graphUi.noSelectionConnections")}</p>
       </div>
@@ -39,7 +38,7 @@ export default function GraphConnectionsPanel({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
+      <div className={cbaiGraphPanel}>
         <h2 className="text-sm font-semibold text-zinc-50">{t("graphUi.evidenceSummary")}</h2>
         <dl className="mt-3 space-y-2 text-xs">
           <div>
@@ -57,7 +56,7 @@ export default function GraphConnectionsPanel({
         </dl>
       </div>
 
-      <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
+      <div className={cbaiGraphPanel}>
         <h2 className="text-sm font-semibold text-zinc-50">{t("graphUi.connectedEntities")}</h2>
         <p className="mt-1 text-[10px] text-zinc-600">
           {t("graphUi.neighborCount", {
@@ -88,7 +87,7 @@ export default function GraphConnectionsPanel({
         </ul>
       </div>
 
-      <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
+      <div className={cbaiGraphPanel}>
         <h2 className="text-sm font-semibold text-zinc-50">{t("graphUi.evidenceRelationships")}</h2>
         <ul className="mt-3 space-y-2">
           {connectedEdges.length === 0 ? (
@@ -109,7 +108,7 @@ export default function GraphConnectionsPanel({
         </ul>
       </div>
 
-      <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
+      <div className={cbaiGraphPanel}>
         <h2 className="text-sm font-semibold text-zinc-50">{t("graphUi.availableInformation")}</h2>
         <p className="mt-2 text-xs leading-relaxed text-zinc-400">{summary.availableInformation}</p>
       </div>

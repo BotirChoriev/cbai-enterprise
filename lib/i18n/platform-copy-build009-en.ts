@@ -405,4 +405,9 @@ export const GRAPH_UI_BUILD009_EN = {
   sourceAdapterCountry: "Country adapter",
   sourceAdapterCompany: "Company adapter",
   sourceAdapterUniversity: "University adapter",
+  canvasHint: "Select a node · Scroll to pan · {nodes} nodes · {edges} edges",
+  zoomControlsAria: "Graph zoom controls",
+  zoomOut: "Zoom out",
+  zoomIn: "Zoom in",
+  zoomReset: "Reset",
 } as const;

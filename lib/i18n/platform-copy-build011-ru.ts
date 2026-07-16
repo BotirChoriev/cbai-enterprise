@@ -101,6 +101,12 @@ export const EVIDENCE_PULSE_RU = {
   outdated: "Устарело",
   unverified: "Не проверено",
   limitation: "Ограничение",
+  limitationNoProject: "Привяжите проект или добавьте доказательства.",
+  limitationNoRefs: "Только ваши ссылки — ничего не выдумывается.",
+  limitationConflicting: "Сверьте противоречивые источники перед решением.",
+  limitationOutdated: "Некоторые источники могут устареть.",
+  limitationUnverified: "Добавьте URL источников, где возможно.",
+  limitationDeviceLocal: "Сохранено на этом устройстве — живая проверка не подключена.",
 } as const;
 
 export const SYSTEM_AWAKENING_RU = {

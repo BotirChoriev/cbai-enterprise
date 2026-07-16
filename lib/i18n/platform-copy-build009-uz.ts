@@ -405,4 +405,9 @@ export const GRAPH_UI_BUILD009_UZ = {
   sourceAdapterCountry: "Mamlakat adapteri",
   sourceAdapterCompany: "Kompaniya adapteri",
   sourceAdapterUniversity: "Universitet adapteri",
+  canvasHint: "Tugunni tanlang · Surish uchun aylantiring · {nodes} tugun · {edges} bog'lanish",
+  zoomControlsAria: "Graf masshtabini boshqarish",
+  zoomOut: "Kichiklashtirish",
+  zoomIn: "Kattalashtirish",
+  zoomReset: "Asliga",
 } as const;

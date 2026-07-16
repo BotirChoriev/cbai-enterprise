@@ -405,4 +405,9 @@ export const GRAPH_UI_BUILD009_TR = {
   sourceAdapterCountry: "Ülke adaptörü",
   sourceAdapterCompany: "Şirket adaptörü",
   sourceAdapterUniversity: "Üniversite adaptörü",
+  canvasHint: "Bir düğüm seçin · Kaydırmak için kaydırın · {nodes} düğüm · {edges} kenar",
+  zoomControlsAria: "Graf yakınlaştırma",
+  zoomOut: "Uzaklaştır",
+  zoomIn: "Yakınlaştır",
+  zoomReset: "Sıfırla",
 } as const;

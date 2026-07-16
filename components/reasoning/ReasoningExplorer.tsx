@@ -5,6 +5,7 @@ import { buildReasoningExplorerModel } from "@/lib/reasoning-explorer";
 import ReasoningPipelineOverview from "@/components/reasoning/ReasoningPipelineOverview";
 import ReasoningEvidenceIndicatorMap from "@/components/reasoning/ReasoningEvidenceIndicatorMap";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
+import { cbaiStatCell } from "@/components/brand/brand-classes";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 
@@ -21,19 +22,19 @@ export default function ReasoningExplorer() {
     >
       {disclosure.showReasoningStats ? (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3">
+          <div className={`${cbaiStatCell} py-3`}>
             <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
               {t("reasoningPage.reviewSteps")}
             </p>
             <p className="mt-1 text-xl font-semibold text-zinc-100">{model.summary.pipelineStages}</p>
           </div>
-          <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3">
+          <div className={`${cbaiStatCell} py-3`}>
             <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
               {t("reasoningPage.topicAreas")}
             </p>
             <p className="mt-1 text-xl font-semibold text-zinc-100">{model.summary.indicatorDomains}</p>
           </div>
-          <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3">
+          <div className={`${cbaiStatCell} py-3`}>
             <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
               {t("reasoningPage.informationConnected")}
             </p>
@@ -42,7 +43,7 @@ export default function ReasoningExplorer() {
               <span className="text-sm font-normal text-zinc-500"> / {model.summary.totalIndicators}</span>
             </p>
           </div>
-          <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3">
+          <div className={`${cbaiStatCell} py-3`}>
             <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
               {t("reasoningPage.sourcesConnected")}
             </p>
