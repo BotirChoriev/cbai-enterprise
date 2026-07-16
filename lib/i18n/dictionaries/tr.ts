@@ -54,6 +54,17 @@ import {
   DISCOVERY_ENGINE_TR,
   SUPREME_CONSTITUTION_TR,
 } from "@/lib/i18n/platform-copy-build010-tr";
+import {
+  EVIDENCE_PULSE_TR,
+  HUMAN_IMPACT_TR,
+  INTELLIGENCE_LENSES_TR,
+  LANGUAGE_SELECTOR_TR,
+  MISSION_CENTER_TR,
+  MISSION_CREATION_TR,
+  MISSION_THREAD_TR,
+  OPERATING_CONTEXT_TR,
+  SYSTEM_AWAKENING_TR,
+} from "@/lib/i18n/platform-copy-build011-tr";
 
 const tr: TranslationDictionary = {
   roles: {
@@ -498,6 +509,15 @@ const tr: TranslationDictionary = {
   adaptiveIntelligence: ADAPTIVE_INTELLIGENCE_TR,
   supremeConstitution: SUPREME_CONSTITUTION_TR,
   capabilityDomains: CAPABILITY_DOMAINS_TR,
+  missionCenter: MISSION_CENTER_TR,
+  missionCreation: MISSION_CREATION_TR,
+  missionThread: MISSION_THREAD_TR,
+  evidencePulse: EVIDENCE_PULSE_TR,
+  systemAwakening: SYSTEM_AWAKENING_TR,
+  languageSelector: LANGUAGE_SELECTOR_TR,
+  intelligenceLenses: INTELLIGENCE_LENSES_TR,
+  humanImpact: HUMAN_IMPACT_TR,
+  operatingContext: OPERATING_CONTEXT_TR,
 };
 
 export default tr;

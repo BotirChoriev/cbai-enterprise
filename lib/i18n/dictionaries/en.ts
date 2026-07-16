@@ -54,6 +54,17 @@ import {
   DISCOVERY_ENGINE_EN,
   SUPREME_CONSTITUTION_EN,
 } from "@/lib/i18n/platform-copy-build010-en";
+import {
+  EVIDENCE_PULSE_EN,
+  HUMAN_IMPACT_EN,
+  INTELLIGENCE_LENSES_EN,
+  LANGUAGE_SELECTOR_EN,
+  MISSION_CENTER_EN,
+  MISSION_CREATION_EN,
+  MISSION_THREAD_EN,
+  OPERATING_CONTEXT_EN,
+  SYSTEM_AWAKENING_EN,
+} from "@/lib/i18n/platform-copy-build011-en";
 
 const en: TranslationDictionary = {
   roles: {
@@ -499,6 +510,15 @@ const en: TranslationDictionary = {
   adaptiveIntelligence: ADAPTIVE_INTELLIGENCE_EN,
   supremeConstitution: SUPREME_CONSTITUTION_EN,
   capabilityDomains: CAPABILITY_DOMAINS_EN,
+  missionCenter: MISSION_CENTER_EN,
+  missionCreation: MISSION_CREATION_EN,
+  missionThread: MISSION_THREAD_EN,
+  evidencePulse: EVIDENCE_PULSE_EN,
+  systemAwakening: SYSTEM_AWAKENING_EN,
+  languageSelector: LANGUAGE_SELECTOR_EN,
+  intelligenceLenses: INTELLIGENCE_LENSES_EN,
+  humanImpact: HUMAN_IMPACT_EN,
+  operatingContext: OPERATING_CONTEXT_EN,
 };
 
 export default en;

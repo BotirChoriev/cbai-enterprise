@@ -25,7 +25,7 @@ export default function Sidebar() {
     <aside
       className={`hidden h-full shrink-0 flex-col bg-[#050810] transition-all duration-300 md:flex ${
         isHome
-          ? "w-16 border-r border-transparent opacity-[0.22] hover:border-teal-500/10 hover:opacity-90"
+          ? "w-56 border-r border-teal-500/10 opacity-100"
           : "w-64 border-r border-teal-500/10 opacity-100"
       }`}
     >
@@ -67,10 +67,10 @@ export default function Sidebar() {
                       isActive
                         ? "bg-teal-500/10 text-teal-400"
                         : "text-zinc-400 hover:bg-slate-900/80 hover:text-zinc-50"
-                    } ${isHome ? "justify-center px-2" : ""}`}
+                    }`}
                   >
                     <NavIcon name={item.icon} />
-                    {!isHome ? label : null}
+                    {label}
                   </Link>
                 );
               })}
@@ -78,8 +78,7 @@ export default function Sidebar() {
           </div>
         ))}
 
-        {!isHome ? (
-          <details className="border-t border-zinc-800/60 pt-3">
+        <details className="border-t border-zinc-800/60 pt-3">
             <summary className="mb-2 cursor-pointer list-none px-3 text-[10px] font-medium uppercase tracking-widest text-zinc-600 hover:text-zinc-400">
               {t("navigation.intelligenceCabinet")}
             </summary>
@@ -110,7 +109,6 @@ export default function Sidebar() {
               </div>
             ))}
           </details>
-        ) : null}
       </nav>
 
       {!isHome ? (

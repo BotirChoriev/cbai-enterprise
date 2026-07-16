@@ -54,6 +54,17 @@ import {
   DISCOVERY_ENGINE_RU,
   SUPREME_CONSTITUTION_RU,
 } from "@/lib/i18n/platform-copy-build010-ru";
+import {
+  EVIDENCE_PULSE_RU,
+  HUMAN_IMPACT_RU,
+  INTELLIGENCE_LENSES_RU,
+  LANGUAGE_SELECTOR_RU,
+  MISSION_CENTER_RU,
+  MISSION_CREATION_RU,
+  MISSION_THREAD_RU,
+  OPERATING_CONTEXT_RU,
+  SYSTEM_AWAKENING_RU,
+} from "@/lib/i18n/platform-copy-build011-ru";
 
 const ru: TranslationDictionary = {
   roles: {
@@ -498,6 +509,15 @@ const ru: TranslationDictionary = {
   adaptiveIntelligence: ADAPTIVE_INTELLIGENCE_RU,
   supremeConstitution: SUPREME_CONSTITUTION_RU,
   capabilityDomains: CAPABILITY_DOMAINS_RU,
+  missionCenter: MISSION_CENTER_RU,
+  missionCreation: MISSION_CREATION_RU,
+  missionThread: MISSION_THREAD_RU,
+  evidencePulse: EVIDENCE_PULSE_RU,
+  systemAwakening: SYSTEM_AWAKENING_RU,
+  languageSelector: LANGUAGE_SELECTOR_RU,
+  intelligenceLenses: INTELLIGENCE_LENSES_RU,
+  humanImpact: HUMAN_IMPACT_RU,
+  operatingContext: OPERATING_CONTEXT_RU,
 };
 
 export default ru;

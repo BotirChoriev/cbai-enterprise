@@ -54,6 +54,17 @@ import {
   DISCOVERY_ENGINE_UZ,
   SUPREME_CONSTITUTION_UZ,
 } from "@/lib/i18n/platform-copy-build010-uz";
+import {
+  EVIDENCE_PULSE_UZ,
+  HUMAN_IMPACT_UZ,
+  INTELLIGENCE_LENSES_UZ,
+  LANGUAGE_SELECTOR_UZ,
+  MISSION_CENTER_UZ,
+  MISSION_CREATION_UZ,
+  MISSION_THREAD_UZ,
+  OPERATING_CONTEXT_UZ,
+  SYSTEM_AWAKENING_UZ,
+} from "@/lib/i18n/platform-copy-build011-uz";
 
 const uz: TranslationDictionary = {
   roles: {
@@ -498,6 +509,15 @@ const uz: TranslationDictionary = {
   adaptiveIntelligence: ADAPTIVE_INTELLIGENCE_UZ,
   supremeConstitution: SUPREME_CONSTITUTION_UZ,
   capabilityDomains: CAPABILITY_DOMAINS_UZ,
+  missionCenter: MISSION_CENTER_UZ,
+  missionCreation: MISSION_CREATION_UZ,
+  missionThread: MISSION_THREAD_UZ,
+  evidencePulse: EVIDENCE_PULSE_UZ,
+  systemAwakening: SYSTEM_AWAKENING_UZ,
+  languageSelector: LANGUAGE_SELECTOR_UZ,
+  intelligenceLenses: INTELLIGENCE_LENSES_UZ,
+  humanImpact: HUMAN_IMPACT_UZ,
+  operatingContext: OPERATING_CONTEXT_UZ,
 };
 
 export default uz;

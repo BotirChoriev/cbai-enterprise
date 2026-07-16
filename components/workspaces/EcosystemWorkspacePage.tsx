@@ -21,7 +21,7 @@ export default function EcosystemWorkspacePage({
   return (
     <OperatingPageShell title={t(titleKey)} description={t(`previewPages.${previewKey}`)}>
       <p className={`${cbaiGlassCard} px-4 py-3 text-xs text-zinc-500`}>
-        {t("previewPages.inDevelopmentEyebrow")} — {t(`previewPages.${previewKey}`)}
+        {t("intelligenceLenses.notPortal")} — {t(`previewPages.${previewKey}`)}
       </p>
       {children}
     </OperatingPageShell>

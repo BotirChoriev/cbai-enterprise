@@ -116,7 +116,7 @@ if (!serverUp) {
     const page = await browser.newPage();
     await page.goto(BASE + "/", { waitUntil: "networkidle" });
     await page.waitForTimeout(2400);
-    await page.locator("summary").first().click();
+    await page.locator("summary[data-cbai-language-selector]").click();
     await page.waitForTimeout(300);
     await page.locator("text=/O.zbek/i").first().click();
     await page.waitForTimeout(600);
@@ -243,7 +243,7 @@ if (!serverUp) {
       await page.goto(BASE + "/", { waitUntil: "networkidle" });
       await page.waitForTimeout(2400);
       if (langIndex > 0) {
-        await page.locator("summary").first().click();
+        await page.locator("summary[data-cbai-language-selector]").click();
         await page.waitForTimeout(300);
         await page.locator(`text=${lang.label}`).first().click();
         await page.waitForTimeout(600);
@@ -297,7 +297,7 @@ if (!serverUp) {
     const page = await browser.newPage();
     await page.goto(BASE + "/", { waitUntil: "networkidle" });
     await page.waitForTimeout(2400);
-    await page.locator("summary").first().click();
+    await page.locator("summary[data-cbai-language-selector]").click();
     await page.waitForTimeout(300);
     await page.locator("text=/O.zbek/i").first().click();
     await page.waitForTimeout(600);

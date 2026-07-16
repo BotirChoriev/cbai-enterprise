@@ -36,3 +36,10 @@ export const cbaiHeroGlow =
   "relative overflow-hidden before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.08),transparent_55%)]";
 
 export const cbaiOperatingShell = "min-h-full bg-[var(--background)] text-[var(--foreground)]";
+
+/** Mineral surface — structured operating panel without excessive glass. */
+export const cbaiMineralSurface =
+  "rounded-xl border border-zinc-800/80 bg-[var(--surface)]/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]";
+
+/** Mission Center primary column rhythm. */
+export const cbaiMissionCenterGrid = "grid gap-6 lg:grid-cols-12";

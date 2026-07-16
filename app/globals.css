@@ -63,18 +63,11 @@ body {
   letter-spacing: -0.01em;
 }
 
-/* Premium glass surface */
-.cbai-glass {
-  background: color-mix(in srgb, var(--card) 90%, transparent);
-  border: 1px solid color-mix(in srgb, var(--accent) 14%, var(--border));
-  backdrop-filter: blur(14px);
-  box-shadow:
-    0 0 48px -16px color-mix(in srgb, var(--accent) 20%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
-}
-
+/* Premium mineral + glass surfaces */
 .cbai-glass {
   background: color-mix(in srgb, var(--surface) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 14%, var(--border));
+  backdrop-filter: blur(14px);
   box-shadow:
     0 0 48px -16px color-mix(in srgb, var(--accent) 18%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
@@ -87,11 +80,18 @@ html.theme-light .cbai-glass {
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
-/* Home page design system */
+/* Mission Center — operating surface rhythm */
+.mission-center {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+/* Home page design system (legacy routes) */
 .home-page {
   display: flex;
   flex-direction: column;
-  gap: clamp(3.5rem, 6vw, 5rem);
+  gap: clamp(2rem, 4vw, 3rem);
 }
 
 .home-section {
