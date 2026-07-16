@@ -84,7 +84,21 @@ test("9. Sidebar on home shows readable labels — not ghost icon-only rail", ()
   assert.match(sidebar, /w-56/);
 });
 
-test("10. Mineral surface token exists for operating panels", () => {
+test("11. Product polish — unified design tokens in brand-classes", () => {
   const brand = readSource("components/brand/brand-classes.ts");
-  assert.match(brand, /cbaiMineralSurface/);
+  assert.match(brand, /cbaiTransition/);
+  assert.match(brand, /cbaiFocusRing/);
+  assert.match(brand, /cbaiChip/);
+  assert.match(brand, /cbaiMineralPanel/);
+  assert.match(brand, /cbaiBtnPrimarySm/);
+  assert.match(brand, /cbaiLinkAction/);
+  const css = readSource("app/globals.css");
+  assert.match(css, /--cbai-motion-fast/);
+  assert.match(css, /--cbai-radius-lg/);
+  const evidence = readSource("components/evidence/EvidencePrimaryStatesPanel.tsx");
+  assert.match(evidence, /cbaiStatCell/);
+  assert.match(evidence, /cbaiLinkAction/);
+  const gateway = readSource("components/gateway/IntelligenceGatewayEntry.tsx");
+  assert.match(gateway, /cbaiChip/);
+  assert.match(gateway, /cbaiProminentAction/);
 });

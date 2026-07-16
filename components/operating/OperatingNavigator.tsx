@@ -9,7 +9,13 @@ import { operatingNavigationItems } from "@/lib/navigation-operating";
 import { deriveNavLiveState, type NavLiveState } from "@/lib/intelligence-os/nav-live-state";
 import { translateNavLabel, translateNavSectionTitle } from "@/lib/i18n/nav-translation";
 import NavIcon from "@/components/layout/NavIcon";
-import { cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import {
+  cbaiNavEyebrow,
+  cbaiNavRow,
+  cbaiNavRowActive,
+  cbaiNavRowIdle,
+  cbaiSectionEyebrow,
+} from "@/components/brand/brand-classes";
 
 const LIVE_LABEL: Record<NavLiveState, string> = {
   active: "operatingNav.liveActive",
@@ -41,9 +47,7 @@ function NavRow({
   return (
     <Link
       href={href}
-      className={`flex items-center gap-2.5 rounded-md px-2 py-2 text-xs transition-colors ${
-        live === "active" ? "bg-teal-500/10 text-teal-300" : "text-zinc-500 hover:bg-zinc-900/60 hover:text-zinc-200"
-      }`}
+      className={`${cbaiNavRow} ${live === "active" ? cbaiNavRowActive : cbaiNavRowIdle}`}
       title={`${label} — ${t(LIVE_LABEL[live])}`}
     >
       <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${LIVE_DOT[live]}`} aria-hidden="true" />
@@ -84,7 +88,7 @@ export default function OperatingNavigator() {
       {primaryNavSections.map((section, index) => (
         <div key={section.title || `section-${index}`}>
           {section.title ? (
-            <p className="mb-2 px-2 text-[10px] font-medium uppercase tracking-widest text-zinc-600">
+            <p className={`${cbaiNavEyebrow} mb-2 px-2`}>
               {translateNavSectionTitle(t, section.title)}
             </p>
           ) : null}
@@ -107,12 +111,12 @@ export default function OperatingNavigator() {
         </div>
       ))}
       <details className="border-t border-zinc-800/60 pt-3">
-        <summary className="mb-2 cursor-pointer list-none px-2 text-[10px] font-medium uppercase tracking-widest text-zinc-600 hover:text-zinc-400">
+        <summary className={`${cbaiNavEyebrow} mb-2 cursor-pointer list-none px-2 hover:text-zinc-400`}>
           {t("navigation.intelligenceCabinet")}
         </summary>
         {secondaryNavSections.map((section, index) => (
           <div key={section.title || `secondary-${index}`} className="mb-3">
-            <p className="mb-2 px-2 text-[10px] font-medium uppercase tracking-widest text-zinc-700">
+            <p className={`${cbaiNavEyebrow} mb-2 px-2 text-zinc-700`}>
               {translateNavSectionTitle(t, section.title)}
             </p>
             <ul className="space-y-0.5">

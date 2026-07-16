@@ -6,6 +6,7 @@ import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import { deriveFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
+import { cbaiLinkAction, cbaiLinkMuted, cbaiTextBody } from "@/components/brand/brand-classes";
 
 /** Mission Gravity 2.0 — quieter in focused mode; one line when possible. */
 export default function GlobalMissionContextBar() {
@@ -22,16 +23,16 @@ export default function GlobalMissionContextBar() {
         aria-label={t("operatingContext.missionContext")}
       >
         <div className="flex items-center justify-between gap-2">
-          <p className="truncate text-sm text-zinc-300">
+          <p className={`truncate ${cbaiTextBody}`}>
             {mission?.problem ?? firstAction.label}
           </p>
           <div className="flex shrink-0 items-center gap-2">
             {pathname !== "/" ? (
-              <Link href="/" className="text-xs text-zinc-500 hover:text-teal-300">
+              <Link href="/" className={cbaiLinkMuted}>
                 {t("zeroLearningCurve.returnToMission")}
               </Link>
             ) : null}
-            <Link href={firstAction.href} className="text-xs text-teal-400 hover:text-teal-300">
+            <Link href={firstAction.href} className={cbaiLinkAction} aria-label={firstAction.label}>
               →
             </Link>
           </div>
@@ -63,7 +64,7 @@ export default function GlobalMissionContextBar() {
             </span>
           ) : null}
           {pathname !== "/" ? (
-            <Link href="/" className="text-teal-400/90 hover:text-teal-300">
+            <Link href="/" className={cbaiLinkAction}>
               {t("zeroLearningCurve.returnToMission")} →
             </Link>
           ) : null}

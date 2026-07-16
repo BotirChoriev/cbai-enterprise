@@ -21,6 +21,24 @@
   --gold: #c6952f;
   --gold-soft: #e8c878;
   --titanium: #767f7c;
+  /* Product polish — unified scale (Phase 1) */
+  --cbai-radius-sm: 0.375rem;
+  --cbai-radius-md: 0.5rem;
+  --cbai-radius-lg: 0.75rem;
+  --cbai-radius-xl: 0.875rem;
+  --cbai-space-1: 0.25rem;
+  --cbai-space-2: 0.5rem;
+  --cbai-space-3: 0.75rem;
+  --cbai-space-4: 1rem;
+  --cbai-space-5: 1.25rem;
+  --cbai-space-6: 1.5rem;
+  --cbai-motion-fast: 150ms;
+  --cbai-motion-base: 250ms;
+  --cbai-motion-slow: 350ms;
+  --cbai-panel-padding: 1rem;
+  --cbai-panel-padding-lg: 1.25rem;
+  --cbai-touch-min: 2rem;
+  --cbai-touch-comfort: 2.5rem;
 }
 
 html.theme-light {
@@ -49,6 +67,16 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+  color: var(--foreground);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--border) 80%, transparent) transparent;
 }
 
 /* The CBAI display face — statement-scale headlines only (the arrival hero, About's section
@@ -411,7 +439,9 @@ html.theme-light [class*="backdrop-blur"] {
 }
 
 .cbai-operating-object {
-  transition: background-color 0.25s ease, border-color 0.25s ease;
+  transition:
+    background-color var(--cbai-motion-base) ease,
+    border-color var(--cbai-motion-base) ease;
 }
 
 .cbai-reduced-motion .cbai-operating-object {

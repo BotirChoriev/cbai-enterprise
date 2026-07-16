@@ -1,6 +1,6 @@
 "use client";
 
-import { cbaiBtnSecondary } from "@/components/brand/brand-classes";
+import { cbaiBtnSecondarySm } from "@/components/brand/brand-classes";
 
 type ResearchNetworkZoomControlsProps = {
   onZoomIn: () => void;
@@ -27,7 +27,7 @@ export default function ResearchNetworkZoomControls({
         type="button"
         onClick={onZoomIn}
         disabled={!canZoomIn}
-        className={`${cbaiBtnSecondary} min-h-9 px-3 py-1.5 text-xs disabled:cursor-not-allowed disabled:opacity-40`}
+        className={`${cbaiBtnSecondarySm} disabled:cursor-not-allowed disabled:opacity-40`}
         aria-label="Zoom in"
       >
         Zoom in
@@ -36,7 +36,7 @@ export default function ResearchNetworkZoomControls({
         type="button"
         onClick={onZoomOut}
         disabled={!canZoomOut}
-        className={`${cbaiBtnSecondary} min-h-9 px-3 py-1.5 text-xs disabled:cursor-not-allowed disabled:opacity-40`}
+        className={`${cbaiBtnSecondarySm} disabled:cursor-not-allowed disabled:opacity-40`}
         aria-label="Zoom out"
       >
         Zoom out
@@ -44,7 +44,7 @@ export default function ResearchNetworkZoomControls({
       <button
         type="button"
         onClick={onResetView}
-        className={`${cbaiBtnSecondary} min-h-9 px-3 py-1.5 text-xs`}
+        className={cbaiBtnSecondarySm}
         aria-label="Reset view"
       >
         Reset view

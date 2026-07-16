@@ -6,7 +6,12 @@ import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import { deriveFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
-import { cbaiBtnPrimary, cbaiMineralSurface, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import {
+  cbaiBtnPrimarySm,
+  cbaiLinkMuted,
+  cbaiMineralPanelMd,
+  cbaiSectionEyebrow,
+} from "@/components/brand/brand-classes";
 
 export default function ReportsPrimaryActions() {
   const { t } = useTranslation();
@@ -24,15 +29,16 @@ export default function ReportsPrimaryActions() {
   ];
 
   return (
-    <nav className={`${cbaiMineralSurface} space-y-3 p-4`} aria-label={t("reports.title")}>
+    <nav className={cbaiMineralPanelMd} aria-label={t("reports.title")}>
       <p className={cbaiSectionEyebrow}>{t("zeroLearningCurve.nextAction")}</p>
-      <Link href={primary.href} className={`${cbaiBtnPrimary} inline-flex text-xs`}>
-        {primary.label} →
+      <Link href={primary.href} className={`${cbaiBtnPrimarySm} gap-1.5`}>
+        {primary.label}
+        <span aria-hidden="true">→</span>
       </Link>
       {disclosure.level !== "beginner" ? (
-        <div className="flex flex-wrap gap-3 text-xs">
+        <div className="flex flex-wrap gap-3">
           {secondary.map((action) => (
-            <Link key={action.href} href={action.href} className="text-zinc-500 hover:text-teal-300">
+            <Link key={action.href} href={action.href} className={cbaiLinkMuted}>
               {action.label}
             </Link>
           ))}

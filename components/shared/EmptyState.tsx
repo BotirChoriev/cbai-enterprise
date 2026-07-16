@@ -1,5 +1,12 @@
 import type { ReactNode } from "react";
-import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import {
+  cbaiEmptyDashed,
+  cbaiGlassCard,
+  cbaiPanelPadding,
+  cbaiSectionEyebrow,
+  cbaiStackSm,
+  cbaiTextMuted,
+} from "@/components/brand/brand-classes";
 
 type EmptyStateProps = {
   /** "dashed" — an inline list/grid came back with zero real results after filtering (e.g. a
@@ -21,19 +28,19 @@ type EmptyStateProps = {
 export default function EmptyState({ variant = "section", title, message, action }: EmptyStateProps) {
   if (variant === "dashed") {
     return (
-      <div className="rounded-xl border border-dashed border-zinc-800 px-5 py-12 text-center">
+      <div className={cbaiEmptyDashed}>
         {title ? <p className="text-sm font-medium text-zinc-300">{title}</p> : null}
-        <p className={`text-sm text-zinc-500 ${title ? "mt-1" : ""}`}>{message}</p>
+        <p className={`${cbaiTextMuted} ${title ? "mt-1" : ""}`}>{message}</p>
         {action ? <div className="mt-4 flex justify-center">{action}</div> : null}
       </div>
     );
   }
 
   return (
-    <section className={`${cbaiGlassCard} space-y-2 p-5`}>
+    <section className={`${cbaiGlassCard} ${cbaiPanelPadding} ${cbaiStackSm}`}>
       {title ? <p className={cbaiSectionEyebrow}>{title}</p> : null}
-      <p className="text-xs text-zinc-500">{message}</p>
-      {action ? <div className="pt-1">{action}</div> : null}
+      <p className={cbaiTextMuted}>{message}</p>
+      {action ? <div>{action}</div> : null}
     </section>
   );
 }

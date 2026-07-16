@@ -6,7 +6,14 @@ import { usePathname } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import HumanDecisionBoundary from "@/components/intelligence-os/HumanDecisionBoundary";
-import { cbaiMineralSurface, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import {
+  cbaiLinkMuted,
+  cbaiMineralPanelMd,
+  cbaiProminentAction,
+  cbaiSectionEyebrow,
+  cbaiTextBody,
+  cbaiTextMuted,
+} from "@/components/brand/brand-classes";
 import {
   deriveRouteCompanion,
   routePurposeI18nKey,
@@ -75,17 +82,14 @@ export default function MissionOperatingContextBar({
     priorThought.lastFocus.length > 0;
 
   return (
-    <aside
-      className={`${cbaiMineralSurface} space-y-3 p-4`}
-      aria-label={t("zeroLearningCurve.companionEyebrow")}
-    >
+    <aside className={cbaiMineralPanelMd} aria-label={t("zeroLearningCurve.companionEyebrow")}>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 flex-1 space-y-2">
           <p className={cbaiSectionEyebrow}>{t("zeroLearningCurve.companionEyebrow")}</p>
-          <p className="text-sm text-zinc-300">{purpose}</p>
-          <p className="text-xs text-zinc-500">{storyBeat}</p>
+          <p className={cbaiTextBody}>{purpose}</p>
+          <p className={cbaiTextMuted}>{storyBeat}</p>
           {showResume ? (
-            <p className="text-xs text-zinc-500">
+            <p className={cbaiTextMuted}>
               {t("zeroLearningCurve.resumeThought")}: {priorThought.lastFocus}
             </p>
           ) : null}
@@ -94,14 +98,12 @@ export default function MissionOperatingContextBar({
           ) : null}
         </div>
         <div className="flex shrink-0 flex-col items-end gap-2">
-          <Link href="/" className="text-xs text-zinc-500 hover:text-teal-300">
+          <Link href="/" className={cbaiLinkMuted}>
             {t("zeroLearningCurve.returnToMission")}
           </Link>
-          <Link
-            href={companion.nextHref}
-            className="rounded-md border border-teal-500/30 px-3 py-1.5 text-xs font-medium text-teal-300 hover:border-teal-400/50 hover:text-teal-200"
-          >
-            {companion.nextLabel} →
+          <Link href={companion.nextHref} className={`${cbaiProminentAction} gap-1.5`}>
+            {companion.nextLabel}
+            <span aria-hidden="true">→</span>
           </Link>
         </div>
       </div>

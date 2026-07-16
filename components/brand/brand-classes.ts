@@ -5,6 +5,31 @@ export const brandAccentHover = "hover:text-teal-300";
 export const brandAccentBg = "bg-teal-500/10";
 export const brandAccentBorder = "border-teal-500/20";
 
+/* ── Motion & focus (one language) ─────────────────────────────────────── */
+
+export const cbaiTransition = "transition-colors duration-150 ease-out";
+
+export const cbaiFocusRing =
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400";
+
+/* ── Spacing scale ─────────────────────────────────────────────────────── */
+
+export const cbaiPanelPadding = "p-4";
+export const cbaiPanelPaddingLg = "p-5";
+export const cbaiStackSm = "space-y-2";
+export const cbaiStackMd = "space-y-3";
+export const cbaiStackLg = "space-y-4";
+export const cbaiGapSm = "gap-2";
+export const cbaiGapMd = "gap-3";
+
+/* ── Typography scale ──────────────────────────────────────────────────── */
+
+export const cbaiTextBody = "text-sm text-zinc-300";
+export const cbaiTextMuted = "text-xs text-zinc-500";
+export const cbaiTextCaption = "text-xs text-zinc-400";
+
+/* ── Surfaces ──────────────────────────────────────────────────────────── */
+
 export const cbaiGlassCard =
   "rounded-xl border border-teal-500/10 bg-[var(--card)]/80 shadow-[0_0_48px_-16px_rgba(13,148,136,0.14)] backdrop-blur-md";
 
@@ -16,18 +41,65 @@ export const cbaiSectionEyebrow =
 export const cbaiPageHeader =
   "rounded-xl border border-teal-500/10 bg-[var(--surface)]/80 px-6 py-5 backdrop-blur-sm";
 
+/** Mineral surface — structured operating panel without excessive glass. */
+export const cbaiMineralSurface =
+  "rounded-xl border border-zinc-800/80 bg-[var(--surface)]/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]";
+
+export const cbaiMineralPanel = `${cbaiMineralSurface} ${cbaiPanelPadding}`;
+export const cbaiMineralPanelMd = `${cbaiMineralSurface} ${cbaiPanelPadding} ${cbaiStackMd}`;
+
+export const cbaiEmptyDashed =
+  "rounded-xl border border-dashed border-zinc-800 px-5 py-12 text-center";
+
+export const cbaiStatCell = "rounded-lg border border-zinc-800/80 bg-zinc-950/40 px-3 py-2";
+
+/* ── Buttons ───────────────────────────────────────────────────────────── */
+
 export const cbaiBtnPrimary =
-  "inline-flex min-h-10 items-center justify-center rounded-lg bg-teal-600 px-5 text-sm font-semibold text-zinc-50 transition-colors hover:bg-teal-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400";
+  `inline-flex min-h-10 items-center justify-center rounded-lg bg-teal-600 px-5 text-sm font-semibold text-zinc-50 ${cbaiTransition} hover:bg-teal-500 ${cbaiFocusRing}`;
+
+export const cbaiBtnPrimarySm =
+  `inline-flex min-h-8 items-center justify-center rounded-lg bg-teal-600 px-4 text-xs font-semibold text-zinc-50 ${cbaiTransition} hover:bg-teal-500 ${cbaiFocusRing}`;
 
 export const cbaiBtnSecondary =
-  "inline-flex min-h-10 items-center justify-center rounded-lg border border-zinc-700 bg-[var(--surface)]/80 px-5 text-sm font-medium text-teal-400 transition-colors hover:border-teal-500/30 hover:bg-zinc-900/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400";
+  `inline-flex min-h-10 items-center justify-center rounded-lg border border-zinc-700 bg-[var(--surface)]/80 px-5 text-sm font-medium text-teal-400 ${cbaiTransition} hover:border-teal-500/30 hover:bg-zinc-900/60 ${cbaiFocusRing}`;
+
+export const cbaiBtnSecondarySm =
+  `inline-flex min-h-8 items-center justify-center rounded-lg border border-zinc-700 bg-[var(--surface)]/80 px-3 text-xs font-medium text-teal-400 ${cbaiTransition} hover:border-teal-500/30 hover:bg-zinc-900/60 disabled:cursor-not-allowed disabled:opacity-40 ${cbaiFocusRing}`;
+
+/* ── Chips & inline actions ────────────────────────────────────────────── */
+
+export const cbaiChip =
+  `inline-flex min-h-8 items-center rounded-lg border border-zinc-800 px-3 py-1.5 text-xs text-zinc-500 ${cbaiTransition} hover:border-teal-500/30 hover:text-teal-300 ${cbaiFocusRing}`;
+
+export const cbaiChipActive =
+  `inline-flex min-h-8 items-center rounded-lg border border-teal-500/30 bg-teal-500/10 px-3 py-1.5 text-xs text-teal-300 ${cbaiFocusRing}`;
+
+export const cbaiProminentAction =
+  `inline-flex min-h-10 items-center rounded-lg border border-teal-500/30 bg-teal-500/10 px-3 py-2 text-sm font-medium text-teal-300 ${cbaiTransition} hover:border-teal-400/50 hover:bg-teal-500/15 ${cbaiFocusRing}`;
+
+export const cbaiLinkMuted =
+  `text-xs text-zinc-500 ${cbaiTransition} hover:text-teal-300 ${cbaiFocusRing}`;
+
+export const cbaiLinkAction =
+  `text-xs text-teal-400 ${cbaiTransition} hover:text-teal-300 ${cbaiFocusRing}`;
+
+/* ── Navigation ────────────────────────────────────────────────────────── */
 
 export const cbaiNavActive = "bg-teal-500/10 text-teal-400";
-export const cbaiNavInactive =
-  "text-zinc-400 hover:bg-zinc-900/80 hover:text-zinc-50";
+export const cbaiNavInactive = `text-zinc-400 ${cbaiTransition} hover:bg-zinc-900/80 hover:text-zinc-50`;
+
+export const cbaiNavEyebrow =
+  "text-[10px] font-medium uppercase tracking-[0.18em] text-zinc-600";
+
+export const cbaiNavRow = `flex items-center gap-2.5 rounded-lg px-2 py-2 text-xs ${cbaiTransition} ${cbaiFocusRing}`;
+export const cbaiNavRowActive = "bg-teal-500/10 text-teal-300";
+export const cbaiNavRowIdle = "text-zinc-500 hover:bg-zinc-900/60 hover:text-zinc-200";
+
+/* ── Search & shell ────────────────────────────────────────────────────── */
 
 export const cbaiSearchShell =
-  "cbai-glass rounded-xl border border-teal-500/20 p-2 shadow-[0_0_40px_-12px_rgba(13,148,136,0.18)] transition-shadow focus-within:border-teal-400/40 focus-within:shadow-[0_0_56px_-8px_rgba(13,148,136,0.28)]";
+  "cbai-glass rounded-xl border border-teal-500/20 p-2 shadow-[0_0_40px_-12px_rgba(13,148,136,0.18)] transition-shadow duration-150 ease-out focus-within:border-teal-400/40 focus-within:shadow-[0_0_56px_-8px_rgba(13,148,136,0.28)]";
 
 export const cbaiSearchInput =
   "home-search-input w-full rounded-lg border border-zinc-800/80 bg-[var(--surface)]/90 px-5 py-4 text-lg text-zinc-100 placeholder:text-zinc-500 focus-visible:outline-none sm:py-5 sm:pr-36 sm:text-xl";
@@ -36,10 +108,6 @@ export const cbaiHeroGlow =
   "relative overflow-hidden before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(ellipse_at_top_left,rgba(13,148,136,0.08),transparent_55%)]";
 
 export const cbaiOperatingShell = "min-h-full bg-[var(--background)] text-[var(--foreground)]";
-
-/** Mineral surface — structured operating panel without excessive glass. */
-export const cbaiMineralSurface =
-  "rounded-xl border border-zinc-800/80 bg-[var(--surface)]/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]";
 
 /** Intelligence Canvas — full operating workspace grid. */
 export const cbaiIntelligenceCanvas =

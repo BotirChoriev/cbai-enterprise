@@ -2,7 +2,12 @@
 
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n/use-translation";
-import { cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import {
+  cbaiChip,
+  cbaiChipActive,
+  cbaiFocusRing,
+  cbaiSectionEyebrow,
+} from "@/components/brand/brand-classes";
 
 type GraphPrimaryViewsProps = {
   focusMode: "mission" | "evidence" | "all";
@@ -31,32 +36,26 @@ export default function GraphPrimaryViews({
   ];
 
   return (
-    <nav className="flex flex-wrap gap-2" aria-label={t("experienceEngineering.universeViews")}>
-      <p className={`${cbaiSectionEyebrow} w-full`}>{t("experienceEngineering.universeViews")}</p>
+    <nav className="space-y-2" aria-label={t("experienceEngineering.universeViews")}>
+      <p className={cbaiSectionEyebrow}>{t("experienceEngineering.universeViews")}</p>
+      <div className="flex flex-wrap gap-2">
       {toggles.map((view) => (
         <button
           key={view.id}
           type="button"
           aria-pressed={focusMode === view.mode}
           onClick={() => onFocusModeChange(view.mode)}
-          className={`rounded-md px-3 py-1.5 text-xs ${
-            focusMode === view.mode
-              ? "border border-teal-500/30 bg-teal-500/10 text-teal-300"
-              : "border border-zinc-800 text-zinc-500 hover:text-zinc-300"
-          }`}
+          className={`${focusMode === view.mode ? cbaiChipActive : cbaiChip} ${cbaiFocusRing}`}
         >
           {view.label}
         </button>
       ))}
       {links.map((link) => (
-        <Link
-          key={link.id}
-          href={link.href}
-          className="rounded-md border border-zinc-800 px-3 py-1.5 text-xs text-zinc-500 hover:text-teal-300"
-        >
+        <Link key={link.id} href={link.href} className={cbaiChip}>
           {link.label}
         </Link>
       ))}
+      </div>
     </nav>
   );
 }

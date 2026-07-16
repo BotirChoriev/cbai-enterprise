@@ -11,7 +11,17 @@ import {
   type UserGoal,
 } from "@/lib/intelligence-os/intelligence-gateway";
 import { deriveFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
-import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import {
+  cbaiChip,
+  cbaiGapSm,
+  cbaiGlassCard,
+  cbaiPanelPadding,
+  cbaiProminentAction,
+  cbaiSectionEyebrow,
+  cbaiStackLg,
+  cbaiStackSm,
+  cbaiTextMuted,
+} from "@/components/brand/brand-classes";
 
 const GOAL_I18N: Record<UserGoal, string> = {
   research: "goalResearch",
@@ -51,34 +61,28 @@ export default function IntelligenceGatewayEntry({
 
   return (
     <section
-      className={`${compact ? "space-y-2" : "space-y-4"} ${variant === "home" ? cbaiGlassCard : ""} ${variant === "home" ? "p-4" : ""}`}
+      className={`${compact ? cbaiStackSm : cbaiStackLg} ${variant === "home" ? `${cbaiGlassCard} ${cbaiPanelPadding}` : ""}`}
       aria-labelledby="intelligence-gateway-heading"
     >
       <div>
         <p className={cbaiSectionEyebrow} id="intelligence-gateway-heading">
           {t("zeroLearningCurve.gatewayEyebrow")}
         </p>
-        <p className="text-xs text-zinc-500">{hint}</p>
+        <p className={cbaiTextMuted}>{hint}</p>
       </div>
 
       {variant === "home" && firstAction && !mission ? (
-        <Link
-          href={firstAction.href}
-          className="block rounded-md border border-teal-500/30 bg-teal-500/10 px-3 py-2 text-sm text-teal-300 hover:bg-teal-500/15"
-        >
-          {firstAction.label} →
+        <Link href={firstAction.href} className={`${cbaiProminentAction} w-full justify-between`}>
+          {firstAction.label}
+          <span aria-hidden="true">→</span>
         </Link>
       ) : null}
 
-      <div className="flex flex-wrap gap-2">
+      <div className={`flex flex-wrap ${cbaiGapSm}`}>
         {goals.map((goal) => {
           const route = resolveGoalRoute(goal, mission);
           return (
-            <Link
-              key={goal}
-              href={route.href}
-              className="rounded-md border border-zinc-800 px-3 py-1.5 text-xs text-zinc-400 hover:border-teal-500/30 hover:text-teal-300"
-            >
+            <Link key={goal} href={route.href} className={cbaiChip}>
               {t(`zeroLearningCurve.${GOAL_I18N[goal]}`)}
             </Link>
           );
