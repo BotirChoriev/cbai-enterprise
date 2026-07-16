@@ -14,7 +14,7 @@ import MissionOperatorPresence from "@/components/mission/MissionOperatorPresenc
 import HumanImpactPanel from "@/components/mission/HumanImpactPanel";
 import SystemAwakeningSequence from "@/components/platform/entry/SystemAwakeningSequence";
 import CanvasOperatingObject from "@/components/canvas/CanvasOperatingObject";
-import { CanvasContextLayer } from "@/components/canvas/CanvasContextLayer";
+import LivingContextRail from "@/components/operating/LivingContextRail";
 import CanvasMissionTimeline from "@/components/canvas/CanvasMissionTimeline";
 import CanvasKnowledgeStream, { MissionDnaStrip } from "@/components/canvas/CanvasKnowledgeStream";
 import LegacyTrail from "@/components/intelligence-os/LegacyTrail";
@@ -55,24 +55,20 @@ export default function IntelligenceCanvas() {
   }
 
   return (
-    <div className={`cbai-intelligence-canvas ${cbaiOperatingShell} flex min-h-[calc(100vh-4rem)] flex-col`} key={refreshKey}>
+    <div className={`cbai-intelligence-canvas cbai-living-canvas ${cbaiOperatingShell} flex min-h-full flex-col`} key={refreshKey}>
       <SystemAwakeningSequence hasMission={Boolean(mission)} />
 
-      <header className="flex shrink-0 items-center justify-between border-b border-zinc-800/80 px-4 py-2 sm:px-5">
-        <div>
-          <p className={cbaiSectionEyebrow}>{t("intelligenceCanvas.eyebrow")}</p>
-          <p className="text-[11px] text-zinc-600">{t("intelligenceCanvas.notDashboard")}</p>
-        </div>
+      <div className="flex shrink-0 items-center justify-end border-b border-zinc-800/80 px-4 py-2 sm:px-5">
         {!mission ? (
           <button type="button" onClick={() => setCreating(true)} className={`${cbaiBtnPrimary} text-xs`}>
             {t("intelligenceCanvas.beginMission")}
           </button>
         ) : null}
-      </header>
+      </div>
 
-      <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[minmax(0,1fr)_16rem] xl:grid-cols-[minmax(0,1fr)_18rem]">
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-px bg-zinc-800/30 lg:grid-cols-[minmax(0,1fr)_15rem] xl:grid-cols-[minmax(0,1fr)_17rem]">
         <div className="flex min-h-0 flex-col overflow-y-auto">
-          <div className="grid flex-1 grid-cols-1 gap-px bg-zinc-800/40 sm:grid-cols-2">
+          <div className="grid flex-1 grid-cols-1 gap-px bg-zinc-800/40 sm:grid-cols-2 lg:grid-cols-2">
             <CanvasOperatingObject
               kind="mission"
               label={t("intelligenceCanvas.centerMission")}
@@ -173,7 +169,7 @@ export default function IntelligenceCanvas() {
         </div>
 
         <div className="hidden lg:block">
-          <CanvasContextLayer />
+          <LivingContextRail />
         </div>
       </div>
 
@@ -181,7 +177,7 @@ export default function IntelligenceCanvas() {
 
       <div className="border-t border-zinc-800/80 px-4 py-2 lg:hidden">
         <Link href="/graph" className="text-xs text-teal-400">
-          {t("intelligenceCanvas.viewGraph")} →
+          {t("intelligenceSpaces.knowledgeUniverseSpace")} →
         </Link>
       </div>
     </div>

@@ -3,7 +3,6 @@
 import type { ReactNode } from "react";
 import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
 import EntityPageHeader from "@/components/shared/EntityPageHeader";
-import MissionOperatingContextBar from "@/components/mission/MissionOperatingContextBar";
 
 type OperatingPageShellProps = {
   title: string;
@@ -15,19 +14,16 @@ type OperatingPageShellProps = {
   children: ReactNode;
 };
 
-/** One operating-system page frame: mission context → header → Operator → content. */
+/** Intelligence space content frame — global mission bar and context rail live in dashboard layout. */
 export default function OperatingPageShell({
   title,
   description,
   action,
   showOperator = true,
-  showMissionContext = true,
-  missionContextVariant = "compact",
   children,
 }: OperatingPageShellProps) {
   return (
-    <div className="space-y-6">
-      {showMissionContext ? <MissionOperatingContextBar variant={missionContextVariant} /> : null}
+    <div className="space-y-4">
       <EntityPageHeader title={title} description={description ?? ""} />
       {action}
       {showOperator ? <ContextualOperatorBanner /> : null}

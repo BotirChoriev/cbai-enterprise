@@ -25,7 +25,7 @@ test("1. Intelligence Canvas replaces stacked card homepage", () => {
 
 test("2. Operating navigation has live state indicators", () => {
   const sidebar = readSource("components/layout/Sidebar.tsx");
-  assert.match(sidebar, /OperatingNavigationPanel/);
+  assert.match(sidebar, /OperatingNavigator/);
   assert.equal(deriveNavLiveState("/", "/"), "active");
 });
 
@@ -36,7 +36,7 @@ test("3. Operator awareness derives honest interventions without mission", () =>
 
 test("4. Context layer and mission timeline wired", () => {
   const canvas = readSource("components/canvas/IntelligenceCanvas.tsx");
-  assert.match(canvas, /CanvasContextLayer/);
+  assert.match(canvas, /LivingContextRail/);
   assert.match(canvas, /CanvasMissionTimeline/);
   assert.match(canvas, /MissionDnaStrip/);
 });

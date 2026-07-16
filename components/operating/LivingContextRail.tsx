@@ -1,0 +1,126 @@
+"use client";
+
+import Link from "next/link";
+import { useMemo } from "react";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import { useMissionContext } from "@/components/mission/MissionContextProvider";
+import { deriveOperatorInterventions } from "@/lib/intelligence-os/operator-awareness";
+import { buildCapabilityPassport } from "@/lib/capability/capability-passport-builder";
+import { resolveOperatorName } from "@/lib/assistant/assistant-profile";
+import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
+import { useHydrated } from "@/lib/hooks/use-hydrated";
+import HumanDecisionBoundary from "@/components/intelligence-os/HumanDecisionBoundary";
+import EvidenceTrustSurfacePanel from "@/components/evidence/EvidenceTrustSurfacePanel";
+import { cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+
+export function OperatorAwarenessStrip() {
+  const { t } = useTranslation();
+  const hydrated = useHydrated();
+  const interventions = useMemo(
+    () => (hydrated ? deriveOperatorInterventions() : []),
+    [hydrated],
+  );
+
+  if (!hydrated || interventions.length === 0) return null;
+
+  return (
+    <div className="space-y-2" role="status" aria-live="polite">
+      {interventions.map((item) => (
+        <div
+          key={item.id}
+          className={`cbai-thought-enter rounded-md border px-3 py-2 text-xs leading-relaxed ${
+            item.priority === "critical"
+              ? "border-[var(--gold)]/30 bg-[var(--gold)]/5 text-[var(--gold-soft)]"
+              : item.priority === "attention"
+                ? "border-amber-500/20 bg-amber-500/5 text-amber-200/90"
+                : "border-zinc-800 bg-zinc-950/40 text-zinc-400"
+          }`}
+        >
+          {item.href ? (
+            <Link href={item.href} className="hover:text-teal-300">
+              {t(`operatorAwareness.${item.messageKey}`)}
+            </Link>
+          ) : (
+            t(`operatorAwareness.${item.messageKey}`)
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+type LivingContextRailProps = {
+  className?: string;
+};
+
+export default function LivingContextRail({ className = "" }: LivingContextRailProps) {
+  const { t } = useTranslation();
+  const hydrated = useHydrated();
+  const { profile } = useAssistantProfile();
+  const { mission, evidencePulse, adaptive, humanImpact } = useMissionContext();
+  const passport = useMemo(
+    () => (hydrated ? buildCapabilityPassport(resolveOperatorName(profile)) : null),
+    [hydrated, profile],
+  );
+
+  const nextHref = adaptive?.suggestedRoutes[0] ?? (mission?.projectId ? `/my-work?project=${mission.projectId}` : "/my-work");
+
+  return (
+    <aside
+      className={`cbai-living-context cbai-space-enter flex h-full flex-col gap-3 border-l border-zinc-800/80 bg-[#050810]/90 px-3 py-4 ${className}`}
+      aria-label={t("intelligenceSpaces.livingContext")}
+    >
+      <p className={cbaiSectionEyebrow}>{t("intelligenceSpaces.livingContext")}</p>
+
+      <OperatorAwarenessStrip />
+
+      <section className="space-y-1">
+        <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("intelligenceCanvas.missionContext")}</p>
+        <p className="text-sm text-zinc-200">{mission?.problem ?? t("intelligenceCanvas.noMissionPrompt")}</p>
+      </section>
+
+      {evidencePulse ? (
+        <section className="space-y-1">
+          <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("intelligenceCanvas.evidenceStatus")}</p>
+          <p className="text-xs text-zinc-400">{evidencePulse.label}</p>
+          {evidencePulse.conflictCount > 0 ? (
+            <p className="text-xs text-[var(--gold-soft)]">{t("evidenceRuntime.consensusConflicted")}</p>
+          ) : null}
+        </section>
+      ) : null}
+
+      {mission?.evidenceMissing ? (
+        <section className="space-y-1">
+          <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("intelligenceCanvas.missingKnowledge")}</p>
+          <p className="text-xs text-zinc-500">{mission.evidenceMissing}</p>
+        </section>
+      ) : null}
+
+      {mission ? <EvidenceTrustSurfacePanel mission={mission} variant="compact" /> : null}
+
+      {passport && passport.totalSignals > 0 ? (
+        <section className="space-y-1">
+          <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("intelligenceSpaces.capabilityGalaxy")}</p>
+          <p className="text-xs text-zinc-500">
+            {passport.totalSignals} {t("intelligenceSpaces.domainSignals")}
+          </p>
+        </section>
+      ) : null}
+
+      <section className="space-y-1">
+        <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("intelligenceCanvas.impactStatus")}</p>
+        <p className="text-xs text-zinc-400">
+          {humanImpact?.isComplete ? t("missionCenter.impactComplete") : t("missionCenter.impactIncomplete")}
+        </p>
+      </section>
+
+      <section className="mt-auto space-y-1.5 border-t border-zinc-800/80 pt-3">
+        <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("intelligenceCanvas.suggestedNext")}</p>
+        <Link href={nextHref} className="text-sm text-teal-400 hover:text-teal-300">
+          {adaptive?.explanation ?? t("missionCenter.nextAction")} →
+        </Link>
+        <HumanDecisionBoundary variant="compact" />
+      </section>
+    </aside>
+  );
+}

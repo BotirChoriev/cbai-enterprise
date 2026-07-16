@@ -20,6 +20,7 @@ import LocalWorkMigrationPrompt from "@/components/account/LocalWorkMigrationPro
 import CloudProfileImportPrompt from "@/components/account/CloudProfileImportPrompt";
 import PendingSyncNotice from "@/components/shared/PendingSyncNotice";
 import CapabilityPassportPanel from "@/components/capability/CapabilityPassportPanel";
+import CapabilityGalaxy from "@/components/capability/CapabilityGalaxy";
 import { loadProject } from "@/lib/project/project-store";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useTranslation } from "@/lib/i18n/use-translation";
@@ -203,6 +204,8 @@ function MyWorkContent() {
       <ProjectList />
 
       <CapabilityPassportPanel />
+
+      <CapabilityGalaxy />
 
       <section aria-labelledby="my-work-continue-heading" className="space-y-3">
         <p className={cbaiSectionEyebrow} id="my-work-continue-heading">

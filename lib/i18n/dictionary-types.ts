@@ -1539,6 +1539,34 @@ export type TranslationDictionary = {
     consensusPartial: string;
     consensusNone: string;
   };
+  intelligenceSpaces: {
+    missionSpace: string;
+    evidenceSpace: string;
+    knowledgeSpace: string;
+    knowledgeUniverseSpace: string;
+    researchSpace: string;
+    reasoningSpace: string;
+    impactSpace: string;
+    trustSpace: string;
+    capabilitySpace: string;
+    reportSpace: string;
+    entitySpace: string;
+    searchSpace: string;
+    settingsSpace: string;
+    accountSpace: string;
+    governanceSpace: string;
+    operatingEnvironment: string;
+    activeMission: string;
+    noMission: string;
+    spatialTransition: string;
+    livingContext: string;
+    continuityTimeline: string;
+    operatingNavigator: string;
+    capabilityGalaxy: string;
+    capabilityGalaxyBody: string;
+    domainSignals: string;
+    hoverForContext: string;
+  };
 };
 
 export type TranslationNamespace = keyof TranslationDictionary;

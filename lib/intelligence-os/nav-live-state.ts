@@ -43,6 +43,14 @@ export function deriveNavLiveState(href: string, pathname: string): NavLiveState
       return "neutral";
     case "/my-work":
       return projects.length > 0 ? "ready" : "neutral";
+    case "/search":
+      return totalEvidence > 0 ? "ready" : "neutral";
+    case "/reasoning":
+      return mission ? "ready" : "neutral";
+    case "/settings":
+      return "neutral";
+    case "/trust":
+      return mission ? "attention" : "neutral";
     default:
       return "neutral";
   }

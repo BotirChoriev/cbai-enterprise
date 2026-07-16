@@ -110,7 +110,7 @@ test("7. No global human ranking in capability or discovery modules", () => {
 
 test("8. Human Decision Boundary wired on conclusion surfaces", () => {
   const canvas = readSource("components/canvas/IntelligenceCanvas.tsx");
-  const context = readSource("components/canvas/CanvasContextLayer.tsx");
+  const context = readSource("components/operating/LivingContextRail.tsx");
   const reports = readSource("components/reports/ReportsCenter.tsx");
   const reasoning = readSource("components/reasoning/ReasoningExplorer.tsx");
   assert.match(canvas, /HumanDecisionBoundary/);

@@ -184,7 +184,7 @@ test("16. Intelligence Cabinet is discoverable — the Sidebar/mobile nav disclo
     assert.ok(dict.navigation.intelligenceCabinet.length > 0);
     assert.notEqual(dict.navigation.intelligenceCabinet, dict.navigation.more);
   }
-  assert.match(read("components/layout/Sidebar.tsx"), /navigation\.intelligenceCabinet/);
+  assert.match(read("components/operating/OperatingNavigator.tsx"), /navigation\.intelligenceCabinet/);
   assert.match(read("components/layout/MobileNavDrawer.tsx"), /navigation\.intelligenceCabinet/);
 });
 
@@ -207,7 +207,7 @@ test("21. Intelligence Canvas: Operator and operating objects share one shell �
 
 test("18. Operating navigation visible on home sidebar", () => {
   const sidebar = read("components/layout/Sidebar.tsx");
-  assert.match(sidebar, /OperatingNavigationPanel/);
+  assert.match(sidebar, /OperatingNavigator/);
 });
 
 test("19. Every role card's suggested command is a real phrase resolveAssistantCommand() actually resolves, in every language — never an invented example", async () => {

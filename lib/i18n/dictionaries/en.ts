@@ -78,6 +78,7 @@ import {
   OPERATOR_AWARENESS_EN,
 } from "@/lib/i18n/platform-copy-build013-en";
 import { EVIDENCE_RUNTIME_EN } from "@/lib/i18n/platform-copy-build014-en";
+import { INTELLIGENCE_SPACES_EN } from "@/lib/i18n/platform-copy-build015-en";
 
 const en: TranslationDictionary = {
   roles: {
@@ -541,6 +542,7 @@ const en: TranslationDictionary = {
   operatorAwareness: OPERATOR_AWARENESS_EN,
   operatingNav: OPERATING_NAV_EN,
   evidenceRuntime: EVIDENCE_RUNTIME_EN,
+  intelligenceSpaces: INTELLIGENCE_SPACES_EN,
 };
 
 export default en;

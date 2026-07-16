@@ -5,10 +5,12 @@ import { usePathname } from "next/navigation";
 import Sidebar from "@/components/layout/Sidebar";
 import Topbar from "@/components/layout/Topbar";
 import MobileNavDrawer from "@/components/layout/MobileNavDrawer";
+import GlobalMissionContextBar from "@/components/operating/GlobalMissionContextBar";
+import LivingContextRail from "@/components/operating/LivingContextRail";
+import ContinuityTimelineStrip from "@/components/operating/ContinuityTimelineStrip";
 import { PlatformContextProvider } from "@/components/platform/context/PlatformContextProvider";
 import { MissionContextProvider } from "@/components/mission/MissionContextProvider";
 import { AuthProvider } from "@/components/platform/context/AuthProvider";
-import PlatformContextHeaderSlot from "@/components/platform/context/PlatformContextHeaderSlot";
 import OfflineBanner from "@/components/system/OfflineBanner";
 
 export default function DashboardLayout({
@@ -19,12 +21,6 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const isHome = pathname === "/";
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
-  // Topbar renders transparent on Home so it doesn't compete with the arrival hero. Topbar and
-  // <main> are non-overlapping flex siblings (verified: header's bottom edge meets main's top
-  // edge exactly, no stacking), so this isn't fixing a rendering bug — it's a deliberate cue that
-  // the arrival moment has ended once the user scrolls into the real workspace below it, the same
-  // "transparent at the top, solid once scrolled" pattern most premium landing pages use. Tracked
-  // here (the one place with both <main> and <Topbar> as siblings) from a real scroll offset.
   const [isScrolled, setIsScrolled] = useState(false);
   const scrollRafRef = useRef<number | null>(null);
 
@@ -41,30 +37,32 @@ export default function DashboardLayout({
   return (
     <AuthProvider>
       <div className="flex h-screen overflow-hidden bg-[var(--background)]">
-          <Sidebar />
-          <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-            <Suspense fallback={null}>
-              <PlatformContextProvider>
-                <MissionContextProvider>
+        <Sidebar />
+        <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+          <Suspense fallback={null}>
+            <PlatformContextProvider>
+              <MissionContextProvider>
                 <OfflineBanner />
                 <MobileNavDrawer open={isMobileNavOpen} onClose={() => setIsMobileNavOpen(false)} />
                 <Topbar onMenuClick={() => setIsMobileNavOpen(true)} transparent={isHome && !isScrolled} />
-                <main className="flex-1 overflow-y-auto" onScroll={handleMainScroll}>
-                  <div
-                    className={
-                      isHome
-                        ? "h-full min-h-0"
-                        : "mx-auto max-w-7xl space-y-6 px-6 py-6 lg:px-8 lg:py-8"
-                    }
-                  >
-                    {!isHome ? <PlatformContextHeaderSlot /> : null}
-                    {children}
-                  </div>
+                <GlobalMissionContextBar />
+                <main className="flex min-h-0 flex-1 flex-col overflow-y-auto" onScroll={handleMainScroll}>
+                  {isHome ? (
+                    <div className="cbai-living-canvas min-h-0 flex-1">{children}</div>
+                  ) : (
+                    <div className="cbai-operating-main flex min-h-0 flex-1 flex-col">
+                      <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[minmax(0,1fr)_15rem] xl:grid-cols-[minmax(0,1fr)_17rem]">
+                        <div className="cbai-space-enter overflow-y-auto px-4 py-4 lg:px-5 lg:py-5">{children}</div>
+                        <LivingContextRail className="hidden lg:flex" />
+                      </div>
+                      <ContinuityTimelineStrip />
+                    </div>
+                  )}
                 </main>
-                </MissionContextProvider>
-              </PlatformContextProvider>
-            </Suspense>
-          </div>
+              </MissionContextProvider>
+            </PlatformContextProvider>
+          </Suspense>
+        </div>
       </div>
     </AuthProvider>
   );

@@ -78,6 +78,7 @@ import {
   OPERATOR_AWARENESS_TR,
 } from "@/lib/i18n/platform-copy-build013-tr";
 import { EVIDENCE_RUNTIME_TR } from "@/lib/i18n/platform-copy-build014-tr";
+import { INTELLIGENCE_SPACES_TR } from "@/lib/i18n/platform-copy-build015-tr";
 
 const tr: TranslationDictionary = {
   roles: {
@@ -540,6 +541,7 @@ const tr: TranslationDictionary = {
   operatorAwareness: OPERATOR_AWARENESS_TR,
   operatingNav: OPERATING_NAV_TR,
   evidenceRuntime: EVIDENCE_RUNTIME_TR,
+  intelligenceSpaces: INTELLIGENCE_SPACES_TR,
 };
 
 export default tr;

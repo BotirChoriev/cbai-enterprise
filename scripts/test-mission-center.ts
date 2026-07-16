@@ -66,7 +66,7 @@ test("7. Intelligence Canvas includes signature systems and Operator presence", 
   const canvas = readSource("components/canvas/IntelligenceCanvas.tsx");
   assert.match(canvas, /MissionOperatorPresence/);
   assert.match(canvas, /CanvasMissionTimeline/);
-  assert.match(canvas, /CanvasContextLayer/);
+  assert.match(canvas, /LivingContextRail/);
   assert.match(canvas, /SystemAwakeningSequence/);
   assert.match(canvas, /CanvasOperatingObject/);
 });
