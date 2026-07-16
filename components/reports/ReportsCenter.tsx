@@ -47,6 +47,7 @@ export default function ReportsCenter() {
     <OperatingPageShell
       title={title}
       description={description}
+      missionContextVariant="full"
       action={
         profileHref ? (
           <Link

@@ -3,8 +3,28 @@
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { cbaiMineralSurface, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
-export default function HumanDecisionBoundary() {
+type HumanDecisionBoundaryProps = {
+  variant?: "full" | "compact";
+};
+
+export default function HumanDecisionBoundary({ variant = "full" }: HumanDecisionBoundaryProps) {
   const { t } = useTranslation();
+
+  if (variant === "compact") {
+    return (
+      <section
+        className="rounded-md border border-[var(--gold)]/15 bg-[var(--gold)]/5 px-3 py-2"
+        aria-label={t("missionCenter.humanDecisionBoundary")}
+      >
+        <p className="text-[10px] uppercase tracking-wider text-[var(--gold-soft)]">
+          {t("missionCenter.humanDecisionBoundary")}
+        </p>
+        <p className="mt-1 text-xs text-zinc-400">
+          {t("missionCenter.humanJudgment")} — suggested routes never replace your conclusions.
+        </p>
+      </section>
+    );
+  }
 
   return (
     <section className={`${cbaiMineralSurface} space-y-3 p-5`} aria-labelledby="human-decision-boundary-heading">

@@ -17,6 +17,8 @@ import CanvasOperatingObject from "@/components/canvas/CanvasOperatingObject";
 import { CanvasContextLayer } from "@/components/canvas/CanvasContextLayer";
 import CanvasMissionTimeline from "@/components/canvas/CanvasMissionTimeline";
 import CanvasKnowledgeStream, { MissionDnaStrip } from "@/components/canvas/CanvasKnowledgeStream";
+import LegacyTrail from "@/components/intelligence-os/LegacyTrail";
+import HumanDecisionBoundary from "@/components/intelligence-os/HumanDecisionBoundary";
 import { cbaiBtnPrimary, cbaiOperatingShell, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 export default function IntelligenceCanvas() {
@@ -132,6 +134,17 @@ export default function IntelligenceCanvas() {
           </div>
 
           <MissionDnaStrip mission={mission} />
+
+          {mission ? (
+            <div className="space-y-px border-t border-zinc-800/80 bg-zinc-800/20">
+              <div className="p-4 lg:hidden">
+                <HumanDecisionBoundary variant="compact" />
+              </div>
+              <div className="p-4">
+                <LegacyTrail mission={mission} />
+              </div>
+            </div>
+          ) : null}
 
           {mission ? (
             <div className="border-t border-zinc-800/80 p-4 lg:hidden">

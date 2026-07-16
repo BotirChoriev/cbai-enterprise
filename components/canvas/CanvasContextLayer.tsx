@@ -9,6 +9,7 @@ import { buildCapabilityPassport } from "@/lib/capability/capability-passport-bu
 import { resolveOperatorName } from "@/lib/assistant/assistant-profile";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
+import HumanDecisionBoundary from "@/components/intelligence-os/HumanDecisionBoundary";
 import { cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 export default function OperatorAwarenessStrip() {
@@ -111,6 +112,7 @@ export function CanvasContextLayer() {
         <Link href={nextHref} className="text-sm text-teal-400 hover:text-teal-300">
           {adaptive?.explanation ?? t("missionCenter.nextAction")} →
         </Link>
+        <HumanDecisionBoundary variant="compact" />
       </section>
     </aside>
   );
