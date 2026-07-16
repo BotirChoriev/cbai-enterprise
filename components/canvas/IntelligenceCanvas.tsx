@@ -123,7 +123,7 @@ export default function IntelligenceCanvas() {
               kind="question"
               label={t("intelligenceCanvas.centerQuestion")}
               value={project?.researchQuestion ?? mission?.whyExists ?? t("missionCenter.noMissionTitle")}
-              detail={questionCount > 0 ? `${questionCount} open` : undefined}
+              detail={questionCount > 0 ? t("zeroLearningCurve.openQuestionsCount", { count: String(questionCount) }) : undefined}
               href={mission?.projectId ? `/my-work${projectQuery}#project-questions` : "/my-work"}
               status={questionCount > 0 || mission?.whyExists ? "partial" : "missing"}
             />

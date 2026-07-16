@@ -21,14 +21,10 @@ export default function EvidenceExplorer() {
   const { mission } = useMissionContext();
   const disclosure = useProgressiveDisclosure();
   const model = useMemo(() => buildEvidenceExplorerModel(), []);
-  const description = mission
-    ? t("zeroLearningCurve.evidenceMissionDescription")
-    : t("evidenceExplorer.description");
 
   return (
     <OperatingPageShell
       title={t("evidence.title")}
-      description={description}
       showOperator={false}
       missionContextVariant="compact"
     >

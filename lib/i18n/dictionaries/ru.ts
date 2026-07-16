@@ -83,7 +83,7 @@ import { LIVING_INTELLIGENCE_RU } from "@/lib/i18n/platform-copy-build016-ru";
 import { EXPERIENCE_ENGINEERING_RU } from "@/lib/i18n/platform-copy-build017-ru";
 import { UNIVERSAL_WORKSPACE_RU } from "@/lib/i18n/platform-copy-build018-ru";
 import { ORGANIZATION_OS_RU } from "@/lib/i18n/platform-copy-build019-ru";
-import { ZERO_LEARNING_CURVE_RU } from "@/lib/i18n/platform-copy-build020-ru";
+import { ZERO_LEARNING_CURVE_RU, MISSION_LIFECYCLE_NEXT_RU } from "@/lib/i18n/platform-copy-build020-ru";
 
 const ru: TranslationDictionary = {
   roles: {
@@ -552,6 +552,7 @@ const ru: TranslationDictionary = {
   universalWorkspace: UNIVERSAL_WORKSPACE_RU,
   organizationOs: ORGANIZATION_OS_RU,
   zeroLearningCurve: ZERO_LEARNING_CURVE_RU,
+  missionLifecycle: MISSION_LIFECYCLE_NEXT_RU,
 };
 
 export default ru;

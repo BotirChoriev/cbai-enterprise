@@ -1841,6 +1841,29 @@ export type TranslationDictionary = {
     reviewOpenQuestions: string;
     reviewNoOpenQuestions: string;
     reviewNotAvailable: string;
+    openQuestionsCount: string;
+    researchHeroEyebrow: string;
+    researchSearchEyebrow: string;
+    researchSearchAria: string;
+    researchExploreTopic: string;
+    researchSearchFootnote: string;
+    reportsAlsoAvailable: string;
+  };
+  missionLifecycle: {
+    completeProblem: string;
+    reviewPurpose: string;
+    reviewQuestions: string;
+    addQuestions: string;
+    verifySources: string;
+    addEvidence: string;
+    reviewReasoning: string;
+    captureNotes: string;
+    documentCapabilities: string;
+    completeImpact: string;
+    reviewImpact: string;
+    previewReport: string;
+    completeForReport: string;
+    createMission: string;
   };
 };
 

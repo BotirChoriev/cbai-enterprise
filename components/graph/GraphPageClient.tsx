@@ -29,11 +29,16 @@ export default function GraphPageClient() {
   const { setFocusedObject } = useUniversalWorkspace();
   const disclosure = useProgressiveDisclosure();
   const fullGraph = useMemo(() => buildKnowledgeGraph(), []);
-  const [focusMode, setFocusMode] = useState<"mission" | "evidence" | "all">("mission");
+  const [focusMode, setFocusMode] = useState<"mission" | "evidence" | "all">(
+    mission?.projectId ? "mission" : "all",
+  );
+
+  const effectiveFocusMode: "mission" | "evidence" | "all" =
+    !mission?.projectId && focusMode === "mission" ? "all" : focusMode;
 
   const analysis = useMemo(
-    () => analyzeGraphForMission(fullGraph, mission, focusMode),
-    [fullGraph, mission, focusMode],
+    () => analyzeGraphForMission(fullGraph, mission, effectiveFocusMode),
+    [fullGraph, mission, effectiveFocusMode],
   );
 
   const graph = useMemo(
@@ -121,7 +126,6 @@ export default function GraphPageClient() {
   return (
     <OperatingPageShell
       title={t("navigation.knowledgeGraph")}
-      description={t("intelligenceNetwork.description")}
       showOperator={false}
       missionContextVariant="compact"
     >

@@ -6,7 +6,7 @@ export const ZERO_LEARNING_CURVE_EN = {
   speak: "Speak",
   type: "Type",
   chooseGoal: "Choose goal",
-  searchGoalHint: "Search above or choose a goal below.",
+  searchGoalHint: "Type a name or topic above.",
   homeNoMissionLead: "State the problem you want to solve. CBAI links evidence, questions, and reports to it.",
   startMission: "Start a mission",
   continueMission: "Continue mission",
@@ -97,6 +97,30 @@ export const ZERO_LEARNING_CURVE_EN = {
   reviewOpenQuestions: "Open questions",
   reviewNoOpenQuestions: "No open questions.",
   reviewNotAvailable: "Not available yet",
+  openQuestionsCount: "{count} open",
+  researchHeroEyebrow: "Research catalog",
+  researchSearchEyebrow: "Find a topic",
+  researchSearchAria: "Search topics",
+  researchExploreTopic: "Explore",
+  researchSearchFootnote: "Filters the catalog below — live databases not connected.",
+  reportsAlsoAvailable: "Also available",
+} as const;
+
+export const MISSION_LIFECYCLE_NEXT_EN = {
+  completeProblem: "Finish the problem statement",
+  reviewPurpose: "Review who benefits",
+  reviewQuestions: "Review open questions",
+  addQuestions: "Add questions",
+  verifySources: "Check source links",
+  addEvidence: "Add evidence",
+  reviewReasoning: "Review your notes",
+  captureNotes: "Add notes",
+  documentCapabilities: "Note capabilities needed",
+  completeImpact: "Complete impact review",
+  reviewImpact: "Review impact",
+  previewReport: "Preview report",
+  completeForReport: "Finish evidence and impact",
+  createMission: "Start a mission",
 } as const;
 
 export type UserGoalI18nKey = keyof Pick<

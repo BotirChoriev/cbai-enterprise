@@ -18,6 +18,7 @@ import {
   deriveRouteCompanion,
   routePurposeI18nKey,
   storyBeatI18nKey,
+  translateFirstMinuteAction,
 } from "@/lib/intelligence-os/first-minute";
 import { loadCompanionThought, recordCompanionThought } from "@/lib/intelligence-os/living-memory";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
@@ -77,8 +78,17 @@ export default function MissionOperatingContextBar({
 
   if (!showBar || !companion) return null;
 
+  const nextLabel = translateFirstMinuteAction(t, {
+    label: companion.nextLabel,
+    labelKey: companion.nextLabelKey,
+    nextActionKey: companion.nextActionKey,
+    href: companion.nextHref,
+    reason: "companion",
+    exposesArchitecture: false,
+  });
+
   const showResume =
-    disclosure.showCompanionStoryBeat &&
+    disclosure.showCompanionDetail &&
     priorThought &&
     priorThought.lastRoute !== basePath &&
     priorThought.missionId === (mission?.id ?? null) &&
@@ -91,7 +101,7 @@ export default function MissionOperatingContextBar({
     return (
       <aside className={cbaiMineralPanelMd} aria-label={t("zeroLearningCurve.nextAction")}>
         <Link href={companion.nextHref} className={`${cbaiProminentAction} w-full justify-between sm:w-auto`}>
-          {companion.nextLabel}
+          {nextLabel}
           <span aria-hidden="true">→</span>
         </Link>
       </aside>
@@ -119,7 +129,7 @@ export default function MissionOperatingContextBar({
             {t("zeroLearningCurve.returnToMission")}
           </Link>
           <Link href={companion.nextHref} className={`${cbaiProminentAction} gap-1.5`}>
-            {companion.nextLabel}
+            {nextLabel}
             <span aria-hidden="true">→</span>
           </Link>
         </div>

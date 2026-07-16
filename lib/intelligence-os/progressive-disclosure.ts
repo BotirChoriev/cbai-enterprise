@@ -123,7 +123,7 @@ export function resolveProgressiveDisclosure(mode: UserDensityMode): Progressive
 
 const REFERENCE_ROUTES = new Set(["/trust", "/about", "/settings", "/account"]);
 const INTENT_ROUTES = new Set(["/search"]);
-const COMPANION_ROUTES = new Set(["/knowledge", "/reasoning", "/graph", "/reports"]);
+const COMPANION_ROUTES = new Set(["/knowledge", "/reasoning", "/graph", "/reports", "/research"]);
 const WORKFLOW_CONTINUITY_ROUTES = new Set(["/knowledge", "/reasoning", "/graph", "/reports"]);
 
 function routeBase(pathname: string): string {
@@ -135,9 +135,11 @@ export function isReferenceRoute(pathname: string): boolean {
   return REFERENCE_ROUTES.has(routeBase(pathname));
 }
 
-/** Routes with page-level mission companion — hide global duplicate bar. */
+/** Routes with page-level mission companion — hide duplicate orientation chrome. */
 export function hasPageMissionCompanion(pathname: string): boolean {
-  return COMPANION_ROUTES.has(routeBase(pathname));
+  const base = routeBase(pathname);
+  if (COMPANION_ROUTES.has(base)) return true;
+  return base.startsWith("/research/");
 }
 
 export function shouldShowGlobalMissionBar(pathname: string): boolean {
@@ -152,17 +154,20 @@ export function shouldShowMentalModelStrip(pathname: string, flags: ProgressiveD
   if (!flags.showMentalModelStrip) return false;
   const base = routeBase(pathname);
   if (base === "/" || isReferenceRoute(pathname) || INTENT_ROUTES.has(base)) return false;
+  if (hasPageMissionCompanion(pathname)) return false;
   return true;
 }
 
 export function shouldShowContinuityTimeline(pathname: string, flags: ProgressiveDisclosureFlags): boolean {
   if (!flags.showContinuityTimeline) return false;
+  if (hasPageMissionCompanion(pathname)) return false;
   return WORKFLOW_CONTINUITY_ROUTES.has(routeBase(pathname));
 }
 
 export function shouldShowOperatingContextColumn(pathname: string, flags: ProgressiveDisclosureFlags): boolean {
   if (!flags.showOperatingContextColumn) return false;
   if (isReferenceRoute(pathname)) return false;
+  if (hasPageMissionCompanion(pathname)) return false;
   return true;
 }
 

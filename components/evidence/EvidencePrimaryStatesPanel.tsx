@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { derivePrimaryEvidenceStates } from "@/lib/intelligence-os/evidence-primary-states";
+import { deriveFirstMinuteAction, translateFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import {
   cbaiLinkAction,
@@ -28,14 +29,15 @@ export default function EvidencePrimaryStatesPanel() {
   const { mission } = useMissionContext();
   const disclosure = useProgressiveDisclosure();
   const states = useMemo(() => derivePrimaryEvidenceStates(mission), [mission]);
+  const next = useMemo(() => deriveFirstMinuteAction(mission), [mission]);
   const total = states.reduce((sum, row) => sum + row.count, 0);
 
   if (!mission) {
     return (
       <section className={`${cbaiMineralPanel} space-y-2`} role="status">
         <p className={cbaiTextCaption}>{t("zeroLearningCurve.evidenceNoMission")}</p>
-        <Link href="/" className={cbaiLinkAction}>
-          {t("zeroLearningCurve.evidenceNoMissionAction")} →
+        <Link href={next.href} className={cbaiLinkAction}>
+          {translateFirstMinuteAction(t, next)} →
         </Link>
       </section>
     );

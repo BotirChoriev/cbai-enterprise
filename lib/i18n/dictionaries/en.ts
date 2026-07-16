@@ -83,7 +83,7 @@ import { LIVING_INTELLIGENCE_EN } from "@/lib/i18n/platform-copy-build016-en";
 import { EXPERIENCE_ENGINEERING_EN } from "@/lib/i18n/platform-copy-build017-en";
 import { UNIVERSAL_WORKSPACE_EN } from "@/lib/i18n/platform-copy-build018-en";
 import { ORGANIZATION_OS_EN } from "@/lib/i18n/platform-copy-build019-en";
-import { ZERO_LEARNING_CURVE_EN } from "@/lib/i18n/platform-copy-build020-en";
+import { ZERO_LEARNING_CURVE_EN, MISSION_LIFECYCLE_NEXT_EN } from "@/lib/i18n/platform-copy-build020-en";
 
 const en: TranslationDictionary = {
   roles: {
@@ -553,6 +553,7 @@ const en: TranslationDictionary = {
   universalWorkspace: UNIVERSAL_WORKSPACE_EN,
   organizationOs: ORGANIZATION_OS_EN,
   zeroLearningCurve: ZERO_LEARNING_CURVE_EN,
+  missionLifecycle: MISSION_LIFECYCLE_NEXT_EN,
 };
 
 export default en;

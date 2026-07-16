@@ -10,6 +10,7 @@ import { loadProjects } from "@/lib/project/project-store";
 export type FirstMinuteAction = {
   readonly label: string;
   readonly labelKey?: keyof typeof import("@/lib/i18n/platform-copy-build020-en").ZERO_LEARNING_CURVE_EN;
+  readonly nextActionKey?: keyof typeof import("@/lib/i18n/platform-copy-build020-en").MISSION_LIFECYCLE_NEXT_EN;
   readonly href: string;
   readonly reason: string;
   readonly exposesArchitecture: false;
@@ -19,6 +20,9 @@ export function translateFirstMinuteAction(
   translate: (path: string) => string,
   action: FirstMinuteAction,
 ): string {
+  if (action.nextActionKey) {
+    return translate(`missionLifecycle.${action.nextActionKey}`);
+  }
   if (action.labelKey) {
     return translate(`zeroLearningCurve.${action.labelKey}`);
   }
@@ -31,6 +35,7 @@ export function deriveFirstMinuteAction(mission: Mission | null): FirstMinuteAct
     if (next) {
       return {
         label: next.nextAction,
+        nextActionKey: next.nextActionKey,
         href: next.href,
         reason: "Continue active mission work",
         exposesArchitecture: false,
@@ -58,10 +63,10 @@ export function deriveFirstMinuteAction(mission: Mission | null): FirstMinuteAct
   }
 
   return {
-    label: "Choose a goal",
-    labelKey: "chooseGoal",
-    href: "/search",
-    reason: "Intelligence Gateway — choose what you want to do",
+    label: "Start a mission",
+    labelKey: "startMission",
+    href: "/?create=1",
+    reason: "Name the problem first",
     exposesArchitecture: false,
   };
 }
@@ -93,6 +98,8 @@ export type RouteCompanionContext = {
   readonly storyBeat: MissionStoryBeat;
   readonly nextHref: string;
   readonly nextLabel: string;
+  readonly nextActionKey?: keyof typeof import("@/lib/i18n/platform-copy-build020-en").MISSION_LIFECYCLE_NEXT_EN;
+  readonly nextLabelKey?: keyof typeof import("@/lib/i18n/platform-copy-build020-en").ZERO_LEARNING_CURVE_EN;
 };
 
 const ROUTE_KEY_MAP: Record<string, string> = {
@@ -163,5 +170,7 @@ export function deriveRouteCompanion(pathname: string, mission: Mission | null):
     storyBeat: deriveMissionStoryBeat(mission),
     nextHref: lifecycleNext?.href ?? fallback.href,
     nextLabel: lifecycleNext?.nextAction ?? fallback.label,
+    nextActionKey: lifecycleNext?.nextActionKey ?? fallback.nextActionKey,
+    nextLabelKey: lifecycleNext ? undefined : fallback.labelKey,
   };
 }

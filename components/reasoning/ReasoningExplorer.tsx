@@ -17,7 +17,7 @@ export default function ReasoningExplorer() {
   return (
     <OperatingPageShell
       title={t("navigation.reasoning")}
-      description={t("zeroLearningCurve.reasoningPurpose")}
+      showOperator={false}
       missionContextVariant={disclosure.showInlineHumanDecisionBoundary ? "full" : "compact"}
     >
       {disclosure.showReasoningStats ? (

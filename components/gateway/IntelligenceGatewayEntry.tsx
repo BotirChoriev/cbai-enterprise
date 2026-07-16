@@ -69,9 +69,11 @@ export default function IntelligenceGatewayEntry({
     >
       <div>
         <p className={cbaiSectionEyebrow} id="intelligence-gateway-heading">
-          {t("zeroLearningCurve.gatewayEyebrow")}
+          {variant === "search" ? t("zeroLearningCurve.commandEyebrow") : t("zeroLearningCurve.gatewayEyebrow")}
         </p>
-        {disclosure.showGatewayGoalChips ? <p className={cbaiTextMuted}>{hint}</p> : null}
+        {disclosure.showGatewayGoalChips || variant === "search" ? (
+          <p className={cbaiTextMuted}>{hint}</p>
+        ) : null}
       </div>
 
       {variant === "home" && firstAction && !mission ? (

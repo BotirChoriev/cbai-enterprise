@@ -17,6 +17,7 @@ export type MissionLifecycleStage = MissionThreadState & {
   readonly exists: string | null;
   readonly missing: string | null;
   readonly nextAction: string;
+  readonly nextActionKey?: keyof typeof import("@/lib/i18n/platform-copy-build020-en").MISSION_LIFECYCLE_NEXT_EN;
   readonly href: string;
 };
 
@@ -55,6 +56,7 @@ export function deriveMissionLifecycle(mission: Mission | null): readonly Missio
       exists: mission.problem.trim() ? mission.problem : null,
       missing: mission.problem.trim().length >= 10 ? null : "Define the problem in at least ten characters.",
       nextAction: mission.problem.trim().length >= 10 ? "Review purpose and beneficiaries." : "Complete the mission problem statement.",
+      nextActionKey: mission.problem.trim().length >= 10 ? "reviewPurpose" : "completeProblem",
       href: "/",
     },
     {
@@ -78,6 +80,7 @@ export function deriveMissionLifecycle(mission: Mission | null): readonly Missio
           : null,
       nextAction:
         questions.length > 0 ? "Review open questions." : "Add questions in My Work or complete mission purpose.",
+      nextActionKey: questions.length > 0 ? "reviewQuestions" : "addQuestions",
       href: projectId ? `/my-work${q}#project-questions` : "/my-work",
     },
     {
@@ -94,6 +97,7 @@ export function deriveMissionLifecycle(mission: Mission | null): readonly Missio
           ? mission.evidenceMissing.trim() || "Link evidence references to the project."
           : null,
       nextAction: evidence.length > 0 ? "Verify source URLs where available." : "Add evidence in My Work.",
+      nextActionKey: evidence.length > 0 ? "verifySources" : "addEvidence",
       href: projectId ? `/my-work${q}#project-evidence` : "/knowledge",
     },
     {
@@ -111,6 +115,7 @@ export function deriveMissionLifecycle(mission: Mission | null): readonly Missio
             : null,
       missing: notes.length === 0 && questions.length === 0 ? "Add notes or structured reasoning artifacts." : null,
       nextAction: notes.length > 0 ? "Review reasoning in Reasoning module." : "Capture analysis notes in My Work.",
+      nextActionKey: notes.length > 0 ? "reviewReasoning" : "captureNotes",
       href: "/reasoning",
     },
     {
@@ -120,6 +125,7 @@ export function deriveMissionLifecycle(mission: Mission | null): readonly Missio
       exists: mission.capabilitiesNeeded.trim() ? mission.capabilitiesNeeded : null,
       missing: mission.capabilitiesNeeded.trim().length <= 5 ? "Specify capabilities needed — no fake collaborators." : null,
       nextAction: "Document required capabilities; collaboration matching is not connected externally.",
+      nextActionKey: "documentCapabilities",
       href: "/trust",
     },
     {
@@ -129,6 +135,7 @@ export function deriveMissionLifecycle(mission: Mission | null): readonly Missio
       exists: impact?.isComplete ? "Human impact review complete" : impact ? "Impact draft started" : null,
       missing: !impact?.isComplete ? "Complete humanity impact review before report readiness." : null,
       nextAction: impact?.isComplete ? "Review impact periodically." : "Complete Human Impact panel in My Work.",
+      nextActionKey: impact?.isComplete ? "reviewImpact" : "completeImpact",
       href: projectId ? `/my-work${q}#human-impact` : "/my-work",
     },
     {
@@ -138,6 +145,7 @@ export function deriveMissionLifecycle(mission: Mission | null): readonly Missio
       exists: hasReport ? "Project report timestamp recorded" : readiness?.canClaimReadiness ? "Readiness criteria met" : null,
       missing: !readiness?.canClaimReadiness ? readiness?.limitation ?? "Evidence and impact required." : null,
       nextAction: readiness?.canClaimReadiness ? "Preview report — export formats honestly unavailable." : "Complete evidence and impact review.",
+      nextActionKey: readiness?.canClaimReadiness ? "previewReport" : "completeForReport",
       href: projectId ? `/my-work${q}#project-report` : "/reports",
     },
   ];
@@ -152,7 +160,8 @@ function emptyLifecycle(): readonly MissionLifecycleStage[] {
     exists: null,
     missing: "Begin a mission to activate the lifecycle.",
     nextAction: "Create a mission from the Intelligence Canvas.",
-    href: "/",
+    nextActionKey: "createMission",
+    href: "/?create=1",
   };
   const stageIds: MissionThreadStage[] = [
     "mission",

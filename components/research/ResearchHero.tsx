@@ -1,28 +1,30 @@
+"use client";
+
 import Link from "next/link";
 import {
   cbaiBtnPrimary,
   cbaiSearchInput,
   cbaiSearchShell,
   cbaiSectionEyebrow,
+  cbaiTextMuted,
 } from "@/components/brand/brand-classes";
 import { RESEARCH_HOME } from "@/lib/research";
 import { RESEARCH_DOMAINS, RESEARCH_TOPICS } from "@/lib/research/research-topics";
 import ResearchEvidenceLattice from "@/components/research/ResearchEvidenceLattice";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type ResearchHeroProps = {
   query?: string;
 };
 
-// The Research room: same kernel (Operator, nav, evidence model) as every other ecosystem, its
-// own atmosphere. Home's hero is radial — one evidence core, the whole world around it. Research
-// is a lattice — real domains laid out like a catalog, not a globe — so arriving here reads as a
-// different room, never a re-skin of the homepage.
 export default function ResearchHero({ query = "" }: ResearchHeroProps) {
+  const { t } = useTranslation();
+
   return (
     <header className="grid items-center gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-8">
       <div className="space-y-6">
         <div className="space-y-3">
-          <p className={cbaiSectionEyebrow}>CBAI Ecosystem · In development</p>
+          <p className={cbaiSectionEyebrow}>{t("zeroLearningCurve.researchHeroEyebrow")}</p>
           <h1 className="cbai-display text-3xl text-zinc-50 sm:text-4xl">
             {RESEARCH_HOME.title}
           </h1>
@@ -34,16 +36,16 @@ export default function ResearchHero({ query = "" }: ResearchHeroProps) {
         <p className="max-w-2xl text-sm leading-relaxed text-zinc-500">{RESEARCH_HOME.coreMessage}</p>
 
         <div className="space-y-3">
-          <p className={cbaiSectionEyebrow}>Topic exploration entry</p>
+          <p className={cbaiSectionEyebrow}>{t("zeroLearningCurve.researchSearchEyebrow")}</p>
           <form
             action="/research"
             method="get"
             role="search"
-            aria-label="Search research topics"
+            aria-label={t("zeroLearningCurve.researchSearchAria")}
             className={`${cbaiSearchShell} flex flex-col gap-3 sm:relative sm:block`}
           >
             <label htmlFor="research-search" className="sr-only">
-              Search research topics
+              {t("zeroLearningCurve.researchSearchAria")}
             </label>
             <input
               id="research-search"
@@ -59,13 +61,10 @@ export default function ResearchHero({ query = "" }: ResearchHeroProps) {
               type="submit"
               className={`${cbaiBtnPrimary} min-h-11 w-full sm:absolute sm:right-3 sm:top-1/2 sm:w-auto sm:-translate-y-1/2`}
             >
-              Explore topic
+              {t("zeroLearningCurve.researchExploreTopic")}
             </button>
           </form>
-          <p className="text-xs text-zinc-600">
-            Search filters the topics catalog below — no live databases or publication results are
-            connected yet.
-          </p>
+          <p className={cbaiTextMuted}>{t("zeroLearningCurve.researchSearchFootnote")}</p>
         </div>
 
         <p className="text-sm text-zinc-500">
