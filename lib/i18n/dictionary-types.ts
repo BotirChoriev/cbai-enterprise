@@ -843,6 +843,282 @@ export type TranslationDictionary = {
     description: string;
     previewNotice: string;
   };
+  entityIntelligence: {
+    fromSearch: string;
+    comparables: string;
+    timelineDetail: string;
+    intelligenceContext: string;
+    relatedEntities: string;
+    reports: string;
+    openQuestions: string;
+    availableInformation: string;
+    missingInformation: string;
+    noOfficialInformation: string;
+    availableNow: string;
+    sourceStatus: string;
+    sourcesConnected: string;
+    sourcesConnectedSummary: string;
+    topicsListedAbove: string;
+    topicsAvailableNow: string;
+    compareDefaultHeading: string;
+    compareDefaultDescription: string;
+    generateReport: string;
+    hideReport: string;
+    openReportsCenter: string;
+    entityTypeCountry: string;
+    entityTypeCompany: string;
+    entityTypeUniversity: string;
+    factGovernment: string;
+    factFounded: string;
+    factOfficialWebsite: string;
+    governanceLensTitle: string;
+    governanceLensBody: string;
+    investorLensTitle: string;
+    investorLensBody: string;
+  };
+  sourceCoverage: {
+    countryHeading: string;
+    countryDescription: string;
+    companyHeading: string;
+    companyDescription: string;
+    universityHeading: string;
+    universityDescription: string;
+    publisher: string;
+    confidence: string;
+    citation: string;
+    supportedIndicators: string;
+  };
+  entityRelationships: {
+    countryHeading: string;
+    countryDescription: string;
+    countryEmpty: string;
+    exploreCompanies: string;
+    exploreUniversities: string;
+    companyHeading: string;
+    companyDescription: string;
+    companyEmpty: string;
+    partnerClaims: string;
+    partnerClaimsNotShown: string;
+    universityHeading: string;
+    universityDescription: string;
+    universityEmpty: string;
+    researchPartnerships: string;
+    researchPartnershipsNotShown: string;
+    relatedEntities: string;
+    verifiedCatalog: string;
+    evidenceMissing: string;
+  };
+  researchTopic: {
+    backToTopics: string;
+    humanReviewNotice: string;
+    experienceNotice: string;
+    overviewEyebrow: string;
+    quickOverview: string;
+    topicLabel: string;
+    domainLabel: string;
+    currentStatus: string;
+    methods: string;
+    evidenceTypes: string;
+    relatedTopics: string;
+    noRelatedTopics: string;
+    humanReview: string;
+    humanReviewDetail: string;
+    topicsHeading: string;
+    topicCount: string;
+  };
+  governanceCenter: {
+    totalRules: string;
+    criticalRules: string;
+    ruleCategories: string;
+    validationStepsLabel: string;
+    reviewStandards: string;
+    reviewStandardsBody: string;
+    ruleCount: string;
+    constitutionalPrinciples: string;
+    constitutionalPrinciplesBody: string;
+    reviewProcess: string;
+    reviewProcessBody: string;
+    stepLabel: string;
+    relatedTopics: string;
+    complianceReportModel: string;
+    complianceReportBody: string;
+    passedRules: string;
+    passedRulesDetail: string;
+    failedRules: string;
+    failedRulesDetail: string;
+    warnings: string;
+    warningsDetail: string;
+    recommendations: string;
+    recommendationsDetail: string;
+    moduleStatus: string;
+    statusRegistered: string;
+    statusDeclared: string;
+    categories: Record<
+      "constitution" | "evidence" | "entity" | "indicator" | "ui" | "persona",
+      { label: string; purpose: string }
+    >;
+    validationStepContent: Record<
+      | "module-proposal"
+      | "standards-check"
+      | "evidence-check"
+      | "persona-check"
+      | "accessibility-check"
+      | "release-review",
+      { title: string; description: string }
+    >;
+    personas: Record<
+      "citizen" | "investor" | "government" | "student" | "researcher" | "academic",
+      { title: string; protection: string }
+    >;
+    limits: Record<
+      "no-automated-enforcement" | "no-runtime-policy-changes" | "no-hidden-ai",
+      { title: string; description: string }
+    >;
+  };
+  reportsModel: {
+    statuses: {
+      notAvailable: string;
+      registryFactsOnly: string;
+      methodologyDefinitionsOnly: string;
+      insufficientEvidence: string;
+      evidenceSourceNotConnected: string;
+      partialLocalRegistry: string;
+      definedInFramework: string;
+      notApplicable: string;
+      planned: string;
+    };
+    evidenceRequired: {
+      country: string;
+      company: string;
+      university: string;
+      investor: string;
+      government: string;
+      research: string;
+      academic: string;
+    };
+    reportTypes: Record<
+      | "country-intelligence"
+      | "company-intelligence"
+      | "university-intelligence"
+      | "investor-brief"
+      | "government-brief"
+      | "research-brief"
+      | "academic-methodology",
+      { title: string; description: string; audience: string }
+    >;
+    exportFuture: Record<
+      "pdf" | "csv" | "api" | "mobile",
+      { format: string; description: string }
+    >;
+    reportPersonas: Record<
+      "citizen" | "investor" | "government" | "student" | "researcher" | "academic",
+      { title: string; usefulReports: readonly string[] }
+    >;
+    trustPillars: Record<
+      | "evidence-first"
+      | "source-attribution"
+      | "methodology-version"
+      | "reproducibility"
+      | "no-fabricated-metrics",
+      { title: string; description: string }
+    >;
+    exportFutureHeading: string;
+    noFakeAnalyticsNotice: string;
+    personasHeading: string;
+    trustHeading: string;
+  };
+  graphUi: {
+    entityDetails: string;
+    clear: string;
+    searchEntities: string;
+    entityType: string;
+    allTypes: string;
+    evidenceStatus: string;
+    relationshipCount: string;
+    availableSources: string;
+    openModule: string;
+    connectedEntities: string;
+    evidenceSummary: string;
+    relationshipStatus: string;
+    evidenceAvailable: string;
+    evidenceMissing: string;
+    entityEvidenceStatus: string;
+    neighborCount: string;
+    evidenceRelationships: string;
+    availableInformation: string;
+    futureEvidence: string;
+    legend: string;
+    activeEntityTypes: string;
+    verifiedRelationships: string;
+    plannedTypes: string;
+    futureTypeCount: string;
+    entityTypes: Record<
+      | "country"
+      | "company"
+      | "university"
+      | "government"
+      | "industry"
+      | "infrastructure"
+      | "natural-resources"
+      | "procurement"
+      | "research-center"
+      | "future",
+      { label: string; note: string }
+    >;
+    relationshipTypes: Record<
+      | "located-in"
+      | "registered-in"
+      | "belongs-to"
+      | "collaborates-with"
+      | "evidence-available"
+      | "evidence-missing",
+      { label: string; description: string }
+    >;
+    evidenceLabels: {
+      localPlatformRegistry: string;
+      partnershipVerification: string;
+    };
+  };
+  aboutPage: {
+    title: string;
+    pageDescription: string;
+    whoWeAreEyebrow: string;
+    purposeHeadline: string;
+    purposeBody: string;
+    whatIsEyebrow: string;
+    whatIsHeadline: string;
+    whatIsBody: string;
+    whyEyebrow: string;
+    whyHeadline: string;
+    whyClosing: string;
+    philosophyEyebrow: string;
+    philosophyHeadline: string;
+    differentEyebrow: string;
+    differentHeadline: string;
+    audiencesEyebrow: string;
+    audiencesHeadline: string;
+    workflowEyebrow: string;
+    workflowHeadline: string;
+    ecosystemsEyebrow: string;
+    ecosystemsHeadline: string;
+    manifestoEyebrow: string;
+    manifestoHeadline: string;
+    enterCBAI: string;
+    trySearch: string;
+    openTrust: string;
+    exploreResearch: string;
+  };
+  resetPasswordPage: {
+    pageDescription: string;
+    passwordUpdated: string;
+    passwordUpdatedBody: string;
+    chooseNewPassword: string;
+    chooseNewPasswordBody: string;
+    newPassword: string;
+    confirmNewPassword: string;
+    setNewPassword: string;
+    minPasswordLength: string;
+  };
 };
 
 export type TranslationNamespace = keyof TranslationDictionary;

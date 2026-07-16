@@ -29,6 +29,17 @@ import {
   TRUST_DATA_SOURCES_TR,
   VALIDATION_TR,
 } from "@/lib/i18n/platform-copy-build007-tr";
+import {
+  ABOUT_PAGE_TR,
+  ENTITY_INTELLIGENCE_TR,
+  ENTITY_RELATIONSHIPS_TR,
+  GOVERNANCE_CENTER_TR,
+  GRAPH_UI_TR,
+  REPORTS_MODEL_TR,
+  RESEARCH_TOPIC_TR,
+  RESET_PASSWORD_PAGE_TR,
+  SOURCE_COVERAGE_TR,
+} from "@/lib/i18n/platform-copy-build008-tr";
 
 const tr: TranslationDictionary = {
   roles: {
@@ -458,6 +469,15 @@ const tr: TranslationDictionary = {
   entityUi: ENTITY_UI_TR,
   projectUi: PROJECT_UI_TR,
   governancePage: GOVERNANCE_PAGE_TR,
+  entityIntelligence: ENTITY_INTELLIGENCE_TR,
+  sourceCoverage: SOURCE_COVERAGE_TR,
+  entityRelationships: ENTITY_RELATIONSHIPS_TR,
+  researchTopic: RESEARCH_TOPIC_TR,
+  governanceCenter: GOVERNANCE_CENTER_TR,
+  reportsModel: REPORTS_MODEL_TR,
+  graphUi: GRAPH_UI_TR,
+  aboutPage: ABOUT_PAGE_TR,
+  resetPasswordPage: RESET_PASSWORD_PAGE_TR,
 };
 
 export default tr;

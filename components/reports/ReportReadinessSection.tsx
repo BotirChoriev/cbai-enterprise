@@ -2,6 +2,8 @@
 
 import type { ReportTypeDefinition } from "@/lib/reports-center";
 import { reportStatusClass } from "@/lib/reports-center";
+import { translatedReportStatusClass } from "@/lib/i18n/reports-center-translation";
+import { getDictionary } from "@/lib/i18n/translate";
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n/use-translation";
 
@@ -9,10 +11,11 @@ type ReportReadinessSectionProps = {
   reportTypes: readonly ReportTypeDefinition[];
 };
 
-function StatusBadge({ label }: { label: string }) {
+function StatusBadge({ label, language }: { label: string; language: string }) {
+  const dictionary = getDictionary(language as "en" | "uz" | "ru" | "tr");
   return (
     <span
-      className={`inline-block rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${reportStatusClass(label)}`}
+      className={`inline-block rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${translatedReportStatusClass(dictionary, label)}`}
     >
       {label}
     </span>
@@ -22,7 +25,7 @@ function StatusBadge({ label }: { label: string }) {
 export default function ReportReadinessSection({
   reportTypes,
 }: ReportReadinessSectionProps) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
 
   return (
     <section className="space-y-4" aria-labelledby="report-readiness-heading">
@@ -41,7 +44,7 @@ export default function ReportReadinessSection({
                 <h3 className="text-sm font-semibold text-zinc-100">{report.title}</h3>
                 <p className="mt-1 text-sm text-zinc-400">{report.description}</p>
               </div>
-              <StatusBadge label={report.availableToday} />
+              <StatusBadge label={report.availableToday} language={language} />
             </div>
 
             <dl className="mt-4 space-y-3 text-sm">

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import PageHeader from "@/components/layout/PageHeader";
-import ResetPasswordForm from "@/components/account/ResetPasswordForm";
+import ResetPasswordPageClient from "@/components/account/ResetPasswordPageClient";
 
 export const metadata: Metadata = {
   title: "Reset Password",
@@ -9,10 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function ResetPasswordPage() {
-  return (
-    <div className="mx-auto max-w-lg space-y-8">
-      <PageHeader title="Reset Password" description="Complete a cloud account password reset." />
-      <ResetPasswordForm />
-    </div>
-  );
+  return <ResetPasswordPageClient />;
 }

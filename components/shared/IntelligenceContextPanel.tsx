@@ -1,6 +1,9 @@
+"use client";
+
 import StatusBadge from "@/components/shared/StatusBadge";
 import { resolveEntityDataStatus } from "@/components/shared/entity-profile-copy";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type IntelligenceContextPanelProps = {
   relatedEntityCount: number;
@@ -9,14 +12,6 @@ type IntelligenceContextPanelProps = {
   reportsCount: number;
   openQuestionsCount: number;
 };
-
-// Platform Completion mission, Phase 2: the "Evidence" stat used to duplicate what
-// EntityEvidenceSection already shows in more detail immediately below this panel on every
-// Country/Company/University page (a connected/total breakdown, not just a bare count) — the same
-// number rendered by two different widgets back to back. Removed here rather than there, since
-// EntityEvidenceSection's version is the more complete one. `evidenceConnectedCount`/
-// `evidenceTotalCount` are still accepted (used for the real status badge below) — only the
-// redundant tile is gone.
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
@@ -27,11 +22,6 @@ function Stat({ label, value }: { label: string; value: number }) {
   );
 }
 
-/**
- * One reusable "Intelligence Context" summary (Release 4, Phase 6) — related entities, evidence
- * count, reports, open questions, and current status. Real numbers only, nothing decorative; the
- * deeper detail behind each number lives further down the same page.
- */
 export default function IntelligenceContextPanel({
   relatedEntityCount,
   evidenceConnectedCount,
@@ -39,20 +29,21 @@ export default function IntelligenceContextPanel({
   reportsCount,
   openQuestionsCount,
 }: IntelligenceContextPanelProps) {
+  const { t } = useTranslation();
   const status = resolveEntityDataStatus(evidenceConnectedCount, evidenceTotalCount);
 
   return (
     <section aria-labelledby="intelligence-context-heading" className={`${cbaiGlassCard} space-y-3 p-4`}>
       <div className="flex items-center justify-between gap-3">
         <p className={cbaiSectionEyebrow} id="intelligence-context-heading">
-          Intelligence Context
+          {t("entityIntelligence.intelligenceContext")}
         </p>
         <StatusBadge status={status} />
       </div>
       <div className="grid grid-cols-3 gap-2">
-        <Stat label="Related entities" value={relatedEntityCount} />
-        <Stat label="Reports" value={reportsCount} />
-        <Stat label="Open questions" value={openQuestionsCount} />
+        <Stat label={t("entityIntelligence.relatedEntities")} value={relatedEntityCount} />
+        <Stat label={t("entityIntelligence.reports")} value={reportsCount} />
+        <Stat label={t("entityIntelligence.openQuestions")} value={openQuestionsCount} />
       </div>
     </section>
   );

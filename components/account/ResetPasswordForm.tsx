@@ -40,8 +40,8 @@ export default function ResetPasswordForm() {
     return (
       <div className={`${cbaiGlassCard} space-y-3 p-6`}>
         <p className={cbaiSectionEyebrow}>{t("accountPage.resetPassword")}</p>
-        <h2 className="text-lg font-semibold text-zinc-100">Password updated</h2>
-        <p className="text-sm text-zinc-500">Your cloud account password has been changed. You can sign in with it now.</p>
+        <h2 className="text-lg font-semibold text-zinc-100">{t("resetPasswordPage.passwordUpdated")}</h2>
+        <p className="text-sm text-zinc-500">{t("resetPasswordPage.passwordUpdatedBody")}</p>
         <Link href="/account" className={`${cbaiBtnPrimary} inline-flex`}>
           {t("accountPage.signIn")}
         </Link>
@@ -54,7 +54,7 @@ export default function ResetPasswordForm() {
     setError(null);
 
     if (password.length < MIN_PASSWORD_LENGTH) {
-      setError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
+      setError(t("resetPasswordPage.minPasswordLength", { length: String(MIN_PASSWORD_LENGTH) }));
       return;
     }
     if (password !== confirmPassword) {
@@ -77,17 +77,14 @@ export default function ResetPasswordForm() {
     <div className={`${cbaiGlassCard} space-y-4 p-6`}>
       <div>
         <p className={cbaiSectionEyebrow}>{t("accountPage.resetPassword")}</p>
-        <h2 className="mt-1 text-lg font-semibold text-zinc-100">Choose a new password</h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          This only works if you followed a real password-reset link sent to your email. If you opened
-          this page directly, the request below will fail.
-        </p>
+        <h2 className="mt-1 text-lg font-semibold text-zinc-100">{t("resetPasswordPage.chooseNewPassword")}</h2>
+        <p className="mt-1 text-sm text-zinc-500">{t("resetPasswordPage.chooseNewPasswordBody")}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
           <label htmlFor="reset-password" className="text-xs text-zinc-500">
-            New password
+            {t("resetPasswordPage.newPassword")}
           </label>
           <input
             id="reset-password"
@@ -100,7 +97,7 @@ export default function ResetPasswordForm() {
         </div>
         <div>
           <label htmlFor="reset-password-confirm" className="text-xs text-zinc-500">
-            Confirm new password
+            {t("resetPasswordPage.confirmNewPassword")}
           </label>
           <input
             id="reset-password-confirm"
@@ -115,7 +112,7 @@ export default function ResetPasswordForm() {
         {error ? <p className="text-xs text-amber-400">{error}</p> : null}
 
         <button type="submit" disabled={isSubmitting} className={`${cbaiBtnPrimary} disabled:opacity-50`}>
-          {isSubmitting ? t("common.saving") : "Set New Password"}
+          {isSubmitting ? t("common.saving") : t("resetPasswordPage.setNewPassword")}
         </button>
       </form>
     </div>

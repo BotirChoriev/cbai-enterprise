@@ -1,8 +1,9 @@
 "use client";
 
 import type { ResearchTopic } from "@/lib/research/research-topics";
-import { RESEARCH_TOPIC_STATUS_LABELS } from "@/lib/research/research-topics";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { getDictionary } from "@/lib/i18n/translate";
+import { translateResearchTopicStatus } from "@/lib/i18n/research-topic-status-translation";
 import { cbaiGlassCard } from "@/components/brand/brand-classes";
 
 type WorkspaceSidebarProps = {
@@ -20,12 +21,13 @@ export default function WorkspaceSidebar({
   onSearchChange,
   onSelectTopic,
 }: WorkspaceSidebarProps) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+  const dictionary = getDictionary(language);
 
   return (
     <aside className={`${cbaiGlassCard} flex h-full flex-col p-3`} aria-label={t("researchWorkspace.filterTopicsAria")}>
       <p className="text-[10px] font-medium uppercase tracking-wider text-teal-400/90">
-        Research topics
+        {t("researchTopic.topicsHeading")}
       </p>
 
       <label htmlFor="workspace-topic-search" className="sr-only">
@@ -40,7 +42,9 @@ export default function WorkspaceSidebar({
         className="mt-3 w-full rounded-md border border-zinc-800 bg-slate-950/70 px-3 py-2 text-xs text-zinc-100 placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-teal-500/30"
       />
 
-      <p className="mt-2 text-[10px] text-zinc-600">{topics.length} topics</p>
+      <p className="mt-2 text-[10px] text-zinc-600">
+        {t("researchTopic.topicCount", { count: String(topics.length) })}
+      </p>
 
       <ul className="mt-2 flex-1 space-y-1 overflow-y-auto pr-1">
         {topics.map((topic) => {
@@ -58,7 +62,7 @@ export default function WorkspaceSidebar({
               >
                 <p className="text-xs font-medium text-zinc-200">{topic.topicName}</p>
                 <p className="mt-0.5 text-[10px] text-zinc-600">
-                  {topic.domain} · {RESEARCH_TOPIC_STATUS_LABELS[topic.status]}
+                  {topic.domain} · {translateResearchTopicStatus(dictionary, topic.status)}
                 </p>
               </button>
             </li>

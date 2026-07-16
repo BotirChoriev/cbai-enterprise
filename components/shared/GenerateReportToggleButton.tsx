@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslation } from "@/lib/i18n/use-translation";
+
 type GenerateReportToggleButtonProps = {
   showReport: boolean;
   onClick: () => void;
@@ -16,9 +18,11 @@ const TOGGLE_CLASS =
  * decides what to render below.
  */
 export default function GenerateReportToggleButton({ showReport, onClick }: GenerateReportToggleButtonProps) {
+  const { t } = useTranslation();
+
   return (
     <button type="button" onClick={onClick} className={TOGGLE_CLASS} aria-expanded={showReport}>
-      {showReport ? "Hide report" : "Generate report"}
+      {showReport ? t("entityIntelligence.hideReport") : t("entityIntelligence.generateReport")}
     </button>
   );
 }

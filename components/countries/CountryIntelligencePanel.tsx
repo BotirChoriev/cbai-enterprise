@@ -35,6 +35,7 @@ import {
 import { getCountryRelationships } from "@/lib/countries.adapter";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import CreateProjectFromEntityButton from "@/components/project/CreateProjectFromEntityButton";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type CountryIntelligencePanelProps = {
   journey: CountryUserJourney;
@@ -47,6 +48,7 @@ export function CountryIntelligencePanel({
   country,
   searchQuery,
 }: CountryIntelligencePanelProps) {
+  const { t } = useTranslation();
   const [showReport, setShowReport] = useState(false);
   const { context } = usePlatformContext();
   const { profile, evidenceGaps, evidenceComparison } = journey;
@@ -75,8 +77,8 @@ export function CountryIntelligencePanel({
   const comparablesAndCoverage = (
     <div className="space-y-6">
       <EntityCompareSection
-        heading="Comparables"
-        description="Benchmark this country against others in the registry before reading the full profile."
+        heading={t("entityIntelligence.comparables")}
+        description={t("entityUi.benchmarkCountry")}
       >
         <EvidenceComparisonPanel
           entityType="country"
@@ -92,7 +94,7 @@ export function CountryIntelligencePanel({
     <div className="space-y-6">
       {searchQuery ? (
         <p className="text-sm text-zinc-500">
-          From search: &quot;{searchQuery}&quot;
+          {t("entityIntelligence.fromSearch", { query: searchQuery })}
         </p>
       ) : null}
 
@@ -110,16 +112,16 @@ export function CountryIntelligencePanel({
 
       <EntityHeader
         name={registryFacts.name}
-        entityType="Country"
+        entityType={t("entityIntelligence.entityTypeCountry")}
         country={registryFacts.name}
         region={registryFacts.region}
         subtitle={`${registryFacts.code} · ${registryFacts.capital}`}
         availableInformation={registryFacts.sourceLabel}
         facts={[
-          { label: "Government", value: registryFacts.government },
+          { label: t("entityIntelligence.factGovernment"), value: registryFacts.government },
           {
-            label: "Official website",
-            value: country.officialWebsite ?? "No verified information available.",
+            label: t("entityIntelligence.factOfficialWebsite"),
+            value: country.officialWebsite ?? t("entityUi.noVerifiedInfo"),
             href: country.officialWebsite,
           },
         ]}
@@ -161,13 +163,13 @@ export function CountryIntelligencePanel({
             }`}
           >
             {lens === "government"
-              ? "Governance Intelligence — institutional record first"
-              : "Economic Intelligence — comparables first"}
+              ? t("entityIntelligence.governanceLensTitle")
+              : t("entityIntelligence.investorLensTitle")}
           </p>
           <p className="mt-1 text-sm text-zinc-400">
             {lens === "government"
-              ? "Entered from the Government workspace — the evidence timeline and institutional coverage below come before the narrative profile."
-              : "Entered from the Investor workspace — comparables and indicator coverage below come before the narrative profile."}
+              ? t("entityIntelligence.governanceLensBody")
+              : t("entityIntelligence.investorLensBody")}
           </p>
         </div>
       ) : null}
@@ -203,7 +205,7 @@ export function CountryIntelligencePanel({
 
         <div className="space-y-4">
           <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">
-            Timeline detail
+            {t("entityIntelligence.timelineDetail")}
           </p>
           {lens === "investor" ? <TimelineReadinessPanel model={timelineModel} /> : null}
           {lens !== "government" ? <TimelineCoverage model={timelineModel} /> : null}

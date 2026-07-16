@@ -8,65 +8,44 @@ import {
   GovernanceValidationFlow,
 } from "@/components/governance-control/GovernanceSections";
 import GovernancePillars from "@/components/governance-control/GovernancePillars";
-import { cbaiPageHeader } from "@/components/brand/brand-classes";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import { getDictionary } from "@/lib/i18n/translate";
+import { translateGovernanceControlModel } from "@/lib/i18n/governance-translation";
 
 type GovernanceControlCenterProps = {
   embedded?: boolean;
 };
 
 export default function GovernanceControlCenter({ embedded = false }: GovernanceControlCenterProps) {
-  const model = useMemo(() => buildGovernanceControlModel(), []);
+  const { language } = useTranslation();
+  const model = useMemo(
+    () => translateGovernanceControlModel(getDictionary(language), buildGovernanceControlModel()),
+    [language],
+  );
+  const gc = getDictionary(language).governanceCenter;
 
   return (
     <div className="space-y-10">
-      {!embedded ? (
-        <div className={cbaiPageHeader}>
-          <div className="grid items-center gap-8 lg:grid-cols-[1.05fr_1fr]">
-            <div className="relative">
-              <h1 className="cbai-display text-2xl text-zinc-50">Governance</h1>
-              <p className="mt-1 max-w-3xl text-sm text-zinc-500">
-                Platform rules, standards, and review process for evidence-based decisions.
-              </p>
-            </div>
-            <GovernancePillars categories={model.ruleCategories} />
-          </div>
-        </div>
-      ) : (
-        <GovernancePillars categories={model.ruleCategories} />
-      )}
+      {embedded ? <GovernancePillars categories={model.ruleCategories} /> : null}
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3">
-          <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
-            Total rules
-          </p>
-          <p className="mt-1 text-xl font-semibold text-zinc-100">
-            {model.summary.totalRules}
-          </p>
+          <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">{gc.totalRules}</p>
+          <p className="mt-1 text-xl font-semibold text-zinc-100">{model.summary.totalRules}</p>
+        </div>
+        <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">{gc.criticalRules}</p>
+          <p className="mt-1 text-xl font-semibold text-zinc-100">{model.summary.criticalRules}</p>
+        </div>
+        <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">{gc.ruleCategories}</p>
+          <p className="mt-1 text-xl font-semibold text-zinc-100">{model.summary.ruleCategories}</p>
         </div>
         <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3">
           <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
-            Critical rules
+            {gc.validationStepsLabel}
           </p>
-          <p className="mt-1 text-xl font-semibold text-zinc-100">
-            {model.summary.criticalRules}
-          </p>
-        </div>
-        <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3">
-          <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
-            Rule categories
-          </p>
-          <p className="mt-1 text-xl font-semibold text-zinc-100">
-            {model.summary.ruleCategories}
-          </p>
-        </div>
-        <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3">
-          <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
-            Validation steps
-          </p>
-          <p className="mt-1 text-xl font-semibold text-zinc-100">
-            {model.summary.validationSteps}
-          </p>
+          <p className="mt-1 text-xl font-semibold text-zinc-100">{model.summary.validationSteps}</p>
         </div>
       </div>
 

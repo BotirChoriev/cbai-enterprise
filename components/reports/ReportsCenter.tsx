@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { buildReportsCenterModel } from "@/lib/reports-center";
+import { translateReportsCenterModel } from "@/lib/i18n/reports-center-translation";
+import { getDictionary } from "@/lib/i18n/translate";
 import {
   buildContextualHref,
   getPrimaryEntity,
@@ -28,8 +30,11 @@ function entityProfilePath(entity: PrimaryEntityRef): string {
 
 export default function ReportsCenter() {
   const { context } = usePlatformContext();
-  const { t } = useTranslation();
-  const model = useMemo(() => buildReportsCenterModel(), []);
+  const { t, language } = useTranslation();
+  const model = useMemo(
+    () => translateReportsCenterModel(getDictionary(language), buildReportsCenterModel()),
+    [language],
+  );
   const entity = getPrimaryEntity(context);
   const profileHref = entity ? buildContextualHref(entityProfilePath(entity), context) : null;
 

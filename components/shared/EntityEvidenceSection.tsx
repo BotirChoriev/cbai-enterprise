@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslation } from "@/lib/i18n/use-translation";
 import EntityProfileSection from "@/components/shared/EntityProfileSection";
 
 type EntityEvidenceSectionProps = {
@@ -13,13 +16,16 @@ export default function EntityEvidenceSection({
   totalSources,
   availableItems,
 }: EntityEvidenceSectionProps) {
+  const { t } = useTranslation();
   const showItemList = availableItems !== undefined;
+  const plural = totalSources === 1 ? "" : "s";
+  const topicPlural = connectedCount === 1 ? "" : "s";
 
   return (
     <EntityProfileSection
       id="evidence"
-      title="Available information"
-      nextStep={{ label: "Missing information →", href: "#missing-evidence" }}
+      title={t("entityIntelligence.availableInformation")}
+      nextStep={{ label: t("entityIntelligence.missingInformation"), href: "#missing-evidence" }}
     >
       {showItemList ? (
         <div className="rounded-lg bg-zinc-900/50 px-4 py-4">
@@ -35,38 +41,43 @@ export default function EntityEvidenceSection({
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-zinc-400">
-              No official information is connected for this profile yet.
-            </p>
+            <p className="text-sm text-zinc-400">{t("entityIntelligence.noOfficialInformation")}</p>
           )}
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3">
           <div className="rounded-lg bg-zinc-900/50 px-4 py-3">
-            <p className="text-xs text-zinc-600">Available now</p>
-            <p className="mt-1 font-mono text-2xl font-semibold text-zinc-100">
-              {connectedCount}
-            </p>
+            <p className="text-xs text-zinc-600">{t("entityIntelligence.availableNow")}</p>
+            <p className="mt-1 font-mono text-2xl font-semibold text-zinc-100">{connectedCount}</p>
           </div>
           <div className="rounded-lg bg-zinc-900/50 px-4 py-3">
-            <p className="text-xs text-zinc-600">Source status</p>
+            <p className="text-xs text-zinc-600">{t("entityIntelligence.sourceStatus")}</p>
             <p className="mt-1 font-mono text-2xl font-semibold text-zinc-100">
               {sourceConnectedCount}
               <span className="text-sm font-normal text-zinc-500"> / {totalSources}</span>
             </p>
-            <p className="mt-1 text-xs text-zinc-500">sources connected</p>
+            <p className="mt-1 text-xs text-zinc-500">{t("entityIntelligence.sourcesConnected")}</p>
           </div>
         </div>
       )}
 
       <p className="text-sm text-zinc-400">
-        {sourceConnectedCount} of {totalSources} official source
-        {totalSources === 1 ? "" : "s"} connected
+        {t("entityIntelligence.sourcesConnectedSummary", {
+          connected: String(sourceConnectedCount),
+          total: String(totalSources),
+          plural,
+        })}
         {showItemList && connectedCount > 0
-          ? ` · ${connectedCount} topic${connectedCount === 1 ? "" : "s"} listed above`
+          ? t("entityIntelligence.topicsListedAbove", {
+              count: String(connectedCount),
+              topicPlural,
+            })
           : showItemList
             ? ""
-            : ` · ${connectedCount} topic${connectedCount === 1 ? "" : "s"} available now`}
+            : t("entityIntelligence.topicsAvailableNow", {
+                count: String(connectedCount),
+                topicPlural,
+              })}
         .
       </p>
     </EntityProfileSection>

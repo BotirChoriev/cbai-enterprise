@@ -46,14 +46,14 @@ export default function GraphEntityPanel({
     <div className="space-y-4">
       <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-zinc-50">Entity Details</h2>
+          <h2 className="text-sm font-semibold text-zinc-50">{t("graphUi.entityDetails")}</h2>
           {selectedNode ? (
             <button
               type="button"
               onClick={onClearSelection}
               className="text-[10px] font-medium text-zinc-500 transition-colors hover:text-zinc-300"
             >
-              Clear
+              {t("graphUi.clear")}
             </button>
           ) : null}
         </div>
@@ -75,7 +75,7 @@ export default function GraphEntityPanel({
           htmlFor="graph-search"
           className="mb-1.5 block text-[10px] font-medium uppercase tracking-widest text-zinc-600"
         >
-          Search Entities
+          {t("graphUi.searchEntities")}
         </label>
         <input
           id="graph-search"

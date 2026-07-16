@@ -29,6 +29,17 @@ import {
   TRUST_DATA_SOURCES_EN,
   VALIDATION_EN,
 } from "@/lib/i18n/platform-copy-build007-en";
+import {
+  ABOUT_PAGE_EN,
+  ENTITY_INTELLIGENCE_EN,
+  ENTITY_RELATIONSHIPS_EN,
+  GOVERNANCE_CENTER_EN,
+  GRAPH_UI_EN,
+  REPORTS_MODEL_EN,
+  RESEARCH_TOPIC_EN,
+  RESET_PASSWORD_PAGE_EN,
+  SOURCE_COVERAGE_EN,
+} from "@/lib/i18n/platform-copy-build008-en";
 
 const en: TranslationDictionary = {
   roles: {
@@ -459,6 +470,15 @@ const en: TranslationDictionary = {
   entityUi: ENTITY_UI_EN,
   projectUi: PROJECT_UI_EN,
   governancePage: GOVERNANCE_PAGE_EN,
+  entityIntelligence: ENTITY_INTELLIGENCE_EN,
+  sourceCoverage: SOURCE_COVERAGE_EN,
+  entityRelationships: ENTITY_RELATIONSHIPS_EN,
+  researchTopic: RESEARCH_TOPIC_EN,
+  governanceCenter: GOVERNANCE_CENTER_EN,
+  reportsModel: REPORTS_MODEL_EN,
+  graphUi: GRAPH_UI_EN,
+  aboutPage: ABOUT_PAGE_EN,
+  resetPasswordPage: RESET_PASSWORD_PAGE_EN,
 };
 
 export default en;

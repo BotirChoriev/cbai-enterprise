@@ -1,3 +1,5 @@
+"use client";
+
 import type {
   GovernanceRuleCategoryRow,
   GovernancePrinciple,
@@ -6,12 +8,17 @@ import type {
 import { governanceStatusClass } from "@/lib/governance-control-center";
 import type { ComplianceReport } from "@/lib/governance/reports/types";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import { getDictionary } from "@/lib/i18n/translate";
 
 type GovernanceRuleRegistryProps = {
   categories: readonly GovernanceRuleCategoryRow[];
 };
 
 export function GovernanceRuleRegistry({ categories }: GovernanceRuleRegistryProps) {
+  const { t, language } = useTranslation();
+  const gc = getDictionary(language).governanceCenter;
+
   return (
     <section className="space-y-4" aria-labelledby="governance-rules-heading">
       <div>
@@ -19,11 +26,9 @@ export function GovernanceRuleRegistry({ categories }: GovernanceRuleRegistryPro
           id="governance-rules-heading"
           className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
         >
-          Review standards
+          {gc.reviewStandards}
         </h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          Platform rules grouped by topic — definitions for manual review.
-        </p>
+        <p className="mt-1 text-sm text-zinc-500">{gc.reviewStandardsBody}</p>
       </div>
 
       <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
@@ -37,13 +42,13 @@ export function GovernanceRuleRegistry({ categories }: GovernanceRuleRegistryPro
                 <p className="text-sm font-semibold text-zinc-100">{row.label}</p>
                 <p className="mt-0.5 text-xs text-zinc-500">{row.purpose}</p>
                 <p className="mt-1 text-xs text-zinc-600">
-                  {row.ruleCount} rule{row.ruleCount === 1 ? "" : "s"}
+                  {gc.ruleCount.replace("{count}", String(row.ruleCount)).replace("{plural}", row.ruleCount === 1 ? "" : "s")}
                 </p>
               </div>
               <span
                 className={`shrink-0 rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${governanceStatusClass(row.status)}`}
               >
-                {row.status}
+                {gc.statusRegistered}
               </span>
             </li>
           ))}
@@ -57,9 +62,10 @@ type GovernancePrinciplesSectionProps = {
   principles: readonly GovernancePrinciple[];
 };
 
-export function GovernancePrinciplesSection({
-  principles,
-}: GovernancePrinciplesSectionProps) {
+export function GovernancePrinciplesSection({ principles }: GovernancePrinciplesSectionProps) {
+  const { language } = useTranslation();
+  const gc = getDictionary(language).governanceCenter;
+
   return (
     <section className="space-y-4" aria-labelledby="governance-principles-heading">
       <div>
@@ -67,11 +73,9 @@ export function GovernancePrinciplesSection({
           id="governance-principles-heading"
           className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
         >
-          Constitutional Principles
+          {gc.constitutionalPrinciples}
         </h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          Supreme principles all platform modules inherit from the CBAI Constitution.
-        </p>
+        <p className="mt-1 text-sm text-zinc-500">{gc.constitutionalPrinciplesBody}</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -93,6 +97,9 @@ type GovernanceValidationFlowProps = {
 };
 
 export function GovernanceValidationFlow({ steps }: GovernanceValidationFlowProps) {
+  const { language } = useTranslation();
+  const gc = getDictionary(language).governanceCenter;
+
   return (
     <section className="space-y-4" aria-labelledby="governance-validation-heading">
       <div>
@@ -100,11 +107,9 @@ export function GovernanceValidationFlow({ steps }: GovernanceValidationFlowProp
           id="governance-validation-heading"
           className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
         >
-          Review process
+          {gc.reviewProcess}
         </h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          Steps for validating releases before they reach users.
-        </p>
+        <p className="mt-1 text-sm text-zinc-500">{gc.reviewProcessBody}</p>
       </div>
 
       <ol className="space-y-3">
@@ -114,19 +119,21 @@ export function GovernanceValidationFlow({ steps }: GovernanceValidationFlowProp
             className="flex flex-col gap-3 rounded-xl border border-zinc-800 bg-zinc-950 px-5 py-4 sm:flex-row sm:items-start sm:justify-between"
           >
             <div className="min-w-0">
-              <p className="text-xs font-medium text-teal-400">Step {step.order}</p>
+              <p className="text-xs font-medium text-teal-400">
+                {gc.stepLabel.replace("{order}", String(step.order))}
+              </p>
               <p className="mt-0.5 text-sm font-semibold text-zinc-100">{step.title}</p>
               <p className="mt-1 text-sm text-zinc-400">{step.description}</p>
               {step.ruleCategories.length > 0 && (
                 <p className="mt-2 text-xs text-zinc-600">
-                  Related topics: {step.ruleCategories.join(", ")}
+                  {gc.relatedTopics} {step.ruleCategories.join(", ")}
                 </p>
               )}
             </div>
             <span
               className={`shrink-0 rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${governanceStatusClass(step.status)}`}
             >
-              {step.status}
+              {gc.statusDeclared}
             </span>
           </li>
         ))}
@@ -140,6 +147,9 @@ type GovernanceComplianceModelProps = {
 };
 
 export function GovernanceComplianceModel({ template }: GovernanceComplianceModelProps) {
+  const { language } = useTranslation();
+  const gc = getDictionary(language).governanceCenter;
+
   return (
     <section className="space-y-4" aria-labelledby="governance-compliance-heading">
       <div>
@@ -147,48 +157,46 @@ export function GovernanceComplianceModel({ template }: GovernanceComplianceMode
           id="governance-compliance-heading"
           className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
         >
-          Compliance Report Model
+          {gc.complianceReportModel}
         </h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          Structural template for manual audits and future CI output — no checks executed here.
-        </p>
+        <p className="mt-1 text-sm text-zinc-500">{gc.complianceReportBody}</p>
       </div>
 
       <Card>
         <CardHeader
           title={template.moduleName}
-          description={`Module ID: ${template.moduleId} · Status: ${template.overallStatus}`}
+          description={gc.moduleStatus
+            .replace("{moduleId}", template.moduleId)
+            .replace("{status}", template.overallStatus)}
         />
         <CardContent>
           <dl className="grid gap-4 text-sm sm:grid-cols-2">
             <div>
-              <dt className="text-zinc-500">Passed rules</dt>
+              <dt className="text-zinc-500">{gc.passedRules}</dt>
               <dd className="mt-1 text-zinc-300">
-                {template.passedRules.length} — populated by future validators
+                {gc.passedRulesDetail.replace("{count}", String(template.passedRules.length))}
               </dd>
             </div>
             <div>
-              <dt className="text-zinc-500">Failed rules</dt>
+              <dt className="text-zinc-500">{gc.failedRules}</dt>
               <dd className="mt-1 text-zinc-300">
-                {template.failedRules.length} — populated by future validators
+                {gc.failedRulesDetail.replace("{count}", String(template.failedRules.length))}
               </dd>
             </div>
             <div>
-              <dt className="text-zinc-500">Warnings</dt>
+              <dt className="text-zinc-500">{gc.warnings}</dt>
               <dd className="mt-1 text-zinc-300">
-                {template.warnings.length} — non-blocking findings
+                {gc.warningsDetail.replace("{count}", String(template.warnings.length))}
               </dd>
             </div>
             <div>
-              <dt className="text-zinc-500">Recommendations</dt>
+              <dt className="text-zinc-500">{gc.recommendations}</dt>
               <dd className="mt-1 text-zinc-300">
-                {template.recommendations.length} — remediation guidance
+                {gc.recommendationsDetail.replace("{count}", String(template.recommendations.length))}
               </dd>
             </div>
           </dl>
-          {template.notes && (
-            <p className="mt-4 text-xs text-zinc-600">{template.notes}</p>
-          )}
+          {template.notes ? <p className="mt-4 text-xs text-zinc-600">{template.notes}</p> : null}
         </CardContent>
       </Card>
     </section>
