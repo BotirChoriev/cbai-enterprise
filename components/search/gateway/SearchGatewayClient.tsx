@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo, useSyncExternalStore } from "react";
+import { useSyncExternalStore, useMemo } from "react";
 import SearchGateway from "@/components/search/gateway/SearchGateway";
+import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import { executeGatewaySearch } from "@/lib/search-gateway";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 function subscribe(onStoreChange: () => void) {
   window.addEventListener("popstate", onStoreChange);
@@ -18,6 +20,7 @@ function getServerSearchQuerySnapshot(): string {
 }
 
 export default function SearchGatewayClient() {
+  const { t } = useTranslation();
   const query = useSyncExternalStore(
     subscribe,
     getSearchQuerySnapshot,
@@ -26,5 +29,13 @@ export default function SearchGatewayClient() {
 
   const response = useMemo(() => executeGatewaySearch(query), [query]);
 
-  return <SearchGateway query={query} response={response} />;
+  return (
+    <OperatingPageShell
+      title={t("navigation.search")}
+      description={t("navigation.startWithSearchBody")}
+      showOperator={false}
+    >
+      <SearchGateway query={query} response={response} />
+    </OperatingPageShell>
+  );
 }

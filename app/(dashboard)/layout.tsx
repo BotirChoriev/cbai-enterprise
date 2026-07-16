@@ -6,7 +6,6 @@ import Sidebar from "@/components/layout/Sidebar";
 import Topbar from "@/components/layout/Topbar";
 import MobileNavDrawer from "@/components/layout/MobileNavDrawer";
 import { PlatformContextProvider } from "@/components/platform/context/PlatformContextProvider";
-import { AssistantProfileProvider } from "@/components/platform/context/AssistantProfileProvider";
 import { AuthProvider } from "@/components/platform/context/AuthProvider";
 import PlatformContextHeaderSlot from "@/components/platform/context/PlatformContextHeaderSlot";
 import OfflineBanner from "@/components/system/OfflineBanner";
@@ -40,8 +39,7 @@ export default function DashboardLayout({
 
   return (
     <AuthProvider>
-      <AssistantProfileProvider>
-        <div className="flex h-screen overflow-hidden bg-[var(--background)]">
+      <div className="flex h-screen overflow-hidden bg-[var(--background)]">
           <Sidebar />
           <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
             <Suspense fallback={null}>
@@ -64,8 +62,7 @@ export default function DashboardLayout({
               </PlatformContextProvider>
             </Suspense>
           </div>
-        </div>
-      </AssistantProfileProvider>
+      </div>
     </AuthProvider>
   );
 }

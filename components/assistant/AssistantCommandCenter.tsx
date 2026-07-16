@@ -120,9 +120,9 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
       if (["save workspace", "save to workspace", "bookmark", "save company"].some((phrase) => normalized.includes(phrase))) {
         if (focusedEntity) {
           pinEntityToWorkspace(focusedEntity);
-          setConfirmation(`Saved "${focusedEntity.name}" to your workspace.`);
+          setConfirmation(t("assistantVoice.savedToWorkspace", { name: focusedEntity.name }));
         } else {
-          setConfirmation("Nothing to save yet — open a country, company, or university profile first.");
+          setConfirmation(t("assistantVoice.nothingToSaveYet"));
         }
         setUnrecognized(null);
         setInput("");
@@ -185,7 +185,7 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
         setUnrecognized(trimmed);
       }
     },
-    [router, focusedEntity, pinEntityToWorkspace, relationshipFocus, updateProfile],
+    [router, focusedEntity, pinEntityToWorkspace, relationshipFocus, updateProfile, t],
   );
 
   function handleSubmit(event: React.FormEvent) {
@@ -241,7 +241,7 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
 
   function handleFileSelected(event: React.ChangeEvent<HTMLInputElement>) {
     if (event.target.files && event.target.files.length > 0) {
-      setUploadNotice("File upload requires a connected ingestion pipeline — not available yet.");
+      setUploadNotice(t("assistantVoice.uploadNotAvailable"));
     }
     event.target.value = "";
   }

@@ -12,6 +12,17 @@ import {
   SETTINGS_TR,
   TRUST_PAGE_TR,
 } from "@/lib/i18n/platform-copy-build006-tr";
+import {
+  ACCOUNT_PAGE_TR,
+  ASSISTANT_VOICE_TR,
+  GRAPH_PLATFORM_TR,
+  PREVIEW_PAGES_TR,
+  REPORTS_CENTER_TR,
+  RESEARCH_HOME_TR,
+  RESEARCH_WORKSPACE_TR,
+  TRUST_DATA_SOURCES_TR,
+  VALIDATION_TR,
+} from "@/lib/i18n/platform-copy-build007-tr";
 
 const tr: TranslationDictionary = {
   roles: {
@@ -426,6 +437,15 @@ const tr: TranslationDictionary = {
   graphPage: GRAPH_TR,
   reasoningPage: REASONING_TR,
   evidenceExplorer: EVIDENCE_TR,
+  accountPage: ACCOUNT_PAGE_TR,
+  reportsCenter: REPORTS_CENTER_TR,
+  researchWorkspace: RESEARCH_WORKSPACE_TR,
+  researchHome: RESEARCH_HOME_TR,
+  graphPlatform: GRAPH_PLATFORM_TR,
+  trustDataSources: TRUST_DATA_SOURCES_TR,
+  previewPages: PREVIEW_PAGES_TR,
+  validation: VALIDATION_TR,
+  assistantVoice: ASSISTANT_VOICE_TR,
 };
 
 export default tr;

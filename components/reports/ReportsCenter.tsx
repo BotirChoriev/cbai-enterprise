@@ -9,8 +9,9 @@ import {
   PLATFORM_MODULES,
   type PrimaryEntityRef,
 } from "@/lib/context";
-import { cbaiPageHeader } from "@/components/brand/brand-classes";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import ReportReadinessSection from "@/components/reports/ReportReadinessSection";
 import SavedReportsSection from "@/components/reports/SavedReportsSection";
 
@@ -27,46 +28,33 @@ function entityProfilePath(entity: PrimaryEntityRef): string {
 
 export default function ReportsCenter() {
   const { context } = usePlatformContext();
+  const { t } = useTranslation();
   const model = useMemo(() => buildReportsCenterModel(), []);
   const entity = getPrimaryEntity(context);
   const profileHref = entity ? buildContextualHref(entityProfilePath(entity), context) : null;
 
+  const title = entity ? entity.name : t("reports.title");
+  const description = entity
+    ? `${t("reportsCenter.continuingFor")} — ${t("reportsCenter.continuingBody")}`
+    : t("reportsCenter.pageDescription");
+
   return (
-    <div className="space-y-8 px-4 sm:space-y-10 sm:px-0">
-      <div className={cbaiPageHeader}>
-        {entity ? (
-          <>
-            <p className="text-[10px] font-medium uppercase tracking-widest text-teal-400">
-              Continuing review for
-            </p>
-            <h1 className="cbai-display mt-1 text-2xl text-zinc-50">
-              {entity.name}
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm text-zinc-500">
-              Your profile review continues here — choose a report type below.
-            </p>
-            {profileHref ? (
-              <Link
-                href={profileHref}
-                className="mt-4 inline-flex min-h-10 items-center text-sm font-medium text-teal-400 transition-colors hover:text-teal-300"
-              >
-                ← Back to profile
-              </Link>
-            ) : null}
-          </>
-        ) : (
-          <>
-            <h1 className="cbai-display text-2xl text-zinc-50">Reports</h1>
-            <p className="mt-1 max-w-2xl text-sm text-zinc-500">
-              What you can open today — official information required for each report type.
-            </p>
-          </>
-        )}
-      </div>
-
+    <OperatingPageShell
+      title={title}
+      description={description}
+      action={
+        profileHref ? (
+          <Link
+            href={profileHref}
+            className="inline-flex min-h-10 items-center text-sm font-medium text-teal-400 transition-colors hover:text-teal-300"
+          >
+            {t("reportsCenter.backToProfile")}
+          </Link>
+        ) : undefined
+      }
+    >
       <SavedReportsSection />
-
       <ReportReadinessSection reportTypes={model.reportTypes} />
-    </div>
+    </OperatingPageShell>
   );
 }

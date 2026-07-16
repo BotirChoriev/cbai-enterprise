@@ -87,6 +87,7 @@ export const MY_WORK_TR = {
   signedInLocal: "{email} olarak giriş yapıldı — Projeler ve Yer İşaretleri yalnızca bu cihazda kaydedilir.",
   continueLinksHeading: "Devam et",
   onboardingHeading: "Başla",
+  pageDescription: "Araştırma, kanıt incelemeleri ve raporlara devam edin.",
 } as const;
 
 export const SYSTEM_TR = {

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import PreviewInDevelopmentPage from "@/components/preview/PreviewInDevelopmentPage";
 import { platformModules } from "@/lib/navigation";
-import { cbaiPageHeader } from "@/components/brand/brand-classes";
 
 // Not in primary navigation (confirmed unreachable from any real nav link) and honestly
 // self-describes as inactive — kept reachable by direct URL for the platform module grid it
@@ -15,15 +15,7 @@ export const metadata: Metadata = {
 
 export default function CorePage() {
   return (
-    <div className="space-y-8">
-      <div className={cbaiPageHeader}>
-        <h1 className="cbai-display text-2xl text-zinc-50">CBAI Core</h1>
-        <p className="mt-1 max-w-2xl text-sm text-zinc-500">
-          Core inference and agent orchestration are not active in this deployment. Use the
-          modules below for live registry intelligence.
-        </p>
-      </div>
-
+    <PreviewInDevelopmentPage variant="core">
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {platformModules.map((module) => (
           <li key={module.href}>
@@ -37,6 +29,6 @@ export default function CorePage() {
           </li>
         ))}
       </ul>
-    </div>
+    </PreviewInDevelopmentPage>
   );
 }

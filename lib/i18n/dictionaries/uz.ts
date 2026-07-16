@@ -12,6 +12,17 @@ import {
   SETTINGS_UZ,
   TRUST_PAGE_UZ,
 } from "@/lib/i18n/platform-copy-build006-uz";
+import {
+  ACCOUNT_PAGE_UZ,
+  ASSISTANT_VOICE_UZ,
+  GRAPH_PLATFORM_UZ,
+  PREVIEW_PAGES_UZ,
+  REPORTS_CENTER_UZ,
+  RESEARCH_HOME_UZ,
+  RESEARCH_WORKSPACE_UZ,
+  TRUST_DATA_SOURCES_UZ,
+  VALIDATION_UZ,
+} from "@/lib/i18n/platform-copy-build007-uz";
 
 const uz: TranslationDictionary = {
   roles: {
@@ -426,6 +437,15 @@ const uz: TranslationDictionary = {
   graphPage: GRAPH_UZ,
   reasoningPage: REASONING_UZ,
   evidenceExplorer: EVIDENCE_UZ,
+  accountPage: ACCOUNT_PAGE_UZ,
+  reportsCenter: REPORTS_CENTER_UZ,
+  researchWorkspace: RESEARCH_WORKSPACE_UZ,
+  researchHome: RESEARCH_HOME_UZ,
+  graphPlatform: GRAPH_PLATFORM_UZ,
+  trustDataSources: TRUST_DATA_SOURCES_UZ,
+  previewPages: PREVIEW_PAGES_UZ,
+  validation: VALIDATION_UZ,
+  assistantVoice: ASSISTANT_VOICE_UZ,
 };
 
 export default uz;

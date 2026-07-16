@@ -91,6 +91,7 @@ export const MY_WORK_EN = {
   signedInLocal: "Signed in as {email} — Projects and Bookmarks below belong to your account, saved to this device only.",
   continueLinksHeading: "Continue",
   onboardingHeading: "Get started",
+  pageDescription: "Continue research, evidence reviews, and reports in progress.",
 } as const;
 
 export const SYSTEM_EN = {

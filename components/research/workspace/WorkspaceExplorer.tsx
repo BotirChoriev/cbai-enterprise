@@ -10,10 +10,7 @@ import {
 import {
   RESEARCH_WORKSPACE,
   WORKSPACE_AVAILABLE_TODAY,
-  WORKSPACE_HUMAN_REVIEW_NOTICE,
   WORKSPACE_NOT_AVAILABLE_YET,
-  WORKSPACE_SHELL_NOTICE,
-  WORKSPACE_STATUS_LABELS,
 } from "@/lib/research/workspace";
 import WorkspaceSidebar from "@/components/research/workspace/WorkspaceSidebar";
 import WorkspaceContent from "@/components/research/workspace/WorkspaceContent";
@@ -22,6 +19,8 @@ import ResearchGapExplorer from "@/components/research/gaps/ResearchGapExplorer"
 import ResearchLandscape from "@/components/research/landscape/ResearchLandscape";
 import MethodComparisonPanel from "@/components/research/method-comparison/MethodComparisonPanel";
 import { cbaiGlassCard, cbaiHeroGlow, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import type { WorkspaceStatus } from "@/lib/research/workspace";
 
 type WorkspaceExplorerProps = {
   initialTopicId?: string;
@@ -34,6 +33,7 @@ export default function WorkspaceExplorer({
   showTopicNotFoundNotice = false,
   deepLinkTopicId,
 }: WorkspaceExplorerProps) {
+  const { t } = useTranslation();
   const defaultTopic = getDefaultWorkspaceTopic();
   const [selectedTopicId, setSelectedTopicId] = useState(
     initialTopicId ?? defaultTopic.topicId,
@@ -53,6 +53,12 @@ export default function WorkspaceExplorer({
     return buildWorkspaceExplorerContext(topic);
   }, [filteredTopics, selectedTopicId, defaultTopic]);
 
+  const statusLabels: Record<WorkspaceStatus, string> = {
+    workspace_shell_available: t("researchWorkspace.statusShellAvailable"),
+    future_workspace: t("researchWorkspace.statusFuture"),
+    not_connected_yet: t("researchWorkspace.statusNotConnected"),
+  };
+
   return (
     <div className={`mx-auto max-w-[1600px] px-3 py-6 sm:px-4 sm:py-8 ${cbaiHeroGlow}`}>
       <header className="mb-6 space-y-3">
@@ -60,28 +66,27 @@ export default function WorkspaceExplorer({
           href="/research"
           className="inline-flex text-sm font-medium text-teal-400 transition-colors hover:text-teal-300"
         >
-          ← Back to Research Intelligence
+          {t("researchWorkspace.backToResearch")}
         </Link>
         <div>
-          <p className={cbaiSectionEyebrow}>Research Workspace</p>
+          <p className={cbaiSectionEyebrow}>{t("researchWorkspace.title")}</p>
           <h1 className="cbai-display text-2xl text-zinc-100">
-            Research Workspace
+            {t("researchWorkspace.title")}
           </h1>
-          <p className="mt-1 max-w-3xl text-sm text-zinc-500">{WORKSPACE_SHELL_NOTICE}</p>
+          <p className="mt-1 max-w-3xl text-sm text-zinc-500">{t("researchWorkspace.shellNotice")}</p>
           {showTopicNotFoundNotice ? (
             <p className="mt-2 rounded-md border border-zinc-800/80 bg-zinc-900/40 px-3 py-2 text-xs text-zinc-500">
-              {`"${deepLinkTopicId}" is not a topic in the research catalog — check the link, or `}
+              {t("researchWorkspace.topicNotFoundPrefix", { topicId: deepLinkTopicId ?? "" })}{" "}
               <Link href="/research" className="text-teal-400 hover:text-teal-300">
-                browse all research topics
+                {t("researchWorkspace.browseAllTopics")}
               </Link>
               .
             </p>
           ) : null}
           {deepLinkTopicId && !showTopicNotFoundNotice ? (
             <p className="mt-2 text-xs text-zinc-500">
-              Selected research topic:{" "}
-              <span className="text-zinc-300">{context.topic.topicName}</span> — continue research
-              review.
+              {t("researchWorkspace.selectedTopic")}{" "}
+              <span className="text-zinc-300">{context.topic.topicName}</span> {t("researchWorkspace.continueReview")}
             </p>
           ) : null}
         </div>
@@ -113,7 +118,7 @@ export default function WorkspaceExplorer({
             <p className={cbaiSectionEyebrow}>Workspace status</p>
             <h2 className="text-sm font-semibold text-zinc-100">Research Workspace</h2>
             <p className="text-xs text-zinc-500">
-              {WORKSPACE_STATUS_LABELS[RESEARCH_WORKSPACE.status]}
+              {statusLabels[RESEARCH_WORKSPACE.status]}
             </p>
             <dl className="space-y-2 text-[11px]">
               <div>
@@ -135,12 +140,12 @@ export default function WorkspaceExplorer({
             <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
               Human review
             </p>
-            <p className="text-xs leading-relaxed text-zinc-500">{WORKSPACE_HUMAN_REVIEW_NOTICE}</p>
+            <p className="text-xs leading-relaxed text-zinc-500">{t("researchWorkspace.humanReviewNotice")}</p>
           </section>
 
           <section className={`${cbaiGlassCard} space-y-2 p-4`}>
             <p className="text-[10px] font-medium uppercase tracking-wider text-emerald-400/90">
-              Available today
+              {t("researchHome.availableToday")}
             </p>
             <ul className="space-y-1">
               {WORKSPACE_AVAILABLE_TODAY.map((item) => (
@@ -158,7 +163,7 @@ export default function WorkspaceExplorer({
 
           <section className={`${cbaiGlassCard} space-y-2 p-4`}>
             <p className="text-[10px] font-medium uppercase tracking-wider text-teal-400/90">
-              Future workspace
+              {t("researchWorkspace.statusFuture")}
             </p>
             <ul className="space-y-1">
               {WORKSPACE_NOT_AVAILABLE_YET.map((item) => (

@@ -2,6 +2,7 @@
 
 import type { ResearchTopic } from "@/lib/research/research-topics";
 import { RESEARCH_TOPIC_STATUS_LABELS } from "@/lib/research/research-topics";
+import { useTranslation } from "@/lib/i18n/use-translation";
 import { cbaiGlassCard } from "@/components/brand/brand-classes";
 
 type WorkspaceSidebarProps = {
@@ -19,21 +20,23 @@ export default function WorkspaceSidebar({
   onSearchChange,
   onSelectTopic,
 }: WorkspaceSidebarProps) {
+  const { t } = useTranslation();
+
   return (
-    <aside className={`${cbaiGlassCard} flex h-full flex-col p-3`} aria-label="Research topics">
+    <aside className={`${cbaiGlassCard} flex h-full flex-col p-3`} aria-label={t("researchWorkspace.filterTopicsAria")}>
       <p className="text-[10px] font-medium uppercase tracking-wider text-teal-400/90">
         Research topics
       </p>
 
       <label htmlFor="workspace-topic-search" className="sr-only">
-        Filter research topics
+        {t("researchWorkspace.filterTopicsAria")}
       </label>
       <input
         id="workspace-topic-search"
         type="search"
         value={searchQuery}
         onChange={(event) => onSearchChange(event.target.value)}
-        placeholder="Filter topics..."
+        placeholder={t("researchWorkspace.filterTopics")}
         className="mt-3 w-full rounded-md border border-zinc-800 bg-slate-950/70 px-3 py-2 text-xs text-zinc-100 placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-teal-500/30"
       />
 

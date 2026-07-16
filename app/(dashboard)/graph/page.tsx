@@ -7,7 +7,7 @@ import {
   computeGraphSelection,
 } from "@/lib/graph/graph.builder";
 import type { GraphNodeFilter } from "@/lib/graph/graph.types";
-import { GRAPH_PLATFORM, GRAPH_TRUST_PILLARS } from "@/lib/graph/graph-platform";
+import { GRAPH_TRUST_PILLARS } from "@/lib/graph/graph-platform";
 import GraphCanvas from "@/components/graph/GraphCanvas";
 import GraphEntityPanel from "@/components/graph/GraphEntityPanel";
 import GraphConnectionsPanel from "@/components/graph/GraphConnectionsPanel";
@@ -16,9 +16,12 @@ import GraphPipeline from "@/components/graph/GraphPipeline";
 import GraphPersonas from "@/components/graph/GraphPersonas";
 import HomeSection from "@/components/platform/home/HomeSection";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { getDictionary } from "@/lib/i18n/translate";
+import { translateGraphPlatform } from "@/lib/i18n/graph-platform-translation";
 
 export default function GraphPage() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+  const graphPlatform = translateGraphPlatform(getDictionary(language));
   const graph = useMemo(() => buildKnowledgeGraph(), []);
   const stats = useMemo(() => computeGraphStats(graph), [graph]);
 
@@ -50,13 +53,13 @@ export default function GraphPage() {
     <div className="home-page mx-auto max-w-[90rem] pb-16">
       <header className="home-surface rounded-2xl border border-zinc-800 px-8 py-8 sm:px-10">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-400/90">
-          {GRAPH_PLATFORM.eyebrow}
+          {graphPlatform.eyebrow}
         </p>
         <h1 className="cbai-display mt-3 text-3xl text-zinc-50 sm:text-4xl">
-          {GRAPH_PLATFORM.headline}
+          {graphPlatform.headline}
         </h1>
         <p className="mt-3 max-w-3xl text-base leading-relaxed text-zinc-400">
-          {t("graphPage.description")}
+          {graphPlatform.explanation}
         </p>
       </header>
 

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import PageHeader from "@/components/layout/PageHeader";
-import MyWork from "@/components/my-work/MyWork";
+import MyWorkPageClient from "@/components/my-work/MyWorkPageClient";
 
 export const metadata: Metadata = {
   title: "My Work",
@@ -8,13 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function MyWorkPage() {
-  return (
-    <div className="space-y-8">
-      <PageHeader
-        title="My Work"
-        description="Continue research, evidence reviews, and reports in progress."
-      />
-      <MyWork />
-    </div>
-  );
+  return <MyWorkPageClient />;
 }

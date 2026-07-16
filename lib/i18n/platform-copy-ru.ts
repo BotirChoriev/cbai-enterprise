@@ -87,6 +87,7 @@ export const MY_WORK_RU = {
   signedInLocal: "Вход как {email} — проекты и закладки сохранены только на этом устройстве.",
   continueLinksHeading: "Продолжить",
   onboardingHeading: "Начать",
+  pageDescription: "Продолжайте исследования, обзор доказательств и отчёты.",
 } as const;
 
 export const SYSTEM_RU = {

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/platform/context/AuthProvider";
+import { useTranslation } from "@/lib/i18n/use-translation";
 import { cbaiBtnPrimary, cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 const MIN_PASSWORD_LENGTH = 8;
@@ -16,6 +17,7 @@ const MIN_PASSWORD_LENGTH = 8;
  */
 export default function ResetPasswordForm() {
   const { completePasswordReset, isCloudConfigured } = useAuth();
+  const { t } = useTranslation();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -25,12 +27,10 @@ export default function ResetPasswordForm() {
   if (!isCloudConfigured) {
     return (
       <div className={`${cbaiGlassCard} space-y-3 p-6`}>
-        <p className={cbaiSectionEyebrow}>Password Reset</p>
-        <p className="text-sm text-zinc-500">
-          Cloud accounts are not available in this deployment yet, so there is no cloud password to reset.
-        </p>
+        <p className={cbaiSectionEyebrow}>{t("accountPage.resetPassword")}</p>
+        <p className="text-sm text-zinc-500">{t("accountPage.cloudNotConfigured")}</p>
         <Link href="/account" className="text-sm font-medium text-teal-400 hover:text-teal-300">
-          ← Back to Account
+          {t("accountPage.backToSignIn")}
         </Link>
       </div>
     );
@@ -39,11 +39,11 @@ export default function ResetPasswordForm() {
   if (done) {
     return (
       <div className={`${cbaiGlassCard} space-y-3 p-6`}>
-        <p className={cbaiSectionEyebrow}>Password Reset</p>
+        <p className={cbaiSectionEyebrow}>{t("accountPage.resetPassword")}</p>
         <h2 className="text-lg font-semibold text-zinc-100">Password updated</h2>
         <p className="text-sm text-zinc-500">Your cloud account password has been changed. You can sign in with it now.</p>
         <Link href="/account" className={`${cbaiBtnPrimary} inline-flex`}>
-          Go to Sign In
+          {t("accountPage.signIn")}
         </Link>
       </div>
     );
@@ -58,7 +58,7 @@ export default function ResetPasswordForm() {
       return;
     }
     if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+      setError(t("validation.passwordsDoNotMatch"));
       return;
     }
 
@@ -76,7 +76,7 @@ export default function ResetPasswordForm() {
   return (
     <div className={`${cbaiGlassCard} space-y-4 p-6`}>
       <div>
-        <p className={cbaiSectionEyebrow}>Password Reset</p>
+        <p className={cbaiSectionEyebrow}>{t("accountPage.resetPassword")}</p>
         <h2 className="mt-1 text-lg font-semibold text-zinc-100">Choose a new password</h2>
         <p className="mt-1 text-sm text-zinc-500">
           This only works if you followed a real password-reset link sent to your email. If you opened
@@ -94,7 +94,7 @@ export default function ResetPasswordForm() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="At least 8 characters"
+            placeholder={t("accountPage.passwordSignUpPlaceholder")}
             className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30"
           />
         </div>
@@ -107,7 +107,7 @@ export default function ResetPasswordForm() {
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Repeat password"
+            placeholder={t("accountPage.passwordSignInPlaceholder")}
             className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30"
           />
         </div>
@@ -115,7 +115,7 @@ export default function ResetPasswordForm() {
         {error ? <p className="text-xs text-amber-400">{error}</p> : null}
 
         <button type="submit" disabled={isSubmitting} className={`${cbaiBtnPrimary} disabled:opacity-50`}>
-          {isSubmitting ? "Saving…" : "Set New Password"}
+          {isSubmitting ? t("common.saving") : "Set New Password"}
         </button>
       </form>
     </div>

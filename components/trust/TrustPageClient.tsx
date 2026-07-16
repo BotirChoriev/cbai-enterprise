@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { getDictionary } from "@/lib/i18n/translate";
+import { translateDataSourceScope } from "@/lib/i18n/trust-data-sources-translation";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import TrustVerificationStatuses from "@/components/trust/TrustVerificationStatuses";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
@@ -25,7 +26,8 @@ const SECTIONS = [
 
 export default function TrustPageClient() {
   const { t, language } = useTranslation();
-  const trustPage = getDictionary(language).trustPage;
+  const dictionary = getDictionary(language);
+  const trustPage = dictionary.trustPage;
 
   return (
     <OperatingPageShell title={t("trust.title")} description={trustPage.pageDescription}>
@@ -66,7 +68,7 @@ export default function TrustPageClient() {
               {"showDataSources" in section && section.showDataSources
                 ? DATA_SOURCE_CATEGORIES.map((source) => (
                     <p key={source.name} className="text-sm leading-relaxed text-zinc-400">
-                      {source.name} — {source.scope}
+                      {source.name} — {translateDataSourceScope(dictionary, source.name)}
                     </p>
                   ))
                 : null}

@@ -3,7 +3,7 @@
 import type { GraphNode, GraphEdge, GraphStats, GraphNodeFilter } from "@/lib/graph/graph.types";
 import { getEntityTypeLabel } from "@/lib/entity/entity.helpers";
 import { buildEntityGraphEvidenceSummary } from "@/lib/graph/graph.evidence";
-import { GRAPH_PLATFORM } from "@/lib/graph/graph-platform";
+import { useTranslation } from "@/lib/i18n/use-translation";
 import Link from "next/link";
 
 type GraphEntityPanelProps = {
@@ -40,6 +40,8 @@ export default function GraphEntityPanel({
   stats,
   onClearSelection,
 }: GraphEntityPanelProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-4">
       <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
@@ -58,7 +60,7 @@ export default function GraphEntityPanel({
 
         {!selectedNode ? (
           <p className="mt-3 text-xs leading-relaxed text-zinc-500">
-            {GRAPH_PLATFORM.noSelectionPrompt}
+            {t("graphPlatform.noSelectionPrompt")}
           </p>
         ) : (
           <EntityDetails
@@ -80,7 +82,7 @@ export default function GraphEntityPanel({
           type="search"
           value={searchQuery}
           onChange={(event) => onSearchChange(event.target.value)}
-          placeholder="Search by name or country…"
+          placeholder={t("graphPlatform.searchPlaceholder")}
           className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-teal-500/50 focus:outline-none focus:ring-1 focus:ring-teal-500/30"
         />
 
@@ -121,8 +123,8 @@ export default function GraphEntityPanel({
         </div>
 
         <dl className="mt-4 grid grid-cols-2 gap-2 border-t border-zinc-800 pt-4">
-          <RegistryStat label="Registry nodes" value={stats.totalNodes} />
-          <RegistryStat label="Verified edges" value={stats.verifiedEdgeCount} />
+          <RegistryStat label={t("graphPlatform.registryNodes")} value={stats.totalNodes} />
+          <RegistryStat label={t("graphPlatform.verifiedEdges")} value={stats.verifiedEdgeCount} />
         </dl>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import InvestorWorkspace from "@/components/workspaces/InvestorWorkspace";
+import InvestorPageClient from "@/components/workspaces/InvestorPageClient";
 
 export const metadata: Metadata = {
   title: "Investor",
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function InvestorPage() {
-  return <InvestorWorkspace />;
+  return <InvestorPageClient />;
 }

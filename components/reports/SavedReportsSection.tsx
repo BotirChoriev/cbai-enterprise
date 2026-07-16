@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { loadReports, deleteReport, NO_REPORTS_NOTE, type SavedReport } from "@/lib/reports/reports-store";
+import { loadReports, deleteReport, type SavedReport } from "@/lib/reports/reports-store";
 import { PLATFORM_MODULES } from "@/lib/context";
+import { useTranslation } from "@/lib/i18n/use-translation";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 function reportHref(report: SavedReport): string {
@@ -27,15 +28,16 @@ function reportHref(report: SavedReport): string {
  * Synced to the cloud when a cloud session is active (see lib/reports/reports-store.ts).
  */
 export default function SavedReportsSection() {
+  const { t } = useTranslation();
   const [reports, setReports] = useState<SavedReport[]>(() => loadReports());
 
   if (reports.length === 0) {
     return (
       <section aria-labelledby="saved-reports-heading" className={`${cbaiGlassCard} space-y-2 p-5`}>
         <p className={cbaiSectionEyebrow} id="saved-reports-heading">
-          Your Saved Reports
+          {t("reports.myReports")}
         </p>
-        <p className="text-sm text-zinc-500">{NO_REPORTS_NOTE}</p>
+        <p className="text-sm text-zinc-500">{t("reports.noReports")}</p>
       </section>
     );
   }
@@ -43,7 +45,7 @@ export default function SavedReportsSection() {
   return (
     <section aria-labelledby="saved-reports-heading" className={`${cbaiGlassCard} space-y-3 p-5`}>
       <p className={cbaiSectionEyebrow} id="saved-reports-heading">
-        Your Saved Reports ({reports.length})
+        {t("reportsCenter.savedCount", { count: String(reports.length) })}
       </p>
       <ul className="space-y-2">
         {reports.map((report) => (
@@ -55,7 +57,9 @@ export default function SavedReportsSection() {
               <Link href={reportHref(report)} className="text-sm font-medium text-teal-400 hover:text-teal-300">
                 {report.title}
               </Link>
-              <p className="text-[11px] text-zinc-600">Saved {new Date(report.generatedAt).toLocaleString()}</p>
+              <p className="text-[11px] text-zinc-600">
+                {t("reportsCenter.savedAt", { date: new Date(report.generatedAt).toLocaleString() })}
+              </p>
             </div>
             <button
               type="button"
@@ -65,7 +69,7 @@ export default function SavedReportsSection() {
               }}
               className="text-xs text-zinc-500 hover:text-amber-400"
             >
-              Delete
+              {t("reportsCenter.delete")}
             </button>
           </li>
         ))}

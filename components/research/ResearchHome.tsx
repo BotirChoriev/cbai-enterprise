@@ -15,9 +15,11 @@ import {
   RESEARCH_HOME,
   RESEARCH_NOT_AVAILABLE_YET,
 } from "@/lib/research";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 export default function ResearchHome() {
   const searchParams = useSearchParams();
+  const { t } = useTranslation();
   const query = (searchParams.get("q") ?? searchParams.get("topic") ?? "").trim();
 
   return (
@@ -32,13 +34,13 @@ export default function ResearchHome() {
           className="rounded-xl border border-teal-500/20 bg-teal-500/5 px-5 py-4"
         >
           <h2 id="research-status-heading" className="sr-only">
-            Research Intelligence status
+            {t("researchHome.statusHeading")}
           </h2>
           <p className="text-sm font-semibold text-teal-300">{RESEARCH_HOME.statusLabel}</p>
           <div className="mt-4 grid gap-6 sm:grid-cols-2">
             <div>
               <p className="text-[10px] font-medium uppercase tracking-wider text-emerald-400/90">
-                Available today
+                {t("researchHome.availableToday")}
               </p>
               <ul className="mt-2 space-y-1.5 text-sm text-zinc-400">
                 {RESEARCH_AVAILABLE_TODAY.map((item) => (
@@ -51,7 +53,7 @@ export default function ResearchHome() {
             </div>
             <div>
               <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
-                Not available yet
+                {t("researchHome.notAvailableYet")}
               </p>
               <ul className="mt-2 space-y-1.5 text-sm text-zinc-500">
                 {RESEARCH_NOT_AVAILABLE_YET.map((item) => (
@@ -84,7 +86,7 @@ export default function ResearchHome() {
               </p>
             </div>
             <Link href={WORKSPACE_PATH} className={`${cbaiBtnSecondary} shrink-0`}>
-              Explore Research Workspace →
+              {t("researchHome.openWorkspace")} →
             </Link>
           </div>
         </section>

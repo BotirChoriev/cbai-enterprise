@@ -3,25 +3,22 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/platform/context/AuthProvider";
-import { LOCAL_ACCOUNT_NOTICE } from "@/lib/auth/auth-types";
 import { loadProjects } from "@/lib/project/project-store";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
+import { useTranslation } from "@/lib/i18n/use-translation";
 import { cbaiBtnPrimary, cbaiBtnSecondary, cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type LocalMode = "sign-in" | "sign-up";
 type CloudMode = "sign-in" | "sign-up" | "forgot-password";
 type AccountTab = "cloud" | "local";
 
-const CLOUD_ACCOUNT_NOTICE =
-  "Cloud account — verified by a real server (Supabase). Your Projects, Bookmarks, and Reports sync across " +
-  "every browser and device you sign into with this email.";
-
 function AccountModeBadge() {
   const { accountMode } = useAuth();
+  const { t } = useTranslation();
   const labels: Record<typeof accountMode, string> = {
-    cloud: "Cloud Account — synced across devices",
-    "device-local": "Device-Local Account — this browser only",
-    "signed-out": "Signed Out",
+    cloud: t("accountPage.modeCloud"),
+    "device-local": t("accountPage.modeLocal"),
+    "signed-out": t("accountPage.modeSignedOut"),
   };
   const colors: Record<typeof accountMode, string> = {
     cloud: "bg-emerald-500/10 text-emerald-300",
@@ -37,13 +34,14 @@ function AccountModeBadge() {
 
 function CloudSignedInView() {
   const { cloudUser, cloudSignOut } = useAuth();
+  const { t } = useTranslation();
   if (!cloudUser) return null;
 
   return (
     <div className={`${cbaiGlassCard} space-y-4 p-6`}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className={cbaiSectionEyebrow}>Cloud Account</p>
+          <p className={cbaiSectionEyebrow}>{t("accountPage.cloudAccount")}</p>
           <h2 className="mt-1 text-lg font-semibold text-zinc-100">{cloudUser.email}</h2>
         </div>
         <AccountModeBadge />
@@ -51,16 +49,15 @@ function CloudSignedInView() {
 
       {!cloudUser.emailConfirmed ? (
         <p className="rounded-md bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
-          Your email is not confirmed yet. Check your inbox for a confirmation link — some cloud features may be
-          limited until you confirm.
+          {t("accountPage.emailNotConfirmed")}
         </p>
       ) : null}
 
-      <p className="border-t border-zinc-800/80 pt-4 text-xs leading-relaxed text-zinc-600">{CLOUD_ACCOUNT_NOTICE}</p>
+      <p className="border-t border-zinc-800/80 pt-4 text-xs leading-relaxed text-zinc-600">{t("accountPage.cloudNotice")}</p>
 
       <div className="flex flex-wrap gap-2">
         <Link href="/my-work" className={cbaiBtnPrimary}>
-          Continue Working
+          {t("accountPage.continueWorking")}
         </Link>
         <button
           type="button"
@@ -69,7 +66,7 @@ function CloudSignedInView() {
           }}
           className={cbaiBtnSecondary}
         >
-          Sign Out of Cloud
+          {t("accountPage.signOutCloud")}
         </button>
       </div>
     </div>
@@ -78,6 +75,7 @@ function CloudSignedInView() {
 
 function CloudSignedOutView() {
   const { cloudSignIn, cloudSignUp, requestPasswordReset, isCloudConfigured } = useAuth();
+  const { t } = useTranslation();
   const [mode, setMode] = useState<CloudMode>("sign-in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -99,7 +97,7 @@ function CloudSignedOutView() {
         setError(result.error);
         return;
       }
-      setNotice("If an account exists for that email, a password reset link has been sent.");
+      setNotice(t("accountPage.resetLinkSent"));
       return;
     }
 
@@ -111,7 +109,7 @@ function CloudSignedOutView() {
       return;
     }
     if (mode === "sign-up" && !result.user.emailConfirmed) {
-      setNotice("Account created. Check your email to confirm before all cloud features are available.");
+      setNotice(t("accountPage.accountCreatedConfirmEmail"));
       return;
     }
     window.location.href = "/my-work";
@@ -120,21 +118,19 @@ function CloudSignedOutView() {
   return (
     <div className={`${cbaiGlassCard} space-y-4 p-6`}>
       <div>
-        <p className={cbaiSectionEyebrow}>Cloud Account</p>
+        <p className={cbaiSectionEyebrow}>{t("accountPage.cloudAccount")}</p>
         <h2 className="mt-1 text-lg font-semibold text-zinc-100">
-          {mode === "sign-in" ? "Sign in" : mode === "sign-up" ? "Create a cloud account" : "Reset password"}
+          {mode === "sign-in"
+            ? t("accountPage.signIn")
+            : mode === "sign-up"
+              ? t("accountPage.createCloudAccount")
+              : t("accountPage.resetPassword")}
         </h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          A real, server-verified account — sync your Projects, Bookmarks, and Reports across every device.
-        </p>
+        <p className="mt-1 text-sm text-zinc-500">{t("accountPage.cloudSubtitle")}</p>
       </div>
 
       {!isCloudConfigured ? (
-        <p className="rounded-md bg-zinc-900/60 px-3 py-2 text-xs text-zinc-500">
-          Cloud accounts are not configured in this deployment yet (no Supabase project connected). You can still
-          use a Device-Local Account below, or try submitting — the app will tell you plainly if it can&apos;t reach
-          the cloud.
-        </p>
+        <p className="rounded-md bg-zinc-900/60 px-3 py-2 text-xs text-zinc-500">{t("accountPage.cloudNotConfigured")}</p>
       ) : null}
 
       {mode !== "forgot-password" ? (
@@ -148,7 +144,7 @@ function CloudSignedOutView() {
             }}
             className={`rounded-md px-3 py-1.5 font-medium transition-colors ${mode === "sign-in" ? "bg-teal-500/10 text-teal-300" : "text-zinc-500 hover:text-zinc-300"}`}
           >
-            Sign In
+            {t("accountPage.signInTab")}
           </button>
           <button
             type="button"
@@ -159,7 +155,7 @@ function CloudSignedOutView() {
             }}
             className={`rounded-md px-3 py-1.5 font-medium transition-colors ${mode === "sign-up" ? "bg-teal-500/10 text-teal-300" : "text-zinc-500 hover:text-zinc-300"}`}
           >
-            Create Account
+            {t("accountPage.createAccountTab")}
           </button>
         </div>
       ) : null}
@@ -167,14 +163,14 @@ function CloudSignedOutView() {
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
           <label htmlFor="cloud-email" className="text-xs text-zinc-500">
-            Email
+            {t("accountPage.email")}
           </label>
           <input
             id="cloud-email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
+            placeholder={t("accountPage.emailPlaceholder")}
             className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30"
           />
         </div>
@@ -182,14 +178,14 @@ function CloudSignedOutView() {
         {mode !== "forgot-password" ? (
           <div>
             <label htmlFor="cloud-password" className="text-xs text-zinc-500">
-              Password
+              {t("accountPage.password")}
             </label>
             <input
               id="cloud-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder={mode === "sign-up" ? "At least 8 characters" : "Your password"}
+              placeholder={mode === "sign-up" ? t("accountPage.passwordSignUpPlaceholder") : t("accountPage.passwordSignInPlaceholder")}
               className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30"
             />
           </div>
@@ -205,7 +201,7 @@ function CloudSignedOutView() {
             }}
             className="text-xs font-medium text-teal-400 hover:text-teal-300"
           >
-            Forgot password?
+            {t("accountPage.forgotPassword")}
           </button>
         ) : null}
         {mode === "forgot-password" ? (
@@ -218,7 +214,7 @@ function CloudSignedOutView() {
             }}
             className="text-xs font-medium text-teal-400 hover:text-teal-300"
           >
-            ← Back to sign in
+            {t("accountPage.backToSignIn")}
           </button>
         ) : null}
 
@@ -227,12 +223,12 @@ function CloudSignedOutView() {
 
         <button type="submit" disabled={isSubmitting} className={`${cbaiBtnPrimary} disabled:opacity-50`}>
           {isSubmitting
-            ? "Please wait…"
+            ? t("accountPage.pleaseWait")
             : mode === "sign-in"
-              ? "Sign In"
+              ? t("account.signIn")
               : mode === "sign-up"
-                ? "Create Account"
-                : "Send Reset Link"}
+                ? t("account.signUp")
+                : t("accountPage.sendResetLink")}
         </button>
       </form>
     </div>
@@ -242,6 +238,7 @@ function CloudSignedOutView() {
 function LocalSignedInView() {
   const { user, signOut } = useAuth();
   const { context } = usePlatformContext();
+  const { t } = useTranslation();
   if (!user) return null;
 
   const projectCount = loadProjects().length;
@@ -250,7 +247,7 @@ function LocalSignedInView() {
   return (
     <div className={`${cbaiGlassCard} space-y-4 p-6`}>
       <div>
-        <p className={cbaiSectionEyebrow}>Device-Local Account</p>
+        <p className={cbaiSectionEyebrow}>{t("accountPage.deviceLocalAccount")}</p>
         <h2 className="mt-1 text-lg font-semibold text-zinc-100">{user.displayName}</h2>
         <p className="text-sm text-zinc-500">{user.email}</p>
         {user.organization ? <p className="mt-1 text-xs text-zinc-600">{user.organization}</p> : null}
@@ -258,24 +255,24 @@ function LocalSignedInView() {
 
       <div className="grid grid-cols-2 gap-3 border-t border-zinc-800/80 pt-4 sm:grid-cols-3">
         <div>
-          <p className="text-[10px] uppercase tracking-wider text-zinc-600">Projects</p>
+          <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("accountPage.projects")}</p>
           <p className="mt-1 text-sm font-medium text-zinc-200">{projectCount}</p>
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-wider text-zinc-600">Bookmarks</p>
+          <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("accountPage.bookmarks")}</p>
           <p className="mt-1 text-sm font-medium text-zinc-200">{bookmarkCount}</p>
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-wider text-zinc-600">Member since</p>
+          <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("accountPage.memberSince")}</p>
           <p className="mt-1 text-sm font-medium text-zinc-200">{new Date(user.createdAt).toLocaleDateString()}</p>
         </div>
       </div>
 
-      <p className="border-t border-zinc-800/80 pt-4 text-xs leading-relaxed text-zinc-600">{LOCAL_ACCOUNT_NOTICE}</p>
+      <p className="border-t border-zinc-800/80 pt-4 text-xs leading-relaxed text-zinc-600">{t("accountPage.localNotice")}</p>
 
       <div className="flex flex-wrap gap-2">
         <Link href="/my-work" className={cbaiBtnPrimary}>
-          Continue Working
+          {t("accountPage.continueWorking")}
         </Link>
         <button
           type="button"
@@ -285,7 +282,7 @@ function LocalSignedInView() {
           }}
           className={cbaiBtnSecondary}
         >
-          Sign Out
+          {t("account.signOut")}
         </button>
       </div>
     </div>
@@ -294,6 +291,7 @@ function LocalSignedInView() {
 
 function LocalSignedOutView() {
   const { signIn, signUp } = useAuth();
+  const { t } = useTranslation();
   const [mode, setMode] = useState<LocalMode>("sign-in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -320,14 +318,11 @@ function LocalSignedOutView() {
   return (
     <div className={`${cbaiGlassCard} space-y-4 p-6`}>
       <div>
-        <p className={cbaiSectionEyebrow}>Device-Local Account</p>
+        <p className={cbaiSectionEyebrow}>{t("accountPage.deviceLocalAccount")}</p>
         <h2 className="mt-1 text-lg font-semibold text-zinc-100">
-          {mode === "sign-in" ? "Sign in" : "Create a local account"}
+          {mode === "sign-in" ? t("accountPage.localSignInTitle") : t("accountPage.localCreateTitle")}
         </h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          Sign in to keep your own Projects, Bookmarks, and Recent Activity separate from anyone
-          else using this browser. Stays on this device only — for cross-device sync, use a Cloud Account instead.
-        </p>
+        <p className="mt-1 text-sm text-zinc-500">{t("accountPage.localSubtitle")}</p>
       </div>
 
       <div className="flex gap-2 text-xs">
@@ -339,7 +334,7 @@ function LocalSignedOutView() {
           }}
           className={`rounded-md px-3 py-1.5 font-medium transition-colors ${mode === "sign-in" ? "bg-teal-500/10 text-teal-300" : "text-zinc-500 hover:text-zinc-300"}`}
         >
-          Sign In
+          {t("accountPage.signInTab")}
         </button>
         <button
           type="button"
@@ -349,7 +344,7 @@ function LocalSignedOutView() {
           }}
           className={`rounded-md px-3 py-1.5 font-medium transition-colors ${mode === "sign-up" ? "bg-teal-500/10 text-teal-300" : "text-zinc-500 hover:text-zinc-300"}`}
         >
-          Create Account
+          {t("accountPage.createAccountTab")}
         </button>
       </div>
 
@@ -357,13 +352,13 @@ function LocalSignedOutView() {
         {mode === "sign-up" ? (
           <div>
             <label htmlFor="account-name" className="text-xs text-zinc-500">
-              Name
+              {t("accountPage.name")}
             </label>
             <input
               id="account-name"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="Your name"
+              placeholder={t("accountPage.namePlaceholder")}
               className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30"
             />
           </div>
@@ -371,28 +366,28 @@ function LocalSignedOutView() {
 
         <div>
           <label htmlFor="account-email" className="text-xs text-zinc-500">
-            Email
+            {t("accountPage.email")}
           </label>
           <input
             id="account-email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
+            placeholder={t("accountPage.emailPlaceholder")}
             className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30"
           />
         </div>
 
         <div>
           <label htmlFor="account-password" className="text-xs text-zinc-500">
-            Password
+            {t("accountPage.password")}
           </label>
           <input
             id="account-password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder={mode === "sign-up" ? "At least 8 characters" : "Your password"}
+            placeholder={mode === "sign-up" ? t("accountPage.passwordSignUpPlaceholder") : t("accountPage.passwordSignInPlaceholder")}
             className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30"
           />
         </div>
@@ -400,13 +395,13 @@ function LocalSignedOutView() {
         {mode === "sign-up" ? (
           <div>
             <label htmlFor="account-org" className="text-xs text-zinc-500">
-              Organization (optional)
+              {t("accountPage.organizationOptional")}
             </label>
             <input
               id="account-org"
               value={organization}
               onChange={(e) => setOrganization(e.target.value)}
-              placeholder="e.g. a university, company, or agency"
+              placeholder={t("accountPage.organizationPlaceholder")}
               className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30"
             />
           </div>
@@ -415,24 +410,18 @@ function LocalSignedOutView() {
         {error ? <p className="text-xs text-amber-400">{error}</p> : null}
 
         <button type="submit" disabled={isSubmitting} className={`${cbaiBtnPrimary} disabled:opacity-50`}>
-          {isSubmitting ? "Please wait…" : mode === "sign-in" ? "Sign In" : "Create Account"}
+          {isSubmitting ? t("accountPage.pleaseWait") : mode === "sign-in" ? t("account.signIn") : t("account.signUp")}
         </button>
       </form>
 
-      <p className="border-t border-zinc-800/80 pt-4 text-xs leading-relaxed text-zinc-600">{LOCAL_ACCOUNT_NOTICE}</p>
+      <p className="border-t border-zinc-800/80 pt-4 text-xs leading-relaxed text-zinc-600">{t("accountPage.localNotice")}</p>
     </div>
   );
 }
 
 export default function AccountForm() {
   const { isSignedIn, isCloudSignedIn, isCloudConfigured } = useAuth();
-  // Default to whichever tab actually works in this deployment. Previously this always opened on
-  // "cloud" — in a deployment with no Supabase project connected (real, honest, and currently the
-  // case in production), that put a real-looking sign-in form in front of every new visitor, with
-  // the "not configured" notice easy to miss above the Email/Password fields. A user could submit
-  // real credentials into a form that was never going to work. isCloudConfigured is a build-time
-  // env-var check (identical on server and client — see lib/supabase/client.ts), so this is safe
-  // to use directly as the initial state with no hydration risk.
+  const { t } = useTranslation();
   const [tab, setTab] = useState<AccountTab>(isCloudConfigured ? "cloud" : "local");
 
   return (
@@ -443,14 +432,14 @@ export default function AccountForm() {
           onClick={() => setTab("cloud")}
           className={`flex-1 rounded-lg border px-3 py-2 font-medium transition-colors ${tab === "cloud" ? "border-teal-500/40 bg-teal-500/10 text-teal-300" : "border-zinc-800 text-zinc-500 hover:text-zinc-300"}`}
         >
-          Cloud Account {isCloudSignedIn ? "●" : ""}
+          {t("accountPage.cloudAccount")} {isCloudSignedIn ? t("accountPage.cloudSignedInActive") : ""}
         </button>
         <button
           type="button"
           onClick={() => setTab("local")}
           className={`flex-1 rounded-lg border px-3 py-2 font-medium transition-colors ${tab === "local" ? "border-teal-500/40 bg-teal-500/10 text-teal-300" : "border-zinc-800 text-zinc-500 hover:text-zinc-300"}`}
         >
-          Device-Local Account {isSignedIn ? "●" : ""}
+          {t("accountPage.deviceLocalAccount")} {isSignedIn ? t("accountPage.localSignedInActive") : ""}
         </button>
       </div>
 

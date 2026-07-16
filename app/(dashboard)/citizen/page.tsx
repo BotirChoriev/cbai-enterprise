@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import CitizenWorkspace from "@/components/workspaces/CitizenWorkspace";
+import CitizenPageClient from "@/components/workspaces/CitizenPageClient";
 
 export const metadata: Metadata = {
   title: "Citizen",
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function CitizenPage() {
-  return <CitizenWorkspace />;
+  return <CitizenPageClient />;
 }

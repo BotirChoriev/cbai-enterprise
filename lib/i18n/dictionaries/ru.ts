@@ -12,6 +12,17 @@ import {
   SETTINGS_RU,
   TRUST_PAGE_RU,
 } from "@/lib/i18n/platform-copy-build006-ru";
+import {
+  ACCOUNT_PAGE_RU,
+  ASSISTANT_VOICE_RU,
+  GRAPH_PLATFORM_RU,
+  PREVIEW_PAGES_RU,
+  REPORTS_CENTER_RU,
+  RESEARCH_HOME_RU,
+  RESEARCH_WORKSPACE_RU,
+  TRUST_DATA_SOURCES_RU,
+  VALIDATION_RU,
+} from "@/lib/i18n/platform-copy-build007-ru";
 
 const ru: TranslationDictionary = {
   roles: {
@@ -426,6 +437,15 @@ const ru: TranslationDictionary = {
   graphPage: GRAPH_RU,
   reasoningPage: REASONING_RU,
   evidenceExplorer: EVIDENCE_RU,
+  accountPage: ACCOUNT_PAGE_RU,
+  reportsCenter: REPORTS_CENTER_RU,
+  researchWorkspace: RESEARCH_WORKSPACE_RU,
+  researchHome: RESEARCH_HOME_RU,
+  graphPlatform: GRAPH_PLATFORM_RU,
+  trustDataSources: TRUST_DATA_SOURCES_RU,
+  previewPages: PREVIEW_PAGES_RU,
+  validation: VALIDATION_RU,
+  assistantVoice: ASSISTANT_VOICE_RU,
 };
 
 export default ru;

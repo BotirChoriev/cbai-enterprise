@@ -1,6 +1,9 @@
+"use client";
+
 import type { ReportTypeDefinition } from "@/lib/reports-center";
 import { reportStatusClass } from "@/lib/reports-center";
 import Link from "next/link";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type ReportReadinessSectionProps = {
   reportTypes: readonly ReportTypeDefinition[];
@@ -19,10 +22,12 @@ function StatusBadge({ label }: { label: string }) {
 export default function ReportReadinessSection({
   reportTypes,
 }: ReportReadinessSectionProps) {
+  const { t } = useTranslation();
+
   return (
     <section className="space-y-4" aria-labelledby="report-readiness-heading">
       <h2 id="report-readiness-heading" className="text-base font-semibold text-zinc-200">
-        What can I open today?
+        {t("reportsCenter.whatCanIOpen")}
       </h2>
 
       <div className="space-y-4">
@@ -42,7 +47,7 @@ export default function ReportReadinessSection({
             <dl className="mt-4 space-y-3 text-sm">
               <div>
                 <dt className="text-xs uppercase tracking-wider text-zinc-600">
-                  Evidence required
+                  {t("reportsCenter.evidenceRequired")}
                 </dt>
                 <dd className="mt-1 text-zinc-400">{report.evidenceRequired}</dd>
               </div>
@@ -52,7 +57,7 @@ export default function ReportReadinessSection({
                     href={report.relatedRoute}
                     className="inline-flex min-h-10 w-full items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 px-4 text-sm font-medium text-teal-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800 sm:w-auto"
                   >
-                    Open related profile →
+                    {t("reportsCenter.openRelatedProfile")}
                   </Link>
                 </div>
               ) : null}

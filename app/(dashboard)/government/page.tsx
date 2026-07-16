@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import GovernmentWorkspace from "@/components/workspaces/GovernmentWorkspace";
+import GovernmentPageClient from "@/components/workspaces/GovernmentPageClient";
 
 export const metadata: Metadata = {
   title: "Government",
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function GovernmentPage() {
-  return <GovernmentWorkspace />;
+  return <GovernmentPageClient />;
 }
