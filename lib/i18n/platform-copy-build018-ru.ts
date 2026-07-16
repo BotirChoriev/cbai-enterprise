@@ -1,8 +1,8 @@
 /** BUILD-018 — EPIC-13.4 Universal Workspace (Русский). */
 
 export const UNIVERSAL_WORKSPACE_RU = {
-  inspectorEyebrow: "Универсальный инспектор",
-  workspaceEyebrow: "Универсальное рабочее пространство",
+  inspectorEyebrow: "Подробности",
+  workspaceEyebrow: "Текущий фокус",
   whatIsThis: "Что это?",
   whyRelevantNow: "Почему актуально сейчас",
   missionConnection: "Связь с миссией",
@@ -26,7 +26,7 @@ export const UNIVERSAL_WORKSPACE_RU = {
   riverCause: "Причина",
   riverUnresolved: "Не решено",
   riverResolved: "Решено",
-  floatingIntelligence: "Наблюдение оператора",
+  floatingIntelligence: "Заметка",
   evidenceBasis: "Основание доказательств",
   suggestedAction: "Рекомендуемое действие",
   humanDecisionRequired: "Требуется решение человека",

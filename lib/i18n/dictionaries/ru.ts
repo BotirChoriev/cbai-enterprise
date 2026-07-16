@@ -243,7 +243,7 @@ const ru: TranslationDictionary = {
     destOpenDashboard: "Открыть панель управления",
     destOpenTrust: "Открыть Доверие",
     destCitizenWorkspace: "Гражданское рабочее пространство",
-    operatingEnvironmentLabel: "Среда интеллектуальной работы",
+    operatingEnvironmentLabel: "Текущая миссия",
     intelligenceSessionLabel: "Текущая интеллектуальная сессия",
     intelligenceSessionActive: "Сессия активна",
     roleSectionHeadline: "Как бы вы ни работали, CBAI понимает форму вашей работы.",

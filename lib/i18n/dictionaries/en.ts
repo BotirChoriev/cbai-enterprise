@@ -243,7 +243,7 @@ const en: TranslationDictionary = {
     destOpenDashboard: "Open Dashboard",
     destOpenTrust: "Open Trust",
     destCitizenWorkspace: "Citizen Workspace",
-    operatingEnvironmentLabel: "Intelligence Operating Environment",
+    operatingEnvironmentLabel: "Current mission",
     intelligenceSessionLabel: "Current intelligence session",
     intelligenceSessionActive: "Session active",
     roleSectionHeadline: "However you work, CBAI understands the shape of it.",

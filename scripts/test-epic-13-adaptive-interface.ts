@@ -49,9 +49,10 @@ test("4. Living context rail supersedes canvas context layer", () => {
   assert.doesNotMatch(canvas, /CanvasContextLayer/);
 });
 
-test("5. Operating page shell defers mission bar to global layout", () => {
+test("5. Operating page shell wires route companion on mission routes", () => {
   const shell = readSource("components/shared/OperatingPageShell.tsx");
-  assert.doesNotMatch(shell, /MissionOperatingContextBar/);
+  assert.match(shell, /MissionOperatingContextBar/);
+  assert.match(shell, /missionContextVariant/);
 });
 
 test("6. Capability Galaxy wired in My Work", () => {

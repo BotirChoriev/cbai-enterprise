@@ -158,3 +158,43 @@ test("17. EPIC-23 — contextual goals and mission creation entry", () => {
   const gateway = readSource("lib/intelligence-os/intelligence-gateway.ts");
   assert.match(gateway, /create=1/);
 });
+
+test("18. EPIC-24 — route companion and human memory architecture", () => {
+  const firstMinute = readSource("lib/intelligence-os/first-minute.ts");
+  assert.match(firstMinute, /deriveRouteCompanion/);
+  assert.match(firstMinute, /deriveMissionStoryBeat/);
+  assert.match(firstMinute, /routePurposeI18nKey/);
+  const memory = readSource("lib/intelligence-os/living-memory.ts");
+  assert.match(memory, /recordCompanionThought/);
+  assert.match(memory, /loadCompanionThought/);
+  const bar = readSource("components/mission/MissionOperatingContextBar.tsx");
+  assert.match(bar, /deriveRouteCompanion/);
+  assert.match(bar, /recordCompanionThought/);
+  assert.doesNotMatch(bar, /mission\?\.problem/);
+});
+
+test("19. EPIC-24 — operator as guidance without greetings", () => {
+  const operator = readSource("components/mission/MissionOperatorPresence.tsx");
+  assert.doesNotMatch(operator, /assistant\.greeting/);
+  assert.doesNotMatch(operator, /OperatorOrb/);
+  assert.match(operator, /deriveOperatorPresenceMode/);
+});
+
+test("20. EPIC-24 — companion i18n in all four active languages", () => {
+  for (const dict of [en, uz, ru, tr]) {
+    assert.ok(dict.zeroLearningCurve.companionEyebrow);
+    assert.ok(dict.zeroLearningCurve.returnToMission);
+    assert.ok(dict.zeroLearningCurve.routeEvidencePurpose);
+    assert.ok(dict.zeroLearningCurve.storyBeatBeginning);
+    assert.ok(dict.zeroLearningCurve.commandEyebrow);
+  }
+});
+
+test("21. EPIC-24 — software language removed from primary copy", () => {
+  assert.doesNotMatch(en.intelligenceSpaces.operatingEnvironment, /environment/i);
+  assert.doesNotMatch(en.intelligenceCanvas.notDashboard, /dashboard/i);
+  assert.doesNotMatch(en.intelligenceCanvas.notDashboard, /workspace/i);
+  assert.doesNotMatch(en.missionThread.eyebrow, /thread/i);
+  assert.doesNotMatch(en.universalWorkspace.workspaceEyebrow, /Universal Workspace/i);
+  assert.match(en.zeroLearningCurve.universalCommandEyebrow, /Ask or search/i);
+});

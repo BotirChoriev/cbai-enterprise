@@ -32,7 +32,7 @@ export const MISSION_CENTER_RU = {
   systemInfers: "Система выводит",
   systemUnknown: "Остаётся неизвестным",
   humanJudgment: "Требуется человеческое суждение",
-  operatorPresence: "Оператор",
+  operatorPresence: "Направление",
   voiceAvailable: "Голос доступен",
   evidenceNetwork: "Сеть доказательств",
   knowledgeNetwork: "Сеть знаний",
@@ -78,7 +78,7 @@ export const MISSION_CREATION_RU = {
 } as const;
 
 export const MISSION_THREAD_RU = {
-  eyebrow: "Нить миссии",
+  eyebrow: "Ход миссии",
   mission: "Миссия",
   question: "Вопрос",
   evidence: "Доказательства",
@@ -161,6 +161,6 @@ export const OPERATING_CONTEXT_RU = {
   missionContext: "Миссия",
   evidenceState: "Доказательства",
   scope: "Область",
-  returnPath: "Вернуться в центр миссии",
+  returnPath: "К миссии",
   noMission: "Нет активной миссии",
 } as const;

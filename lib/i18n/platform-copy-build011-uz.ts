@@ -32,7 +32,7 @@ export const MISSION_CENTER_UZ = {
   systemInfers: "Tizim taxmin qiladi",
   systemUnknown: "Noma'lum qoladi",
   humanJudgment: "Inson hukmi talab qilinadi",
-  operatorPresence: "Operator",
+  operatorPresence: "Yo'nalish",
   voiceAvailable: "Ovoz mavjud",
   evidenceNetwork: "Dalillar tarmog'i",
   knowledgeNetwork: "Bilim tarmog'i",
@@ -78,7 +78,7 @@ export const MISSION_CREATION_UZ = {
 } as const;
 
 export const MISSION_THREAD_UZ = {
-  eyebrow: "Missiya ipi",
+  eyebrow: "Missiya jarayoni",
   mission: "Missiya",
   question: "Savol",
   evidence: "Dalil",
@@ -161,6 +161,6 @@ export const OPERATING_CONTEXT_UZ = {
   missionContext: "Missiya",
   evidenceState: "Dalil",
   scope: "Doira",
-  returnPath: "Missiya markaziga qaytish",
+  returnPath: "Missiyaga",
   noMission: "Faol missiya yo'q",
 } as const;

@@ -243,7 +243,7 @@ const uz: TranslationDictionary = {
     destOpenDashboard: "Boshqaruv panelini ochish",
     destOpenTrust: "Ishonchni ochish",
     destCitizenWorkspace: "Fuqaro ish maydoni",
-    operatingEnvironmentLabel: "Intellektual operatsion muhit",
+    operatingEnvironmentLabel: "Joriy missiya",
     intelligenceSessionLabel: "Joriy intellektual sessiya",
     intelligenceSessionActive: "Sessiya faol",
     roleSectionHeadline: "Qanday ishlashingizdan qat’i nazar, CBAI uning shaklini tushunadi.",

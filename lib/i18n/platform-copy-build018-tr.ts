@@ -1,8 +1,8 @@
 /** BUILD-018 — EPIC-13.4 Universal Workspace (Türkçe). */
 
 export const UNIVERSAL_WORKSPACE_TR = {
-  inspectorEyebrow: "Evrensel denetleyici",
-  workspaceEyebrow: "Evrensel çalışma alanı",
+  inspectorEyebrow: "Ayrıntılar",
+  workspaceEyebrow: "Mevcut odak",
   whatIsThis: "Bu nedir?",
   whyRelevantNow: "Neden şimdi önemli",
   missionConnection: "Görev bağlantısı",
@@ -26,7 +26,7 @@ export const UNIVERSAL_WORKSPACE_TR = {
   riverCause: "Neden",
   riverUnresolved: "Çözülmedi",
   riverResolved: "Çözüldü",
-  floatingIntelligence: "Operatör gözlemi",
+  floatingIntelligence: "Not",
   evidenceBasis: "Kanıt temeli",
   suggestedAction: "Önerilen eylem",
   humanDecisionRequired: "İnsan kararı gerekli",

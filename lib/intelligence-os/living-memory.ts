@@ -7,6 +7,7 @@ import { resolveStorageKey } from "@/lib/storage/namespaced-key";
 
 const FLOW_SNAPSHOT_KEY = "cbai-living-memory-flow";
 const MEMORY_CLEARED_KEY = "cbai-living-memory-cleared";
+const COMPANION_THOUGHT_KEY = "cbai-companion-thought";
 
 export type FlowStageSnapshot = {
   readonly id: string;
@@ -82,10 +83,56 @@ const FLOW_CHANGE_KEYS: Record<string, string> = {
 export function clearLivingMemory(): void {
   if (!isBrowser()) return;
   window.sessionStorage.removeItem(resolveStorageKey(FLOW_SNAPSHOT_KEY));
+  window.sessionStorage.removeItem(resolveStorageKey(COMPANION_THOUGHT_KEY));
   window.sessionStorage.setItem(resolveStorageKey(MEMORY_CLEARED_KEY), "1");
 }
 
 export function resetLivingMemoryClearFlag(): void {
   if (!isBrowser()) return;
   window.sessionStorage.removeItem(resolveStorageKey(MEMORY_CLEARED_KEY));
+}
+
+export type CompanionThoughtSnapshot = {
+  readonly missionId: string | null;
+  readonly lastRoute: string;
+  readonly lastFocus: string;
+  readonly recordedAt: string;
+};
+
+/** EPIC-24 — Remember what the user was pursuing, not only clicks. Architecture only. */
+export function recordCompanionThought(
+  missionId: string | null,
+  pathname: string,
+  focus: string,
+): void {
+  if (!isBrowser() || window.sessionStorage.getItem(resolveStorageKey(MEMORY_CLEARED_KEY)) === "1") {
+    return;
+  }
+  const payload: CompanionThoughtSnapshot = {
+    missionId,
+    lastRoute: pathname.split("?")[0],
+    lastFocus: focus,
+    recordedAt: new Date().toISOString(),
+  };
+  window.sessionStorage.setItem(resolveStorageKey(COMPANION_THOUGHT_KEY), JSON.stringify(payload));
+}
+
+export function loadCompanionThought(): CompanionThoughtSnapshot | null {
+  if (!isBrowser()) return null;
+  const raw = window.sessionStorage.getItem(resolveStorageKey(COMPANION_THOUGHT_KEY));
+  if (!raw) return null;
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (
+      typeof parsed === "object" &&
+      parsed !== null &&
+      typeof (parsed as { lastRoute: string }).lastRoute === "string" &&
+      typeof (parsed as { lastFocus: string }).lastFocus === "string"
+    ) {
+      return parsed as CompanionThoughtSnapshot;
+    }
+  } catch {
+    return null;
+  }
+  return null;
 }

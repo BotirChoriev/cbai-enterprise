@@ -243,7 +243,7 @@ const tr: TranslationDictionary = {
     destOpenDashboard: "Panoyu Aç",
     destOpenTrust: "Güveni Aç",
     destCitizenWorkspace: "Vatandaş Çalışma Alanı",
-    operatingEnvironmentLabel: "İstihbarat Operasyon Ortamı",
+    operatingEnvironmentLabel: "Mevcut görev",
     intelligenceSessionLabel: "Mevcut istihbarat oturumu",
     intelligenceSessionActive: "Oturum aktif",
     roleSectionHeadline: "Nasıl çalışırsanız çalışın, CBAI bunun yapısını anlar.",

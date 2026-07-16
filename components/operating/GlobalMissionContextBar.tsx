@@ -28,7 +28,7 @@ export default function GlobalMissionContextBar() {
           <div className="flex shrink-0 items-center gap-2">
             {pathname !== "/" ? (
               <Link href="/" className="text-xs text-zinc-500 hover:text-teal-300">
-                {t("operatingContext.returnPath")}
+                {t("zeroLearningCurve.returnToMission")}
               </Link>
             ) : null}
             <Link href={firstAction.href} className="text-xs text-teal-400 hover:text-teal-300">
@@ -43,7 +43,7 @@ export default function GlobalMissionContextBar() {
   return (
     <header
       className="cbai-global-mission-context shrink-0 border-b border-zinc-800/80 px-4 py-2.5 sm:px-5"
-      aria-label={t("intelligenceSpaces.operatingEnvironment")}
+      aria-label={t("zeroLearningCurve.companionEyebrow")}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="min-w-0 flex-1">
@@ -64,7 +64,7 @@ export default function GlobalMissionContextBar() {
           ) : null}
           {pathname !== "/" ? (
             <Link href="/" className="text-teal-400/90 hover:text-teal-300">
-              {t("operatingContext.returnPath")} →
+              {t("zeroLearningCurve.returnToMission")} →
             </Link>
           ) : null}
         </div>

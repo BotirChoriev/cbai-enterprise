@@ -8,7 +8,7 @@ export const EXPERIENCE_ENGINEERING_EN = {
   whatUnfinished: "Unfinished",
   whatNext: "Next",
   whatChanged: "Changed",
-  beginMission: "Begin a mission to orient the environment",
+  beginMission: "Begin a mission to orient yourself",
   flowComplete: "All flow stages addressed for current mission",
   noMission: "No active mission",
   ambientEyebrow: "Ambient intelligence",

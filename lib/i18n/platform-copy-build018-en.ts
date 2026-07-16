@@ -1,8 +1,8 @@
 /** BUILD-018 — EPIC-13.4 Universal Workspace & Object-First Intelligence. */
 
 export const UNIVERSAL_WORKSPACE_EN = {
-  inspectorEyebrow: "Universal Inspector",
-  workspaceEyebrow: "Universal Workspace",
+  inspectorEyebrow: "Details",
+  workspaceEyebrow: "Current focus",
   whatIsThis: "What is this?",
   whyRelevantNow: "Why relevant now",
   missionConnection: "Mission connection",
@@ -26,7 +26,7 @@ export const UNIVERSAL_WORKSPACE_EN = {
   riverCause: "Cause",
   riverUnresolved: "Unresolved",
   riverResolved: "Resolved",
-  floatingIntelligence: "Operator observation",
+  floatingIntelligence: "Note",
   evidenceBasis: "Evidence basis",
   suggestedAction: "Suggested action",
   humanDecisionRequired: "Human decision required",

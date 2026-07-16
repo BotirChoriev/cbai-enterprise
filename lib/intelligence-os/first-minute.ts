@@ -4,7 +4,7 @@
 
 import type { Mission } from "@/lib/intelligence-os/mission.types";
 import { resolveGoalRoute, type UserGoal } from "@/lib/intelligence-os/intelligence-gateway";
-import { getMissionNextAction } from "@/lib/intelligence-os/mission-lifecycle";
+import { getMissionNextAction, deriveMissionLifecycle } from "@/lib/intelligence-os/mission-lifecycle";
 import { loadProjects } from "@/lib/project/project-store";
 
 export type FirstMinuteAction = {
@@ -69,5 +69,85 @@ export function deriveFirstMinutePath(mission: Mission | null): {
     action: deriveFirstMinuteAction(mission),
     goal,
     goalRoute: resolveGoalRoute(goal, mission),
+  };
+}
+
+export type MissionStoryBeat = "beginning" | "middle" | "unknown" | "next" | "completion";
+
+export type RouteCompanionContext = {
+  readonly routeKey: string;
+  readonly storyBeat: MissionStoryBeat;
+  readonly nextHref: string;
+  readonly nextLabel: string;
+};
+
+const ROUTE_KEY_MAP: Record<string, string> = {
+  "/": "home",
+  "/knowledge": "evidence",
+  "/reasoning": "reasoning",
+  "/graph": "graph",
+  "/reports": "reports",
+  "/analytics": "reports",
+  "/my-work": "myWork",
+  "/search": "search",
+  "/trust": "trust",
+  "/settings": "settings",
+  "/account": "account",
+  "/about": "about",
+  "/research": "research",
+};
+
+export function deriveMissionStoryBeat(mission: Mission | null): MissionStoryBeat {
+  if (!mission) return "beginning";
+  const lifecycle = deriveMissionLifecycle(mission);
+  if (lifecycle.every((s) => s.status === "complete")) return "completion";
+  const open = lifecycle.find((s) => s.status === "missing" || s.status === "partial");
+  if (!open) return "next";
+  if (open.stage === "mission" || open.stage === "question") return "beginning";
+  if (open.stage === "evidence" || open.stage === "reasoning") return "middle";
+  if (open.missing?.toLowerCase().includes("unknown") || open.status === "blocked") return "unknown";
+  return "next";
+}
+
+export function storyBeatI18nKey(beat: MissionStoryBeat): string {
+  const keys: Record<MissionStoryBeat, string> = {
+    beginning: "storyBeatBeginning",
+    middle: "storyBeatMiddle",
+    unknown: "storyBeatUnknown",
+    next: "storyBeatNext",
+    completion: "storyBeatCompletion",
+  };
+  return keys[beat];
+}
+
+export function routePurposeI18nKey(routeKey: string): string {
+  const keys: Record<string, string> = {
+    home: "routeHomePurpose",
+    evidence: "routeEvidencePurpose",
+    reasoning: "routeReasoningPurpose",
+    graph: "routeGraphPurpose",
+    reports: "routeReportsPurpose",
+    myWork: "routeMyWorkPurpose",
+    search: "routeSearchPurpose",
+    trust: "routeTrustPurpose",
+    research: "routeResearchPurpose",
+    settings: "routeSettingsPurpose",
+    account: "routeAccountPurpose",
+    about: "routeAboutPurpose",
+  };
+  return keys[routeKey] ?? "routeHomePurpose";
+}
+
+/** EPIC-24 — Route companion: where, why, one next step — no fake AI memory. */
+export function deriveRouteCompanion(pathname: string, mission: Mission | null): RouteCompanionContext {
+  const base = pathname.split("?")[0];
+  const routeKey = ROUTE_KEY_MAP[base] ?? (base.startsWith("/research/") ? "research" : "home");
+  const lifecycleNext = getMissionNextAction(mission);
+  const fallback = deriveFirstMinuteAction(mission);
+  return {
+    routeKey,
+    storyBeat: deriveMissionStoryBeat(mission),
+    nextHref: lifecycleNext?.href ?? fallback.href,
+    nextLabel: lifecycleNext?.nextAction ?? fallback.label,
   };
 }

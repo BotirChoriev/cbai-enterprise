@@ -1,8 +1,8 @@
 /** BUILD-018 — EPIC-13.4 Universal Workspace (Oʻzbek). */
 
 export const UNIVERSAL_WORKSPACE_UZ = {
-  inspectorEyebrow: "Universal inspektor",
-  workspaceEyebrow: "Universal ish maydoni",
+  inspectorEyebrow: "Tafsilotlar",
+  workspaceEyebrow: "Joriy fokus",
   whatIsThis: "Bu nima?",
   whyRelevantNow: "Nima uchun hozir muhim",
   missionConnection: "Missiya bogʻlanishi",
@@ -26,7 +26,7 @@ export const UNIVERSAL_WORKSPACE_UZ = {
   riverCause: "Sabab",
   riverUnresolved: "Hal etilmagan",
   riverResolved: "Hal etilgan",
-  floatingIntelligence: "Operator kuzatuvi",
+  floatingIntelligence: "Eslatma",
   evidenceBasis: "Dalil asosi",
   suggestedAction: "Tavsiya etilgan harakat",
   humanDecisionRequired: "Inson qarori talab qilinadi",

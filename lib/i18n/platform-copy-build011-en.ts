@@ -32,14 +32,14 @@ export const MISSION_CENTER_EN = {
   systemInfers: "System infers",
   systemUnknown: "Remains unknown",
   humanJudgment: "Requires human judgment",
-  operatorPresence: "Operator",
+  operatorPresence: "Guidance",
   voiceAvailable: "Voice available",
   evidenceNetwork: "Evidence network",
   knowledgeNetwork: "Knowledge network",
   capabilitySummary: "Capability constellation",
   viewPassport: "View full passport",
   openProjects: "Current projects",
-  notHomepage: "This is not a homepage — it is your operating state.",
+  notHomepage: "Start here — your mission, evidence, and next step in one place.",
 } as const;
 
 export const MISSION_CREATION_EN = {
@@ -78,7 +78,7 @@ export const MISSION_CREATION_EN = {
 } as const;
 
 export const MISSION_THREAD_EN = {
-  eyebrow: "Mission thread",
+  eyebrow: "Mission progress",
   mission: "Mission",
   question: "Question",
   evidence: "Evidence",
@@ -111,7 +111,7 @@ export const SYSTEM_AWAKENING_EN = {
   stageMission: "Recovering mission state",
   stageEvidence: "Evidence network ready",
   stageOperator: "Operator available",
-  stageReady: "Environment ready",
+  stageReady: "Ready to work",
 } as const;
 
 export const LANGUAGE_SELECTOR_EN = {
@@ -158,9 +158,9 @@ export const HUMAN_IMPACT_EN = {
 } as const;
 
 export const OPERATING_CONTEXT_EN = {
-  missionContext: "Mission",
+  missionContext: "In this mission",
   evidenceState: "Evidence",
   scope: "Scope",
-  returnPath: "Return to Mission Center",
-  noMission: "No active mission",
+  returnPath: "Mission home",
+  noMission: "No active mission yet",
 } as const;

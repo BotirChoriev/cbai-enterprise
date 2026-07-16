@@ -32,7 +32,7 @@ export const MISSION_CENTER_TR = {
   systemInfers: "Sistem çıkarır",
   systemUnknown: "Bilinmeyen kalır",
   humanJudgment: "İnsan yargısı gerekli",
-  operatorPresence: "Operatör",
+  operatorPresence: "Rehberlik",
   voiceAvailable: "Ses kullanılabilir",
   evidenceNetwork: "Kanıt ağı",
   knowledgeNetwork: "Bilgi ağı",
@@ -78,7 +78,7 @@ export const MISSION_CREATION_TR = {
 } as const;
 
 export const MISSION_THREAD_TR = {
-  eyebrow: "Misyon ipliği",
+  eyebrow: "Görev ilerlemesi",
   mission: "Misyon",
   question: "Soru",
   evidence: "Kanıt",
@@ -161,6 +161,6 @@ export const OPERATING_CONTEXT_TR = {
   missionContext: "Misyon",
   evidenceState: "Kanıt",
   scope: "Kapsam",
-  returnPath: "Misyon merkezine dön",
+  returnPath: "Göreve dön",
   noMission: "Aktif misyon yok",
 } as const;

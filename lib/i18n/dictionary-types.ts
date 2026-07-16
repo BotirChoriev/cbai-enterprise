@@ -1789,6 +1789,27 @@ export type TranslationDictionary = {
     evidenceEmptyAction: string;
     simplicityAuditEyebrow: string;
     simplicityAuditNote: string;
+    companionEyebrow: string;
+    returnToMission: string;
+    resumeThought: string;
+    commandEyebrow: string;
+    storyBeatBeginning: string;
+    storyBeatMiddle: string;
+    storyBeatUnknown: string;
+    storyBeatNext: string;
+    storyBeatCompletion: string;
+    routeHomePurpose: string;
+    routeEvidencePurpose: string;
+    routeReasoningPurpose: string;
+    routeGraphPurpose: string;
+    routeReportsPurpose: string;
+    routeMyWorkPurpose: string;
+    routeSearchPurpose: string;
+    routeTrustPurpose: string;
+    routeResearchPurpose: string;
+    routeSettingsPurpose: string;
+    routeAccountPurpose: string;
+    routeAboutPurpose: string;
   };
 };
 
