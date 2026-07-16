@@ -37,4 +37,12 @@ export const ZERO_LEARNING_CURVE_TR = {
   capabilityAssessmentBody: "Gerçek çalışmadan sonra — zorunlu değil.",
   advancedDetails: "Gelişmiş ayrıntılar",
   noTutorial: "Eğitim yok — arayüz eylemle öğretir.",
+  reasoningPurpose: "Kanıt üzerinden düşünün — tek süreç, tek adım.",
+  evidenceStatesEyebrow: "Kanıt durumu",
+  evidenceNoMission: "Kanıt durumunu görmek için bir görev başlatın.",
+  evidenceNoMissionAction: "Hedef seç",
+  evidenceEmpty: "Bu görev için henüz bağlı kanıt yok.",
+  evidenceEmptyAction: "Kanıt ekle",
+  simplicityAuditEyebrow: "Basitlik denetimi",
+  simplicityAuditNote: "Yalnızca sezgisel puanlar — sahte analitik yok.",
 } as const;

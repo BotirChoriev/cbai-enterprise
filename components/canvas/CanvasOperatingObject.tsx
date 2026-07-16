@@ -49,7 +49,7 @@ export default function CanvasOperatingObject({
         <p className={cbaiSectionEyebrow}>{label}</p>
         <span
           className={`mt-1 h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_DOT[status]}`}
-          aria-hidden="true"
+          aria-label={status}
           title={status}
         />
       </div>

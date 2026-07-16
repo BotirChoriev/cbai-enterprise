@@ -1,16 +1,13 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useTranslation } from "@/lib/i18n/use-translation";
-import { getCurrentMission } from "@/lib/intelligence-os/mission-engine";
-import { deriveEvidencePulse } from "@/lib/intelligence-os/evidence-pulse";
-import { loadProjects, loadProjectQuestions } from "@/lib/project/project-store";
-import { loadHumanImpactForMission } from "@/lib/intelligence-os/human-impact-store";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import { deriveFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
+import { loadProjects, loadProjectQuestions } from "@/lib/project/project-store";
 import IntelligenceGatewayEntry from "@/components/gateway/IntelligenceGatewayEntry";
 import MissionCreationFlow from "@/components/mission/MissionCreationFlow";
 import MissionOperatorPresence from "@/components/mission/MissionOperatorPresence";
@@ -25,19 +22,18 @@ import HumanDecisionBoundary from "@/components/intelligence-os/HumanDecisionBou
 import EvidencePulsePanel from "@/components/intelligence-os/EvidencePulsePanel";
 import EvidenceTrustSurfacePanel from "@/components/evidence/EvidenceTrustSurfacePanel";
 import EvidenceJourneyPanel from "@/components/evidence/EvidenceJourneyPanel";
-import { cbaiBtnPrimary, cbaiOperatingShell, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { cbaiBtnPrimary, cbaiOperatingShell } from "@/components/brand/brand-classes";
 
 export default function IntelligenceCanvas() {
   const { t } = useTranslation();
   const hydrated = useHydrated();
-  const { refreshMissionContext } = useMissionContext();
+  const { mission, evidencePulse, humanImpact, refreshMissionContext } = useMissionContext();
   const disclosure = useProgressiveDisclosure();
   const [creating, setCreating] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const mission = hydrated ? getCurrentMission() : null;
-  const pulse = useMemo(() => (hydrated ? deriveEvidencePulse(mission) : null), [hydrated, mission]);
-  const impact = mission && hydrated ? loadHumanImpactForMission(mission.id) : null;
+  const pulse = evidencePulse;
+  const impact = humanImpact;
   const project =
     hydrated && mission?.projectId ? loadProjects().find((p) => p.id === mission.projectId) : null;
   const questionCount = hydrated && project ? loadProjectQuestions(project.id).length : 0;
@@ -134,8 +130,7 @@ export default function IntelligenceCanvas() {
             />
 
             <div className="cbai-operating-object border-l-2 border-l-teal-300/40 bg-[var(--surface)]/40 sm:col-span-2">
-              <p className={`${cbaiSectionEyebrow} px-4 pt-3`}>{t("intelligenceCanvas.centerOperator")}</p>
-              <div className="px-2 pb-3">
+              <div className="px-2 pb-3 pt-2">
                 <MissionOperatorPresence mission={mission} />
               </div>
             </div>

@@ -1770,6 +1770,14 @@ export type TranslationDictionary = {
     capabilityAssessmentBody: string;
     advancedDetails: string;
     noTutorial: string;
+    reasoningPurpose: string;
+    evidenceStatesEyebrow: string;
+    evidenceNoMission: string;
+    evidenceNoMissionAction: string;
+    evidenceEmpty: string;
+    evidenceEmptyAction: string;
+    simplicityAuditEyebrow: string;
+    simplicityAuditNote: string;
   };
 };
 

@@ -37,6 +37,14 @@ export const ZERO_LEARNING_CURVE_EN = {
   capabilityAssessmentBody: "Available after real work — never mandatory.",
   advancedDetails: "Advanced details",
   noTutorial: "No tutorial — the interface teaches through action.",
+  reasoningPurpose: "Think through evidence — one pipeline, one next step.",
+  evidenceStatesEyebrow: "Evidence state",
+  evidenceNoMission: "Start a mission to see how evidence supports your work.",
+  evidenceNoMissionAction: "Choose a goal",
+  evidenceEmpty: "No linked evidence yet for this mission.",
+  evidenceEmptyAction: "Add evidence",
+  simplicityAuditEyebrow: "Simplicity audit",
+  simplicityAuditNote: "Heuristic scores only — no fabricated analytics.",
 } as const;
 
 export type UserGoalI18nKey = keyof Pick<

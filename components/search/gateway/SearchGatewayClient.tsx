@@ -32,7 +32,7 @@ export default function SearchGatewayClient() {
   return (
     <OperatingPageShell
       title={t("navigation.search")}
-      description={t("zeroLearningCurve.gatewayHint")}
+      description={query ? t("navigation.startWithSearchBody") : undefined}
       showOperator={false}
     >
       <SearchGateway query={query} response={response} />

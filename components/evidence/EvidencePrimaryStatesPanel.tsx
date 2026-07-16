@@ -20,11 +20,34 @@ export default function EvidencePrimaryStatesPanel() {
   const { mission } = useMissionContext();
   const disclosure = useProgressiveDisclosure();
   const states = useMemo(() => derivePrimaryEvidenceStates(mission), [mission]);
+  const total = states.reduce((sum, row) => sum + row.count, 0);
+
+  if (!mission) {
+    return (
+      <section className={`${cbaiMineralSurface} space-y-2 p-4`} role="status">
+        <p className="text-sm text-zinc-400">{t("zeroLearningCurve.evidenceNoMission")}</p>
+        <Link href="/" className="text-xs text-teal-400 hover:text-teal-300">
+          {t("zeroLearningCurve.evidenceNoMissionAction")} →
+        </Link>
+      </section>
+    );
+  }
+
+  if (total === 0) {
+    return (
+      <section className={`${cbaiMineralSurface} space-y-2 p-4`} role="status">
+        <p className="text-sm text-zinc-400">{t("zeroLearningCurve.evidenceEmpty")}</p>
+        <Link href={`/my-work${mission.projectId ? `?project=${mission.projectId}#project-evidence` : ""}`} className="text-xs text-teal-400 hover:text-teal-300">
+          {t("zeroLearningCurve.evidenceEmptyAction")} →
+        </Link>
+      </section>
+    );
+  }
 
   return (
     <section className={`${cbaiMineralSurface} space-y-3 p-4`} aria-labelledby="evidence-primary-states">
       <p className={cbaiSectionEyebrow} id="evidence-primary-states">
-        {t("evidence.title")}
+        {t("zeroLearningCurve.evidenceStatesEyebrow")}
       </p>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {states.map((row) => (
@@ -39,9 +62,11 @@ export default function EvidencePrimaryStatesPanel() {
           </div>
         ))}
       </div>
-      <Link href="/knowledge" className="text-xs text-teal-400 hover:text-teal-300">
-        {t("zeroLearningCurve.advancedDetails")} →
-      </Link>
+      {disclosure.showEvidenceAdvanced ? (
+        <Link href="/knowledge" className="text-xs text-teal-400 hover:text-teal-300">
+          {t("zeroLearningCurve.advancedDetails")} →
+        </Link>
+      ) : null}
     </section>
   );
 }

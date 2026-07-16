@@ -108,3 +108,26 @@ export function deriveAmbientInsight(
 
   return null;
 }
+
+export type OperatorPresenceMode = "silent" | "compact" | "intervention";
+
+const INTERVENTION_INSIGHT_IDS: ReadonlySet<AmbientInsightId> = new Set([
+  "conflicting-evidence",
+  "outdated-evidence",
+  "impact-not-reviewed",
+  "missing-expertise",
+]);
+
+/** EPIC-22 — Operator visible only for uncertainty, missing evidence, contradiction, or decisions. */
+export function deriveOperatorPresenceMode(
+  mission: Mission | null,
+  operatorName: string,
+  rolePreference: WorkspaceRole | null,
+): { readonly mode: OperatorPresenceMode; readonly insight: AmbientInsight | null } {
+  const insight = deriveAmbientInsight(mission, operatorName, rolePreference);
+  if (!insight) return { mode: "silent", insight: null };
+  if (INTERVENTION_INSIGHT_IDS.has(insight.id)) {
+    return { mode: "intervention", insight };
+  }
+  return { mode: "compact", insight };
+}

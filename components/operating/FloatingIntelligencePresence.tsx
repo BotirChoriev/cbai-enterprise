@@ -2,17 +2,20 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
+import { usePathname } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { useUniversalWorkspace } from "@/components/platform/context/UniversalWorkspaceProvider";
 import { resolveOperatorName } from "@/lib/assistant/assistant-profile";
 import { deriveFloatingIntelligence } from "@/lib/intelligence-os/floating-intelligence";
+import { deriveOperatorPresenceMode } from "@/lib/intelligence-os/ambient-intelligence";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 
-/** One primary Operator intervention — context-attached, never generic once a mission exists. */
+/** One intervention strip — only when uncertainty requires attention, never on home canvas duplicate. */
 export default function FloatingIntelligencePresence() {
+  const pathname = usePathname();
   const { t } = useTranslation();
   const hydrated = useHydrated();
   const disclosure = useProgressiveDisclosure();
@@ -20,20 +23,37 @@ export default function FloatingIntelligencePresence() {
   const { mission } = useMissionContext();
   const { focusedObject } = useUniversalWorkspace();
 
-  const intervention = useMemo(
+  const operatorName = resolveOperatorName(profile);
+  const presence = useMemo(
     () =>
       hydrated
+        ? deriveOperatorPresenceMode(mission, operatorName, profile.workspaceRole ?? null)
+        : { mode: "silent" as const, insight: null },
+    [hydrated, mission, operatorName, profile.workspaceRole],
+  );
+
+  const intervention = useMemo(
+    () =>
+      hydrated && presence.mode === "intervention"
         ? deriveFloatingIntelligence(
             mission,
-            resolveOperatorName(profile),
+            operatorName,
             profile.workspaceRole,
             focusedObject,
           )
         : null,
-    [hydrated, mission, profile, focusedObject],
+    [hydrated, presence.mode, mission, operatorName, profile.workspaceRole, focusedObject],
   );
 
-  if (!hydrated || !intervention || !disclosure.showFloatingIntelligence) return null;
+  if (
+    !hydrated ||
+    !intervention ||
+    !disclosure.showFloatingIntelligence ||
+    presence.mode !== "intervention" ||
+    pathname === "/"
+  ) {
+    return null;
+  }
 
   const body = (
     <div className="space-y-0.5">
@@ -44,12 +64,6 @@ export default function FloatingIntelligencePresence() {
           {t("experienceEngineering.ambientReason")}: {t(`experienceEngineering.${intervention.reasonKey}`)}
         </span>
       </p>
-      <p className="text-zinc-600">
-        {t("universalWorkspace.evidenceBasis")}: {intervention.evidenceBasis}
-      </p>
-      <p className="text-zinc-600">
-        {t("universalWorkspace.limitations")}: {intervention.limitation}
-      </p>
       {intervention.requiresHumanJudgment ? (
         <p className="text-amber-500/80">{t("universalWorkspace.humanDecisionRequired")}</p>
       ) : null}
@@ -59,13 +73,11 @@ export default function FloatingIntelligencePresence() {
   return (
     <aside
       className="cbai-floating-intelligence shrink-0 border-b border-zinc-800/40 px-4 py-2 text-[11px] leading-relaxed sm:px-5"
-      role="note"
+      role="status"
+      aria-live="polite"
       aria-label={t("universalWorkspace.floatingIntelligence")}
       data-cbai-operator-intervention="primary"
     >
-      <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600">
-        {t("universalWorkspace.floatingIntelligence")}
-      </p>
       {intervention.suggestedActionHref ? (
         <Link href={intervention.suggestedActionHref} className="block hover:text-teal-300">
           {body}

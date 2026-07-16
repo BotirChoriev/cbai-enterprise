@@ -40,6 +40,9 @@ export function MissionContextProvider({ children }: { children: ReactNode }) {
   const [tick, setTick] = useState(0);
   const refreshMissionContext = useCallback(() => setTick((n) => n + 1), []);
 
+  const workspaceRole = profile.workspaceRole ?? null;
+  const operatorName = resolveOperatorName(profile);
+
   const value = useMemo((): MissionContextValue => {
     if (!hydrated) {
       return {
@@ -53,17 +56,16 @@ export function MissionContextProvider({ children }: { children: ReactNode }) {
     }
     void tick;
     const mission = getCurrentMission();
-    const ownerLabel = resolveOperatorName(profile);
-    const passport = buildCapabilityPassport(ownerLabel);
+    const passport = buildCapabilityPassport(operatorName);
     return {
       mission,
       evidencePulse: deriveEvidencePulse(mission),
       missionThread: deriveMissionThread(mission),
-      adaptive: deriveAdaptiveIntelligence(passport, profile.workspaceRole ?? null),
+      adaptive: deriveAdaptiveIntelligence(passport, workspaceRole),
       humanImpact: mission ? loadHumanImpactForMission(mission.id) : null,
       refreshMissionContext,
     };
-  }, [hydrated, profile, tick, refreshMissionContext]);
+  }, [hydrated, workspaceRole, operatorName, tick, refreshMissionContext]);
 
   return <MissionContext.Provider value={value}>{children}</MissionContext.Provider>;
 }

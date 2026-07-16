@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import AssistantCommandCenter from "@/components/assistant/AssistantCommandCenter";
 import OperatorOrb, { type OperatorOrbState } from "@/components/shared/OperatorOrb";
@@ -11,6 +11,7 @@ import { resolveOperatorName } from "@/lib/assistant/assistant-profile";
 import { loadProjects } from "@/lib/project/project-store";
 import { resolveProjectGuideStep } from "@/lib/project/project-guide";
 import { translateProjectTypeLabel, translateProjectStatus } from "@/lib/i18n/project-translation";
+import { deriveOperatorPresenceMode } from "@/lib/intelligence-os/ambient-intelligence";
 import type { Mission } from "@/lib/intelligence-os/mission.types";
 import { cbaiBtnPrimary, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
@@ -18,39 +19,56 @@ type MissionOperatorPresenceProps = {
   mission: Mission | null;
 };
 
+/** Operator — almost invisible unless uncertainty requires intervention. */
 export default function MissionOperatorPresence({ mission }: MissionOperatorPresenceProps) {
   const { profile, isActive } = useAssistantProfile();
   const { t } = useTranslation();
   const hydrated = useHydrated();
   const [liveOrbState, setLiveOrbState] = useState<OperatorOrbState>("present");
-  const [isGreeting, setIsGreeting] = useState(true);
 
-  useEffect(() => {
-    const timer = window.setTimeout(() => setIsGreeting(false), 800);
-    return () => window.clearTimeout(timer);
-  }, []);
+  const operatorName = resolveOperatorName(profile);
+  const presence = useMemo(
+    () =>
+      hydrated
+        ? deriveOperatorPresenceMode(mission, operatorName, profile.workspaceRole ?? null)
+        : { mode: "silent" as const, insight: null },
+    [hydrated, mission, operatorName, profile.workspaceRole],
+  );
 
-  const orbState: OperatorOrbState = isGreeting ? "greeting" : liveOrbState;
   const linkedProject =
     hydrated && mission?.projectId ? loadProjects().find((p) => p.id === mission.projectId) : null;
   const guideStep = linkedProject ? resolveProjectGuideStep(linkedProject, t) : null;
+  const orbState: OperatorOrbState = presence.mode === "intervention" ? liveOrbState : "present";
+
+  if (!hydrated) return null;
+
+  if (presence.mode === "silent" || presence.mode === "compact") {
+    return (
+      <section aria-label={t("zeroLearningCurve.universalCommandEyebrow")} className="space-y-2">
+        <AssistantCommandCenter size="prominent" hideOrb onOrbStateChange={setLiveOrbState} />
+      </section>
+    );
+  }
 
   return (
-    <section className="space-y-6" aria-labelledby="mission-operator-heading">
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-        <div className="flex shrink-0 flex-col items-center gap-3 lg:items-start">
-          <OperatorOrb state={orbState} size={72} />
+    <section className="space-y-4" aria-labelledby="mission-operator-heading">
+      <h2 id="mission-operator-heading" className="sr-only">
+        {t("missionCenter.operatorPresence")}
+      </h2>
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+        <div className="flex shrink-0 flex-col items-center gap-2 lg:items-start">
+          <OperatorOrb state={orbState} size={56} />
           <p className={cbaiSectionEyebrow}>{t("missionCenter.operatorPresence")}</p>
-          <p className="text-xs text-zinc-500">{t("missionCenter.voiceAvailable")}</p>
         </div>
 
-        <div className="min-w-0 flex-1 space-y-4">
+        <div className="min-w-0 flex-1 space-y-3">
+          {presence.insight ? (
+            <p className="text-sm text-amber-200/90" role="status" aria-live="polite">
+              {t(`experienceEngineering.${presence.insight.messageKey}`)}
+            </p>
+          ) : null}
           {mission ? (
             <>
-              <p className={cbaiSectionEyebrow}>{t("missionCenter.missionActive")}</p>
-              <h1 id="mission-operator-heading" className="cbai-display text-2xl leading-tight text-zinc-50 sm:text-3xl">
-                {mission.problem}
-              </h1>
               {linkedProject ? (
                 <p className="text-xs text-zinc-500">
                   {translateProjectTypeLabel(t, linkedProject.type)} · {translateProjectStatus(t, linkedProject.status)}
@@ -59,16 +77,11 @@ export default function MissionOperatorPresence({ mission }: MissionOperatorPres
               {guideStep ? <p className="text-sm text-zinc-400">{guideStep.detail}</p> : null}
             </>
           ) : (
-            <>
-              <h1 id="mission-operator-heading" className="cbai-display text-2xl text-zinc-50 sm:text-3xl">
-                {isActive
-                  ? t("assistant.greetingReturning", { name: profile.name })
-                  : t("assistant.greetingSignedOut")}
-              </h1>
-              <p className="text-sm text-zinc-400">
-                {t("missionCenter.notHomepage")} {resolveOperatorName(profile)} {t("missionCenter.operatorPresence")}.
-              </p>
-            </>
+            <p className="text-sm text-zinc-400">
+              {isActive
+                ? t("assistant.greetingReturning", { name: profile.name })
+                : t("assistant.greetingSignedOut")}
+            </p>
           )}
 
           <AssistantCommandCenter size="prominent" hideOrb onOrbStateChange={setLiveOrbState} />

@@ -23,6 +23,7 @@ import CapabilityPassportPanel from "@/components/capability/CapabilityPassportP
 import CapabilityGalaxy from "@/components/capability/CapabilityGalaxy";
 import { loadProject } from "@/lib/project/project-store";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
+import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { PROJECT_TYPES, type ProjectTypeId } from "@/lib/project/project-types";
 import type { ContextEntityRef } from "@/lib/context/context-types";
@@ -105,6 +106,7 @@ function MyWorkContent() {
   const { context } = usePlatformContext();
   const { user, isSignedIn, cloudUser, accountMode, cloudSessionRestoring } = useAuth();
   const preferredLanguage = ASSISTANT_LANGUAGES.find((l) => l.code === profile.preferredLanguage);
+  const disclosure = useProgressiveDisclosure();
 
   // Real loading state — avoids a flash of "not signed in" while a real cloud session is still
   // being restored from storage (Phase 10). Never shown when cloud accounts aren't configured, so
@@ -203,9 +205,12 @@ function MyWorkContent() {
 
       <ProjectList />
 
-      <CapabilityPassportPanel />
-
-      <CapabilityGalaxy />
+      {disclosure.showMyWorkCapabilityPanels ? (
+        <>
+          <CapabilityPassportPanel />
+          <CapabilityGalaxy />
+        </>
+      ) : null}
 
       <section aria-labelledby="my-work-continue-heading" className="space-y-3">
         <p className={cbaiSectionEyebrow} id="my-work-continue-heading">

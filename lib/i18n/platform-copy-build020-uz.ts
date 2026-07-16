@@ -37,4 +37,12 @@ export const ZERO_LEARNING_CURVE_UZ = {
   capabilityAssessmentBody: "Haqiqiy ishdan keyin — majburiy emas.",
   advancedDetails: "Qo'shimcha tafsilotlar",
   noTutorial: "Dars yo'q — interfeys harakat orqali o'rgatadi.",
+  reasoningPurpose: "Dalillar orqali o'ylang — bitta jarayon, bitta qadam.",
+  evidenceStatesEyebrow: "Dalil holati",
+  evidenceNoMission: "Dalil holatini ko'rish uchun missiyani boshlang.",
+  evidenceNoMissionAction: "Maqsad tanlash",
+  evidenceEmpty: "Bu missiya uchun hali bog'langan dalillar yo'q.",
+  evidenceEmptyAction: "Dalil qo'shish",
+  simplicityAuditEyebrow: "Soddalik auditi",
+  simplicityAuditNote: "Faqat evristik ballar — soxta analitika yo'q.",
 } as const;

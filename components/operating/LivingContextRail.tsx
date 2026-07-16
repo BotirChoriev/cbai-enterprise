@@ -20,6 +20,7 @@ import {
   resolveIntelligenceSpace,
 } from "@/lib/intelligence-os/intelligence-spaces";
 import { deriveOperatorInterventions } from "@/lib/intelligence-os/operator-awareness";
+import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import { cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 export function OperatorAwarenessStrip() {
@@ -57,6 +58,7 @@ export default function LivingContextRail({ className = "" }: LivingContextRailP
   const pathname = usePathname();
   const { t } = useTranslation();
   const hydrated = useHydrated();
+  const disclosure = useProgressiveDisclosure();
   const { profile } = useAssistantProfile();
   const { mission, adaptive } = useMissionContext();
   const passport = useMemo(
@@ -74,6 +76,8 @@ export default function LivingContextRail({ className = "" }: LivingContextRailP
 
   const nextHref = adaptive?.suggestedRoutes[0] ?? (mission?.projectId ? `/my-work?project=${mission.projectId}` : "/my-work");
   const currentSpace = resolveIntelligenceSpace(pathname);
+
+  if (!disclosure.showLivingContextRail) return null;
 
   return (
     <aside

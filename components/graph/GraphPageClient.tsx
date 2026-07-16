@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect, useCallback } from "react";
+import { useMemo, useState, useEffect, useCallback, useRef } from "react";
 import {
   buildKnowledgeGraph,
   computeGraphStats,
@@ -49,6 +49,7 @@ export default function GraphPageClient() {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<GraphNodeFilter>("all");
+  const lastFocusKeyRef = useRef<string | null>(null);
 
   const selection = useMemo(
     () => computeGraphSelection(graph, selectedNodeId),
@@ -87,9 +88,11 @@ export default function GraphPageClient() {
   );
 
   useEffect(() => {
-    if (selectedNode) {
-      setFocusedObject({ type: selectedNode.type, id: selectedNode.entityId });
-    }
+    if (!selectedNode) return;
+    const focusKey = `${selectedNode.type}:${selectedNode.entityId}`;
+    if (lastFocusKeyRef.current === focusKey) return;
+    lastFocusKeyRef.current = focusKey;
+    setFocusedObject({ type: selectedNode.type, id: selectedNode.entityId });
   }, [selectedNode, setFocusedObject]);
 
   useEffect(() => {

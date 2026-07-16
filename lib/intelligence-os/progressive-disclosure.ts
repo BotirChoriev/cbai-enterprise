@@ -20,6 +20,11 @@ export type ProgressiveDisclosureFlags = {
   readonly showReportsReadinessDetail: boolean;
   readonly showAwakeningSequence: boolean;
   readonly primaryActionOnly: boolean;
+  readonly showLivingContextRail: boolean;
+  readonly showOperatingContextColumn: boolean;
+  readonly showGlobalMissionBarDetail: boolean;
+  readonly showMyWorkCapabilityPanels: boolean;
+  readonly showReasoningStats: boolean;
 };
 
 const LEVEL_MAP: Record<UserDensityMode, DisclosureLevel> = {
@@ -49,6 +54,11 @@ export function resolveProgressiveDisclosure(mode: UserDensityMode): Progressive
       showReportsReadinessDetail: false,
       showAwakeningSequence: false,
       primaryActionOnly: true,
+      showLivingContextRail: false,
+      showOperatingContextColumn: false,
+      showGlobalMissionBarDetail: false,
+      showMyWorkCapabilityPanels: false,
+      showReasoningStats: false,
     };
   }
 
@@ -66,6 +76,11 @@ export function resolveProgressiveDisclosure(mode: UserDensityMode): Progressive
       showReportsReadinessDetail: true,
       showAwakeningSequence: true,
       primaryActionOnly: true,
+      showLivingContextRail: true,
+      showOperatingContextColumn: true,
+      showGlobalMissionBarDetail: true,
+      showMyWorkCapabilityPanels: false,
+      showReasoningStats: false,
     };
   }
 
@@ -82,5 +97,10 @@ export function resolveProgressiveDisclosure(mode: UserDensityMode): Progressive
     showReportsReadinessDetail: true,
     showAwakeningSequence: true,
     primaryActionOnly: false,
+    showLivingContextRail: true,
+    showOperatingContextColumn: true,
+    showGlobalMissionBarDetail: true,
+    showMyWorkCapabilityPanels: true,
+    showReasoningStats: true,
   };
 }

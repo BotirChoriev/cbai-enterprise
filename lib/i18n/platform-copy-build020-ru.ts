@@ -37,4 +37,12 @@ export const ZERO_LEARNING_CURVE_RU = {
   capabilityAssessmentBody: "После реальной работы — не обязательно.",
   advancedDetails: "Дополнительные сведения",
   noTutorial: "Без обучения — интерфейс учит через действие.",
+  reasoningPurpose: "Думайте через доказательства — один процесс, один шаг.",
+  evidenceStatesEyebrow: "Состояние доказательств",
+  evidenceNoMission: "Начните миссию, чтобы увидеть состояние доказательств.",
+  evidenceNoMissionAction: "Выбрать цель",
+  evidenceEmpty: "Для этой миссии пока нет связанных доказательств.",
+  evidenceEmptyAction: "Добавить доказательства",
+  simplicityAuditEyebrow: "Аудит простоты",
+  simplicityAuditNote: "Только эвристические оценки — без фальшивой аналитики.",
 } as const;

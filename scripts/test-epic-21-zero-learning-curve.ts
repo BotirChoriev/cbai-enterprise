@@ -11,6 +11,7 @@ import { deriveFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
 import { listSimplicityMetrics } from "@/lib/intelligence-os/simplicity-metrics";
 import { derivePrimaryEvidenceStates } from "@/lib/intelligence-os/evidence-primary-states";
 import { deriveCapabilityAssessmentOffer } from "@/lib/intelligence-os/capability-assessment";
+import { deriveScreenSimplicityAudit } from "@/lib/intelligence-os/simplicity-metrics";
 import {
   UNIVERSAL_COMMAND_EXAMPLES,
   resolveUniversalCommand,
@@ -119,5 +120,28 @@ test("12. BUILD-020 i18n in all four active languages", () => {
     assert.ok(dict.zeroLearningCurve.goalResearch);
     assert.ok(dict.zeroLearningCurve.reportsContinue);
     assert.ok(dict.zeroLearningCurve.noTutorial);
+    assert.ok(dict.zeroLearningCurve.reasoningPurpose);
   }
+});
+
+test("13. EPIC-22 — operator silent unless intervention required", () => {
+  const ambient = readSource("lib/intelligence-os/ambient-intelligence.ts");
+  assert.match(ambient, /deriveOperatorPresenceMode/);
+  const operator = readSource("components/mission/MissionOperatorPresence.tsx");
+  assert.match(operator, /deriveOperatorPresenceMode/);
+  const floating = readSource("components/operating/FloatingIntelligencePresence.tsx");
+  assert.match(floating, /presence\.mode !== "intervention"/);
+});
+
+test("14. EPIC-22 — extended progressive disclosure flags", () => {
+  const focused = resolveProgressiveDisclosure("focused");
+  assert.equal(focused.showLivingContextRail, false);
+  assert.equal(focused.showOperatingContextColumn, false);
+  assert.equal(focused.showGlobalMissionBarDetail, false);
+});
+
+test("15. EPIC-22 — screen simplicity audit architecture", () => {
+  const audit = deriveScreenSimplicityAudit("home", "professional");
+  assert.ok(audit.score >= audit.target - 1);
+  assert.match(audit.note, /Heuristic/i);
 });

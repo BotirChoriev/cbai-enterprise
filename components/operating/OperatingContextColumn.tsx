@@ -20,6 +20,7 @@ import {
   resolveIntelligenceSpace,
 } from "@/lib/intelligence-os/intelligence-spaces";
 import { cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 
 type OperatingContextColumnProps = {
   className?: string;
@@ -30,6 +31,7 @@ export default function OperatingContextColumn({ className = "" }: OperatingCont
   const pathname = usePathname();
   const { t } = useTranslation();
   const hydrated = useHydrated();
+  const disclosure = useProgressiveDisclosure();
   const { mission, adaptive } = useMissionContext();
   const { workspace } = useUniversalWorkspace();
 
@@ -41,6 +43,8 @@ export default function OperatingContextColumn({ className = "" }: OperatingCont
 
   const currentSpace = resolveIntelligenceSpace(pathname);
   const nextHref = adaptive?.suggestedRoutes[0] ?? (mission?.projectId ? `/my-work?project=${mission.projectId}` : "/my-work");
+
+  if (!disclosure.showOperatingContextColumn) return null;
 
   return (
     <aside
