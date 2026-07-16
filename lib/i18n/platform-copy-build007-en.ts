@@ -96,6 +96,27 @@ export const RESEARCH_HOME_EN = {
   availableToday: "Available today",
   notAvailableYet: "Not available yet",
   openWorkspace: "Open Research Workspace",
+  pageDescription:
+    "Explore catalog research topics and metadata connections in the Global Research Network.",
+  statusLabel: "Research Intelligence: In development",
+  workspaceEyebrow: "Research workspace",
+  workspaceTitle: "Structured research workspace",
+  workspaceBody:
+    "Explore one topic from catalog, notebook, timeline, and graph perspectives — read-only shell until live evidence connects.",
+  availableTodayItems: [
+    "Ecosystem vision and product direction",
+    "Research topics catalog (read-only)",
+    "Topic exploration entry (this page)",
+    "Public research intelligence positioning",
+    "Link to university profiles in Public Intelligence",
+  ],
+  notAvailableYetItems: [
+    "Live scientific databases",
+    "Publication search and full-text access",
+    "Researcher profiles and collaboration",
+    "Live experiments and lab data",
+    "AI-generated research summaries",
+  ],
 } as const;
 
 export const GRAPH_PLATFORM_EN = {
@@ -159,4 +180,168 @@ export const ASSISTANT_VOICE_EN = {
   nothingToSaveYet: "Nothing to save yet — open a country, company, or university profile first.",
   uploadNotAvailable: "File upload requires a connected ingestion pipeline — not available yet.",
   speechDetected: "Speech detected — review the transcript below.",
+  commandCenterAria: "CBAI Personal Operator command center",
+  contextPrefix: "Context:",
+  operatorContextTitle: "Operator context: {name}",
+} as const;
+
+export const MY_WORK_EXT_EN = {
+  continueWorking: "Continue Working",
+  recentlyViewed: "Recently Viewed",
+  reportsSection: "Reports",
+  reportsCenterLink: "Reports Center",
+  reportsCenterDetail: "{count} report types defined for profile and comparison review.",
+  evidenceReviews: "Evidence Reviews",
+  evidenceReviewsEmpty:
+    "No personal review history is connected yet. Platform-wide, {connected} of {total} evidence sources are connected — open",
+  evidenceLink: "Evidence",
+  evidenceReviewsSuffix: "to review current status.",
+  savedWork: "Saved Work",
+  signInBrowserHint: "to keep your work separate from others using this browser.",
+  signInAccountHint: "to keep your own Projects and Bookmarks separate from anyone else using this browser.",
+  continueResearchWorkspace: "Research Workspace",
+  continueResearchWorkspaceDetail: "Open the structured workspace for evidence review and knowledge organization.",
+  continueResearchCatalog: "Research Catalog",
+  continueResearchCatalogDetail: "Browse research topics, missions, and evidence status.",
+  continueEvidence: "Evidence",
+  continueEvidenceDetail: "Review official source status across profiles.",
+  onboardingExploreResearch: "Explore Research",
+  onboardingExploreCountries: "Explore Countries",
+  onboardingSearchEvidence: "Search Evidence",
+  onboardingConfigureOperator: "Configure Personal Operator",
+  onboardingOpenTrust: "Open Trust Center",
+  loading: "Loading…",
+} as const;
+
+export const RESEARCH_CATALOG_EN = {
+  catalogEyebrow: "Research topics catalog",
+  catalogTitle: "Browse research domains and topics",
+  catalogDescription:
+    "Structured read-only catalog with detail pages for each research topic. No live databases, publications, or researcher profiles are connected.",
+  filterLabel: "Filter research topics",
+  filterPlaceholder: "Filter by topic, method, domain, or evidence type...",
+  showingCount: "Showing {filtered} of {total} research topics",
+  noMatch: "No research topics match your filter.",
+  tryDifferent: "Try a different domain or search term.",
+  clearFilters: "Clear filters",
+  methods: "Methods",
+  evidenceTypes: "Evidence types",
+  futureWorkspace: "Future workspace",
+  openTopic: "Open topic",
+  topicStatus: {
+    catalog_available: "Catalog available",
+    workspace_not_available: "Workspace not available",
+    evidence_not_connected: "Evidence not connected",
+  },
+} as const;
+
+export const GRAPH_EXTENDED_EN = {
+  whatCanILearn: "What can I learn?",
+  personaGuidanceAria: "Knowledge graph persona guidance",
+  pipelineAria: "How the knowledge graph connects Entity through Decision Intelligence",
+  pipelineStages: [
+    "Entity",
+    "Relationship",
+    "Evidence",
+    "Reasoning",
+    "Decision Intelligence",
+  ] as const,
+  personas: {
+    citizen: {
+      title: "Citizen",
+      whatCanILearn:
+        "Which public institutions and companies share a country registry link with universities — without popularity scores.",
+    },
+    investor: {
+      title: "Investor",
+      whatCanILearn:
+        "Catalog-level entity adjacency only. Investment or partnership claims require connected financial evidence.",
+    },
+    government: {
+      title: "Government",
+      whatCanILearn:
+        "Government form labels from country registry when linked. No political recommendations from graph traversal.",
+    },
+    student: {
+      title: "Student",
+      whatCanILearn:
+        "University location and same-country company listings from local registries — not rankings or employability scores.",
+    },
+    researcher: {
+      title: "Researcher",
+      whatCanILearn: "Exportable relationship list with evidence status per edge for reproducible scoping.",
+    },
+    academic: {
+      title: "Academic",
+      whatCanILearn: "How CBAI separates catalog-derived links from verified collaboration evidence.",
+    },
+  },
+  trustPillars: {
+    evidence: {
+      title: "Evidence",
+      description:
+        "Edges exist only when local registries provide verifiable linkage. No inferred or weighted relationships.",
+    },
+    methodology: {
+      title: "Methodology",
+      description:
+        "Graph builder derives nodes from entity adapters and edges from catalog rules — not AI clustering.",
+    },
+    neutrality: {
+      title: "Neutrality",
+      description: "The graph does not recommend paths, rank entities, or endorse partnerships.",
+    },
+    transparency: {
+      title: "Transparency",
+      description:
+        "Each relationship shows status: evidence available from catalog or evidence missing for future types.",
+    },
+  },
+} as const;
+
+export const ENTITY_UI_EN = {
+  notAssessed: "Not assessed",
+  notAvailable: "Not available",
+  notConnected: "Not connected",
+  officialWebsite: "Official website",
+  publicationDate: "Publication date",
+  openSourceLink: "Open source link",
+  connected: "Connected",
+  planned: "Planned",
+  noVerifiedData: "No verified data available.",
+  noVerifiedInfo: "No verified information available.",
+  benchmarkCountry: "Benchmark this country against others in the registry before reading the full profile.",
+  benchmarkCompany: "Benchmark this company against others in the registry before reading the full profile.",
+  noRelationshipsCountry:
+    "No verified relationships yet — connections appear once a company, university, or research topic in the catalog references this country.",
+  noRelationshipsCompany:
+    "No verified relationships yet — connections appear once a country, university, or research topic in the catalog references this company.",
+  searchCountries: "Search countries…",
+  dataStatusLegend: "Data status legend",
+  searchResults: "Search results",
+} as const;
+
+export const PROJECT_UI_EN = {
+  researchQuestion: "Research Question",
+  objectives: "Objectives",
+  notes: "Notes",
+  tasks: "Tasks",
+  openQuestions: "Open Questions",
+  timeline: "Timeline",
+  entities: "Entities",
+  noResearchQuestion: "No research question recorded yet.",
+  noObjectives: "No objectives recorded yet.",
+  noEntitiesLinked: "No entities linked to this project yet.",
+  noRelatedCountry: "No related country in the current catalog.",
+  noEvidence: "No evidence added yet.",
+  noNotes: "No notes recorded yet.",
+  noTasks: "No tasks added yet.",
+  noOpenQuestions: "No open questions right now.",
+  noTimeline: "No timeline activity recorded yet.",
+} as const;
+
+export const GOVERNANCE_PAGE_EN = {
+  title: "Governance",
+  description: "Platform rules, standards, and review process for evidence-based decisions.",
+  previewNotice: "Governance control center — early preview. Rules and review workflows are not fully connected yet.",
 } as const;

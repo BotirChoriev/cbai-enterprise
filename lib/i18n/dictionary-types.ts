@@ -670,6 +670,13 @@ export type TranslationDictionary = {
     availableToday: string;
     notAvailableYet: string;
     openWorkspace: string;
+    pageDescription: string;
+    statusLabel: string;
+    workspaceEyebrow: string;
+    workspaceTitle: string;
+    workspaceBody: string;
+    availableTodayItems: readonly string[];
+    notAvailableYetItems: readonly string[];
   };
   graphPlatform: {
     eyebrow: string;
@@ -724,6 +731,117 @@ export type TranslationDictionary = {
     nothingToSaveYet: string;
     uploadNotAvailable: string;
     speechDetected: string;
+    commandCenterAria: string;
+    contextPrefix: string;
+    operatorContextTitle: string;
+  };
+  myWorkExt: {
+    continueWorking: string;
+    recentlyViewed: string;
+    reportsSection: string;
+    reportsCenterLink: string;
+    reportsCenterDetail: string;
+    evidenceReviews: string;
+    evidenceReviewsEmpty: string;
+    evidenceLink: string;
+    evidenceReviewsSuffix: string;
+    savedWork: string;
+    signInBrowserHint: string;
+    signInAccountHint: string;
+    continueResearchWorkspace: string;
+    continueResearchWorkspaceDetail: string;
+    continueResearchCatalog: string;
+    continueResearchCatalogDetail: string;
+    continueEvidence: string;
+    continueEvidenceDetail: string;
+    onboardingExploreResearch: string;
+    onboardingExploreCountries: string;
+    onboardingSearchEvidence: string;
+    onboardingConfigureOperator: string;
+    onboardingOpenTrust: string;
+    loading: string;
+  };
+  researchCatalog: {
+    catalogEyebrow: string;
+    catalogTitle: string;
+    catalogDescription: string;
+    filterLabel: string;
+    filterPlaceholder: string;
+    showingCount: string;
+    noMatch: string;
+    tryDifferent: string;
+    clearFilters: string;
+    methods: string;
+    evidenceTypes: string;
+    futureWorkspace: string;
+    openTopic: string;
+    topicStatus: {
+      catalog_available: string;
+      workspace_not_available: string;
+      evidence_not_connected: string;
+    };
+  };
+  graphExtended: {
+    whatCanILearn: string;
+    personaGuidanceAria: string;
+    pipelineAria: string;
+    pipelineStages: readonly string[];
+    personas: {
+      citizen: { title: string; whatCanILearn: string };
+      investor: { title: string; whatCanILearn: string };
+      government: { title: string; whatCanILearn: string };
+      student: { title: string; whatCanILearn: string };
+      researcher: { title: string; whatCanILearn: string };
+      academic: { title: string; whatCanILearn: string };
+    };
+    trustPillars: {
+      evidence: { title: string; description: string };
+      methodology: { title: string; description: string };
+      neutrality: { title: string; description: string };
+      transparency: { title: string; description: string };
+    };
+  };
+  entityUi: {
+    notAssessed: string;
+    notAvailable: string;
+    notConnected: string;
+    officialWebsite: string;
+    publicationDate: string;
+    openSourceLink: string;
+    connected: string;
+    planned: string;
+    noVerifiedData: string;
+    noVerifiedInfo: string;
+    benchmarkCountry: string;
+    benchmarkCompany: string;
+    noRelationshipsCountry: string;
+    noRelationshipsCompany: string;
+    searchCountries: string;
+    dataStatusLegend: string;
+    searchResults: string;
+  };
+  projectUi: {
+    researchQuestion: string;
+    objectives: string;
+    notes: string;
+    tasks: string;
+    openQuestions: string;
+    timeline: string;
+    entities: string;
+    noResearchQuestion: string;
+    noObjectives: string;
+    noEntitiesLinked: string;
+    noRelatedCountry: string;
+    noEvidence: string;
+    noNotes: string;
+    noTasks: string;
+    noOpenQuestions: string;
+    noTimeline: string;
+  };
+  governancePage: {
+    title: string;
+    description: string;
+    previewNotice: string;
   };
 };
 

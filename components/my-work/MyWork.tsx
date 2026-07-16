@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useMemo } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { buildEvidenceExplorerModel } from "@/lib/evidence-explorer";
@@ -29,35 +29,43 @@ import {
   resolveOperatorName,
 } from "@/lib/assistant/assistant-profile";
 
-const continueLinks = [
-  {
-    label: "Research Workspace",
-    href: "/research/workspace",
-    detail: "Open the structured workspace for evidence review and knowledge organization.",
-  },
-  {
-    label: "Research Catalog",
-    href: "/research",
-    detail: "Browse research topics, missions, and evidence status.",
-  },
-  {
-    label: "Evidence",
-    href: "/knowledge",
-    detail: "Review official source status across profiles.",
-  },
-] as const;
-
-const ONBOARDING_LINKS = [
-  { label: "Explore Research", href: "/research" },
-  { label: "Explore Countries", href: "/countries" },
-  { label: "Search Evidence", href: "/knowledge" },
-  { label: "Configure Personal Operator", href: "/settings" },
-  { label: "Open Trust Center", href: "/trust" },
-] as const;
-
 function MyWorkContent() {
   const searchParams = useSearchParams();
   const { t } = useTranslation();
+
+  const continueLinks = useMemo(
+    () =>
+      [
+        {
+          label: t("myWorkExt.continueResearchWorkspace"),
+          href: "/research/workspace",
+          detail: t("myWorkExt.continueResearchWorkspaceDetail"),
+        },
+        {
+          label: t("myWorkExt.continueResearchCatalog"),
+          href: "/research",
+          detail: t("myWorkExt.continueResearchCatalogDetail"),
+        },
+        {
+          label: t("myWorkExt.continueEvidence"),
+          href: "/knowledge",
+          detail: t("myWorkExt.continueEvidenceDetail"),
+        },
+      ] as const,
+    [t],
+  );
+
+  const onboardingLinks = useMemo(
+    () =>
+      [
+        { label: t("myWorkExt.onboardingExploreResearch"), href: "/research" },
+        { label: t("myWorkExt.onboardingExploreCountries"), href: "/countries" },
+        { label: t("myWorkExt.onboardingSearchEvidence"), href: "/knowledge" },
+        { label: t("myWorkExt.onboardingConfigureOperator"), href: "/settings" },
+        { label: t("myWorkExt.onboardingOpenTrust"), href: "/trust" },
+      ] as const,
+    [t],
+  );
   const projectId = searchParams.get("project");
   // Real hydration-mismatch fix (found via actual browser testing): loadProject() is honestly
   // empty on the server (no window/localStorage), so reading it directly during render produced a
@@ -156,7 +164,7 @@ function MyWorkContent() {
                 <Link href="/account" className="text-teal-400 hover:text-teal-300">
                   {t("myWork.signInPrompt")}
                 </Link>{" "}
-                to keep your work separate from others using this browser.
+                {t("myWorkExt.signInBrowserHint")}
               </>
             ) : null}
           </p>
@@ -170,10 +178,10 @@ function MyWorkContent() {
             <Link href="/account" className="text-teal-400 hover:text-teal-300">
               {t("myWork.signInOrCreate")}
             </Link>{" "}
-            to keep your own Projects and Bookmarks separate from anyone else using this browser.
+            {t("myWorkExt.signInAccountHint")}
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
-            {ONBOARDING_LINKS.map((link) => (
+            {onboardingLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -195,7 +203,7 @@ function MyWorkContent() {
 
       <section aria-labelledby="my-work-continue-heading" className="space-y-3">
         <p className={cbaiSectionEyebrow} id="my-work-continue-heading">
-          Continue Working
+          {t("myWorkExt.continueWorking")}
         </p>
         <div className="grid gap-3 sm:grid-cols-2">
           {continueLinks.map((link) => (
@@ -213,22 +221,22 @@ function MyWorkContent() {
 
       <section aria-labelledby="my-work-recent-heading" className={`${cbaiGlassCard} space-y-2 p-5`}>
         <p className={cbaiSectionEyebrow} id="my-work-recent-heading">
-          Recently Viewed
+          {t("myWorkExt.recentlyViewed")}
         </p>
         <RecentEntities entities={context.recentEntities} />
       </section>
 
       <section aria-labelledby="my-work-reports-heading" className="space-y-3">
         <p className={cbaiSectionEyebrow} id="my-work-reports-heading">
-          Reports
+          {t("myWorkExt.reportsSection")}
         </p>
         <Link
           href="/analytics"
           className={`${cbaiGlassCard} flex flex-col px-5 py-4 transition-colors hover:border-teal-500/25 sm:max-w-sm`}
         >
-          <span className="text-sm font-semibold text-teal-400">Reports Center</span>
+          <span className="text-sm font-semibold text-teal-400">{t("myWorkExt.reportsCenterLink")}</span>
           <span className="mt-1 text-xs text-zinc-500">
-            {reports.summary.reportTypes} report types defined for profile and comparison review.
+            {t("myWorkExt.reportsCenterDetail", { count: String(reports.summary.reportTypes) })}
           </span>
         </Link>
       </section>
@@ -239,21 +247,23 @@ function MyWorkContent() {
           className={`${cbaiGlassCard} space-y-2 p-5`}
         >
           <p className={cbaiSectionEyebrow} id="my-work-evidence-reviews-heading">
-            Evidence Reviews
+            {t("myWorkExt.evidenceReviews")}
           </p>
           <p className="text-xs text-zinc-500">
-            No personal review history is connected yet. Platform-wide, {evidence.summary.connectedSources}{" "}
-            of {evidence.summary.totalSources} evidence sources are connected — open{" "}
+            {t("myWorkExt.evidenceReviewsEmpty", {
+              connected: String(evidence.summary.connectedSources),
+              total: String(evidence.summary.totalSources),
+            })}{" "}
             <Link href="/knowledge" className="text-teal-400 hover:text-teal-300">
-              Evidence
+              {t("myWorkExt.evidenceLink")}
             </Link>{" "}
-            to review current status.
+            {t("myWorkExt.evidenceReviewsSuffix")}
           </p>
         </section>
 
         <section aria-labelledby="my-work-saved-heading" className={`${cbaiGlassCard} space-y-2 p-5`}>
           <p className={cbaiSectionEyebrow} id="my-work-saved-heading">
-            Saved Work
+            {t("myWorkExt.savedWork")}
           </p>
           <PinnedEntities entities={context.pinnedEntities.filter((entity) => entity.kind !== "evidence")} />
         </section>
@@ -265,8 +275,10 @@ function MyWorkContent() {
 }
 
 export default function MyWork() {
+  const { t } = useTranslation();
+
   return (
-    <Suspense fallback={<div className="text-sm text-zinc-500">Loading…</div>}>
+    <Suspense fallback={<div className="text-sm text-zinc-500">{t("myWorkExt.loading")}</div>}>
       <MyWorkContent />
     </Suspense>
   );

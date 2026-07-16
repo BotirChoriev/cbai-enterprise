@@ -55,13 +55,13 @@ export default function ProjectReportView({ report }: ProjectReportViewProps) {
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Research Question</p>
-        <p className="text-sm text-zinc-300">{report.researchQuestion ?? "No research question recorded yet."}</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{t("projectUi.researchQuestion")}</p>
+        <p className="text-sm text-zinc-300">{report.researchQuestion ?? t("projectUi.noResearchQuestion")}</p>
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Objectives</p>
-        <p className="text-sm text-zinc-300">{report.objectives ?? "No objectives recorded yet."}</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{t("projectUi.objectives")}</p>
+        <p className="text-sm text-zinc-300">{report.objectives ?? t("projectUi.noObjectives")}</p>
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
@@ -75,12 +75,12 @@ export default function ProjectReportView({ report }: ProjectReportViewProps) {
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-zinc-500">No evidence added yet.</p>
+          <p className="text-sm text-zinc-500">{t("projectUi.noEvidence")}</p>
         )}
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Notes</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{t("projectUi.notes")}</p>
         {report.notes.length > 0 ? (
           <ul className="space-y-1.5">
             {report.notes.map((note) => (
@@ -90,20 +90,20 @@ export default function ProjectReportView({ report }: ProjectReportViewProps) {
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-zinc-500">No notes recorded yet.</p>
+          <p className="text-sm text-zinc-500">{t("projectUi.noNotes")}</p>
         )}
       </div>
 
       <div className="border-t border-zinc-800/80 pt-4">
         <EntityRelatedPanel
-          title="Entities"
+          title={t("projectUi.entities")}
           relationships={report.relationships}
-          emptyLabel="No entities linked to this project yet."
+          emptyLabel={t("projectUi.noEntitiesLinked")}
         />
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Tasks</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{t("projectUi.tasks")}</p>
         {report.tasks.length > 0 ? (
           <ul className="space-y-1">
             {report.tasks.map((task) => (
@@ -113,12 +113,12 @@ export default function ProjectReportView({ report }: ProjectReportViewProps) {
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-zinc-500">No tasks added yet.</p>
+          <p className="text-sm text-zinc-500">{t("projectUi.noTasks")}</p>
         )}
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Open Questions</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{t("projectUi.openQuestions")}</p>
         {report.openQuestions.filter((q) => !q.resolved).length > 0 ? (
           <ul className="space-y-1">
             {report.openQuestions
@@ -130,12 +130,12 @@ export default function ProjectReportView({ report }: ProjectReportViewProps) {
               ))}
           </ul>
         ) : (
-          <p className="text-sm text-zinc-500">No open questions right now.</p>
+          <p className="text-sm text-zinc-500">{t("projectUi.noOpenQuestions")}</p>
         )}
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Timeline</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{t("projectUi.timeline")}</p>
         {report.timeline.length > 0 ? (
           <ul className="space-y-1">
             {report.timeline.map((entry) => (
@@ -145,7 +145,7 @@ export default function ProjectReportView({ report }: ProjectReportViewProps) {
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-zinc-500">No timeline activity recorded yet.</p>
+          <p className="text-sm text-zinc-500">{t("projectUi.noTimeline")}</p>
         )}
       </div>
 

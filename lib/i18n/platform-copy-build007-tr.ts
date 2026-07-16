@@ -100,6 +100,27 @@ export const RESEARCH_HOME_TR = {
   availableToday: "Bugün mevcut",
   notAvailableYet: "Henüz mevcut değil",
   openWorkspace: "Araştırma Çalışma Alanını Aç",
+  pageDescription:
+    "Küresel Araştırma Ağı'nda katalog araştırma konularını ve meta veri bağlantılarını keşfedin.",
+  statusLabel: "Araştırma İstihbaratı: Geliştiriliyor",
+  workspaceEyebrow: "Araştırma çalışma alanı",
+  workspaceTitle: "Yapılandırılmış araştırma çalışma alanı",
+  workspaceBody:
+    "Bir konuyu katalog, not defteri, zaman çizelgesi ve grafik perspektiflerinden keşfedin — canlı kanıtlar bağlanana kadar salt okunur kabuk.",
+  availableTodayItems: [
+    "Ekosistem vizyonu ve ürün yönü",
+    "Araştırma konuları kataloğu (salt okunur)",
+    "Konu keşfi giriş noktası (bu sayfa)",
+    "Kamusal araştırma istihbaratı konumlandırması",
+    "Kamusal İstihbarat'taki üniversite profillerine bağlantı",
+  ],
+  notAvailableYetItems: [
+    "Canlı bilimsel veritabanları",
+    "Yayın arama ve tam metin erişimi",
+    "Araştırmacı profilleri ve iş birliği",
+    "Canlı deneyler ve laboratuvar verileri",
+    "Yapay zeka tarafından oluşturulan araştırma özetleri",
+  ],
 } as const;
 
 export const GRAPH_PLATFORM_TR = {
@@ -166,4 +187,164 @@ export const ASSISTANT_VOICE_TR = {
   nothingToSaveYet: "Henüz kaydedilecek bir şey yok — önce bir ülke, şirket veya üniversite profili açın.",
   uploadNotAvailable: "Dosya yükleme bağlı bir alım hattı gerektirir — henüz kullanılamıyor.",
   speechDetected: "Konuşma algılandı — transkripti aşağıda inceleyin.",
+  commandCenterAria: "CBAI Kişisel Operatör komut merkezi",
+  contextPrefix: "Bağlam:",
+  operatorContextTitle: "Operatör bağlamı: {name}",
+} as const;
+
+export const MY_WORK_EXT_TR = {
+  continueWorking: "Çalışmaya Devam Et",
+  recentlyViewed: "Son Görüntülenenler",
+  reportsSection: "Raporlar",
+  reportsCenterLink: "Rapor Merkezi",
+  reportsCenterDetail: "Profil ve karşılaştırma incelemesi için {count} rapor türü tanımlı.",
+  evidenceReviews: "Kanıt İncelemeleri",
+  evidenceReviewsEmpty:
+    "Kişisel inceleme geçmişi henüz bağlı değil. Platform genelinde {total} kanıt kaynağından {connected} tanesi bağlı — açın",
+  evidenceLink: "Kanıt",
+  evidenceReviewsSuffix: "mevcut durumu incelemek için.",
+  savedWork: "Kaydedilen Çalışma",
+  signInBrowserHint: "bu tarayıcıyı kullanan diğerlerinden çalışmanızı ayırmak için.",
+  signInAccountHint:
+    "Projelerinizi ve Yer İşaretlerinizi bu tarayıcıyı kullanan diğerlerinden ayırmak için.",
+  continueResearchWorkspace: "Araştırma Çalışma Alanı",
+  continueResearchWorkspaceDetail: "Kanıt incelemesi ve bilgi organizasyonu için yapılandırılmış çalışma alanını açın.",
+  continueResearchCatalog: "Araştırma Kataloğu",
+  continueResearchCatalogDetail: "Araştırma konularını, görevleri ve kanıt durumunu gözden geçirin.",
+  continueEvidence: "Kanıt",
+  continueEvidenceDetail: "Profiller genelinde resmi kaynak durumunu inceleyin.",
+  onboardingExploreResearch: "Araştırmayı Keşfet",
+  onboardingExploreCountries: "Ülkeleri Keşfet",
+  onboardingSearchEvidence: "Kanıt Ara",
+  onboardingConfigureOperator: "Kişisel Operatörü Yapılandır",
+  onboardingOpenTrust: "Güven Merkezini Aç",
+  loading: "Yükleniyor…",
+} as const;
+
+export const RESEARCH_CATALOG_TR = {
+  catalogEyebrow: "Araştırma konuları kataloğu",
+  catalogTitle: "Araştırma alanlarını ve konularını gözden geçirin",
+  catalogDescription:
+    "Her araştırma konusu için ayrıntı sayfalarıyla yapılandırılmış salt okunur katalog. Canlı veritabanları, yayınlar veya araştırmacı profilleri bağlı değil.",
+  filterLabel: "Araştırma konularını filtrele",
+  filterPlaceholder: "Konu, yöntem, alan veya kanıt türüne göre filtrele...",
+  showingCount: "{total} konudan {filtered} tanesi gösteriliyor",
+  noMatch: "Filtrenize uyan araştırma konusu yok.",
+  tryDifferent: "Farklı bir alan veya arama terimi deneyin.",
+  clearFilters: "Filtreleri temizle",
+  methods: "Yöntemler",
+  evidenceTypes: "Kanıt türleri",
+  futureWorkspace: "Gelecek çalışma alanı",
+  openTopic: "Konuyu aç",
+  topicStatus: {
+    catalog_available: "Katalogda mevcut",
+    workspace_not_available: "Çalışma alanı mevcut değil",
+    evidence_not_connected: "Kanıt bağlı değil",
+  },
+} as const;
+
+export const GRAPH_EXTENDED_TR = {
+  whatCanILearn: "Ne öğrenebilirim?",
+  personaGuidanceAria: "Bilgi grafiği persona rehberi",
+  pipelineAria: "Bilgi grafiği Varlıktan Karar Zekasına nasıl bağlanır",
+  pipelineStages: ["Varlık", "İlişki", "Kanıt", "Akıl Yürütme", "Karar Zekası"] as const,
+  personas: {
+    citizen: {
+      title: "Vatandaş",
+      whatCanILearn:
+        "Hangi kamu kurumları ve şirketler üniversitelerle ülke kaydı üzerinden bağlantılı — popülerlik puanları olmadan.",
+    },
+    investor: {
+      title: "Yatırımcı",
+      whatCanILearn:
+        "Yalnızca katalog düzeyinde varlık yakınlığı. Yatırım veya ortaklık iddiaları bağlı finansal kanıt gerektirir.",
+    },
+    government: {
+      title: "Hükümet",
+      whatCanILearn:
+        "Bağlandığında ülke kaydından hükümet formu etiketleri. Grafik gezinmesinden siyasi öneriler yok.",
+    },
+    student: {
+      title: "Öğrenci",
+      whatCanILearn:
+        "Üniversite konumu ve aynı ülkedeki şirket listeleri — sıralama veya istihdam puanları değil.",
+    },
+    researcher: {
+      title: "Araştırmacı",
+      whatCanILearn: "Her kenar için kanıt durumuyla dışa aktarılabilir ilişki listesi.",
+    },
+    academic: {
+      title: "Akademisyen",
+      whatCanILearn: "CBAI'nin katalog türevli bağlantıları doğrulanmış iş birliği kanıtlarından nasıl ayırdığı.",
+    },
+  },
+  trustPillars: {
+    evidence: {
+      title: "Kanıt",
+      description:
+        "Kenarlar yalnızca yerel kayıtlar doğrulanabilir bağlantı sağladığında vardır. Çıkarımsal veya ağırlıklı ilişkiler yok.",
+    },
+    methodology: {
+      title: "Metodoloji",
+      description:
+        "Graf oluşturucu düğümleri varlık adaptörlerinden, kenarları katalog kurallarından türetir — yapay zeka kümelemesi değil.",
+    },
+    neutrality: {
+      title: "Tarafsızlık",
+      description: "Graf yol önermez, varlıkları sıralamaz veya ortaklıkları onaylamaz.",
+    },
+    transparency: {
+      title: "Şeffaflık",
+      description:
+        "Her ilişki durumu gösterir: katalogdan kanıt mevcut veya gelecek türler için kanıt eksik.",
+    },
+  },
+} as const;
+
+export const ENTITY_UI_TR = {
+  notAssessed: "Değerlendirilmedi",
+  notAvailable: "Mevcut değil",
+  notConnected: "Bağlı değil",
+  officialWebsite: "Resmi web sitesi",
+  publicationDate: "Yayın tarihi",
+  openSourceLink: "Açık kaynak bağlantısı",
+  connected: "Bağlı",
+  planned: "Planlandı",
+  noVerifiedData: "Doğrulanmış veri yok.",
+  noVerifiedInfo: "Doğrulanmış bilgi mevcut değil.",
+  benchmarkCountry: "Tam profili okumadan önce bu ülkeyi kayıttaki diğerleriyle karşılaştırın.",
+  benchmarkCompany: "Tam profili okumadan önce bu şirketi kayıttaki diğerleriyle karşılaştırın.",
+  noRelationshipsCountry:
+    "Henüz doğrulanmış ilişki yok — katalogdaki bir şirket, üniversite veya araştırma konusu bu ülkeye atıfta bulunduğunda bağlantılar görünür.",
+  noRelationshipsCompany:
+    "Henüz doğrulanmış ilişki yok — katalogdaki bir ülke, üniversite veya araştırma konusu bu şirkete atıfta bulunduğunda bağlantılar görünür.",
+  searchCountries: "Ülkeleri ara…",
+  dataStatusLegend: "Veri durumu açıklaması",
+  searchResults: "Arama sonuçları",
+} as const;
+
+export const PROJECT_UI_TR = {
+  researchQuestion: "Araştırma Sorusu",
+  objectives: "Hedefler",
+  notes: "Notlar",
+  tasks: "Görevler",
+  openQuestions: "Açık Sorular",
+  timeline: "Zaman Çizelgesi",
+  entities: "Varlıklar",
+  noResearchQuestion: "Henüz araştırma sorusu kaydedilmedi.",
+  noObjectives: "Henüz hedefler kaydedilmedi.",
+  noEntitiesLinked: "Bu projeye henüz varlık bağlanmadı.",
+  noRelatedCountry: "Mevcut katalogda ilgili ülke yok.",
+  noEvidence: "Henüz kanıt eklenmedi.",
+  noNotes: "Henüz not kaydedilmedi.",
+  noTasks: "Henüz görev eklenmedi.",
+  noOpenQuestions: "Şu anda açık soru yok.",
+  noTimeline: "Zaman çizelgesi etkinliği kaydedilmedi.",
+} as const;
+
+export const GOVERNANCE_PAGE_TR = {
+  title: "Yönetişim",
+  description: "Kanıta dayalı kararlar için platform kuralları, standartları ve inceleme süreci.",
+  previewNotice:
+    "Yönetişim kontrol merkezi — erken önizleme. Kurallar ve inceleme iş akışları henüz tam bağlı değil.",
 } as const;

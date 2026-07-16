@@ -289,15 +289,15 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
         <Link
           href={assistantContext.href}
           className="mb-1.5 inline-flex items-center gap-1.5 text-[11px] text-zinc-500 hover:text-teal-300"
-          title={`Operator context: ${assistantContext.name}`}
+          title={t("assistantVoice.operatorContextTitle", { name: assistantContext.name })}
         >
           <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-teal-400" />
-          Context: {assistantContext.name}
+          {t("assistantVoice.contextPrefix")} {assistantContext.name}
         </Link>
       ) : null}
       <form
         role="search"
-        aria-label="CBAI Personal Operator command center"
+        aria-label={t("assistantVoice.commandCenterAria")}
         onSubmit={handleSubmit}
         className="relative flex items-center gap-1.5"
       >
@@ -390,7 +390,7 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            title="Upload — not yet connected"
+            title={t("assistantVoice.uploadNotAvailable")}
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-800 bg-slate-900/80 text-zinc-400 transition-colors hover:text-zinc-100"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

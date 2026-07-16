@@ -100,6 +100,27 @@ export const RESEARCH_HOME_UZ = {
   availableToday: "Bugun mavjud",
   notAvailableYet: "Hali mavjud emas",
   openWorkspace: "Tadqiqot ish maydonini ochish",
+  pageDescription:
+    "Global tadqiqot tarmog'ida katalog tadqiqot mavzulari va metadata bog'lanishlarini o'rganing.",
+  statusLabel: "Tadqiqot intellekti: Ishlab chiqilmoqda",
+  workspaceEyebrow: "Tadqiqot ish maydoni",
+  workspaceTitle: "Tuzilgan tadqiqot ish maydoni",
+  workspaceBody:
+    "Bitta mavzuni katalog, daftar, vaqt chizig'i va graf nuqtai nazaridan o'rganing — jonli dalillar ulanmaguncha faqat o'qish rejimi.",
+  availableTodayItems: [
+    "Ekotizim ko'rinishi va mahsulot yo'nalishi",
+    "Tadqiqot mavzulari katalogi (faqat o'qish)",
+    "Mavzu o'rganish kirish nuqtasi (ushbu sahifa)",
+    "Ommaviy tadqiqot intellekti pozitsiyasi",
+    "Ommaviy intellektdagi universitet profillariga havola",
+  ],
+  notAvailableYetItems: [
+    "Jonli ilmiy ma'lumot bazalari",
+    "Nashrlarni qidirish va to'liq matn",
+    "Tadqiqotchi profillari va hamkorlik",
+    "Jonli tajribalar va laboratoriya ma'lumotlari",
+    "SI tomonidan yaratilgan tadqiqot xulosalari",
+  ],
 } as const;
 
 export const GRAPH_PLATFORM_UZ = {
@@ -166,4 +187,164 @@ export const ASSISTANT_VOICE_UZ = {
   nothingToSaveYet: "Hali saqlash uchun hech narsa yo'q — avval mamlakat, kompaniya yoki universitet profilini oching.",
   uploadNotAvailable: "Fayl yuklash ulangan qabul qilish tizimini talab qiladi — hali mavjud emas.",
   speechDetected: "Nutq aniqlandi — transkriptni quyida ko'rib chiqing.",
+  commandCenterAria: "CBAI shaxsiy operator buyruq markazi",
+  contextPrefix: "Kontekst:",
+  operatorContextTitle: "Operator konteksti: {name}",
+} as const;
+
+export const MY_WORK_EXT_UZ = {
+  continueWorking: "Ishni davom ettirish",
+  recentlyViewed: "Yaqinda ko'rilgan",
+  reportsSection: "Hisobotlar",
+  reportsCenterLink: "Hisobotlar markazi",
+  reportsCenterDetail: "Profil va taqqoslash ko'rib chiqishi uchun {count} hisobot turi belgilangan.",
+  evidenceReviews: "Dalil ko'rib chiqishlari",
+  evidenceReviewsEmpty:
+    "Shaxsiy ko'rib chiqish tarixi hali ulanmagan. Platforma bo'yicha {connected}/{total} dalil manbasi ulangan — oching",
+  evidenceLink: "Dalillar",
+  evidenceReviewsSuffix: "joriy holatni ko'rib chiqish uchun.",
+  savedWork: "Saqlangan ish",
+  signInBrowserHint: "bu brauzerdan foydalanayotgan boshqalardan ishingizni ajratib saqlash uchun.",
+  signInAccountHint:
+    "o'z Loyihalar va Xatcho'plaringizni bu brauzerdan foydalanayotgan boshqalardan ajratib saqlash uchun.",
+  continueResearchWorkspace: "Tadqiqot ish maydoni",
+  continueResearchWorkspaceDetail: "Dalil ko'rib chiqishi va bilimni tuzish uchun tuzilgan ish maydonini oching.",
+  continueResearchCatalog: "Tadqiqot katalogi",
+  continueResearchCatalogDetail: "Tadqiqot mavzulari, missiyalar va dalil holatini ko'ring.",
+  continueEvidence: "Dalillar",
+  continueEvidenceDetail: "Profillar bo'yicha rasmiy manba holatini ko'rib chiqing.",
+  onboardingExploreResearch: "Tadqiqotni o'rganish",
+  onboardingExploreCountries: "Mamlakatlarni o'rganish",
+  onboardingSearchEvidence: "Dalillarni qidirish",
+  onboardingConfigureOperator: "Shaxsiy operatorni sozlash",
+  onboardingOpenTrust: "Ishonch markazini ochish",
+  loading: "Yuklanmoqda…",
+} as const;
+
+export const RESEARCH_CATALOG_UZ = {
+  catalogEyebrow: "Tadqiqot mavzulari katalogi",
+  catalogTitle: "Tadqiqot sohalari va mavzularini ko'ring",
+  catalogDescription:
+    "Har bir tadqiqot mavzusi uchun batafsil sahifalar bilan tuzilgan faqat o'qish katalogi. Jonli ma'lumot bazalari, nashrlar yoki tadqiqotchi profillari ulanmagan.",
+  filterLabel: "Tadqiqot mavzularini filtrlash",
+  filterPlaceholder: "Mavzu, usul, soha yoki dalil turi bo'yicha filtrlash...",
+  showingCount: "{total} ta mavzudan {filtered} tasi ko'rsatilmoqda",
+  noMatch: "Filtrga mos tadqiqot mavzulari topilmadi.",
+  tryDifferent: "Boshqa soha yoki qidiruv so'zini sinab ko'ring.",
+  clearFilters: "Filtrlarni tozalash",
+  methods: "Usullar",
+  evidenceTypes: "Dalil turlari",
+  futureWorkspace: "Kelajakdagi ish maydoni",
+  openTopic: "Mavzuni ochish",
+  topicStatus: {
+    catalog_available: "Katalogda mavjud",
+    workspace_not_available: "Ish maydoni mavjud emas",
+    evidence_not_connected: "Dalillar ulanmagan",
+  },
+} as const;
+
+export const GRAPH_EXTENDED_UZ = {
+  whatCanILearn: "Nima o'rganishim mumkin?",
+  personaGuidanceAria: "Bilim grafi personasi bo'yicha yo'riqnoma",
+  pipelineAria: "Bilim grafi Obyektdan Qaror intellektigacha qanday bog'lanadi",
+  pipelineStages: ["Obyekt", "Munosabat", "Dalil", "Mantiq", "Qaror intellekti"] as const,
+  personas: {
+    citizen: {
+      title: "Fuqaro",
+      whatCanILearn:
+        "Qaysi davlat muassasalari va kompaniyalar universitetlar bilan mamlakat reyestri orqali bog'langan — mashhurlik ballarisiz.",
+    },
+    investor: {
+      title: "Investor",
+      whatCanILearn:
+        "Faqat katalog darajasidagi obyekt yaqinligi. Investitsiya yoki hamkorlik da'volari ulangan moliyaviy dalillarni talab qiladi.",
+    },
+    government: {
+      title: "Hukumat",
+      whatCanILearn:
+        "Bog'langan bo'lsa, mamlakat reyestridan hukumat shakli yorliqlari. Graf bo'ylab siyosiy tavsiyalar yo'q.",
+    },
+    student: {
+      title: "Talaba",
+      whatCanILearn:
+        "Universitet joylashuvi va bir mamlakatdagi kompaniyalar ro'yxati — reyting yoki ishga joylashish ballari emas.",
+    },
+    researcher: {
+      title: "Tadqiqotchi",
+      whatCanILearn: "Har bir bog'lanish uchun dalil holati bilan eksport qilinadigan munosabatlar ro'yxati.",
+    },
+    academic: {
+      title: "Akademik",
+      whatCanILearn: "CBAI katalogdan olingan bog'lanishlarni tasdiqlangan hamkorlik dalillaridan qanday ajratadi.",
+    },
+  },
+  trustPillars: {
+    evidence: {
+      title: "Dalil",
+      description:
+        "Bog'lanishlar faqat mahalliy reyestrlar tekshiriladigan aloqani ta'minlaganda mavjud. Xulosa qilingan yoki og'irlikli munosabatlar yo'q.",
+    },
+    methodology: {
+      title: "Metodologiya",
+      description:
+        "Graf quruvchi tugunlarni obyekt adapterlaridan, bog'lanishlarni katalog qoidalaridan oladi — SI klasterlash emas.",
+    },
+    neutrality: {
+      title: "Neytrallik",
+      description: "Graf yo'llarni tavsiya qilmaydi, obyektlarni reytinglamaydi yoki hamkorlikni tasdiqlamaydi.",
+    },
+    transparency: {
+      title: "Shaffoflik",
+      description:
+        "Har bir munosabat holatini ko'rsatadi: katalogdan dalil mavjud yoki kelajak turlar uchun dalil yo'q.",
+    },
+  },
+} as const;
+
+export const ENTITY_UI_UZ = {
+  notAssessed: "Baholanmagan",
+  notAvailable: "Mavjud emas",
+  notConnected: "Ulanmagan",
+  officialWebsite: "Rasmiy veb-sayt",
+  publicationDate: "Nashr sanasi",
+  openSourceLink: "Ochiq manba havolasi",
+  connected: "Ulangan",
+  planned: "Rejalashtirilgan",
+  noVerifiedData: "Tasdiqlangan ma'lumot yo'q.",
+  noVerifiedInfo: "Tasdiqlangan ma'lumot mavjud emas.",
+  benchmarkCountry: "To'liq profilni o'qishdan oldin ushbu mamlakatni reyestrdagi boshqalar bilan taqqoslang.",
+  benchmarkCompany: "To'liq profilni o'qishdan oldin ushbu kompaniyani reyestrdagi boshqalar bilan taqqoslang.",
+  noRelationshipsCountry:
+    "Hali tasdiqlangan munosabatlar yo'q — katalogdagi kompaniya, universitet yoki tadqiqot mavzusi ushbu mamlakatga murojaat qilganda bog'lanishlar paydo bo'ladi.",
+  noRelationshipsCompany:
+    "Hali tasdiqlangan munosabatlar yo'q — katalogdagi mamlakat, universitet yoki tadqiqot mavzusi ushbu kompaniyaga murojaat qilganda bog'lanishlar paydo bo'ladi.",
+  searchCountries: "Mamlakatlarni qidirish…",
+  dataStatusLegend: "Ma'lumot holati afsonasi",
+  searchResults: "Qidiruv natijalari",
+} as const;
+
+export const PROJECT_UI_UZ = {
+  researchQuestion: "Tadqiqot savoli",
+  objectives: "Maqsadlar",
+  notes: "Eslatmalar",
+  tasks: "Vazifalar",
+  openQuestions: "Ochiq savollar",
+  timeline: "Vaqt chizig'i",
+  entities: "Obyektlar",
+  noResearchQuestion: "Hali tadqiqot savoli qayd etilmagan.",
+  noObjectives: "Hali maqsadlar qayd etilmagan.",
+  noEntitiesLinked: "Ushbu loyihaga hali obyektlar bog'lanmagan.",
+  noRelatedCountry: "Joriy katalogda bog'liq mamlakat yo'q.",
+  noEvidence: "Hali dalil qo'shilmagan.",
+  noNotes: "Hali eslatmalar qayd etilmagan.",
+  noTasks: "Hali vazifalar qo'shilmagan.",
+  noOpenQuestions: "Hozir ochiq savollar yo'q.",
+  noTimeline: "Vaqt chizig'i faoliyati qayd etilmagan.",
+} as const;
+
+export const GOVERNANCE_PAGE_UZ = {
+  title: "Boshqaruv",
+  description: "Dalilga asoslangan qarorlar uchun platforma qoidalari, standartlari va ko'rib chiqish jarayoni.",
+  previewNotice:
+    "Boshqaruv nazorat markazi — erta ko'rib chiqish. Qoidalar va ko'rib chiqish ish jarayonlari hali to'liq ulanmagan.",
 } as const;

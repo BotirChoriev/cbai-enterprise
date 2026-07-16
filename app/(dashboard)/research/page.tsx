@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import ResearchHome from "@/components/research/ResearchHome";
+import ResearchPageClient from "@/components/research/ResearchPageClient";
 
 export const metadata: Metadata = {
   title: "Research",
   description:
-    "Explore 64 catalog research topics and their metadata connections in the Global Research Network.",
+    "Explore catalog research topics and metadata connections in the Global Research Network.",
 };
 
 export default function ResearchPage() {
   return (
     <Suspense fallback={null}>
-      <ResearchHome />
+      <ResearchPageClient />
     </Suspense>
   );
 }

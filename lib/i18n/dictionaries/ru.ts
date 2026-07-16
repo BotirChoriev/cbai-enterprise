@@ -15,9 +15,15 @@ import {
 import {
   ACCOUNT_PAGE_RU,
   ASSISTANT_VOICE_RU,
+  ENTITY_UI_RU,
+  GOVERNANCE_PAGE_RU,
+  GRAPH_EXTENDED_RU,
   GRAPH_PLATFORM_RU,
+  MY_WORK_EXT_RU,
   PREVIEW_PAGES_RU,
+  PROJECT_UI_RU,
   REPORTS_CENTER_RU,
+  RESEARCH_CATALOG_RU,
   RESEARCH_HOME_RU,
   RESEARCH_WORKSPACE_RU,
   TRUST_DATA_SOURCES_RU,
@@ -446,6 +452,12 @@ const ru: TranslationDictionary = {
   previewPages: PREVIEW_PAGES_RU,
   validation: VALIDATION_RU,
   assistantVoice: ASSISTANT_VOICE_RU,
+  myWorkExt: MY_WORK_EXT_RU,
+  researchCatalog: RESEARCH_CATALOG_RU,
+  graphExtended: GRAPH_EXTENDED_RU,
+  entityUi: ENTITY_UI_RU,
+  projectUi: PROJECT_UI_RU,
+  governancePage: GOVERNANCE_PAGE_RU,
 };
 
 export default ru;

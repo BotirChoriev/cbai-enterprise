@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import GovernanceControlCenter from "@/components/governance-control/GovernanceControlCenter";
+import GovernancePageClient from "@/components/governance-control/GovernancePageClient";
 
 export const metadata: Metadata = {
   title: "Governance",
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function AIControlPage() {
-  return <GovernanceControlCenter />;
+  return <GovernancePageClient />;
 }

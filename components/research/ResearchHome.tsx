@@ -10,16 +10,13 @@ import ResearchGraphPanel from "@/components/research/graph/ResearchGraphPanel";
 import ResearchPrinciples from "@/components/research/ResearchPrinciples";
 import { cbaiBtnSecondary, cbaiGlassCard, cbaiHeroGlow, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import { WORKSPACE_PATH } from "@/lib/research/workspace";
-import {
-  RESEARCH_AVAILABLE_TODAY,
-  RESEARCH_HOME,
-  RESEARCH_NOT_AVAILABLE_YET,
-} from "@/lib/research";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { getDictionary } from "@/lib/i18n/translate";
 
 export default function ResearchHome() {
   const searchParams = useSearchParams();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+  const researchHome = getDictionary(language).researchHome;
   const query = (searchParams.get("q") ?? searchParams.get("topic") ?? "").trim();
 
   return (
@@ -36,14 +33,14 @@ export default function ResearchHome() {
           <h2 id="research-status-heading" className="sr-only">
             {t("researchHome.statusHeading")}
           </h2>
-          <p className="text-sm font-semibold text-teal-300">{RESEARCH_HOME.statusLabel}</p>
+          <p className="text-sm font-semibold text-teal-300">{researchHome.statusLabel}</p>
           <div className="mt-4 grid gap-6 sm:grid-cols-2">
             <div>
               <p className="text-[10px] font-medium uppercase tracking-wider text-emerald-400/90">
                 {t("researchHome.availableToday")}
               </p>
               <ul className="mt-2 space-y-1.5 text-sm text-zinc-400">
-                {RESEARCH_AVAILABLE_TODAY.map((item) => (
+                {researchHome.availableTodayItems.map((item) => (
                   <li key={item} className="flex items-start gap-2">
                     <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-emerald-400" />
                     {item}
@@ -56,7 +53,7 @@ export default function ResearchHome() {
                 {t("researchHome.notAvailableYet")}
               </p>
               <ul className="mt-2 space-y-1.5 text-sm text-zinc-500">
-                {RESEARCH_NOT_AVAILABLE_YET.map((item) => (
+                {researchHome.notAvailableYetItems.map((item) => (
                   <li key={item} className="flex items-start gap-2">
                     <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-zinc-600" />
                     {item}
@@ -74,16 +71,13 @@ export default function ResearchHome() {
         className={`mx-auto max-w-6xl space-y-14 px-4 pb-10 sm:px-6 sm:pb-14 ${cbaiHeroGlow}`}
       >
         <section aria-labelledby="research-workspace-cta-heading" className="space-y-3">
-          <p className={cbaiSectionEyebrow}>Research workspace</p>
+          <p className={cbaiSectionEyebrow}>{researchHome.workspaceEyebrow}</p>
           <div className={`${cbaiGlassCard} flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between`}>
             <div>
               <h2 id="research-workspace-cta-heading" className="text-lg font-semibold text-zinc-100">
-                Structured knowledge organization
+                {researchHome.workspaceTitle}
               </h2>
-              <p className="mt-1 text-sm text-zinc-500">
-                Explore the read-only workspace shell where evidence review and future collaboration
-                will meet — human review required.
-              </p>
+              <p className="mt-1 text-sm text-zinc-500">{researchHome.workspaceBody}</p>
             </div>
             <Link href={WORKSPACE_PATH} className={`${cbaiBtnSecondary} shrink-0`}>
               {t("researchHome.openWorkspace")} →

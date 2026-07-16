@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import ResearchWorkspaceHome from "@/components/research/workspace/ResearchWorkspaceHome";
+import ResearchWorkspacePageClient from "@/components/research/workspace/ResearchWorkspacePageClient";
 
 export const metadata: Metadata = {
   title: "Research Workspace",
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function ResearchWorkspacePage() {
   return (
     <Suspense fallback={null}>
-      <ResearchWorkspaceHome />
+      <ResearchWorkspacePageClient />
     </Suspense>
   );
 }

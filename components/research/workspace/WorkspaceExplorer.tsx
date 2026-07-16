@@ -26,12 +26,14 @@ type WorkspaceExplorerProps = {
   initialTopicId?: string;
   showTopicNotFoundNotice?: boolean;
   deepLinkTopicId?: string;
+  embedded?: boolean;
 };
 
 export default function WorkspaceExplorer({
   initialTopicId,
   showTopicNotFoundNotice = false,
   deepLinkTopicId,
+  embedded = false,
 }: WorkspaceExplorerProps) {
   const { t } = useTranslation();
   const defaultTopic = getDefaultWorkspaceTopic();
@@ -68,13 +70,14 @@ export default function WorkspaceExplorer({
         >
           {t("researchWorkspace.backToResearch")}
         </Link>
-        <div>
-          <p className={cbaiSectionEyebrow}>{t("researchWorkspace.title")}</p>
-          <h1 className="cbai-display text-2xl text-zinc-100">
-            {t("researchWorkspace.title")}
-          </h1>
-          <p className="mt-1 max-w-3xl text-sm text-zinc-500">{t("researchWorkspace.shellNotice")}</p>
-          {showTopicNotFoundNotice ? (
+        {!embedded ? (
+          <div>
+            <p className={cbaiSectionEyebrow}>{t("researchWorkspace.title")}</p>
+            <h1 className="cbai-display text-2xl text-zinc-100">{t("researchWorkspace.title")}</h1>
+            <p className="mt-1 max-w-3xl text-sm text-zinc-500">{t("researchWorkspace.shellNotice")}</p>
+          </div>
+        ) : null}
+        {showTopicNotFoundNotice ? (
             <p className="mt-2 rounded-md border border-zinc-800/80 bg-zinc-900/40 px-3 py-2 text-xs text-zinc-500">
               {t("researchWorkspace.topicNotFoundPrefix", { topicId: deepLinkTopicId ?? "" })}{" "}
               <Link href="/research" className="text-teal-400 hover:text-teal-300">
@@ -83,13 +86,12 @@ export default function WorkspaceExplorer({
               .
             </p>
           ) : null}
-          {deepLinkTopicId && !showTopicNotFoundNotice ? (
-            <p className="mt-2 text-xs text-zinc-500">
-              {t("researchWorkspace.selectedTopic")}{" "}
-              <span className="text-zinc-300">{context.topic.topicName}</span> {t("researchWorkspace.continueReview")}
-            </p>
-          ) : null}
-        </div>
+        {deepLinkTopicId && !showTopicNotFoundNotice ? (
+          <p className="mt-2 text-xs text-zinc-500">
+            {t("researchWorkspace.selectedTopic")}{" "}
+            <span className="text-zinc-300">{context.topic.topicName}</span> {t("researchWorkspace.continueReview")}
+          </p>
+        ) : null}
       </header>
 
       <div className="grid gap-4 lg:grid-cols-[240px_minmax(0,1fr)_240px] xl:grid-cols-[260px_minmax(0,1fr)_260px]">

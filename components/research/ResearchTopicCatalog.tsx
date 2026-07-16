@@ -12,12 +12,14 @@ import {
   RESEARCH_TOPICS,
   type ResearchDomainId,
 } from "@/lib/research/research-topics";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type ResearchTopicCatalogProps = {
   initialQuery?: string;
 };
 
 export default function ResearchTopicCatalog({ initialQuery = "" }: ResearchTopicCatalogProps) {
+  const { t } = useTranslation();
   const [filterQuery, setFilterQuery] = useState(initialQuery);
   const [selectedDomain, setSelectedDomain] = useState<ResearchDomainId | "all">("all");
 
@@ -34,7 +36,7 @@ export default function ResearchTopicCatalog({ initialQuery = "" }: ResearchTopi
 
   const lens = getResearchDomainLens(selectedDomain);
   const domainTopics = useMemo(
-    () => (selectedDomain === "all" ? [] : RESEARCH_TOPICS.filter((t) => t.domainId === selectedDomain)),
+    () => (selectedDomain === "all" ? [] : RESEARCH_TOPICS.filter((topic) => topic.domainId === selectedDomain)),
     [selectedDomain],
   );
 
@@ -62,27 +64,26 @@ export default function ResearchTopicCatalog({ initialQuery = "" }: ResearchTopi
         </div>
       ) : (
         <div className="space-y-2">
-          <p className={cbaiSectionEyebrow}>Research topics catalog</p>
+          <p className={cbaiSectionEyebrow}>{t("researchCatalog.catalogEyebrow")}</p>
           <h2 id="research-catalog-heading" className="text-2xl font-semibold text-zinc-50">
-            Browse research domains and topics
+            {t("researchCatalog.catalogTitle")}
           </h2>
           <p className="max-w-2xl text-sm leading-relaxed text-zinc-400">
-            Structured read-only catalog with detail pages for each research topic. No live
-            databases, publications, or researcher profiles are connected.
+            {t("researchCatalog.catalogDescription")}
           </p>
         </div>
       )}
 
       <div className={`${cbaiGlassCard} space-y-4 p-4`}>
         <label htmlFor="catalog-filter" className="sr-only">
-          Filter research topics
+          {t("researchCatalog.filterLabel")}
         </label>
         <input
           id="catalog-filter"
           type="search"
           value={filterQuery}
           onChange={(event) => setFilterQuery(event.target.value)}
-          placeholder="Filter by topic, method, domain, or evidence type..."
+          placeholder={t("researchCatalog.filterPlaceholder")}
           className="home-search-input w-full rounded-lg border border-zinc-800/80 bg-slate-950/70 px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-teal-500/30"
         />
         <ResearchDomainFilter
@@ -93,13 +94,16 @@ export default function ResearchTopicCatalog({ initialQuery = "" }: ResearchTopi
       </div>
 
       <p className="text-sm text-zinc-500">
-        Showing {filteredTopics.length} of {RESEARCH_TOPICS.length} research topics
+        {t("researchCatalog.showingCount", {
+          filtered: String(filteredTopics.length),
+          total: String(RESEARCH_TOPICS.length),
+        })}
       </p>
 
       {filteredTopics.length === 0 ? (
         <div className={`${cbaiGlassCard} px-5 py-8 text-center`}>
-          <p className="text-sm text-zinc-400">No research topics match your filter.</p>
-          <p className="mt-1 text-xs text-zinc-600">Try a different domain or search term.</p>
+          <p className="text-sm text-zinc-400">{t("researchCatalog.noMatch")}</p>
+          <p className="mt-1 text-xs text-zinc-600">{t("researchCatalog.tryDifferent")}</p>
           <button
             type="button"
             onClick={() => {
@@ -108,7 +112,7 @@ export default function ResearchTopicCatalog({ initialQuery = "" }: ResearchTopi
             }}
             className="mt-4 inline-flex min-h-9 items-center rounded-lg border border-zinc-700 bg-zinc-900 px-3.5 text-xs font-medium text-teal-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
           >
-            Clear filters
+            {t("researchCatalog.clearFilters")}
           </button>
         </div>
       ) : (
@@ -117,9 +121,10 @@ export default function ResearchTopicCatalog({ initialQuery = "" }: ResearchTopi
             <li key={topic.topicId}>
               <ResearchTopicCard
                 topic={topic}
-                methodsLabel={lens.methodsLabel}
-                evidenceLabel={lens.evidenceLabel}
-                actionLabel={lens.actionLabel}
+                methodsLabel={lens.methodsLabel ?? t("researchCatalog.methods")}
+                evidenceLabel={lens.evidenceLabel ?? t("researchCatalog.evidenceTypes")}
+                actionLabel={lens.actionLabel ?? t("researchCatalog.openTopic")}
+                futureWorkspaceLabel={t("researchCatalog.futureWorkspace")}
               />
             </li>
           ))}

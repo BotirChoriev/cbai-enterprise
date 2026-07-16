@@ -15,9 +15,15 @@ import {
 import {
   ACCOUNT_PAGE_UZ,
   ASSISTANT_VOICE_UZ,
+  ENTITY_UI_UZ,
+  GOVERNANCE_PAGE_UZ,
+  GRAPH_EXTENDED_UZ,
   GRAPH_PLATFORM_UZ,
+  MY_WORK_EXT_UZ,
   PREVIEW_PAGES_UZ,
+  PROJECT_UI_UZ,
   REPORTS_CENTER_UZ,
+  RESEARCH_CATALOG_UZ,
   RESEARCH_HOME_UZ,
   RESEARCH_WORKSPACE_UZ,
   TRUST_DATA_SOURCES_UZ,
@@ -446,6 +452,12 @@ const uz: TranslationDictionary = {
   previewPages: PREVIEW_PAGES_UZ,
   validation: VALIDATION_UZ,
   assistantVoice: ASSISTANT_VOICE_UZ,
+  myWorkExt: MY_WORK_EXT_UZ,
+  researchCatalog: RESEARCH_CATALOG_UZ,
+  graphExtended: GRAPH_EXTENDED_UZ,
+  entityUi: ENTITY_UI_UZ,
+  projectUi: PROJECT_UI_UZ,
+  governancePage: GOVERNANCE_PAGE_UZ,
 };
 
 export default uz;

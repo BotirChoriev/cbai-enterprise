@@ -6,7 +6,7 @@ import { getResearchTopicById } from "@/lib/research/research-topics";
 import { getDefaultWorkspaceTopic } from "@/lib/research/workspace/workspace-explorer";
 import WorkspaceExplorer from "@/components/research/workspace/WorkspaceExplorer";
 
-function ResearchWorkspaceHomeContent() {
+function ResearchWorkspaceHomeContent({ embedded = false }: { embedded?: boolean }) {
   const searchParams = useSearchParams();
   const topicParam = searchParams.get("topic");
   const requestedTopic = topicParam ? getResearchTopicById(topicParam) : undefined;
@@ -18,14 +18,15 @@ function ResearchWorkspaceHomeContent() {
       initialTopicId={initialTopicId}
       showTopicNotFoundNotice={showTopicNotFoundNotice}
       deepLinkTopicId={requestedTopic?.topicId}
+      embedded={embedded}
     />
   );
 }
 
-export default function ResearchWorkspaceHome() {
+export default function ResearchWorkspaceHome({ embedded = false }: { embedded?: boolean }) {
   return (
     <Suspense fallback={null}>
-      <ResearchWorkspaceHomeContent />
+      <ResearchWorkspaceHomeContent embedded={embedded} />
     </Suspense>
   );
 }
