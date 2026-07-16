@@ -3,6 +3,7 @@
 import { useTranslation } from "@/lib/i18n/use-translation";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import AssistantSettingsForm from "@/components/assistant/AssistantSettingsForm";
+import LivingMemoryControl from "@/components/operating/LivingMemoryControl";
 
 export default function SettingsPageClient() {
   const { t } = useTranslation();
@@ -10,6 +11,7 @@ export default function SettingsPageClient() {
   return (
     <OperatingPageShell title={t("navigation.settings")} description={t("settingsPage.description")}>
       <AssistantSettingsForm />
+      <LivingMemoryControl />
     </OperatingPageShell>
   );
 }

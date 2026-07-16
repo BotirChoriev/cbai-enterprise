@@ -5,56 +5,45 @@ import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
-import { deriveOperatorInterventions } from "@/lib/intelligence-os/operator-awareness";
 import { buildCapabilityPassport } from "@/lib/capability/capability-passport-builder";
 import { resolveOperatorName } from "@/lib/assistant/assistant-profile";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import HumanDecisionBoundary from "@/components/intelligence-os/HumanDecisionBoundary";
-import EvidenceTrustSurfacePanel from "@/components/evidence/EvidenceTrustSurfacePanel";
 import {
   deriveLivingContextMemory,
   entityStudyHref,
 } from "@/lib/intelligence-os/living-context-memory";
-import { deriveIntelligenceFlow } from "@/lib/intelligence-os/intelligence-flow";
+import { deriveFocusedFlow } from "@/lib/intelligence-os/intelligence-flow";
 import {
   intelligenceSpaceI18nKey,
   resolveIntelligenceSpace,
 } from "@/lib/intelligence-os/intelligence-spaces";
+import { deriveOperatorInterventions } from "@/lib/intelligence-os/operator-awareness";
 import { cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 export function OperatorAwarenessStrip() {
   const { t } = useTranslation();
   const hydrated = useHydrated();
   const interventions = useMemo(
-    () => (hydrated ? deriveOperatorInterventions().slice(0, 2) : []),
+    () => (hydrated ? deriveOperatorInterventions().slice(0, 1) : []),
     [hydrated],
   );
 
   if (!hydrated || interventions.length === 0) return null;
 
+  const item = interventions[0];
   return (
     <div className="space-y-2" role="status" aria-live="polite">
-      {interventions.map((item) => (
-        <div
-          key={item.id}
-          className={`cbai-thought-enter rounded-md border px-3 py-2 text-xs leading-relaxed ${
-            item.priority === "critical"
-              ? "border-[var(--gold)]/30 bg-[var(--gold)]/5 text-[var(--gold-soft)]"
-              : item.priority === "attention"
-                ? "border-amber-500/20 bg-amber-500/5 text-amber-200/90"
-                : "border-zinc-800 bg-zinc-950/40 text-zinc-400"
-          }`}
-        >
-          {item.href ? (
-            <Link href={item.href} className="hover:text-teal-300">
-              {t(`operatorAwareness.${item.messageKey}`)}
-            </Link>
-          ) : (
-            t(`operatorAwareness.${item.messageKey}`)
-          )}
-        </div>
-      ))}
+      <div className="rounded-md border border-zinc-800 bg-zinc-950/40 px-3 py-2 text-xs leading-relaxed text-zinc-400">
+        {item.href ? (
+          <Link href={item.href} className="hover:text-teal-300">
+            {t(`operatorAwareness.${item.messageKey}`)}
+          </Link>
+        ) : (
+          t(`operatorAwareness.${item.messageKey}`)
+        )}
+      </div>
     </div>
   );
 }
@@ -63,12 +52,13 @@ type LivingContextRailProps = {
   className?: string;
 };
 
+/** Ambient context — memory, focused flow, discovery explanation — not noisy. */
 export default function LivingContextRail({ className = "" }: LivingContextRailProps) {
   const pathname = usePathname();
   const { t } = useTranslation();
   const hydrated = useHydrated();
   const { profile } = useAssistantProfile();
-  const { mission, evidencePulse, adaptive, humanImpact } = useMissionContext();
+  const { mission, adaptive } = useMissionContext();
   const passport = useMemo(
     () => (hydrated ? buildCapabilityPassport(resolveOperatorName(profile)) : null),
     [hydrated, profile],
@@ -78,7 +68,7 @@ export default function LivingContextRail({ className = "" }: LivingContextRailP
     [hydrated, mission],
   );
   const flow = useMemo(
-    () => (hydrated ? deriveIntelligenceFlow(mission) : []),
+    () => (hydrated ? deriveFocusedFlow(mission) : []),
     [hydrated, mission],
   );
 
@@ -92,15 +82,8 @@ export default function LivingContextRail({ className = "" }: LivingContextRailP
     >
       <p className={cbaiSectionEyebrow}>{t("intelligenceSpaces.livingContext")}</p>
 
-      <OperatorAwarenessStrip />
-
-      <section className="space-y-1">
-        <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("livingIntelligence.intentionEyebrow")}</p>
-        <p className="text-sm text-zinc-200">{mission?.problem ?? t("intelligenceCanvas.noMissionPrompt")}</p>
-      </section>
-
       {memory?.hasContinuity ? (
-        <section className="space-y-2 border-t border-zinc-800/60 pt-2">
+        <section className="space-y-2">
           <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("livingIntelligence.contextMemory")}</p>
           {memory.lastVisit && memory.lastVisit.spaceId !== currentSpace ? (
             <p className="text-xs text-zinc-500">
@@ -112,8 +95,7 @@ export default function LivingContextRail({ className = "" }: LivingContextRailP
           ) : null}
           {memory.recentStudy.length > 0 ? (
             <ul className="space-y-1">
-              <li className="text-[10px] text-zinc-600">{t("livingIntelligence.recentStudy")}</li>
-              {memory.recentStudy.map((entity) => (
+              {memory.recentStudy.slice(0, 3).map((entity) => (
                 <li key={`${entity.kind}-${entity.id}`}>
                   <Link href={entityStudyHref(entity)} className="text-xs text-zinc-400 hover:text-teal-300">
                     {entity.name}
@@ -122,11 +104,6 @@ export default function LivingContextRail({ className = "" }: LivingContextRailP
               ))}
             </ul>
           ) : null}
-          {memory.legacyArtifactCount > 0 ? (
-            <p className="text-xs text-zinc-500">
-              {memory.legacyArtifactCount} {t("livingIntelligence.legacyArtifacts")}
-            </p>
-          ) : null}
         </section>
       ) : null}
 
@@ -134,18 +111,8 @@ export default function LivingContextRail({ className = "" }: LivingContextRailP
         <section className="space-y-1">
           <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("livingIntelligence.unfinishedFlow")}</p>
           <Link href={memory.currentFlowStage.href} className="text-xs text-teal-400 hover:text-teal-300">
-            {memory.currentFlowStage.label}: {memory.currentFlowStage.detail} →
+            {memory.currentFlowStage.label} →
           </Link>
-        </section>
-      ) : null}
-
-      {evidencePulse ? (
-        <section className="space-y-1">
-          <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("intelligenceCanvas.evidenceStatus")}</p>
-          <p className="text-xs text-zinc-400">{evidencePulse.label}</p>
-          {evidencePulse.conflictCount > 0 ? (
-            <p className="text-xs text-[var(--gold-soft)]">{t("evidenceRuntime.consensusConflicted")}</p>
-          ) : null}
         </section>
       ) : null}
 
@@ -156,8 +123,6 @@ export default function LivingContextRail({ className = "" }: LivingContextRailP
         </section>
       ) : null}
 
-      {mission ? <EvidenceTrustSurfacePanel mission={mission} variant="compact" /> : null}
-
       {passport && passport.totalSignals > 0 ? (
         <section className="space-y-1">
           <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("intelligenceSpaces.capabilityGalaxy")}</p>
@@ -167,29 +132,20 @@ export default function LivingContextRail({ className = "" }: LivingContextRailP
         </section>
       ) : null}
 
-      <section className="space-y-1">
-        <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("intelligenceCanvas.impactStatus")}</p>
-        <p className="text-xs text-zinc-400">
-          {humanImpact?.isComplete ? t("missionCenter.impactComplete") : t("missionCenter.impactIncomplete")}
-        </p>
-      </section>
-
       {flow.length > 0 ? (
         <section className="space-y-1.5">
           <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("livingIntelligence.flowEyebrow")}</p>
-          <ol className="flex flex-wrap gap-1">
+          <ol className="flex flex-col gap-1">
             {flow.map((stage) => (
               <li key={stage.id}>
                 <Link
                   href={stage.href}
-                  className={`inline-block rounded px-1.5 py-0.5 text-[9px] uppercase tracking-wide ${
+                  className={`block rounded px-2 py-1 text-xs ${
                     stage.status === "complete"
-                      ? "bg-emerald-500/10 text-emerald-400/80"
+                      ? "text-emerald-400/80"
                       : stage.status === "attention"
-                        ? "bg-[var(--gold)]/10 text-[var(--gold-soft)]"
-                        : stage.status === "partial"
-                          ? "bg-amber-500/10 text-amber-300/80"
-                          : "bg-zinc-800/60 text-zinc-600"
+                        ? "text-[var(--gold-soft)]"
+                        : "text-zinc-400 hover:text-teal-300"
                   }`}
                   title={stage.detail}
                 >
@@ -202,9 +158,11 @@ export default function LivingContextRail({ className = "" }: LivingContextRailP
       ) : null}
 
       <section className="mt-auto space-y-1.5 border-t border-zinc-800/80 pt-3">
-        <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("intelligenceCanvas.suggestedNext")}</p>
+        {adaptive ? (
+          <p className="text-[10px] text-zinc-600">{adaptive.explanation}</p>
+        ) : null}
         <Link href={nextHref} className="text-sm text-teal-400 hover:text-teal-300">
-          {adaptive?.explanation ?? t("missionCenter.nextAction")} →
+          {t("experienceEngineering.whatNext")} →
         </Link>
         <HumanDecisionBoundary variant="compact" />
       </section>

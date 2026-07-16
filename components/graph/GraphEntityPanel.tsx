@@ -165,6 +165,7 @@ function EntityDetails({
           summary: node.entity.subtitle ?? null,
           evidence: summary.evidenceStatus,
           reasoning: `${summary.relationshipCount} ${t("graphUi.relationshipCount").toLowerCase()}`,
+          validation: summary.evidenceStatus,
           history: summary.availableSources.length > 0 ? summary.availableSources.join(", ") : null,
           impact: null,
           legacy: route ? t("graphUi.openModule", { type: typeLabel }) : null,

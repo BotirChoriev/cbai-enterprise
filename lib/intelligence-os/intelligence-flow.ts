@@ -1,21 +1,23 @@
 /**
- * EPIC-13.2 — Intelligence flow: question → research → evidence → reasoning → validation → impact → legacy.
- * Single flow authority derived from real mission artifacts.
+ * EPIC-13.3 — Scientific workflow flow (visible, not a wizard).
+ * Question → Hypothesis → Evidence → Reasoning → Review → Impact → Publication → Legacy
  */
 
 import { deriveEvidenceJourney } from "@/lib/evidence-runtime/evidence-journey";
 import { deriveLegacyTrail } from "@/lib/intelligence-os/legacy-trail";
 import { getMissionNextAction } from "@/lib/intelligence-os/mission-lifecycle";
+import { deriveReportReadiness } from "@/lib/intelligence-os/report-readiness";
 import type { Mission } from "@/lib/intelligence-os/mission.types";
 import { loadProjects } from "@/lib/project/project-store";
 
 export type IntelligenceFlowStageId =
   | "question"
-  | "research"
+  | "hypothesis"
   | "evidence"
   | "reasoning"
-  | "validation"
+  | "review"
   | "impact"
+  | "publication"
   | "legacy";
 
 export type IntelligenceFlowStage = {
@@ -36,7 +38,9 @@ export function deriveIntelligenceFlow(mission: Mission | null): readonly Intell
   const legacy = deriveLegacyTrail(mission);
   const next = getMissionNextAction(mission);
   const q = projectQuery(mission);
-  const hasResearchProject = loadProjects().some((p) => p.type === "research_project");
+  const projectId = mission?.projectId;
+  const readiness = projectId ? deriveReportReadiness(projectId) : null;
+  const project = projectId ? loadProjects().find((p) => p.id === projectId) : null;
 
   const byId = Object.fromEntries(journey.map((s) => [s.id, s])) as Record<
     string,
@@ -52,11 +56,11 @@ export function deriveIntelligenceFlow(mission: Mission | null): readonly Intell
       href: byId.question?.href ?? "/my-work",
     },
     {
-      id: "research",
-      label: "Research",
-      status: hasResearchProject || mission?.projectId ? "partial" : "missing",
-      detail: hasResearchProject ? "Research project active" : "Open research workspace",
-      href: mission?.projectId ? `/research/workspace${q}` : "/research",
+      id: "hypothesis",
+      label: "Hypothesis",
+      status: mission?.whyExists?.trim() || mission?.successCriteria?.trim() ? "partial" : "missing",
+      detail: mission?.whyExists?.trim() ? mission.whyExists : "State purpose and success criteria",
+      href: "/",
     },
     {
       id: "evidence",
@@ -73,10 +77,10 @@ export function deriveIntelligenceFlow(mission: Mission | null): readonly Intell
       href: "/reasoning",
     },
     {
-      id: "validation",
-      label: "Validation",
+      id: "review",
+      label: "Review",
       status: byId.validation?.status ?? "missing",
-      detail: byId.validation?.detail ?? "Verify sources",
+      detail: byId.validation?.detail ?? "Validate sources and consensus",
       href: byId.validation?.href ?? "/knowledge",
     },
     {
@@ -84,7 +88,20 @@ export function deriveIntelligenceFlow(mission: Mission | null): readonly Intell
       label: "Impact",
       status: next?.stage === "impact" ? (next.status as IntelligenceFlowStage["status"]) : "partial",
       detail: next?.stage === "impact" ? next.nextAction : "Assess human impact",
-      href: mission?.projectId ? `/my-work${q}#human-impact` : "/my-work",
+      href: projectId ? `/my-work${q}#human-impact` : "/my-work",
+    },
+    {
+      id: "publication",
+      label: "Publication",
+      status: project?.reportGeneratedAt
+        ? "complete"
+        : readiness?.canClaimReadiness
+          ? "partial"
+          : "missing",
+      detail: project?.reportGeneratedAt
+        ? "Report generated"
+        : readiness?.limitation ?? "Complete review before publication",
+      href: projectId ? `/reports${q}` : "/reports",
     },
     {
       id: "legacy",
@@ -99,4 +116,12 @@ export function deriveIntelligenceFlow(mission: Mission | null): readonly Intell
 export function deriveCurrentFlowStage(mission: Mission | null): IntelligenceFlowStage | null {
   const flow = deriveIntelligenceFlow(mission);
   return flow.find((s) => s.status === "missing" || s.status === "attention") ?? flow[flow.length - 1] ?? null;
+}
+
+/** Current + next stage only — reduces cognitive load in ambient context. */
+export function deriveFocusedFlow(mission: Mission | null): readonly IntelligenceFlowStage[] {
+  const flow = deriveIntelligenceFlow(mission);
+  const currentIdx = flow.findIndex((s) => s.status === "missing" || s.status === "attention");
+  if (currentIdx <= 0) return flow.slice(0, 2);
+  return flow.slice(Math.max(0, currentIdx - 1), currentIdx + 2);
 }

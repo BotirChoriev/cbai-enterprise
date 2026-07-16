@@ -479,6 +479,35 @@ html.theme-light [class*="backdrop-blur"] {
   scrollbar-width: thin;
 }
 
+/* EPIC-13.3 — Mobile Intelligence Mode: sequential, focused — not shrunk desktop. */
+@media (max-width: 1023px) {
+  .cbai-mobile-intelligence-mode .cbai-mental-model-strip dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cbai-mobile-intelligence-mode .cbai-operating-main {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cbai-mobile-intelligence-mode .cbai-ambient-intelligence {
+    order: -1;
+  }
+
+  .cbai-mobile-intelligence-mode .cbai-space-enter {
+    padding-inline: 1rem;
+    padding-block: 0.875rem;
+  }
+}
+
+.cbai-ambient-trust {
+  background: rgba(var(--cbai-atmosphere-accent) / 0.02);
+}
+
+.cbai-ambient-intelligence {
+  background: rgba(5, 8, 16, 0.6);
+}
+
 /* Living Intelligence Network (homepage) — the exact same 4.5s idle timing as the Operator orb
    and the CBAI mark, so the "network breathes" moment reads as the same living system, not a
    fourth, unrelated animation. */

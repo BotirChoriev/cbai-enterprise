@@ -8,6 +8,7 @@ export type KnowledgeLayerContent = {
   summary?: string | null;
   evidence?: string | null;
   reasoning?: string | null;
+  validation?: string | null;
   history?: string | null;
   impact?: string | null;
   legacy?: string | null;
@@ -23,6 +24,7 @@ const LAYER_KEYS = [
   ["layerSummary", "summary"],
   ["layerEvidence", "evidence"],
   ["layerReasoning", "reasoning"],
+  ["layerValidation", "validation"],
   ["layerHistory", "history"],
   ["layerImpact", "impact"],
   ["layerLegacy", "legacy"],
@@ -47,7 +49,9 @@ export default function KnowledgeLayersDisclosure({ layers, className = "" }: Kn
               open={field === "surface" && Boolean(value)}
             >
               <summary className="cursor-pointer text-xs font-medium text-zinc-400">
-                {t(`livingIntelligence.${labelKey}`)}
+                {labelKey === "layerValidation"
+                  ? t("experienceEngineering.layerValidation")
+                  : t(`livingIntelligence.${labelKey}`)}
               </summary>
               <p className="mt-1.5 text-xs leading-relaxed text-zinc-500">
                 {value?.trim() ? value : t("livingIntelligence.layerEmpty")}

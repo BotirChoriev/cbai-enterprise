@@ -4,44 +4,38 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
-import {
-  intelligenceSpaceI18nKey,
-  resolveIntelligenceSpace,
-} from "@/lib/intelligence-os/intelligence-spaces";
-import { cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
+/** Mission Gravity 2.0 — mission is the invisible center; space is ambient context only. */
 export default function GlobalMissionContextBar() {
   const pathname = usePathname();
   const { t } = useTranslation();
   const { mission, evidencePulse } = useMissionContext();
-  const spaceId = resolveIntelligenceSpace(pathname);
-  const spaceKey = intelligenceSpaceI18nKey(spaceId);
 
   return (
     <header
-      className="cbai-global-mission-context shrink-0 border-b border-zinc-800/80 px-4 py-2 sm:px-5"
+      className="cbai-global-mission-context shrink-0 border-b border-zinc-800/80 px-4 py-2.5 sm:px-5"
       aria-label={t("intelligenceSpaces.operatingEnvironment")}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="min-w-0 flex-1">
-          <p className={cbaiSectionEyebrow}>{t("livingIntelligence.intentionEyebrow")}</p>
-          <p className="truncate text-sm font-medium text-zinc-200" title={mission?.problem}>
+          <p className="truncate text-base font-medium text-zinc-100" title={mission?.problem}>
             {mission?.problem ?? t("intelligenceSpaces.noMission")}
           </p>
-          <p className="text-[10px] text-zinc-600">
-            {t(`intelligenceSpaces.${spaceKey}`)}
-            {pathname !== "/" ? ` · ${t("intelligenceSpaces.spatialTransition")}` : null}
-          </p>
+          {mission?.whyExists ? (
+            <p className="truncate text-xs text-zinc-500" title={mission.whyExists}>
+              {mission.whyExists}
+            </p>
+          ) : null}
         </div>
         <div className="flex shrink-0 items-center gap-3 text-xs">
-          {evidencePulse ? (
-            <span className="text-zinc-500" title={evidencePulse.limitation}>
+          {evidencePulse && evidencePulse.count > 0 ? (
+            <span className="text-zinc-600" title={evidencePulse.limitation}>
               {evidencePulse.label}
             </span>
           ) : null}
           {pathname !== "/" ? (
-            <Link href="/" className="text-teal-400 hover:text-teal-300">
-              {t("intelligenceSpaces.missionSpace")} →
+            <Link href="/" className="text-teal-400/90 hover:text-teal-300">
+              {t("operatingContext.returnPath")} →
             </Link>
           ) : null}
         </div>

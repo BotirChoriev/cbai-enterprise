@@ -157,3 +157,83 @@ EPIC-13 established the spatial operating model. EPIC-13.2 deepens:
 - Design constitution for operating components
 
 Do not rebuild layout independently. Evolve within the existing grammar.
+
+---
+
+## XIII. Experience Engineering (EPIC-13.3)
+
+Experience Engineering extends this constitution for human cognition, not UI decoration.
+
+### Mental Model
+
+Every route must answer:
+
+1. Where am I?
+2. Why am I here?
+3. What is happening?
+4. What remains unfinished?
+5. What should I do next?
+6. What changed?
+
+Implementation: `MentalModelStrip` + `mental-model.ts`
+
+### Cognitive Load
+
+- One primary next action — never ten equal buttons
+- Focused flow shows current stage ±1 only (`deriveFocusedFlow`)
+- Default `OperatingPageShell` hides duplicate operator banner
+- Ambient intelligence: maximum **one** global insight with **because** explanation
+
+### Ambient Intelligence
+
+Operator never interrupts. One insight when meaningful:
+
+- Contradictory evidence
+- Outdated evidence
+- Impact not reviewed
+- Missing expertise on mission
+- Complementary discipline suggestion
+
+Implementation: `ambient-intelligence.ts`, `AmbientIntelligenceHint`
+
+### Ambient Trust
+
+Trust visible without Trust page: confidence, limitations, review state.
+
+Implementation: `AmbientTrustStrip`
+
+### Living Memory
+
+Session flow snapshots detect what changed. User clears memory in Settings — projects and mission are never deleted.
+
+Implementation: `living-memory.ts`, `LivingMemoryControl`
+
+### Scientific Workflow Flow
+
+Question → Hypothesis → Evidence → Reasoning → Review → Impact → Publication → Legacy
+
+Visible as flow indicators — not a wizard.
+
+Implementation: `intelligence-flow.ts` (8 stages)
+
+### Extended Component Declaration
+
+Every operating component must now define:
+
+| Field | Requirement |
+|-------|-------------|
+| Purpose | Why it exists |
+| Meaning | What intelligence it exposes |
+| Evidence | Real data sources |
+| Attention | What it guides the eye toward |
+| Cognitive Load | How it reduces unnecessary decisions |
+| Motion | State-change motion only — or none |
+| Memory | What it remembers — or none |
+| Human Control | How human responsibility is preserved |
+| Accessibility | Landmarks, keyboard, reduced motion |
+| Constitution Alignment | Interface principle IDs |
+
+Code registry: `lib/design/living-intelligence-registry.ts`
+
+Test suite: `npm run test:epic-13-experience-engineering`
+

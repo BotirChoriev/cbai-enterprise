@@ -80,6 +80,7 @@ import {
 import { EVIDENCE_RUNTIME_RU } from "@/lib/i18n/platform-copy-build014-ru";
 import { INTELLIGENCE_SPACES_RU } from "@/lib/i18n/platform-copy-build015-ru";
 import { LIVING_INTELLIGENCE_RU } from "@/lib/i18n/platform-copy-build016-ru";
+import { EXPERIENCE_ENGINEERING_RU } from "@/lib/i18n/platform-copy-build017-ru";
 
 const ru: TranslationDictionary = {
   roles: {
@@ -544,6 +545,7 @@ const ru: TranslationDictionary = {
   evidenceRuntime: EVIDENCE_RUNTIME_RU,
   intelligenceSpaces: INTELLIGENCE_SPACES_RU,
   livingIntelligence: LIVING_INTELLIGENCE_RU,
+  experienceEngineering: EXPERIENCE_ENGINEERING_RU,
 };
 
 export default ru;

@@ -16,6 +16,7 @@ import GraphEntityPanel from "@/components/graph/GraphEntityPanel";
 import GraphConnectionsPanel from "@/components/graph/GraphConnectionsPanel";
 import GraphLegend from "@/components/graph/GraphLegend";
 import GraphMissionInstrument from "@/components/graph/GraphMissionInstrument";
+import KnowledgeUniverseViews from "@/components/graph/KnowledgeUniverseViews";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
@@ -108,10 +109,11 @@ export default function GraphPageClient() {
     <OperatingPageShell
       title={t("intelligenceCanvas.knowledgeUniverse")}
       description={t("intelligenceNetwork.description")}
-      showOperator
+      showOperator={false}
       missionContextVariant="compact"
     >
       <div className="mx-auto max-w-[90rem] space-y-6 pb-16">
+        <KnowledgeUniverseViews focusMode={focusMode} onFocusModeChange={setFocusMode} />
         <GraphMissionInstrument
           analysis={analysis}
           focusMode={focusMode}

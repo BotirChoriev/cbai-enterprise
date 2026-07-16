@@ -19,7 +19,7 @@ export default function OperatingPageShell({
   title,
   description,
   action,
-  showOperator = true,
+  showOperator = false,
   children,
 }: OperatingPageShellProps) {
   return (

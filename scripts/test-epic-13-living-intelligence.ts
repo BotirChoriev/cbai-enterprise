@@ -39,12 +39,12 @@ test("3. Living context memory derives from real stores", () => {
   assert.equal(typeof memory.hasContinuity, "boolean");
 });
 
-test("4. Intelligence flow has seven canonical stages", () => {
+test("4. Intelligence flow has eight canonical scientific workflow stages", () => {
   const flow = deriveIntelligenceFlow(null);
-  assert.equal(flow.length, 7);
+  assert.equal(flow.length, 8);
   assert.deepEqual(
     flow.map((s) => s.id),
-    ["question", "research", "evidence", "reasoning", "validation", "impact", "legacy"],
+    ["question", "hypothesis", "evidence", "reasoning", "review", "impact", "publication", "legacy"],
   );
   assert.ok(deriveCurrentFlowStage(null));
 });
@@ -59,17 +59,17 @@ test("5. Capability growth never ranks — only growth labels", () => {
   }
 });
 
-test("6. Living context rail uses context memory and flow", () => {
+test("6. Living context rail uses context memory and focused flow", () => {
   const rail = readSource("components/operating/LivingContextRail.tsx");
   assert.match(rail, /deriveLivingContextMemory/);
-  assert.match(rail, /deriveIntelligenceFlow/);
+  assert.match(rail, /deriveFocusedFlow/);
   assert.match(rail, /livingIntelligence\.contextMemory/);
 });
 
-test("7. Global mission bar leads with intention not page title", () => {
+test("7. Global mission bar centers mission (Gravity 2.0)", () => {
   const bar = readSource("components/operating/GlobalMissionContextBar.tsx");
-  assert.match(bar, /livingIntelligence\.intentionEyebrow/);
-  assert.match(bar, /spatialTransition/);
+  assert.match(bar, /Mission Gravity 2\.0/);
+  assert.match(bar, /mission\?\.problem/);
 });
 
 test("8. Knowledge layers disclosure in Knowledge Universe", () => {
@@ -83,10 +83,11 @@ test("9. Design constitution document and component registry exist", () => {
   const doc = readSource("docs/product/CBAI-LIVING-INTELLIGENCE-DESIGN-CONSTITUTION.md");
   assert.match(doc, /First Law/);
   assert.match(doc, /Mission Gravity/);
+  assert.match(doc, /Experience Engineering/);
   assert.ok(LIVING_INTELLIGENCE_REGISTRY.length >= 5);
   for (const record of LIVING_INTELLIGENCE_REGISTRY) {
     assert.ok(record.purpose.length > 10);
-    assert.ok(record.humanDecisionSupport.length > 5);
+    assert.ok(record.humanControl.length > 5);
   }
 });
 
