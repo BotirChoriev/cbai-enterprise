@@ -25,13 +25,13 @@ export default function Sidebar() {
     <aside
       className={`hidden h-full shrink-0 flex-col bg-[#050810] transition-all duration-300 md:flex ${
         isHome
-          ? "w-16 border-r border-transparent opacity-[0.22] hover:border-cyan-500/10 hover:opacity-90"
-          : "w-64 border-r border-cyan-500/10 opacity-100"
+          ? "w-16 border-r border-transparent opacity-[0.22] hover:border-teal-500/10 hover:opacity-90"
+          : "w-64 border-r border-teal-500/10 opacity-100"
       }`}
     >
       <Link
         href="/"
-        className="flex h-16 items-center gap-2.5 border-b border-cyan-500/10 px-4 transition-colors hover:bg-slate-900/50"
+        className="flex h-16 items-center gap-2.5 border-b border-teal-500/10 px-4 transition-colors hover:bg-slate-900/50"
         title="CBAI — Universal Intelligence"
         aria-label="CBAI — Universal Intelligence, go to homepage"
       >
@@ -65,7 +65,7 @@ export default function Sidebar() {
                     aria-label={isHome ? label : undefined}
                     className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                       isActive
-                        ? "bg-cyan-500/10 text-cyan-400"
+                        ? "bg-teal-500/10 text-teal-400"
                         : "text-zinc-400 hover:bg-slate-900/80 hover:text-zinc-50"
                     } ${isHome ? "justify-center px-2" : ""}`}
                   >
@@ -97,7 +97,7 @@ export default function Sidebar() {
                         href={item.href}
                         className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                           isActive
-                            ? "bg-cyan-500/10 text-cyan-400"
+                            ? "bg-teal-500/10 text-teal-400"
                             : "text-zinc-500 hover:bg-slate-900/80 hover:text-zinc-50"
                         }`}
                       >
@@ -114,13 +114,13 @@ export default function Sidebar() {
       </nav>
 
       {!isHome ? (
-        <div className="border-t border-cyan-500/10 p-4">
-          <div className="rounded-xl border border-cyan-500/10 bg-slate-950/60 p-3 backdrop-blur-sm">
+        <div className="border-t border-teal-500/10 p-4">
+          <div className="rounded-xl border border-teal-500/10 bg-slate-950/60 p-3 backdrop-blur-sm">
             <p className="text-xs font-medium text-zinc-300">{t("navigation.startWithSearch")}</p>
             <p className="mt-1 text-xs text-zinc-500">{t("navigation.startWithSearchBody")}</p>
             <Link
               href="/search"
-              className="mt-3 inline-flex text-xs font-medium text-cyan-400 hover:text-cyan-300"
+              className="mt-3 inline-flex text-xs font-medium text-teal-400 hover:text-teal-300"
             >
               {t("navigation.openSearch")} →
             </Link>

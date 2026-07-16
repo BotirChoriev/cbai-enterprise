@@ -12,7 +12,7 @@ function statusClass(status: MethodEvidenceRow["status"]): string {
     case "catalog_available":
       return "border-emerald-500/30 bg-emerald-500/10 text-emerald-300";
     case "human_review_required":
-      return "border-cyan-500/25 bg-cyan-500/5 text-cyan-300";
+      return "border-teal-500/25 bg-teal-500/5 text-teal-300";
     case "evidence_not_connected":
       return "border-zinc-700 bg-zinc-900/60 text-zinc-400";
   }

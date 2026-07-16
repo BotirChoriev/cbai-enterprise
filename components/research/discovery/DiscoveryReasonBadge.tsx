@@ -8,7 +8,7 @@ type DiscoveryReasonBadgeProps = {
 function badgeClass(reason: DiscoveryRelationshipReason): string {
   switch (reason) {
     case "same_domain":
-      return "border-cyan-500/30 bg-cyan-500/10 text-cyan-300";
+      return "border-teal-500/30 bg-teal-500/10 text-teal-300";
     case "shared_method":
       return "border-emerald-500/30 bg-emerald-500/10 text-emerald-300";
     case "shared_evidence_type":

@@ -27,7 +27,7 @@ export default function WorkspaceHero({
   motif,
   metrics,
 }: WorkspaceHeroProps) {
-  const eyebrowClass = accentClassName ?? "text-cyan-400";
+  const eyebrowClass = accentClassName ?? "text-teal-400";
 
   return (
     <>

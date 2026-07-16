@@ -21,7 +21,7 @@ export default function WorkspaceSidebar({
 }: WorkspaceSidebarProps) {
   return (
     <aside className={`${cbaiGlassCard} flex h-full flex-col p-3`} aria-label="Research topics">
-      <p className="text-[10px] font-medium uppercase tracking-wider text-cyan-400/90">
+      <p className="text-[10px] font-medium uppercase tracking-wider text-teal-400/90">
         Research topics
       </p>
 
@@ -49,7 +49,7 @@ export default function WorkspaceSidebar({
                 onClick={() => onSelectTopic(topic.topicId)}
                 className={`w-full rounded-md border px-2 py-2 text-left transition-colors ${
                   selected
-                    ? "border-cyan-500/30 bg-cyan-500/10"
+                    ? "border-teal-500/30 bg-teal-500/10"
                     : "border-transparent hover:border-zinc-800 hover:bg-zinc-900/50"
                 }`}
               >

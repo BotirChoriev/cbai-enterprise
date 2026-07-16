@@ -8,7 +8,7 @@ type PipelineCompatibilityCardProps = {
 function ConnectionLabel({ label }: { label: PipelineConnectorReadiness["connectionLabel"] }) {
   const className =
     label === "Connected"
-      ? "text-cyan-400 bg-cyan-500/10 border-cyan-500/20"
+      ? "text-teal-400 bg-teal-500/10 border-teal-500/20"
       : label === "Evidence source planned"
         ? "text-violet-400 bg-violet-500/10 border-violet-500/20"
         : "text-zinc-400 bg-zinc-800/50 border-zinc-700/50";

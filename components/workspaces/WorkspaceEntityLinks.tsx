@@ -38,7 +38,7 @@ export default function WorkspaceEntityLinks({ links }: WorkspaceEntityLinksProp
               <h3 className="text-sm font-semibold text-zinc-100">{link.label}</h3>
               <Link
                 href={buildContextualHref(link.route, context)}
-                className="shrink-0 text-xs text-cyan-400 underline-offset-2 hover:underline"
+                className="shrink-0 text-xs text-teal-400 underline-offset-2 hover:underline"
               >
                 Open
               </Link>

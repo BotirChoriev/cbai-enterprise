@@ -113,7 +113,7 @@ export default function TopicReviewWorkspace({ topic, workflow }: TopicReviewWor
                 key={question.questionId}
                 className="flex items-start gap-2 text-xs text-zinc-500"
               >
-                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-cyan-500/60" />
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-teal-500/60" />
                 {question.question}
               </li>
             ))}

@@ -26,7 +26,7 @@ export default function ResearchNotebookPanel({ topic, embedded = false }: Resea
           <p className="mt-1 text-sm text-zinc-500">
             A structured notebook for reviewing this research topic.
           </p>
-          <p className="mt-2 rounded-md border border-cyan-500/15 bg-cyan-500/5 px-3 py-2 text-xs text-zinc-400">
+          <p className="mt-2 rounded-md border border-teal-500/15 bg-teal-500/5 px-3 py-2 text-xs text-zinc-400">
             {NOTEBOOK_CATALOG_ONLY_NOTICE} Live evidence not connected.
           </p>
         </div>

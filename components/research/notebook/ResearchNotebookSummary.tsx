@@ -18,7 +18,7 @@ export default function ResearchNotebookSummary({ notebook }: ResearchNotebookSu
     <div className={`${cbaiGlassCard} space-y-3 p-4`}>
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <p className="text-[10px] font-medium uppercase tracking-wider text-cyan-400/90">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-teal-400/90">
             {notebook.domain}
           </p>
           <h3 className="text-base font-semibold text-zinc-100">{notebook.topicName}</h3>

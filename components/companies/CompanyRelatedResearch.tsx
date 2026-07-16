@@ -39,7 +39,7 @@ export default function CompanyRelatedResearch({ company }: CompanyRelatedResear
           <li key={match.topic.topicId}>
             <Link
               href={getResearchTopicPath(match.topic.topicId)}
-              className="block rounded-lg border border-zinc-800 bg-zinc-900/50 px-3 py-2.5 transition-colors hover:border-cyan-500/30 hover:bg-zinc-900"
+              className="block rounded-lg border border-zinc-800 bg-zinc-900/50 px-3 py-2.5 transition-colors hover:border-teal-500/30 hover:bg-zinc-900"
             >
               <p className="text-sm font-medium text-zinc-100">{match.topic.topicName}</p>
               <p className="mt-0.5 text-xs text-zinc-500">{match.topic.domain}</p>

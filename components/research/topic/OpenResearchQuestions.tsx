@@ -24,7 +24,7 @@ export default function OpenResearchQuestions({ topic }: OpenResearchQuestionsPr
       <ul className="space-y-2">
         {questions.slice(0, 3).map((question) => (
           <li key={question.questionId} className={`${cbaiGlassCard} p-3`}>
-            <p className="text-xs font-medium text-cyan-400/90">{question.questionCategory}</p>
+            <p className="text-xs font-medium text-teal-400/90">{question.questionCategory}</p>
             <dl className="mt-2 space-y-2 text-[11px]">
               <div>
                 <dt className="font-medium uppercase tracking-wider text-zinc-600">Why it matters</dt>

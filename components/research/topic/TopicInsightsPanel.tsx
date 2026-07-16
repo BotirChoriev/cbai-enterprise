@@ -30,7 +30,7 @@ export default function TopicInsightsPanel({ topic }: TopicInsightsPanelProps) {
       title: "Future evidence",
       value: String(RESEARCH_TOPIC_NOT_AVAILABLE_YET.length),
       detail: RESEARCH_TOPIC_NOT_AVAILABLE_YET.slice(0, 2).join(" · "),
-      accent: "border-cyan-500/25 bg-cyan-500/5",
+      accent: "border-teal-500/25 bg-teal-500/5",
     },
     {
       title: "Knowledge gaps",

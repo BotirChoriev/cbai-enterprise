@@ -15,7 +15,7 @@ export default function ReportHeaderLogo() {
   return (
     <div className="mb-3 flex items-center gap-2 print:mb-2" role="img" aria-label={LOGO_ACCESSIBLE_NAME}>
       <CBAIMark size={22} id="cbai-report" />
-      <span aria-hidden="true" className="text-sm font-bold tracking-tight text-cyan-300 print:text-black">
+      <span aria-hidden="true" className="text-sm font-bold tracking-tight text-teal-300 print:text-black">
         CBAI
       </span>
     </div>

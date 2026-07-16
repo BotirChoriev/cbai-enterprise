@@ -15,7 +15,7 @@ export default function ResearchPrinciples() {
         {RESEARCH_PRINCIPLES.map((principle) => (
           <li key={principle.id}>
             <article className={`${cbaiGlassCard} h-full p-5`}>
-              <h3 className="text-sm font-semibold text-cyan-300">{principle.title}</h3>
+              <h3 className="text-sm font-semibold text-teal-300">{principle.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-zinc-400">
                 {principle.description}
               </p>

@@ -10,16 +10,19 @@ import {
 import { getUniversityLinkedEntities } from "@/lib/universities.adapter";
 import { buildUniversityUserJourney } from "@/lib/university-user-journey";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
+import { useTranslation } from "@/lib/i18n/use-translation";
 import UniversityFilters from "@/components/universities/UniversityFilters";
 import UniversityList from "@/components/universities/UniversityList";
 import UniversityRelationships from "@/components/universities/UniversityRelationships";
 import EntityOptionalExploration from "@/components/shared/EntityOptionalExploration";
+import EntityPageHeader from "@/components/shared/EntityPageHeader";
 import { UniversityIntelligencePanel } from "@/components/universities/UniversityIntelligencePanel";
 import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
 import EntityNotFoundNotice from "@/components/system/EntityNotFoundNotice";
 
 export default function UniversitiesPageClient() {
   const { context, setUniversity, recordEntityView } = usePlatformContext();
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
   const [country, setCountry] = useState("All");
@@ -80,12 +83,7 @@ export default function UniversitiesPageClient() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border border-cyan-500/10 bg-slate-950/50 px-6 py-5 backdrop-blur-sm">
-        <h1 className="cbai-display text-2xl text-zinc-50">Universities</h1>
-        <p className="mt-1 max-w-3xl text-sm text-zinc-500">
-          Overview, available information, missing information, and reports for each university.
-        </p>
-      </div>
+      <EntityPageHeader title={t("universities.title")} description={t("entities.universitiesDescription")} />
 
       {requestedUniversityNotFound && requestedUniversityId ? (
         <EntityNotFoundNotice
@@ -119,6 +117,8 @@ export default function UniversitiesPageClient() {
               setCountry("All");
               setType("All");
             }}
+            emptyMessage={t("entities.noMatchFilters")}
+            clearFiltersLabel={t("entities.clearFilters")}
           />
         </div>
 

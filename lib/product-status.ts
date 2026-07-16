@@ -49,7 +49,7 @@ export const PRODUCT_STATUS_EXPLANATIONS: Record<ProductStatus, string> = {
 
 export const PRODUCT_STATUS_DOT_CLASSES: Record<ProductStatus, string> = {
   live: "bg-emerald-400",
-  partial: "bg-cyan-400",
+  partial: "bg-teal-400",
   waiting_for_verified_data: "bg-amber-400",
   preview: "bg-violet-400",
   restricted: "bg-orange-400",

@@ -42,7 +42,7 @@ export default function EvidenceSourceCoverage({ sources }: EvidenceSourceCovera
                   <p className="font-semibold text-zinc-100">{source.name}</p>
                   <a
                     href={source.officialWebsite}
-                    className="mt-0.5 text-xs text-cyan-400 underline-offset-2 hover:underline"
+                    className="mt-0.5 text-xs text-teal-400 underline-offset-2 hover:underline"
                     target="_blank"
                     rel="noopener noreferrer"
                   >

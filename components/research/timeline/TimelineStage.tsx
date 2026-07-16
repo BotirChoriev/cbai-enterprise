@@ -17,7 +17,7 @@ function statusBadgeClass(status: TimelineStageStatus): string {
     case "catalog_available":
       return "border-emerald-500/35 bg-emerald-500/10 text-emerald-300";
     case "future_workspace":
-      return "border-cyan-500/25 bg-cyan-500/5 text-cyan-300";
+      return "border-teal-500/25 bg-teal-500/5 text-teal-300";
     case "not_connected_yet":
       return "border-zinc-700 bg-zinc-900/60 text-zinc-400";
   }
@@ -31,7 +31,7 @@ export default function TimelineStage({ stage }: TimelineStageProps) {
   return (
     <article className={`${cbaiGlassCard} flex gap-3 p-4`}>
       <span
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-cyan-500/25 bg-cyan-500/10 text-sm text-cyan-300"
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-teal-500/25 bg-teal-500/10 text-sm text-teal-300"
         aria-hidden="true"
       >
         {STAGE_ICONS[stage.stageId]}
@@ -50,7 +50,7 @@ export default function TimelineStage({ stage }: TimelineStageProps) {
             {TIMELINE_STAGE_STATUS_LABELS[stage.status]}
           </span>
         </div>
-        <p className="text-xs text-cyan-400/80">{stage.purpose}</p>
+        <p className="text-xs text-teal-400/80">{stage.purpose}</p>
         <p className="text-xs leading-relaxed text-zinc-500">{stage.description}</p>
         <p className="text-[11px] leading-relaxed text-zinc-600">{stage.explanation}</p>
       </div>

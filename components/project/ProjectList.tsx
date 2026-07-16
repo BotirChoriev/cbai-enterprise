@@ -86,7 +86,7 @@ function ProjectCard({ project }: { project: Project }) {
   return (
     <div className={`${cbaiGlassCard} space-y-2 p-4`}>
       <div className="flex items-start justify-between gap-2">
-        <Link href={`/my-work?project=${project.id}`} className="text-sm font-semibold text-cyan-400 hover:text-cyan-300">
+        <Link href={`/my-work?project=${project.id}`} className="text-sm font-semibold text-teal-400 hover:text-teal-300">
           {project.title}
         </Link>
         <SaveToWorkspaceButton entity={{ kind: "project", id: project.id, name: project.title }} className="shrink-0" />
@@ -99,7 +99,7 @@ function ProjectCard({ project }: { project: Project }) {
       </p>
       <div className="flex items-center justify-between gap-2 border-t border-zinc-800/80 pt-2">
         <p className="text-[11px] text-zinc-600">{t("project.lastActivity")}: {new Date(project.updatedAt).toLocaleString()}</p>
-        <Link href={step.href} className="shrink-0 text-xs font-medium text-cyan-400 hover:text-cyan-300">
+        <Link href={step.href} className="shrink-0 text-xs font-medium text-teal-400 hover:text-teal-300">
           {t("project.catalog.continueAction")} →
         </Link>
       </div>

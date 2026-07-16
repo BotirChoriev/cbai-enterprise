@@ -29,12 +29,12 @@ export default function ResearchHome() {
 
         <section
           aria-labelledby="research-status-heading"
-          className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 px-5 py-4"
+          className="rounded-xl border border-teal-500/20 bg-teal-500/5 px-5 py-4"
         >
           <h2 id="research-status-heading" className="sr-only">
             Research Intelligence status
           </h2>
-          <p className="text-sm font-semibold text-cyan-300">{RESEARCH_HOME.statusLabel}</p>
+          <p className="text-sm font-semibold text-teal-300">{RESEARCH_HOME.statusLabel}</p>
           <div className="mt-4 grid gap-6 sm:grid-cols-2">
             <div>
               <p className="text-[10px] font-medium uppercase tracking-wider text-emerald-400/90">

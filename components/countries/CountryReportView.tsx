@@ -24,7 +24,7 @@ function LinkList({ links, emptyLabel }: { links: readonly CountryReportLink[]; 
           <li key={link.name}>
             <Link
               href={link.href}
-              className="rounded-full border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-xs text-zinc-400 hover:text-cyan-300"
+              className="rounded-full border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-xs text-zinc-400 hover:text-teal-300"
             >
               {link.name}
             </Link>
@@ -44,7 +44,7 @@ export default function CountryReportView({ report }: CountryReportViewProps) {
   return (
     <section
       aria-labelledby="country-report-heading"
-      className={`${cbaiGlassCard} cbai-print-area space-y-6 border-cyan-500/15 p-5 sm:p-6`}
+      className={`${cbaiGlassCard} cbai-print-area space-y-6 border-teal-500/15 p-5 sm:p-6`}
     >
       <ReportHeaderLogo />
       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -81,7 +81,7 @@ export default function CountryReportView({ report }: CountryReportViewProps) {
             <dt className="text-[10px] uppercase tracking-wider text-zinc-600">Official website</dt>
             <dd className="mt-0.5 text-zinc-300">
               {report.overview.officialWebsite ? (
-                <a href={report.overview.officialWebsite} target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
+                <a href={report.overview.officialWebsite} target="_blank" rel="noopener noreferrer" className="text-teal-400 hover:underline">
                   {report.overview.officialWebsite}
                 </a>
               ) : (
@@ -142,7 +142,7 @@ export default function CountryReportView({ report }: CountryReportViewProps) {
             <LinkList links={report.linkedProjects} emptyLabel="No projects link to this country yet." />
             <Link
               href={`/my-work?entityKind=country&entityId=${report.country.id}&entityName=${encodeURIComponent(report.country.name)}`}
-              className="mt-1.5 inline-flex text-xs font-medium text-cyan-400 hover:text-cyan-300"
+              className="mt-1.5 inline-flex text-xs font-medium text-teal-400 hover:text-teal-300"
             >
               + Create a project for {report.country.name} →
             </Link>

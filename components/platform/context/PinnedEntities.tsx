@@ -59,7 +59,7 @@ export default function PinnedEntities({ entities }: PinnedEntitiesProps) {
               key={`${entity.kind}-${entity.id}`}
               className="flex items-center gap-1 rounded-md border border-zinc-800 pl-2 pr-1 py-1 text-[11px] text-zinc-400"
             >
-              <Link href={entityHref(entity, context)} className="hover:text-cyan-300">
+              <Link href={entityHref(entity, context)} className="hover:text-teal-300">
                 {entity.name}
               </Link>
               <button

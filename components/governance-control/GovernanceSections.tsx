@@ -114,7 +114,7 @@ export function GovernanceValidationFlow({ steps }: GovernanceValidationFlowProp
             className="flex flex-col gap-3 rounded-xl border border-zinc-800 bg-zinc-950 px-5 py-4 sm:flex-row sm:items-start sm:justify-between"
           >
             <div className="min-w-0">
-              <p className="text-xs font-medium text-cyan-400">Step {step.order}</p>
+              <p className="text-xs font-medium text-teal-400">Step {step.order}</p>
               <p className="mt-0.5 text-sm font-semibold text-zinc-100">{step.title}</p>
               <p className="mt-1 text-sm text-zinc-400">{step.description}</p>
               {step.ruleCategories.length > 0 && (

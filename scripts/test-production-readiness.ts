@@ -107,7 +107,7 @@ test("10. Error boundaries exist at both the dashboard and root level", () => {
 
 test("11. SystemPageShell offers every required recovery action — never strands a user", () => {
   const content = read("components/system/SystemPageShell.tsx");
-  for (const requiredAction of ["Return Home", "Go Back", "Search", "Continue Project", "Feedback"]) {
+  for (const requiredAction of ["returnHome", "goBack", "search", "continueProject", "feedback"]) {
     assert.ok(content.includes(requiredAction), `SystemPageShell is missing the "${requiredAction}" action`);
   }
 });
@@ -135,7 +135,7 @@ test("13. Entity-not-found notices exist for Countries, Companies, and Universit
 test("14. My Work's missing-project state explains what happened and what to do next", () => {
   const content = read("components/my-work/MyWork.tsx");
   assert.equal(content.includes(">Project not found.<"), false);
-  assert.ok(content.includes("saved to this browser only"));
+  assert.ok(content.includes("myWork.projectUnavailableBody"));
 });
 
 test("15. The real production 404 fallback (out/404.html) is CBAI-branded, not the generic Next.js default", () => {

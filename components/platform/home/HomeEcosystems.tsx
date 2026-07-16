@@ -15,7 +15,7 @@ function statusBadgeClass(status: EcosystemStatus): string {
     case "available-today":
       return "border-emerald-500/40 bg-emerald-500/10 text-emerald-300 shadow-[0_0_16px_-4px_rgba(52,211,153,0.3)]";
     case "in-development":
-      return "border-cyan-500/30 bg-cyan-500/8 text-cyan-300";
+      return "border-teal-500/30 bg-teal-500/8 text-teal-300";
     case "future-workspace":
       return "border-zinc-600/80 bg-zinc-900/70 text-zinc-400";
   }
@@ -24,9 +24,9 @@ function statusBadgeClass(status: EcosystemStatus): string {
 function cardOpacityClass(status: EcosystemStatus): string {
   switch (status) {
     case "available-today":
-      return "border-cyan-500/20 shadow-[0_0_56px_-16px_rgba(34,211,238,0.22)]";
+      return "border-teal-500/20 shadow-[0_0_56px_-16px_rgba(34,211,238,0.22)]";
     case "in-development":
-      return "border-cyan-500/10 opacity-95";
+      return "border-teal-500/10 opacity-95";
     case "future-workspace":
       return "border-zinc-700/60 opacity-90";
   }
@@ -36,7 +36,7 @@ function EcosystemIcon({ id, size = "sm" }: { id: EcosystemIconId; size?: "sm" |
   const shared =
     size === "lg"
       ? "h-16 w-16 shrink-0 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3.5 text-emerald-400"
-      : "h-10 w-10 shrink-0 rounded-lg border border-cyan-500/15 bg-cyan-500/5 p-2 text-cyan-400";
+      : "h-10 w-10 shrink-0 rounded-lg border border-teal-500/15 bg-teal-500/5 p-2 text-teal-400";
 
   switch (id) {
     case "public":
@@ -146,7 +146,7 @@ export default function HomeEcosystems() {
               </div>
               <p className="text-xs leading-relaxed text-zinc-400">{ecosystem.valueSentence}</p>
               {ecosystem.href && ecosystem.status === "available-today" ? (
-                <Link href={ecosystem.href} className="mt-auto inline-flex text-xs font-semibold text-cyan-400 transition-colors hover:text-cyan-300">
+                <Link href={ecosystem.href} className="mt-auto inline-flex text-xs font-semibold text-teal-400 transition-colors hover:text-teal-300">
                   {ecosystem.ctaLabel ?? "Open →"}
                 </Link>
               ) : (

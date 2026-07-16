@@ -22,7 +22,7 @@ export default function LaboratoryLayerOverview() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <div className={`${cbaiGlassCard} p-4`}>
-          <p className="text-[10px] font-medium uppercase tracking-wider text-cyan-400/90">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-teal-400/90">
             Supported future lab types
           </p>
           <ul className="mt-3 flex flex-wrap gap-2">
@@ -39,7 +39,7 @@ export default function LaboratoryLayerOverview() {
         </div>
 
         <div className={`${cbaiGlassCard} p-4`}>
-          <p className="text-[10px] font-medium uppercase tracking-wider text-cyan-400/90">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-teal-400/90">
             Expected metadata
           </p>
           <ul className="mt-3 grid gap-1.5 sm:grid-cols-2">

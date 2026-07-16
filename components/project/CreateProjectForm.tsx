@@ -112,7 +112,7 @@ export default function CreateProjectForm({ initialPrimaryEntity, initialType, o
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder={t("project.form.titlePlaceholder")}
-            className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-cyan-500/30"
+            className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30"
           />
         </div>
 
@@ -167,7 +167,7 @@ export default function CreateProjectForm({ initialPrimaryEntity, initialType, o
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
             placeholder={t("project.form.descriptionPlaceholder")}
-            className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-cyan-500/30"
+            className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30"
           />
         </div>
 
@@ -181,7 +181,7 @@ export default function CreateProjectForm({ initialPrimaryEntity, initialType, o
               value={tagsInput}
               onChange={(e) => setTagsInput(e.target.value)}
               placeholder={t("project.form.tagsPlaceholder")}
-              className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-cyan-500/30"
+              className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30"
             />
           </div>
 
@@ -208,7 +208,7 @@ export default function CreateProjectForm({ initialPrimaryEntity, initialType, o
 
         <button
           type="submit"
-          className="rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-300 hover:border-cyan-500/50"
+          className="rounded-lg border border-teal-500/30 bg-teal-500/10 px-4 py-2 text-sm font-medium text-teal-300 hover:border-teal-500/50"
         >
           {t("project.form.submit")}
         </button>

@@ -18,10 +18,10 @@ export default function HomeFooter() {
         </div>
 
         <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
-          <Link href="/about" className="inline-flex text-sm font-medium text-cyan-400 hover:text-cyan-300">
+          <Link href="/about" className="inline-flex text-sm font-medium text-teal-400 hover:text-teal-300">
             Read our story →
           </Link>
-          <Link href="/trust" className="inline-flex text-sm font-medium text-cyan-400 hover:text-cyan-300">
+          <Link href="/trust" className="inline-flex text-sm font-medium text-teal-400 hover:text-teal-300">
             Visit Trust Center →
           </Link>
         </div>

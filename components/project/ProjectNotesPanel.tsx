@@ -61,7 +61,7 @@ export default function ProjectNotesPanel({ projectId, evidence, relatedEntities
           onChange={(e) => setBody(e.target.value)}
           placeholder="Write a project note…"
           rows={2}
-          className="w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-xs text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-cyan-500/30"
+          className="w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-xs text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30"
         />
         <div className="flex flex-wrap gap-2">
           {evidence.length > 0 ? (
@@ -94,7 +94,7 @@ export default function ProjectNotesPanel({ projectId, evidence, relatedEntities
           ) : null}
           <button
             type="submit"
-            className="ml-auto rounded-md border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-[11px] font-medium text-cyan-300 hover:border-cyan-500/50"
+            className="ml-auto rounded-md border border-teal-500/30 bg-teal-500/10 px-3 py-1 text-[11px] font-medium text-teal-300 hover:border-teal-500/50"
           >
             Add note
           </button>

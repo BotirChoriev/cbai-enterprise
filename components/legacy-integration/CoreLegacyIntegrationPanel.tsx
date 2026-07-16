@@ -34,11 +34,11 @@ export default function CoreLegacyIntegrationPanel({
 
       <p className="text-sm text-zinc-500">
         Live runtime observability is available on{" "}
-        <Link href="/dashboard" className="text-cyan-400 underline-offset-2 hover:underline">
+        <Link href="/dashboard" className="text-teal-400 underline-offset-2 hover:underline">
           System Monitor
         </Link>
         . Governance policy and harness metadata on{" "}
-        <Link href="/ai-control" className="text-cyan-400 underline-offset-2 hover:underline">
+        <Link href="/ai-control" className="text-teal-400 underline-offset-2 hover:underline">
           Governance Control
         </Link>
         .

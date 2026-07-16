@@ -22,7 +22,7 @@ export default function ResearchEcosystemOverview() {
               className={`${cbaiGlassCard} flex items-center gap-3 px-4 py-3 opacity-90`}
             >
               <span
-                className="h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400/70 shadow-[0_0_6px_rgba(34,211,238,0.5)]"
+                className="h-1.5 w-1.5 shrink-0 rounded-full bg-teal-400/70 shadow-[0_0_6px_rgba(34,211,238,0.5)]"
                 aria-hidden="true"
               />
               <span className="text-sm text-zinc-300">{area.label}</span>

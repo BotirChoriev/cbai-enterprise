@@ -95,7 +95,7 @@ export default function ResearchWorkspaceDashboard({ topic }: ResearchWorkspaceD
         <div>
           <p className="mb-1.5 text-[10px] uppercase tracking-wider text-zinc-600">Related reports</p>
           <p className="text-xs text-zinc-500">
-            <Link href={profileSectionHref(`/research/${topic.topicId}`, "generate-report")} className="text-cyan-400 hover:underline">
+            <Link href={profileSectionHref(`/research/${topic.topicId}`, "generate-report")} className="text-teal-400 hover:underline">
               1 report type available →
             </Link>
           </p>

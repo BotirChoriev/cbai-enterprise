@@ -1,23 +1,31 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo } from "react";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
-import { resolveCompassDirections } from "@/lib/assistant/intelligence-compass";
+import {
+  COMPASS_DIRECTION_HREFS,
+  COMPASS_DIRECTION_ORDER,
+} from "@/lib/assistant/intelligence-compass";
+import { getDictionary } from "@/lib/i18n/translate";
+import { translateCompassDirection } from "@/lib/i18n/compass-translation";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
-/**
- * Intelligence Compass (Platform Activation mission, Mission 10) — a functional navigation
- * mechanism, not a decorative clock: six real directions arranged in a ring, each a real link to
- * an already-existing route. Framing text adapts to the user's real, saved work-context role
- * (lib/assistant/intelligence-compass.ts); the destinations themselves never change per role.
- * This is always an *additional* way in — the standard Sidebar/mobile nav remains the primary,
- * always-available navigation, so nothing here is the only way to reach any of these six pages.
- */
 export default function IntelligenceCompass() {
   const { profile } = useAssistantProfile();
-  const { t } = useTranslation();
-  const directions = resolveCompassDirections(profile.workspaceRole);
+  const { t, language } = useTranslation();
+  const dictionary = getDictionary(language);
+
+  const directions = useMemo(
+    () =>
+      COMPASS_DIRECTION_ORDER.map((id) => ({
+        id,
+        href: COMPASS_DIRECTION_HREFS[id],
+        ...translateCompassDirection(dictionary, profile.workspaceRole, id),
+      })),
+    [dictionary, profile.workspaceRole],
+  );
 
   return (
     <section aria-labelledby="home-compass-heading" className="space-y-3">

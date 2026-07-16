@@ -62,7 +62,7 @@ export default function SearchResultCard({ entry }: SearchResultCardProps) {
             </p>
             <p className="mt-1 text-xs text-zinc-400">{entry.shortDescription}</p>
             {entry.coverageLabel ? <p className="mt-1 text-[11px] text-zinc-600">{entry.coverageLabel}</p> : null}
-            <p className="mt-2 text-xs font-semibold text-cyan-400/90 group-hover:text-cyan-300">
+            <p className="mt-2 text-xs font-semibold text-teal-400/90 group-hover:text-teal-300">
               Open profile →
             </p>
           </Link>
@@ -71,7 +71,7 @@ export default function SearchResultCard({ entry }: SearchResultCardProps) {
             {entry.createProjectHref ? (
               <Link
                 href={entry.createProjectHref}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-2.5 py-1 text-[11px] font-medium text-cyan-300 transition-colors hover:border-cyan-500/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-teal-500/30 bg-teal-500/10 px-2.5 py-1 text-[11px] font-medium text-teal-300 transition-colors hover:border-teal-500/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400"
               >
                 + Add to Project
               </Link>

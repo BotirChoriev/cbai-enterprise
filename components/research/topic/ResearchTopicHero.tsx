@@ -10,7 +10,7 @@ function statusBadgeClass(status: ResearchTopic["status"]): string {
     case "catalog_available":
       return "border-emerald-500/35 bg-emerald-500/10 text-emerald-300";
     case "workspace_not_available":
-      return "border-cyan-500/25 bg-cyan-500/5 text-cyan-300";
+      return "border-teal-500/25 bg-teal-500/5 text-teal-300";
     case "evidence_not_connected":
       return "border-zinc-600/80 bg-zinc-900/60 text-zinc-400";
   }
@@ -25,7 +25,7 @@ export default function ResearchTopicHero({ topic }: ResearchTopicHeroProps) {
     <header className="space-y-5">
       <Link
         href="/research"
-        className="inline-flex text-sm font-medium text-cyan-400 transition-colors hover:text-cyan-300"
+        className="inline-flex text-sm font-medium text-teal-400 transition-colors hover:text-teal-300"
       >
         ← Back to Research topics
       </Link>

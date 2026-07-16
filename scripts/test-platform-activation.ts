@@ -14,7 +14,13 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { createEmptyAssistantProfile } from "@/lib/assistant/assistant-profile";
 import { resolveTimeOfDay } from "@/lib/assistant/time-of-day";
-import { resolveCompassDirections } from "@/lib/assistant/intelligence-compass";
+import {
+  COMPASS_DIRECTION_HREFS,
+  COMPASS_DIRECTION_ORDER,
+  type CompassDirectionId,
+} from "@/lib/assistant/intelligence-compass";
+import { translateCompassDirection } from "@/lib/i18n/compass-translation";
+import type { WorkspaceRole } from "@/lib/assistant/assistant-profile";
 import { resolveAssistantCommand } from "@/lib/assistant/assistant-commands";
 import { getDictionary } from "@/lib/i18n/translate";
 import en from "@/lib/i18n/dictionaries/en";
@@ -23,6 +29,15 @@ import ru from "@/lib/i18n/dictionaries/ru";
 import tr from "@/lib/i18n/dictionaries/tr";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+function resolveCompassDirections(role: WorkspaceRole) {
+  const dictionary = getDictionary("en");
+  return COMPASS_DIRECTION_ORDER.map((id: CompassDirectionId) => ({
+    id,
+    href: COMPASS_DIRECTION_HREFS[id],
+    ...translateCompassDirection(dictionary, role, id),
+  }));
+}
 const ROOT = join(__dirname, "..");
 function read(relativePath: string): string {
   return readFileSync(join(ROOT, relativePath), "utf8");

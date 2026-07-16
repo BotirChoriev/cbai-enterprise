@@ -9,6 +9,15 @@
  * errors.
  */
 
+export type CompassDirectionCopy = {
+  discover: { label: string; description: string };
+  research: { label: string; description: string };
+  evidence: { label: string; description: string };
+  analyze: { label: string; description: string };
+  organize: { label: string; description: string };
+  report: { label: string; description: string };
+};
+
 export type RoleCardText = {
   title: string;
   description: string;
@@ -305,6 +314,56 @@ export type TranslationDictionary = {
     notFound: string;
     couldNotSave: string;
     tryAgain: string;
+  };
+  productStatus: {
+    live: { label: string; explanation: string };
+    partial: { label: string; explanation: string };
+    waiting_for_verified_data: { label: string; explanation: string };
+    preview: { label: string; explanation: string };
+    restricted: { label: string; explanation: string };
+    not_connected: { label: string; explanation: string };
+    planned: { label: string; explanation: string };
+  };
+  entities: {
+    countriesDescription: string;
+    companiesDescription: string;
+    universitiesDescription: string;
+    noMatchFilters: string;
+    clearFilters: string;
+    selected: string;
+    worldMapTitle: string;
+    worldMapShowing: string;
+  };
+  compass: {
+    default: CompassDirectionCopy;
+    academic: CompassDirectionCopy;
+    engineer: CompassDirectionCopy;
+    investor: CompassDirectionCopy;
+    government: CompassDirectionCopy;
+  };
+  myWork: {
+    title: string;
+    yourWork: string;
+    restoringSession: string;
+    projectUnavailable: string;
+    projectUnavailableBody: string;
+    backToMyWork: string;
+    localProfileNotSetUp: string;
+    savedToBrowser: string;
+    signInPrompt: string;
+    signInOrCreate: string;
+    signedInCloud: string;
+    signedInLocal: string;
+    continueLinksHeading: string;
+    onboardingHeading: string;
+  };
+  system: {
+    returnHome: string;
+    goBack: string;
+    search: string;
+    continueProject: string;
+    tryAgain: string;
+    feedback: string;
   };
   /** Translated mirror of lib/project/project-guide.ts's 7 real guide steps — previously
    * English-only because the step text only ever lived buried inside a small card (ProjectList).

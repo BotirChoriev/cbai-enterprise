@@ -1,4 +1,5 @@
 import type { TranslationDictionary } from "@/lib/i18n/dictionary-types";
+import { COMPASS_COPY_UZ, ENTITIES_UZ, MY_WORK_UZ, PRODUCT_STATUS_UZ, SYSTEM_UZ } from "@/lib/i18n/platform-copy-uz";
 
 const uz: TranslationDictionary = {
   roles: {
@@ -365,6 +366,11 @@ const uz: TranslationDictionary = {
     couldNotSave: "Saqlab bo‘lmadi. Qayta urinilsinmi?",
     tryAgain: "Qayta urinish",
   },
+  productStatus: PRODUCT_STATUS_UZ,
+  entities: ENTITIES_UZ,
+  compass: COMPASS_COPY_UZ,
+  myWork: MY_WORK_UZ,
+  system: SYSTEM_UZ,
   workspaceRoles: {
     citizen: "Fuqaro",
     student: "Talaba",

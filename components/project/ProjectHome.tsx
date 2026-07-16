@@ -102,7 +102,7 @@ function LinkEntityForm({ projectId, onLinked }: { projectId: string; onLinked: 
       <button
         type="submit"
         disabled={!id}
-        className="rounded-md border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-[11px] font-medium text-cyan-300 hover:border-cyan-500/50 disabled:opacity-40"
+        className="rounded-md border border-teal-500/30 bg-teal-500/10 px-3 py-1 text-[11px] font-medium text-teal-300 hover:border-teal-500/50 disabled:opacity-40"
       >
         Link entity
       </button>
@@ -160,7 +160,7 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <Link href="/my-work" className="text-xs text-cyan-400 hover:text-cyan-300">
+          <Link href="/my-work" className="text-xs text-teal-400 hover:text-teal-300">
             ← My Work
           </Link>
           <h1 className="cbai-display mt-2 text-2xl text-zinc-50">{project.title}</h1>
@@ -199,7 +199,7 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
             onChange={(e) => setResearchQuestionDraft(e.target.value)}
             rows={2}
             placeholder="What question is this project answering?"
-            className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-cyan-500/30"
+            className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30"
           />
         </div>
         <div>
@@ -212,14 +212,14 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
             onChange={(e) => setObjectivesDraft(e.target.value)}
             rows={2}
             placeholder="What does this project need to accomplish?"
-            className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-cyan-500/30"
+            className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30"
           />
         </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={handleSaveQuestionObjectives}
-            className="rounded-md border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-[11px] font-medium text-cyan-300 hover:border-cyan-500/50"
+            className="rounded-md border border-teal-500/30 bg-teal-500/10 px-3 py-1 text-[11px] font-medium text-teal-300 hover:border-teal-500/50"
           >
             Save
           </button>
@@ -271,7 +271,7 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
                       aria-label={pinned ? `Remove ${entity.name} bookmark` : `Bookmark ${entity.name}`}
                       aria-pressed={pinned}
                       title={pinned ? `Remove ${entity.name} bookmark` : `Bookmark ${entity.name}`}
-                      className={`rounded-full px-1.5 py-0.5 ${pinned ? "text-cyan-300" : "text-zinc-600 hover:text-cyan-300"}`}
+                      className={`rounded-full px-1.5 py-0.5 ${pinned ? "text-teal-300" : "text-zinc-600 hover:text-teal-300"}`}
                     >
                       <span aria-hidden="true">{pinned ? "★" : "☆"}</span>
                     </button>
@@ -316,7 +316,7 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
             {entities
               .filter((e) => isEntityPinned(e.kind, e.id))
               .map((e) => (
-                <li key={`${e.kind}-${e.id}`} className="rounded-full border border-cyan-500/20 bg-cyan-500/10 px-2.5 py-1 text-xs text-cyan-300">
+                <li key={`${e.kind}-${e.id}`} className="rounded-full border border-teal-500/20 bg-teal-500/10 px-2.5 py-1 text-xs text-teal-300">
                   {e.name}
                 </li>
               ))}

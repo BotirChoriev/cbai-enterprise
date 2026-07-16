@@ -82,7 +82,7 @@ export default function EntityOverviewSection({
                     href={fact.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-cyan-400 underline-offset-2 hover:underline"
+                    className="text-teal-400 underline-offset-2 hover:underline"
                   >
                     {fact.value}
                   </a>

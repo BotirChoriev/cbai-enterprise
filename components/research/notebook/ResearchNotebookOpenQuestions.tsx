@@ -29,7 +29,7 @@ export default function ResearchNotebookOpenQuestions({
         {notebook.openQuestionCategories.map((category) => (
           <li
             key={category}
-            className="rounded-md border border-cyan-500/15 bg-cyan-500/5 px-2 py-0.5 text-[11px] text-zinc-400"
+            className="rounded-md border border-teal-500/15 bg-teal-500/5 px-2 py-0.5 text-[11px] text-zinc-400"
           >
             {category}
           </li>

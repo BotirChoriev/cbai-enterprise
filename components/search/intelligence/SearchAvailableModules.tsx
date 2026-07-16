@@ -60,7 +60,7 @@ function ModuleContent({
   return (
     <>
       <p
-        className={`text-sm font-medium ${linked ? "text-cyan-400" : "text-zinc-400"}`}
+        className={`text-sm font-medium ${linked ? "text-teal-400" : "text-zinc-400"}`}
       >
         {module.label}
       </p>

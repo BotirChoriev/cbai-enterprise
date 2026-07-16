@@ -59,10 +59,10 @@ export default function LanguageSelector({ compact = false }: LanguageSelectorPr
   return (
     <details ref={detailsRef} className="relative">
       <summary
-        className="flex min-h-10 cursor-pointer list-none items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-950/80 px-2.5 py-1.5 text-xs font-medium text-zinc-300 transition-colors hover:border-cyan-500/30 hover:text-cyan-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400 [&::-webkit-details-marker]:hidden"
+        className="flex min-h-10 cursor-pointer list-none items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-950/80 px-2.5 py-1.5 text-xs font-medium text-zinc-300 transition-colors hover:border-teal-500/30 hover:text-teal-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400 [&::-webkit-details-marker]:hidden"
         aria-label={`${t("common.open")} language settings — current interface language: ${current.nativeName} (${current.code})`}
       >
-        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className="h-4 w-4 shrink-0 text-cyan-400">
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className="h-4 w-4 shrink-0 text-teal-400">
           <circle cx="10" cy="10" r="7.5" stroke="currentColor" strokeWidth="1.4" />
           <path d="M2.5 10h15M10 2.5c2.2 2.1 3.4 4.8 3.4 7.5s-1.2 5.4-3.4 7.5c-2.2-2.1-3.4-4.8-3.4-7.5S7.8 4.6 10 2.5Z" stroke="currentColor" strokeWidth="1.2" />
         </svg>
@@ -84,7 +84,7 @@ export default function LanguageSelector({ compact = false }: LanguageSelectorPr
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search languages…"
               aria-label="Search languages"
-              className="mb-2 w-full rounded-md border border-zinc-800 bg-zinc-900/80 px-2.5 py-1.5 text-xs text-zinc-200 placeholder:text-zinc-600 outline-none focus-visible:border-cyan-500/40"
+              className="mb-2 w-full rounded-md border border-zinc-800 bg-zinc-900/80 px-2.5 py-1.5 text-xs text-zinc-200 placeholder:text-zinc-600 outline-none focus-visible:border-teal-500/40"
             />
           ) : null}
           <ul className="max-h-56 space-y-0.5 overflow-y-auto">
@@ -96,7 +96,7 @@ export default function LanguageSelector({ compact = false }: LanguageSelectorPr
                   aria-pressed={language.code === profile.preferredLanguage}
                   className={`flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left text-xs transition-colors ${
                     language.code === profile.preferredLanguage
-                      ? "bg-cyan-500/10 text-cyan-300"
+                      ? "bg-teal-500/10 text-teal-300"
                       : "text-zinc-300 hover:bg-zinc-900"
                   }`}
                 >
@@ -142,7 +142,7 @@ export default function LanguageSelector({ compact = false }: LanguageSelectorPr
             id="voice-language-select"
             value={profile.speechLanguage}
             onChange={(event) => updateProfile({ speechLanguage: event.target.value })}
-            className="w-full rounded-md border border-zinc-800 bg-zinc-900/80 px-2.5 py-1.5 text-xs text-zinc-200 outline-none focus-visible:border-cyan-500/40"
+            className="w-full rounded-md border border-zinc-800 bg-zinc-900/80 px-2.5 py-1.5 text-xs text-zinc-200 outline-none focus-visible:border-teal-500/40"
           >
             {languages
               .filter((language) => language.voiceLocale)

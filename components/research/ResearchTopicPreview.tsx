@@ -22,11 +22,11 @@ export default function ResearchTopicPreview({ query = "" }: ResearchTopicPrevie
 
       {query ? (
         <div
-          className={`${cbaiGlassCard} border-cyan-500/20 px-5 py-4`}
+          className={`${cbaiGlassCard} border-teal-500/20 px-5 py-4`}
           role="status"
         >
           <p className="text-sm font-medium text-zinc-200">
-            Topic entry: <span className="text-cyan-400">{query}</span>
+            Topic entry: <span className="text-teal-400">{query}</span>
           </p>
           <p className="mt-2 text-sm leading-relaxed text-zinc-400">
             {RESEARCH_HOME.topicExplorationNote}
@@ -39,7 +39,7 @@ export default function ResearchTopicPreview({ query = "" }: ResearchTopicPrevie
           <li key={topic}>
             <Link
               href={`/research?topic=${encodeURIComponent(topic)}`}
-              className={`${cbaiGlassCard} inline-flex min-h-10 items-center px-4 py-2 text-sm font-medium text-zinc-200 transition-colors hover:border-cyan-400/30 hover:text-cyan-300`}
+              className={`${cbaiGlassCard} inline-flex min-h-10 items-center px-4 py-2 text-sm font-medium text-zinc-200 transition-colors hover:border-teal-400/30 hover:text-teal-300`}
             >
               {topic}
             </Link>

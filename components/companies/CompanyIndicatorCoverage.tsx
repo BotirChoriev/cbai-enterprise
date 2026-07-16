@@ -57,7 +57,7 @@ export default function CompanyIndicatorCoverage({
                     {indicator.statusLabel === "Connected" && indicator.evidenceValue ? (
                       <p className="mt-2 text-sm text-zinc-300">
                         Available information:{" "}
-                        <span className="font-mono text-cyan-400/90">
+                        <span className="font-mono text-teal-400/90">
                           {indicator.evidenceValue}
                         </span>
                       </p>

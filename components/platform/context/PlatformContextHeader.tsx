@@ -28,7 +28,7 @@ export default function PlatformContextHeader({ moduleLabel }: PlatformContextHe
     >
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0 space-y-2">
-          <p className="text-[10px] font-medium uppercase tracking-widest text-cyan-400">
+          <p className="text-[10px] font-medium uppercase tracking-widest text-teal-400">
             Platform Context
           </p>
           <p className="text-lg font-semibold text-zinc-50">{model.primaryEntityLabel}</p>

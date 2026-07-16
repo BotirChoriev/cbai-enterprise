@@ -74,14 +74,14 @@ export default function DiscoveryTopicCard({
           <button
             type="button"
             onClick={() => onSelectTopic(relatedTopic.topicId)}
-            className="text-xs font-medium text-cyan-400 transition-colors hover:text-cyan-300"
+            className="text-xs font-medium text-teal-400 transition-colors hover:text-teal-300"
           >
             Open in workspace →
           </button>
         ) : null}
         <Link
           href={getResearchTopicPath(relatedTopic.topicId)}
-          className="text-xs font-medium text-cyan-400 transition-colors hover:text-cyan-300"
+          className="text-xs font-medium text-teal-400 transition-colors hover:text-teal-300"
         >
           Open topic →
         </Link>

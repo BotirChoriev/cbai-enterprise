@@ -21,13 +21,13 @@ export default function ResearcherContributionModel({ layer }: ResearcherContrib
         </ul>
       </div>
       <div>
-        <h4 className="text-xs font-semibold uppercase tracking-wider text-cyan-400/80">
+        <h4 className="text-xs font-semibold uppercase tracking-wider text-teal-400/80">
           Future capabilities
         </h4>
         <ul className="mt-2 space-y-1.5">
           {layer.futureCapabilities.slice(0, 3).map((capability) => (
             <li key={capability} className="flex items-start gap-2 text-[11px] text-zinc-400">
-              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-cyan-500/60" />
+              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-teal-500/60" />
               {capability}
             </li>
           ))}

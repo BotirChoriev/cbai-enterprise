@@ -27,7 +27,7 @@ export default function ResearchNetworkControls({
 
   return (
     <div
-      className={`flex flex-wrap items-center gap-2 ${compact ? "" : "rounded-lg border border-cyan-500/15 bg-slate-950/70 p-3 backdrop-blur-sm"}`}
+      className={`flex flex-wrap items-center gap-2 ${compact ? "" : "rounded-lg border border-teal-500/15 bg-slate-950/70 p-3 backdrop-blur-sm"}`}
       role="toolbar"
       aria-label="Network focus controls"
     >

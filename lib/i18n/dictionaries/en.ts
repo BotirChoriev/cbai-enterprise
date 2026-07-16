@@ -1,4 +1,5 @@
 import type { TranslationDictionary } from "@/lib/i18n/dictionary-types";
+import { COMPASS_COPY_EN, ENTITIES_EN, MY_WORK_EN, PRODUCT_STATUS_EN, SYSTEM_EN } from "@/lib/i18n/platform-copy-en";
 
 const en: TranslationDictionary = {
   roles: {
@@ -366,6 +367,11 @@ const en: TranslationDictionary = {
     couldNotSave: "Could not save. Retry?",
     tryAgain: "Try again",
   },
+  productStatus: PRODUCT_STATUS_EN,
+  entities: ENTITIES_EN,
+  compass: COMPASS_COPY_EN,
+  myWork: MY_WORK_EN,
+  system: SYSTEM_EN,
   workspaceRoles: {
     citizen: "Citizen",
     student: "Student",

@@ -49,7 +49,7 @@ export default function WorkspaceReadiness() {
       </div>
 
       <div className={`${cbaiGlassCard} p-5`}>
-        <p className="text-[10px] font-medium uppercase tracking-wider text-cyan-400/90">
+        <p className="text-[10px] font-medium uppercase tracking-wider text-teal-400/90">
           Supported objects
         </p>
         <ul className="mt-3 flex flex-wrap gap-2">

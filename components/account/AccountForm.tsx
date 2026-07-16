@@ -146,7 +146,7 @@ function CloudSignedOutView() {
               setError(null);
               setNotice(null);
             }}
-            className={`rounded-md px-3 py-1.5 font-medium transition-colors ${mode === "sign-in" ? "bg-cyan-500/10 text-cyan-300" : "text-zinc-500 hover:text-zinc-300"}`}
+            className={`rounded-md px-3 py-1.5 font-medium transition-colors ${mode === "sign-in" ? "bg-teal-500/10 text-teal-300" : "text-zinc-500 hover:text-zinc-300"}`}
           >
             Sign In
           </button>
@@ -157,7 +157,7 @@ function CloudSignedOutView() {
               setError(null);
               setNotice(null);
             }}
-            className={`rounded-md px-3 py-1.5 font-medium transition-colors ${mode === "sign-up" ? "bg-cyan-500/10 text-cyan-300" : "text-zinc-500 hover:text-zinc-300"}`}
+            className={`rounded-md px-3 py-1.5 font-medium transition-colors ${mode === "sign-up" ? "bg-teal-500/10 text-teal-300" : "text-zinc-500 hover:text-zinc-300"}`}
           >
             Create Account
           </button>
@@ -175,7 +175,7 @@ function CloudSignedOutView() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
-            className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-cyan-500/30"
+            className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30"
           />
         </div>
 
@@ -190,7 +190,7 @@ function CloudSignedOutView() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={mode === "sign-up" ? "At least 8 characters" : "Your password"}
-              className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-cyan-500/30"
+              className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30"
             />
           </div>
         ) : null}
@@ -203,7 +203,7 @@ function CloudSignedOutView() {
               setError(null);
               setNotice(null);
             }}
-            className="text-xs font-medium text-cyan-400 hover:text-cyan-300"
+            className="text-xs font-medium text-teal-400 hover:text-teal-300"
           >
             Forgot password?
           </button>
@@ -216,7 +216,7 @@ function CloudSignedOutView() {
               setError(null);
               setNotice(null);
             }}
-            className="text-xs font-medium text-cyan-400 hover:text-cyan-300"
+            className="text-xs font-medium text-teal-400 hover:text-teal-300"
           >
             ← Back to sign in
           </button>
@@ -337,7 +337,7 @@ function LocalSignedOutView() {
             setMode("sign-in");
             setError(null);
           }}
-          className={`rounded-md px-3 py-1.5 font-medium transition-colors ${mode === "sign-in" ? "bg-cyan-500/10 text-cyan-300" : "text-zinc-500 hover:text-zinc-300"}`}
+          className={`rounded-md px-3 py-1.5 font-medium transition-colors ${mode === "sign-in" ? "bg-teal-500/10 text-teal-300" : "text-zinc-500 hover:text-zinc-300"}`}
         >
           Sign In
         </button>
@@ -347,7 +347,7 @@ function LocalSignedOutView() {
             setMode("sign-up");
             setError(null);
           }}
-          className={`rounded-md px-3 py-1.5 font-medium transition-colors ${mode === "sign-up" ? "bg-cyan-500/10 text-cyan-300" : "text-zinc-500 hover:text-zinc-300"}`}
+          className={`rounded-md px-3 py-1.5 font-medium transition-colors ${mode === "sign-up" ? "bg-teal-500/10 text-teal-300" : "text-zinc-500 hover:text-zinc-300"}`}
         >
           Create Account
         </button>
@@ -364,7 +364,7 @@ function LocalSignedOutView() {
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder="Your name"
-              className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-cyan-500/30"
+              className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30"
             />
           </div>
         ) : null}
@@ -379,7 +379,7 @@ function LocalSignedOutView() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
-            className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-cyan-500/30"
+            className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30"
           />
         </div>
 
@@ -393,7 +393,7 @@ function LocalSignedOutView() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder={mode === "sign-up" ? "At least 8 characters" : "Your password"}
-            className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-cyan-500/30"
+            className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30"
           />
         </div>
 
@@ -407,7 +407,7 @@ function LocalSignedOutView() {
               value={organization}
               onChange={(e) => setOrganization(e.target.value)}
               placeholder="e.g. a university, company, or agency"
-              className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-cyan-500/30"
+              className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30"
             />
           </div>
         ) : null}
@@ -441,14 +441,14 @@ export default function AccountForm() {
         <button
           type="button"
           onClick={() => setTab("cloud")}
-          className={`flex-1 rounded-lg border px-3 py-2 font-medium transition-colors ${tab === "cloud" ? "border-cyan-500/40 bg-cyan-500/10 text-cyan-300" : "border-zinc-800 text-zinc-500 hover:text-zinc-300"}`}
+          className={`flex-1 rounded-lg border px-3 py-2 font-medium transition-colors ${tab === "cloud" ? "border-teal-500/40 bg-teal-500/10 text-teal-300" : "border-zinc-800 text-zinc-500 hover:text-zinc-300"}`}
         >
           Cloud Account {isCloudSignedIn ? "●" : ""}
         </button>
         <button
           type="button"
           onClick={() => setTab("local")}
-          className={`flex-1 rounded-lg border px-3 py-2 font-medium transition-colors ${tab === "local" ? "border-cyan-500/40 bg-cyan-500/10 text-cyan-300" : "border-zinc-800 text-zinc-500 hover:text-zinc-300"}`}
+          className={`flex-1 rounded-lg border px-3 py-2 font-medium transition-colors ${tab === "local" ? "border-teal-500/40 bg-teal-500/10 text-teal-300" : "border-zinc-800 text-zinc-500 hover:text-zinc-300"}`}
         >
           Device-Local Account {isSignedIn ? "●" : ""}
         </button>

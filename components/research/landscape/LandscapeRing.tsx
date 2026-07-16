@@ -27,7 +27,7 @@ export default function LandscapeRing({
     <div className="relative space-y-3">
       {ringId !== "center" ? (
         <div
-          className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[85%] w-[95%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-500/10"
+          className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[85%] w-[95%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-teal-500/10"
           aria-hidden="true"
         />
       ) : null}

@@ -106,7 +106,7 @@ export default function ResearchTopicCatalog({ initialQuery = "" }: ResearchTopi
               setFilterQuery("");
               setSelectedDomain("all");
             }}
-            className="mt-4 inline-flex min-h-9 items-center rounded-lg border border-zinc-700 bg-zinc-900 px-3.5 text-xs font-medium text-cyan-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
+            className="mt-4 inline-flex min-h-9 items-center rounded-lg border border-zinc-700 bg-zinc-900 px-3.5 text-xs font-medium text-teal-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
           >
             Clear filters
           </button>

@@ -84,7 +84,7 @@ export default function LocalWorkMigrationPrompt() {
   }
 
   return (
-    <div className={`${cbaiGlassCard} space-y-3 border-cyan-500/20 p-5`}>
+    <div className={`${cbaiGlassCard} space-y-3 border-teal-500/20 p-5`}>
       <p className={cbaiSectionEyebrow}>Local work was found on this device</p>
       <p className="text-sm text-zinc-300">
         {counts.projects} project{counts.projects === 1 ? "" : "s"}, {counts.notes} note{counts.notes === 1 ? "" : "s"},{" "}

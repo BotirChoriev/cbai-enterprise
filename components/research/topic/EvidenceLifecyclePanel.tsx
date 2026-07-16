@@ -62,9 +62,9 @@ function StageTrack({ stage }: { stage: EvidenceLifecycleStage }) {
           title={EVIDENCE_LIFECYCLE_LABELS[s]}
           className={`rounded-full border px-2 py-0.5 text-[9px] font-medium uppercase tracking-wider ${
             index < currentIndex
-              ? "border-cyan-500/20 bg-cyan-500/10 text-cyan-400"
+              ? "border-teal-500/20 bg-teal-500/10 text-teal-400"
               : index === currentIndex
-                ? "border-cyan-500/40 bg-cyan-500/15 text-cyan-300"
+                ? "border-teal-500/40 bg-teal-500/15 text-teal-300"
                 : "border-zinc-800 bg-zinc-900/40 text-zinc-600"
           }`}
         >
@@ -127,7 +127,7 @@ export default function EvidenceLifecyclePanel({ topicId, evidenceItems }: Evide
                     <button
                       type="button"
                       onClick={() => handleAdvance(item.evidenceItemId)}
-                      className="shrink-0 rounded-md border border-zinc-700 bg-zinc-900 px-2.5 py-1 text-[11px] font-medium text-cyan-400 hover:border-zinc-600"
+                      className="shrink-0 rounded-md border border-zinc-700 bg-zinc-900 px-2.5 py-1 text-[11px] font-medium text-teal-400 hover:border-zinc-600"
                     >
                       Mark as {EVIDENCE_LIFECYCLE_LABELS[EVIDENCE_LIFECYCLE_STAGES[EVIDENCE_LIFECYCLE_STAGES.indexOf(stage) + 1]]}
                     </button>

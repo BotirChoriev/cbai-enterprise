@@ -26,7 +26,7 @@ function statusDotClass(status: ResearchGraphStatus): string {
     case "not_connected_yet":
       return "bg-zinc-500";
     case "future_workspace":
-      return "bg-cyan-400";
+      return "bg-teal-400";
   }
 }
 

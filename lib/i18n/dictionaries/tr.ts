@@ -1,4 +1,5 @@
 import type { TranslationDictionary } from "@/lib/i18n/dictionary-types";
+import { COMPASS_COPY_TR, ENTITIES_TR, MY_WORK_TR, PRODUCT_STATUS_TR, SYSTEM_TR } from "@/lib/i18n/platform-copy-tr";
 
 const tr: TranslationDictionary = {
   roles: {
@@ -365,6 +366,11 @@ const tr: TranslationDictionary = {
     couldNotSave: "Kaydedilemedi. Tekrar denensin mi?",
     tryAgain: "Tekrar dene",
   },
+  productStatus: PRODUCT_STATUS_TR,
+  entities: ENTITIES_TR,
+  compass: COMPASS_COPY_TR,
+  myWork: MY_WORK_TR,
+  system: SYSTEM_TR,
   workspaceRoles: {
     citizen: "Vatandaş",
     student: "Öğrenci",

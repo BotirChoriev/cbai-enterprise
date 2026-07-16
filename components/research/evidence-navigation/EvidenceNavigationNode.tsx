@@ -53,7 +53,7 @@ function statusAccent(status: EvidenceNavigationStatus): string {
     case "not_connected_yet":
       return "border-zinc-700 bg-zinc-900/40 text-zinc-400";
     case "future_workspace":
-      return "border-cyan-500/25 bg-cyan-500/5 text-cyan-300";
+      return "border-teal-500/25 bg-teal-500/5 text-teal-300";
     case "human_review_required":
       return "border-amber-500/25 bg-amber-500/5 text-amber-300";
   }
@@ -68,7 +68,7 @@ export default function EvidenceNavigationNode({
     humanReviewRequired || node.status === "human_review_required";
 
   return (
-    <article className={`${cbaiGlassCard} space-y-4 border-cyan-500/15 p-5`}>
+    <article className={`${cbaiGlassCard} space-y-4 border-teal-500/15 p-5`}>
       <div className="space-y-2">
         <p className={cbaiSectionEyebrow}>Selected node</p>
         <h3 className="text-xl font-semibold text-zinc-100">{node.label}</h3>
@@ -112,7 +112,7 @@ export default function EvidenceNavigationNode({
                 key={step.edge.edgeId}
                 className="rounded-lg border border-zinc-800/80 bg-slate-950/50 px-3 py-2 text-sm text-zinc-400"
               >
-                <span className="text-cyan-400/90">
+                <span className="text-teal-400/90">
                   {RELATIONSHIP_LABELS[step.edge.relationshipType]}
                 </span>
                 <span className="text-zinc-600"> → </span>

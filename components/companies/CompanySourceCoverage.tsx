@@ -15,7 +15,7 @@ function EvidenceField({ label, value, href }: { label: string; value: string; h
       <dt className="text-[10px] uppercase tracking-wider text-zinc-600">{label}</dt>
       <dd className="mt-0.5 text-xs text-zinc-300">
         {href ? (
-          <a href={href} target="_blank" rel="noopener noreferrer" className="text-cyan-400 underline-offset-2 hover:underline">
+          <a href={href} target="_blank" rel="noopener noreferrer" className="text-teal-400 underline-offset-2 hover:underline">
             {value}
           </a>
         ) : (

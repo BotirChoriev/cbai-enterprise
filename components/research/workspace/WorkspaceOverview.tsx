@@ -23,14 +23,14 @@ export default function WorkspaceOverview() {
 
       <div className={`${cbaiGlassCard} space-y-4 p-6`}>
         <p className="text-sm leading-relaxed text-zinc-400">{WORKSPACE_OVERVIEW_COPY.description}</p>
-        <p className="rounded-md border border-cyan-500/15 bg-cyan-500/5 px-3 py-2 text-xs text-zinc-500">
+        <p className="rounded-md border border-teal-500/15 bg-teal-500/5 px-3 py-2 text-xs text-zinc-500">
           {WORKSPACE_OVERVIEW_COPY.notice}
         </p>
         <div className="flex flex-wrap items-center gap-3 text-xs">
           <span className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-emerald-300">
             {WORKSPACE_STATUS_LABELS[workspace.status]}
           </span>
-          <Link href="/research" className="text-cyan-400 transition-colors hover:text-cyan-300">
+          <Link href="/research" className="text-teal-400 transition-colors hover:text-teal-300">
             Browse research topics →
           </Link>
         </div>

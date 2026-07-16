@@ -24,7 +24,7 @@ function LinkList({ links, emptyLabel }: { links: readonly UniversityReportLink[
           <li key={link.name}>
             <Link
               href={link.href}
-              className="rounded-full border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-xs text-zinc-400 hover:text-cyan-300"
+              className="rounded-full border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-xs text-zinc-400 hover:text-teal-300"
             >
               {link.name}
             </Link>
@@ -44,7 +44,7 @@ export default function UniversityReportView({ report }: UniversityReportViewPro
   return (
     <section
       aria-labelledby="university-report-heading"
-      className={`${cbaiGlassCard} cbai-print-area space-y-6 border-cyan-500/15 p-5 sm:p-6`}
+      className={`${cbaiGlassCard} cbai-print-area space-y-6 border-teal-500/15 p-5 sm:p-6`}
     >
       <ReportHeaderLogo />
       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -81,7 +81,7 @@ export default function UniversityReportView({ report }: UniversityReportViewPro
             <dt className="text-[10px] uppercase tracking-wider text-zinc-600">Website</dt>
             <dd className="mt-0.5 text-zinc-300">
               {report.overview.website ? (
-                <a href={report.overview.website} target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
+                <a href={report.overview.website} target="_blank" rel="noopener noreferrer" className="text-teal-400 hover:underline">
                   {report.overview.website}
                 </a>
               ) : (
@@ -146,7 +146,7 @@ export default function UniversityReportView({ report }: UniversityReportViewPro
             <LinkList links={report.linkedProjects} emptyLabel="No projects link to this university yet." />
             <Link
               href={`/my-work?entityKind=university&entityId=${report.university.id}&entityName=${encodeURIComponent(report.university.name)}`}
-              className="mt-1.5 inline-flex text-xs font-medium text-cyan-400 hover:text-cyan-300"
+              className="mt-1.5 inline-flex text-xs font-medium text-teal-400 hover:text-teal-300"
             >
               + Create a project for {report.university.name} →
             </Link>

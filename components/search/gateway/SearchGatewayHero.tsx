@@ -33,7 +33,7 @@ export default function SearchGatewayHero({ query }: SearchGatewayHeroProps) {
           spellCheck={false}
           enterKeyHint="search"
           autoFocus={Boolean(query)}
-          className="home-search-input w-full rounded-lg border border-zinc-800/80 bg-slate-950/60 px-4 py-4 text-base text-zinc-100 placeholder:text-zinc-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400 sm:py-4 sm:pr-28 sm:text-lg"
+          className="home-search-input w-full rounded-lg border border-zinc-800/80 bg-slate-950/60 px-4 py-4 text-base text-zinc-100 placeholder:text-zinc-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400 sm:py-4 sm:pr-28 sm:text-lg"
         />
         <button
           type="submit"
@@ -45,7 +45,7 @@ export default function SearchGatewayHero({ query }: SearchGatewayHeroProps) {
       {!query ? (
         <p className="text-xs text-zinc-600">
           Part of{" "}
-          <Link href="/" className="text-cyan-400/80 hover:text-cyan-300">
+          <Link href="/" className="text-teal-400/80 hover:text-teal-300">
             Public Intelligence
           </Link>{" "}
           — available today.

@@ -7,6 +7,8 @@ type UniversityListProps = {
   selectedId: string;
   onSelect: (id: string) => void;
   onClearFilters?: () => void;
+  emptyMessage: string;
+  clearFiltersLabel: string;
 };
 
 export default function UniversityList({
@@ -14,20 +16,22 @@ export default function UniversityList({
   selectedId,
   onSelect,
   onClearFilters,
+  emptyMessage,
+  clearFiltersLabel,
 }: UniversityListProps) {
   if (universities.length === 0) {
     return (
       <EmptyState
         variant="dashed"
-        message="No universities match your filters."
+        message={emptyMessage}
         action={
           onClearFilters ? (
             <button
               type="button"
               onClick={onClearFilters}
-              className="inline-flex min-h-9 items-center rounded-lg border border-zinc-700 bg-zinc-900 px-3.5 text-xs font-medium text-cyan-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
+              className="inline-flex min-h-9 items-center rounded-lg border border-zinc-700 bg-zinc-900 px-3.5 text-xs font-medium text-teal-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
             >
-              Clear filters
+              {clearFiltersLabel}
             </button>
           ) : undefined
         }

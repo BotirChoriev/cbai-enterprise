@@ -60,7 +60,7 @@ export default function IndicatorExplorerPanel({
           id="indicator-explorer-select"
           value={selectedId}
           onChange={(e) => setManualId(e.target.value)}
-          className="mt-3 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-200 outline-none focus:border-cyan-500/40 focus:ring-1 focus:ring-cyan-500/20"
+          className="mt-3 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-200 outline-none focus:border-teal-500/40 focus:ring-1 focus:ring-cyan-500/20"
         >
           {catalog.indicators.map((indicator) => (
             <option key={indicator.indicatorId} value={indicator.indicatorId}>
@@ -100,7 +100,7 @@ export function IndicatorExploreLink({
     <button
       type="button"
       onClick={() => onExplore?.(indicatorId)}
-      className="text-xs text-cyan-400 underline-offset-2 hover:underline"
+      className="text-xs text-teal-400 underline-offset-2 hover:underline"
       aria-label={`Explore indicator ${indicatorName}`}
     >
       Explore indicator

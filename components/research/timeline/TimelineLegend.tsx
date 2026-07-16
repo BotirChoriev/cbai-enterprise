@@ -11,7 +11,7 @@ function statusDotClass(status: TimelineStageStatus): string {
     case "catalog_available":
       return "bg-emerald-400";
     case "future_workspace":
-      return "bg-cyan-400";
+      return "bg-teal-400";
     case "not_connected_yet":
       return "bg-zinc-500";
   }

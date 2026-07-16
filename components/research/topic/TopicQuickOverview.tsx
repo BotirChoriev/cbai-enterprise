@@ -17,7 +17,7 @@ function statusClass(status: ResearchTopic["status"]): string {
     case "catalog_available":
       return "border-emerald-500/30 bg-emerald-500/10 text-emerald-300";
     case "workspace_not_available":
-      return "border-cyan-500/25 bg-cyan-500/5 text-cyan-300";
+      return "border-teal-500/25 bg-teal-500/5 text-teal-300";
     case "evidence_not_connected":
       return "border-zinc-700 bg-zinc-900/60 text-zinc-400";
   }
@@ -85,7 +85,7 @@ export default function TopicQuickOverview({ topic }: TopicQuickOverviewProps) {
                   <li key={discovery.discoveryId}>
                     <Link
                       href={getResearchTopicPath(related.topicId)}
-                      className="rounded-md border border-zinc-800 bg-zinc-900/50 px-2 py-1 text-xs text-cyan-400 transition-colors hover:border-cyan-500/30 hover:text-cyan-300"
+                      className="rounded-md border border-zinc-800 bg-zinc-900/50 px-2 py-1 text-xs text-teal-400 transition-colors hover:border-teal-500/30 hover:text-teal-300"
                     >
                       {related.topicName}
                     </Link>

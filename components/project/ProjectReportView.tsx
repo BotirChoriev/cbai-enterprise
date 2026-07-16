@@ -27,7 +27,7 @@ export default function ProjectReportView({ report }: ProjectReportViewProps) {
     <section
       id="project-report"
       aria-labelledby="project-report-heading"
-      className={`${cbaiGlassCard} cbai-print-area space-y-6 border-cyan-500/15 p-5 sm:p-6`}
+      className={`${cbaiGlassCard} cbai-print-area space-y-6 border-teal-500/15 p-5 sm:p-6`}
     >
       <ReportHeaderLogo />
       <div className="flex flex-wrap items-start justify-between gap-2">

@@ -22,7 +22,7 @@ export default function ProjectGuidePanel({ project }: ProjectGuidePanelProps) {
   return (
     <section
       aria-labelledby="project-guide-heading"
-      className={`${cbaiGlassCard} space-y-2 border-cyan-500/15 p-4`}
+      className={`${cbaiGlassCard} space-y-2 border-teal-500/15 p-4`}
     >
       <div className="flex items-center justify-between gap-2">
         <p className={cbaiSectionEyebrow} id="project-guide-heading">
@@ -39,7 +39,7 @@ export default function ProjectGuidePanel({ project }: ProjectGuidePanelProps) {
       {!isReady ? (
         <Link
           href={step.href}
-          className="inline-flex items-center gap-1 text-xs font-medium text-cyan-400 hover:text-cyan-300"
+          className="inline-flex items-center gap-1 text-xs font-medium text-teal-400 hover:text-teal-300"
         >
           Continue →
         </Link>

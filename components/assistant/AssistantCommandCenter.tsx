@@ -288,10 +288,10 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
       {assistantContext ? (
         <Link
           href={assistantContext.href}
-          className="mb-1.5 inline-flex items-center gap-1.5 text-[11px] text-zinc-500 hover:text-cyan-300"
+          className="mb-1.5 inline-flex items-center gap-1.5 text-[11px] text-zinc-500 hover:text-teal-300"
           title={`Operator context: ${assistantContext.name}`}
         >
-          <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
+          <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-teal-400" />
           Context: {assistantContext.name}
         </Link>
       ) : null}
@@ -339,7 +339,7 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
                   ? t("home.commandProcessing")
                   : t("home.commandPlaceholder")
             }
-            className={`w-full rounded-lg border border-zinc-800 bg-slate-900/80 text-zinc-300 placeholder:text-zinc-600 outline-none transition-colors focus:border-cyan-500/30 focus:ring-1 focus:ring-cyan-500/20 ${
+            className={`w-full rounded-lg border border-zinc-800 bg-slate-900/80 text-zinc-300 placeholder:text-zinc-600 outline-none transition-colors focus:border-teal-500/30 focus:ring-1 focus:ring-cyan-500/20 ${
               isProminent ? "py-3.5 pl-11 pr-4 text-base" : "py-2 pl-10 pr-4 text-sm"
             }`}
           />
@@ -358,8 +358,8 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
             } ${
               voiceStatus === "listening" || voiceStatus === "requesting"
                 ? isProminent
-                  ? "scale-105 border-cyan-400/60 bg-cyan-500/20 text-cyan-200 shadow-[0_0_24px_-4px_rgba(34,211,238,0.5)]"
-                  : "border-cyan-500/40 bg-cyan-500/10 text-cyan-300"
+                  ? "scale-105 border-teal-400/60 bg-teal-500/20 text-cyan-200 shadow-[0_0_24px_-4px_rgba(34,211,238,0.5)]"
+                  : "border-teal-500/40 bg-teal-500/10 text-teal-300"
                 : voiceStatus === "permission-denied" || voiceStatus === "network-error"
                   ? "border-amber-500/40 bg-amber-500/10 text-amber-300"
                   : isProminent
@@ -444,7 +444,7 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
                   setUnrecognized(null);
                   router.push(assistantContext.href);
                 }}
-                className="rounded-full border border-cyan-500/30 bg-cyan-500/10 px-2.5 py-1 text-[11px] text-cyan-300 transition-colors hover:border-cyan-500/50"
+                className="rounded-full border border-teal-500/30 bg-teal-500/10 px-2.5 py-1 text-[11px] text-teal-300 transition-colors hover:border-teal-500/50"
               >
                 {`Open ${assistantContext.name}`}
               </button>
@@ -462,7 +462,7 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
           </div>
           <Link
             href={`/search?q=${encodeURIComponent(unrecognized)}`}
-            className="inline-flex text-xs font-medium text-cyan-400 hover:text-cyan-300"
+            className="inline-flex text-xs font-medium text-teal-400 hover:text-teal-300"
           >
             Search Global Search for &quot;{unrecognized}&quot; →
           </Link>

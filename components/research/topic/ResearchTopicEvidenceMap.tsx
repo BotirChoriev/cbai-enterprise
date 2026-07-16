@@ -23,7 +23,7 @@ export default function ResearchTopicEvidenceMap({ topic }: ResearchTopicEvidenc
           <li key={evidenceType}>
             <article className={`${cbaiGlassCard} flex items-start gap-3 p-4`}>
               <span
-                className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400/80 shadow-[0_0_6px_rgba(34,211,238,0.6)]"
+                className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-teal-400/80 shadow-[0_0_6px_rgba(34,211,238,0.6)]"
                 aria-hidden="true"
               />
               <div>

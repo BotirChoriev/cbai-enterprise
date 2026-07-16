@@ -41,7 +41,7 @@ export default function HomeCapabilityFlow() {
         {CAPABILITY_FLOW.map((stage, index) => (
           <li key={stage.label} className={`${cbaiGlassCard} p-4`}>
             <div className="flex items-center gap-2.5">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-cyan-500/30 bg-cyan-500/10 text-[11px] font-semibold text-cyan-300">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-teal-500/30 bg-teal-500/10 text-[11px] font-semibold text-teal-300">
                 {index + 1}
               </span>
               <p className="text-sm font-semibold text-zinc-100">{stage.label}</p>

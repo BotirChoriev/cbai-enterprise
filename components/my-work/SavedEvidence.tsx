@@ -43,7 +43,7 @@ export default function SavedEvidence({ entities }: SavedEvidenceProps) {
                 className="flex items-center justify-between gap-2 rounded-lg border border-zinc-800/80 bg-zinc-900/40 px-3 py-2"
               >
                 <div className="min-w-0">
-                  <Link href={evidenceItemHref(entity.id)} className="text-sm text-cyan-400 hover:text-cyan-300">
+                  <Link href={evidenceItemHref(entity.id)} className="text-sm text-teal-400 hover:text-teal-300">
                     {entity.name}
                   </Link>
                   {topicName ? <p className="mt-0.5 text-[11px] text-zinc-600">From: {topicName}</p> : null}
@@ -67,7 +67,7 @@ export default function SavedEvidence({ entities }: SavedEvidenceProps) {
           </p>
           <Link
             href="/research"
-            className="inline-flex items-center rounded-full border border-zinc-800 bg-zinc-900/60 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:border-cyan-500/30 hover:text-cyan-300"
+            className="inline-flex items-center rounded-full border border-zinc-800 bg-zinc-900/60 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:border-teal-500/30 hover:text-teal-300"
           >
             Explore Research Topics →
           </Link>

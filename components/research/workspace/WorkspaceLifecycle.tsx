@@ -19,7 +19,7 @@ export default function WorkspaceLifecycle() {
         {WORKSPACE_LIFECYCLE_STAGES.map((stage, index) => (
           <li key={stage.stageId}>
             <div className={`${cbaiGlassCard} flex gap-4 p-4`}>
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-cyan-500/25 bg-cyan-500/10 text-xs font-semibold text-cyan-300">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-teal-500/25 bg-teal-500/10 text-xs font-semibold text-teal-300">
                 {index + 1}
               </span>
               <div>

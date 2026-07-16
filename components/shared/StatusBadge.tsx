@@ -1,24 +1,21 @@
-import {
-  PRODUCT_STATUS_DOT_CLASSES,
-  PRODUCT_STATUS_EXPLANATIONS,
-  PRODUCT_STATUS_LABELS,
-  type ProductStatus,
-} from "@/lib/product-status";
+"use client";
+
+import { PRODUCT_STATUS_DOT_CLASSES, type ProductStatus } from "@/lib/product-status";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type StatusBadgeProps = {
   status: ProductStatus;
-  /** Render the full explanatory sentence beneath the badge, not just on hover. */
   showExplanation?: boolean;
   className?: string;
 };
 
 /**
- * One reusable status badge. Text is always visible (never color-only); the dot is decorative.
- * The explanation is always available via `title`, and optionally rendered inline as a sentence.
+ * One reusable status badge — labels and explanations come from i18n, never hardcoded English.
  */
 export default function StatusBadge({ status, showExplanation, className = "" }: StatusBadgeProps) {
-  const label = PRODUCT_STATUS_LABELS[status];
-  const explanation = PRODUCT_STATUS_EXPLANATIONS[status];
+  const { t } = useTranslation();
+  const label = t(`productStatus.${status}.label`);
+  const explanation = t(`productStatus.${status}.explanation`);
 
   return (
     <span className={className}>

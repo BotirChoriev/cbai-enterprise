@@ -99,7 +99,7 @@ export default function EvidenceNavigationPath({
         {sections.map((section, sectionIndex) => (
           <li key={section.sectionId} className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-cyan-500/30 bg-cyan-500/10 text-[10px] font-semibold text-cyan-300">
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-teal-500/30 bg-teal-500/10 text-[10px] font-semibold text-teal-300">
                 {sectionIndex + 1}
               </span>
               <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
@@ -118,8 +118,8 @@ export default function EvidenceNavigationPath({
                         onClick={() => onSelectNode(node.nodeId)}
                         className={`w-full rounded-lg border px-3 py-2 text-left transition-all duration-[250ms] ${
                           selected
-                            ? "border-cyan-500/40 bg-cyan-500/10 shadow-[0_0_16px_-6px_rgba(34,211,238,0.35)]"
-                            : "border-zinc-800/80 bg-slate-950/40 hover:border-cyan-500/20 hover:bg-cyan-500/5"
+                            ? "border-teal-500/40 bg-teal-500/10 shadow-[0_0_16px_-6px_rgba(34,211,238,0.35)]"
+                            : "border-zinc-800/80 bg-slate-950/40 hover:border-teal-500/20 hover:bg-teal-500/5"
                         }`}
                       >
                         <span className="block text-sm font-medium text-zinc-200">{node.label}</span>

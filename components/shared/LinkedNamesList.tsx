@@ -20,7 +20,7 @@ export default function LinkedNamesList({ names, entityType, emptyLabel = "None 
         return (
           <span key={name}>
             {href ? (
-              <Link href={href} className="text-cyan-400 hover:text-cyan-300">
+              <Link href={href} className="text-teal-400 hover:text-teal-300">
                 {name}
               </Link>
             ) : (

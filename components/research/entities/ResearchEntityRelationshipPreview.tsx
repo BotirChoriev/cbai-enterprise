@@ -52,7 +52,7 @@ export default function ResearchEntityRelationshipPreview({
               <article className={`${cbaiGlassCard} space-y-3 p-4`}>
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
-                    <p className="text-[10px] font-medium uppercase tracking-wider text-cyan-400/80">
+                    <p className="text-[10px] font-medium uppercase tracking-wider text-teal-400/80">
                       {typeLabel}
                     </p>
                     <h4 className="mt-1 text-sm font-semibold text-zinc-100">
@@ -98,7 +98,7 @@ export default function ResearchEntityRelationshipPreview({
                       {relations.relatedEntities.map((related) => (
                         <li
                           key={related.entityId}
-                          className="rounded-md border border-cyan-500/15 bg-cyan-500/5 px-2 py-1 text-xs text-zinc-400"
+                          className="rounded-md border border-teal-500/15 bg-teal-500/5 px-2 py-1 text-xs text-zinc-400"
                         >
                           {RESEARCH_ENTITY_TYPE_DEFINITIONS[related.entityType].displayName}:{" "}
                           {related.displayName}

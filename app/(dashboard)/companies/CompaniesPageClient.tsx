@@ -10,16 +10,19 @@ import {
 import { getCompanyLinkedEntities } from "@/lib/companies.adapter";
 import { buildCompanyUserJourney } from "@/lib/company-user-journey";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
+import { useTranslation } from "@/lib/i18n/use-translation";
 import CompanyFilters from "@/components/companies/CompanyFilters";
 import CompanyList from "@/components/companies/CompanyList";
 import CompanyRelationships from "@/components/companies/CompanyRelationships";
 import EntityOptionalExploration from "@/components/shared/EntityOptionalExploration";
+import EntityPageHeader from "@/components/shared/EntityPageHeader";
 import { CompanyIntelligencePanel } from "@/components/companies/CompanyIntelligencePanel";
 import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
 import EntityNotFoundNotice from "@/components/system/EntityNotFoundNotice";
 
 export default function CompaniesPageClient() {
   const { context, setCompany, recordEntityView } = usePlatformContext();
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
   const [industry, setIndustry] = useState("All");
@@ -71,12 +74,7 @@ export default function CompaniesPageClient() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-xl border border-cyan-500/10 bg-slate-950/50 px-6 py-5 backdrop-blur-sm">
-        <h1 className="cbai-display text-2xl text-zinc-50">Companies</h1>
-        <p className="mt-1 max-w-3xl text-sm text-zinc-500">
-          Overview, available information, missing information, and reports for each company.
-        </p>
-      </div>
+      <EntityPageHeader title={t("companies.title")} description={t("entities.companiesDescription")} />
 
       {requestedCompanyNotFound && requestedCompanyId ? (
         <EntityNotFoundNotice
@@ -110,6 +108,8 @@ export default function CompaniesPageClient() {
               setIndustry("All");
               setCountry("All");
             }}
+            emptyMessage={t("entities.noMatchFilters")}
+            clearFiltersLabel={t("entities.clearFilters")}
           />
         </div>
 

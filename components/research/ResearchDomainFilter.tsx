@@ -16,7 +16,7 @@ export default function ResearchDomainFilter({
 
   return (
     <div className="space-y-3">
-      <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-cyan-400/90">
+      <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-teal-400/90">
         Filter by domain
       </p>
       <ul className="flex flex-wrap gap-2">
@@ -26,8 +26,8 @@ export default function ResearchDomainFilter({
             onClick={() => onSelectDomain("all")}
             className={`min-h-9 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${
               selectedDomain === "all"
-                ? "border-cyan-500/40 bg-cyan-500/10 text-cyan-300"
-                : "border-zinc-800 bg-slate-950/60 text-zinc-400 hover:border-cyan-500/20 hover:text-zinc-200"
+                ? "border-teal-500/40 bg-teal-500/10 text-teal-300"
+                : "border-zinc-800 bg-slate-950/60 text-zinc-400 hover:border-teal-500/20 hover:text-zinc-200"
             }`}
           >
             All domains
@@ -41,8 +41,8 @@ export default function ResearchDomainFilter({
               onClick={() => onSelectDomain(domain.domainId)}
               className={`min-h-9 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${
                 selectedDomain === domain.domainId
-                  ? "border-cyan-500/40 bg-cyan-500/10 text-cyan-300"
-                  : "border-zinc-800 bg-slate-950/60 text-zinc-400 hover:border-cyan-500/20 hover:text-zinc-200"
+                  ? "border-teal-500/40 bg-teal-500/10 text-teal-300"
+                  : "border-zinc-800 bg-slate-950/60 text-zinc-400 hover:border-teal-500/20 hover:text-zinc-200"
               }`}
             >
               {domain.domainName}

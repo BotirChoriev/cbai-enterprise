@@ -96,7 +96,7 @@ export default function ResearchMissionWorkspace({ review }: ResearchMissionWork
               <ul className="mt-2 space-y-1.5">
                 {section.items.map((item) => (
                   <li key={item} className="flex items-start gap-2 text-xs text-zinc-500">
-                    <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-cyan-500/60" />
+                    <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-teal-500/60" />
                     {item}
                   </li>
                 ))}

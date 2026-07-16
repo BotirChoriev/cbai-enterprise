@@ -20,7 +20,7 @@ function statusAccent(status: ResearchReviewStatus): string {
     case "pending_review":
       return "border-amber-500/25 bg-amber-500/5 text-amber-300";
     case "in_review":
-      return "border-cyan-500/25 bg-cyan-500/5 text-cyan-300";
+      return "border-teal-500/25 bg-teal-500/5 text-teal-300";
     case "completed":
       return "border-emerald-500/25 bg-emerald-500/5 text-emerald-300";
     case "archived":

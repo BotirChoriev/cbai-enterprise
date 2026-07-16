@@ -24,7 +24,7 @@ function LinkList({ links, emptyLabel }: { links: readonly { name: string; href:
           <li key={link.name}>
             <Link
               href={link.href}
-              className="rounded-full border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-xs text-zinc-400 hover:text-cyan-300"
+              className="rounded-full border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-xs text-zinc-400 hover:text-teal-300"
             >
               {link.name}
             </Link>
@@ -48,7 +48,7 @@ export default function ResearchTopicReportView({ report }: ResearchTopicReportV
   return (
     <section
       aria-labelledby="research-topic-report-heading"
-      className={`${cbaiGlassCard} cbai-print-area space-y-6 border-cyan-500/15 p-5 sm:p-6`}
+      className={`${cbaiGlassCard} cbai-print-area space-y-6 border-teal-500/15 p-5 sm:p-6`}
     >
       <ReportHeaderLogo />
       <div className="flex flex-wrap items-start justify-between gap-2">

@@ -43,7 +43,7 @@ function groupByType(
 
 function verifiedBadgeClass(verified: boolean): string {
   return verified
-    ? "text-cyan-400 bg-cyan-500/10 border-cyan-500/20"
+    ? "text-teal-400 bg-teal-500/10 border-teal-500/20"
     : "text-zinc-400 bg-zinc-800/50 border-zinc-700/50";
 }
 
@@ -52,7 +52,7 @@ function RelationshipRow({ item }: { item: EntityRelationship }) {
     <li className="flex flex-col gap-2 rounded-lg border border-zinc-800 bg-zinc-900/40 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
         {item.targetHref ? (
-          <Link href={item.targetHref} className="text-sm font-medium text-cyan-400 hover:text-cyan-300">
+          <Link href={item.targetHref} className="text-sm font-medium text-teal-400 hover:text-teal-300">
             {item.targetName}
           </Link>
         ) : (
@@ -75,7 +75,7 @@ function RelationshipPill({ item }: { item: EntityRelationship }) {
       {item.targetHref ? (
         <Link
           href={item.targetHref}
-          className="inline-flex items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-900/60 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:border-cyan-500/30 hover:text-cyan-300"
+          className="inline-flex items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-900/60 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:border-teal-500/30 hover:text-teal-300"
         >
           {item.targetName}
         </Link>
@@ -121,7 +121,7 @@ export default function EntityRelatedPanel({
               <Link
                 key={action.href}
                 href={action.href}
-                className="inline-flex items-center rounded-full border border-zinc-800 bg-zinc-900/60 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:border-cyan-500/30 hover:text-cyan-300"
+                className="inline-flex items-center rounded-full border border-zinc-800 bg-zinc-900/60 px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:border-teal-500/30 hover:text-teal-300"
               >
                 {action.label} →
               </Link>

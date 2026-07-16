@@ -12,7 +12,7 @@ export default function RelatedModules({ modules }: RelatedModulesProps) {
         <Link
           key={mod.id}
           href={mod.href}
-          className="rounded-md border border-zinc-800 bg-zinc-950 px-2.5 py-1.5 text-[11px] text-zinc-400 transition-colors hover:border-cyan-500/20 hover:text-cyan-300"
+          className="rounded-md border border-zinc-800 bg-zinc-950 px-2.5 py-1.5 text-[11px] text-zinc-400 transition-colors hover:border-teal-500/20 hover:text-teal-300"
           title={mod.description}
         >
           {mod.label}

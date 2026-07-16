@@ -51,7 +51,7 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
       />
       <nav
         aria-label="Mobile navigation"
-        className="relative flex h-full w-72 max-w-[85vw] flex-col overflow-y-auto border-r border-cyan-500/10 bg-[#050810] p-4"
+        className="relative flex h-full w-72 max-w-[85vw] flex-col overflow-y-auto border-r border-teal-500/10 bg-[#050810] p-4"
       >
         <div className="mb-4 flex items-center justify-between">
           <Link href="/" onClick={onClose}>
@@ -61,7 +61,7 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
             type="button"
             onClick={onClose}
             aria-label="Close navigation"
-            className="flex h-11 w-11 items-center justify-center rounded-md text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-400"
+            className="flex h-11 w-11 items-center justify-center rounded-md text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-400"
           >
             <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className="h-5 w-5">
               <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
@@ -84,7 +84,7 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
                   onClick={onClose}
                   className={`flex min-h-11 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                     isNavItemActive(pathname, item.href)
-                      ? "bg-cyan-500/10 text-cyan-400"
+                      ? "bg-teal-500/10 text-teal-400"
                       : "text-zinc-300 hover:bg-zinc-900"
                   }`}
                 >
@@ -113,7 +113,7 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
                     onClick={onClose}
                     className={`flex min-h-11 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                       isNavItemActive(pathname, item.href)
-                        ? "bg-cyan-500/10 text-cyan-400"
+                        ? "bg-teal-500/10 text-teal-400"
                         : "text-zinc-400 hover:bg-zinc-900"
                     }`}
                   >

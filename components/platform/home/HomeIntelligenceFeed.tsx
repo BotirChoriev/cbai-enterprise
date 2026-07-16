@@ -89,13 +89,13 @@ export default function HomeIntelligenceFeed() {
         <div className="space-y-3">
           <p className="text-sm text-zinc-500">{t("home.feedEmptyTitle")}</p>
           <div className="flex flex-wrap gap-2">
-            <Link href="/research" className="rounded-full border border-zinc-800 bg-zinc-900/40 px-3 py-1.5 text-xs text-zinc-300 hover:text-cyan-300">
+            <Link href="/research" className="rounded-full border border-zinc-800 bg-zinc-900/40 px-3 py-1.5 text-xs text-zinc-300 hover:text-teal-300">
               {t("home.feedExploreResearch")}
             </Link>
-            <Link href="/knowledge" className="rounded-full border border-zinc-800 bg-zinc-900/40 px-3 py-1.5 text-xs text-zinc-300 hover:text-cyan-300">
+            <Link href="/knowledge" className="rounded-full border border-zinc-800 bg-zinc-900/40 px-3 py-1.5 text-xs text-zinc-300 hover:text-teal-300">
               {t("home.feedSearchEvidence")}
             </Link>
-            <Link href="/countries" className="rounded-full border border-zinc-800 bg-zinc-900/40 px-3 py-1.5 text-xs text-zinc-300 hover:text-cyan-300">
+            <Link href="/countries" className="rounded-full border border-zinc-800 bg-zinc-900/40 px-3 py-1.5 text-xs text-zinc-300 hover:text-teal-300">
               {t("home.feedOpenCountries")}
             </Link>
           </div>
@@ -107,7 +107,7 @@ export default function HomeIntelligenceFeed() {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="min-w-0">
                   <p className="text-[10px] uppercase tracking-wider text-zinc-600">{item.category}</p>
-                  <Link href={item.href} className="text-sm font-medium text-cyan-400 hover:text-cyan-300">
+                  <Link href={item.href} className="text-sm font-medium text-teal-400 hover:text-teal-300">
                     {item.title}
                   </Link>
                   <p className="mt-0.5 text-[11px] text-zinc-600">
@@ -119,7 +119,7 @@ export default function HomeIntelligenceFeed() {
                   {item.saveEntity ? (
                     <SaveToWorkspaceButton entity={item.saveEntity} className="!px-2.5 !py-1 !text-[11px]" />
                   ) : null}
-                  <Link href={item.href} className="text-xs font-medium text-zinc-400 hover:text-cyan-300">
+                  <Link href={item.href} className="text-xs font-medium text-zinc-400 hover:text-teal-300">
                     {t("common.open")} →
                   </Link>
                 </div>

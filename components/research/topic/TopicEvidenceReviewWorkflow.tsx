@@ -66,8 +66,8 @@ export default function TopicEvidenceReviewWorkflow({
                       aria-current={isSelected ? "true" : undefined}
                       className={`block rounded-lg border px-3 py-2 transition-colors ${
                         isSelected
-                          ? "border-cyan-500/40 bg-cyan-500/10"
-                          : "border-zinc-800/80 bg-slate-950/40 hover:border-cyan-500/20 hover:bg-cyan-500/5"
+                          ? "border-teal-500/40 bg-teal-500/10"
+                          : "border-zinc-800/80 bg-slate-950/40 hover:border-teal-500/20 hover:bg-teal-500/5"
                       }`}
                     >
                       <p className="text-sm font-medium text-zinc-200">{item.label}</p>
@@ -132,7 +132,7 @@ export default function TopicEvidenceReviewWorkflow({
             <ul className="space-y-1.5">
               {nextActions.map((action) => (
                 <li key={action} className="flex items-start gap-2 text-xs text-zinc-400">
-                  <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-cyan-500/60" />
+                  <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-teal-500/60" />
                   {action}
                 </li>
               ))}

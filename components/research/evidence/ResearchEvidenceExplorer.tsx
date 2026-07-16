@@ -39,7 +39,7 @@ function strengthAccent(strength: EvidenceStrength): string {
     case "moderate":
       return "border-amber-500/25 bg-amber-500/5 text-amber-300";
     case "strong":
-      return "border-cyan-500/25 bg-cyan-500/5 text-cyan-300";
+      return "border-teal-500/25 bg-teal-500/5 text-teal-300";
     case "conclusive":
       return "border-emerald-500/25 bg-emerald-500/5 text-emerald-300";
   }

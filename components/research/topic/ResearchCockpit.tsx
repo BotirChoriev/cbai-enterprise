@@ -104,7 +104,7 @@ export default function ResearchCockpit({ topic, workflow }: ResearchCockpitProp
             {workflow.actionLink ? (
               <Link
                 href={workflow.actionLink.href}
-                className="mt-1.5 inline-flex rounded-md border border-cyan-500/30 bg-cyan-500/10 px-2.5 py-1 text-xs font-medium text-cyan-300 transition-colors hover:border-cyan-500/50 hover:bg-cyan-500/15"
+                className="mt-1.5 inline-flex rounded-md border border-teal-500/30 bg-teal-500/10 px-2.5 py-1 text-xs font-medium text-teal-300 transition-colors hover:border-teal-500/50 hover:bg-teal-500/15"
               >
                 {workflow.actionLink.label} →
               </Link>

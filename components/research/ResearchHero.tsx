@@ -70,7 +70,7 @@ export default function ResearchHero({ query = "" }: ResearchHeroProps) {
 
         <p className="text-sm text-zinc-500">
           University profiles available today in{" "}
-          <Link href="/universities" className="font-medium text-cyan-400 hover:text-cyan-300">
+          <Link href="/universities" className="font-medium text-teal-400 hover:text-teal-300">
             Public Intelligence → Universities
           </Link>
           .

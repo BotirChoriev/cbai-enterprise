@@ -65,7 +65,7 @@ export default function CloudProfileImportPrompt() {
   }
 
   return (
-    <div className={`${cbaiGlassCard} space-y-3 border-cyan-500/20 p-5`}>
+    <div className={`${cbaiGlassCard} space-y-3 border-teal-500/20 p-5`}>
       <p className={cbaiSectionEyebrow}>Cloud Assistant preferences found</p>
       <p className="text-sm text-zinc-300">
         Your cloud account has a saved Assistant profile ({cloudProfile.assistantName || "unnamed"}) that differs

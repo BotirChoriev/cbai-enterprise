@@ -39,7 +39,7 @@ export default function EntityEvidenceCoverage({
               </div>
               <Link
                 href={module.route}
-                className="inline-flex min-h-9 shrink-0 items-center rounded-lg border border-zinc-700 bg-zinc-900 px-3 text-xs font-medium text-cyan-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
+                className="inline-flex min-h-9 shrink-0 items-center rounded-lg border border-zinc-700 bg-zinc-900 px-3 text-xs font-medium text-teal-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
               >
                 Open →
               </Link>

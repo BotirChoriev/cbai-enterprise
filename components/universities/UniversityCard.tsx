@@ -32,13 +32,13 @@ export default function UniversityCard({
       onClick={onSelect}
       className={`w-full rounded-xl border p-4 text-left transition-all ${
         isSelected
-          ? "border-cyan-500/40 bg-cyan-500/5 ring-1 ring-cyan-500/20"
+          ? "border-teal-500/40 bg-teal-500/5 ring-1 ring-teal-500/20"
           : "border-zinc-800 bg-zinc-900/40 hover:border-zinc-700 hover:bg-zinc-900/70"
       }`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900 font-mono text-[10px] font-bold text-cyan-400">
+          <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900 font-mono text-[10px] font-bold text-teal-400">
             {university.icon}
           </span>
           <div>
@@ -49,7 +49,7 @@ export default function UniversityCard({
           </div>
         </div>
         {isSelected ? (
-          <span className="rounded-full bg-cyan-500/10 px-2 py-0.5 text-[10px] font-medium text-cyan-400">
+          <span className="rounded-full bg-teal-500/10 px-2 py-0.5 text-[10px] font-medium text-teal-400">
             Selected
           </span>
         ) : null}

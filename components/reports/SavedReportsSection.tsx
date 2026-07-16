@@ -52,7 +52,7 @@ export default function SavedReportsSection() {
             className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-zinc-800/80 bg-zinc-900/40 px-3 py-2"
           >
             <div>
-              <Link href={reportHref(report)} className="text-sm font-medium text-cyan-400 hover:text-cyan-300">
+              <Link href={reportHref(report)} className="text-sm font-medium text-teal-400 hover:text-teal-300">
                 {report.title}
               </Link>
               <p className="text-[11px] text-zinc-600">Saved {new Date(report.generatedAt).toLocaleString()}</p>

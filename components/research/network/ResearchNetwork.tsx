@@ -243,7 +243,7 @@ export default function ResearchNetwork() {
             <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
               Catalog connections
             </p>
-            <p className="mt-1 text-2xl font-semibold tabular-nums text-cyan-300">
+            <p className="mt-1 text-2xl font-semibold tabular-nums text-teal-300">
               {network.connectionCount}
             </p>
             <p className="text-xs text-zinc-500">Metadata relationships</p>

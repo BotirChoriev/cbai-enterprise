@@ -78,13 +78,13 @@ export default function LaboratoryReadiness({ layer }: LaboratoryReadinessProps)
         </div>
 
         <div className={`${cbaiGlassCard} p-4`}>
-          <p className="text-[10px] font-medium uppercase tracking-wider text-cyan-400/80">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-teal-400/80">
             Future capabilities
           </p>
           <ul className="mt-3 space-y-2">
             {layer.futureCapabilities.map((capability) => (
               <li key={capability} className="flex items-start gap-2 text-xs text-zinc-400">
-                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-cyan-500/60" />
+                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-teal-500/60" />
                 {capability}
               </li>
             ))}

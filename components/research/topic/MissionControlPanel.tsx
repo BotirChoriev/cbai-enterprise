@@ -13,7 +13,7 @@ function stageAccent(stage: WorkflowStage): string {
     case "evidence_connection_required":
       return "border-amber-500/25 bg-amber-500/5 text-amber-300";
     case "evidence_ready_for_review":
-      return "border-cyan-500/25 bg-cyan-500/5 text-cyan-300";
+      return "border-teal-500/25 bg-teal-500/5 text-teal-300";
     case "review_required":
       return "border-amber-600/30 bg-amber-600/10 text-amber-500";
     case "monitoring_required":
@@ -79,7 +79,7 @@ export default function MissionControlPanel({ topic }: MissionControlPanelProps)
           {workflow.actionLink ? (
             <Link
               href={workflow.actionLink.href}
-              className="mt-1.5 inline-flex rounded-md border border-cyan-500/30 bg-cyan-500/10 px-2.5 py-1 text-xs font-medium text-cyan-300 transition-colors hover:border-cyan-500/50 hover:bg-cyan-500/15"
+              className="mt-1.5 inline-flex rounded-md border border-teal-500/30 bg-teal-500/10 px-2.5 py-1 text-xs font-medium text-teal-300 transition-colors hover:border-teal-500/50 hover:bg-teal-500/15"
             >
               {workflow.actionLink.label} →
             </Link>

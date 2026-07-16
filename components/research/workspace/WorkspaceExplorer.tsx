@@ -58,7 +58,7 @@ export default function WorkspaceExplorer({
       <header className="mb-6 space-y-3">
         <Link
           href="/research"
-          className="inline-flex text-sm font-medium text-cyan-400 transition-colors hover:text-cyan-300"
+          className="inline-flex text-sm font-medium text-teal-400 transition-colors hover:text-teal-300"
         >
           ← Back to Research Intelligence
         </Link>
@@ -71,7 +71,7 @@ export default function WorkspaceExplorer({
           {showTopicNotFoundNotice ? (
             <p className="mt-2 rounded-md border border-zinc-800/80 bg-zinc-900/40 px-3 py-2 text-xs text-zinc-500">
               {`"${deepLinkTopicId}" is not a topic in the research catalog — check the link, or `}
-              <Link href="/research" className="text-cyan-400 hover:text-cyan-300">
+              <Link href="/research" className="text-teal-400 hover:text-teal-300">
                 browse all research topics
               </Link>
               .
@@ -157,7 +157,7 @@ export default function WorkspaceExplorer({
           <MethodComparisonPanel topic={context.topic} variant="workspace" />
 
           <section className={`${cbaiGlassCard} space-y-2 p-4`}>
-            <p className="text-[10px] font-medium uppercase tracking-wider text-cyan-400/90">
+            <p className="text-[10px] font-medium uppercase tracking-wider text-teal-400/90">
               Future workspace
             </p>
             <ul className="space-y-1">

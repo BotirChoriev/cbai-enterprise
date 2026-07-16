@@ -19,7 +19,7 @@ export default function WorkspaceTopicNavigator({ topic }: WorkspaceTopicNavigat
       </div>
       <Link
         href={getResearchTopicPath(topic.topicId)}
-        className="text-xs font-medium text-cyan-400 transition-colors hover:text-cyan-300"
+        className="text-xs font-medium text-teal-400 transition-colors hover:text-teal-300"
       >
         Open topic page →
       </Link>

@@ -176,7 +176,7 @@ function EntityMatchCard({ entry, matchedLabel }: EntityMatchCardProps) {
       ) : null}
 
       {entry.coverageLabel ? (
-        <p className="mt-1 text-xs text-cyan-400/80">{entry.coverageLabel}</p>
+        <p className="mt-1 text-xs text-teal-400/80">{entry.coverageLabel}</p>
       ) : null}
 
       <p className="mt-1 text-xs text-zinc-600">{entry.nextStep}</p>
@@ -191,7 +191,7 @@ function EntityMatchCard({ entry, matchedLabel }: EntityMatchCardProps) {
         {!matchedLabel && entry.showCompare ? (
           <Link
             href={profileSectionHref(entry.href, "compare")}
-            className="inline-flex min-h-9 items-center rounded-lg border border-zinc-700 bg-zinc-900 px-3.5 text-xs font-medium text-cyan-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
+            className="inline-flex min-h-9 items-center rounded-lg border border-zinc-700 bg-zinc-900 px-3.5 text-xs font-medium text-teal-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
           >
             Compare →
           </Link>
@@ -199,7 +199,7 @@ function EntityMatchCard({ entry, matchedLabel }: EntityMatchCardProps) {
         {!matchedLabel && entry.showReports ? (
           <Link
             href={profileSectionHref(entry.href, "reports")}
-            className="inline-flex min-h-9 items-center rounded-lg border border-zinc-700 bg-zinc-900 px-3.5 text-xs font-medium text-cyan-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
+            className="inline-flex min-h-9 items-center rounded-lg border border-zinc-700 bg-zinc-900 px-3.5 text-xs font-medium text-teal-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
           >
             Open reports →
           </Link>
@@ -207,7 +207,7 @@ function EntityMatchCard({ entry, matchedLabel }: EntityMatchCardProps) {
         {entry.createProjectHref ? (
           <Link
             href={entry.createProjectHref}
-            className="inline-flex min-h-9 items-center rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3.5 text-xs font-medium text-cyan-300 transition-colors hover:border-cyan-500/50"
+            className="inline-flex min-h-9 items-center rounded-lg border border-teal-500/30 bg-teal-500/10 px-3.5 text-xs font-medium text-teal-300 transition-colors hover:border-teal-500/50"
           >
             Create Project →
           </Link>

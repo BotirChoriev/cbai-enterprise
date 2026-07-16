@@ -55,7 +55,7 @@ export default function TopicSectionTabs({
               onClick={() => onTabChange(tab.id)}
               className={`rounded-md px-3 py-2 text-xs font-medium transition-colors ${
                 selected
-                  ? "bg-cyan-500/15 text-cyan-300"
+                  ? "bg-teal-500/15 text-teal-300"
                   : "text-zinc-500 hover:bg-zinc-900/60 hover:text-zinc-300"
               }`}
             >

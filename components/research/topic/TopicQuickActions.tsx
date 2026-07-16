@@ -57,18 +57,18 @@ export default function TopicQuickActions({ topic, onTabChange }: TopicQuickActi
             {action.href ? (
               <Link
                 href={action.href}
-                className={`${cbaiGlassCard} block p-3 transition-colors hover:border-cyan-500/25`}
+                className={`${cbaiGlassCard} block p-3 transition-colors hover:border-teal-500/25`}
               >
-                <p className="text-xs font-medium text-cyan-400">{action.label} →</p>
+                <p className="text-xs font-medium text-teal-400">{action.label} →</p>
                 <p className="mt-0.5 text-[11px] text-zinc-600">{action.description}</p>
               </Link>
             ) : (
               <button
                 type="button"
                 onClick={action.onClick}
-                className={`${cbaiGlassCard} w-full p-3 text-left transition-colors hover:border-cyan-500/25`}
+                className={`${cbaiGlassCard} w-full p-3 text-left transition-colors hover:border-teal-500/25`}
               >
-                <p className="text-xs font-medium text-cyan-400">{action.label} →</p>
+                <p className="text-xs font-medium text-teal-400">{action.label} →</p>
                 <p className="mt-0.5 text-[11px] text-zinc-600">{action.description}</p>
               </button>
             )}

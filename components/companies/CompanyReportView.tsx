@@ -40,7 +40,7 @@ function LinkList({ links, emptyLabel }: { links: readonly CompanyReportLink[]; 
           <li key={link.name}>
             <Link
               href={link.href}
-              className="rounded-full border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-xs text-zinc-400 hover:text-cyan-300"
+              className="rounded-full border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-xs text-zinc-400 hover:text-teal-300"
             >
               {link.name}
             </Link>
@@ -60,7 +60,7 @@ export default function CompanyReportView({ report }: CompanyReportViewProps) {
   return (
     <section
       aria-labelledby="company-report-heading"
-      className={`${cbaiGlassCard} cbai-print-area space-y-6 border-cyan-500/15 p-5 sm:p-6`}
+      className={`${cbaiGlassCard} cbai-print-area space-y-6 border-teal-500/15 p-5 sm:p-6`}
     >
       <ReportHeaderLogo />
       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -97,7 +97,7 @@ export default function CompanyReportView({ report }: CompanyReportViewProps) {
             <dt className="text-[10px] uppercase tracking-wider text-zinc-600">Website</dt>
             <dd className="mt-0.5 text-zinc-300">
               {report.overview.website ? (
-                <a href={report.overview.website} target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">
+                <a href={report.overview.website} target="_blank" rel="noopener noreferrer" className="text-teal-400 hover:underline">
                   {report.overview.website}
                 </a>
               ) : (
@@ -139,7 +139,7 @@ export default function CompanyReportView({ report }: CompanyReportViewProps) {
               <li key={match.topic.topicId}>
                 <Link
                   href={getResearchTopicPath(match.topic.topicId)}
-                  className="rounded-full border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-xs text-zinc-400 hover:text-cyan-300"
+                  className="rounded-full border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-xs text-zinc-400 hover:text-teal-300"
                 >
                   {match.topic.topicName}
                 </Link>
@@ -154,7 +154,7 @@ export default function CompanyReportView({ report }: CompanyReportViewProps) {
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
         <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Country</p>
         {report.country ? (
-          <Link href={report.country.href} className="text-sm text-cyan-400 hover:underline">
+          <Link href={report.country.href} className="text-sm text-teal-400 hover:underline">
             {report.country.name} →
           </Link>
         ) : (
@@ -167,7 +167,7 @@ export default function CompanyReportView({ report }: CompanyReportViewProps) {
         <LinkList links={report.linkedProjects} emptyLabel="No projects link to this company yet." />
         <Link
           href={`/my-work?entityKind=company&entityId=${report.company.id}&entityName=${encodeURIComponent(report.company.name)}`}
-          className="mt-1.5 inline-flex text-xs font-medium text-cyan-400 hover:text-cyan-300"
+          className="mt-1.5 inline-flex text-xs font-medium text-teal-400 hover:text-teal-300"
         >
           + Create a project for {report.company.name} →
         </Link>

@@ -12,7 +12,6 @@ import { useAuth } from "@/components/platform/context/AuthProvider";
 import RecentEntities from "@/components/platform/context/RecentEntities";
 import PinnedEntities from "@/components/platform/context/PinnedEntities";
 import SavedEvidence from "@/components/my-work/SavedEvidence";
-import StatusBadge from "@/components/shared/StatusBadge";
 import Avatar from "@/components/shared/Avatar";
 import CreateProjectForm from "@/components/project/CreateProjectForm";
 import ProjectList from "@/components/project/ProjectList";
@@ -22,11 +21,11 @@ import CloudProfileImportPrompt from "@/components/account/CloudProfileImportPro
 import PendingSyncNotice from "@/components/shared/PendingSyncNotice";
 import { loadProject } from "@/lib/project/project-store";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
+import { useTranslation } from "@/lib/i18n/use-translation";
 import { PROJECT_TYPES, type ProjectTypeId } from "@/lib/project/project-types";
 import type { ContextEntityRef } from "@/lib/context/context-types";
 import {
   ASSISTANT_LANGUAGES,
-  WORKSPACE_ROLE_LABELS,
   resolveOperatorName,
 } from "@/lib/assistant/assistant-profile";
 
@@ -58,6 +57,7 @@ const ONBOARDING_LINKS = [
 
 function MyWorkContent() {
   const searchParams = useSearchParams();
+  const { t } = useTranslation();
   const projectId = searchParams.get("project");
   // Real hydration-mismatch fix (found via actual browser testing): loadProject() is honestly
   // empty on the server (no window/localStorage), so reading it directly during render produced a
@@ -100,7 +100,7 @@ function MyWorkContent() {
   // being restored from storage (Phase 10). Never shown when cloud accounts aren't configured, so
   // Local Mode's first paint is unaffected.
   if (cloudSessionRestoring) {
-    return <div className={`${cbaiGlassCard} p-5 text-sm text-zinc-500`}>Restoring your session…</div>;
+    return <div className={`${cbaiGlassCard} p-5 text-sm text-zinc-500`}>{t("myWork.restoringSession")}</div>;
   }
 
   if (projectId && project) {
@@ -118,13 +118,10 @@ function MyWorkContent() {
   if (projectId && !project) {
     return (
       <div className={`${cbaiGlassCard} space-y-2 p-5`}>
-        <p className="text-sm text-zinc-300">This project isn&apos;t available.</p>
-        <p className="text-xs text-zinc-500">
-          Projects are saved to this browser only, so this link may be from another device, or
-          the project may have been removed here. Your real projects are listed below.
-        </p>
-        <Link href="/my-work" className="text-xs text-cyan-400 hover:text-cyan-300">
-          ← Back to My Work
+        <p className="text-sm text-zinc-300">{t("myWork.projectUnavailable")}</p>
+        <p className="text-xs text-zinc-500">{t("myWork.projectUnavailableBody")}</p>
+        <Link href="/my-work" className="text-xs text-teal-400 hover:text-teal-300">
+          {t("myWork.backToMyWork")}
         </Link>
       </div>
     );
@@ -133,32 +130,31 @@ function MyWorkContent() {
   return (
     <div className="space-y-8">
       {isActive || isSignedIn ? (
-        <div className={`${cbaiGlassCard} border-cyan-500/15 px-6 py-5`}>
+        <div className={`${cbaiGlassCard} border-teal-500/15 px-6 py-5`}>
           <div className="flex flex-wrap items-center gap-3">
             <Avatar name={user?.displayName || profile.name} avatar={profile.avatar} />
             <div>
               <h2 className="text-lg font-semibold text-zinc-100">
-                {user?.displayName || profile.name}&apos;s Work
+                {t("myWork.yourWork", { name: user?.displayName || profile.name })}
               </h2>
               <p className="text-xs text-zinc-500">
                 {isActive
-                  ? `${resolveOperatorName(profile)} · ${WORKSPACE_ROLE_LABELS[profile.workspaceRole]} workspace · ${preferredLanguage?.label ?? profile.preferredLanguage}`
-                  : "Local Assistant profile not set up yet"}
+                  ? `${resolveOperatorName(profile)} · ${t(`workspaceRoles.${profile.workspaceRole}`)} · ${preferredLanguage?.label ?? profile.preferredLanguage}`
+                  : t("myWork.localProfileNotSetUp")}
               </p>
             </div>
-            <StatusBadge status="live" className="ml-auto" />
           </div>
           <p className="mt-3 max-w-2xl text-xs text-zinc-500">
             {accountMode === "cloud"
-              ? `Signed in with a cloud account as ${cloudUser!.email} — Projects and Bookmarks below sync across every device you sign into.`
+              ? t("myWork.signedInCloud", { email: cloudUser!.email })
               : isSignedIn
-                ? `Signed in as ${user!.email} — Projects and Bookmarks below belong to your account, saved to this device only.`
-                : "Saved to this browser — real projects, research, and evidence entry points below, never fabricated activity or recommendations."}
+                ? t("myWork.signedInLocal", { email: user!.email })
+                : t("myWork.savedToBrowser")}
             {!isSignedIn && accountMode !== "cloud" ? (
               <>
                 {" "}
-                <Link href="/account" className="text-cyan-400 hover:text-cyan-300">
-                  Sign in
+                <Link href="/account" className="text-teal-400 hover:text-teal-300">
+                  {t("myWork.signInPrompt")}
                 </Link>{" "}
                 to keep your work separate from others using this browser.
               </>
@@ -167,14 +163,12 @@ function MyWorkContent() {
           {accountMode === "cloud" ? <PendingSyncNotice cloudUserId={cloudUser!.id} /> : null}
         </div>
       ) : (
-        <div className={`${cbaiGlassCard} border-cyan-500/15 px-6 py-5`}>
-          <h2 className="text-lg font-semibold text-zinc-100">My Work</h2>
+        <div className={`${cbaiGlassCard} border-teal-500/15 px-6 py-5`}>
+          <h2 className="text-lg font-semibold text-zinc-100">{t("myWork.title")}</h2>
           <p className="mt-1 max-w-2xl text-sm text-zinc-400">
-            Nothing below is personalized to you yet. Projects, and the real, working entry points
-            into research and evidence review across the platform, are saved to this browser only
-            — never a fabricated history.{" "}
-            <Link href="/account" className="text-cyan-400 hover:text-cyan-300">
-              Sign in or create a local account
+            {t("myWork.savedToBrowser")}{" "}
+            <Link href="/account" className="text-teal-400 hover:text-teal-300">
+              {t("myWork.signInOrCreate")}
             </Link>{" "}
             to keep your own Projects and Bookmarks separate from anyone else using this browser.
           </p>
@@ -183,7 +177,7 @@ function MyWorkContent() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-full border border-zinc-800 bg-zinc-900/40 px-3 py-1.5 text-xs text-zinc-300 transition-colors hover:border-cyan-500/30 hover:text-cyan-300"
+                className="rounded-full border border-zinc-800 bg-zinc-900/40 px-3 py-1.5 text-xs text-zinc-300 transition-colors hover:border-teal-500/30 hover:text-teal-300"
               >
                 {link.label}
               </Link>
@@ -208,9 +202,9 @@ function MyWorkContent() {
             <Link
               key={link.href}
               href={link.href}
-              className={`${cbaiGlassCard} flex flex-col px-5 py-4 transition-colors hover:border-cyan-500/25`}
+              className={`${cbaiGlassCard} flex flex-col px-5 py-4 transition-colors hover:border-teal-500/25`}
             >
-              <span className="text-sm font-semibold text-cyan-400">{link.label}</span>
+              <span className="text-sm font-semibold text-teal-400">{link.label}</span>
               <span className="mt-1 text-xs text-zinc-500">{link.detail}</span>
             </Link>
           ))}
@@ -230,9 +224,9 @@ function MyWorkContent() {
         </p>
         <Link
           href="/analytics"
-          className={`${cbaiGlassCard} flex flex-col px-5 py-4 transition-colors hover:border-cyan-500/25 sm:max-w-sm`}
+          className={`${cbaiGlassCard} flex flex-col px-5 py-4 transition-colors hover:border-teal-500/25 sm:max-w-sm`}
         >
-          <span className="text-sm font-semibold text-cyan-400">Reports Center</span>
+          <span className="text-sm font-semibold text-teal-400">Reports Center</span>
           <span className="mt-1 text-xs text-zinc-500">
             {reports.summary.reportTypes} report types defined for profile and comparison review.
           </span>
@@ -250,7 +244,7 @@ function MyWorkContent() {
           <p className="text-xs text-zinc-500">
             No personal review history is connected yet. Platform-wide, {evidence.summary.connectedSources}{" "}
             of {evidence.summary.totalSources} evidence sources are connected — open{" "}
-            <Link href="/knowledge" className="text-cyan-400 hover:text-cyan-300">
+            <Link href="/knowledge" className="text-teal-400 hover:text-teal-300">
               Evidence
             </Link>{" "}
             to review current status.

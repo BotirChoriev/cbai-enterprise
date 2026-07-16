@@ -12,7 +12,7 @@ function statusClass(status: ResearchGraphNode["status"]): string {
     case "not_connected_yet":
       return "border-zinc-700 bg-zinc-900/60 text-zinc-400";
     case "future_workspace":
-      return "border-cyan-500/25 bg-cyan-500/5 text-cyan-300";
+      return "border-teal-500/25 bg-teal-500/5 text-teal-300";
   }
 }
 

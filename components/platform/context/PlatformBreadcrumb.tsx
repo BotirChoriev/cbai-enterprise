@@ -17,7 +17,7 @@ export default function PlatformBreadcrumb({ segments }: PlatformBreadcrumbProps
             {segment.href && !isLast ? (
               <Link
                 href={segment.href}
-                className="text-cyan-400 underline-offset-2 hover:underline"
+                className="text-teal-400 underline-offset-2 hover:underline"
               >
                 {segment.label}
               </Link>

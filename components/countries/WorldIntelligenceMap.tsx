@@ -19,7 +19,7 @@ const LEGEND_STATUSES = PRODUCT_STATUSES.filter((status) =>
 // claiming any specific connection or geography that isn't real.
 const STATUS_ACCENT_BORDER: Record<WorldMapCountry["status"], string> = {
   live: "hover:border-emerald-500/50",
-  partial: "hover:border-cyan-500/40",
+  partial: "hover:border-teal-500/40",
   waiting_for_verified_data: "hover:border-amber-500/40",
   preview: "hover:border-violet-500/40",
   restricted: "hover:border-orange-500/40",
@@ -105,7 +105,7 @@ export default function WorldIntelligenceMap() {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search countries…"
             aria-labelledby="world-map-search-label"
-            className="w-full rounded-lg border border-zinc-800 bg-slate-900/80 px-3 py-2 text-sm text-zinc-200 outline-none transition-colors focus:border-cyan-500/30 focus:ring-1 focus:ring-cyan-500/20"
+            className="w-full rounded-lg border border-zinc-800 bg-slate-900/80 px-3 py-2 text-sm text-zinc-200 outline-none transition-colors focus:border-teal-500/30 focus:ring-1 focus:ring-cyan-500/20"
           />
         </label>
       </div>

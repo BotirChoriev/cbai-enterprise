@@ -13,7 +13,7 @@ export default function CreateProjectFromEntityButton({ entity, className = "" }
   return (
     <Link
       href={`/my-work?${params.toString()}`}
-      className={`inline-flex items-center gap-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 py-1.5 text-xs font-medium text-cyan-300 transition-colors hover:border-cyan-500/50 ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-lg border border-teal-500/30 bg-teal-500/10 px-3 py-1.5 text-xs font-medium text-teal-300 transition-colors hover:border-teal-500/50 ${className}`}
     >
       Create Project
     </Link>

@@ -47,11 +47,11 @@ export default function ProjectOpenQuestionsPanel({ projectId, onChange }: Proje
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="New open question…"
-          className="flex-1 rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-1.5 text-xs text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-cyan-500/30"
+          className="flex-1 rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-1.5 text-xs text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30"
         />
         <button
           type="submit"
-          className="rounded-md border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-[11px] font-medium text-cyan-300 hover:border-cyan-500/50"
+          className="rounded-md border border-teal-500/30 bg-teal-500/10 px-3 py-1 text-[11px] font-medium text-teal-300 hover:border-teal-500/50"
         >
           Add question
         </button>
@@ -65,7 +65,7 @@ export default function ProjectOpenQuestionsPanel({ projectId, onChange }: Proje
               <button
                 type="button"
                 onClick={() => handleResolve(q.questionId)}
-                className="shrink-0 text-[10px] text-cyan-400 hover:underline"
+                className="shrink-0 text-[10px] text-teal-400 hover:underline"
               >
                 Mark resolved
               </button>

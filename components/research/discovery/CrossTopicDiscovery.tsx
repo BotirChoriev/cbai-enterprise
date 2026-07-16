@@ -51,7 +51,7 @@ export default function CrossTopicDiscovery({
           <p className="text-xs text-zinc-500">No related topics found from catalog metadata for this topic.</p>
           <Link
             href="/research"
-            className="inline-flex items-center text-xs font-medium text-cyan-400 hover:text-cyan-300"
+            className="inline-flex items-center text-xs font-medium text-teal-400 hover:text-teal-300"
           >
             Browse the full Research catalog →
           </Link>

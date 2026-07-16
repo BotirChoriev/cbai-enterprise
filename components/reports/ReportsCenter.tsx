@@ -36,7 +36,7 @@ export default function ReportsCenter() {
       <div className={cbaiPageHeader}>
         {entity ? (
           <>
-            <p className="text-[10px] font-medium uppercase tracking-widest text-cyan-400">
+            <p className="text-[10px] font-medium uppercase tracking-widest text-teal-400">
               Continuing review for
             </p>
             <h1 className="cbai-display mt-1 text-2xl text-zinc-50">
@@ -48,7 +48,7 @@ export default function ReportsCenter() {
             {profileHref ? (
               <Link
                 href={profileHref}
-                className="mt-4 inline-flex min-h-10 items-center text-sm font-medium text-cyan-400 transition-colors hover:text-cyan-300"
+                className="mt-4 inline-flex min-h-10 items-center text-sm font-medium text-teal-400 transition-colors hover:text-teal-300"
               >
                 ← Back to profile
               </Link>

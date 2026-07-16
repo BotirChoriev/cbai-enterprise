@@ -40,7 +40,7 @@ export default function ResearchTopicWorkspaceStatus({
         </div>
 
         <div className={`${cbaiGlassCard} p-5`}>
-          <p className="text-[10px] font-medium uppercase tracking-wider text-cyan-400/90">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-teal-400/90">
             Future workspace
           </p>
           <p className="mt-3 text-sm leading-relaxed text-zinc-400">{topic.futureWorkspace}</p>

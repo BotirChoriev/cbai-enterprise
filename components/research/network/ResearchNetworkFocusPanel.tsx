@@ -40,7 +40,7 @@ export default function ResearchNetworkFocusPanel({
   return (
     <aside
       aria-labelledby="network-focus-heading"
-      className={`${cbaiGlassCard} flex flex-col gap-4 border-cyan-500/20 p-4 shadow-[0_0_32px_-8px_rgba(34,211,238,0.25)] transition-all duration-[250ms] lg:max-h-[720px] lg:overflow-y-auto`}
+      className={`${cbaiGlassCard} flex flex-col gap-4 border-teal-500/20 p-4 shadow-[0_0_32px_-8px_rgba(34,211,238,0.25)] transition-all duration-[250ms] lg:max-h-[720px] lg:overflow-y-auto`}
     >
       <div className="space-y-1">
         <p className={cbaiSectionEyebrow}>Selected topic</p>
@@ -110,11 +110,11 @@ export default function ResearchNetworkFocusPanel({
                 <button
                   type="button"
                   onClick={() => onSelectTopic(related.topicId)}
-                  className="w-full rounded-lg border border-zinc-800/80 bg-slate-950/50 px-3 py-2 text-left transition-all duration-[250ms] hover:border-cyan-500/30 hover:bg-cyan-500/5"
+                  className="w-full rounded-lg border border-zinc-800/80 bg-slate-950/50 px-3 py-2 text-left transition-all duration-[250ms] hover:border-teal-500/30 hover:bg-teal-500/5"
                 >
                   <span className="block text-sm font-medium text-zinc-200">{related.topicName}</span>
                   <span className="mt-0.5 block text-[10px] text-zinc-500">{related.domain}</span>
-                  <span className="mt-1 block text-[10px] text-cyan-400/80">
+                  <span className="mt-1 block text-[10px] text-teal-400/80">
                     {formatConnectionTypes(related.connectionTypes)}
                   </span>
                 </button>

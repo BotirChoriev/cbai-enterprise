@@ -51,7 +51,7 @@ export default function RecentEntities({ entities }: RecentEntitiesProps) {
             <li key={`${entity.kind}-${entity.id}`}>
               <Link
                 href={entityHref(entity, context)}
-                className="rounded-md border border-zinc-800 px-2 py-1 text-[11px] text-zinc-400 hover:text-cyan-300"
+                className="rounded-md border border-zinc-800 px-2 py-1 text-[11px] text-zinc-400 hover:text-teal-300"
               >
                 {entity.name}
               </Link>

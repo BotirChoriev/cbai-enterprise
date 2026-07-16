@@ -55,12 +55,12 @@ function RoleCard({
 
   return (
     <div
-      className={`${cbaiGlassCard} flex flex-col gap-2.5 p-4 transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-16px_rgba(0,88,16,0.3)] ${isSelected ? "border-cyan-500/40" : ""}`}
+      className={`${cbaiGlassCard} flex flex-col gap-2.5 p-4 transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_-16px_rgba(0,88,16,0.3)] ${isSelected ? "border-teal-500/40" : ""}`}
     >
       <div className="flex items-start justify-between gap-2">
         <h3 className="text-sm font-semibold text-zinc-100">{t(`${namespaceKey}.title`)}</h3>
         {isSelected ? (
-          <span className="shrink-0 rounded-full bg-cyan-500/10 px-2 py-0.5 text-[10px] font-medium text-cyan-300">
+          <span className="shrink-0 rounded-full bg-teal-500/10 px-2 py-0.5 text-[10px] font-medium text-teal-300">
             {t("common.yes")}
           </span>
         ) : null}
@@ -73,7 +73,7 @@ function RoleCard({
           command bar is the one input, never duplicated per card. */}
       <p className="text-[11px] text-zinc-600">
         <span className="text-zinc-700">{t("common.tryCommand")}: </span>
-        <span className="italic text-cyan-400/80">&quot;{t(`${namespaceKey}.sampleCommand`)}&quot;</span>
+        <span className="italic text-teal-400/80">&quot;{t(`${namespaceKey}.sampleCommand`)}&quot;</span>
       </p>
       <div className="mt-auto flex items-center gap-2 pt-1">
         <Link

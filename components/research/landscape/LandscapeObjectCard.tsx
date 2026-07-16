@@ -14,7 +14,7 @@ function statusClass(status: LandscapeObject["status"]): string {
     case "catalog_available":
       return "border-emerald-500/30 bg-emerald-500/10 text-emerald-300";
     case "future_workspace":
-      return "border-cyan-500/30 bg-cyan-500/10 text-cyan-300";
+      return "border-teal-500/30 bg-teal-500/10 text-teal-300";
     case "not_connected_yet":
       return "border-zinc-700 bg-zinc-900/60 text-zinc-400";
   }
@@ -43,7 +43,7 @@ export default function LandscapeObjectCard({
     </>
   );
 
-  const className = `${cbaiGlassCard} min-w-[7.5rem] max-w-[11rem] flex-1 p-2.5 transition-colors hover:border-cyan-500/20`;
+  const className = `${cbaiGlassCard} min-w-[7.5rem] max-w-[11rem] flex-1 p-2.5 transition-colors hover:border-teal-500/20`;
 
   if (object.topicId && onSelectTopic) {
     return (

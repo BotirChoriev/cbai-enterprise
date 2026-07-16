@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import PageHeader from "@/components/layout/PageHeader";
+import TrustVerificationStatuses from "@/components/trust/TrustVerificationStatuses";
 import { HOME_FOOTER, PLATFORM_VERSION, TRUST_PILLARS } from "@/lib/platform-home";
-import { PRODUCT_STATUS_LABELS, PRODUCT_STATUS_EXPLANATIONS } from "@/lib/product-status";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 export const metadata: Metadata = {
@@ -21,8 +21,6 @@ function findPillar(id: string) {
 const humanDecisionPillar = findPillar("humans-decide");
 const evidenceFirstPillar = findPillar("sources-before-conclusions");
 const uncertaintyPillar = findPillar("uncertainty-visible");
-
-const VERIFICATION_STATUSES = ["live", "partial", "waiting_for_verified_data", "preview"] as const;
 
 const DATA_SOURCE_CATEGORIES = [
   { name: "United Nations", scope: "Country-level institutional and treaty reporting." },
@@ -43,6 +41,7 @@ type TrustSection = {
   id: string;
   title: string;
   body: string[];
+  showVerificationStatuses?: boolean;
 };
 
 const sections: TrustSection[] = [
@@ -64,10 +63,8 @@ const sections: TrustSection[] = [
     title: "Verification Model",
     body: [
       "Every profile and topic on this platform carries one of four honest labels, always shown as a full sentence, never a bare word or color alone:",
-      ...VERIFICATION_STATUSES.map(
-        (status) => `${PRODUCT_STATUS_LABELS[status]} — ${PRODUCT_STATUS_EXPLANATIONS[status]}`,
-      ),
     ],
+    showVerificationStatuses: true,
   },
   {
     id: "evidence-policy",
@@ -152,7 +149,7 @@ export default function TrustPage() {
         <ul className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
           {sections.map((section) => (
             <li key={section.id}>
-              <a href={`#${section.id}`} className="text-cyan-400 hover:text-cyan-300">
+              <a href={`#${section.id}`} className="text-teal-400 hover:text-teal-300">
                 {section.title}
               </a>
             </li>
@@ -180,13 +177,14 @@ export default function TrustPage() {
                 {paragraph}
               </p>
             ))}
+            {section.showVerificationStatuses ? <TrustVerificationStatuses /> : null}
           </section>
         ))}
       </div>
 
       <p className="text-xs text-zinc-600">
         Full pillar-by-pillar detail lives on the{" "}
-        <Link href="/#home-trust-heading" className="text-cyan-400 hover:text-cyan-300">
+        <Link href="/#home-trust-heading" className="text-teal-400 hover:text-teal-300">
           Home
         </Link>{" "}
         page&apos;s trust summary.

@@ -38,7 +38,7 @@ export default function ResearcherVerificationReadiness({
           {verificationSources.map((source) => (
             <li
               key={source}
-              className="rounded-md border border-cyan-500/10 bg-cyan-500/5 px-2 py-0.5 text-[11px] text-zinc-500"
+              className="rounded-md border border-teal-500/10 bg-teal-500/5 px-2 py-0.5 text-[11px] text-zinc-500"
             >
               {source}
             </li>

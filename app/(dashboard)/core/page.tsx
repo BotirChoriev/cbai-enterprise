@@ -29,7 +29,7 @@ export default function CorePage() {
           <li key={module.href}>
             <Link
               href={module.href}
-              className="block rounded-xl border border-zinc-800 bg-zinc-950 px-5 py-4 transition-colors hover:border-cyan-500/30"
+              className="block rounded-xl border border-zinc-800 bg-zinc-950 px-5 py-4 transition-colors hover:border-teal-500/30"
             >
               <p className="text-sm font-semibold text-zinc-200">{module.label}</p>
               <p className="mt-1 text-xs text-zinc-500">{module.description}</p>

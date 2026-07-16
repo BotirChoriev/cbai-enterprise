@@ -26,7 +26,7 @@ export default function ResearchNetworkLegend({ compact = false }: ResearchNetwo
         <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">Node types</p>
         <ul className="mt-2 space-y-1.5 text-xs text-zinc-500">
           <li className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-cyan-400/90 shadow-[0_0_8px_rgba(34,211,238,0.5)]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-teal-400/90 shadow-[0_0_8px_rgba(34,211,238,0.5)]" />
             Research topic — catalog node
           </li>
           <li className="flex items-center gap-2">

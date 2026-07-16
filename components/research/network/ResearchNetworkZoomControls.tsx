@@ -19,7 +19,7 @@ export default function ResearchNetworkZoomControls({
 }: ResearchNetworkZoomControlsProps) {
   return (
     <div
-      className="flex flex-wrap items-center gap-2 rounded-lg border border-cyan-500/15 bg-slate-950/80 p-2 backdrop-blur-sm"
+      className="flex flex-wrap items-center gap-2 rounded-lg border border-teal-500/15 bg-slate-950/80 p-2 backdrop-blur-sm"
       role="toolbar"
       aria-label="Network zoom controls"
     >
