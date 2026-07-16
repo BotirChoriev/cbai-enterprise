@@ -1711,6 +1711,28 @@ export type TranslationDictionary = {
     objectTypeRelationship: string;
     objectTypeCapabilitySignal: string;
   };
+  organizationOs: {
+    inspectorEyebrow: string;
+    architecturePreview: string;
+    missionHealth: string;
+    evidenceQuality: string;
+    knowledgeContribution: string;
+    capabilityCoverage: string;
+    humanImpact: string;
+    trust: string;
+    unknowns: string;
+    decisionBacklog: string;
+    maturity: string;
+    limitation: string;
+    none: string;
+    missionRoomEyebrow: string;
+    missionRoomInactive: string;
+    capabilityRequirements: string;
+    noPeopleRecommended: string;
+    cloudNotConnected: string;
+    marketplaceInactive: string;
+    discussionRule: string;
+  };
 };
 
 export type TranslationNamespace = keyof TranslationDictionary;

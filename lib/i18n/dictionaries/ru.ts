@@ -82,6 +82,7 @@ import { INTELLIGENCE_SPACES_RU } from "@/lib/i18n/platform-copy-build015-ru";
 import { LIVING_INTELLIGENCE_RU } from "@/lib/i18n/platform-copy-build016-ru";
 import { EXPERIENCE_ENGINEERING_RU } from "@/lib/i18n/platform-copy-build017-ru";
 import { UNIVERSAL_WORKSPACE_RU } from "@/lib/i18n/platform-copy-build018-ru";
+import { ORGANIZATION_OS_RU } from "@/lib/i18n/platform-copy-build019-ru";
 
 const ru: TranslationDictionary = {
   roles: {
@@ -548,6 +549,7 @@ const ru: TranslationDictionary = {
   livingIntelligence: LIVING_INTELLIGENCE_RU,
   experienceEngineering: EXPERIENCE_ENGINEERING_RU,
   universalWorkspace: UNIVERSAL_WORKSPACE_RU,
+  organizationOs: ORGANIZATION_OS_RU,
 };
 
 export default ru;

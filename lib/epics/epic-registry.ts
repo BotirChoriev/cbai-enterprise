@@ -43,7 +43,7 @@ export const EPIC_DEFINITIONS: readonly EpicDefinition[] = [
   { id: "EPIC-02", slug: "mission-operating-system", title: "Mission Operating System", status: "in-implementation", docPath: "docs/epics/EPIC-02-mission-operating-system.md" },
   { id: "EPIC-03", slug: "intelligence-identity-capability-passport", title: "Intelligence Identity & Capability Passport", status: "foundation", docPath: "docs/epics/EPIC-03-intelligence-identity-capability-passport.md" },
   { id: "EPIC-04", slug: "discovery-opportunity-network", title: "Discovery & Opportunity Network", status: "foundation", docPath: "docs/epics/EPIC-04-discovery-opportunity-network.md" },
-  { id: "EPIC-05", slug: "scientific-collaboration-os", title: "Scientific Collaboration Operating System", status: "proposed", docPath: "docs/epics/EPIC-05-scientific-collaboration-os.md" },
+  { id: "EPIC-05", slug: "scientific-collaboration-os", title: "Scientific Collaboration Operating System", status: "foundation", docPath: "docs/epics/EPIC-05-scientific-collaboration-os.md" },
   { id: "EPIC-06", slug: "evidence-trust-engine", title: "Evidence & Trust Engine", status: "in-implementation", docPath: "docs/epics/EPIC-06-evidence-trust-engine.md" },
   { id: "EPIC-07", slug: "research-reasoning-os", title: "Research & Reasoning Operating System", status: "foundation", docPath: "docs/epics/EPIC-07-research-reasoning-os.md" },
   { id: "EPIC-08", slug: "universal-knowledge-entity-system", title: "Universal Knowledge & Entity System", status: "functional", docPath: "docs/epics/EPIC-08-universal-knowledge-entity-system.md" },

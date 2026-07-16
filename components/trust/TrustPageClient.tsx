@@ -6,6 +6,7 @@ import { getDictionary } from "@/lib/i18n/translate";
 import { translateDataSourceScope } from "@/lib/i18n/trust-data-sources-translation";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import ModuleAccountabilityPanel from "@/components/trust/ModuleAccountabilityPanel";
+import OrganizationInspectorPanel from "@/components/organization/OrganizationInspectorPanel";
 import TrustVerificationStatuses from "@/components/trust/TrustVerificationStatuses";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import { DATA_SOURCE_CATEGORIES } from "@/lib/trust/data-source-categories";
@@ -84,6 +85,7 @@ export default function TrustPageClient() {
         })}
       </div>
 
+      <OrganizationInspectorPanel />
       <ModuleAccountabilityPanel />
 
       <p className="text-xs text-zinc-600">

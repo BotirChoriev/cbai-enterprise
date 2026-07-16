@@ -1,6 +1,6 @@
 # EPIC-05 — Scientific Collaboration Operating System
 
-**Status:** Proposed  
+**Status:** Foundation (architecture)  
 **Owner:** CBAI Product  
 **Constitution:** `docs/standards/01-cbai-constitution.md` (authoritative — not duplicated here)  
 **Supreme Principles:** `lib/constitution/supreme-principles.ts`
@@ -38,9 +38,11 @@ Shared missions, contributors, review, disagreements, attribution.
 
 ## Architecture boundary
 
-**In scope:** lib/research-mission/ (research vertical only)
+**In scope:** `lib/organization-os/` — organization workspace, mission room, decision ledger, knowledge contribution, knowledge DNA, mission marketplace, capability matching, permissions architecture, cloud interfaces (stubs).
 
-**Out of scope:** Fabricated collaborators, simulated external APIs, global human rankings, profession-only portals.
+**Also related:** `lib/research-mission/` (research vertical catalog — not merged with user missions yet)
+
+**Out of scope:** Fabricated collaborators, simulated messaging, fake users, cloud sync, CRM/Slack/Teams UX patterns.
 
 ---
 
@@ -129,9 +131,9 @@ No multi-user collaboration. Research mission engine not merged with user missio
 
 | Dimension | State |
 |-----------|-------|
-| Architecture | Planned |
-| Product | Proposed |
-| User workflow | Not started |
+| Architecture | Foundation |
+| Product | Foundation |
+| User workflow | Architecture preview on Trust |
 | Data | Device-local |
 | Trust | Module accountability registered |
 | Test | Node + browser suites |

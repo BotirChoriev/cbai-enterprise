@@ -319,3 +319,41 @@ Code registry: `lib/design/living-intelligence-registry.ts`
 
 Test suite: `npm run test:epic-13-universal-workspace`
 
+---
+
+## XV. Organization Intelligence & Mission Collaboration (EPIC-05)
+
+EPIC-05 prepares multi-organization intelligence architecture without fake collaboration, messaging, users, or cloud sync.
+
+### Organization Intelligence
+
+Organizations may be companies, universities, research centers, governments, hospitals, NGOs, startups, or independent laboratories. One organization model exposes identity, mission, knowledge, evidence, projects, people, capabilities, trust, reports, impact, and legacy pillars.
+
+Implementation: `lib/organization-os/`
+
+### Mission Collaboration
+
+Mission is the collaboration space — the **Mission Room** holds discussion, evidence, questions, decisions, reports, impact, knowledge, and timeline. No generic chat rooms, Slack, Teams, or Discord patterns.
+
+Implementation: `mission-room.ts`, `mission-discussion.types.ts`
+
+### Knowledge Contribution
+
+Explainable contribution types only — evidence review, question, reasoning, validation, methodology, research, teaching, mentoring, documentation, impact review. No points, rankings, or gamification.
+
+Implementation: `knowledge-contribution.types.ts`
+
+### Decision Memory
+
+Decision Ledger stores decision, evidence, alternatives, reason, participants, human reviewer, impact, and review date. Architecture-only persistence until cloud auth (EPIC-15).
+
+Implementation: `decision-ledger.types.ts`
+
+### Capability Discovery
+
+Knowledge DNA reflects demonstrated capability — never IQ, prestige, university, country, or title. Collaborator matching recommends **required capability only**, never people.
+
+Implementation: `knowledge-dna.ts`, `capability-matching.ts`
+
+Test suite: `npm run test:epic-05-organization-os`
+
