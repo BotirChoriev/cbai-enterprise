@@ -1754,6 +1754,9 @@ export type TranslationDictionary = {
     homeNoMissionLead: string;
     startMission: string;
     continueMission: string;
+    continueEvidence: string;
+    continueReview: string;
+    continueReport: string;
     goalResearch: string;
     goalVerify: string;
     goalCompare: string;

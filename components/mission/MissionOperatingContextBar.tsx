@@ -86,7 +86,6 @@ export default function MissionOperatingContextBar({
     reason: "companion",
     exposesArchitecture: false,
   });
-
   const showResume =
     disclosure.showCompanionDetail &&
     priorThought &&

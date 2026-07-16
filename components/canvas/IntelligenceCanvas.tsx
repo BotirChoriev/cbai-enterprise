@@ -218,12 +218,6 @@ export default function IntelligenceCanvas() {
       </div>
 
       <CanvasMissionTimeline mission={mission} />
-
-      <div className="border-t border-zinc-800/80 px-4 py-2 lg:hidden">
-        <Link href="/graph" className="text-xs text-teal-400">
-          {t("navigation.knowledgeGraph")} →
-        </Link>
-      </div>
     </div>
   );
 }

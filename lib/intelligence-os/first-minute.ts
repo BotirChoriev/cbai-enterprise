@@ -3,6 +3,7 @@
  */
 
 import type { Mission } from "@/lib/intelligence-os/mission.types";
+import type { MissionThreadStage } from "@/lib/intelligence-os/mission.types";
 import { resolveGoalRoute, type UserGoal } from "@/lib/intelligence-os/intelligence-gateway";
 import { getMissionNextAction, deriveMissionLifecycle } from "@/lib/intelligence-os/mission-lifecycle";
 import { loadProjects } from "@/lib/project/project-store";
@@ -20,13 +21,29 @@ export function translateFirstMinuteAction(
   translate: (path: string) => string,
   action: FirstMinuteAction,
 ): string {
-  if (action.nextActionKey) {
-    return translate(`missionLifecycle.${action.nextActionKey}`);
-  }
   if (action.labelKey) {
     return translate(`zeroLearningCurve.${action.labelKey}`);
   }
+  if (action.nextActionKey) {
+    return translate(`missionLifecycle.${action.nextActionKey}`);
+  }
   return action.label;
+}
+
+const MISSION_CONTINUE_INTENT: Partial<
+  Record<MissionThreadStage, FirstMinuteAction["labelKey"]>
+> = {
+  mission: "continueMission",
+  question: "continueMission",
+  evidence: "continueEvidence",
+  reasoning: "continueReview",
+  collaborators: "continueMission",
+  impact: "continueMission",
+  report: "continueReport",
+};
+
+function missionContinueIntentKey(stage: MissionThreadStage): FirstMinuteAction["labelKey"] {
+  return MISSION_CONTINUE_INTENT[stage] ?? "continueMission";
 }
 
 export function deriveFirstMinuteAction(mission: Mission | null): FirstMinuteAction {
@@ -35,6 +52,7 @@ export function deriveFirstMinuteAction(mission: Mission | null): FirstMinuteAct
     if (next) {
       return {
         label: next.nextAction,
+        labelKey: missionContinueIntentKey(next.stage),
         nextActionKey: next.nextActionKey,
         href: next.href,
         reason: "Continue active mission work",
@@ -171,6 +189,8 @@ export function deriveRouteCompanion(pathname: string, mission: Mission | null):
     nextHref: lifecycleNext?.href ?? fallback.href,
     nextLabel: lifecycleNext?.nextAction ?? fallback.label,
     nextActionKey: lifecycleNext?.nextActionKey ?? fallback.nextActionKey,
-    nextLabelKey: lifecycleNext ? undefined : fallback.labelKey,
+    nextLabelKey: lifecycleNext
+      ? missionContinueIntentKey(lifecycleNext.stage)
+      : fallback.labelKey,
   };
 }

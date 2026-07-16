@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useMissionContext } from "@/components/mission/MissionContextProvider";
+import { deriveFirstMinuteAction, translateFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { loadReports, deleteReport, type SavedReport } from "@/lib/reports/reports-store";
 import { PLATFORM_MODULES } from "@/lib/context";
@@ -29,6 +31,8 @@ function reportHref(report: SavedReport): string {
  */
 export default function SavedReportsSection() {
   const { t } = useTranslation();
+  const { mission } = useMissionContext();
+  const next = useMemo(() => deriveFirstMinuteAction(mission), [mission]);
   const [reports, setReports] = useState<SavedReport[]>(() => loadReports());
 
   if (reports.length === 0) {
@@ -38,8 +42,8 @@ export default function SavedReportsSection() {
           {t("reports.myReports")}
         </p>
         <p className="text-sm text-zinc-500">{t("reports.noReports")}</p>
-        <Link href="/search" className="text-xs text-teal-400 hover:text-teal-300">
-          {t("zeroLearningCurve.reportsEmptyAction")} →
+        <Link href={next.href} className="text-xs text-teal-400 hover:text-teal-300">
+          {translateFirstMinuteAction(t, next)} →
         </Link>
       </section>
     );

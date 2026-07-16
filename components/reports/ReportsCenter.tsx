@@ -42,18 +42,14 @@ export default function ReportsCenter() {
   const disclosure = useProgressiveDisclosure();
 
   const title = entity ? entity.name : t("reports.title");
-  const description = entity
-    ? `${t("reportsCenter.continuingFor")} ${entity.name}`
-    : t("reportsCenter.pageDescription");
 
   return (
     <OperatingPageShell
       title={title}
-      description={description}
       showOperator={false}
       missionContextVariant={disclosure.showInlineHumanDecisionBoundary ? "full" : "compact"}
       action={
-        profileHref ? (
+        disclosure.level === "expert" && profileHref ? (
           <Link
             href={profileHref}
             className="inline-flex min-h-10 items-center text-sm font-medium text-teal-400 transition-colors hover:text-teal-300"

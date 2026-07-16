@@ -34,8 +34,8 @@ export default function SearchGatewayClient() {
   return (
     <OperatingPageShell
       title={t("navigation.search")}
-      description={query ? undefined : t("navigation.startWithSearchBody")}
       showOperator={false}
+      missionContextVariant="compact"
     >
       <SearchGateway query={query} response={response} showGoalEntry={disclosure.showGatewayGoalChips} />
     </OperatingPageShell>

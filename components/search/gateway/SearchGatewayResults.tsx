@@ -14,6 +14,8 @@ import TopicResultCard from "@/components/search/gateway/SearchResultCard";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import VoiceSummaryButton from "@/components/shared/VoiceSummaryButton";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
+import { cbaiLinkMuted, cbaiProminentAction } from "@/components/brand/brand-classes";
 
 type SearchGatewayResultsProps = {
   response: GatewaySearchResponse;
@@ -69,6 +71,7 @@ export default function SearchGatewayResults({ response, query }: SearchGatewayR
       <EntityMatchCard
         entry={entry}
         matchedLabel={t("search.matched", { name: entry.name })}
+        prominent
       />
     );
   }
@@ -89,11 +92,6 @@ export default function SearchGatewayResults({ response, query }: SearchGatewayR
     <div className="space-y-6">
       {results.length > 0 ? (
         <div className="space-y-3">
-          <p className="text-sm text-zinc-500">
-            {results.length === 1
-              ? t("search.profilesPickOne", { count: String(results.length) })
-              : t("search.profilesPickMany", { count: String(results.length) })}
-          </p>
           <ul className="space-y-2">
             {results.map((result) => {
               const entry = buildEntityResultEntry(result.entity, query);
@@ -126,14 +124,14 @@ export default function SearchGatewayResults({ response, query }: SearchGatewayR
 type EntityMatchCardProps = {
   entry: SearchResultEntry;
   matchedLabel?: string;
+  prominent?: boolean;
 };
 
-function EntityMatchCard({ entry, matchedLabel }: EntityMatchCardProps) {
+function EntityMatchCard({ entry, matchedLabel, prominent = false }: EntityMatchCardProps) {
   const { t } = useTranslation();
+  const disclosure = useProgressiveDisclosure();
+  const showSecondary = disclosure.level === "expert";
   const showCountryInHeader = entry.type !== "Country" && entry.countryLabel;
-  const voiceSummaryText = [entry.name, entry.type, entry.distinguishingFact, entry.coverageLabel, entry.nextStep]
-    .filter((part): part is string => Boolean(part))
-    .join(". ");
 
   return (
     <article className="rounded-lg bg-zinc-900/50 px-4 py-3">
@@ -164,42 +162,48 @@ function EntityMatchCard({ entry, matchedLabel }: EntityMatchCardProps) {
         <p className="mt-1 text-xs text-teal-400/80">{entry.coverageLabel}</p>
       ) : null}
 
-      <p className="mt-1 text-xs text-zinc-600">{entry.nextStep}</p>
-
-      <div className="mt-3 flex flex-wrap items-center gap-2">
+      <div className="mt-3">
         <Link
           href={entry.href}
-          className="inline-flex min-h-9 items-center rounded-lg bg-zinc-100 px-3.5 text-xs font-semibold text-zinc-900 transition-colors hover:bg-white"
+          className={
+            prominent
+              ? `${cbaiProminentAction} w-full justify-between`
+              : `${cbaiProminentAction} gap-1.5`
+          }
         >
-          {t("search.openProfileArrow")}
+          {t("search.openProfile")}
+          <span aria-hidden="true">→</span>
         </Link>
-        {!matchedLabel && entry.showCompare ? (
-          <Link
-            href={profileSectionHref(entry.href, "compare")}
-            className="inline-flex min-h-9 items-center rounded-lg border border-zinc-700 bg-zinc-900 px-3.5 text-xs font-medium text-teal-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
-          >
-            {t("search.compareArrow")}
-          </Link>
-        ) : null}
-        {!matchedLabel && entry.showReports ? (
-          <Link
-            href={profileSectionHref(entry.href, "reports")}
-            className="inline-flex min-h-9 items-center rounded-lg border border-zinc-700 bg-zinc-900 px-3.5 text-xs font-medium text-teal-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
-          >
-            {t("search.openReportsArrow")}
-          </Link>
-        ) : null}
-        {entry.createProjectHref ? (
-          <Link
-            href={entry.createProjectHref}
-            className="inline-flex min-h-9 items-center rounded-lg border border-teal-500/30 bg-teal-500/10 px-3.5 text-xs font-medium text-teal-300 transition-colors hover:border-teal-500/50"
-          >
-            {t("search.createProjectArrow")}
-          </Link>
-        ) : null}
-        {entry.entityRef ? <SaveToWorkspaceButton entity={entry.entityRef} /> : null}
-        <VoiceSummaryButton text={voiceSummaryText} />
       </div>
+
+      {showSecondary ? (
+        <details className="mt-3 group">
+          <summary className={cbaiLinkMuted}>{t("zeroLearningCurve.advancedDetails")}</summary>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            {entry.showCompare ? (
+              <Link href={profileSectionHref(entry.href, "compare")} className={cbaiLinkMuted}>
+                {t("search.compareArrow")}
+              </Link>
+            ) : null}
+            {entry.showReports ? (
+              <Link href={profileSectionHref(entry.href, "reports")} className={cbaiLinkMuted}>
+                {t("search.openReportsArrow")}
+              </Link>
+            ) : null}
+            {entry.createProjectHref ? (
+              <Link href={entry.createProjectHref} className={cbaiLinkMuted}>
+                {t("search.createProjectArrow")}
+              </Link>
+            ) : null}
+            {entry.entityRef ? <SaveToWorkspaceButton entity={entry.entityRef} /> : null}
+            <VoiceSummaryButton
+              text={[entry.name, entry.type, entry.distinguishingFact, entry.coverageLabel]
+                .filter(Boolean)
+                .join(". ")}
+            />
+          </div>
+        </details>
+      ) : null}
     </article>
   );
 }

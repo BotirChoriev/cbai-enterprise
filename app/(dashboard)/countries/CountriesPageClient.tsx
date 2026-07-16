@@ -13,14 +13,17 @@ import CountryList from "@/components/countries/CountryList";
 import CountryRelationships from "@/components/countries/CountryRelationships";
 import EntityOptionalExploration from "@/components/shared/EntityOptionalExploration";
 import EntityPageHeader from "@/components/shared/EntityPageHeader";
+import MissionOperatingContextBar from "@/components/mission/MissionOperatingContextBar";
 import { CountryIntelligencePanel } from "@/components/countries/CountryIntelligencePanel";
 import WorldIntelligenceMap from "@/components/countries/WorldIntelligenceMap";
 import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
 import EntityNotFoundNotice from "@/components/system/EntityNotFoundNotice";
+import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 
 export default function CountriesPageClient() {
   const { context, setCountry, recordEntityView } = usePlatformContext();
   const { t } = useTranslation();
+  const disclosure = useProgressiveDisclosure();
   const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
   const [region, setRegion] = useState<CountryRegion | "All">("All");
@@ -67,6 +70,7 @@ export default function CountriesPageClient() {
   return (
     <div className="space-y-6">
       <EntityPageHeader title={t("countries.title")} description={t("entities.countriesDescription")} />
+      <MissionOperatingContextBar variant="compact" />
 
       {requestedCountryNotFound && requestedCountryId ? (
         <EntityNotFoundNotice
@@ -76,7 +80,7 @@ export default function CountriesPageClient() {
         />
       ) : null}
 
-      <ContextualOperatorBanner />
+      {disclosure.level === "expert" ? <ContextualOperatorBanner /> : null}
 
       <details className="scroll-mt-6 rounded-lg border border-zinc-800/60 bg-zinc-950/50" open={!context.country}>
         <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium text-zinc-500 marker:content-none [&::-webkit-details-marker]:hidden">
