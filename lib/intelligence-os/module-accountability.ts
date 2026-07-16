@@ -1,3 +1,4 @@
+import { getEpicForRoute, type EpicId } from "@/lib/epics/epic-registry";
 /**
  * Module Accountability Registry — every primary route must answer six questions.
  *
@@ -31,6 +32,9 @@ export type ExtendedModuleAccountability = ModuleAccountabilityEntry & {
   readonly responsibleHuman: string;
   readonly storage: string;
   readonly nextAction: string;
+  readonly epicOwnership: EpicId | "unassigned";
+  readonly privacyConsiderations: string;
+  readonly maturityLabel: ModuleAccountabilityEntry["maturity"];
 };
 
 export function toExtendedAccountability(entry: ModuleAccountabilityEntry): ExtendedModuleAccountability {
@@ -48,6 +52,9 @@ export function toExtendedAccountability(entry: ModuleAccountabilityEntry): Exte
       entry.maturity === "live" || entry.maturity === "partial"
         ? `Continue work on ${entry.route}`
         : `Review limits — ${entry.moduleName} is not fully active`,
+    epicOwnership: getEpicForRoute(entry.route) ?? "unassigned",
+    privacyConsiderations: "Device-local by default; cloud sync requires explicit account connection.",
+    maturityLabel: entry.maturity,
   };
 }
 
