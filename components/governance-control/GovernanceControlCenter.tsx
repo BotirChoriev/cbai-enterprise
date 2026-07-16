@@ -8,6 +8,7 @@ import {
   GovernanceValidationFlow,
 } from "@/components/governance-control/GovernanceSections";
 import GovernancePillars from "@/components/governance-control/GovernancePillars";
+import SupremePrinciplesSection from "@/components/governance-control/SupremePrinciplesSection";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { getDictionary } from "@/lib/i18n/translate";
 import { translateGovernanceControlModel } from "@/lib/i18n/governance-translation";
@@ -27,6 +28,8 @@ export default function GovernanceControlCenter({ embedded = false }: Governance
   return (
     <div className="space-y-10">
       {embedded ? <GovernancePillars categories={model.ruleCategories} /> : null}
+
+      <SupremePrinciplesSection />
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3">

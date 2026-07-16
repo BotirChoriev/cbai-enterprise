@@ -26,7 +26,8 @@
     "test:platform-activation": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-platform-activation.ts",
     "test:product-gaps": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-product-gaps.ts",
     "test:browser-regression": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-browser-regression.ts",
-    "test:real-user-audit": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-real-user-audit.ts"
+    "test:real-user-audit": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-real-user-audit.ts",
+    "test:universal-intelligence-os": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-universal-intelligence-os.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.2",

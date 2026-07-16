@@ -85,6 +85,7 @@ export type TranslationDictionary = {
     more: string;
     intelligenceCabinet: string;
     ecosystems: string;
+    intelligenceLenses: string;
     intelligence: string;
     government: string;
     investor: string;
@@ -1186,6 +1187,64 @@ export type TranslationDictionary = {
     confirmNewPassword: string;
     setNewPassword: string;
     minPasswordLength: string;
+  };
+  capabilityPassport: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    readinessEmpty: string;
+    readinessEmerging: string;
+    readinessActive: string;
+    domainsHeading: string;
+    recentSignalsHeading: string;
+    noSignals: string;
+    maturityNone: string;
+    maturityEmerging: string;
+    maturityDeveloping: string;
+    maturityDemonstrated: string;
+    signalCount: string;
+    notCvNotice: string;
+  };
+  discoveryEngine: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    notConnected: string;
+    localOnly: string;
+    noCandidates: string;
+    candidatesHeading: string;
+    opportunityReadiness: string;
+  };
+  adaptiveIntelligence: {
+    eyebrow: string;
+    title: string;
+    modeCapability: string;
+    modePreference: string;
+    suggestedRoutes: string;
+  };
+  supremeConstitution: {
+    eyebrow: string;
+    title: string;
+    productImplication: string;
+    principles: Record<
+      | "humanity-first"
+      | "nature-first"
+      | "evidence-first"
+      | "truth-before-popularity"
+      | "capability-before-status"
+      | "knowledge-has-no-borders"
+      | "intelligence-has-no-passport"
+      | "technology-expands-human-potential",
+      { title: string; statement: string; productImplication: string }
+    >;
+  };
+  capabilityDomains: {
+    research: string;
+    evidence: string;
+    analysis: string;
+    governance: string;
+    synthesis: string;
+    collaboration: string;
   };
 };
 

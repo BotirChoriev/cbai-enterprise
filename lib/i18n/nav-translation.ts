@@ -35,7 +35,8 @@ const NAV_LABEL_KEYS: Record<string, string> = {
 
 const NAV_SECTION_TITLE_KEYS: Record<string, string> = {
   Explore: "navigation.explore",
-  Ecosystems: "navigation.ecosystems",
+  Ecosystems: "navigation.intelligenceLenses",
+  "Intelligence Lenses": "navigation.intelligenceLenses",
   Intelligence: "navigation.intelligence",
 };
 

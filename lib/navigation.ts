@@ -138,25 +138,25 @@ export const primaryNavSections: NavSection[] = [
  */
 export const secondaryNavSections: NavSection[] = [
   {
-    title: "Ecosystems",
+    title: "Intelligence Lenses",
     items: [
       {
         label: "Government",
         href: "/government",
         icon: "government",
-        description: "Governance evidence coverage for public institutions.",
+        description: "Governance evidence lens — one system, not a separate portal.",
       },
       {
         label: "Investor",
         href: "/investor",
         icon: "investor",
-        description: "Investment evidence readiness by domain.",
+        description: "Economic evidence lens — one system, not a separate portal.",
       },
       {
         label: "Citizen",
         href: "/citizen",
         icon: "citizen",
-        description: "Public information topics in clear language.",
+        description: "Public information lens — one system, not a separate portal.",
       },
     ],
   },

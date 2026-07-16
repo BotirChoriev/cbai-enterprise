@@ -47,6 +47,13 @@ import {
   GRAPH_UI_BUILD009_EN,
   REPORTS_MODEL_BUILD009_EN,
 } from "@/lib/i18n/platform-copy-build009-en";
+import {
+  ADAPTIVE_INTELLIGENCE_EN,
+  CAPABILITY_DOMAINS_EN,
+  CAPABILITY_PASSPORT_EN,
+  DISCOVERY_ENGINE_EN,
+  SUPREME_CONSTITUTION_EN,
+} from "@/lib/i18n/platform-copy-build010-en";
 
 const en: TranslationDictionary = {
   roles: {
@@ -155,6 +162,7 @@ const en: TranslationDictionary = {
     more: "More",
     intelligenceCabinet: "Intelligence Cabinet",
     ecosystems: "Ecosystems",
+    intelligenceLenses: "Intelligence Lenses",
     intelligence: "Intelligence",
     government: "Government",
     investor: "Investor",
@@ -486,6 +494,11 @@ const en: TranslationDictionary = {
   graphUi: { ...GRAPH_UI_EN, ...GRAPH_UI_BUILD009_EN },
   aboutPage: { ...ABOUT_PAGE_EN, ...ABOUT_PAGE_BUILD009_EN },
   resetPasswordPage: RESET_PASSWORD_PAGE_EN,
+  capabilityPassport: CAPABILITY_PASSPORT_EN,
+  discoveryEngine: DISCOVERY_ENGINE_EN,
+  adaptiveIntelligence: ADAPTIVE_INTELLIGENCE_EN,
+  supremeConstitution: SUPREME_CONSTITUTION_EN,
+  capabilityDomains: CAPABILITY_DOMAINS_EN,
 };
 
 export default en;

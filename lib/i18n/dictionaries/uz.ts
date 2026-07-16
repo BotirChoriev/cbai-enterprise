@@ -47,6 +47,13 @@ import {
   GRAPH_UI_BUILD009_UZ,
   REPORTS_MODEL_BUILD009_UZ,
 } from "@/lib/i18n/platform-copy-build009-uz";
+import {
+  ADAPTIVE_INTELLIGENCE_UZ,
+  CAPABILITY_DOMAINS_UZ,
+  CAPABILITY_PASSPORT_UZ,
+  DISCOVERY_ENGINE_UZ,
+  SUPREME_CONSTITUTION_UZ,
+} from "@/lib/i18n/platform-copy-build010-uz";
 
 const uz: TranslationDictionary = {
   roles: {
@@ -155,6 +162,7 @@ const uz: TranslationDictionary = {
     more: "Ko‘proq",
     intelligenceCabinet: "Intellekt kabineti",
     ecosystems: "Ekotizimlar",
+    intelligenceLenses: "Intellekt linzalari",
     intelligence: "Intellekt",
     government: "Davlat",
     investor: "Investor",
@@ -485,6 +493,11 @@ const uz: TranslationDictionary = {
   graphUi: { ...GRAPH_UI_UZ, ...GRAPH_UI_BUILD009_UZ },
   aboutPage: { ...ABOUT_PAGE_UZ, ...ABOUT_PAGE_BUILD009_UZ },
   resetPasswordPage: RESET_PASSWORD_PAGE_UZ,
+  capabilityPassport: CAPABILITY_PASSPORT_UZ,
+  discoveryEngine: DISCOVERY_ENGINE_UZ,
+  adaptiveIntelligence: ADAPTIVE_INTELLIGENCE_UZ,
+  supremeConstitution: SUPREME_CONSTITUTION_UZ,
+  capabilityDomains: CAPABILITY_DOMAINS_UZ,
 };
 
 export default uz;

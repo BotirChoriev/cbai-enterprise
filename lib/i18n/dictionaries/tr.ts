@@ -47,6 +47,13 @@ import {
   GRAPH_UI_BUILD009_TR,
   REPORTS_MODEL_BUILD009_TR,
 } from "@/lib/i18n/platform-copy-build009-tr";
+import {
+  ADAPTIVE_INTELLIGENCE_TR,
+  CAPABILITY_DOMAINS_TR,
+  CAPABILITY_PASSPORT_TR,
+  DISCOVERY_ENGINE_TR,
+  SUPREME_CONSTITUTION_TR,
+} from "@/lib/i18n/platform-copy-build010-tr";
 
 const tr: TranslationDictionary = {
   roles: {
@@ -155,6 +162,7 @@ const tr: TranslationDictionary = {
     more: "Daha fazla",
     intelligenceCabinet: "İstihbarat Kabini",
     ecosystems: "Ekosistemler",
+    intelligenceLenses: "Zeka lensleri",
     intelligence: "İstihbarat",
     government: "Devlet",
     investor: "Yatırımcı",
@@ -485,6 +493,11 @@ const tr: TranslationDictionary = {
   graphUi: { ...GRAPH_UI_TR, ...GRAPH_UI_BUILD009_TR },
   aboutPage: { ...ABOUT_PAGE_TR, ...ABOUT_PAGE_BUILD009_TR },
   resetPasswordPage: RESET_PASSWORD_PAGE_TR,
+  capabilityPassport: CAPABILITY_PASSPORT_TR,
+  discoveryEngine: DISCOVERY_ENGINE_TR,
+  adaptiveIntelligence: ADAPTIVE_INTELLIGENCE_TR,
+  supremeConstitution: SUPREME_CONSTITUTION_TR,
+  capabilityDomains: CAPABILITY_DOMAINS_TR,
 };
 
 export default tr;

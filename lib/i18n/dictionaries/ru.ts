@@ -47,6 +47,13 @@ import {
   GRAPH_UI_BUILD009_RU,
   REPORTS_MODEL_BUILD009_RU,
 } from "@/lib/i18n/platform-copy-build009-ru";
+import {
+  ADAPTIVE_INTELLIGENCE_RU,
+  CAPABILITY_DOMAINS_RU,
+  CAPABILITY_PASSPORT_RU,
+  DISCOVERY_ENGINE_RU,
+  SUPREME_CONSTITUTION_RU,
+} from "@/lib/i18n/platform-copy-build010-ru";
 
 const ru: TranslationDictionary = {
   roles: {
@@ -155,6 +162,7 @@ const ru: TranslationDictionary = {
     more: "Ещё",
     intelligenceCabinet: "Кабинет интеллекта",
     ecosystems: "Экосистемы",
+    intelligenceLenses: "Интеллектуальные линзы",
     intelligence: "Интеллект",
     government: "Государство",
     investor: "Инвестор",
@@ -485,6 +493,11 @@ const ru: TranslationDictionary = {
   graphUi: { ...GRAPH_UI_RU, ...GRAPH_UI_BUILD009_RU },
   aboutPage: { ...ABOUT_PAGE_RU, ...ABOUT_PAGE_BUILD009_RU },
   resetPasswordPage: RESET_PASSWORD_PAGE_RU,
+  capabilityPassport: CAPABILITY_PASSPORT_RU,
+  discoveryEngine: DISCOVERY_ENGINE_RU,
+  adaptiveIntelligence: ADAPTIVE_INTELLIGENCE_RU,
+  supremeConstitution: SUPREME_CONSTITUTION_RU,
+  capabilityDomains: CAPABILITY_DOMAINS_RU,
 };
 
 export default ru;

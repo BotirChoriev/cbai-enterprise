@@ -19,6 +19,7 @@ import ProjectHome from "@/components/project/ProjectHome";
 import LocalWorkMigrationPrompt from "@/components/account/LocalWorkMigrationPrompt";
 import CloudProfileImportPrompt from "@/components/account/CloudProfileImportPrompt";
 import PendingSyncNotice from "@/components/shared/PendingSyncNotice";
+import CapabilityPassportPanel from "@/components/capability/CapabilityPassportPanel";
 import { loadProject } from "@/lib/project/project-store";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useTranslation } from "@/lib/i18n/use-translation";
@@ -200,6 +201,8 @@ function MyWorkContent() {
       <CreateProjectForm initialPrimaryEntity={initialPrimaryEntity} initialType={initialType} />
 
       <ProjectList />
+
+      <CapabilityPassportPanel />
 
       <section aria-labelledby="my-work-continue-heading" className="space-y-3">
         <p className={cbaiSectionEyebrow} id="my-work-continue-heading">
