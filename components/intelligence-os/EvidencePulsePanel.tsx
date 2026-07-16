@@ -34,7 +34,7 @@ export default function EvidencePulsePanel({ mission }: { mission: Mission | nul
         className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 ${STATE_RING[pulse.state]}`}
         aria-hidden="true"
       >
-        <span className="h-2 w-2 animate-pulse rounded-full bg-teal-400/80 motion-reduce:animate-none" />
+        <span className="h-2 w-2 rounded-full bg-teal-400/80" />
       </div>
       <div className="min-w-0 flex-1 space-y-1">
         <p className={cbaiSectionEyebrow}>{t("evidencePulse.eyebrow")}</p>

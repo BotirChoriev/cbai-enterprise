@@ -1517,6 +1517,28 @@ export type TranslationDictionary = {
     liveAttention: string;
     liveNeutral: string;
   };
+  evidenceRuntime: {
+    operatingEyebrow: string;
+    trustProperty: string;
+    whatWeKnow: string;
+    howWeKnow: string;
+    whoVerified: string;
+    whenVerified: string;
+    whyTrust: string;
+    whatMissing: string;
+    whatContradicts: string;
+    needsResearch: string;
+    journeyEyebrow: string;
+    heatmapEyebrow: string;
+    infrastructureNote: string;
+    machineValidation: string;
+    machineValidationOff: string;
+    humanValidation: string;
+    consensusAligned: string;
+    consensusConflicted: string;
+    consensusPartial: string;
+    consensusNone: string;
+  };
 };
 
 export type TranslationNamespace = keyof TranslationDictionary;

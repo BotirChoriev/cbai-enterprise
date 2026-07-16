@@ -10,6 +10,7 @@ import { resolveOperatorName } from "@/lib/assistant/assistant-profile";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import HumanDecisionBoundary from "@/components/intelligence-os/HumanDecisionBoundary";
+import EvidenceTrustSurfacePanel from "@/components/evidence/EvidenceTrustSurfacePanel";
 import { cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 export default function OperatorAwarenessStrip() {
@@ -78,8 +79,13 @@ export function CanvasContextLayer() {
         <section className="space-y-1.5">
           <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("intelligenceCanvas.evidenceStatus")}</p>
           <p className="text-xs text-zinc-400">{evidencePulse.label}</p>
+          {evidencePulse.conflictCount > 0 ? (
+            <p className="text-xs text-[var(--gold-soft)]">{t("evidenceRuntime.consensusConflicted")}</p>
+          ) : null}
         </section>
       ) : null}
+
+      {mission ? <EvidenceTrustSurfacePanel mission={mission} variant="compact" /> : null}
 
       {mission?.evidenceMissing ? (
         <section className="space-y-1.5">

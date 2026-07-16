@@ -19,6 +19,9 @@ import CanvasMissionTimeline from "@/components/canvas/CanvasMissionTimeline";
 import CanvasKnowledgeStream, { MissionDnaStrip } from "@/components/canvas/CanvasKnowledgeStream";
 import LegacyTrail from "@/components/intelligence-os/LegacyTrail";
 import HumanDecisionBoundary from "@/components/intelligence-os/HumanDecisionBoundary";
+import EvidencePulsePanel from "@/components/intelligence-os/EvidencePulsePanel";
+import EvidenceTrustSurfacePanel from "@/components/evidence/EvidenceTrustSurfacePanel";
+import EvidenceJourneyPanel from "@/components/evidence/EvidenceJourneyPanel";
 import { cbaiBtnPrimary, cbaiOperatingShell, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 export default function IntelligenceCanvas() {
@@ -137,8 +140,17 @@ export default function IntelligenceCanvas() {
 
           {mission ? (
             <div className="space-y-px border-t border-zinc-800/80 bg-zinc-800/20">
+              <div className="p-4">
+                <EvidencePulsePanel mission={mission} />
+              </div>
               <div className="p-4 lg:hidden">
                 <HumanDecisionBoundary variant="compact" />
+              </div>
+              <div className="p-4">
+                <EvidenceJourneyPanel mission={mission} />
+              </div>
+              <div className="p-4">
+                <EvidenceTrustSurfacePanel mission={mission} variant="full" />
               </div>
               <div className="p-4">
                 <LegacyTrail mission={mission} />

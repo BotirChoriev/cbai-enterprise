@@ -77,6 +77,7 @@ import {
   OPERATING_NAV_RU,
   OPERATOR_AWARENESS_RU,
 } from "@/lib/i18n/platform-copy-build013-ru";
+import { EVIDENCE_RUNTIME_RU } from "@/lib/i18n/platform-copy-build014-ru";
 
 const ru: TranslationDictionary = {
   roles: {
@@ -538,6 +539,7 @@ const ru: TranslationDictionary = {
   intelligenceCanvas: INTELLIGENCE_CANVAS_RU,
   operatorAwareness: OPERATOR_AWARENESS_RU,
   operatingNav: OPERATING_NAV_RU,
+  evidenceRuntime: EVIDENCE_RUNTIME_RU,
 };
 
 export default ru;
