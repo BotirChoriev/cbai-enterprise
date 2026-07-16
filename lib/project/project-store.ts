@@ -23,6 +23,7 @@ import type {
 import { PROJECT_TYPES } from "@/lib/project/project-types";
 import type { ContextEntityRef } from "@/lib/context/context-types";
 import { resolveStorageKey } from "@/lib/storage/namespaced-key";
+import { notifyMissionDataChanged } from "@/lib/intelligence-os/mission-activation-events";
 import { getSyncedCloudUserId } from "@/lib/supabase/cloud-session-sync";
 import { enqueueSync } from "@/lib/supabase/outbox";
 
@@ -217,6 +218,7 @@ export function createProject(input: CreateProjectInput): Project {
   if (input.primaryEntity) {
     linkEntityToProject(project.id, input.primaryEntity);
   }
+  notifyMissionDataChanged("project");
   return project;
 }
 
@@ -229,6 +231,7 @@ export function updateProject(id: string, patch: Partial<Omit<Project, "id" | "c
   next[index] = updated;
   writeList(PROJECTS_KEY, next);
   syncProjectRow(updated);
+  notifyMissionDataChanged("project");
   return updated;
 }
 
@@ -316,6 +319,7 @@ export function saveProjectNote(input: Omit<ProjectNote, "noteId" | "createdAt">
   const note: ProjectNote = { ...input, noteId: newId("pnote"), createdAt: new Date().toISOString() };
   writeList(PROJECT_NOTES_KEY, [...all, note]);
   syncNoteRow(note);
+  notifyMissionDataChanged("note");
   return note;
 }
 
@@ -391,6 +395,7 @@ export function createProjectQuestion(projectId: string, question: string): Proj
   const record: ProjectQuestion = { questionId: newId("pq"), projectId, question, resolved: false, createdAt: new Date().toISOString() };
   writeList(PROJECT_QUESTIONS_KEY, [...all, record]);
   syncQuestionRow(record);
+  notifyMissionDataChanged("question");
   return record;
 }
 
@@ -433,6 +438,7 @@ export function saveProjectEvidence(input: Omit<ProjectEvidenceReference, "evide
   const record: ProjectEvidenceReference = { ...input, evidenceRefId: newId("pev"), createdAt: new Date().toISOString() };
   writeList(PROJECT_EVIDENCE_KEY, [...all, record]);
   syncEvidenceRow(record);
+  notifyMissionDataChanged("evidence");
   return record;
 }
 

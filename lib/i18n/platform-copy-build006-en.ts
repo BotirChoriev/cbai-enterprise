@@ -48,6 +48,8 @@ export const SEARCH_EN = {
   groupProjects: "Projects",
   opensTo: "Opens to",
   exampleSearchesAria: "Example searches",
+  voiceSummary: "Read aloud",
+  voiceSummaryStop: "Stop reading",
 } as const;
 
 export const EVIDENCE_EN = {

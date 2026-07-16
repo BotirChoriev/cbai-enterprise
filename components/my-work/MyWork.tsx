@@ -13,6 +13,7 @@ import RecentEntities from "@/components/platform/context/RecentEntities";
 import PinnedEntities from "@/components/platform/context/PinnedEntities";
 import SavedEvidence from "@/components/my-work/SavedEvidence";
 import Avatar from "@/components/shared/Avatar";
+import MissionHomeSummary from "@/components/my-work/MissionHomeSummary";
 import CreateProjectForm from "@/components/project/CreateProjectForm";
 import ProjectList from "@/components/project/ProjectList";
 import ProjectHome from "@/components/project/ProjectHome";
@@ -176,8 +177,7 @@ function MyWorkContent() {
         </div>
       ) : (
         <div className={`${cbaiGlassCard} border-teal-500/15 px-6 py-5`}>
-          <h2 className="text-lg font-semibold text-zinc-100">{t("myWork.title")}</h2>
-          <p className="mt-1 max-w-2xl text-sm text-zinc-400">
+          <p className="max-w-2xl text-sm text-zinc-400">
             {t("myWork.savedToBrowser")}{" "}
             <Link href="/account" className="text-teal-400 hover:text-teal-300">
               {t("myWork.signInOrCreate")}
@@ -200,6 +200,8 @@ function MyWorkContent() {
 
       {accountMode === "cloud" ? <CloudProfileImportPrompt /> : null}
       {accountMode === "cloud" ? <LocalWorkMigrationPrompt /> : null}
+
+      <MissionHomeSummary />
 
       <CreateProjectForm initialPrimaryEntity={initialPrimaryEntity} initialType={initialType} />
 

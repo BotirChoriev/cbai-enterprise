@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { loadProjects } from "@/lib/project/project-store";
+import { loadProjects, loadProjectEvidence, loadProjectNotes } from "@/lib/project/project-store";
 import type { Project } from "@/lib/project/project-types";
 import { resolveProjectGuideStep } from "@/lib/project/project-guide";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
@@ -10,6 +10,8 @@ import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { translateProjectTypeLabel, translateProjectStatus } from "@/lib/i18n/project-translation";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import EmptyState from "@/components/shared/EmptyState";
+import { useMissionDataRevision } from "@/lib/hooks/use-mission-data-revision";
 
 /**
  * My Work, Project-first: Recent Projects (every real project, most recently updated first) and
@@ -24,6 +26,7 @@ import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-clas
  */
 export default function ProjectList() {
   const hydrated = useHydrated();
+  useMissionDataRevision();
   const projects = hydrated ? loadProjects() : [];
   const { context } = usePlatformContext();
   const { t } = useTranslation();
@@ -33,12 +36,10 @@ export default function ProjectList() {
 
   if (projects.length === 0) {
     return (
-      <section aria-labelledby="my-work-projects-heading" className={`${cbaiGlassCard} space-y-2 p-5`}>
-        <p className={cbaiSectionEyebrow} id="my-work-projects-heading">
-          {t("project.catalog.recentProjects")}
-        </p>
-        <p className="text-xs text-zinc-500">{t("project.catalog.noProjectsCreatedYet")}</p>
-      </section>
+      <EmptyState
+        title={t("project.catalog.recentProjects")}
+        message={t("project.catalog.noProjectsCreatedYet")}
+      />
     );
   }
 
@@ -80,8 +81,16 @@ export default function ProjectList() {
  * a second suggestion mechanism.
  */
 function ProjectCard({ project }: { project: Project }) {
+  useMissionDataRevision();
   const step = resolveProjectGuideStep(project);
   const { t } = useTranslation();
+  const evidenceCount = loadProjectEvidence(project.id).length;
+  const notesCount = loadProjectNotes(project.id).length;
+  const liveSignals = [
+    evidenceCount > 0 ? t("activation.projectEvidenceCount", { count: String(evidenceCount) }) : null,
+    notesCount > 0 ? t("activation.projectNotesCount", { count: String(notesCount) }) : null,
+    project.reportGeneratedAt ? t("activation.projectReportReady") : null,
+  ].filter(Boolean);
 
   return (
     <div className={`${cbaiGlassCard} space-y-2 p-4`}>
@@ -94,6 +103,11 @@ function ProjectCard({ project }: { project: Project }) {
       <p className="text-xs text-zinc-500">
         {translateProjectTypeLabel(t, project.type)} · {translateProjectStatus(t, project.status)}
       </p>
+      {liveSignals.length > 0 ? (
+        <p className="text-[11px] text-zinc-500" role="status">
+          {liveSignals.join(" · ")}
+        </p>
+      ) : null}
       <p className="text-xs text-zinc-400">
         <span className="text-zinc-600">{t("project.catalog.suggestedNextStep")}</span> {step.suggestion}
       </p>

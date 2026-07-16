@@ -218,7 +218,7 @@ export const MY_WORK_EXT_RU = {
   onboardingExploreResearch: "Изучить исследования",
   onboardingExploreCountries: "Изучить страны",
   onboardingSearchEvidence: "Искать доказательства",
-  onboardingConfigureOperator: "Настроить персонального оператора",
+  onboardingConfigureOperator: "Настроить параметры",
   onboardingOpenTrust: "Открыть центр доверия",
   loading: "Загрузка…",
 } as const;

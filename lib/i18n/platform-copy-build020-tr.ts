@@ -75,7 +75,7 @@ export const ZERO_LEARNING_CURVE_TR = {
   routeReasoningPurpose: "Karar vermeden önce kanıt üzerinde düşünün.",
   routeGraphPurpose: "İnsanların, yerlerin ve konuların nasıl bağlandığını görün.",
   routeReportsPurpose: "Bulguları izlenebilir kaynaklarla iletin.",
-  routeMyWorkPurpose: "Görevinize bağlı projeye devam edin.",
+  routeMyWorkPurpose: "Görev ana sayfası — ilerleme, sonraki adım ve son kanıt, akıl yürütme ve raporlar.",
   routeSearchPurpose: "Ülke, şirket, üniversite veya konu bulun.",
   routeCountriesPurpose: "Bir ülke açın ve nelerin bilindiğini, eksik olduğunu veya çeliştiğini görün.",
   routeCompaniesPurpose: "Bir şirket açın ve nelerin bilindiğini, eksik olduğunu veya çeliştiğini görün.",

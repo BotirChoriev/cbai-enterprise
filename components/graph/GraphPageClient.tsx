@@ -22,11 +22,13 @@ import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { useUniversalWorkspace } from "@/components/platform/context/UniversalWorkspaceProvider";
+import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 
 export default function GraphPageClient() {
   const { t } = useTranslation();
   const { mission } = useMissionContext();
   const { setFocusedObject } = useUniversalWorkspace();
+  const { recordEntityView, setCountry, setCompany, setUniversity } = usePlatformContext();
   const disclosure = useProgressiveDisclosure();
   const fullGraph = useMemo(() => buildKnowledgeGraph(), []);
   const [focusMode, setFocusMode] = useState<"mission" | "evidence" | "all">(
@@ -93,12 +95,32 @@ export default function GraphPageClient() {
   );
 
   useEffect(() => {
-    if (!selectedNode) return;
+    if (!selectedNode) {
+      const prevFocus = lastFocusKeyRef.current;
+      if (prevFocus) {
+        lastFocusKeyRef.current = null;
+        setFocusedObject(null);
+        const kind = prevFocus.split(":")[0];
+        if (kind === "country") setCountry(null);
+        else if (kind === "company") setCompany(null);
+        else setUniversity(null);
+      }
+      return;
+    }
     const focusKey = `${selectedNode.type}:${selectedNode.entityId}`;
     if (lastFocusKeyRef.current === focusKey) return;
     lastFocusKeyRef.current = focusKey;
     setFocusedObject({ type: selectedNode.type, id: selectedNode.entityId });
-  }, [selectedNode, setFocusedObject]);
+    const entityRef = {
+      kind: selectedNode.type,
+      id: selectedNode.entityId,
+      name: selectedNode.label,
+    } as const;
+    recordEntityView(entityRef);
+    if (selectedNode.type === "country") setCountry(selectedNode.entityId);
+    else if (selectedNode.type === "company") setCompany(selectedNode.entityId);
+    else setUniversity(selectedNode.entityId);
+  }, [selectedNode, setFocusedObject, recordEntityView, setCountry, setCompany, setUniversity]);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {

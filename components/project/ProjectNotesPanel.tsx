@@ -5,6 +5,7 @@ import type { ContextEntityRef } from "@/lib/context/context-types";
 import type { ProjectEvidenceReference, ProjectNote } from "@/lib/project/project-types";
 import { loadProjectNotes, saveProjectNote } from "@/lib/project/project-store";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type ProjectNotesPanelProps = {
   projectId: string;
@@ -20,10 +21,12 @@ type ProjectNotesPanelProps = {
  * how they reference a report — see ProjectNote's own doc comment).
  */
 export default function ProjectNotesPanel({ projectId, evidence, relatedEntities, onAdded }: ProjectNotesPanelProps) {
+  const { t } = useTranslation();
   const [notes, setNotes] = useState<ProjectNote[]>(() => loadProjectNotes(projectId));
   const [body, setBody] = useState("");
   const [evidenceRefId, setEvidenceRefId] = useState("");
   const [entityId, setEntityId] = useState("");
+  const [savedMessage, setSavedMessage] = useState<string | null>(null);
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -46,6 +49,8 @@ export default function ProjectNotesPanel({ projectId, evidence, relatedEntities
     setBody("");
     setEvidenceRefId("");
     setEntityId("");
+    setSavedMessage(t("activation.noteSaved"));
+    window.setTimeout(() => setSavedMessage(null), 2500);
     onAdded?.();
   }
 
@@ -56,6 +61,11 @@ export default function ProjectNotesPanel({ projectId, evidence, relatedEntities
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-2">
+        {savedMessage ? (
+          <p role="status" className="text-xs text-emerald-400">
+            {savedMessage}
+          </p>
+        ) : null}
         <textarea
           value={body}
           onChange={(e) => setBody(e.target.value)}

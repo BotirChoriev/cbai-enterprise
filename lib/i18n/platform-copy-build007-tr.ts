@@ -216,7 +216,7 @@ export const MY_WORK_EXT_TR = {
   onboardingExploreResearch: "Araştırmayı Keşfet",
   onboardingExploreCountries: "Ülkeleri Keşfet",
   onboardingSearchEvidence: "Kanıt Ara",
-  onboardingConfigureOperator: "Kişisel Operatörü Yapılandır",
+  onboardingConfigureOperator: "Tercihleri ayarla",
   onboardingOpenTrust: "Güven Merkezini Aç",
   loading: "Yükleniyor…",
 } as const;

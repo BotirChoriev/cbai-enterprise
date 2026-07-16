@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { saveReport, type ReportKind } from "@/lib/reports/reports-store";
+import ActivationStatusLine from "@/components/shared/ActivationStatusLine";
 import { cbaiBtnSecondary } from "@/components/brand/brand-classes";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type SaveReportButtonProps = {
   kind: ReportKind;
@@ -12,26 +14,23 @@ type SaveReportButtonProps = {
   projectId?: string;
 };
 
-/**
- * Real, persisted report ownership (Real Supabase Authentication + Cloud Persistence mission,
- * Phase 11). Saves an index record — kind/entity/when — to My Reports (Reports Center); the
- * report content itself is never duplicated into storage (see lib/reports/reports-store.ts) — a
- * saved report always reopens to the live, current profile/project report.
- */
 export default function SaveReportButton({ kind, entityId, entityName, title, projectId }: SaveReportButtonProps) {
-  const [saved, setSaved] = useState(false);
+  const { t } = useTranslation();
+  const [status, setStatus] = useState<string | null>(null);
 
   return (
-    <button
-      type="button"
-      onClick={() => {
-        saveReport({ kind, entityId, entityName, title, projectId });
-        setSaved(true);
-        window.setTimeout(() => setSaved(false), 3000);
-      }}
-      className={`${cbaiBtnSecondary} cbai-no-print`}
-    >
-      {saved ? "Saved to My Reports" : "Save to My Reports"}
-    </button>
+    <div className="space-y-2">
+      <button
+        type="button"
+        onClick={() => {
+          saveReport({ kind, entityId, entityName, title, projectId });
+          setStatus(t("activation.reportSaved"));
+        }}
+        className={`${cbaiBtnSecondary} cbai-no-print`}
+      >
+        {t("reports.saveToMyReports")}
+      </button>
+      {status ? <ActivationStatusLine message={status} compact /> : null}
+    </div>
   );
 }

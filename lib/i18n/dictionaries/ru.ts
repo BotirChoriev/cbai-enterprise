@@ -84,6 +84,9 @@ import { EXPERIENCE_ENGINEERING_RU } from "@/lib/i18n/platform-copy-build017-ru"
 import { UNIVERSAL_WORKSPACE_RU } from "@/lib/i18n/platform-copy-build018-ru";
 import { ORGANIZATION_OS_RU } from "@/lib/i18n/platform-copy-build019-ru";
 import { ZERO_LEARNING_CURVE_RU, MISSION_LIFECYCLE_NEXT_RU } from "@/lib/i18n/platform-copy-build020-ru";
+import { ACTIVATION_RU } from "@/lib/i18n/platform-copy-build021-ru";
+import { MISSION_HOME_RU, RESEARCH_DASHBOARD_RU, SAVED_EVIDENCE_RU, PROJECT_PANEL_RU } from "@/lib/i18n/platform-copy-build022-ru";
+import { RESEARCH_NOTES_RU, EVIDENCE_LIFECYCLE_COPY_RU } from "@/lib/i18n/platform-copy-build023-ru";
 
 const ru: TranslationDictionary = {
   roles: {
@@ -161,6 +164,10 @@ const ru: TranslationDictionary = {
     loadingEvidence: "Проверяем доказательства…",
     loadingReport: "Загружаем отчёт…",
     loadingKnowledge: "Открываем знания…",
+    loadingSearch: "Поиск…",
+    loadingProfile: "Открываем профиль…",
+    loadingGraph: "Подготавливаем граф…",
+    loadingResearch: "Открываем исследование…",
     save: "Сохранить",
     saving: "Сохранение…",
     saved: "Сохранено.",
@@ -304,7 +311,7 @@ const ru: TranslationDictionary = {
     catalog: {
       recentProjects: "Недавние проекты",
       pinnedProjects: "Закреплённые проекты",
-      noProjectsCreatedYet: "Проекты ещё не созданы — никакой выдуманной активности. Создайте первый проект выше.",
+      noProjectsCreatedYet: "Проектов для этой миссии пока нет. Опишите проблему выше, чтобы начать.",
       suggestedNextStep: "Рекомендуемый следующий шаг:",
       continueAction: "Продолжить",
       startA: "Начать: {label}",
@@ -354,7 +361,7 @@ const ru: TranslationDictionary = {
     title: "Отчёты",
     saveToMyReports: "Сохранить в мои отчёты",
     myReports: "Ваши сохранённые отчёты",
-    noReports: "Отчётов пока не сохранено.",
+    noReports: "Отчётов для этой миссии пока нет. Продолжите, когда доказательства и рассуждения будут готовы.",
   },
   trust: {
     title: "Доверие",
@@ -558,6 +565,13 @@ const ru: TranslationDictionary = {
   organizationOs: ORGANIZATION_OS_RU,
   zeroLearningCurve: ZERO_LEARNING_CURVE_RU,
   missionLifecycle: MISSION_LIFECYCLE_NEXT_RU,
+  activation: ACTIVATION_RU,
+  missionHome: MISSION_HOME_RU,
+  researchDashboard: RESEARCH_DASHBOARD_RU,
+  savedEvidence: SAVED_EVIDENCE_RU,
+  projectPanel: PROJECT_PANEL_RU,
+  researchNotes: RESEARCH_NOTES_RU,
+  evidenceLifecycle: EVIDENCE_LIFECYCLE_COPY_RU,
 };
 
 export default ru;

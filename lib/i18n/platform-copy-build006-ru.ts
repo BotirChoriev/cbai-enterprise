@@ -47,6 +47,8 @@ export const SEARCH_RU = {
   groupProjects: "Проекты",
   opensTo: "Открывает",
   exampleSearchesAria: "Примеры поиска",
+  voiceSummary: "Прочитать вслух",
+  voiceSummaryStop: "Остановить",
 } as const;
 
 export const EVIDENCE_RU = {

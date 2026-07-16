@@ -19,6 +19,7 @@ import { UniversalWorkspaceProvider } from "@/components/platform/context/Univer
 import { MissionContextProvider } from "@/components/mission/MissionContextProvider";
 import { AuthProvider } from "@/components/platform/context/AuthProvider";
 import OfflineBanner from "@/components/system/OfflineBanner";
+import RouteChromeFallback from "@/components/system/RouteChromeFallback";
 
 export default function DashboardLayout({
   children,
@@ -46,7 +47,7 @@ export default function DashboardLayout({
       <div className="flex h-screen overflow-hidden bg-[var(--background)]">
         <Sidebar />
         <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-          <Suspense fallback={null}>
+          <Suspense fallback={<RouteChromeFallback />}>
             <PlatformContextProvider>
               <MissionContextProvider>
                 <UniversalWorkspaceProvider>

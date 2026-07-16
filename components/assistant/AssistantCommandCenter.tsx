@@ -259,8 +259,8 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
   const voiceStatusLabel: Record<VoiceStatus, string> = {
     idle: t("assistant.micReady"),
     requesting: t("assistant.micRequesting"),
-    listening: t("assistant.micListening"),
-    processing: t("assistant.micProcessing"),
+    listening: t("activation.voiceListening"),
+    processing: t("activation.voiceUnderstanding"),
     "permission-denied": t("assistant.micPermissionDenied"),
     "network-error": t("assistant.micNetworkError"),
   };
@@ -410,10 +410,12 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
       </form>
 
       {profile.voiceInputEnabled && !speechSupported ? (
-        <p className="mt-1.5 text-[11px] text-zinc-600">{t("assistant.micUnsupportedBrowser")}</p>
+        <p className="mt-1.5 text-[11px] text-zinc-600">{t("activation.voiceUnsupportedRecovery")}</p>
       ) : null}
       {voiceStatus === "permission-denied" ? (
-        <p role="alert" className="mt-1.5 text-[11px] text-amber-400">{t("assistant.micPermissionDenied")}</p>
+        <p role="alert" className="mt-1.5 text-[11px] text-amber-400">
+          {t("assistant.micPermissionDenied")} {t("activation.voicePermissionRecovery")}
+        </p>
       ) : null}
       {voiceStatus === "network-error" ? (
         <p role="alert" className="mt-1.5 text-[11px] text-amber-400">{t("assistant.micNetworkError")}</p>

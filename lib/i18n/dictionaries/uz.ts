@@ -84,6 +84,9 @@ import { EXPERIENCE_ENGINEERING_UZ } from "@/lib/i18n/platform-copy-build017-uz"
 import { UNIVERSAL_WORKSPACE_UZ } from "@/lib/i18n/platform-copy-build018-uz";
 import { ORGANIZATION_OS_UZ } from "@/lib/i18n/platform-copy-build019-uz";
 import { ZERO_LEARNING_CURVE_UZ, MISSION_LIFECYCLE_NEXT_UZ } from "@/lib/i18n/platform-copy-build020-uz";
+import { ACTIVATION_UZ } from "@/lib/i18n/platform-copy-build021-uz";
+import { MISSION_HOME_UZ, RESEARCH_DASHBOARD_UZ, SAVED_EVIDENCE_UZ, PROJECT_PANEL_UZ } from "@/lib/i18n/platform-copy-build022-uz";
+import { RESEARCH_NOTES_UZ, EVIDENCE_LIFECYCLE_COPY_UZ } from "@/lib/i18n/platform-copy-build023-uz";
 
 const uz: TranslationDictionary = {
   roles: {
@@ -161,6 +164,10 @@ const uz: TranslationDictionary = {
     loadingEvidence: "Dalillar tekshirilmoqda…",
     loadingReport: "Hisobot yuklanmoqda…",
     loadingKnowledge: "Bilim ochilmoqda…",
+    loadingSearch: "Qidirilmoqda…",
+    loadingProfile: "Profil ochilmoqda…",
+    loadingGraph: "Graf tayyorlanmoqda…",
+    loadingResearch: "Tadqiqot ochilmoqda…",
     save: "Saqlash",
     saving: "Saqlanmoqda…",
     saved: "Saqlandi.",
@@ -304,7 +311,7 @@ const uz: TranslationDictionary = {
     catalog: {
       recentProjects: "So‘nggi loyihalar",
       pinnedProjects: "Mahkamlangan loyihalar",
-      noProjectsCreatedYet: "Hali loyihalar yaratilmagan — to‘qib chiqarilgan faoliyat yo‘q. Yuqorida birinchisini yarating.",
+      noProjectsCreatedYet: "Bu missiya uchun hali loyihalar yo‘q. Boshlash uchun yuqorida muammoni nomlang.",
       suggestedNextStep: "Tavsiya etilgan keyingi qadam:",
       continueAction: "Davom etish",
       startA: "{label} boshlash",
@@ -354,7 +361,7 @@ const uz: TranslationDictionary = {
     title: "Hisobotlar",
     saveToMyReports: "Mening hisobotlarimga saqlash",
     myReports: "Saqlangan hisobotlaringiz",
-    noReports: "Hali hisobotlar saqlanmagan.",
+    noReports: "Bu missiya uchun hali hisobotlar yo‘q. Dalil va mulohaza tayyor bo‘lganda davom eting.",
   },
   trust: {
     title: "Ishonch",
@@ -558,6 +565,13 @@ const uz: TranslationDictionary = {
   organizationOs: ORGANIZATION_OS_UZ,
   zeroLearningCurve: ZERO_LEARNING_CURVE_UZ,
   missionLifecycle: MISSION_LIFECYCLE_NEXT_UZ,
+  activation: ACTIVATION_UZ,
+  missionHome: MISSION_HOME_UZ,
+  researchDashboard: RESEARCH_DASHBOARD_UZ,
+  savedEvidence: SAVED_EVIDENCE_UZ,
+  projectPanel: PROJECT_PANEL_UZ,
+  researchNotes: RESEARCH_NOTES_UZ,
+  evidenceLifecycle: EVIDENCE_LIFECYCLE_COPY_UZ,
 };
 
 export default uz;

@@ -47,6 +47,8 @@ export const SEARCH_UZ = {
   groupProjects: "Loyihalar",
   opensTo: "Ochiladi",
   exampleSearchesAria: "Misol qidiruvlar",
+  voiceSummary: "Ovozda o'qish",
+  voiceSummaryStop: "To'xtatish",
 } as const;
 
 export const EVIDENCE_UZ = {

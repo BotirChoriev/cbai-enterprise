@@ -87,7 +87,7 @@ export const MY_WORK_UZ = {
   signedInLocal: "{email} sifatida kirilgan — Loyihalar va Xatcho‘plar ushbu qurilmada saqlanadi.",
   continueLinksHeading: "Davom etish",
   onboardingHeading: "Boshlash",
-  pageDescription: "Tadqiqot, dalil ko‘rib chiqish va hisobotlarni davom ettiring.",
+  pageDescription: "Missiya uyi — progress, keyingi qadam va so‘nggi ish bir joyda.",
 } as const;
 
 export const SYSTEM_UZ = {

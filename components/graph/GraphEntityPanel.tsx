@@ -5,7 +5,9 @@ import { getEntityTypeLabel } from "@/lib/entity/entity.helpers";
 import { buildEntityGraphEvidenceSummary } from "@/lib/graph/graph.evidence";
 import KnowledgeLayersDisclosure from "@/components/knowledge/KnowledgeLayersDisclosure";
 import { useTranslation } from "@/lib/i18n/use-translation";
-import { cbaiGraphPanel } from "@/components/brand/brand-classes";
+import { useMissionContext } from "@/components/mission/MissionContextProvider";
+import { loadProjects } from "@/lib/project/project-store";
+import { cbaiGraphPanel, cbaiTextCaption } from "@/components/brand/brand-classes";
 import Link from "next/link";
 import { getDictionary } from "@/lib/i18n/translate";
 
@@ -135,10 +137,19 @@ function EntityDetails({
   connectedEdges: GraphEdge[];
 }) {
   const { t, language } = useTranslation();
+  const { mission } = useMissionContext();
   const dictionary = getDictionary(language);
   const summary = buildEntityGraphEvidenceSummary(node, connectedEdges, dictionary);
   const route = MODULE_ROUTES[node.type];
   const typeLabel = getEntityTypeLabel(node.type);
+
+  const missionProject = mission?.projectId
+    ? loadProjects().find((p) => p.id === mission.projectId)
+    : null;
+  const missionLinked =
+    missionProject?.primaryEntity?.kind === node.type &&
+    missionProject.primaryEntity.id === node.entityId;
+  const missingEdges = connectedEdges.filter((e) => e.evidenceStatus !== "evidence_available").length;
 
   return (
     <div className="mt-4 space-y-4">
@@ -148,6 +159,9 @@ function EntityDetails({
         {node.entity.subtitle ? (
           <p className="text-xs text-zinc-500">{node.entity.subtitle}</p>
         ) : null}
+        <p className={`mt-2 ${cbaiTextCaption}`}>
+          {missionLinked ? t("activation.graphMissionRelevant") : t("activation.graphMissionNotLinked")}
+        </p>
       </div>
 
       <dl className="space-y-2 text-xs">
@@ -157,6 +171,15 @@ function EntityDetails({
           label={t("graphUi.availableSources")}
           value={summary.availableSources.join(", ")}
         />
+        {missingEdges > 0 ? (
+          <>
+            <DetailRow
+              label={t("activation.graphUnknowns")}
+              value={String(missingEdges)}
+            />
+            <p className={`${cbaiTextCaption} text-amber-400/80`}>{t("activation.graphUnknownsExplain")}</p>
+          </>
+        ) : null}
       </dl>
 
       <KnowledgeLayersDisclosure

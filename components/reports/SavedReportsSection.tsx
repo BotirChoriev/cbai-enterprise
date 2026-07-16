@@ -8,6 +8,9 @@ import { loadReports, deleteReport, type SavedReport } from "@/lib/reports/repor
 import { PLATFORM_MODULES } from "@/lib/context";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import EmptyState from "@/components/shared/EmptyState";
+import ActivationStatusLine from "@/components/shared/ActivationStatusLine";
+import { useMissionDataRevision } from "@/lib/hooks/use-mission-data-revision";
 
 function reportHref(report: SavedReport): string {
   switch (report.kind) {
@@ -24,28 +27,25 @@ function reportHref(report: SavedReport): string {
   }
 }
 
-/**
- * Real, persisted Report ownership (Phase 11) — "reopen" always navigates to the live current
- * report (never a stored, potentially stale snapshot); "delete" removes the real saved record.
- * Synced to the cloud when a cloud session is active (see lib/reports/reports-store.ts).
- */
 export default function SavedReportsSection() {
   const { t } = useTranslation();
   const { mission } = useMissionContext();
+  useMissionDataRevision();
   const next = useMemo(() => deriveFirstMinuteAction(mission), [mission]);
-  const [reports, setReports] = useState<SavedReport[]>(() => loadReports());
+  const reports = loadReports();
+  const [status, setStatus] = useState<string | null>(null);
 
   if (reports.length === 0) {
     return (
-      <section aria-labelledby="saved-reports-heading" className={`${cbaiGlassCard} space-y-2 p-5`}>
-        <p className={cbaiSectionEyebrow} id="saved-reports-heading">
-          {t("reports.myReports")}
-        </p>
-        <p className="text-sm text-zinc-500">{t("reports.noReports")}</p>
-        <Link href={next.href} className="text-xs text-teal-400 hover:text-teal-300">
-          {translateFirstMinuteAction(t, next)} →
-        </Link>
-      </section>
+      <EmptyState
+        title={t("reports.myReports")}
+        message={t("reports.noReports")}
+        action={
+          <Link href={next.href} className="text-xs text-teal-400 hover:text-teal-300">
+            {translateFirstMinuteAction(t, next)} →
+          </Link>
+        }
+      />
     );
   }
 
@@ -54,6 +54,7 @@ export default function SavedReportsSection() {
       <p className={cbaiSectionEyebrow} id="saved-reports-heading">
         {t("reportsCenter.savedCount", { count: String(reports.length) })}
       </p>
+      {status ? <ActivationStatusLine message={status} compact /> : null}
       <ul className="space-y-2">
         {reports.map((report) => (
           <li
@@ -72,7 +73,7 @@ export default function SavedReportsSection() {
               type="button"
               onClick={() => {
                 deleteReport(report.id);
-                setReports(loadReports());
+                setStatus(t("activation.reportRemoved"));
               }}
               className="text-xs text-zinc-500 hover:text-amber-400"
             >

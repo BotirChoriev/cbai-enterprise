@@ -208,7 +208,7 @@ export const MY_WORK_EXT_EN = {
   onboardingExploreResearch: "Explore Research",
   onboardingExploreCountries: "Explore Countries",
   onboardingSearchEvidence: "Search Evidence",
-  onboardingConfigureOperator: "Configure Personal Operator",
+  onboardingConfigureOperator: "Set preferences",
   onboardingOpenTrust: "Open Trust Center",
   loading: "Loading…",
 } as const;

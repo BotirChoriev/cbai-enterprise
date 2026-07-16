@@ -84,6 +84,9 @@ import { EXPERIENCE_ENGINEERING_EN } from "@/lib/i18n/platform-copy-build017-en"
 import { UNIVERSAL_WORKSPACE_EN } from "@/lib/i18n/platform-copy-build018-en";
 import { ORGANIZATION_OS_EN } from "@/lib/i18n/platform-copy-build019-en";
 import { ZERO_LEARNING_CURVE_EN, MISSION_LIFECYCLE_NEXT_EN } from "@/lib/i18n/platform-copy-build020-en";
+import { ACTIVATION_EN } from "@/lib/i18n/platform-copy-build021-en";
+import { MISSION_HOME_EN, RESEARCH_DASHBOARD_EN, SAVED_EVIDENCE_EN, PROJECT_PANEL_EN } from "@/lib/i18n/platform-copy-build022-en";
+import { RESEARCH_NOTES_EN, EVIDENCE_LIFECYCLE_COPY_EN } from "@/lib/i18n/platform-copy-build023-en";
 
 const en: TranslationDictionary = {
   roles: {
@@ -161,6 +164,10 @@ const en: TranslationDictionary = {
     loadingEvidence: "Checking evidence…",
     loadingReport: "Loading report…",
     loadingKnowledge: "Opening knowledge…",
+    loadingSearch: "Searching…",
+    loadingProfile: "Opening profile…",
+    loadingGraph: "Preparing graph…",
+    loadingResearch: "Opening research…",
     save: "Save",
     saving: "Saving…",
     saved: "Saved.",
@@ -304,7 +311,7 @@ const en: TranslationDictionary = {
     catalog: {
       recentProjects: "Recent Projects",
       pinnedProjects: "Pinned Projects",
-      noProjectsCreatedYet: "No projects created yet — no fabricated activity. Create the first one above.",
+      noProjectsCreatedYet: "No projects for this mission yet. Name the problem above to begin.",
       suggestedNextStep: "Suggested next step:",
       continueAction: "Continue",
       startA: "Start a {label}",
@@ -354,7 +361,7 @@ const en: TranslationDictionary = {
     title: "Reports",
     saveToMyReports: "Save to My Reports",
     myReports: "Your Saved Reports",
-    noReports: "No reports saved yet.",
+    noReports: "No reports for this mission yet. Continue when evidence and reasoning are ready.",
   },
   trust: {
     title: "Trust",
@@ -559,6 +566,13 @@ const en: TranslationDictionary = {
   organizationOs: ORGANIZATION_OS_EN,
   zeroLearningCurve: ZERO_LEARNING_CURVE_EN,
   missionLifecycle: MISSION_LIFECYCLE_NEXT_EN,
+  activation: ACTIVATION_EN,
+  missionHome: MISSION_HOME_EN,
+  researchDashboard: RESEARCH_DASHBOARD_EN,
+  savedEvidence: SAVED_EVIDENCE_EN,
+  projectPanel: PROJECT_PANEL_EN,
+  researchNotes: RESEARCH_NOTES_EN,
+  evidenceLifecycle: EVIDENCE_LIFECYCLE_COPY_EN,
 };
 
 export default en;

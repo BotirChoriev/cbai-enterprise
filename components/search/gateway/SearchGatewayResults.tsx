@@ -13,9 +13,11 @@ import type { Entity } from "@/lib/entity/entity.types";
 import TopicResultCard from "@/components/search/gateway/SearchResultCard";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import VoiceSummaryButton from "@/components/shared/VoiceSummaryButton";
+import EmptyState from "@/components/shared/EmptyState";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
-import { cbaiLinkMuted, cbaiProminentAction } from "@/components/brand/brand-classes";
+import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
+import { cbaiLinkMuted, cbaiMineralPanel, cbaiProminentAction } from "@/components/brand/brand-classes";
 
 type SearchGatewayResultsProps = {
   response: GatewaySearchResponse;
@@ -55,11 +57,16 @@ export default function SearchGatewayResults({ response, query }: SearchGatewayR
 
   if (!response.hasResults) {
     return (
-      <div className="space-y-4" role="status">
-        <p className="text-sm text-zinc-300">{t("search.noResults", { query: response.query })}</p>
-        <p className="text-xs text-zinc-500">{t("search.noResultsHint")}</p>
-        <SearchExamples />
-      </div>
+      <EmptyState
+        variant="section"
+        message={t("search.noResults", { query: response.query })}
+        action={
+          <>
+            <p className="text-xs text-zinc-500">{t("search.noResultsHint")}</p>
+            <SearchExamples />
+          </>
+        }
+      />
     );
   }
 
@@ -129,12 +136,17 @@ type EntityMatchCardProps = {
 
 function EntityMatchCard({ entry, matchedLabel, prominent = false }: EntityMatchCardProps) {
   const { t } = useTranslation();
+  const { recordEntityView } = usePlatformContext();
   const disclosure = useProgressiveDisclosure();
   const showSecondary = disclosure.level === "expert";
   const showCountryInHeader = entry.type !== "Country" && entry.countryLabel;
 
+  function handleOpenProfile() {
+    if (entry.entityRef) recordEntityView(entry.entityRef);
+  }
+
   return (
-    <article className="rounded-lg bg-zinc-900/50 px-4 py-3">
+    <article className={cbaiMineralPanel}>
       {matchedLabel ? (
         <p className="text-sm font-medium text-zinc-200">{matchedLabel}</p>
       ) : (
@@ -165,6 +177,7 @@ function EntityMatchCard({ entry, matchedLabel, prominent = false }: EntityMatch
       <div className="mt-3">
         <Link
           href={entry.href}
+          onClick={handleOpenProfile}
           className={
             prominent
               ? `${cbaiProminentAction} w-full justify-between`

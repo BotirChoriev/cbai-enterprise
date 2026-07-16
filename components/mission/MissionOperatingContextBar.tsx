@@ -72,9 +72,14 @@ export default function MissionOperatingContextBar({
   const priorThought = useMemo(() => (showBar ? loadCompanionThought() : null), [showBar]);
 
   useEffect(() => {
-    if (!showBar || !purpose) return;
-    recordCompanionThought(mission?.id ?? null, pathname, purpose);
-  }, [showBar, mission?.id, pathname, purpose]);
+    if (!showBar) return;
+    const focus =
+      mission?.problem?.trim() ||
+      (mission?.whyExists?.trim() ? mission.whyExists : "") ||
+      purpose;
+    if (!focus.trim()) return;
+    recordCompanionThought(mission?.id ?? null, pathname, focus.trim());
+  }, [showBar, mission?.id, mission?.problem, mission?.whyExists, pathname, purpose]);
 
   if (!showBar || !companion) return null;
 
@@ -91,7 +96,9 @@ export default function MissionOperatingContextBar({
     priorThought &&
     priorThought.lastRoute !== basePath &&
     priorThought.missionId === (mission?.id ?? null) &&
-    priorThought.lastFocus.length > 0;
+    priorThought.lastFocus.trim().length > 0 &&
+    priorThought.lastFocus !== purpose &&
+    priorThought.lastFocus !== mission?.problem?.trim();
 
   const showBoundary =
     variant === "full" && disclosure.showInlineHumanDecisionBoundary;

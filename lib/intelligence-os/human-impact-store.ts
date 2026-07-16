@@ -5,6 +5,7 @@
 import type { HumanImpactAssessment, HumanImpactDraft } from "@/lib/intelligence-os/human-impact.types";
 import { isHumanImpactComplete } from "@/lib/intelligence-os/human-impact.types";
 import { resolveStorageKey } from "@/lib/storage/namespaced-key";
+import { notifyMissionDataChanged } from "@/lib/intelligence-os/mission-activation-events";
 
 const IMPACT_KEY = "cbai-human-impact";
 
@@ -77,5 +78,6 @@ export function saveHumanImpact(draft: HumanImpactDraft): HumanImpactAssessment 
       !(draft.projectId && i.projectId === draft.projectId),
   );
   writeAll([assessment, ...items]);
+  notifyMissionDataChanged("impact");
   return assessment;
 }

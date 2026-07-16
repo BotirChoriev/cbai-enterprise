@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import ResearchWorkspacePageClient from "@/components/research/workspace/ResearchWorkspacePageClient";
+import RouteChromeFallback from "@/components/system/RouteChromeFallback";
 
 export const metadata: Metadata = {
   title: "Research Workspace",
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function ResearchWorkspacePage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<RouteChromeFallback messageKey="loadingResearch" />}>
       <ResearchWorkspacePageClient />
     </Suspense>
   );

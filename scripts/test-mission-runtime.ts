@@ -99,9 +99,9 @@ test("9. Human impact panel wired to Mission Center and Project Home", () => {
 });
 
 test("10. Mission thread stages link to real routes", () => {
-  const thread = readSource("components/intelligence-os/MissionThread.tsx");
-  assert.match(thread, /resolveStageHref/);
-  assert.match(thread, /missionThreadUi/);
+  const lifecycle = readSource("lib/intelligence-os/mission-lifecycle.ts");
+  assert.match(lifecycle, /href:/);
+  assert.match(lifecycle, /project-evidence/);
 });
 
 test("11. Operator orb uses extended states without decorative waveform animation", () => {

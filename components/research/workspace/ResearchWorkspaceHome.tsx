@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { getResearchTopicById } from "@/lib/research/research-topics";
 import { getDefaultWorkspaceTopic } from "@/lib/research/workspace/workspace-explorer";
 import WorkspaceExplorer from "@/components/research/workspace/WorkspaceExplorer";
+import RouteChromeFallback from "@/components/system/RouteChromeFallback";
 
 function ResearchWorkspaceHomeContent({ embedded = false }: { embedded?: boolean }) {
   const searchParams = useSearchParams();
@@ -25,7 +26,7 @@ function ResearchWorkspaceHomeContent({ embedded = false }: { embedded?: boolean
 
 export default function ResearchWorkspaceHome({ embedded = false }: { embedded?: boolean }) {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<RouteChromeFallback messageKey="loadingResearch" />}>
       <ResearchWorkspaceHomeContent embedded={embedded} />
     </Suspense>
   );

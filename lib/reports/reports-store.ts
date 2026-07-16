@@ -18,6 +18,7 @@ import { resolveStorageKey } from "@/lib/storage/namespaced-key";
 import { getSyncedCloudUserId } from "@/lib/supabase/cloud-session-sync";
 import { enqueueSync } from "@/lib/supabase/outbox";
 import type { ReportKindValue } from "@/lib/supabase/database.types";
+import { notifyMissionDataChanged } from "@/lib/intelligence-os/mission-activation-events";
 
 const REPORTS_KEY = "cbai-saved-reports";
 
@@ -122,12 +123,14 @@ export function saveReport(input: SaveReportInput): SavedReport {
   const next = existing ? all.map((r) => (r.id === report.id ? report : r)) : [...all, report];
   writeReports(next);
   syncReportRow(report);
+  notifyMissionDataChanged("report");
   return report;
 }
 
 export function deleteReport(id: string): void {
   writeReports(readReports().filter((r) => r.id !== id));
   syncDeleteReport(id);
+  notifyMissionDataChanged("report");
 }
 
 export const NO_REPORTS_NOTE = "No reports saved yet — no fabricated history, save one from any report view below.";

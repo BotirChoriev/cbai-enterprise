@@ -84,6 +84,9 @@ import { EXPERIENCE_ENGINEERING_TR } from "@/lib/i18n/platform-copy-build017-tr"
 import { UNIVERSAL_WORKSPACE_TR } from "@/lib/i18n/platform-copy-build018-tr";
 import { ORGANIZATION_OS_TR } from "@/lib/i18n/platform-copy-build019-tr";
 import { ZERO_LEARNING_CURVE_TR, MISSION_LIFECYCLE_NEXT_TR } from "@/lib/i18n/platform-copy-build020-tr";
+import { ACTIVATION_TR } from "@/lib/i18n/platform-copy-build021-tr";
+import { MISSION_HOME_TR, RESEARCH_DASHBOARD_TR, SAVED_EVIDENCE_TR, PROJECT_PANEL_TR } from "@/lib/i18n/platform-copy-build022-tr";
+import { RESEARCH_NOTES_TR, EVIDENCE_LIFECYCLE_COPY_TR } from "@/lib/i18n/platform-copy-build023-tr";
 
 const tr: TranslationDictionary = {
   roles: {
@@ -161,6 +164,10 @@ const tr: TranslationDictionary = {
     loadingEvidence: "Kanıt kontrol ediliyor…",
     loadingReport: "Rapor yükleniyor…",
     loadingKnowledge: "Bilgi açılıyor…",
+    loadingSearch: "Aranıyor…",
+    loadingProfile: "Profil açılıyor…",
+    loadingGraph: "Grafik hazırlanıyor…",
+    loadingResearch: "Araştırma açılıyor…",
     save: "Kaydet",
     saving: "Kaydediliyor…",
     saved: "Kaydedildi.",
@@ -304,7 +311,7 @@ const tr: TranslationDictionary = {
     catalog: {
       recentProjects: "Son Projeler",
       pinnedProjects: "Sabitlenmiş Projeler",
-      noProjectsCreatedYet: "Henüz proje oluşturulmadı — uydurma etkinlik yok. Yukarıdan ilkini oluşturun.",
+      noProjectsCreatedYet: "Bu görev için henüz proje yok. Başlamak için yukarıda sorunu adlandırın.",
       suggestedNextStep: "Önerilen sonraki adım:",
       continueAction: "Devam Et",
       startA: "{label} Başlat",
@@ -354,7 +361,7 @@ const tr: TranslationDictionary = {
     title: "Raporlar",
     saveToMyReports: "Raporlarıma Kaydet",
     myReports: "Kaydedilen Raporlarınız",
-    noReports: "Henüz kaydedilmiş rapor yok.",
+    noReports: "Bu görev için henüz rapor yok. Kanıt ve akıl yürütme hazır olduğunda devam edin.",
   },
   trust: {
     title: "Güven",
@@ -558,6 +565,13 @@ const tr: TranslationDictionary = {
   organizationOs: ORGANIZATION_OS_TR,
   zeroLearningCurve: ZERO_LEARNING_CURVE_TR,
   missionLifecycle: MISSION_LIFECYCLE_NEXT_TR,
+  activation: ACTIVATION_TR,
+  missionHome: MISSION_HOME_TR,
+  researchDashboard: RESEARCH_DASHBOARD_TR,
+  savedEvidence: SAVED_EVIDENCE_TR,
+  projectPanel: PROJECT_PANEL_TR,
+  researchNotes: RESEARCH_NOTES_TR,
+  evidenceLifecycle: EVIDENCE_LIFECYCLE_COPY_TR,
 };
 
 export default tr;

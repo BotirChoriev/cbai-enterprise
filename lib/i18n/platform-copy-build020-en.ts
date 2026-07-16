@@ -75,7 +75,7 @@ export const ZERO_LEARNING_CURVE_EN = {
   routeReasoningPurpose: "Think through evidence before you decide.",
   routeGraphPurpose: "See how people, places, and topics connect.",
   routeReportsPurpose: "Communicate findings with traceable sources.",
-  routeMyWorkPurpose: "Continue the project linked to your mission.",
+  routeMyWorkPurpose: "Mission home — progress, next action, and latest evidence, reasoning, and reports.",
   routeSearchPurpose: "Find a country, company, university, or topic.",
   routeCountriesPurpose: "Open a country and see what is known, missing, or in conflict.",
   routeCompaniesPurpose: "Open a company and see what is known, missing, or in conflict.",

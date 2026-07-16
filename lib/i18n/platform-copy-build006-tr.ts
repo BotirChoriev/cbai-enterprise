@@ -47,6 +47,8 @@ export const SEARCH_TR = {
   groupProjects: "Projeler",
   opensTo: "Açar",
   exampleSearchesAria: "Örnek aramalar",
+  voiceSummary: "Sesli oku",
+  voiceSummaryStop: "Durdur",
 } as const;
 
 export const EVIDENCE_TR = {

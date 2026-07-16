@@ -75,7 +75,7 @@ export const ZERO_LEARNING_CURVE_UZ = {
   routeReasoningPurpose: "Qaror qilishdan oldin dalillarni o'ylab ko'ring.",
   routeGraphPurpose: "Odamlar, joylar va mavzular qanday bog'langanini ko'ring.",
   routeReportsPurpose: "Kuzatiladigan manbalar bilan xulosalarni yetkazing.",
-  routeMyWorkPurpose: "Missiyaga bog'langan loyihani davom ettiring.",
+  routeMyWorkPurpose: "Missiya uyi — progress, keyingi qadam va so‘nggi dalillar, mulohaza va hisobotlar.",
   routeSearchPurpose: "Mamlakat, kompaniya, universitet yoki mavzu toping.",
   routeCountriesPurpose: "Mamlakatni oching va nima ma'lum, nima yetishmayotgani yoki ziddiyat borligini ko'ring.",
   routeCompaniesPurpose: "Kompaniyani oching va nima ma'lum, nima yetishmayotgani yoki ziddiyat borligini ko'ring.",

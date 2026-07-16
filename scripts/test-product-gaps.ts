@@ -107,7 +107,8 @@ test("8. My Work renders a dedicated Saved Evidence section, distinct from the g
   assert.match(myWork, /entity\.kind !== "evidence"/);
   assert.match(myWork, /entity\.kind === "evidence"/);
   const savedEvidence = read("components/my-work/SavedEvidence.tsx");
-  assert.match(savedEvidence, /No evidence saved yet/);
+  assert.match(savedEvidence, /savedEvidence\.empty/);
+  assert.match(savedEvidence, /EmptyState/);
 });
 
 test("9. Evidence bookmarks are distinguished from linked Project Evidence at the schema level, not just in the UI", () => {

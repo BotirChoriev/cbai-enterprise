@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import {
   createContext,
   useCallback,
@@ -15,6 +16,7 @@ import { deriveMissionThread } from "@/lib/intelligence-os/mission-engine";
 import { deriveAdaptiveIntelligence } from "@/lib/intelligence-os/adaptive-intelligence";
 import { buildCapabilityPassport } from "@/lib/capability/capability-passport-builder";
 import { loadHumanImpactForMission } from "@/lib/intelligence-os/human-impact-store";
+import { MISSION_DATA_CHANGED } from "@/lib/intelligence-os/mission-activation-events";
 import type { Mission } from "@/lib/intelligence-os/mission.types";
 import type { EvidencePulseReading } from "@/lib/intelligence-os/evidence-pulse";
 import type { MissionThreadState } from "@/lib/intelligence-os/mission.types";
@@ -39,6 +41,12 @@ export function MissionContextProvider({ children }: { children: ReactNode }) {
   const { profile } = useAssistantProfile();
   const [tick, setTick] = useState(0);
   const refreshMissionContext = useCallback(() => setTick((n) => n + 1), []);
+
+  useEffect(() => {
+    const onMissionDataChanged = () => refreshMissionContext();
+    window.addEventListener(MISSION_DATA_CHANGED, onMissionDataChanged);
+    return () => window.removeEventListener(MISSION_DATA_CHANGED, onMissionDataChanged);
+  }, [refreshMissionContext]);
 
   const workspaceRole = profile.workspaceRole ?? null;
   const operatorName = resolveOperatorName(profile);

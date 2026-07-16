@@ -1,13 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import OperatingContextColumn from "@/components/operating/OperatingContextColumn";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
+import { shouldShowOperatingContextColumn } from "@/lib/intelligence-os/progressive-disclosure";
 
 /** Mobile access to Living Context — hidden on lg+ where rail is persistent. */
 export default function LivingContextMobileToggle() {
   const { t } = useTranslation();
+  const pathname = usePathname();
+  const disclosure = useProgressiveDisclosure();
   const [open, setOpen] = useState(false);
+
+  if (!shouldShowOperatingContextColumn(pathname, disclosure)) return null;
 
   return (
     <>

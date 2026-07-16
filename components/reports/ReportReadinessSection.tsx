@@ -1,10 +1,10 @@
 "use client";
 
-import type { ReportTypeDefinition } from "@/lib/reports-center";
+import type { ReportTypeDefinition, ReportAvailabilityLabel } from "@/lib/reports-center";
 import { translatedReportStatusClass } from "@/lib/i18n/reports-center-translation";
 import { getDictionary } from "@/lib/i18n/translate";
 import Link from "next/link";
-import { cbaiGraphPanel } from "@/components/brand/brand-classes";
+import { cbaiGraphPanel, cbaiTextCaption } from "@/components/brand/brand-classes";
 import { useTranslation } from "@/lib/i18n/use-translation";
 
 type ReportReadinessSectionProps = {
@@ -22,6 +22,28 @@ function StatusBadge({ label, language }: { label: string; language: string }) {
   );
 }
 
+function resolveReportProcessSteps(
+  availableToday: ReportAvailabilityLabel,
+  t: (path: string) => string,
+): readonly string[] {
+  if (availableToday === "Not available") {
+    return [t("activation.reportCollectingEvidence"), t("activation.reportNotAvailable")];
+  }
+  if (availableToday === "Registry facts only") {
+    return [
+      t("activation.reportCollectingEvidence"),
+      t("activation.reportCheckingReadiness"),
+      t("activation.reportPreparing"),
+    ];
+  }
+  return [
+    t("activation.reportCollectingEvidence"),
+    t("activation.reportCheckingReadiness"),
+    t("activation.reportCheckingImpact"),
+    t("activation.reportReady"),
+  ];
+}
+
 export default function ReportReadinessSection({
   reportTypes,
 }: ReportReadinessSectionProps) {
@@ -34,39 +56,45 @@ export default function ReportReadinessSection({
       </h2>
 
       <div className="space-y-4">
-        {reportTypes.map((report) => (
-          <div
-            key={report.id}
-            className={cbaiGraphPanel}
-          >
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div className="min-w-0">
-                <h3 className="text-sm font-semibold text-zinc-100">{report.title}</h3>
-                <p className="mt-1 text-sm text-zinc-400">{report.description}</p>
-              </div>
-              <StatusBadge label={report.availableToday} language={language} />
-            </div>
-
-            <dl className="mt-4 space-y-3 text-sm">
-              <div>
-                <dt className="text-xs uppercase tracking-wider text-zinc-600">
-                  {t("reportsCenter.evidenceRequired")}
-                </dt>
-                <dd className="mt-1 text-zinc-400">{report.evidenceRequired}</dd>
-              </div>
-              {report.relatedRoute ? (
-                <div>
-                  <Link
-                    href={report.relatedRoute}
-                    className="inline-flex min-h-10 w-full items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 px-4 text-sm font-medium text-teal-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800 sm:w-auto"
-                  >
-                    {t("reportsCenter.openRelatedProfile")}
-                  </Link>
+        {reportTypes.map((report) => {
+          const steps = resolveReportProcessSteps(report.availableToday, t);
+          return (
+            <div key={report.id} className={cbaiGraphPanel}>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
+                  <h3 className="text-sm font-semibold text-zinc-100">{report.title}</h3>
+                  <p className="mt-1 text-sm text-zinc-400">{report.description}</p>
                 </div>
-              ) : null}
-            </dl>
-          </div>
-        ))}
+                <StatusBadge label={report.availableToday} language={language} />
+              </div>
+
+              <ol className={`mt-3 list-inside list-decimal ${cbaiTextCaption}`}>
+                {steps.map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
+              </ol>
+
+              <dl className="mt-4 space-y-3 text-sm">
+                <div>
+                  <dt className="text-xs uppercase tracking-wider text-zinc-600">
+                    {t("reportsCenter.evidenceRequired")}
+                  </dt>
+                  <dd className="mt-1 text-zinc-400">{report.evidenceRequired}</dd>
+                </div>
+                {report.relatedRoute ? (
+                  <div>
+                    <Link
+                      href={report.relatedRoute}
+                      className="inline-flex min-h-10 w-full items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 px-4 text-sm font-medium text-teal-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800 sm:w-auto"
+                    >
+                      {t("reportsCenter.openRelatedProfile")}
+                    </Link>
+                  </div>
+                ) : null}
+              </dl>
+            </div>
+          );
+        })}
       </div>
     </section>
   );

@@ -216,7 +216,7 @@ export const MY_WORK_EXT_UZ = {
   onboardingExploreResearch: "Tadqiqotni o'rganish",
   onboardingExploreCountries: "Mamlakatlarni o'rganish",
   onboardingSearchEvidence: "Dalillarni qidirish",
-  onboardingConfigureOperator: "Shaxsiy operatorni sozlash",
+  onboardingConfigureOperator: "Sozlamalarni ochish",
   onboardingOpenTrust: "Ishonch markazini ochish",
   loading: "Yuklanmoqda…",
 } as const;

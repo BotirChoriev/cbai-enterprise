@@ -123,7 +123,15 @@ export function resolveProgressiveDisclosure(mode: UserDensityMode): Progressive
 
 const REFERENCE_ROUTES = new Set(["/trust", "/about", "/settings", "/account"]);
 const INTENT_ROUTES = new Set(["/search"]);
-const COMPANION_ROUTES = new Set(["/knowledge", "/reasoning", "/graph", "/reports", "/research"]);
+const COMPANION_ROUTES = new Set([
+  "/knowledge",
+  "/reasoning",
+  "/graph",
+  "/reports",
+  "/research",
+  "/my-work",
+  "/search",
+]);
 const ENTITY_EXPLORE_ROUTES = new Set(["/countries", "/companies", "/universities"]);
 const WORKFLOW_CONTINUITY_ROUTES = new Set(["/knowledge", "/reasoning", "/graph", "/reports"]);
 
@@ -174,6 +182,6 @@ export function shouldShowOperatingContextColumn(pathname: string, flags: Progre
 
 export function shouldShowAmbientTrustStrip(pathname: string, flags: ProgressiveDisclosureFlags): boolean {
   if (!flags.showAmbientTrustStrip) return false;
-  if (isReferenceRoute(pathname)) return false;
+  if (isReferenceRoute(pathname) || hasPageMissionCompanion(pathname)) return false;
   return true;
 }

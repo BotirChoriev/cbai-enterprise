@@ -25,6 +25,7 @@ import {
   type PlatformContextSnapshot,
   type WorkspaceId,
 } from "@/lib/context";
+import { notifyMissionDataChanged } from "@/lib/intelligence-os/mission-activation-events";
 
 type PlatformContextValue = {
   context: PlatformContextSnapshot;
@@ -154,10 +155,12 @@ export function PlatformContextProvider({ children }: { children: ReactNode }) {
 
   const pinEntityToWorkspace = useCallback((entity: ContextEntityRef) => {
     setPinnedEntities(pinEntity(entity));
+    notifyMissionDataChanged("bookmark");
   }, []);
 
   const unpinEntityFromWorkspace = useCallback((kind: ContextEntityRef["kind"], id: string) => {
     setPinnedEntities(unpinEntity(kind, id));
+    notifyMissionDataChanged("bookmark");
   }, []);
 
   const isEntityPinned = useCallback(

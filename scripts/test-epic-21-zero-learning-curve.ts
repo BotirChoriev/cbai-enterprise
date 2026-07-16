@@ -6,7 +6,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { USER_GOALS, resolveGoalRoute, deriveContextualGoals } from "@/lib/intelligence-os/intelligence-gateway";
-import { resolveProgressiveDisclosure, shouldShowGlobalMissionBar } from "@/lib/intelligence-os/progressive-disclosure";
+import { resolveProgressiveDisclosure, shouldShowGlobalMissionBar, shouldShowOperatingContextColumn, shouldShowAmbientTrustStrip } from "@/lib/intelligence-os/progressive-disclosure";
+import { deriveSearchActivationStages } from "@/lib/intelligence-os/search-activation";
+import { executeGatewaySearch } from "@/lib/search-gateway";
 import { deriveFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
 import { listSimplicityMetrics } from "@/lib/intelligence-os/simplicity-metrics";
 import { derivePrimaryEvidenceStates } from "@/lib/intelligence-os/evidence-primary-states";
@@ -170,7 +172,8 @@ test("18. EPIC-24 — route companion and human memory architecture", () => {
   const bar = readSource("components/mission/MissionOperatingContextBar.tsx");
   assert.match(bar, /deriveRouteCompanion/);
   assert.match(bar, /recordCompanionThought/);
-  assert.doesNotMatch(bar, /mission\?\.problem/);
+  assert.match(bar, /recordCompanionThought/);
+  assert.match(bar, /priorThought\.lastFocus/);
 });
 
 test("19. EPIC-24 — operator as guidance without greetings", () => {
@@ -217,7 +220,26 @@ test("23. Entity explore routes — page companion hides duplicate global bar", 
   assert.equal(shouldShowGlobalMissionBar("/countries"), false);
   assert.equal(shouldShowGlobalMissionBar("/companies"), false);
   assert.equal(shouldShowGlobalMissionBar("/universities"), false);
-  assert.equal(shouldShowGlobalMissionBar("/my-work"), true);
+  assert.equal(shouldShowGlobalMissionBar("/my-work"), false);
+  assert.equal(shouldShowGlobalMissionBar("/search"), false);
+});
+
+test("26. Platform convergence — mission home and contextual loading", () => {
+  const flags = resolveProgressiveDisclosure("standard");
+  assert.equal(shouldShowOperatingContextColumn("/my-work", flags), false);
+  assert.equal(shouldShowOperatingContextColumn("/search", flags), false);
+  assert.equal(shouldShowAmbientTrustStrip("/graph", flags), false);
+  const layout = readSource("app/(dashboard)/layout.tsx");
+  assert.match(layout, /RouteChromeFallback/);
+  assert.doesNotMatch(layout, /fallback=\{null\}/);
+  const graph = readSource("components/graph/GraphPageClient.tsx");
+  assert.match(graph, /recordEntityView/);
+  assert.match(graph, /setCountry/);
+  const myWork = readSource("components/my-work/MyWorkPageClient.tsx");
+  assert.match(myWork, /missionContextVariant="compact"/);
+  for (const dict of [en, uz, ru, tr]) {
+    assert.ok(dict.common.loadingResearch);
+  }
 });
 
 test("24. Entity explore routes — companion purpose keys in all languages", () => {
@@ -225,5 +247,86 @@ test("24. Entity explore routes — companion purpose keys in all languages", ()
     assert.ok(dict.zeroLearningCurve.routeCountriesPurpose);
     assert.ok(dict.zeroLearningCurve.routeCompaniesPurpose);
     assert.ok(dict.zeroLearningCurve.routeUniversitiesPurpose);
+  }
+});
+
+test("25. Platform activation — search and voice i18n in all languages", () => {
+  for (const dict of [en, uz, ru, tr]) {
+    assert.ok(dict.activation.searchCompleted);
+    assert.ok(dict.activation.voiceListening);
+    assert.ok(dict.search.voiceSummary);
+  }
+  const stages = deriveSearchActivationStages("japan", executeGatewaySearch("japan"));
+  assert.ok(stages.includes("completed"));
+});
+
+test("27. Product excellence — mission home and research dashboard i18n", () => {
+  const myWork = readSource("components/my-work/MyWork.tsx");
+  assert.match(myWork, /MissionHomeSummary/);
+  const dashboard = readSource("components/research/topic/ResearchWorkspaceDashboard.tsx");
+  assert.match(dashboard, /researchDashboard\./);
+  assert.doesNotMatch(dashboard, /Research Dashboard/);
+  const mobile = readSource("components/operating/LivingContextMobileToggle.tsx");
+  assert.match(mobile, /shouldShowOperatingContextColumn/);
+  for (const dict of [en, uz, ru, tr]) {
+    assert.ok(dict.missionHome.eyebrow);
+    assert.ok(dict.researchDashboard.eyebrow);
+  }
+});
+
+test("28. Product unification — project panels and saved evidence i18n", () => {
+  const saved = readSource("components/my-work/SavedEvidence.tsx");
+  assert.match(saved, /savedEvidence\./);
+  assert.match(saved, /EmptyState/);
+  const evidence = readSource("components/project/ProjectEvidencePanel.tsx");
+  assert.match(evidence, /projectPanel\./);
+  assert.match(evidence, /ActivationStatusLine/);
+  const timeline = readSource("components/project/ProjectTimelinePanel.tsx");
+  assert.match(timeline, /projectPanel\.timelineEmpty/);
+  for (const dict of [en, uz, ru, tr]) {
+    assert.ok(dict.savedEvidence.empty);
+    assert.ok(dict.projectPanel.evidenceAdded);
+  }
+});
+
+test("29. Living platform — mission data revision and status feedback", () => {
+  const hook = readSource("lib/hooks/use-mission-data-revision.ts");
+  assert.match(hook, /MISSION_DATA_CHANGED/);
+  const reports = readSource("lib/reports/reports-store.ts");
+  assert.match(reports, /notifyMissionDataChanged\("report"\)/);
+  const saveReportBtn = readSource("components/shared/SaveReportButton.tsx");
+  assert.match(saveReportBtn, /ActivationStatusLine/);
+  const bookmark = readSource("components/shared/SaveToWorkspaceButton.tsx");
+  assert.match(bookmark, /activation\.bookmarkSaved/);
+  const projects = readSource("components/project/ProjectList.tsx");
+  assert.match(projects, /useMissionDataRevision/);
+  assert.match(projects, /projectEvidenceCount/);
+  for (const dict of [en, uz, ru, tr]) {
+    assert.ok(dict.activation.graphUnknownsExplain);
+    assert.ok(dict.activation.reportSaved);
+  }
+});
+
+test("30. System integration — research activation, continuity, dead code removal", () => {
+  const notes = readSource("components/research/topic/ResearchNotesPanel.tsx");
+  assert.match(notes, /researchNotes\./);
+  assert.match(notes, /ActivationStatusLine/);
+  assert.match(notes, /useMissionDataRevision/);
+  const lifecycle = readSource("components/research/topic/EvidenceLifecyclePanel.tsx");
+  assert.match(lifecycle, /evidenceLifecycle\./);
+  assert.match(lifecycle, /ActivationStatusLine/);
+  const activity = readSource("components/research/topic/ResearchWorkspaceActivity.tsx");
+  assert.match(activity, /useMissionDataRevision/);
+  assert.match(activity, /EmptyState/);
+  const search = readSource("components/search/gateway/SearchGatewayResults.tsx");
+  assert.match(search, /recordEntityView/);
+  const graph = readSource("components/graph/GraphPageClient.tsx");
+  assert.match(graph, /prevFocus/);
+  const workspace = readSource("components/research/workspace/ResearchWorkspacePageClient.tsx");
+  assert.match(workspace, /RouteChromeFallback/);
+  assert.doesNotMatch(readSource("app/(dashboard)/layout.tsx"), /fallback=\{null\}/);
+  for (const dict of [en, uz, ru, tr]) {
+    assert.ok(dict.researchNotes.notesEmpty);
+    assert.ok(dict.evidenceLifecycle.stageCollected);
   }
 });

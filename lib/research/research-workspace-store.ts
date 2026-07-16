@@ -14,6 +14,8 @@
  * one step at a time — never skipped, never auto-completed.
  */
 
+import { notifyMissionDataChanged } from "@/lib/intelligence-os/mission-activation-events";
+
 export type EvidenceLifecycleStage =
   | "collected"
   | "reviewed"
@@ -148,6 +150,7 @@ export function saveResearchNote(input: Omit<PersistedResearchNote, "noteId" | "
     createdAt: new Date().toISOString(),
   };
   writeList(NOTES_KEY, [...all, note]);
+  notifyMissionDataChanged("research");
   return note;
 }
 
@@ -166,6 +169,7 @@ export function saveResearchFinding(input: Omit<PersistedResearchFinding, "findi
     createdAt: new Date().toISOString(),
   };
   writeList(FINDINGS_KEY, [...all, finding]);
+  notifyMissionDataChanged("research");
   return finding;
 }
 
