@@ -41,5 +41,10 @@ export const cbaiOperatingShell = "min-h-full bg-[var(--background)] text-[var(-
 export const cbaiMineralSurface =
   "rounded-xl border border-zinc-800/80 bg-[var(--surface)]/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]";
 
-/** Mission Center primary column rhythm. */
-export const cbaiMissionCenterGrid = "grid gap-6 lg:grid-cols-12";
+/** Intelligence Canvas — full operating workspace grid. */
+export const cbaiIntelligenceCanvas =
+  "cbai-intelligence-canvas relative min-h-full bg-[var(--background)]";
+
+/** Living operating object — not a card. */
+export const cbaiOperatingObject =
+  "cbai-operating-object relative overflow-hidden";

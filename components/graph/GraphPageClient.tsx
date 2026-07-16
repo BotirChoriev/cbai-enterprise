@@ -18,14 +18,10 @@ import GraphLegend from "@/components/graph/GraphLegend";
 import GraphMissionInstrument from "@/components/graph/GraphMissionInstrument";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import { useTranslation } from "@/lib/i18n/use-translation";
-import { getDictionary } from "@/lib/i18n/translate";
-import { translateGraphPlatform } from "@/lib/i18n/graph-platform-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 
 export default function GraphPageClient() {
-  const { t, language } = useTranslation();
-  const dictionary = getDictionary(language);
-  const graphPlatform = translateGraphPlatform(dictionary);
+  const { t } = useTranslation();
   const { mission } = useMissionContext();
   const fullGraph = useMemo(() => buildKnowledgeGraph(), []);
   const [focusMode, setFocusMode] = useState<"mission" | "evidence" | "all">("mission");
@@ -110,7 +106,7 @@ export default function GraphPageClient() {
 
   return (
     <OperatingPageShell
-      title={graphPlatform.headline}
+      title={t("intelligenceCanvas.knowledgeUniverse")}
       description={t("intelligenceNetwork.description")}
       showOperator
       missionContextVariant="compact"

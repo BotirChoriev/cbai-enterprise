@@ -72,6 +72,11 @@ import {
   MODULE_ACCOUNTABILITY_UI_TR,
   OPERATOR_STATES_TR,
 } from "@/lib/i18n/platform-copy-build012-tr";
+import {
+  INTELLIGENCE_CANVAS_TR,
+  OPERATING_NAV_TR,
+  OPERATOR_AWARENESS_TR,
+} from "@/lib/i18n/platform-copy-build013-tr";
 
 const tr: TranslationDictionary = {
   roles: {
@@ -530,6 +535,9 @@ const tr: TranslationDictionary = {
   moduleAccountabilityUi: MODULE_ACCOUNTABILITY_UI_TR,
   capabilityPassportExt: CAPABILITY_PASSPORT_BUILD012_TR,
   missionThreadUi: MISSION_THREAD_BUILD012_TR,
+  intelligenceCanvas: INTELLIGENCE_CANVAS_TR,
+  operatorAwareness: OPERATOR_AWARENESS_TR,
+  operatingNav: OPERATING_NAV_TR,
 };
 
 export default tr;

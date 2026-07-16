@@ -91,9 +91,9 @@ test("8. Mission context provider wired in dashboard layout", () => {
 });
 
 test("9. Human impact panel wired to Mission Center and Project Home", () => {
-  const center = readSource("components/mission/MissionCenter.tsx");
+  const canvas = readSource("components/canvas/IntelligenceCanvas.tsx");
   const project = readSource("components/project/ProjectHome.tsx");
-  assert.match(center, /HumanImpactPanel/);
+  assert.match(canvas, /HumanImpactPanel/);
   assert.match(project, /HumanImpactPanel/);
   assert.match(project, /deriveReportReadiness/);
 });

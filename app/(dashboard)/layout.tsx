@@ -53,7 +53,7 @@ export default function DashboardLayout({
                   <div
                     className={
                       isHome
-                        ? "mx-auto max-w-7xl"
+                        ? "h-full min-h-0"
                         : "mx-auto max-w-7xl space-y-6 px-6 py-6 lg:px-8 lg:py-8"
                     }
                   >

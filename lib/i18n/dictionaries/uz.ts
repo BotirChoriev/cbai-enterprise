@@ -72,6 +72,11 @@ import {
   MODULE_ACCOUNTABILITY_UI_UZ,
   OPERATOR_STATES_UZ,
 } from "@/lib/i18n/platform-copy-build012-uz";
+import {
+  INTELLIGENCE_CANVAS_UZ,
+  OPERATING_NAV_UZ,
+  OPERATOR_AWARENESS_UZ,
+} from "@/lib/i18n/platform-copy-build013-uz";
 
 const uz: TranslationDictionary = {
   roles: {
@@ -530,6 +535,9 @@ const uz: TranslationDictionary = {
   moduleAccountabilityUi: MODULE_ACCOUNTABILITY_UI_UZ,
   capabilityPassportExt: CAPABILITY_PASSPORT_BUILD012_UZ,
   missionThreadUi: MISSION_THREAD_BUILD012_UZ,
+  intelligenceCanvas: INTELLIGENCE_CANVAS_UZ,
+  operatorAwareness: OPERATOR_AWARENESS_UZ,
+  operatingNav: OPERATING_NAV_UZ,
 };
 
 export default uz;

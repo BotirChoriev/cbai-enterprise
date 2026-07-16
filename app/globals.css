@@ -386,6 +386,38 @@ html.theme-light [class*="backdrop-blur"] {
   animation: none !important;
 }
 
+/* BUILD-013 — Intelligence Canvas thought transitions (no bounce, no float). */
+@keyframes cbai-thought-enter {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cbai-thought-enter {
+  animation: cbai-thought-enter 0.35s ease-out both;
+}
+
+.cbai-reduced-motion .cbai-thought-enter {
+  animation: none !important;
+}
+
+.cbai-intelligence-canvas {
+  --canvas-gap: 1px;
+}
+
+.cbai-operating-object {
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.cbai-reduced-motion .cbai-operating-object {
+  transition: none;
+}
+
 /* Living Intelligence Network (homepage) — the exact same 4.5s idle timing as the Operator orb
    and the CBAI mark, so the "network breathes" moment reads as the same living system, not a
    fourth, unrelated animation. */

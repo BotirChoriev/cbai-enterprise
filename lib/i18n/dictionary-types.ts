@@ -1467,6 +1467,56 @@ export type TranslationDictionary = {
     stageReport: string;
     stageImpact: string;
   };
+  intelligenceCanvas: {
+    eyebrow: string;
+    notHomepage: string;
+    notDashboard: string;
+    livingWorkspace: string;
+    centerMission: string;
+    centerQuestion: string;
+    centerEvidence: string;
+    centerKnowledge: string;
+    centerImpact: string;
+    centerOperator: string;
+    contextLayer: string;
+    missionContext: string;
+    capabilitySignals: string;
+    missingKnowledge: string;
+    suggestedNext: string;
+    missionDna: string;
+    knowledgeStream: string;
+    knowledgeUniverse: string;
+    timelineQuestion: string;
+    timelineEvidence: string;
+    timelineAnalysis: string;
+    timelineValidation: string;
+    timelineImpact: string;
+    timelineReport: string;
+    openStage: string;
+    noMissionPrompt: string;
+    beginMission: string;
+    operatingNavigation: string;
+    viewGraph: string;
+    viewProjects: string;
+    impactStatus: string;
+    evidenceStatus: string;
+  };
+  operatorAwareness: {
+    noMissionDefined: string;
+    needIndependentSources: string;
+    weakEvidence: string;
+    impactIncomplete: string;
+    unresolvedQuestions: string;
+    needSourceUrls: string;
+    missingKnowledge: string;
+    similarProblem: string;
+  };
+  operatingNav: {
+    liveActive: string;
+    liveReady: string;
+    liveAttention: string;
+    liveNeutral: string;
+  };
 };
 
 export type TranslationNamespace = keyof TranslationDictionary;

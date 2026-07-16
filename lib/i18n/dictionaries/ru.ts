@@ -72,6 +72,11 @@ import {
   MODULE_ACCOUNTABILITY_UI_RU,
   OPERATOR_STATES_RU,
 } from "@/lib/i18n/platform-copy-build012-ru";
+import {
+  INTELLIGENCE_CANVAS_RU,
+  OPERATING_NAV_RU,
+  OPERATOR_AWARENESS_RU,
+} from "@/lib/i18n/platform-copy-build013-ru";
 
 const ru: TranslationDictionary = {
   roles: {
@@ -530,6 +535,9 @@ const ru: TranslationDictionary = {
   moduleAccountabilityUi: MODULE_ACCOUNTABILITY_UI_RU,
   capabilityPassportExt: CAPABILITY_PASSPORT_BUILD012_RU,
   missionThreadUi: MISSION_THREAD_BUILD012_RU,
+  intelligenceCanvas: INTELLIGENCE_CANVAS_RU,
+  operatorAwareness: OPERATOR_AWARENESS_RU,
+  operatingNav: OPERATING_NAV_RU,
 };
 
 export default ru;

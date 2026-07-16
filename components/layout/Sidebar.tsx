@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { primaryNavSections, secondaryNavSections } from "@/lib/navigation";
 import NavIcon from "@/components/layout/NavIcon";
 import CBAILogo, { CBAIMark } from "@/components/brand/CBAILogo";
+import OperatingNavigationPanel from "@/components/canvas/OperatingNavigationPanel";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { translateNavLabel, translateNavSectionTitle } from "@/lib/i18n/nav-translation";
 
@@ -45,6 +46,10 @@ export default function Sidebar() {
       </Link>
 
       <nav className="flex-1 space-y-4 overflow-y-auto px-3 py-4">
+        {isHome ? (
+          <OperatingNavigationPanel />
+        ) : (
+          <>
         {primaryNavSections.map((section, index) => (
           <div key={section.title || `section-${index}`}>
             {!isHome && section.title ? (
@@ -109,6 +114,8 @@ export default function Sidebar() {
               </div>
             ))}
           </details>
+          </>
+        )}
       </nav>
 
       {!isHome ? (

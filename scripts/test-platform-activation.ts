@@ -188,26 +188,26 @@ test("16. Intelligence Cabinet is discoverable — the Sidebar/mobile nav disclo
   assert.match(read("components/layout/MobileNavDrawer.tsx"), /navigation\.intelligenceCabinet/);
 });
 
-test("17. Homepage identity: Mission Center replaces marketing homepage — Operator and awakening on first screen", () => {
+test("17. Homepage identity: Intelligence Canvas replaces marketing homepage — Operator on first screen", () => {
   const home = read("components/platform/PlatformHome.tsx");
-  assert.match(home, /MissionCenter/);
-  const center = read("components/mission/MissionCenter.tsx");
-  assert.match(center, /SystemAwakeningSequence/);
-  assert.match(center, /MissionOperatorPresence/);
+  assert.match(home, /IntelligenceCanvas/);
+  const canvas = read("components/canvas/IntelligenceCanvas.tsx");
+  assert.match(canvas, /SystemAwakeningSequence/);
+  assert.match(canvas, /MissionOperatorPresence/);
 });
 
-test("21. Mission Center hero: Operator console and intelligence field share one operating shell — no separate marketing divider", () => {
-  const center = read("components/mission/MissionCenter.tsx");
-  assert.match(center, /cbaiOperatingShell/);
-  assert.match(center, /MissionOperatorPresence/);
-  assert.match(center, /IntelligenceField/);
-  assert.doesNotMatch(center, /HomeIntelligenceGlobe/);
-  assert.doesNotMatch(center, /Your workspace/);
+test("21. Intelligence Canvas: Operator and operating objects share one shell — no marketing divider", () => {
+  const canvas = read("components/canvas/IntelligenceCanvas.tsx");
+  assert.match(canvas, /cbai-intelligence-canvas/);
+  assert.match(canvas, /MissionOperatorPresence/);
+  assert.match(canvas, /CanvasOperatingObject/);
+  assert.doesNotMatch(canvas, /HomeIntelligenceGlobe/);
+  assert.doesNotMatch(canvas, /Your workspace/);
 });
 
-test("18. Intelligence Lenses are visible on Mission Center — not only secondary navigation", () => {
-  const center = read("components/mission/MissionCenter.tsx");
-  assert.match(center, /IntelligenceLensesGrid/);
+test("18. Operating navigation visible on home sidebar", () => {
+  const sidebar = read("components/layout/Sidebar.tsx");
+  assert.match(sidebar, /OperatingNavigationPanel/);
 });
 
 test("19. Every role card's suggested command is a real phrase resolveAssistantCommand() actually resolves, in every language — never an invented example", async () => {

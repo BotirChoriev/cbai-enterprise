@@ -54,22 +54,21 @@ test("5. BUILD-011 i18n in all four active languages", () => {
   }
 });
 
-test("6. PlatformHome renders Mission Center — not marketing homepage stack", () => {
+test("6. PlatformHome renders Intelligence Canvas — not marketing homepage stack", () => {
   const home = readSource("components/platform/PlatformHome.tsx");
-  assert.match(home, /MissionCenter/);
+  assert.match(home, /IntelligenceCanvas/);
   assert.doesNotMatch(home, /HomeEcosystems/);
   assert.doesNotMatch(home, /RoleWorkContextCards/);
   assert.doesNotMatch(home, /HomeIntelligenceGlobe/);
 });
 
-test("7. Mission Center includes signature systems and Operator presence", () => {
-  const center = readSource("components/mission/MissionCenter.tsx");
-  assert.match(center, /MissionOperatorPresence/);
-  assert.match(center, /MissionThread/);
-  assert.match(center, /EvidencePulsePanel/);
-  assert.match(center, /CapabilityConstellation/);
-  assert.match(center, /HumanDecisionBoundary/);
-  assert.match(center, /SystemAwakeningSequence/);
+test("7. Intelligence Canvas includes signature systems and Operator presence", () => {
+  const canvas = readSource("components/canvas/IntelligenceCanvas.tsx");
+  assert.match(canvas, /MissionOperatorPresence/);
+  assert.match(canvas, /CanvasMissionTimeline/);
+  assert.match(canvas, /CanvasContextLayer/);
+  assert.match(canvas, /SystemAwakeningSequence/);
+  assert.match(canvas, /CanvasOperatingObject/);
 });
 
 test("8. Language selector uses i18n keys in rendered panel", () => {
