@@ -201,7 +201,7 @@ export function createEmptyAssistantProfile(): AssistantProfile {
       highContrast: false,
       largerText: false,
     },
-    themeMode: "system",
+    themeMode: "dark",
   };
 }
 

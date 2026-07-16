@@ -1,12 +1,29 @@
 @import "tailwindcss";
 
-/* CBAI Design System 4.0 — the calm "Intelligence" palette is the real default product identity
-   now, not an optional light mode: Apple-precision, Bloomberg-professional, NASA-reliable. The
-   previous dark navy/cyan look survives only as the explicit "Deep" theme choice (html.theme-dark
-   below), for users who prefer it — never the default a new visitor sees.
-   Design Bible Part III.3.1: "CBAI has no red." --error intentionally equals --warning — every
-   honest error and limitation is expressed in amber, never in the color that means alarm. */
+/* CBAI Design System — Variant 1 Dark Premium (default operating environment).
+   Deep navy, deep emerald accent, titanium muted text, warm white foreground, restrained gold.
+   Light Intelligence palette is explicit via html.theme-light only.
+   Design Bible Part III.3.1: "CBAI has no red." --error equals --warning (amber). */
 :root {
+  --background: #050810;
+  --surface: #0a1628;
+  --card: #0c1220;
+  --foreground: #f5f2eb;
+  --border: #1e3a4f;
+  --muted: #8a9490;
+  --accent: #0d9488;
+  --accent-muted: rgba(13, 148, 136, 0.14);
+  --trust: #10b981;
+  --intelligence: #8b5cf6;
+  --warning: #d97706;
+  --error: #d97706;
+  --navy-deep: #0b1f3a;
+  --gold: #c6952f;
+  --gold-soft: #e8c878;
+  --titanium: #767f7c;
+}
+
+html.theme-light {
   --background: #f8f6f1;
   --surface: #eef4f2;
   --card: #ffffff;
@@ -19,25 +36,6 @@
   --intelligence: #6d28d9;
   --warning: #b45309;
   --error: #b45309;
-  --navy-deep: #0b1f3a;
-  --gold: #c6952f;
-  --gold-soft: #f3d38a;
-  --titanium: #767f7c;
-}
-
-html.theme-dark {
-  --background: #050810;
-  --surface: #0c1220;
-  --card: #0c1220;
-  --foreground: #fafafa;
-  --border: #1e293b;
-  --muted: #94a3b8;
-  --accent: #22d3ee;
-  --accent-muted: rgba(34, 211, 238, 0.12);
-  --trust: #10b981;
-  --intelligence: #8b5cf6;
-  --warning: #d97706;
-  --error: #d97706;
 }
 
 @theme inline {
@@ -75,11 +73,18 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
-html.theme-dark .cbai-glass {
+.cbai-glass {
   background: color-mix(in srgb, var(--surface) 72%, transparent);
   box-shadow:
-    0 0 48px -16px rgba(34, 211, 238, 0.14),
+    0 0 48px -16px color-mix(in srgb, var(--accent) 18%, transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+html.theme-light .cbai-glass {
+  background: color-mix(in srgb, var(--card) 90%, transparent);
+  box-shadow:
+    0 0 48px -16px color-mix(in srgb, var(--accent) 20%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 /* Home page design system */
@@ -123,18 +128,12 @@ html.theme-dark .cbai-glass {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
-/* CBAI Design System 4.0 — the calm Intelligence palette (Design System 4.0 mission). This is the
-   real, default product identity: pearl/mist surfaces, deep charcoal text, deep forest-green
-   accent replacing cyan everywhere it appeared. Implemented as overrides of the exact Tailwind
-   utility classes already used across every route (same technique proven in the Platform
-   Activation mission's light mode), scoped to "not explicitly in Deep mode" — so this applies by
-   default and to an explicit "Light" choice alike, while html.theme-dark (unscoped, using
-   Tailwind's own built-in dark/cyan utility values with zero extra CSS) preserves the previous
-   dark navy/cyan look for anyone who chooses it. */
-html:not(.theme-dark) [class*="bg-zinc-950"],
-html:not(.theme-dark) [class*="bg-zinc-900"],
-html:not(.theme-dark) [class*="bg-slate-950"],
-html:not(.theme-dark) [class*="bg-slate-900"] {
+/* Light Intelligence palette — explicit html.theme-light overrides for Tailwind utilities
+   already used across routes. Dark Premium Variant 1 is :root; no class needed for default. */
+html.theme-light [class*="bg-zinc-950"],
+html.theme-light [class*="bg-zinc-900"],
+html.theme-light [class*="bg-slate-950"],
+html.theme-light [class*="bg-slate-900"] {
   background-color: #ffffff;
 }
 
@@ -142,7 +141,7 @@ html:not(.theme-dark) [class*="bg-slate-900"] {
    arbitrary-value class bg-[#050810] rather than a Tailwind palette color, so it needs its own
    override — the page's real Main Background, not a card white. No escaping is needed here: the
    attribute selector matches the literal class-attribute substring, not a CSS class selector. */
-html:not(.theme-dark) [class*="bg-[#050810]"] {
+html.theme-light [class*="bg-[#050810]"] {
   background-color: #f8f6f1;
 }
 
@@ -154,43 +153,43 @@ html:not(.theme-dark) [class*="bg-[#050810]"] {
   background: radial-gradient(circle at 50% 40%, #10294a 0%, var(--navy-deep) 60%, #071527 100%);
 }
 
-html:not(.theme-dark) [class*="bg-zinc-800"] {
+html.theme-light [class*="bg-zinc-800"] {
   background-color: #eef4f2;
 }
 
-html:not(.theme-dark) [class~="bg-zinc-600"] {
+html.theme-light [class~="bg-zinc-600"] {
   background-color: #8fa39a;
 }
 
-html:not(.theme-dark) [class~="text-zinc-50"],
-html:not(.theme-dark) [class~="text-zinc-100"] {
+html.theme-light [class~="text-zinc-50"],
+html.theme-light [class~="text-zinc-100"] {
   color: #1f2422;
 }
 
-html:not(.theme-dark) [class~="text-zinc-200"],
-html:not(.theme-dark) [class~="text-zinc-300"] {
+html.theme-light [class~="text-zinc-200"],
+html.theme-light [class~="text-zinc-300"] {
   color: #2e3532;
 }
 
-html:not(.theme-dark) [class~="text-zinc-400"] {
+html.theme-light [class~="text-zinc-400"] {
   color: #445049;
 }
 
-html:not(.theme-dark) [class~="text-zinc-500"] {
+html.theme-light [class~="text-zinc-500"] {
   color: #5b6670;
 }
 
-html:not(.theme-dark) [class~="text-zinc-600"],
-html:not(.theme-dark) [class~="text-zinc-700"] {
+html.theme-light [class~="text-zinc-600"],
+html.theme-light [class~="text-zinc-700"] {
   color: #5b6670;
 }
 
-html:not(.theme-dark) [class*="border-zinc-800"],
-html:not(.theme-dark) [class*="border-zinc-700"] {
+html.theme-light [class*="border-zinc-800"],
+html.theme-light [class*="border-zinc-700"] {
   border-color: #d7e4da;
 }
 
-html:not(.theme-dark) [class~="border-zinc-600"] {
+html.theme-light [class~="border-zinc-600"] {
   border-color: #b9ccbe;
 }
 
@@ -198,34 +197,34 @@ html:not(.theme-dark) [class~="border-zinc-600"] {
    substring matches (not enumerated exact tokens) so every real opacity/shade variant in the
    codebase (text-cyan-300/80, bg-cyan-400/70, border-cyan-400/40, ...) is covered by construction,
    not by keeping this list in sync with every component by hand. */
-html:not(.theme-dark) [class*="text-cyan-"] {
+html.theme-light [class*="text-cyan-"] {
   color: #005810;
 }
 
-html:not(.theme-dark) [class*="border-cyan-"] {
+html.theme-light [class*="border-cyan-"] {
   border-color: rgba(0, 88, 16, 0.28);
 }
 
-html:not(.theme-dark) [class*="bg-cyan-"] {
+html.theme-light [class*="bg-cyan-"] {
   background-color: rgba(0, 88, 16, 0.08);
 }
 
 /* Primary buttons (cbaiBtnPrimary: bg-zinc-100 + text-slate-950) become a real, confident solid
    accent action rather than a flat light-gray button indistinguishable from the page. */
-html:not(.theme-dark) [class*="bg-zinc-100"] {
+html.theme-light [class*="bg-zinc-100"] {
   background-color: #005810;
 }
-html:not(.theme-dark) [class*="bg-zinc-100"][class*="text-slate-950"] {
+html.theme-light [class*="bg-zinc-100"][class*="text-slate-950"] {
   color: #ffffff;
 }
-html:not(.theme-dark) [class~="hover:bg-white"]:hover {
+html.theme-light [class~="hover:bg-white"]:hover {
   background-color: #00470d;
 }
 
 /* Backdrop blur "glass" panels look muddy against a light page background without a visible
    boundary — a real, deliberate light-palette-only shadow, not present in Deep mode. */
-html:not(.theme-dark) .cbai-glass,
-html:not(.theme-dark) [class*="backdrop-blur"] {
+html.theme-light .cbai-glass,
+html.theme-light [class*="backdrop-blur"] {
   box-shadow: 0 1px 2px rgba(31, 36, 34, 0.05), 0 8px 24px -12px rgba(31, 36, 34, 0.1);
 }
 

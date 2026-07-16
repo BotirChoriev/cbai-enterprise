@@ -81,8 +81,8 @@ export default function ThemeToggle({
             aria-label={`${option.label} theme`}
             title={`${option.label} theme`}
             onClick={() => updateProfile({ themeMode: option.mode })}
-            className={`flex h-7 min-w-7 items-center justify-center gap-1 rounded-md px-1.5 text-[11px] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400 ${
-              isActive ? "bg-cyan-500/15 text-cyan-300" : "text-zinc-500 hover:text-zinc-200"
+            className={`flex h-7 min-w-7 items-center justify-center gap-1 rounded-md px-1.5 text-[11px] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400 ${
+              isActive ? "bg-teal-500/15 text-teal-300" : "text-zinc-500 hover:text-zinc-200"
             }`}
           >
             {option.icon}
