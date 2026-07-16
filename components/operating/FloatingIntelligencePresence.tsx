@@ -9,11 +9,13 @@ import { useUniversalWorkspace } from "@/components/platform/context/UniversalWo
 import { resolveOperatorName } from "@/lib/assistant/assistant-profile";
 import { deriveFloatingIntelligence } from "@/lib/intelligence-os/floating-intelligence";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
+import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 
 /** One primary Operator intervention — context-attached, never generic once a mission exists. */
 export default function FloatingIntelligencePresence() {
   const { t } = useTranslation();
   const hydrated = useHydrated();
+  const disclosure = useProgressiveDisclosure();
   const { profile } = useAssistantProfile();
   const { mission } = useMissionContext();
   const { focusedObject } = useUniversalWorkspace();
@@ -31,7 +33,7 @@ export default function FloatingIntelligencePresence() {
     [hydrated, mission, profile, focusedObject],
   );
 
-  if (!hydrated || !intervention) return null;
+  if (!hydrated || !intervention || !disclosure.showFloatingIntelligence) return null;
 
   const body = (
     <div className="space-y-0.5">

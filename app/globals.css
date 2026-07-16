@@ -479,7 +479,7 @@ html.theme-light [class*="backdrop-blur"] {
   scrollbar-width: thin;
 }
 
-/* EPIC-13.3 — Mobile Intelligence Mode: sequential, focused — not shrunk desktop. */
+/* EPIC-21 — Mobile: one mission, one object, one action; context drawer preserved. */
 @media (max-width: 1023px) {
   .cbai-mobile-intelligence-mode .cbai-mental-model-strip dl {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -497,6 +497,15 @@ html.theme-light [class*="backdrop-blur"] {
   .cbai-mobile-intelligence-mode .cbai-space-enter {
     padding-inline: 1rem;
     padding-block: 0.875rem;
+  }
+
+  .cbai-mobile-intelligence-mode .cbai-intelligence-canvas .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cbai-mobile-intelligence-mode .cbai-intelligence-canvas > .border-b:first-of-type + .grid,
+  .cbai-mobile-intelligence-mode .cbai-intelligence-canvas > .flex.shrink-0 + .grid {
+    margin-top: 0;
   }
 }
 

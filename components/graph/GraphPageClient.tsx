@@ -16,8 +16,9 @@ import GraphEntityPanel from "@/components/graph/GraphEntityPanel";
 import GraphConnectionsPanel from "@/components/graph/GraphConnectionsPanel";
 import GraphLegend from "@/components/graph/GraphLegend";
 import GraphMissionInstrument from "@/components/graph/GraphMissionInstrument";
-import KnowledgeUniverseViews from "@/components/graph/KnowledgeUniverseViews";
+import GraphPrimaryViews from "@/components/graph/GraphPrimaryViews";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
+import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { useUniversalWorkspace } from "@/components/platform/context/UniversalWorkspaceProvider";
@@ -26,6 +27,7 @@ export default function GraphPageClient() {
   const { t } = useTranslation();
   const { mission } = useMissionContext();
   const { setFocusedObject } = useUniversalWorkspace();
+  const disclosure = useProgressiveDisclosure();
   const fullGraph = useMemo(() => buildKnowledgeGraph(), []);
   const [focusMode, setFocusMode] = useState<"mission" | "evidence" | "all">("mission");
 
@@ -121,12 +123,19 @@ export default function GraphPageClient() {
       missionContextVariant="compact"
     >
       <div className="mx-auto max-w-[90rem] space-y-6 pb-16">
-        <KnowledgeUniverseViews focusMode={focusMode} onFocusModeChange={setFocusMode} />
-        <GraphMissionInstrument
-          analysis={analysis}
+        <GraphPrimaryViews
           focusMode={focusMode}
           onFocusModeChange={setFocusMode}
+          missionProjectId={mission?.projectId}
         />
+        {disclosure.showGraphAnalysis ? (
+          <GraphMissionInstrument
+            analysis={analysis}
+            focusMode={focusMode}
+            onFocusModeChange={setFocusMode}
+            hideFocusToggles
+          />
+        ) : null}
 
         <div className="grid gap-6 xl:grid-cols-12">
           <div className="space-y-4 xl:col-span-3">
@@ -140,7 +149,7 @@ export default function GraphPageClient() {
               stats={stats}
               onClearSelection={() => setSelectedNodeId(null)}
             />
-            <GraphLegend />
+            {disclosure.showGraphLegend ? <GraphLegend /> : null}
           </div>
 
           <div className="xl:col-span-6">

@@ -16,6 +16,8 @@ import { useTranslation } from "@/lib/i18n/use-translation";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import ReportReadinessSection from "@/components/reports/ReportReadinessSection";
 import SavedReportsSection from "@/components/reports/SavedReportsSection";
+import ReportsPrimaryActions from "@/components/reports/ReportsPrimaryActions";
+import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 
 function entityProfilePath(entity: PrimaryEntityRef): string {
   switch (entity.kind) {
@@ -37,6 +39,7 @@ export default function ReportsCenter() {
   );
   const entity = getPrimaryEntity(context);
   const profileHref = entity ? buildContextualHref(entityProfilePath(entity), context) : null;
+  const disclosure = useProgressiveDisclosure();
 
   const title = entity ? entity.name : t("reports.title");
   const description = entity
@@ -47,6 +50,7 @@ export default function ReportsCenter() {
     <OperatingPageShell
       title={title}
       description={description}
+      showOperator={false}
       missionContextVariant="full"
       action={
         profileHref ? (
@@ -59,8 +63,11 @@ export default function ReportsCenter() {
         ) : undefined
       }
     >
+      <ReportsPrimaryActions />
       <SavedReportsSection />
-      <ReportReadinessSection reportTypes={model.reportTypes} />
+      {disclosure.showReportsReadinessDetail ? (
+        <ReportReadinessSection reportTypes={model.reportTypes} />
+      ) : null}
     </OperatingPageShell>
   );
 }

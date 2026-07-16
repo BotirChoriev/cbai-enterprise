@@ -47,7 +47,7 @@ export default function SystemAwakeningSequence({ hasMission }: SystemAwakeningS
   const shouldShow = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const [dismissed, setDismissed] = useState(false);
   const [stageIndex, setStageIndex] = useState(0);
-  const visible = shouldShow && !dismissed;
+  const visible = shouldShow && !dismissed && !hasMission;
 
   useEffect(() => {
     if (!visible) return;

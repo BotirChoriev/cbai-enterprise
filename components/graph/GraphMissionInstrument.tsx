@@ -9,12 +9,14 @@ type GraphMissionInstrumentProps = {
   analysis: GraphMissionAnalysis;
   focusMode: "mission" | "evidence" | "all";
   onFocusModeChange: (mode: "mission" | "evidence" | "all") => void;
+  hideFocusToggles?: boolean;
 };
 
 export default function GraphMissionInstrument({
   analysis,
   focusMode,
   onFocusModeChange,
+  hideFocusToggles = false,
 }: GraphMissionInstrumentProps) {
   const { t } = useTranslation();
 
@@ -30,21 +32,23 @@ export default function GraphMissionInstrument({
         {t("intelligenceNetwork.missionFocus")}
       </h2>
       <div className="flex flex-wrap gap-2" role="group" aria-label={t("intelligenceNetwork.focusModes")}>
-        {(["mission", "evidence", "all"] as const).map((mode) => (
-          <button
-            key={mode}
-            type="button"
-            aria-pressed={focusMode === mode}
-            onClick={() => onFocusModeChange(mode)}
-            className={`rounded-full px-3 py-1 text-xs ${
-              focusMode === mode
-                ? "border border-teal-500/40 bg-teal-500/10 text-teal-300"
-                : "border border-zinc-800 text-zinc-500 hover:text-zinc-300"
-            }`}
-          >
-            {t(`intelligenceNetwork.mode${mode.charAt(0).toUpperCase()}${mode.slice(1)}` as "intelligenceNetwork.modeMission")}
-          </button>
-        ))}
+        {!hideFocusToggles
+          ? (["mission", "evidence", "all"] as const).map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                aria-pressed={focusMode === mode}
+                onClick={() => onFocusModeChange(mode)}
+                className={`rounded-full px-3 py-1 text-xs ${
+                  focusMode === mode
+                    ? "border border-teal-500/40 bg-teal-500/10 text-teal-300"
+                    : "border border-zinc-800 text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                {t(`intelligenceNetwork.mode${mode.charAt(0).toUpperCase()}${mode.slice(1)}` as "intelligenceNetwork.modeMission")}
+              </button>
+            ))
+          : null}
       </div>
       <dl className="grid gap-2 text-xs sm:grid-cols-2">
         <div>

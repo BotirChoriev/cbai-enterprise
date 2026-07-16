@@ -357,3 +357,53 @@ Implementation: `knowledge-dna.ts`, `capability-matching.ts`
 
 Test suite: `npm run test:epic-05-organization-os`
 
+---
+
+## XVI. Zero Learning Curve & Invisible Operating System (EPIC-21)
+
+The platform must disappear. Users solve problems — they do not operate software. Every screen answers instantly: where am I, what am I doing, why it matters, and what is the next action.
+
+### Zero Learning Curve
+
+No tutorial, walkthrough, or coach marks. The interface teaches itself through action. Capability assessment is optional, offered only after real work, never mandatory, never blocking.
+
+Implementation: `first-minute.ts`, `IntelligenceGatewayEntry`, `CapabilityAssessmentOffer`
+
+### Invisible Operating System
+
+Hide system architecture until useful. Mission remains center. Operator remains ambient. Evidence remains visible. One dominant action per surface in focused and standard density.
+
+Implementation: `progressive-disclosure.ts`, `use-progressive-disclosure.ts`, `IntelligenceCanvas`
+
+### One Door Many Depths
+
+One Intelligence Gateway replaces multiple starting points. Three natural inputs: speak (command bar), type (search), choose goal. No module, dashboard, ecosystem, or role selection at entry.
+
+Implementation: `intelligence-gateway.ts`, `SearchGateway`, `IntelligenceGatewayEntry`
+
+### Progressive Disclosure
+
+Beginner (focused): one next action, minimal chrome. Professional (standard): full operating context without expert panels. Expert: complete workspace depth including graph analysis, evidence advanced, canvas expert panels.
+
+Implementation: `progressive-disclosure.ts`, `AdaptiveDensityControl`
+
+### Intent Before Navigation
+
+Goal-based experience replaces navigation thinking. User goals (research, verify, compare, continue, create, collaborate, publish) determine operating path through deterministic routing — never fake AI routing.
+
+Implementation: `intelligence-gateway.ts`, `universal-command.ts`
+
+### Universal Command
+
+One command surface extends existing `assistant-commands.ts`. Documented examples only; all resolve deterministically.
+
+Implementation: `universal-command.ts`
+
+### Simplicity Metrics
+
+Six UX metrics defined as architecture only — Time To First Success, Time To Resume, Navigation Confidence, Context Continuity, Mission Completion Flow, Decision Confidence. Values are never fabricated.
+
+Implementation: `simplicity-metrics.ts`
+
+Test suite: `npm run test:epic-21-zero-learning-curve`
+

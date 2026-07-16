@@ -9,6 +9,7 @@ import { useAssistantProfile } from "@/components/platform/context/AssistantProf
 import { buildCapabilityPassport } from "@/lib/capability/capability-passport-builder";
 import { resolveOperatorName } from "@/lib/assistant/assistant-profile";
 import { deriveMentalModel } from "@/lib/intelligence-os/mental-model";
+import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
@@ -20,13 +21,14 @@ export default function MentalModelStrip() {
   const { profile } = useAssistantProfile();
   const { mission } = useMissionContext();
 
+  const disclosure = useProgressiveDisclosure();
   const model = useMemo(() => {
     if (!hydrated) return null;
     const passport = buildCapabilityPassport(resolveOperatorName(profile));
     return deriveMentalModel(pathname, mission, passport, profile.workspaceRole);
   }, [hydrated, pathname, mission, profile]);
 
-  if (!hydrated || !model) return null;
+  if (!hydrated || !model || !disclosure.showMentalModelStrip) return null;
 
   const whyText = model.why === "begin-mission"
     ? t("experienceEngineering.beginMission")

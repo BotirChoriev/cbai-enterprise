@@ -9,6 +9,9 @@ import { deriveEvidencePulse } from "@/lib/intelligence-os/evidence-pulse";
 import { loadProjects, loadProjectQuestions } from "@/lib/project/project-store";
 import { loadHumanImpactForMission } from "@/lib/intelligence-os/human-impact-store";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
+import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
+import { deriveFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
+import IntelligenceGatewayEntry from "@/components/gateway/IntelligenceGatewayEntry";
 import MissionCreationFlow from "@/components/mission/MissionCreationFlow";
 import MissionOperatorPresence from "@/components/mission/MissionOperatorPresence";
 import HumanImpactPanel from "@/components/mission/HumanImpactPanel";
@@ -28,6 +31,7 @@ export default function IntelligenceCanvas() {
   const { t } = useTranslation();
   const hydrated = useHydrated();
   const { refreshMissionContext } = useMissionContext();
+  const disclosure = useProgressiveDisclosure();
   const [creating, setCreating] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -45,6 +49,7 @@ export default function IntelligenceCanvas() {
   }, [refreshMissionContext]);
 
   const projectQuery = mission?.projectId ? `?project=${mission.projectId}` : "";
+  const firstAction = hydrated ? deriveFirstMinuteAction(mission) : null;
 
   if (creating) {
     return (
@@ -56,15 +61,19 @@ export default function IntelligenceCanvas() {
 
   return (
     <div className={`cbai-intelligence-canvas cbai-living-canvas ${cbaiOperatingShell} flex min-h-full flex-col`} key={refreshKey}>
-      <SystemAwakeningSequence hasMission={Boolean(mission)} />
+      {disclosure.showAwakeningSequence ? <SystemAwakeningSequence hasMission={Boolean(mission)} /> : null}
 
-      <div className="flex shrink-0 items-center justify-end border-b border-zinc-800/80 px-4 py-2 sm:px-5">
-        {!mission ? (
-          <button type="button" onClick={() => setCreating(true)} className={`${cbaiBtnPrimary} text-xs`}>
-            {t("intelligenceCanvas.beginMission")}
-          </button>
-        ) : null}
-      </div>
+      {!mission ? (
+        <div className="border-b border-zinc-800/80 px-4 py-3 sm:px-5">
+          <IntelligenceGatewayEntry compact />
+        </div>
+      ) : firstAction && disclosure.primaryActionOnly ? (
+        <div className="flex shrink-0 items-center border-b border-zinc-800/80 px-4 py-2 sm:px-5">
+          <Link href={firstAction.href} className={`${cbaiBtnPrimary} text-xs`}>
+            {firstAction.label} →
+          </Link>
+        </div>
+      ) : null}
 
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-px bg-zinc-800/30 lg:grid-cols-[minmax(0,1fr)_15rem] xl:grid-cols-[minmax(0,1fr)_17rem]">
         <div className="flex min-h-0 flex-col overflow-y-auto">
@@ -134,7 +143,7 @@ export default function IntelligenceCanvas() {
 
           <MissionDnaStrip mission={mission} />
 
-          {mission ? (
+          {mission && disclosure.showCanvasExpertPanels ? (
             <div className="space-y-px border-t border-zinc-800/80 bg-zinc-800/20">
               <div className="p-4">
                 <EvidencePulsePanel mission={mission} />

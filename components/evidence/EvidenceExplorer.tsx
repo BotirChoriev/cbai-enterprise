@@ -11,32 +11,38 @@ import EvidenceTrust from "@/components/evidence/EvidenceTrust";
 import EvidenceMethodology from "@/components/evidence/EvidenceMethodology";
 import EvidenceIndicatorMap from "@/components/evidence/EvidenceIndicatorMap";
 import EvidenceTrustSurfacePanel from "@/components/evidence/EvidenceTrustSurfacePanel";
+import EvidencePrimaryStatesPanel from "@/components/evidence/EvidencePrimaryStatesPanel";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
+import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import { useTranslation } from "@/lib/i18n/use-translation";
 
 export default function EvidenceExplorer() {
   const { t } = useTranslation();
   const { mission } = useMissionContext();
+  const disclosure = useProgressiveDisclosure();
   const model = useMemo(() => buildEvidenceExplorerModel(), []);
 
   return (
     <OperatingPageShell
       title={t("evidence.title")}
       description={t("evidenceExplorer.description")}
-      missionContextVariant="full"
+      showOperator={false}
+      missionContextVariant="compact"
     >
-      <EvidenceOperatingStatus summary={model.summary} />
+      <EvidencePrimaryStatesPanel />
 
-      {mission ? (
-        <EvidenceTrustSurfacePanel mission={mission} variant="full" />
+      {disclosure.showEvidenceAdvanced ? (
+        <>
+          <EvidenceOperatingStatus summary={model.summary} />
+          {mission ? <EvidenceTrustSurfacePanel mission={mission} variant="full" /> : null}
+          <EvidenceSourceCoverage sources={model.sources} />
+          <EntityEvidenceCoverage entityModules={model.entityModules} />
+          <EvidenceLifecycle stages={model.lifecycleStages} />
+          <EvidenceIndicatorMap indicatorsByDomain={model.indicatorsByDomain} />
+          <EvidenceMethodology points={model.methodology} />
+          <EvidenceTrust pillars={model.trustPillars} />
+        </>
       ) : null}
-
-      <EvidenceSourceCoverage sources={model.sources} />
-      <EntityEvidenceCoverage entityModules={model.entityModules} />
-      <EvidenceLifecycle stages={model.lifecycleStages} />
-      <EvidenceIndicatorMap indicatorsByDomain={model.indicatorsByDomain} />
-      <EvidenceMethodology points={model.methodology} />
-      <EvidenceTrust pillars={model.trustPillars} />
     </OperatingPageShell>
   );
 }

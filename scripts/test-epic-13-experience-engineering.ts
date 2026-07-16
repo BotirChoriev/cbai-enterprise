@@ -52,10 +52,10 @@ test("5. Mission Gravity 2.0 — global bar centers mission not space label", ()
   assert.match(bar, /mission\?\.problem/);
 });
 
-test("6. Knowledge Universe views — one universe, multiple views", () => {
+test("6. Knowledge Universe views — primary views on graph page", () => {
   const graph = readSource("components/graph/GraphPageClient.tsx");
-  assert.match(graph, /KnowledgeUniverseViews/);
-  assert.match(readSource("components/graph/KnowledgeUniverseViews.tsx"), /universeViews/);
+  assert.match(graph, /GraphPrimaryViews/);
+  assert.match(readSource("components/graph/GraphPrimaryViews.tsx"), /graphPeople/);
 });
 
 test("7. Operating page shell reduces operator duplication by default", () => {

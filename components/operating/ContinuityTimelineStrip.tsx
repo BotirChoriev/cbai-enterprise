@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
+import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { getCurrentMission } from "@/lib/intelligence-os/mission-engine";
 import { deriveEvidenceJourney } from "@/lib/evidence-runtime/evidence-journey";
@@ -19,10 +20,11 @@ const STATUS_COLOR: Record<string, string> = {
 export default function ContinuityTimelineStrip() {
   const { t } = useTranslation();
   const hydrated = useHydrated();
+  const disclosure = useProgressiveDisclosure();
   const mission = hydrated ? getCurrentMission() : null;
   const journey = useMemo(() => (hydrated ? deriveEvidenceJourney(mission) : []), [hydrated, mission]);
 
-  if (!hydrated || journey.length === 0) return null;
+  if (!hydrated || journey.length === 0 || !disclosure.showContinuityTimeline) return null;
 
   return (
     <footer
