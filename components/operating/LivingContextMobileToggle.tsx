@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import LivingContextRail from "@/components/operating/LivingContextRail";
+import OperatingContextColumn from "@/components/operating/OperatingContextColumn";
 import { useTranslation } from "@/lib/i18n/use-translation";
 
 /** Mobile access to Living Context — hidden on lg+ where rail is persistent. */
@@ -28,7 +28,7 @@ export default function LivingContextMobileToggle() {
           aria-modal="true"
           aria-label={t("intelligenceSpaces.livingContext")}
         >
-          <LivingContextRail className="border-l-0" />
+          <OperatingContextColumn className="border-l-0" />
         </div>
       ) : null}
     </>

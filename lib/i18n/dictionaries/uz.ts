@@ -81,6 +81,7 @@ import { EVIDENCE_RUNTIME_UZ } from "@/lib/i18n/platform-copy-build014-uz";
 import { INTELLIGENCE_SPACES_UZ } from "@/lib/i18n/platform-copy-build015-uz";
 import { LIVING_INTELLIGENCE_UZ } from "@/lib/i18n/platform-copy-build016-uz";
 import { EXPERIENCE_ENGINEERING_UZ } from "@/lib/i18n/platform-copy-build017-uz";
+import { UNIVERSAL_WORKSPACE_UZ } from "@/lib/i18n/platform-copy-build018-uz";
 
 const uz: TranslationDictionary = {
   roles: {
@@ -546,6 +547,7 @@ const uz: TranslationDictionary = {
   intelligenceSpaces: INTELLIGENCE_SPACES_UZ,
   livingIntelligence: LIVING_INTELLIGENCE_UZ,
   experienceEngineering: EXPERIENCE_ENGINEERING_UZ,
+  universalWorkspace: UNIVERSAL_WORKSPACE_UZ,
 };
 
 export default uz;

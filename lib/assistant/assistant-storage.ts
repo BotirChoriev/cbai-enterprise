@@ -3,6 +3,7 @@ import {
   type AssistantProfile,
   type WorkspaceRole,
   type ThemeMode,
+  type UserDensityMode,
   WORKSPACE_ROLES,
   ASSISTANT_AVATARS,
 } from "@/lib/assistant/assistant-profile";
@@ -12,6 +13,11 @@ import { upsertCloudProfile } from "@/lib/supabase/cloud-profile";
 
 const ASSISTANT_STORAGE_KEY = "cbai-assistant-profile";
 const THEME_MODES: readonly ThemeMode[] = ["system", "light", "dark"];
+const DENSITY_MODES: readonly UserDensityMode[] = ["focused", "standard", "expert"];
+
+function isDensityMode(value: unknown): value is UserDensityMode {
+  return typeof value === "string" && (DENSITY_MODES as string[]).includes(value);
+}
 
 function isBrowser(): boolean {
   return typeof window !== "undefined";
@@ -75,6 +81,9 @@ function sanitizeProfile(raw: unknown): AssistantProfile {
       largerText: Boolean(candidate.accessibility?.largerText),
     },
     themeMode: isThemeMode(candidate.themeMode) ? candidate.themeMode : fallback.themeMode,
+    displayDensity: isDensityMode(candidate.displayDensity)
+      ? candidate.displayDensity
+      : fallback.displayDensity,
   };
 }
 

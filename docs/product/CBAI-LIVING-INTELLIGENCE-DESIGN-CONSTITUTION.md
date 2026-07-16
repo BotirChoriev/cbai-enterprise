@@ -237,3 +237,85 @@ Code registry: `lib/design/living-intelligence-registry.ts`
 
 Test suite: `npm run test:epic-13-experience-engineering`
 
+---
+
+## XIV. Universal Workspace & Object-First Intelligence (EPIC-13.4)
+
+The final experience architecture pass unifies Mission, Research, Evidence, Knowledge Universe, Reasoning, Impact, Reports, Entities, Trust, and Capability as **views into one Universal Workspace** — not separate product islands.
+
+### Universal Workspace
+
+Persistent composed state (sessionStorage):
+
+- Active mission, object, project, scope
+- Evidence count, impact status, report readiness
+- Return path and last meaningful action
+
+Implementation: `universal-workspace.ts`, `UniversalWorkspaceProvider`
+
+Survives route changes, browser back, refresh, and language switching (same session).
+
+### Object-First Interaction
+
+Every primary object exposes a common contract via `resolveUniversalObject()`:
+
+- Identity, type, purpose, state, mission relation
+- Evidence, unknowns, trust, actions, limitations
+- Progressive knowledge layers, human judgment flag
+
+Types: mission, project, research_topic, evidence, country, company, university, report, question, relationship, capability_signal.
+
+### Universal Inspector
+
+One inspector grammar in the right context rail answers nine operating questions for any focused object.
+
+Implementation: `UniversalInspector`, `OperatingContextColumn`
+
+### Floating Intelligence Presence
+
+Maximum **one** primary Operator intervention with full contract: observation, reason, evidence basis, limitation, suggested action, human decision boundary.
+
+Implementation: `floating-intelligence.ts`, `FloatingIntelligencePresence`
+
+Replaces duplicate ambient banners — not a fixed chatbot card.
+
+### Adaptive Density
+
+User-controlled modes: Focused, Standard (default), Expert.
+
+Never gates access by capability, title, or prestige.
+
+Implementation: `adaptive-density.ts`, `AdaptiveDensityControl`, `displayDensity` on AssistantProfile
+
+### Knowledge River
+
+Temporal events derived only from real evidence, questions, impact, report readiness, and legacy records — no fabricated events or progress scores.
+
+Implementation: `knowledge-river.ts`, `KnowledgeRiver`
+
+### Ambient Collaboration
+
+Collaboration guidance explains expertise gaps and contributor roles without fake people, fake institutions, or implied availability.
+
+Implementation: `ambient-collaboration.ts` (`externalMatchingConnected: false`)
+
+### Mission Scale
+
+Architecture boundaries only — no over-engineered multi-user infrastructure. Interface must not collapse as missions, evidence, and relationships grow.
+
+### Extended Component Declaration (EPIC-13.4)
+
+Every major operating component must also declare:
+
+| Field | Requirement |
+|-------|-------------|
+| Object type | Which universal object(s) it serves |
+| Mission relation | How it connects to active mission |
+| Progressive depth | Surface → legacy disclosure pattern |
+| Human decision support | Where human judgment is required |
+| Failure state | Honest empty or blocked state |
+
+Code registry: `lib/design/living-intelligence-registry.ts`
+
+Test suite: `npm run test:epic-13-universal-workspace`
+

@@ -20,10 +20,12 @@ import KnowledgeUniverseViews from "@/components/graph/KnowledgeUniverseViews";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
+import { useUniversalWorkspace } from "@/components/platform/context/UniversalWorkspaceProvider";
 
 export default function GraphPageClient() {
   const { t } = useTranslation();
   const { mission } = useMissionContext();
+  const { setFocusedObject } = useUniversalWorkspace();
   const fullGraph = useMemo(() => buildKnowledgeGraph(), []);
   const [focusMode, setFocusMode] = useState<"mission" | "evidence" | "all">("mission");
 
@@ -81,6 +83,12 @@ export default function GraphPageClient() {
     },
     [nodeIds, selectedNodeId],
   );
+
+  useEffect(() => {
+    if (selectedNode) {
+      setFocusedObject({ type: selectedNode.type, id: selectedNode.entityId });
+    }
+  }, [selectedNode, setFocusedObject]);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {

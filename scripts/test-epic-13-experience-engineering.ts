@@ -21,7 +21,7 @@ function readSource(relativePath: string): string {
 test("1. Experience engineering shell wired in dashboard layout", () => {
   const layout = readSource("app/(dashboard)/layout.tsx");
   assert.match(layout, /MentalModelStrip/);
-  assert.match(layout, /AmbientIntelligenceHint/);
+  assert.match(layout, /FloatingIntelligencePresence/);
   assert.match(layout, /AmbientTrustStrip/);
   assert.match(layout, /MobileIntelligenceShell/);
 });

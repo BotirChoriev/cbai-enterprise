@@ -6,16 +6,21 @@ export type LivingIntelligenceComponentRecord = {
   readonly id: string;
   readonly path: string;
   readonly purpose: string;
+  readonly objectType?: string;
+  readonly missionRelation?: string;
   readonly meaning: string;
   readonly interaction: string;
   readonly evidence: string;
   readonly attention: string;
   readonly cognitiveLoad: string;
+  readonly progressiveDepth?: string;
   readonly motion: string;
   readonly memory: string;
   readonly humanControl: string;
   readonly accessibility: string;
   readonly constitutionAlignment: readonly string[];
+  readonly humanDecisionSupport?: string;
+  readonly failureState?: string;
 };
 
 export const LIVING_INTELLIGENCE_REGISTRY: readonly LivingIntelligenceComponentRecord[] = [
@@ -138,5 +143,125 @@ export const LIVING_INTELLIGENCE_REGISTRY: readonly LivingIntelligenceComponentR
     humanControl: "Same human boundaries as desktop.",
     accessibility: "Responsive layout; context drawer preserved.",
     constitutionAlignment: ["calm-precision", "one-grammar"],
+  },
+  {
+    id: "universal-workspace-provider",
+    path: "components/platform/context/UniversalWorkspaceProvider.tsx",
+    purpose: "Compose and persist Universal Workspace state across routes.",
+    objectType: "all primary types",
+    missionRelation: "Centers active mission and focused object.",
+    meaning: "One operating environment — routes are views.",
+    interaction: "React context; sessionStorage persistence.",
+    evidence: "universal-workspace.ts, mission store, context builder.",
+    attention: "Focused object drives inspector and operator attachment.",
+    cognitiveLoad: "Single composed state — no duplicate stores.",
+    progressiveDepth: "State only — depth in Inspector layers.",
+    motion: "None.",
+    memory: "sessionStorage workspace snapshot.",
+    humanControl: "User navigation sets focus; override via graph select.",
+    accessibility: "Context provider — no visual chrome.",
+    constitutionAlignment: ["operating-state-first", "mission-center", "one-grammar"],
+    humanDecisionSupport: "Preserves return path and last meaningful action.",
+    failureState: "Empty object when no route focus — honest placeholder in Inspector.",
+  },
+  {
+    id: "universal-inspector",
+    path: "components/operating/UniversalInspector.tsx",
+    purpose: "Nine-question inspector for any focused universal object.",
+    objectType: "mission, project, evidence, entity, question, report, capability_signal",
+    missionRelation: "Shows mission connection for every object type.",
+    meaning: "What, why, evidence, gaps, actions, human judgment.",
+    interaction: "Read-only sections plus KnowledgeLayersDisclosure.",
+    evidence: "resolveUniversalObject(), ambient-collaboration.ts.",
+    attention: "Primary right-rail focus above living context.",
+    cognitiveLoad: "Progressive disclosure — not all depth at once.",
+    progressiveDepth: "KnowledgeLayersDisclosure: surface → legacy.",
+    motion: "None.",
+    memory: "None — derives from focused object each render.",
+    humanControl: "Human judgment flag always visible.",
+    accessibility: "Section landmarks; readable text sizes.",
+    constitutionAlignment: ["evidence-honesty", "human-decision-boundary", "one-grammar"],
+    humanDecisionSupport: "Explicit requiresHumanJudgment row.",
+    failureState: "noObjectSelected copy when nothing focused.",
+  },
+  {
+    id: "operating-context-column",
+    path: "components/operating/OperatingContextColumn.tsx",
+    purpose: "Single right context rail — Inspector, River, slim living context.",
+    objectType: "workspace + focused object",
+    missionRelation: "Shows scope, evidence count, impact, report readiness.",
+    meaning: "Replaces duplicate LivingContextRail chrome.",
+    interaction: "Scrollable aside; mobile drawer via LivingContextMobileToggle.",
+    evidence: "Universal workspace state, living-context-memory, focused flow.",
+    attention: "Inspector first — one context column only.",
+    cognitiveLoad: "Demoted duplicate operator and mission blocks.",
+    progressiveDepth: "Inspector layers + compact river events.",
+    motion: "None.",
+    memory: "Return continuity and recent study links.",
+    humanControl: "Human Decision Boundary at terminus.",
+    accessibility: "Aside landmark; data-cbai-context-rail=primary.",
+    constitutionAlignment: ["one-grammar", "mission-center"],
+    humanDecisionSupport: "HumanDecisionBoundary compact variant.",
+    failureState: "River hidden when no real events.",
+  },
+  {
+    id: "floating-intelligence-presence",
+    path: "components/operating/FloatingIntelligencePresence.tsx",
+    purpose: "One ambient Operator intervention with full contract.",
+    objectType: "focused object or workspace",
+    missionRelation: "Attaches to mission or selected object.",
+    meaning: "Observation, reason, evidence basis, limitation, action.",
+    interaction: "Optional link to suggested action.",
+    evidence: "floating-intelligence.ts, ambient-intelligence.ts, evidence pulse.",
+    attention: "Maximum one primary intervention globally.",
+    cognitiveLoad: "Single strip — replaces AmbientIntelligenceHint duplication.",
+    progressiveDepth: "Surface observation only.",
+    motion: "None.",
+    memory: "None — fresh derivation.",
+    humanControl: "requiresHumanJudgment surfaced when true.",
+    accessibility: "role=note; data-cbai-operator-intervention=primary.",
+    constitutionAlignment: ["operator-presence", "human-decision-boundary"],
+    humanDecisionSupport: "humanDecisionRequired label when judgment needed.",
+    failureState: "Renders null when no meaningful insight.",
+  },
+  {
+    id: "knowledge-river",
+    path: "components/operating/KnowledgeRiver.tsx",
+    purpose: "Temporal operating instrument from real mission/project events.",
+    objectType: "evidence, question, impact, report, legacy",
+    missionRelation: "Events tagged with mission stage.",
+    meaning: "What changed, when, why, unresolved state.",
+    interaction: "Linked event list in context rail.",
+    evidence: "knowledge-river.ts — no fabricated events.",
+    attention: "Compact list — categorical unresolved/resolved.",
+    cognitiveLoad: "Max 4 events in compact mode.",
+    progressiveDepth: "Event detail inline — no modal chain.",
+    motion: "None.",
+    memory: "None — derived from stores.",
+    humanControl: "User follows links to inspect changes.",
+    accessibility: "Ordered list; link targets for events.",
+    constitutionAlignment: ["evidence-honesty", "calm-precision"],
+    humanDecisionSupport: "Unresolved events flagged in amber.",
+    failureState: "Hidden when deriveKnowledgeRiver returns empty.",
+  },
+  {
+    id: "adaptive-density-control",
+    path: "components/operating/AdaptiveDensityControl.tsx",
+    purpose: "User-controlled Focused / Standard / Expert density.",
+    objectType: "workspace presentation",
+    missionRelation: "Affects atmosphere density only — not mission access.",
+    meaning: "Explainable, reversible information density.",
+    interaction: "Three toggle buttons in Settings.",
+    evidence: "adaptive-density.ts, AssistantProfile.displayDensity.",
+    attention: "Settings-only — never interrupts work.",
+    cognitiveLoad: "Three explicit choices with explanation.",
+    progressiveDepth: "N/A — presentation preference.",
+    motion: "None.",
+    memory: "localStorage via AssistantProfile.",
+    humanControl: "User selects mode; assertNoCapabilityLockout.",
+    accessibility: "aria-pressed on mode buttons.",
+    constitutionAlignment: ["capability-not-title", "human-decision-boundary"],
+    humanDecisionSupport: "Never hides routes by inferred capability.",
+    failureState: "Defaults to Standard when unset.",
   },
 ] as const;

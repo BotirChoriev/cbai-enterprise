@@ -9,6 +9,10 @@
  * are, so switching accounts on one device currently means starting the Assistant profile over.
  */
 
+import type { UserDensityMode } from "@/lib/intelligence-os/adaptive-density";
+
+export type { UserDensityMode };
+
 export type WorkspaceRole =
   | "citizen"
   | "student"
@@ -168,6 +172,8 @@ export type AssistantProfile = {
   notifications: NotificationPreferences;
   accessibility: AccessibilitySettings;
   themeMode: ThemeMode;
+  /** User-controlled display density — never gates access to features. */
+  displayDensity: UserDensityMode;
 };
 
 function browserTimezone(): string {
@@ -202,6 +208,7 @@ export function createEmptyAssistantProfile(): AssistantProfile {
       largerText: false,
     },
     themeMode: "dark",
+    displayDensity: "standard",
   };
 }
 

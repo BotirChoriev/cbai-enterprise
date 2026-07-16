@@ -22,7 +22,7 @@ function readSource(relativePath: string): string {
 test("1. Dashboard layout implements spatial operating model", () => {
   const layout = readSource("app/(dashboard)/layout.tsx");
   assert.match(layout, /GlobalMissionContextBar/);
-  assert.match(layout, /LivingContextRail/);
+  assert.match(layout, /OperatingContextColumn/);
   assert.match(layout, /ContinuityTimelineStrip/);
   assert.match(layout, /cbai-operating-main/);
   assert.match(layout, /cbai-space-enter/);

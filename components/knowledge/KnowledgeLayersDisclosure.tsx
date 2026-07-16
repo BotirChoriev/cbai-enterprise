@@ -3,16 +3,9 @@
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
-export type KnowledgeLayerContent = {
-  surface?: string | null;
-  summary?: string | null;
-  evidence?: string | null;
-  reasoning?: string | null;
-  validation?: string | null;
-  history?: string | null;
-  impact?: string | null;
-  legacy?: string | null;
-};
+import type { KnowledgeLayerContent } from "@/lib/intelligence-os/knowledge-layer-content";
+
+export type { KnowledgeLayerContent };
 
 type KnowledgeLayersDisclosureProps = {
   layers: KnowledgeLayerContent;
