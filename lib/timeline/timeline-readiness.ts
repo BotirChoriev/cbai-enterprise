@@ -21,9 +21,9 @@ export function timelineReadinessLabel(status: TimelineReadinessStatus): string 
 export function timelineReadinessStatusClass(status: TimelineReadinessStatus): string {
   switch (status) {
     case "verified":
-      return "text-cyan-400 bg-cyan-500/10 border-cyan-500/20";
+      return "text-teal-400 bg-teal-500/10 border-teal-500/20";
     case "ready_for_evidence":
-      return "text-sky-400 bg-sky-500/10 border-sky-500/20";
+      return "text-teal-400 bg-teal-500/10 border-teal-500/20";
     case "partial":
       return "text-violet-400 bg-violet-500/10 border-violet-500/20";
     case "planned":
@@ -34,11 +34,11 @@ export function timelineReadinessStatusClass(status: TimelineReadinessStatus): s
 export function timelineYearStatusClass(status: TimelineYearStatus): string {
   switch (status) {
     case "verified":
-      return "text-cyan-400 bg-cyan-500/10 border-cyan-500/20";
+      return "text-teal-400 bg-teal-500/10 border-teal-500/20";
     case "partial":
       return "text-violet-400 bg-violet-500/10 border-violet-500/20";
     case "future":
-      return "text-sky-400 bg-sky-500/10 border-sky-500/20";
+      return "text-teal-400 bg-teal-500/10 border-teal-500/20";
     case "missing":
       return "text-zinc-400 bg-zinc-800/50 border-zinc-700/50";
   }

@@ -11,13 +11,13 @@ export default function SearchPersonas() {
         <li key={persona.id}>
           <Link
             href={persona.href}
-            className="flex min-h-[5.5rem] flex-col justify-center rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-4 transition-colors hover:border-zinc-600 hover:bg-zinc-900/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+            className="flex min-h-[5.5rem] flex-col justify-center rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-4 transition-colors hover:border-zinc-600 hover:bg-zinc-900/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400"
           >
             <span className="text-sm font-semibold text-zinc-100">
               {persona.title}
             </span>
             <span className="mt-1 text-xs text-zinc-500">Example search</span>
-            <span className="mt-1 font-mono text-sm text-sky-400/90">
+            <span className="mt-1 font-mono text-sm text-teal-400/90">
               {persona.exampleQuery}
             </span>
           </Link>

@@ -1,5 +1,17 @@
 import type { TranslationDictionary } from "@/lib/i18n/dictionary-types";
 import { COMPASS_COPY_TR, ENTITIES_TR, MY_WORK_TR, PRODUCT_STATUS_TR, SYSTEM_TR } from "@/lib/i18n/platform-copy-tr";
+import {
+  DASHBOARD_TR,
+  ERRORS_PAGES_TR,
+  EVIDENCE_TR,
+  FILTERS_TR,
+  GRAPH_TR,
+  REASONING_TR,
+  REPORTS_COMMON_TR,
+  SEARCH_TR,
+  SETTINGS_TR,
+  TRUST_PAGE_TR,
+} from "@/lib/i18n/platform-copy-build006-tr";
 
 const tr: TranslationDictionary = {
   roles: {
@@ -404,6 +416,16 @@ const tr: TranslationDictionary = {
     readySuggestion: "Rehberli tüm adımlar tamamlandı",
     readyDetail: "Hazır olduğunuzda kanıt, not ve görev eklemeye devam edin.",
   },
+  errorsPages: ERRORS_PAGES_TR,
+  search: SEARCH_TR,
+  filters: FILTERS_TR,
+  settingsPage: SETTINGS_TR,
+  dashboardPage: DASHBOARD_TR,
+  reportsCommon: REPORTS_COMMON_TR,
+  trustPage: TRUST_PAGE_TR,
+  graphPage: GRAPH_TR,
+  reasoningPage: REASONING_TR,
+  evidenceExplorer: EVIDENCE_TR,
 };
 
 export default tr;

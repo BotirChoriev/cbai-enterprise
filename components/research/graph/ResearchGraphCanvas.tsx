@@ -50,7 +50,7 @@ function GraphTier({ title, graph, nodes, compact, limit }: GraphTierProps) {
 function Connector() {
   return (
     <div className="flex justify-center py-1" aria-hidden="true">
-      <div className="h-4 w-px bg-gradient-to-b from-cyan-500/40 to-cyan-500/10" />
+      <div className="h-4 w-px bg-gradient-to-b from-teal-500/40 to-teal-500/10" />
     </div>
   );
 }

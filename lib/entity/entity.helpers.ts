@@ -15,7 +15,7 @@ export function clampScore(score: number): number {
 export function getScoreColor(score: number, inverted = false): string {
   const effective = inverted ? 100 - clampScore(score) : clampScore(score);
   if (effective >= 80) return "text-emerald-400";
-  if (effective >= 60) return "text-sky-400";
+  if (effective >= 60) return "text-teal-400";
   if (effective >= 40) return "text-amber-400";
   return "text-amber-600";
 }
@@ -24,7 +24,7 @@ export function getScoreColor(score: number, inverted = false): string {
 export function getScoreBarColor(score: number, inverted = false): string {
   const effective = inverted ? 100 - clampScore(score) : clampScore(score);
   if (effective >= 80) return "bg-emerald-500";
-  if (effective >= 60) return "bg-sky-500";
+  if (effective >= 60) return "bg-teal-500";
   if (effective >= 40) return "bg-amber-500";
   return "bg-amber-600";
 }
@@ -61,8 +61,8 @@ export function getStatusConfig(status: EntityStatus): {
     },
     monitoring: {
       label: "Monitoring",
-      dot: "bg-sky-400 animate-pulse",
-      badge: "bg-sky-500/10 text-sky-400 border-sky-500/20",
+      dot: "bg-teal-400 animate-pulse",
+      badge: "bg-teal-500/10 text-teal-400 border-teal-500/20",
     },
   };
   return configs[status];

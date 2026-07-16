@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import type { ResearchTopicReport } from "@/lib/entity/entity-report";
 import type { ProductStatus } from "@/lib/product-status";
@@ -8,6 +10,7 @@ import SaveReportButton from "@/components/shared/SaveReportButton";
 import ReportHeaderLogo from "@/components/shared/ReportHeaderLogo";
 import ReportHonestyStatement from "@/components/shared/ReportHonestyStatement";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { useReportCommon } from "@/lib/i18n/use-report-common";
 
 type ResearchTopicReportViewProps = {
   report: ResearchTopicReport & { dataStatus?: ProductStatus };
@@ -45,6 +48,9 @@ function LinkList({ links, emptyLabel }: { links: readonly { name: string; href:
  * to already-real data; nothing invented.
  */
 export default function ResearchTopicReportView({ report }: ResearchTopicReportViewProps) {
+  const labels = useReportCommon();
+  const generatedDate = new Date().toLocaleString();
+
   return (
     <section
       aria-labelledby="research-topic-report-heading"
@@ -53,15 +59,20 @@ export default function ResearchTopicReportView({ report }: ResearchTopicReportV
       <ReportHeaderLogo />
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <p className={cbaiSectionEyebrow}>Research Topic Report</p>
+          <p className={cbaiSectionEyebrow}>{labels.researchEyebrow}</p>
           <h2 id="research-topic-report-heading" className="mt-1 text-lg font-semibold text-zinc-100">
             {report.topicName}
           </h2>
-          <p className="mt-1 text-xs text-zinc-600">Generated {new Date().toLocaleString()}</p>
+          <p className="mt-1 text-xs text-zinc-600">{labels.generated(generatedDate)}</p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {report.dataStatus ? <StatusBadge status={report.dataStatus} /> : null}
-          <SaveReportButton kind="research_topic" entityId={report.topicId} entityName={report.topicName} title={`${report.topicName} — Research Topic Report`} />
+          <SaveReportButton
+            kind="research_topic"
+            entityId={report.topicId}
+            entityName={report.topicName}
+            title={`${report.topicName} — ${labels.researchEyebrow}`}
+          />
           <ReportPrintButton />
         </div>
       </div>
@@ -72,7 +83,7 @@ export default function ResearchTopicReportView({ report }: ResearchTopicReportV
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Overview</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.overview}</p>
         <dl className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
           <div>
             <dt className="text-[10px] uppercase tracking-wider text-zinc-600">Domain</dt>
@@ -86,7 +97,7 @@ export default function ResearchTopicReportView({ report }: ResearchTopicReportV
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Evidence</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.evidence}</p>
         <p className="text-sm text-zinc-400">
           {report.evidenceConnectedCount} items connected · {report.supportingEvidence.length} supporting ·{" "}
           {report.counterEvidence.length} counter evidence.
@@ -110,26 +121,26 @@ export default function ResearchTopicReportView({ report }: ResearchTopicReportV
 
       <div className="border-t border-zinc-800/80 pt-4">
         <EntityRelatedPanel
-          title="Organizations"
+          title={labels.organizations}
           relationships={report.relationships}
-          emptyLabel="No related companies in the current catalog."
+          emptyLabel={labels.noRelatedCompanies}
         />
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Projects</p>
-        <LinkList links={report.linkedProjects} emptyLabel="No projects link to this research topic yet." />
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.projects}</p>
+        <LinkList links={report.linkedProjects} emptyLabel={labels.noProjectsLinked} />
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Trust Statement</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.trustStatement}</p>
         <p className="text-sm text-zinc-400">{report.trustStatement}</p>
       </div>
 
       <ReportHonestyStatement />
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Limitations</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.limitations}</p>
         <ul className="list-disc space-y-1 pl-4">
           {report.limitations.map((limitation) => (
             <li key={limitation} className="text-sm text-zinc-500">

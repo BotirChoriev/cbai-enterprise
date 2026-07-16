@@ -3,6 +3,7 @@
 import type { CountryRegion } from "@/lib/countries";
 import { regions } from "@/lib/countries";
 import { cbaiGlassCard } from "@/components/brand/brand-classes";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type CountryFiltersProps = {
   search: string;
@@ -19,15 +20,22 @@ export default function CountryFilters({
   onRegionChange,
   resultCount,
 }: CountryFiltersProps) {
+  const { t } = useTranslation();
+  const resultLabel =
+    resultCount === 1
+      ? t("filters.resultCountry", { count: String(resultCount) })
+      : t("filters.resultCountries", { count: String(resultCount) });
+
   return (
     <div className={`${cbaiGlassCard} flex flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between`}>
-      <div className="relative flex-1 max-w-md">
+      <div className="relative max-w-md flex-1">
         <svg
           className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
           strokeWidth={1.5}
+          aria-hidden="true"
         >
           <path
             strokeLinecap="round"
@@ -39,8 +47,9 @@ export default function CountryFilters({
           type="search"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Search countries..."
-          className="w-full rounded-lg border border-zinc-800 bg-zinc-900/60 py-2 pl-10 pr-4 text-sm text-zinc-300 placeholder:text-zinc-600 outline-none transition-colors focus:border-sky-500/40 focus:ring-1 focus:ring-sky-500/20"
+          placeholder={t("filters.searchCountries")}
+          aria-label={t("filters.searchCountries")}
+          className="w-full rounded-lg border border-zinc-800 bg-zinc-900/60 py-2 pl-10 pr-4 text-sm text-zinc-300 placeholder:text-zinc-600 outline-none transition-colors focus:border-teal-500/40 focus:ring-1 focus:ring-teal-500/20"
         />
       </div>
 
@@ -48,22 +57,24 @@ export default function CountryFilters({
         <button
           type="button"
           onClick={() => onRegionChange("All")}
+          aria-pressed={region === "All"}
           className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
             region === "All"
-              ? "bg-sky-500/10 text-sky-400 ring-1 ring-sky-500/30"
+              ? "bg-teal-500/10 text-teal-400 ring-1 ring-teal-500/30"
               : "border border-zinc-800 text-zinc-500 hover:text-zinc-300"
           }`}
         >
-          All Regions
+          {t("filters.allRegions")}
         </button>
         {regions.map((r) => (
           <button
             key={r}
             type="button"
             onClick={() => onRegionChange(r)}
+            aria-pressed={region === r}
             className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
               region === r
-                ? "bg-sky-500/10 text-sky-400 ring-1 ring-sky-500/30"
+                ? "bg-teal-500/10 text-teal-400 ring-1 ring-teal-500/30"
                 : "border border-zinc-800 text-zinc-500 hover:text-zinc-300"
             }`}
           >
@@ -72,9 +83,7 @@ export default function CountryFilters({
         ))}
       </div>
 
-      <span className="font-mono text-xs text-zinc-600">
-        {resultCount} {resultCount === 1 ? "country" : "countries"}
-      </span>
+      <span className="font-mono text-xs text-zinc-600">{resultLabel}</span>
     </div>
   );
 }

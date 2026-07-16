@@ -36,7 +36,7 @@ export default function EntityNode({
   const ringClass = selected
     ? "ring-2 ring-white shadow-lg shadow-white/20"
     : connected
-      ? "ring-2 ring-sky-400/60"
+      ? "ring-2 ring-teal-400/60"
       : searchMatch
         ? "ring-2 ring-amber-400/50"
         : "ring-1 ring-zinc-700/80";

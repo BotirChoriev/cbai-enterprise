@@ -15,8 +15,10 @@ import GraphLegend from "@/components/graph/GraphLegend";
 import GraphPipeline from "@/components/graph/GraphPipeline";
 import GraphPersonas from "@/components/graph/GraphPersonas";
 import HomeSection from "@/components/platform/home/HomeSection";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 export default function GraphPage() {
+  const { t } = useTranslation();
   const graph = useMemo(() => buildKnowledgeGraph(), []);
   const stats = useMemo(() => computeGraphStats(graph), [graph]);
 
@@ -47,14 +49,14 @@ export default function GraphPage() {
   return (
     <div className="home-page mx-auto max-w-[90rem] pb-16">
       <header className="home-surface rounded-2xl border border-zinc-800 px-8 py-8 sm:px-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-400/90">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-400/90">
           {GRAPH_PLATFORM.eyebrow}
         </p>
         <h1 className="cbai-display mt-3 text-3xl text-zinc-50 sm:text-4xl">
           {GRAPH_PLATFORM.headline}
         </h1>
         <p className="mt-3 max-w-3xl text-base leading-relaxed text-zinc-400">
-          {GRAPH_PLATFORM.explanation}
+          {t("graphPage.description")}
         </p>
       </header>
 
@@ -93,15 +95,15 @@ export default function GraphPage() {
         </div>
       </div>
 
-      <HomeSection id="graph-personas" title="Graph by Role">
+      <HomeSection id="graph-personas" title={t("graphPage.graphByRole")}>
         <GraphPersonas />
       </HomeSection>
 
-      <HomeSection id="graph-pipeline" title="How It Works">
+      <HomeSection id="graph-pipeline" title={t("graphPage.howItWorks")}>
         <GraphPipeline />
       </HomeSection>
 
-      <HomeSection id="graph-trust" title="Trust">
+      <HomeSection id="graph-trust" title={t("graphPage.trust")}>
         <ul className="grid gap-3 sm:grid-cols-2">
           {GRAPH_TRUST_PILLARS.map((pillar) => (
             <li

@@ -69,7 +69,7 @@ export function changeTypeClass(changeType: EvidenceWatchChangeType): string {
     case "new_source_connected":
     case "connector_verified":
     case "new_dataset_available":
-      return "text-cyan-400 bg-cyan-500/10 border-cyan-500/20";
+      return "text-teal-400 bg-teal-500/10 border-teal-500/20";
     case "verification_status_changed":
     case "dataset_updated":
     case "methodology_updated":

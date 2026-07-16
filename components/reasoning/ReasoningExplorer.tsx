@@ -4,24 +4,22 @@ import { useMemo } from "react";
 import { buildReasoningExplorerModel } from "@/lib/reasoning-explorer";
 import ReasoningPipelineOverview from "@/components/reasoning/ReasoningPipelineOverview";
 import ReasoningEvidenceIndicatorMap from "@/components/reasoning/ReasoningEvidenceIndicatorMap";
-import { cbaiPageHeader } from "@/components/brand/brand-classes";
+import OperatingPageShell from "@/components/shared/OperatingPageShell";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 export default function ReasoningExplorer() {
+  const { t } = useTranslation();
   const model = useMemo(() => buildReasoningExplorerModel(), []);
 
   return (
-    <div className="space-y-10">
-      <div className={cbaiPageHeader}>
-        <h1 className="cbai-display text-2xl text-zinc-50">Reasoning</h1>
-        <p className="mt-1 max-w-3xl text-sm text-zinc-500">
-          How evidence is reviewed before decisions — clear steps and related information by topic.
-        </p>
-      </div>
-
+    <OperatingPageShell
+      title={t("navigation.reasoning")}
+      description={t("reasoningPage.extendedDescription")}
+    >
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3">
           <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
-            Review steps
+            {t("reasoningPage.reviewSteps")}
           </p>
           <p className="mt-1 text-xl font-semibold text-zinc-100">
             {model.summary.pipelineStages}
@@ -29,7 +27,7 @@ export default function ReasoningExplorer() {
         </div>
         <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3">
           <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
-            Topic areas
+            {t("reasoningPage.topicAreas")}
           </p>
           <p className="mt-1 text-xl font-semibold text-zinc-100">
             {model.summary.indicatorDomains}
@@ -37,7 +35,7 @@ export default function ReasoningExplorer() {
         </div>
         <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3">
           <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
-            Information connected
+            {t("reasoningPage.informationConnected")}
           </p>
           <p className="mt-1 text-xl font-semibold text-zinc-100">
             {model.summary.connectedIndicators}
@@ -49,7 +47,7 @@ export default function ReasoningExplorer() {
         </div>
         <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3">
           <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
-            Sources connected
+            {t("reasoningPage.sourcesConnected")}
           </p>
           <p className="mt-1 text-xl font-semibold text-zinc-100">
             {model.summary.connectedSources}
@@ -59,6 +57,6 @@ export default function ReasoningExplorer() {
 
       <ReasoningPipelineOverview stages={model.pipeline} />
       <ReasoningEvidenceIndicatorMap domains={model.domainEvidenceMap} />
-    </div>
+    </OperatingPageShell>
   );
 }

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import PageHeader from "@/components/layout/PageHeader";
-import AssistantSettingsForm from "@/components/assistant/AssistantSettingsForm";
+import SettingsPageClient from "@/components/settings/SettingsPageClient";
 
 export const metadata: Metadata = {
   title: "Settings",
@@ -8,13 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function SettingsPage() {
-  return (
-    <div className="space-y-8">
-      <PageHeader
-        title="Settings"
-        description="Your CBAI Personal Operator — saved to this browser."
-      />
-      <AssistantSettingsForm />
-    </div>
-  );
+  return <SettingsPageClient />;
 }

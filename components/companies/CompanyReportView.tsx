@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import type { CompanyReport, CompanyReportLink } from "@/lib/company-report";
 import type { ProductStatus } from "@/lib/product-status";
@@ -9,6 +11,7 @@ import ReportHeaderLogo from "@/components/shared/ReportHeaderLogo";
 import ReportHonestyStatement from "@/components/shared/ReportHonestyStatement";
 import { getResearchTopicPath } from "@/lib/research/research-topics";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { useReportCommon } from "@/lib/i18n/use-report-common";
 
 type CompanyReportViewProps = {
   report: CompanyReport & { dataStatus?: ProductStatus };
@@ -57,6 +60,9 @@ function LinkList({ links, emptyLabel }: { links: readonly CompanyReportLink[]; 
 
 /** Real, compiled Company Intelligence Report — every field traces to already-real data; nothing invented. */
 export default function CompanyReportView({ report }: CompanyReportViewProps) {
+  const labels = useReportCommon();
+  const generatedDate = new Date().toLocaleString();
+
   return (
     <section
       aria-labelledby="company-report-heading"
@@ -65,21 +71,26 @@ export default function CompanyReportView({ report }: CompanyReportViewProps) {
       <ReportHeaderLogo />
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <p className={cbaiSectionEyebrow}>Company Intelligence Report</p>
+          <p className={cbaiSectionEyebrow}>{labels.companyEyebrow}</p>
           <h2 id="company-report-heading" className="mt-1 text-lg font-semibold text-zinc-100">
             {report.company.name}
           </h2>
-          <p className="mt-1 text-xs text-zinc-600">Generated {new Date().toLocaleString()}</p>
+          <p className="mt-1 text-xs text-zinc-600">{labels.generated(generatedDate)}</p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {report.dataStatus ? <StatusBadge status={report.dataStatus} /> : null}
-          <SaveReportButton kind="company" entityId={report.company.id} entityName={report.company.name} title={`${report.company.name} — Company Intelligence Report`} />
+          <SaveReportButton
+            kind="company"
+            entityId={report.company.id}
+            entityName={report.company.name}
+            title={`${report.company.name} — ${labels.companyEyebrow}`}
+          />
           <ReportPrintButton />
         </div>
       </div>
 
       <div className="space-y-2">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Overview</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.overview}</p>
         <dl className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
           <div>
             <dt className="text-[10px] uppercase tracking-wider text-zinc-600">Industry</dt>
@@ -101,7 +112,7 @@ export default function CompanyReportView({ report }: CompanyReportViewProps) {
                   {report.overview.website}
                 </a>
               ) : (
-                "No verified data available."
+                labels.noVerifiedInfo
               )}
             </dd>
           </div>
@@ -109,20 +120,23 @@ export default function CompanyReportView({ report }: CompanyReportViewProps) {
       </div>
 
       <div className="space-y-3 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Evidence</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.evidence}</p>
         <p className="text-sm text-zinc-400">
-          {report.evidence.connectedSources} of {report.evidence.totalSources} official sources
-          connected · {report.evidence.connectedIndicators} indicators connected ·{" "}
-          {report.evidence.openQuestions} open questions.
+          {labels.evidenceSummary({
+            connected: String(report.evidence.connectedSources),
+            total: String(report.evidence.totalSources),
+            indicators: String(report.evidence.connectedIndicators),
+            questions: String(report.evidence.openQuestions),
+          })}
         </p>
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
-            <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600">Connected Evidence</p>
-            <NameList names={report.evidence.connectedSourceNames} emptyLabel="No official sources connected yet." />
+            <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600">{labels.connectedEvidence}</p>
+            <NameList names={report.evidence.connectedSourceNames} emptyLabel={labels.noSourcesConnected} />
           </div>
           <div>
-            <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600">Missing Evidence</p>
-            <NameList names={report.evidence.missingSourceNames} emptyLabel="No missing sources — every tracked source is connected." />
+            <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600">{labels.missingEvidence}</p>
+            <NameList names={report.evidence.missingSourceNames} emptyLabel={labels.noMissingSources} />
           </div>
         </div>
       </div>
@@ -132,7 +146,7 @@ export default function CompanyReportView({ report }: CompanyReportViewProps) {
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Research</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.research}</p>
         {report.research.length > 0 ? (
           <ul className="flex flex-wrap gap-2">
             {report.research.map((match) => (
@@ -147,7 +161,7 @@ export default function CompanyReportView({ report }: CompanyReportViewProps) {
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-zinc-500">No verified data available.</p>
+          <p className="text-sm text-zinc-500">{labels.noVerifiedInfo}</p>
         )}
       </div>
 
@@ -158,23 +172,23 @@ export default function CompanyReportView({ report }: CompanyReportViewProps) {
             {report.country.name} →
           </Link>
         ) : (
-          <p className="text-sm text-zinc-500">No verified data available.</p>
+          <p className="text-sm text-zinc-500">{labels.noVerifiedInfo}</p>
         )}
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Projects</p>
-        <LinkList links={report.linkedProjects} emptyLabel="No projects link to this company yet." />
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.projects}</p>
+        <LinkList links={report.linkedProjects} emptyLabel={labels.noProjectsLinked} />
         <Link
           href={`/my-work?entityKind=company&entityId=${report.company.id}&entityName=${encodeURIComponent(report.company.name)}`}
           className="mt-1.5 inline-flex text-xs font-medium text-teal-400 hover:text-teal-300"
         >
-          + Create a project for {report.company.name} →
+          {labels.createProjectFor(report.company.name)}
         </Link>
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Methodology</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.methodology}</p>
         <ul className="space-y-1.5">
           {report.methodology.map((point) => (
             <li key={point.id} className="text-sm text-zinc-400">
@@ -185,14 +199,14 @@ export default function CompanyReportView({ report }: CompanyReportViewProps) {
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Trust Statement</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.trustStatement}</p>
         <p className="text-sm text-zinc-400">{report.trustStatement}</p>
       </div>
 
       <ReportHonestyStatement />
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Limitations</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.limitations}</p>
         <ul className="list-disc space-y-1 pl-4">
           {report.limitations.map((limitation) => (
             <li key={limitation} className="text-sm text-zinc-500">

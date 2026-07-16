@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslation } from "@/lib/i18n/use-translation";
 import { cbaiBtnPrimary, cbaiGlassCard } from "@/components/brand/brand-classes";
 
 type SearchGatewayHeroProps = {
@@ -6,20 +9,20 @@ type SearchGatewayHeroProps = {
 };
 
 export default function SearchGatewayHero({ query }: SearchGatewayHeroProps) {
+  const { t } = useTranslation();
+
   return (
     <header className="space-y-3">
-      {!query ? (
-        <p className="text-sm text-zinc-400">Search country, company, or university.</p>
-      ) : null}
+      {!query ? <p className="text-sm text-zinc-400">{t("search.hint")}</p> : null}
       <form
         action="/search"
         method="get"
         role="search"
-        aria-label="Search country, company, or university"
+        aria-label={t("search.ariaLabel")}
         className={`${cbaiGlassCard} flex flex-col gap-2 p-2 sm:relative sm:block`}
       >
         <label htmlFor="gateway-search" className="sr-only">
-          Search country, company, or university
+          {t("search.ariaLabel")}
         </label>
         <input
           id="gateway-search"
@@ -27,7 +30,7 @@ export default function SearchGatewayHero({ query }: SearchGatewayHeroProps) {
           type="search"
           key={query}
           defaultValue={query}
-          placeholder="Japan, Apple, Harvard University"
+          placeholder={t("search.placeholder")}
           autoComplete="off"
           autoCorrect="off"
           spellCheck={false}
@@ -39,16 +42,16 @@ export default function SearchGatewayHero({ query }: SearchGatewayHeroProps) {
           type="submit"
           className={`${cbaiBtnPrimary} min-h-11 w-full sm:absolute sm:right-3 sm:top-1/2 sm:w-auto sm:-translate-y-1/2`}
         >
-          Search
+          {t("search.submit")}
         </button>
       </form>
       {!query ? (
         <p className="text-xs text-zinc-600">
-          Part of{" "}
+          {t("search.partOf")}{" "}
           <Link href="/" className="text-teal-400/80 hover:text-teal-300">
-            Public Intelligence
+            {t("search.publicIntelligence")}
           </Link>{" "}
-          — available today.
+          — {t("search.availableToday")}
         </p>
       ) : null}
     </header>

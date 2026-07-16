@@ -141,10 +141,14 @@ test("10. Country/Company/University report views separate Connected Evidence fr
     "components/universities/UniversityReportView.tsx",
   ]) {
     const content = read(file);
-    assert.ok(content.includes("Connected Evidence"));
-    assert.ok(content.includes("Missing Evidence"));
+    assert.ok(content.includes("useReportCommon"), `${file} should use shared report i18n labels`);
+    assert.ok(content.includes("connectedEvidence"), `${file} should render connected evidence section`);
+    assert.ok(content.includes("missingEvidence"), `${file} should render missing evidence section`);
     assert.ok(content.includes("EntityFutureSources"));
   }
+  const reportCopy = read("lib/i18n/platform-copy-build006-en.ts");
+  assert.ok(reportCopy.includes("Connected Evidence"));
+  assert.ok(reportCopy.includes("Missing Evidence"));
 });
 
 test("11. University profile has Research Topics parity with Country's honest 'not connected' statement", () => {

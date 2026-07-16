@@ -314,7 +314,7 @@ export function companyEvidenceStatusClass(
 ): string {
   switch (status) {
     case "connected":
-      return "text-cyan-400 bg-cyan-500/10 border-cyan-500/20";
+      return "text-teal-400 bg-teal-500/10 border-teal-500/20";
     case "insufficient":
       return "text-amber-400 bg-amber-500/10 border-amber-500/20";
     case "not_connected":

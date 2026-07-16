@@ -81,7 +81,7 @@ export default function GraphEntityPanel({
           value={searchQuery}
           onChange={(event) => onSearchChange(event.target.value)}
           placeholder="Search by name or country…"
-          className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-sky-500/50 focus:outline-none focus:ring-1 focus:ring-sky-500/30"
+          className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:border-teal-500/50 focus:outline-none focus:ring-1 focus:ring-teal-500/30"
         />
 
         <p className="mb-2 mt-4 text-[10px] font-medium uppercase tracking-widest text-zinc-600">
@@ -105,7 +105,7 @@ export default function GraphEntityPanel({
                 onClick={() => onTypeFilterChange(option.value)}
                 className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs transition-colors ${
                   active
-                    ? "bg-sky-500/10 text-sky-300 ring-1 ring-sky-500/30"
+                    ? "bg-teal-500/10 text-teal-300 ring-1 ring-teal-500/30"
                     : "text-zinc-400 hover:bg-zinc-900 hover:text-zinc-200"
                 }`}
               >
@@ -166,7 +166,7 @@ function EntityDetails({
       {route ? (
         <Link
           href={`${route}?id=${node.entityId}`}
-          className="block w-full rounded-lg border border-zinc-700 bg-zinc-900 py-2 text-center text-xs font-medium text-zinc-300 transition-colors hover:border-sky-500/40 hover:text-sky-300"
+          className="block w-full rounded-lg border border-zinc-700 bg-zinc-900 py-2 text-center text-xs font-medium text-zinc-300 transition-colors hover:border-teal-500/40 hover:text-teal-300"
         >
           Open {getEntityTypeLabel(node.type)} Module
         </Link>

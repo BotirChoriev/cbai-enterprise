@@ -34,7 +34,7 @@ export default function WorkspaceSidebar({
         value={searchQuery}
         onChange={(event) => onSearchChange(event.target.value)}
         placeholder="Filter topics..."
-        className="mt-3 w-full rounded-md border border-zinc-800 bg-slate-950/70 px-3 py-2 text-xs text-zinc-100 placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/30"
+        className="mt-3 w-full rounded-md border border-zinc-800 bg-slate-950/70 px-3 py-2 text-xs text-zinc-100 placeholder:text-zinc-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-teal-500/30"
       />
 
       <p className="mt-2 text-[10px] text-zinc-600">{topics.length} topics</p>

@@ -3,6 +3,7 @@
 import type { ProjectReport } from "@/lib/entity/entity-report";
 import type { ProductStatus } from "@/lib/product-status";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { useReportCommon } from "@/lib/i18n/use-report-common";
 import { translateProjectTaskStatus } from "@/lib/i18n/project-translation";
 import StatusBadge from "@/components/shared/StatusBadge";
 import EntityRelatedPanel from "@/components/shared/EntityRelatedPanel";
@@ -23,6 +24,8 @@ type ProjectReportViewProps = {
  */
 export default function ProjectReportView({ report }: ProjectReportViewProps) {
   const { t } = useTranslation();
+  const labels = useReportCommon();
+  const generatedDate = new Date().toLocaleString();
   return (
     <section
       id="project-report"
@@ -32,22 +35,22 @@ export default function ProjectReportView({ report }: ProjectReportViewProps) {
       <ReportHeaderLogo />
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <p className={cbaiSectionEyebrow}>Project Report</p>
+          <p className={cbaiSectionEyebrow}>{labels.projectEyebrow}</p>
           <h2 id="project-report-heading" className="mt-1 text-lg font-semibold text-zinc-100">
             {report.title}
           </h2>
           <p className="mt-0.5 text-xs text-zinc-500">{report.typeLabel}</p>
-          <p className="mt-1 text-xs text-zinc-600">Generated {new Date().toLocaleString()}</p>
+          <p className="mt-1 text-xs text-zinc-600">{labels.generated(generatedDate)}</p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {report.dataStatus ? <StatusBadge status={report.dataStatus} /> : null}
-          <SaveReportButton kind="project" entityId={report.projectId} entityName={report.title} title={`${report.title} — Project Report`} projectId={report.projectId} />
+          <SaveReportButton kind="project" entityId={report.projectId} entityName={report.title} title={`${report.title} — ${labels.projectEyebrow}`} projectId={report.projectId} />
           <ReportPrintButton />
         </div>
       </div>
 
       <div className="space-y-2">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Overview</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.overview}</p>
         <p className="text-sm text-zinc-300">{report.description}</p>
       </div>
 
@@ -62,7 +65,7 @@ export default function ProjectReportView({ report }: ProjectReportViewProps) {
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Evidence</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.evidence}</p>
         {report.evidence.length > 0 ? (
           <ul className="space-y-1">
             {report.evidence.map((e) => (
@@ -147,14 +150,14 @@ export default function ProjectReportView({ report }: ProjectReportViewProps) {
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Trust Statement</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.trustStatement}</p>
         <p className="text-sm text-zinc-400">{report.trustStatement}</p>
       </div>
 
       <ReportHonestyStatement />
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Limitations</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.limitations}</p>
         <ul className="list-disc space-y-1 pl-4">
           {report.limitations.map((limitation) => (
             <li key={limitation} className="text-sm text-zinc-500">

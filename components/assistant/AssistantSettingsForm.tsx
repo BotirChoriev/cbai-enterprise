@@ -6,19 +6,20 @@ import {
   ASSISTANT_LANGUAGES,
   DEFAULT_OPERATOR_NAME,
   WORKSPACE_ROLES,
-  WORKSPACE_ROLE_LABELS,
   type WorkspaceRole,
 } from "@/lib/assistant/assistant-profile";
 import { countries } from "@/lib/countries";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import Avatar from "@/components/shared/Avatar";
 import ThemeToggle from "@/components/shared/ThemeToggle";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 const inputClass =
-  "w-full rounded-lg border border-zinc-800 bg-slate-900/80 px-3 py-2 text-sm text-zinc-200 outline-none transition-colors focus:border-teal-500/30 focus:ring-1 focus:ring-cyan-500/20";
+  "w-full rounded-lg border border-zinc-800 bg-slate-900/80 px-3 py-2 text-sm text-zinc-200 outline-none transition-colors focus:border-teal-500/30 focus:ring-1 focus:ring-teal-500/20";
 const labelClass = "text-xs font-medium uppercase tracking-wider text-zinc-500";
 
 export default function AssistantSettingsForm() {
+  const { t } = useTranslation();
   const { profile, isActive, updateProfile, resetProfile } = useAssistantProfile();
 
   return (
@@ -29,30 +30,30 @@ export default function AssistantSettingsForm() {
         />
         <p className="text-sm text-zinc-300">
           {isActive
-            ? `Your CBAI Personal Operator is ready — saved to this browser as "${profile.name}."`
-            : "Your CBAI Personal Operator is not set up yet — add your name below to activate it."}
+            ? t("settingsPage.operatorReady", { name: profile.name })
+            : t("settingsPage.operatorNotReady")}
         </p>
       </div>
 
       <section aria-labelledby="assistant-identity-heading" className={`${cbaiGlassCard} space-y-4 p-5`}>
         <p className={cbaiSectionEyebrow} id="assistant-identity-heading">
-          Personal Operator Identity
+          {t("settingsPage.identityHeading")}
         </p>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="space-y-1.5">
-            <span className={labelClass}>Your Name</span>
+            <span className={labelClass}>{t("settingsPage.yourName")}</span>
             <input
               type="text"
               value={profile.name}
               onChange={(e) => updateProfile({ name: e.target.value })}
-              placeholder="e.g. Botir"
+              placeholder={t("settingsPage.yourNamePlaceholder")}
               className={inputClass}
             />
           </label>
 
           <label className="space-y-1.5">
-            <span className={labelClass}>Operator Name</span>
+            <span className={labelClass}>{t("settingsPage.operatorName")}</span>
             <input
               type="text"
               value={profile.operatorName}
@@ -63,7 +64,7 @@ export default function AssistantSettingsForm() {
           </label>
 
           <label className="space-y-1.5 sm:col-span-2">
-            <span className={labelClass}>Workspace Role</span>
+            <span className={labelClass}>{t("settingsPage.workspaceRole")}</span>
             <select
               value={profile.workspaceRole}
               onChange={(e) => updateProfile({ workspaceRole: e.target.value as WorkspaceRole })}
@@ -71,7 +72,7 @@ export default function AssistantSettingsForm() {
             >
               {WORKSPACE_ROLES.map((role) => (
                 <option key={role} value={role}>
-                  {WORKSPACE_ROLE_LABELS[role]}
+                  {t(`workspaceRoles.${role}`)}
                 </option>
               ))}
             </select>
@@ -79,7 +80,7 @@ export default function AssistantSettingsForm() {
         </div>
 
         <div className="space-y-1.5">
-          <span className={labelClass}>Avatar</span>
+          <span className={labelClass}>{t("settingsPage.avatar")}</span>
           <div className="flex flex-wrap gap-2">
             {ASSISTANT_AVATARS.map((avatar) => (
               <button
@@ -87,9 +88,9 @@ export default function AssistantSettingsForm() {
                 type="button"
                 onClick={() => updateProfile({ avatar })}
                 aria-pressed={profile.avatar === avatar}
-                title={`${avatar} avatar`}
+                title={avatar}
                 className={`rounded-full transition-shadow ${
-                  profile.avatar === avatar ? "ring-2 ring-cyan-400/60 ring-offset-2 ring-offset-slate-950" : ""
+                  profile.avatar === avatar ? "ring-2 ring-teal-400/60 ring-offset-2 ring-offset-slate-950" : ""
                 }`}
               >
                 <Avatar name={profile.name || avatar} avatar={avatar} />
@@ -101,7 +102,7 @@ export default function AssistantSettingsForm() {
 
       <section aria-labelledby="assistant-voice-heading" className={`${cbaiGlassCard} space-y-4 p-5`}>
         <p className={cbaiSectionEyebrow} id="assistant-voice-heading">
-          Voice &amp; Language
+          {t("settingsPage.voiceLanguageHeading")}
         </p>
 
         <label className="flex items-center gap-2.5 text-sm text-zinc-300">
@@ -111,12 +112,12 @@ export default function AssistantSettingsForm() {
             onChange={(e) => updateProfile({ voiceInputEnabled: e.target.checked })}
             className="h-4 w-4 rounded border-zinc-700 bg-slate-900"
           />
-          Show voice input in the Command Center
+          {t("settingsPage.showVoiceInput")}
         </label>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="space-y-1.5">
-            <span className={labelClass}>Preferred Language</span>
+            <span className={labelClass}>{t("settingsPage.preferredLanguage")}</span>
             <select
               value={profile.preferredLanguage}
               onChange={(e) => updateProfile({ preferredLanguage: e.target.value })}
@@ -125,14 +126,14 @@ export default function AssistantSettingsForm() {
               {ASSISTANT_LANGUAGES.map((language) => (
                 <option key={language.code} value={language.code} disabled={!language.available}>
                   {language.label}
-                  {language.available ? "" : " (not available yet)"}
+                  {language.available ? "" : t("settingsPage.languageNotAvailable")}
                 </option>
               ))}
             </select>
           </label>
 
           <label className="space-y-1.5">
-            <span className={labelClass}>Future Translation Language</span>
+            <span className={labelClass}>{t("settingsPage.futureTranslationLanguage")}</span>
             <select
               value={profile.translationLanguage}
               onChange={(e) => updateProfile({ translationLanguage: e.target.value })}
@@ -141,45 +142,40 @@ export default function AssistantSettingsForm() {
               {ASSISTANT_LANGUAGES.map((language) => (
                 <option key={language.code} value={language.code} disabled={!language.available}>
                   {language.label}
-                  {language.available ? "" : " (not available yet)"}
+                  {language.available ? "" : t("settingsPage.languageNotAvailable")}
                 </option>
               ))}
             </select>
           </label>
 
           <label className="space-y-1.5 sm:col-span-2">
-            <span className={labelClass}>Speech Language (voice recognition)</span>
+            <span className={labelClass}>{t("settingsPage.speechLanguage")}</span>
             <select
               value={profile.speechLanguage}
               onChange={(e) => updateProfile({ speechLanguage: e.target.value })}
               className={inputClass}
             >
-              <option value="en-US">English (United States)</option>
-              <option value="en-GB">English (United Kingdom)</option>
+              <option value="en-US">{t("settingsPage.speechEnUs")}</option>
+              <option value="en-GB">{t("settingsPage.speechEnGb")}</option>
             </select>
           </label>
         </div>
-        <p className="text-xs text-zinc-600">
-          English, Oʻzbek, Русский, and Türkçe are fully implemented in this platform&apos;s
-          interface today. The other language options above are saved preferences, honestly
-          marked unavailable rather than silently doing nothing. Voice recognition (speech-to-text)
-          currently supports English only, regardless of your interface language.
-        </p>
+        <p className="text-xs text-zinc-600">{t("settingsPage.languageHonestyNote")}</p>
       </section>
 
       <section aria-labelledby="assistant-context-heading" className={`${cbaiGlassCard} space-y-4 p-5`}>
         <p className={cbaiSectionEyebrow} id="assistant-context-heading">
-          Context
+          {t("settingsPage.contextHeading")}
         </p>
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="space-y-1.5">
-            <span className={labelClass}>Country</span>
+            <span className={labelClass}>{t("settingsPage.country")}</span>
             <select
               value={profile.country}
               onChange={(e) => updateProfile({ country: e.target.value })}
               className={inputClass}
             >
-              <option value="">Not set</option>
+              <option value="">{t("settingsPage.countryNotSet")}</option>
               {countries.map((country) => (
                 <option key={country.id} value={country.id}>
                   {country.name}
@@ -189,18 +185,18 @@ export default function AssistantSettingsForm() {
           </label>
 
           <label className="space-y-1.5">
-            <span className={labelClass}>Organization</span>
+            <span className={labelClass}>{t("settingsPage.organization")}</span>
             <input
               type="text"
               value={profile.organization}
               onChange={(e) => updateProfile({ organization: e.target.value })}
-              placeholder="Optional"
+              placeholder={t("settingsPage.organizationPlaceholder")}
               className={inputClass}
             />
           </label>
 
           <label className="space-y-1.5 sm:col-span-2">
-            <span className={labelClass}>Timezone</span>
+            <span className={labelClass}>{t("settingsPage.timezone")}</span>
             <input
               type="text"
               value={profile.timezone}
@@ -216,19 +212,16 @@ export default function AssistantSettingsForm() {
         className={`${cbaiGlassCard} space-y-3 p-5`}
       >
         <p className={cbaiSectionEyebrow} id="assistant-notifications-heading">
-          Notification Preferences
+          {t("settingsPage.notificationsHeading")}
         </p>
-        <p className="text-xs text-zinc-600">
-          Preferences are saved, but no notification delivery is connected to this platform yet —
-          nothing will be sent until it is.
-        </p>
+        <p className="text-xs text-zinc-600">{t("settingsPage.notificationsHonesty")}</p>
         {(
           [
-            ["evidenceUpdates", "Evidence updates"],
-            ["missionActivity", "Mission activity"],
-            ["weeklySummary", "Weekly summary"],
+            ["evidenceUpdates", "settingsPage.notifyEvidenceUpdates"],
+            ["missionActivity", "settingsPage.notifyMissionActivity"],
+            ["weeklySummary", "settingsPage.notifyWeeklySummary"],
           ] as const
-        ).map(([key, label]) => (
+        ).map(([key, labelKey]) => (
           <label key={key} className="flex items-center gap-2.5 text-sm text-zinc-300">
             <input
               type="checkbox"
@@ -238,19 +231,16 @@ export default function AssistantSettingsForm() {
               }
               className="h-4 w-4 rounded border-zinc-700 bg-slate-900"
             />
-            {label}
+            {t(labelKey)}
           </label>
         ))}
       </section>
 
       <section aria-labelledby="assistant-theme-heading" className={`${cbaiGlassCard} space-y-3 p-5`}>
         <p className={cbaiSectionEyebrow} id="assistant-theme-heading">
-          Interface Theme
+          {t("settingsPage.themeHeading")}
         </p>
-        <p className="text-xs text-zinc-500">
-          System follows your device&apos;s real light/dark preference. Light and Deep are an explicit
-          override, saved to this profile.
-        </p>
+        <p className="text-xs text-zinc-500">{t("settingsPage.themeNote")}</p>
         <ThemeToggle />
       </section>
 
@@ -259,15 +249,15 @@ export default function AssistantSettingsForm() {
         className={`${cbaiGlassCard} space-y-3 p-5`}
       >
         <p className={cbaiSectionEyebrow} id="assistant-accessibility-heading">
-          Accessibility Settings
+          {t("settingsPage.accessibilityHeading")}
         </p>
         {(
           [
-            ["reducedMotion", "Reduce motion"],
-            ["highContrast", "Increase contrast"],
-            ["largerText", "Larger text"],
+            ["reducedMotion", "settingsPage.reduceMotion"],
+            ["highContrast", "settingsPage.increaseContrast"],
+            ["largerText", "settingsPage.largerText"],
           ] as const
-        ).map(([key, label]) => (
+        ).map(([key, labelKey]) => (
           <label key={key} className="flex items-center gap-2.5 text-sm text-zinc-300">
             <input
               type="checkbox"
@@ -277,7 +267,7 @@ export default function AssistantSettingsForm() {
               }
               className="h-4 w-4 rounded border-zinc-700 bg-slate-900"
             />
-            {label}
+            {t(labelKey)}
           </label>
         ))}
       </section>
@@ -287,7 +277,7 @@ export default function AssistantSettingsForm() {
         onClick={resetProfile}
         className="text-xs font-medium text-zinc-500 transition-colors hover:text-zinc-300"
       >
-        Reset Personal Operator on this browser
+        {t("settingsPage.resetProfile")}
       </button>
     </div>
   );

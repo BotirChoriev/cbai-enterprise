@@ -67,7 +67,7 @@ export default function ResearchTopicCard({
 
       <Link
         href={topicPath}
-        className="mt-5 inline-flex min-h-10 w-full items-center justify-center rounded-lg border border-teal-500/25 bg-teal-500/10 px-4 text-sm font-medium text-teal-300 transition-colors hover:border-teal-500/40 hover:bg-teal-500/15 hover:text-cyan-200"
+        className="mt-5 inline-flex min-h-10 w-full items-center justify-center rounded-lg border border-teal-500/25 bg-teal-500/10 px-4 text-sm font-medium text-teal-300 transition-colors hover:border-teal-500/40 hover:bg-teal-500/15 hover:text-teal-200"
       >
         {actionLabel} →
       </Link>

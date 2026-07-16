@@ -54,7 +54,7 @@ export default function SearchResultCard({ entry }: SearchResultCardProps) {
         </>
       ) : (
         <>
-          <Link href={entry.href} className="group block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400">
+          <Link href={entry.href} className="group block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400">
             <p className="text-sm font-semibold text-zinc-100">{entry.name}</p>
             <p className="mt-0.5 text-xs text-zinc-500">
               {entry.type}

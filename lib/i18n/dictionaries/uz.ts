@@ -1,5 +1,17 @@
 import type { TranslationDictionary } from "@/lib/i18n/dictionary-types";
 import { COMPASS_COPY_UZ, ENTITIES_UZ, MY_WORK_UZ, PRODUCT_STATUS_UZ, SYSTEM_UZ } from "@/lib/i18n/platform-copy-uz";
+import {
+  DASHBOARD_UZ,
+  ERRORS_PAGES_UZ,
+  EVIDENCE_UZ,
+  FILTERS_UZ,
+  GRAPH_UZ,
+  REASONING_UZ,
+  REPORTS_COMMON_UZ,
+  SEARCH_UZ,
+  SETTINGS_UZ,
+  TRUST_PAGE_UZ,
+} from "@/lib/i18n/platform-copy-build006-uz";
 
 const uz: TranslationDictionary = {
   roles: {
@@ -404,6 +416,16 @@ const uz: TranslationDictionary = {
     readySuggestion: "Barcha yo‘naltirilgan bosqichlar yakunlandi",
     readyDetail: "Tayyor bo‘lganingizda dalil, eslatma va vazifalar qo‘shishda davom eting.",
   },
+  errorsPages: ERRORS_PAGES_UZ,
+  search: SEARCH_UZ,
+  filters: FILTERS_UZ,
+  settingsPage: SETTINGS_UZ,
+  dashboardPage: DASHBOARD_UZ,
+  reportsCommon: REPORTS_COMMON_UZ,
+  trustPage: TRUST_PAGE_UZ,
+  graphPage: GRAPH_UZ,
+  reasoningPage: REASONING_UZ,
+  evidenceExplorer: EVIDENCE_UZ,
 };
 
 export default uz;

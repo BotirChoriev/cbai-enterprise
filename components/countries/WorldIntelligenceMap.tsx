@@ -105,7 +105,7 @@ export default function WorldIntelligenceMap() {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search countries…"
             aria-labelledby="world-map-search-label"
-            className="w-full rounded-lg border border-zinc-800 bg-slate-900/80 px-3 py-2 text-sm text-zinc-200 outline-none transition-colors focus:border-teal-500/30 focus:ring-1 focus:ring-cyan-500/20"
+            className="w-full rounded-lg border border-zinc-800 bg-slate-900/80 px-3 py-2 text-sm text-zinc-200 outline-none transition-colors focus:border-teal-500/30 focus:ring-1 focus:ring-teal-500/20"
           />
         </label>
       </div>

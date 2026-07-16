@@ -315,7 +315,7 @@ export function buildGovernanceControlModel(): GovernanceControlModel {
 
 export function governanceStatusClass(status: string): string {
   if (status === "Registered" || status === "Declared — not automated") {
-    return "text-cyan-400 bg-cyan-500/10 border-cyan-500/20";
+    return "text-teal-400 bg-teal-500/10 border-teal-500/20";
   }
   if (status === "not_evaluated") {
     return "text-zinc-400 bg-zinc-800/50 border-zinc-700/50";

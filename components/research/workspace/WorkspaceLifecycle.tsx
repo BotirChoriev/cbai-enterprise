@@ -29,7 +29,7 @@ export default function WorkspaceLifecycle() {
             </div>
             {index < WORKSPACE_LIFECYCLE_STAGES.length - 1 ? (
               <div className="flex justify-start pl-6" aria-hidden="true">
-                <div className="h-4 w-px bg-gradient-to-b from-cyan-500/40 to-cyan-500/10" />
+                <div className="h-4 w-px bg-gradient-to-b from-teal-500/40 to-teal-500/10" />
               </div>
             ) : null}
           </li>

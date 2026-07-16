@@ -74,7 +74,7 @@ export default function AgentCard({ agent }: AgentCardProps) {
     <Card className="transition-colors hover:border-zinc-700">
       <CardContent>
         <div className="flex items-start justify-between gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900 text-sky-400">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900 text-teal-400">
             <svg
               className="h-5 w-5"
               fill="none"

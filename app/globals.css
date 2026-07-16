@@ -193,19 +193,16 @@ html.theme-light [class~="border-zinc-600"] {
   border-color: #b9ccbe;
 }
 
-/* Cyan → deep forest green: the accent identity swap at the center of Design System 4.0. Broad
-   substring matches (not enumerated exact tokens) so every real opacity/shade variant in the
-   codebase (text-cyan-300/80, bg-cyan-400/70, border-cyan-400/40, ...) is covered by construction,
-   not by keeping this list in sync with every component by hand. */
-html.theme-light [class*="text-cyan-"] {
+/* Teal accent in light mode — deep forest green for statement-scale identity. */
+html.theme-light [class*="text-teal-"] {
   color: #005810;
 }
 
-html.theme-light [class*="border-cyan-"] {
+html.theme-light [class*="border-teal-"] {
   border-color: rgba(0, 88, 16, 0.28);
 }
 
-html.theme-light [class*="bg-cyan-"] {
+html.theme-light [class*="bg-teal-"] {
   background-color: rgba(0, 88, 16, 0.08);
 }
 

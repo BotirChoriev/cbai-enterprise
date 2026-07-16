@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import type { UniversityReport, UniversityReportLink } from "@/lib/university-report";
 import type { ProductStatus } from "@/lib/product-status";
@@ -8,6 +10,7 @@ import SaveReportButton from "@/components/shared/SaveReportButton";
 import ReportHeaderLogo from "@/components/shared/ReportHeaderLogo";
 import ReportHonestyStatement from "@/components/shared/ReportHonestyStatement";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { useReportCommon } from "@/lib/i18n/use-report-common";
 
 type UniversityReportViewProps = {
   report: UniversityReport & { dataStatus?: ProductStatus };
@@ -41,6 +44,9 @@ function LinkList({ links, emptyLabel }: { links: readonly UniversityReportLink[
 
 /** Real, compiled University Intelligence Report — every field traces to already-real data; nothing invented. */
 export default function UniversityReportView({ report }: UniversityReportViewProps) {
+  const labels = useReportCommon();
+  const generatedDate = new Date().toLocaleString();
+
   return (
     <section
       aria-labelledby="university-report-heading"
@@ -49,21 +55,26 @@ export default function UniversityReportView({ report }: UniversityReportViewPro
       <ReportHeaderLogo />
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <p className={cbaiSectionEyebrow}>University Intelligence Report</p>
+          <p className={cbaiSectionEyebrow}>{labels.universityEyebrow}</p>
           <h2 id="university-report-heading" className="mt-1 text-lg font-semibold text-zinc-100">
             {report.university.name}
           </h2>
-          <p className="mt-1 text-xs text-zinc-600">Generated {new Date().toLocaleString()}</p>
+          <p className="mt-1 text-xs text-zinc-600">{labels.generated(generatedDate)}</p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {report.dataStatus ? <StatusBadge status={report.dataStatus} /> : null}
-          <SaveReportButton kind="university" entityId={report.university.id} entityName={report.university.name} title={`${report.university.name} — University Intelligence Report`} />
+          <SaveReportButton
+            kind="university"
+            entityId={report.university.id}
+            entityName={report.university.name}
+            title={`${report.university.name} — ${labels.universityEyebrow}`}
+          />
           <ReportPrintButton />
         </div>
       </div>
 
       <div className="space-y-2">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Overview</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.overview}</p>
         <dl className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
           <div>
             <dt className="text-[10px] uppercase tracking-wider text-zinc-600">City</dt>
@@ -85,7 +96,7 @@ export default function UniversityReportView({ report }: UniversityReportViewPro
                   {report.overview.website}
                 </a>
               ) : (
-                "No verified data available."
+                labels.noVerifiedInfo
               )}
             </dd>
           </div>
@@ -93,25 +104,28 @@ export default function UniversityReportView({ report }: UniversityReportViewPro
       </div>
 
       <div className="space-y-3 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Evidence</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.evidence}</p>
         <p className="text-sm text-zinc-400">
-          {report.evidence.connectedSources} of {report.evidence.totalSources} official sources
-          connected · {report.evidence.connectedIndicators} indicators connected ·{" "}
-          {report.evidence.openQuestions} open questions.
+          {labels.evidenceSummary({
+            connected: String(report.evidence.connectedSources),
+            total: String(report.evidence.totalSources),
+            indicators: String(report.evidence.connectedIndicators),
+            questions: String(report.evidence.openQuestions),
+          })}
         </p>
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
-            <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600">Connected Evidence</p>
+            <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600">{labels.connectedEvidence}</p>
             <LinkList
               links={report.evidence.connectedSourceNames.map((name) => ({ name, href: null }))}
-              emptyLabel="No official sources connected yet."
+              emptyLabel={labels.noSourcesConnected}
             />
           </div>
           <div>
-            <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600">Missing Evidence</p>
+            <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600">{labels.missingEvidence}</p>
             <LinkList
               links={report.evidence.missingSourceNames.map((name) => ({ name, href: null }))}
-              emptyLabel="No missing sources — every tracked source is connected."
+              emptyLabel={labels.noMissingSources}
             />
           </div>
         </div>
@@ -122,12 +136,12 @@ export default function UniversityReportView({ report }: UniversityReportViewPro
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Research</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.research}</p>
         <p className="text-sm text-zinc-500">{report.research}</p>
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Organizations</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.organizations}</p>
         <div className="space-y-3">
           <div>
             <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600">Related country</p>
@@ -138,24 +152,24 @@ export default function UniversityReportView({ report }: UniversityReportViewPro
             )}
           </div>
           <div>
-            <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600">Related companies</p>
-            <LinkList links={report.relatedCompanies} emptyLabel="No related companies in the current catalog." />
+            <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600">{labels.relatedCompanies}</p>
+            <LinkList links={report.relatedCompanies} emptyLabel={labels.noRelatedCompanies} />
           </div>
           <div>
-            <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600">Projects</p>
-            <LinkList links={report.linkedProjects} emptyLabel="No projects link to this university yet." />
+            <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600">{labels.projects}</p>
+            <LinkList links={report.linkedProjects} emptyLabel={labels.noProjectsLinked} />
             <Link
               href={`/my-work?entityKind=university&entityId=${report.university.id}&entityName=${encodeURIComponent(report.university.name)}`}
               className="mt-1.5 inline-flex text-xs font-medium text-teal-400 hover:text-teal-300"
             >
-              + Create a project for {report.university.name} →
+              {labels.createProjectFor(report.university.name)}
             </Link>
           </div>
         </div>
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Methodology</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.methodology}</p>
         <ul className="space-y-1.5">
           {report.methodology.map((point) => (
             <li key={point.id} className="text-sm text-zinc-400">
@@ -166,14 +180,14 @@ export default function UniversityReportView({ report }: UniversityReportViewPro
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Trust Statement</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.trustStatement}</p>
         <p className="text-sm text-zinc-400">{report.trustStatement}</p>
       </div>
 
       <ReportHonestyStatement />
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Limitations</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.limitations}</p>
         <ul className="list-disc space-y-1 pl-4">
           {report.limitations.map((limitation) => (
             <li key={limitation} className="text-sm text-zinc-500">

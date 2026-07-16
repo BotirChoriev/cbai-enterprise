@@ -339,7 +339,7 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
                   ? t("home.commandProcessing")
                   : t("home.commandPlaceholder")
             }
-            className={`w-full rounded-lg border border-zinc-800 bg-slate-900/80 text-zinc-300 placeholder:text-zinc-600 outline-none transition-colors focus:border-teal-500/30 focus:ring-1 focus:ring-cyan-500/20 ${
+            className={`w-full rounded-lg border border-zinc-800 bg-slate-900/80 text-zinc-300 placeholder:text-zinc-600 outline-none transition-colors focus:border-teal-500/30 focus:ring-1 focus:ring-teal-500/20 ${
               isProminent ? "py-3.5 pl-11 pr-4 text-base" : "py-2 pl-10 pr-4 text-sm"
             }`}
           />
@@ -358,7 +358,7 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
             } ${
               voiceStatus === "listening" || voiceStatus === "requesting"
                 ? isProminent
-                  ? "scale-105 border-teal-400/60 bg-teal-500/20 text-cyan-200 shadow-[0_0_24px_-4px_rgba(34,211,238,0.5)]"
+                  ? "scale-105 border-teal-400/60 bg-teal-500/20 text-teal-200 shadow-[0_0_24px_-4px_rgba(45,212,191,0.5)]"
                   : "border-teal-500/40 bg-teal-500/10 text-teal-300"
                 : voiceStatus === "permission-denied" || voiceStatus === "network-error"
                   ? "border-amber-500/40 bg-amber-500/10 text-amber-300"

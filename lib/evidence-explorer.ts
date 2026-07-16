@@ -481,7 +481,7 @@ export function buildEvidenceExplorerModel(): EvidenceExplorerModel {
 export function explorerStatusClass(label: CoverageStatusLabel | string): string {
   switch (label) {
     case "Connected":
-      return "text-cyan-400 bg-cyan-500/10 border-cyan-500/20";
+      return "text-teal-400 bg-teal-500/10 border-teal-500/20";
     case "Planned":
     case "Evidence source planned":
       return "text-violet-400 bg-violet-500/10 border-violet-500/20";

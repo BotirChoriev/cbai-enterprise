@@ -26,7 +26,7 @@ export default function LandscapeCenter({ centerTopic, compact = false }: Landsc
         aria-hidden="true"
       />
       <div
-        className={`${cbaiGlassCard} relative w-full max-w-md border-teal-500/30 bg-gradient-to-b from-cyan-500/10 to-transparent text-center shadow-[0_0_40px_rgba(34,211,238,0.08)] ${compact ? "p-4" : "p-6"}`}
+        className={`${cbaiGlassCard} relative w-full max-w-md border-teal-500/30 bg-gradient-to-b from-teal-500/10 to-transparent text-center shadow-[0_0_40px_rgba(45,212,191,0.08)] ${compact ? "p-4" : "p-6"}`}
       >
         <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-teal-400/90">
           Research topic

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { CBAIMark } from "@/components/brand/CBAILogo";
 import { loadProjects } from "@/lib/project/project-store";
 import { cbaiBtnPrimary, cbaiBtnSecondary, cbaiGlassCard } from "@/components/brand/brand-classes";
-import { SYSTEM_EN } from "@/lib/i18n/platform-copy-en";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 function resolveContinueProjectHref(): string | null {
   const projects = loadProjects();
@@ -14,20 +14,33 @@ function resolveContinueProjectHref(): string | null {
 }
 
 type SystemPageShellProps = {
-  eyebrow: string;
-  title: string;
-  message: string;
+  variant: "notFound" | "error" | "researchTopicNotFound";
   onRetry?: () => void;
 };
 
-/**
- * System-level pages (404, errors) render outside the dashboard AssistantProfileProvider.
- * Action labels use English defaults here; the dashboard shell handles i18n everywhere else.
- */
-export default function SystemPageShell({ eyebrow, title, message, onRetry }: SystemPageShellProps) {
+export default function SystemPageShell({ variant, onRetry }: SystemPageShellProps) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [continueProjectHref] = useState<string | null>(() => resolveContinueProjectHref());
-  const labels = SYSTEM_EN;
+
+  const eyebrow =
+    variant === "notFound"
+      ? t("errorsPages.notFoundEyebrow")
+      : variant === "researchTopicNotFound"
+        ? t("errorsPages.researchNotFoundEyebrow")
+        : t("errorsPages.errorEyebrow");
+  const title =
+    variant === "notFound"
+      ? t("errorsPages.notFoundTitle")
+      : variant === "researchTopicNotFound"
+        ? t("errorsPages.researchNotFoundTitle")
+        : t("errorsPages.errorTitle");
+  const message =
+    variant === "notFound"
+      ? t("errorsPages.notFoundMessage")
+      : variant === "researchTopicNotFound"
+        ? t("errorsPages.researchNotFoundMessage")
+        : t("errorsPages.errorMessage");
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--background)] px-6 py-16 text-center">
@@ -42,26 +55,26 @@ export default function SystemPageShell({ eyebrow, title, message, onRetry }: Sy
 
         <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
           <Link href="/" className={cbaiBtnPrimary}>
-            {labels.returnHome}
+            {t("system.returnHome")}
           </Link>
           <button type="button" onClick={() => router.back()} className={cbaiBtnSecondary}>
-            {labels.goBack}
+            {t("system.goBack")}
           </button>
           <Link href="/search" className={cbaiBtnSecondary}>
-            {labels.search}
+            {t("system.search")}
           </Link>
           {continueProjectHref ? (
             <Link href={continueProjectHref} className={cbaiBtnSecondary}>
-              {labels.continueProject}
+              {t("system.continueProject")}
             </Link>
           ) : null}
           {onRetry ? (
             <button type="button" onClick={onRetry} className={cbaiBtnSecondary}>
-              {labels.tryAgain}
+              {t("system.tryAgain")}
             </button>
           ) : null}
           <Link href="/trust" className={cbaiBtnSecondary}>
-            {labels.feedback}
+            {t("system.feedback")}
           </Link>
         </div>
       </div>

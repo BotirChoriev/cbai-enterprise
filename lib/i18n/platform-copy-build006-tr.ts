@@ -1,0 +1,269 @@
+/** BUILD-006 extended copy — Turkish */
+export const ERRORS_PAGES_TR = {
+  notFoundEyebrow: "404",
+  notFoundTitle: "Sayfa bulunamadı",
+  notFoundMessage:
+    "Bu sayfa mevcut değil — taşınmış olabilir veya bağlantı güncel olmayabilir. CBAI'nin geri kalanı bir tık uzağınızda.",
+  errorEyebrow: "Beklenmeyen hata",
+  errorTitle: "Bir şeyler ters gitti",
+  errorMessage:
+    "Beklenmeyen bir hata bu sayfayı kesintiye uğrattı. Kaydedilen verileriniz kaybolmadı — Projeler, notlar ve kanıtlar tarayıcıda kalır. Tekrar deneyin veya çalışan bir bölüme dönün.",
+  researchNotFoundEyebrow: "Bulunamadı",
+  researchNotFoundTitle: "Araştırma konusu bulunamadı",
+  researchNotFoundMessage:
+    "Bu konu Araştırma kataloğunda yok — yeniden adlandırılmış olabilir veya bağlantı güncel olmayabilir. Mevcut konulara göz atın.",
+} as const;
+
+export const SEARCH_TR = {
+  hint: "Ülke, şirket veya üniversite arayın.",
+  ariaLabel: "Ülke, şirket veya üniversite ara",
+  placeholder: "Japan, Apple, Harvard University",
+  submit: "Ara",
+  publicIntelligence: "Kamusal İstihbarat",
+  partOf: "Parçası",
+  availableToday: "bugün mevcut.",
+  noResults: '"{query}" için eşleşen sonuç bulunamadı.',
+  noOpenableResults: '"{query}" için açılabilir profil veya bağlı konu bulunamadı.',
+  noResultsHint:
+    "Arama yalnızca yerel kayıttaki adlarla eşleşir — daha kısa deneyin, yazımı kontrol edin veya örneklerden başlayın:",
+  tryExample: "Örnek deneyin",
+  exampleCountry: "Ülke",
+  exampleCompany: "Şirket",
+  exampleUniversity: "Üniversite",
+  exampleResearch: "Araştırma konusu",
+  openProfile: "Profili aç",
+  openProfileArrow: "Profili aç →",
+  compareArrow: "Karşılaştır →",
+  openReportsArrow: "Raporları aç →",
+  createProjectArrow: "Proje Oluştur →",
+  matched: "Eşleşen: {name}",
+  profilesPickOne: "{count} profil · açmak için birini seçin",
+  profilesPickMany: "{count} profil · açmak için birini seçin",
+  resultsFor: "Sonuçlar",
+  groupCountries: "Ülkeler",
+  groupCompanies: "Şirketler",
+  groupUniversities: "Üniversiteler",
+  groupResearch: "Araştırma konuları",
+  groupProjects: "Projeler",
+  opensTo: "Açar",
+  exampleSearchesAria: "Örnek aramalar",
+} as const;
+
+export const EVIDENCE_TR = {
+  description:
+    "Ülke, şirket ve üniversite profillerinde resmi kaynak durumu ve mevcut bilgiler.",
+  sourcesConnected: "Bağlı kaynaklar",
+  informationConnected: "Bağlı bilgi",
+  profilesAvailable: "Mevcut profiller",
+} as const;
+
+export const FILTERS_TR = {
+  searchCountries: "Ülkeleri ara…",
+  searchCompanies: "Şirketleri ara…",
+  searchUniversities: "Üniversiteleri ara…",
+  allRegions: "Tüm bölgeler",
+  allIndustries: "Tüm sektörler",
+  allCountries: "Tüm ülkeler",
+  allTypes: "Tüm türler",
+  all: "Tümü",
+  industry: "Sektör",
+  countryLabel: "Ülke",
+  resultCountry: "{count} ülke",
+  resultCountries: "{count} ülke",
+  resultCompany: "{count} şirket",
+  resultCompanies: "{count} şirket",
+  resultUniversity: "{count} üniversite",
+  resultUniversities: "{count} üniversite",
+  selected: "Seçildi",
+} as const;
+
+export const SETTINGS_TR = {
+  description: "CBAI Kişisel Operatörünüz — bu tarayıcıda kaydedildi.",
+  operatorReady: 'CBAI Kişisel Operatörünüz hazır — "{name}" olarak kaydedildi.',
+  operatorNotReady: "CBAI Kişisel Operatörünüz henüz ayarlanmadı — etkinleştirmek için adınızı ekleyin.",
+  identityHeading: "Kişisel Operatör kimliği",
+  yourName: "Adınız",
+  yourNamePlaceholder: "ör. Botir",
+  operatorName: "Operatör adı",
+  workspaceRole: "Çalışma alanı rolü",
+  avatar: "Avatar",
+  voiceLanguageHeading: "Ses ve Dil",
+  showVoiceInput: "Komut Merkezinde sesli girişi göster",
+  preferredLanguage: "Tercih edilen dil",
+  futureTranslationLanguage: "Gelecekteki çeviri dili",
+  speechLanguage: "Konuşma dili (ses tanıma)",
+  speechEnUs: "İngilizce (Amerika Birleşik Devletleri)",
+  speechEnGb: "İngilizce (Birleşik Krallık)",
+  languageNotAvailable: " (henüz kullanılamıyor)",
+  languageHonestyNote:
+    "İngilizce, Oʻzbek, Русский ve Türkçe bu platformun arayüzünde bugün tam olarak uygulanmıştır. Yukarıdaki diğer dil seçenekleri kaydedilmiş tercihlerdir — sessizce hiçbir şey yapmak yerine dürüstçe kullanılamıyor olarak işaretlenmiştir. Ses tanıma (konuşmadan metne) şu anda arayüz dilinizden bağımsız olarak yalnızca İngilizceyi destekler.",
+  contextHeading: "Bağlam",
+  country: "Ülke",
+  countryNotSet: "Belirlenmedi",
+  organization: "Kuruluş",
+  organizationPlaceholder: "İsteğe bağlı",
+  timezone: "Saat dilimi",
+  notificationsHeading: "Bildirim tercihleri",
+  notificationsHonesty:
+    "Tercihler kaydedilir, ancak henüz bu platforma bağlı bir bildirim teslimatı yoktur — bağlanana kadar hiçbir şey gönderilmeyecektir.",
+  notifyEvidenceUpdates: "Kanıt güncellemeleri",
+  notifyMissionActivity: "Görev etkinliği",
+  notifyWeeklySummary: "Haftalık özet",
+  themeHeading: "Arayüz teması",
+  themeNote:
+    "Sistem, cihazınızın gerçek açık/koyu tercihini izler. Açık ve Derin, bu profile kaydedilen açık bir geçersiz kılmadır.",
+  accessibilityHeading: "Erişilebilirlik ayarları",
+  reduceMotion: "Hareketi azalt",
+  increaseContrast: "Kontrastı artır",
+  largerText: "Daha büyük metin",
+  interfaceLanguage: "Arayüz dili",
+  voiceLanguage: "Ses tanıma dili",
+  accessibility: "Erişilebilirlik",
+  saveProfile: "Profili kaydet",
+  resetProfile: "Bu tarayıcıda Kişisel Operatörü sıfırla",
+} as const;
+
+export const DASHBOARD_TR = {
+  description: "Kamusal İstihbarat — bugün CBAI'de mevcut olanlar.",
+} as const;
+
+export const REPORTS_COMMON_TR = {
+  countryReportEyebrow: "Ülke istihbarat raporu",
+  companyReportEyebrow: "Şirket istihbarat raporu",
+  universityReportEyebrow: "Üniversite istihbarat raporu",
+  projectReportEyebrow: "Proje istihbarat raporu",
+  researchReportEyebrow: "Araştırma istihbarat raporu",
+  generated: "Oluşturuldu {date}",
+  overview: "Genel bakış",
+  region: "Bölge",
+  capital: "Başkent",
+  government: "Hükümet",
+  officialWebsite: "Resmi web sitesi",
+  noVerifiedInfo: "Doğrulanmış bilgi mevcut değil.",
+  evidence: "Kanıt",
+  evidenceSummary:
+    "{total} resmi kaynaktan {connected} tanesi bağlı · {indicators} gösterge · {questions} açık soru.",
+  connectedEvidence: "Bağlı kanıt",
+  missingEvidence: "Eksik kanıt",
+  noSourcesConnected: "Henüz resmi kaynak bağlanmadı.",
+  noMissingSources: "Eksik kaynak yok — izlenen tüm kaynaklar bağlı.",
+  research: "Araştırma",
+  organizations: "Kuruluşlar",
+  relatedCompanies: "İlgili şirketler",
+  relatedUniversities: "İlgili üniversiteler",
+  projects: "Projeler",
+  noRelatedCompanies: "Mevcut katalogda ilgili şirket yok.",
+  noRelatedUniversities: "Mevcut katalogda ilgili üniversite yok.",
+  noProjectsLinked: "Henüz bu varlığa bağlı proje yok.",
+  createProjectFor: "+ {name} için proje oluştur →",
+  methodology: "Metodoloji",
+  trustStatement: "Güven bildirimi",
+  limitations: "Sınırlamalar",
+} as const;
+
+export const TRUST_PAGE_TR = {
+  pageDescription:
+    "CBAI güveni nasıl kazanır — anayasa, metodoloji ve platform politikaları tek yerde.",
+  homeLink: "Ana sayfa",
+  homeLinkHint: "güven özeti.",
+  sectionsNav: "Güven bölümleri",
+  verificationIntro:
+    "Her profil ve konu dört dürüst etiketten birine sahiptir — her zaman tam cümle olarak gösterilir, asla yalnız bir kelime veya renk değil:",
+  constitution: {
+    title: "Anayasa",
+    body: [
+      "İnsanların kanıtları kullanarak daha iyi kararlar almasına yardım edin. Asla manipüle etmeyin. Asla uydurmayın. Asla siyasi olmayın. Her zaman açıklayın. Her zaman şeffaf kalın.",
+      "Yönetim belgesi: CBAI Anayasası v1.",
+    ],
+  },
+  methodology: {
+    title: "Metodoloji",
+    body: ["Herhangi bir sonuç sunulmadan önce kanıtlar bağlanır ve incelenir — asla tersi değil."],
+  },
+  verificationModel: {
+    title: "Doğrulama modeli",
+    body: [
+      "Her profil ve konu dört dürüst etiketten birine sahiptir — her zaman tam cümle olarak gösterilir, asla yalnız bir kelime veya renk değil:",
+    ],
+  },
+  evidencePolicy: {
+    title: "Kanıt politikası",
+    body: [
+      "Bu platformdaki her iddia bağlı, adlandırılmış bir kaynağa izlenebilmeli — veya eksik olarak etiketlenmelidir.",
+      "Kaynaklar sonuçlardan önce gelir. Gerçek bir kaynak bağlanana kadar hiçbir iddia doğrulanmış olarak sunulmaz.",
+      "Belirsizlik görünür. Kanıt kısmi veya eksik olduğunda platform bunu söyler — asla boşlukları kendinden emin bir dille gizlemez.",
+    ],
+  },
+  dataSources: {
+    title: "Veri kaynakları",
+    body: [
+      "Bu platformun bağlanmak üzere oluşturulduğu resmi kaynaklar, kategoriye göre:",
+      "Bir kaynak yalnızca ondan gelen gerçek, doğrulanabilir veriler bir profile bağlandığında bağlı sayılır — yalnızca kategoriden varsayılmaz.",
+    ],
+  },
+  humanDecision: {
+    title: "İnsan kararı",
+    body: [
+      "İnsanlar karar verir. CBAI kanıtları bağlar ve seçenekleri açıklar — asla insan yargısının yerini almaz.",
+      "Bu platformun ürettiği her akıl yürütme sonucu her zaman true olan insan-kararı-gerekli bayrağını taşır — otomatik testle doğrulanmış, şansa bırakılmamış.",
+    ],
+  },
+  privacy: {
+    title: "Gizlilik",
+    body: [
+      "İki hesap türü vardır: Cihaza Özel Hesap (yalnızca bu tarayıcıda saklanır, hiçbir yere gönderilmez) ve yapılandırıldığında Supabase destekli gerçek Bulut Hesabı.",
+      "Satır Düzeyinde Güvenlik her bulut tablosunda uygulanır: yalnızca kendi oturum açmış oturumunuz kayıtlarınızı okuyabilir, yazabilir veya silebilir.",
+      "Analitik yok, izleme betiği yok ve üçüncü taraf bu verileri asla almaz.",
+      "Tam bir gizlilik politikası, yasal inceleme tamamlandıktan sonra herhangi bir ticari veya kamuya açık lansmandan önce yayınlanacaktır.",
+    ],
+  },
+  termsOfUse: {
+    title: "Kullanım şartları",
+    body: [
+      "Bu, gerçek mevcut davranışın asgari, dürüst bir ifadesidir — avukat tarafından hazırlanmış Hizmet Şartlarının yerine geçmez.",
+      "CBAI olduğu gibi sağlanır — doğruluk, tamlık veya belirli bir amaca uygunluk garantisi yoktur.",
+      "Gerçek bir karar için güvenmeden önce herhangi bir bilgiyi doğrulamaktan siz sorumlusunuz.",
+      "Cihaza özel hesaplar ve yerel olarak saklanan veriler bu tarayıcının depolaması temizlenirse kaybolabilir.",
+      "Bulut Hesabı silme, gerçek bir self-servis akışı oluşturulana kadar bu dağıtımın operatörüne başvurmayı gerektirebilir.",
+    ],
+  },
+  copyright: {
+    title: "Telif hakkı",
+    body: [
+      "CBAI, bu platformda referans verilen üçüncü taraf verilerinin, bayraklarının, logolarının, yayınlarının, veri kümelerinin veya devlet materyallerinin sahipliğini iddia etmez.",
+      "Orijinal CBAI platform içeriği ve tasarımı CBAI'nin mülkiyetindedir.",
+    ],
+  },
+  knownLimitations: {
+    title: "Bilinen sınırlamalar",
+    body: [
+      "Bugünkü kapsam kasıtlı olarak gerçekte olduğu gibi gösterilir: çoğu profilde şu ana kadar yalnızca az sayıda resmi kaynak bağlı.",
+      "Cihaza özel hesaplarda sunucu doğrulaması ve cihazlar arası senkronizasyon yoktur.",
+      "Yönetişim, Yatırımcı ve Vatandaş çalışma alanları ile Bilgi Grafiği ve Akıl Yürütme görünümleri hâlâ erken aşamada — mevcut derinliği bir önizleme olarak değerlendirin.",
+    ],
+  },
+  transparency: {
+    title: "Şeffaflık bildirimi",
+    body: [
+      "CBAI neyin bağlı, neyin eksik ve neyin hâlâ geliştirilmekte olduğunu gösterir — kanıtların desteklediğinden fazlasını asla göstermez.",
+      "Henüz bağlı bir destek veya iletişim kanalı yoktur.",
+    ],
+  },
+} as const;
+
+export const GRAPH_TR = {
+  description: "Platform varlıkları arasındaki doğrulanmış ilişkileri keşfedin.",
+  graphByRole: "Role göre graf",
+  howItWorks: "Nasıl çalışır",
+  trust: "Güven",
+} as const;
+
+export const REASONING_TR = {
+  description: "Resmi bilginin kararlardan önce incelemeyi nasıl desteklediği.",
+  extendedDescription:
+    "Kanıtların kararlardan önce nasıl incelendiği — net adımlar ve konuya göre ilişkili bilgiler.",
+  reviewSteps: "İnceleme adımları",
+  topicAreas: "Konu alanları",
+  informationConnected: "Bağlı bilgiler",
+  sourcesConnected: "Bağlı kaynaklar",
+} as const;

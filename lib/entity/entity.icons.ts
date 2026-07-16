@@ -22,8 +22,8 @@ export const entityTypeIconPaths: Record<EntityType, string> = {
 
 /** Accent color classes per entity type */
 export const entityTypeAccents: Record<EntityType, string> = {
-  country: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20",
-  company: "text-sky-400 bg-sky-500/10 border-sky-500/20",
+  country: "text-teal-400 bg-teal-500/10 border-teal-500/20",
+  company: "text-teal-400 bg-teal-500/10 border-teal-500/20",
   university: "text-violet-400 bg-violet-500/10 border-violet-500/20",
   government: "text-amber-400 bg-amber-500/10 border-amber-500/20",
   investor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
@@ -48,7 +48,7 @@ export const timelineTypeIconPaths: Record<string, string> = {
 /** Tag variant styling */
 export const tagVariantStyles: Record<string, string> = {
   default: "border-zinc-700 bg-zinc-800/60 text-zinc-400",
-  accent: "border-sky-500/20 bg-sky-500/10 text-sky-400",
+  accent: "border-teal-500/20 bg-teal-500/10 text-teal-400",
   success: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
   warning: "border-amber-500/20 bg-amber-500/10 text-amber-400",
   danger: "border-amber-600/30 bg-amber-600/10 text-amber-500",
@@ -57,7 +57,7 @@ export const tagVariantStyles: Record<string, string> = {
 /** Timeline event type color classes */
 export const timelineTypeColors: Record<string, string> = {
   milestone: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
-  update: "text-sky-400 bg-sky-500/10 border-sky-500/20",
+  update: "text-teal-400 bg-teal-500/10 border-teal-500/20",
   alert: "text-amber-400 bg-amber-500/10 border-amber-500/20",
   analysis: "text-violet-400 bg-violet-500/10 border-violet-500/20",
   system: "text-zinc-400 bg-zinc-500/10 border-zinc-700",

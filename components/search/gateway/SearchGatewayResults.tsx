@@ -13,6 +13,7 @@ import type { Entity } from "@/lib/entity/entity.types";
 import TopicResultCard from "@/components/search/gateway/SearchResultCard";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import VoiceSummaryButton from "@/components/shared/VoiceSummaryButton";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type SearchGatewayResultsProps = {
   response: GatewaySearchResponse;
@@ -21,13 +22,6 @@ type SearchGatewayResultsProps = {
 
 const OPENABLE_GROUP_IDS = new Set(["countries", "companies", "universities", "research_topics", "projects"]);
 const TOPIC_GROUP_IDS = new Set<SearchResultGroupId>(["knowledge", "evidence", "future_modules"]);
-
-const SEARCH_EXAMPLES = [
-  { label: "Country", query: "Japan" },
-  { label: "Company", query: "Apple" },
-  { label: "University", query: "Harvard University" },
-  { label: "Research Topic", query: "microbiology" },
-] as const;
 
 function resolveSingleEntityMatch(response: GatewaySearchResponse): Entity | null {
   const entities = response.groups
@@ -49,10 +43,8 @@ function collectTopicGroups(response: GatewaySearchResponse) {
   );
 }
 
-export default function SearchGatewayResults({
-  response,
-  query,
-}: SearchGatewayResultsProps) {
+export default function SearchGatewayResults({ response, query }: SearchGatewayResultsProps) {
+  const { t } = useTranslation();
   const singleEntity = useMemo(() => resolveSingleEntityMatch(response), [response]);
 
   if (!response.query) {
@@ -62,13 +54,8 @@ export default function SearchGatewayResults({
   if (!response.hasResults) {
     return (
       <div className="space-y-4" role="status">
-        <p className="text-sm text-zinc-300">
-          No matching country, company, university, or research topic was found for &quot;{response.query}&quot;.
-        </p>
-        <p className="text-xs text-zinc-500">
-          Search only matches names already in the local registry — try a shorter term, check the
-          spelling, or start from one of these:
-        </p>
+        <p className="text-sm text-zinc-300">{t("search.noResults", { query: response.query })}</p>
+        <p className="text-xs text-zinc-500">{t("search.noResultsHint")}</p>
         <SearchExamples />
       </div>
     );
@@ -78,26 +65,21 @@ export default function SearchGatewayResults({
 
   if (singleEntity && topicGroups.length === 0) {
     const entry = buildEntityResultEntry(singleEntity, query);
-    return <EntityMatchCard entry={entry} matchedLabel={`Matched: ${entry.name}`} />;
+    return (
+      <EntityMatchCard
+        entry={entry}
+        matchedLabel={t("search.matched", { name: entry.name })}
+      />
+    );
   }
 
   const results = collectEntityResults(response);
 
-  // Real edge case, not hypothetical: `response.hasResults` is true whenever any group exists at
-  // all (lib/search-gateway.ts), but a "knowledge"/"evidence"/"future_modules" group can exist
-  // with zero real topics inside it — filtered out by collectTopicGroups' own `topics.length > 0`
-  // check. When that's the only group and there are also no entity results, the two lists below
-  // are both empty and this component would otherwise render nothing at all. Same honest fallback
-  // as the `!response.hasResults` case above, not a silent blank area.
   if (results.length === 0 && topicGroups.length === 0) {
     return (
       <div className="space-y-4" role="status">
-        <p className="text-sm text-zinc-300">
-          No open-able profile or connected topic was found for &quot;{response.query}&quot;.
-        </p>
-        <p className="text-xs text-zinc-500">
-          Try a shorter term, check the spelling, or start from one of these:
-        </p>
+        <p className="text-sm text-zinc-300">{t("search.noOpenableResults", { query: response.query })}</p>
+        <p className="text-xs text-zinc-500">{t("search.noResultsHint")}</p>
         <SearchExamples />
       </div>
     );
@@ -108,7 +90,9 @@ export default function SearchGatewayResults({
       {results.length > 0 ? (
         <div className="space-y-3">
           <p className="text-sm text-zinc-500">
-            {results.length} profile{results.length === 1 ? "" : "s"} · pick one to open
+            {results.length === 1
+              ? t("search.profilesPickOne", { count: String(results.length) })
+              : t("search.profilesPickMany", { count: String(results.length) })}
           </p>
           <ul className="space-y-2">
             {results.map((result) => {
@@ -145,6 +129,7 @@ type EntityMatchCardProps = {
 };
 
 function EntityMatchCard({ entry, matchedLabel }: EntityMatchCardProps) {
+  const { t } = useTranslation();
   const showCountryInHeader = entry.type !== "Country" && entry.countryLabel;
   const voiceSummaryText = [entry.name, entry.type, entry.distinguishingFact, entry.coverageLabel, entry.nextStep]
     .filter((part): part is string => Boolean(part))
@@ -186,14 +171,14 @@ function EntityMatchCard({ entry, matchedLabel }: EntityMatchCardProps) {
           href={entry.href}
           className="inline-flex min-h-9 items-center rounded-lg bg-zinc-100 px-3.5 text-xs font-semibold text-zinc-900 transition-colors hover:bg-white"
         >
-          Open profile →
+          {t("search.openProfileArrow")}
         </Link>
         {!matchedLabel && entry.showCompare ? (
           <Link
             href={profileSectionHref(entry.href, "compare")}
             className="inline-flex min-h-9 items-center rounded-lg border border-zinc-700 bg-zinc-900 px-3.5 text-xs font-medium text-teal-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
           >
-            Compare →
+            {t("search.compareArrow")}
           </Link>
         ) : null}
         {!matchedLabel && entry.showReports ? (
@@ -201,7 +186,7 @@ function EntityMatchCard({ entry, matchedLabel }: EntityMatchCardProps) {
             href={profileSectionHref(entry.href, "reports")}
             className="inline-flex min-h-9 items-center rounded-lg border border-zinc-700 bg-zinc-900 px-3.5 text-xs font-medium text-teal-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
           >
-            Open reports →
+            {t("search.openReportsArrow")}
           </Link>
         ) : null}
         {entry.createProjectHref ? (
@@ -209,7 +194,7 @@ function EntityMatchCard({ entry, matchedLabel }: EntityMatchCardProps) {
             href={entry.createProjectHref}
             className="inline-flex min-h-9 items-center rounded-lg border border-teal-500/30 bg-teal-500/10 px-3.5 text-xs font-medium text-teal-300 transition-colors hover:border-teal-500/50"
           >
-            Create Project →
+            {t("search.createProjectArrow")}
           </Link>
         ) : null}
         {entry.entityRef ? <SaveToWorkspaceButton entity={entry.entityRef} /> : null}
@@ -220,9 +205,17 @@ function EntityMatchCard({ entry, matchedLabel }: EntityMatchCardProps) {
 }
 
 function SearchExamples() {
+  const { t } = useTranslation();
+  const examples = [
+    { label: t("search.exampleCountry"), query: "Japan" },
+    { label: t("search.exampleCompany"), query: "Apple" },
+    { label: t("search.exampleUniversity"), query: "Harvard University" },
+    { label: t("search.exampleResearch"), query: "microbiology" },
+  ] as const;
+
   return (
-    <ul className="flex flex-wrap gap-2" aria-label="Example searches">
-      {SEARCH_EXAMPLES.map((example) => (
+    <ul className="flex flex-wrap gap-2" aria-label={t("search.exampleSearchesAria")}>
+      {examples.map((example) => (
         <li key={example.query}>
           <Link
             href={`/search?q=${encodeURIComponent(example.query)}`}

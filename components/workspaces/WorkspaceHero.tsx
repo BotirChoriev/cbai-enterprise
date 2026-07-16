@@ -35,7 +35,7 @@ export default function WorkspaceHero({
         {!motif && (
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-sky-500/5 to-violet-500/5"
+            className="pointer-events-none absolute inset-0 bg-gradient-to-r from-teal-500/5 via-teal-500/5 to-violet-500/5"
           />
         )}
         <div className={motif ? "relative grid items-center gap-8 lg:grid-cols-[1.05fr_1fr]" : "relative"}>

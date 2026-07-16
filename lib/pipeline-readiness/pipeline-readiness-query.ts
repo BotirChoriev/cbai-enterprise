@@ -34,7 +34,7 @@ export function pipelineReadinessStateLabel(state: PipelineReadinessState): stri
 export function pipelineReadinessStatusClass(state: PipelineReadinessState): string {
   switch (state) {
     case "ready":
-      return "text-cyan-400 bg-cyan-500/10 border-cyan-500/20";
+      return "text-teal-400 bg-teal-500/10 border-teal-500/20";
     case "partial":
       return "text-amber-400 bg-amber-500/10 border-amber-500/20";
     case "planned":

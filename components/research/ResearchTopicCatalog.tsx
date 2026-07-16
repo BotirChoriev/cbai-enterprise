@@ -83,7 +83,7 @@ export default function ResearchTopicCatalog({ initialQuery = "" }: ResearchTopi
           value={filterQuery}
           onChange={(event) => setFilterQuery(event.target.value)}
           placeholder="Filter by topic, method, domain, or evidence type..."
-          className="home-search-input w-full rounded-lg border border-zinc-800/80 bg-slate-950/70 px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500/30"
+          className="home-search-input w-full rounded-lg border border-zinc-800/80 bg-slate-950/70 px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-teal-500/30"
         />
         <ResearchDomainFilter
           selectedDomain={selectedDomain}

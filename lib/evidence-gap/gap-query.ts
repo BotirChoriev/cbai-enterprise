@@ -36,7 +36,7 @@ export function gapStatusLabel(status: EntityEvidenceGapProfile["gaps"][number][
 export function gapStatusClass(status: EntityEvidenceGapProfile["gaps"][number]["currentStatus"]): string {
   switch (status) {
     case "available":
-      return "text-cyan-400 bg-cyan-500/10 border-cyan-500/20";
+      return "text-teal-400 bg-teal-500/10 border-teal-500/20";
     case "planned":
       return "text-violet-400 bg-violet-500/10 border-violet-500/20";
     case "missing":

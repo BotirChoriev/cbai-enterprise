@@ -1,5 +1,17 @@
 import type { TranslationDictionary } from "@/lib/i18n/dictionary-types";
 import { COMPASS_COPY_EN, ENTITIES_EN, MY_WORK_EN, PRODUCT_STATUS_EN, SYSTEM_EN } from "@/lib/i18n/platform-copy-en";
+import {
+  DASHBOARD_EN,
+  ERRORS_PAGES_EN,
+  EVIDENCE_EN,
+  FILTERS_EN,
+  GRAPH_EN,
+  REASONING_EN,
+  REPORTS_COMMON_EN,
+  SEARCH_EN,
+  SETTINGS_EN,
+  TRUST_PAGE_EN,
+} from "@/lib/i18n/platform-copy-build006-en";
 
 const en: TranslationDictionary = {
   roles: {
@@ -405,6 +417,16 @@ const en: TranslationDictionary = {
     readySuggestion: "Every guided milestone is complete",
     readyDetail: "Keep adding evidence, notes, and tasks whenever you're ready to continue.",
   },
+  errorsPages: ERRORS_PAGES_EN,
+  search: SEARCH_EN,
+  filters: FILTERS_EN,
+  settingsPage: SETTINGS_EN,
+  dashboardPage: DASHBOARD_EN,
+  reportsCommon: REPORTS_COMMON_EN,
+  trustPage: TRUST_PAGE_EN,
+  graphPage: GRAPH_EN,
+  reasoningPage: REASONING_EN,
+  evidenceExplorer: EVIDENCE_EN,
 };
 
 export default en;

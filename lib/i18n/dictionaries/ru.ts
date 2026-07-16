@@ -1,5 +1,17 @@
 import type { TranslationDictionary } from "@/lib/i18n/dictionary-types";
 import { COMPASS_COPY_RU, ENTITIES_RU, MY_WORK_RU, PRODUCT_STATUS_RU, SYSTEM_RU } from "@/lib/i18n/platform-copy-ru";
+import {
+  DASHBOARD_RU,
+  ERRORS_PAGES_RU,
+  EVIDENCE_RU,
+  FILTERS_RU,
+  GRAPH_RU,
+  REASONING_RU,
+  REPORTS_COMMON_RU,
+  SEARCH_RU,
+  SETTINGS_RU,
+  TRUST_PAGE_RU,
+} from "@/lib/i18n/platform-copy-build006-ru";
 
 const ru: TranslationDictionary = {
   roles: {
@@ -404,6 +416,16 @@ const ru: TranslationDictionary = {
     readySuggestion: "Все этапы руководства выполнены",
     readyDetail: "Продолжайте добавлять доказательства, заметки и задачи, когда будете готовы.",
   },
+  errorsPages: ERRORS_PAGES_RU,
+  search: SEARCH_RU,
+  filters: FILTERS_RU,
+  settingsPage: SETTINGS_RU,
+  dashboardPage: DASHBOARD_RU,
+  reportsCommon: REPORTS_COMMON_RU,
+  trustPage: TRUST_PAGE_RU,
+  graphPage: GRAPH_RU,
+  reasoningPage: REASONING_RU,
+  evidenceExplorer: EVIDENCE_RU,
 };
 
 export default ru;

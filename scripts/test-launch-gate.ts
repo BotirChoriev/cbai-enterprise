@@ -76,7 +76,11 @@ test("4. Reports carry a real generation date, not a fabricated timestamp field"
     "components/universities/UniversityReportView.tsx",
     "components/project/ProjectReportView.tsx",
   ]) {
-    assert.ok(read(view).includes("Generated {new Date()"), `${view} is missing a generation date`);
+    const content = read(view);
+    assert.ok(
+      content.includes("toLocaleString()") || content.includes("labels.generated"),
+      `${view} is missing a generation date`,
+    );
   }
 });
 
@@ -90,14 +94,14 @@ test("5. Project reports now include Objectives, Tasks, and Open Questions (prev
 });
 
 test("6. Trust Center's Privacy and Known Limitations sections describe the real local account system, not a false 'no accounts' claim", () => {
-  const content = read("app/(dashboard)/trust/page.tsx");
+  const content = read("lib/i18n/platform-copy-build006-en.ts");
   assert.equal(content.includes("does not have user accounts"), false);
   assert.equal(content.includes("There are no accounts, sign-in"), false);
   assert.ok(content.includes("hashed and salted"));
 });
 
 test("7. Trust Center has a real Terms of Use section that invents no legal guarantees", () => {
-  const content = read("app/(dashboard)/trust/page.tsx");
+  const content = read("lib/i18n/platform-copy-build006-en.ts");
   assert.ok(content.includes('"Terms of Use"'));
   assert.ok(content.includes("not a substitute for a lawyer-drafted"));
 });

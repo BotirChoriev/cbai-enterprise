@@ -41,7 +41,7 @@ export default function DashboardLayout({
   return (
     <AuthProvider>
       <AssistantProfileProvider>
-        <div className="flex h-screen overflow-hidden bg-[#050810]">
+        <div className="flex h-screen overflow-hidden bg-[var(--background)]">
           <Sidebar />
           <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
             <Suspense fallback={null}>

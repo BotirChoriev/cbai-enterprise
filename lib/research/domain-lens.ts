@@ -20,7 +20,7 @@ const DEFAULT_LENS: ResearchDomainLens = {
   methodsLabel: "Research methods",
   evidenceLabel: "Evidence types",
   actionLabel: "Open topic",
-  accent: { text: "text-cyan-300", glow: "rgba(34,211,238,0.14)", line: "#22d3ee" },
+  accent: { text: "text-teal-300", glow: "rgba(45,212,191,0.14)", line: "#2dd4bf" },
 };
 
 // Only domains the mission calls out by name get a fully distinct room — Medicine and

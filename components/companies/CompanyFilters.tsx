@@ -1,6 +1,7 @@
 "use client";
 
 import { cbaiGlassCard } from "@/components/brand/brand-classes";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type CompanyFiltersProps = {
   search: string;
@@ -25,6 +26,12 @@ export default function CompanyFilters({
   onCountryChange,
   resultCount,
 }: CompanyFiltersProps) {
+  const { t } = useTranslation();
+  const resultLabel =
+    resultCount === 1
+      ? t("filters.resultCompany", { count: String(resultCount) })
+      : t("filters.resultCompanies", { count: String(resultCount) });
+
   return (
     <div className={`${cbaiGlassCard} space-y-4 p-4`}>
       <div className="relative">
@@ -34,6 +41,7 @@ export default function CompanyFilters({
           viewBox="0 0 24 24"
           stroke="currentColor"
           strokeWidth={1.5}
+          aria-hidden="true"
         >
           <path
             strokeLinecap="round"
@@ -45,18 +53,19 @@ export default function CompanyFilters({
           type="search"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Search companies..."
-          className="w-full rounded-lg border border-zinc-800 bg-zinc-900/60 py-2 pl-10 pr-4 text-sm text-zinc-300 placeholder:text-zinc-600 outline-none transition-colors focus:border-sky-500/40 focus:ring-1 focus:ring-sky-500/20"
+          placeholder={t("filters.searchCompanies")}
+          aria-label={t("filters.searchCompanies")}
+          className="w-full rounded-lg border border-zinc-800 bg-zinc-900/60 py-2 pl-10 pr-4 text-sm text-zinc-300 placeholder:text-zinc-600 outline-none transition-colors focus:border-teal-500/40 focus:ring-1 focus:ring-teal-500/20"
         />
       </div>
 
       <div>
         <p className="mb-2 text-[10px] font-medium uppercase tracking-widest text-zinc-600">
-          Industry
+          {t("filters.industry")}
         </p>
         <div className="flex flex-wrap gap-1.5">
           <FilterPill
-            label="All"
+            label={t("filters.all")}
             active={industry === "All"}
             onClick={() => onIndustryChange("All")}
           />
@@ -73,11 +82,11 @@ export default function CompanyFilters({
 
       <div>
         <p className="mb-2 text-[10px] font-medium uppercase tracking-widest text-zinc-600">
-          Country
+          {t("filters.countryLabel")}
         </p>
         <div className="flex flex-wrap gap-1.5">
           <FilterPill
-            label="All"
+            label={t("filters.all")}
             active={country === "All"}
             onClick={() => onCountryChange("All")}
           />
@@ -92,9 +101,7 @@ export default function CompanyFilters({
         </div>
       </div>
 
-      <p className="font-mono text-xs text-zinc-600">
-        {resultCount} {resultCount === 1 ? "company" : "companies"}
-      </p>
+      <p className="font-mono text-xs text-zinc-600">{resultLabel}</p>
     </div>
   );
 }
@@ -112,9 +119,10 @@ function FilterPill({
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={active}
       className={`rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors ${
         active
-          ? "bg-sky-500/10 text-sky-400 ring-1 ring-sky-500/30"
+          ? "bg-teal-500/10 text-teal-400 ring-1 ring-teal-500/30"
           : "border border-zinc-800 text-zinc-500 hover:text-zinc-300"
       }`}
     >

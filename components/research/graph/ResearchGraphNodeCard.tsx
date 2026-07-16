@@ -30,7 +30,7 @@ export default function ResearchGraphNodeCard({
   const content = (
     <div
       className={`rounded-lg border px-3 py-2 ${statusClass(node.status)} ${
-        focused ? "ring-1 ring-cyan-400/40" : ""
+        focused ? "ring-1 ring-teal-400/40" : ""
       } ${compact ? "text-xs" : "text-sm"}`}
     >
       <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">

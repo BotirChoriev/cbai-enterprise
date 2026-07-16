@@ -5,7 +5,7 @@ const activityColors: Record<
   RuntimeActivityItem["kind"],
   string
 > = {
-  session: "bg-sky-500/10 text-sky-400",
+  session: "bg-teal-500/10 text-teal-400",
   task: "bg-violet-500/10 text-violet-400",
   queue: "bg-emerald-500/10 text-emerald-400",
   scheduler: "bg-amber-500/10 text-amber-400",

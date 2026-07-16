@@ -56,7 +56,7 @@ export function comparisonReadinessLabel(status: ComparisonReadinessStatus): str
 export function comparisonReadinessStatusClass(status: ComparisonReadinessStatus): string {
   switch (status) {
     case "comparable":
-      return "text-cyan-400 bg-cyan-500/10 border-cyan-500/20";
+      return "text-teal-400 bg-teal-500/10 border-teal-500/20";
     case "partial":
       return "text-violet-400 bg-violet-500/10 border-violet-500/20";
     case "insufficient_evidence":
@@ -68,6 +68,6 @@ export function comparisonReadinessStatusClass(status: ComparisonReadinessStatus
 
 export function comparisonNoteClass(note: string): string {
   if (note.includes("same evidence")) return "text-zinc-400";
-  if (note.includes("more evidence connected")) return "text-sky-400";
+  if (note.includes("more evidence connected")) return "text-teal-400";
   return "text-violet-400";
 }

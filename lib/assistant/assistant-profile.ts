@@ -91,7 +91,7 @@ export const ASSISTANT_AVATARS: readonly AssistantAvatarId[] = [
 // former "rose" option) never included the alarm color — indigo replaces it here for a personal
 // preference sixth to sit beside the account's own accent, not to signal any system state.
 export const ASSISTANT_AVATAR_CLASSES: Record<AssistantAvatarId, string> = {
-  cyan: "bg-cyan-500/15 text-cyan-300 border-cyan-500/30",
+  cyan: "bg-teal-500/15 text-teal-300 border-teal-500/30",
   violet: "bg-violet-500/15 text-violet-300 border-violet-500/30",
   amber: "bg-amber-500/15 text-amber-300 border-amber-500/30",
   emerald: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",

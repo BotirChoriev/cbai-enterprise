@@ -52,13 +52,15 @@ test("2. HomeFooter no longer renders the internal build string", () => {
 });
 
 test("3. Trust Center contains the required non-developer sections and nothing developer-oriented", () => {
-  const content = read("app/(dashboard)/trust/page.tsx");
+  const trustCopy = read("lib/i18n/platform-copy-build006-en.ts");
+  const trustClient = read("components/trust/TrustPageClient.tsx");
+  assert.ok(trustClient.includes("TrustPageClient"), "Trust page must render via TrustPageClient");
   for (const required of ["Methodology", "Verification Model", "Evidence Policy", "Data Sources", "Known Limitations", "Transparency Statement"]) {
-    assert.ok(content.includes(`"${required}"`), `Trust page is missing the "${required}" section`);
+    assert.ok(trustCopy.includes(`title: "${required}"`), `Trust copy is missing the "${required}" section`);
   }
-  assert.equal(content.includes("elite-home-final"), false);
-  assert.equal(content.includes("Version History"), false);
-  assertNoForbiddenCopy("app/(dashboard)/trust/page.tsx");
+  assert.equal(trustCopy.includes("elite-home-final"), false);
+  assert.equal(trustCopy.includes("Version History"), false);
+  assertNoForbiddenCopy("components/trust/TrustPageClient.tsx");
 });
 
 test("4. Agent 'runtime' labels were replaced with production-appropriate copy", () => {
