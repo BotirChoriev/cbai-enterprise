@@ -46,6 +46,8 @@ export const ZERO_LEARNING_CURVE_RU = {
   evidenceStatesExplainer: "Счётчики из проекта и каталога источников.",
   reasoningNoMission: "Подключите миссию, чтобы отслеживать рассуждения по доказательствам.",
   reasoningOpenNotes: "Открыть заметки проекта",
+  reasoningPipelineTitle: "Как проверяются доказательства",
+  reasoningPipelineLead: "От имеющейся информации к вашему решению.",
   graphNoMission: "Начните миссию, чтобы выделить связанные объекты на графе.",
   reportsEmptyAction: "Найти профиль для отчёта",
   missionContinueBanner: "Ваша миссия продолжается.",

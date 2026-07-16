@@ -60,7 +60,9 @@ export default function EvidencePrimaryStatesPanel() {
       <p className={cbaiSectionEyebrow} id="evidence-primary-states">
         {t("zeroLearningCurve.evidenceStatesEyebrow")}
       </p>
-      <p className={cbaiTextMuted}>{t("zeroLearningCurve.evidenceStatesExplainer")}</p>
+      {disclosure.showEvidenceAdvanced ? (
+        <p className={cbaiTextMuted}>{t("zeroLearningCurve.evidenceStatesExplainer")}</p>
+      ) : null}
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {states.map((row) => (
           <div key={row.state} className={cbaiStatCell}>

@@ -46,6 +46,8 @@ export const ZERO_LEARNING_CURVE_TR = {
   evidenceStatesExplainer: "Proje ve katalog kaynaklarından sayılar.",
   reasoningNoMission: "Kanıtlara göre akıl yürütmeyi izlemek için bir görev bağlayın.",
   reasoningOpenNotes: "Proje notlarını aç",
+  reasoningPipelineTitle: "Kanıt nasıl incelenir",
+  reasoningPipelineLead: "Mevcut bilgiden kararınıza.",
   graphNoMission: "İlgili varlıkları vurgulamak için bir görev başlatın.",
   reportsEmptyAction: "Rapor için profil arayın",
   missionContinueBanner: "Göreviniz devam ediyor.",

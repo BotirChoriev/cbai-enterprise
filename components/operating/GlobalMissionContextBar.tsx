@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
-import { deriveFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
+import { deriveFirstMinuteAction, translateFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
+import { shouldShowGlobalMissionBar } from "@/lib/intelligence-os/progressive-disclosure";
 import { cbaiLinkAction, cbaiLinkMuted, cbaiTextBody } from "@/components/brand/brand-classes";
 
 /** Mission Gravity 2.0 — quieter in focused mode; one line when possible. */
@@ -15,6 +16,9 @@ export default function GlobalMissionContextBar() {
   const { mission, evidencePulse } = useMissionContext();
   const disclosure = useProgressiveDisclosure();
   const firstAction = deriveFirstMinuteAction(mission);
+  const firstLabel = translateFirstMinuteAction(t, firstAction);
+
+  if (!shouldShowGlobalMissionBar(pathname)) return null;
 
   if (!disclosure.showGlobalMissionBarDetail) {
     return (
@@ -24,7 +28,7 @@ export default function GlobalMissionContextBar() {
       >
         <div className="flex items-center justify-between gap-2">
           <p className={`truncate ${cbaiTextBody}`}>
-            {mission?.problem ?? firstAction.label}
+            {mission?.problem ?? firstLabel}
           </p>
           <div className="flex shrink-0 items-center gap-2">
             {pathname !== "/" ? (
@@ -32,7 +36,7 @@ export default function GlobalMissionContextBar() {
                 {t("zeroLearningCurve.returnToMission")}
               </Link>
             ) : null}
-            <Link href={firstAction.href} className={cbaiLinkAction} aria-label={firstAction.label}>
+            <Link href={firstAction.href} className={cbaiLinkAction} aria-label={firstLabel}>
               →
             </Link>
           </div>

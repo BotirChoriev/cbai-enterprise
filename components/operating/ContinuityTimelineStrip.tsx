@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
+import { usePathname } from "next/navigation";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
+import { shouldShowContinuityTimeline } from "@/lib/intelligence-os/progressive-disclosure";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { getCurrentMission } from "@/lib/intelligence-os/mission-engine";
 import { deriveEvidenceJourney } from "@/lib/evidence-runtime/evidence-journey";
@@ -18,13 +20,14 @@ const STATUS_COLOR: Record<string, string> = {
 
 /** Bottom continuity strip — mission evidence journey on non-home routes. */
 export default function ContinuityTimelineStrip() {
+  const pathname = usePathname();
   const { t } = useTranslation();
   const hydrated = useHydrated();
   const disclosure = useProgressiveDisclosure();
   const mission = hydrated ? getCurrentMission() : null;
   const journey = useMemo(() => (hydrated ? deriveEvidenceJourney(mission) : []), [hydrated, mission]);
 
-  if (!hydrated || journey.length === 0 || !disclosure.showContinuityTimeline) return null;
+  if (!hydrated || journey.length === 0 || !shouldShowContinuityTimeline(pathname, disclosure)) return null;
 
   return (
     <footer

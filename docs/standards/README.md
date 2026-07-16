@@ -51,12 +51,13 @@ flowchart TB
 | [10 — Mobile](./10-mobile-standard.md) | iOS, Android, responsive web, offline readiness |
 | [11 — API](./11-api-standard.md) | Future REST, GraphQL, SDK contracts |
 | [12 — Versioning](./12-versioning-standard.md) | Semantic versioning for platform, indicators, methodology |
+| [13 — Product Engineering Mode](./13-product-engineering-mode.md) | Permanent 80/20 development ratio; usability, consistency, polish, performance before new capability |
 
 ---
 
 ## Reading order
 
-**For engineers shipping features:** 01 → 04 → 02 → 03 → 06 → 05 → 07 → 08 → 09 → 12
+**For engineers shipping features:** 01 → 13 → 04 → 02 → 03 → 06 → 05 → 07 → 08 → 09 → 12
 
 **For design and mobile:** 01 → 08 → 09 → 10 → 07
 

@@ -12,7 +12,7 @@ export default function EntityPageHeader({ title, description }: EntityPageHeade
   return (
     <header className={`${cbaiPageHeader} flex flex-col gap-1.5`}>
       <h1 className="cbai-display text-2xl text-zinc-50">{title}</h1>
-      <p className={`max-w-3xl ${cbaiTextMuted}`}>{description}</p>
+      <p className={`max-w-3xl line-clamp-2 ${cbaiTextMuted}`}>{description}</p>
     </header>
   );
 }

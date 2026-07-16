@@ -44,7 +44,9 @@ Every EPIC document must include:
 
 ## Supreme product principles (all EPICs)
 
-1. Humanity First  
+**Development ratio:** 80% product quality / 20% new capability — see [13 — Product Engineering Mode](../standards/13-product-engineering-mode.md).
+
+1. Humanity First
 2. Nature First  
 3. Evidence First  
 4. Truth Before Popularity  

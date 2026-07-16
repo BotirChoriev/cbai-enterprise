@@ -51,7 +51,7 @@ export default function ReportsCenter() {
       title={title}
       description={description}
       showOperator={false}
-      missionContextVariant="full"
+      missionContextVariant={disclosure.showInlineHumanDecisionBoundary ? "full" : "compact"}
       action={
         profileHref ? (
           <Link

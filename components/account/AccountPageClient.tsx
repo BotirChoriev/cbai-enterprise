@@ -8,7 +8,7 @@ export default function AccountPageClient() {
   const { t } = useTranslation();
 
   return (
-    <OperatingPageShell title={t("navigation.account")} description={t("accountPage.pageDescription")}>
+    <OperatingPageShell title={t("navigation.account")} description={t("accountPage.pageDescription")} showMissionContext={false}>
       <div className="mx-auto max-w-lg">
         <AccountForm />
       </div>

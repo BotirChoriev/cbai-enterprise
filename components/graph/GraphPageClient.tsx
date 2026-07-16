@@ -17,7 +17,6 @@ import GraphConnectionsPanel from "@/components/graph/GraphConnectionsPanel";
 import GraphLegend from "@/components/graph/GraphLegend";
 import GraphMissionInstrument from "@/components/graph/GraphMissionInstrument";
 import GraphPrimaryViews from "@/components/graph/GraphPrimaryViews";
-import Link from "next/link";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import { useTranslation } from "@/lib/i18n/use-translation";
@@ -127,17 +126,6 @@ export default function GraphPageClient() {
       missionContextVariant="compact"
     >
       <div className="mx-auto max-w-[90rem] space-y-6 pb-16">
-        {!mission ? (
-          <p className="text-sm text-zinc-500" role="status">
-            {t("zeroLearningCurve.graphNoMission")}{" "}
-            <Link href="/?create=1" className="text-teal-400 hover:text-teal-300">
-              {t("zeroLearningCurve.startMission")} →
-            </Link>
-          </p>
-        ) : null}
-        {!selectedNodeId ? (
-          <p className="text-xs text-zinc-500">{t("graphPlatform.noSelectionPrompt")}</p>
-        ) : null}
         <GraphPrimaryViews
           focusMode={focusMode}
           onFocusModeChange={setFocusMode}

@@ -21,8 +21,6 @@ import CloudProfileImportPrompt from "@/components/account/CloudProfileImportPro
 import PendingSyncNotice from "@/components/shared/PendingSyncNotice";
 import CapabilityPassportPanel from "@/components/capability/CapabilityPassportPanel";
 import CapabilityGalaxy from "@/components/capability/CapabilityGalaxy";
-import { useMissionContext } from "@/components/mission/MissionContextProvider";
-import { deriveFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
 import { loadProject } from "@/lib/project/project-store";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
@@ -109,8 +107,6 @@ function MyWorkContent() {
   const { user, isSignedIn, cloudUser, accountMode, cloudSessionRestoring } = useAuth();
   const preferredLanguage = ASSISTANT_LANGUAGES.find((l) => l.code === profile.preferredLanguage);
   const disclosure = useProgressiveDisclosure();
-  const { mission } = useMissionContext();
-  const continueAction = deriveFirstMinuteAction(mission);
 
   // Real loading state — avoids a flash of "not signed in" while a real cloud session is still
   // being restored from storage (Phase 10). Never shown when cloud accounts aren't configured, so
@@ -128,7 +124,7 @@ function MyWorkContent() {
   // the brief window before useHydrated() flips true, since `project` is honestly null in both
   // cases until then.
   if (projectId && !hydrated) {
-    return null;
+    return <div className={`${cbaiGlassCard} p-5 text-sm text-zinc-500`}>{t("common.loading")}</div>;
   }
 
   if (projectId && !project) {
@@ -145,18 +141,6 @@ function MyWorkContent() {
 
   return (
     <div className="space-y-8">
-      {mission && !projectId ? (
-        <section className={`${cbaiGlassCard} flex flex-wrap items-center justify-between gap-3 border-teal-500/20 px-5 py-4`}>
-          <div>
-            <p className="text-sm text-zinc-300">{t("zeroLearningCurve.missionContinueBanner")}</p>
-            <p className="truncate text-xs text-zinc-500">{mission.problem}</p>
-          </div>
-          <Link href={continueAction.href} className="text-sm text-teal-400 hover:text-teal-300">
-            {continueAction.label} →
-          </Link>
-        </section>
-      ) : null}
-
       {isActive || isSignedIn ? (
         <div className={`${cbaiGlassCard} border-teal-500/15 px-6 py-5`}>
           <div className="flex flex-wrap items-center gap-3">
@@ -201,7 +185,7 @@ function MyWorkContent() {
             {t("myWorkExt.signInAccountHint")}
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
-            {onboardingLinks.map((link) => (
+            {(disclosure.showGatewayGoalChips ? onboardingLinks : onboardingLinks.slice(0, 2)).map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -228,23 +212,25 @@ function MyWorkContent() {
         </>
       ) : null}
 
-      <section aria-labelledby="my-work-continue-heading" className="space-y-3">
-        <p className={cbaiSectionEyebrow} id="my-work-continue-heading">
-          {t("myWorkExt.continueWorking")}
-        </p>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {continueLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`${cbaiGlassCard} flex flex-col px-5 py-4 transition-colors hover:border-teal-500/25`}
-            >
-              <span className="text-sm font-semibold text-teal-400">{link.label}</span>
-              <span className="mt-1 text-xs text-zinc-500">{link.detail}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
+      {disclosure.showGatewayGoalChips ? (
+        <section aria-labelledby="my-work-continue-heading" className="space-y-3">
+          <p className={cbaiSectionEyebrow} id="my-work-continue-heading">
+            {t("myWorkExt.continueWorking")}
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {continueLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`${cbaiGlassCard} flex flex-col px-5 py-4 transition-colors hover:border-teal-500/25`}
+              >
+                <span className="text-sm font-semibold text-teal-400">{link.label}</span>
+                <span className="mt-1 text-xs text-zinc-500">{link.detail}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section aria-labelledby="my-work-recent-heading" className={`${cbaiGlassCard} space-y-2 p-5`}>
         <p className={cbaiSectionEyebrow} id="my-work-recent-heading">

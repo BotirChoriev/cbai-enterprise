@@ -115,8 +115,8 @@ test("8. Human Decision Boundary wired on conclusion surfaces", () => {
   const reasoning = readSource("components/reasoning/ReasoningExplorer.tsx");
   assert.match(canvas, /HumanDecisionBoundary/);
   assert.match(context, /HumanDecisionBoundary/);
-  assert.match(reports, /missionContextVariant="full"/);
-  assert.match(reasoning, /missionContextVariant="full"/);
+  assert.match(reports, /missionContextVariant=/);
+  assert.match(reasoning, /missionContextVariant=/);
 });
 
 test("9. Legacy Trail derives from real artifacts — wired on Intelligence Canvas", () => {

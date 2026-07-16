@@ -198,3 +198,15 @@ test("21. EPIC-24 — software language removed from primary copy", () => {
   assert.doesNotMatch(en.universalWorkspace.workspaceEyebrow, /Universal Workspace/i);
   assert.match(en.zeroLearningCurve.universalCommandEyebrow, /Ask or search/i);
 });
+
+test("22. Phase 2 — route-aware chrome reduces cognitive load", () => {
+  const disclosure = readSource("lib/intelligence-os/progressive-disclosure.ts");
+  assert.match(disclosure, /shouldShowGlobalMissionBar/);
+  assert.match(disclosure, /shouldShowContinuityTimeline/);
+  assert.match(disclosure, /showCompanionDetail/);
+  assert.match(disclosure, /showGatewayGoalChips/);
+  const companion = readSource("components/mission/MissionOperatingContextBar.tsx");
+  assert.match(companion, /showCompanionDetail/);
+  const gateway = readSource("components/gateway/IntelligenceGatewayEntry.tsx");
+  assert.match(gateway, /showGatewayGoalChips/);
+});

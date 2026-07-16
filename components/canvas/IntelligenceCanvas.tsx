@@ -6,7 +6,7 @@ import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
-import { deriveFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
+import { deriveFirstMinuteAction, translateFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
 import { loadProjects, loadProjectQuestions } from "@/lib/project/project-store";
 import IntelligenceGatewayEntry from "@/components/gateway/IntelligenceGatewayEntry";
 import MissionCreationFlow from "@/components/mission/MissionCreationFlow";
@@ -75,15 +75,12 @@ export default function IntelligenceCanvas() {
       {!mission ? (
         <div className="space-y-3 border-b border-zinc-800/80 px-4 py-3 sm:px-5">
           <p className="max-w-2xl text-sm text-zinc-400">{t("zeroLearningCurve.homeNoMissionLead")}</p>
-          <button type="button" onClick={() => setCreating(true)} className={`${cbaiBtnPrimary} text-xs`}>
-            {t("zeroLearningCurve.startMission")} →
-          </button>
           <IntelligenceGatewayEntry compact variant="home" />
         </div>
       ) : firstAction && disclosure.primaryActionOnly ? (
         <div className="flex shrink-0 items-center border-b border-zinc-800/80 px-4 py-2 sm:px-5">
           <Link href={firstAction.href} className={`${cbaiBtnPrimary} text-xs`}>
-            {firstAction.label} →
+            {translateFirstMinuteAction(t, firstAction)} →
           </Link>
         </div>
       ) : null}

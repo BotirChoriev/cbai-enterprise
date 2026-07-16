@@ -20,6 +20,7 @@ import {
   storyBeatI18nKey,
 } from "@/lib/intelligence-os/first-minute";
 import { loadCompanionThought, recordCompanionThought } from "@/lib/intelligence-os/living-memory";
+import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 
 type MissionOperatingContextBarProps = {
   /** Compact strip only — full boundary on mission-heavy routes */
@@ -49,6 +50,7 @@ export default function MissionOperatingContextBar({
 }: MissionOperatingContextBarProps) {
   const pathname = usePathname();
   const { t } = useTranslation();
+  const disclosure = useProgressiveDisclosure();
   const { mission, humanImpact } = useMissionContext();
 
   const basePath = pathname.split("?")[0];
@@ -76,10 +78,25 @@ export default function MissionOperatingContextBar({
   if (!showBar || !companion) return null;
 
   const showResume =
+    disclosure.showCompanionStoryBeat &&
     priorThought &&
     priorThought.lastRoute !== basePath &&
     priorThought.missionId === (mission?.id ?? null) &&
     priorThought.lastFocus.length > 0;
+
+  const showBoundary =
+    variant === "full" && disclosure.showInlineHumanDecisionBoundary;
+
+  if (!disclosure.showCompanionDetail) {
+    return (
+      <aside className={cbaiMineralPanelMd} aria-label={t("zeroLearningCurve.nextAction")}>
+        <Link href={companion.nextHref} className={`${cbaiProminentAction} w-full justify-between sm:w-auto`}>
+          {companion.nextLabel}
+          <span aria-hidden="true">→</span>
+        </Link>
+      </aside>
+    );
+  }
 
   return (
     <aside className={cbaiMineralPanelMd} aria-label={t("zeroLearningCurve.companionEyebrow")}>
@@ -87,7 +104,7 @@ export default function MissionOperatingContextBar({
         <div className="min-w-0 flex-1 space-y-2">
           <p className={cbaiSectionEyebrow}>{t("zeroLearningCurve.companionEyebrow")}</p>
           <p className={cbaiTextBody}>{purpose}</p>
-          <p className={cbaiTextMuted}>{storyBeat}</p>
+          {disclosure.showCompanionStoryBeat ? <p className={cbaiTextMuted}>{storyBeat}</p> : null}
           {showResume ? (
             <p className={cbaiTextMuted}>
               {t("zeroLearningCurve.resumeThought")}: {priorThought.lastFocus}
@@ -107,7 +124,7 @@ export default function MissionOperatingContextBar({
           </Link>
         </div>
       </div>
-      {variant === "full" ? <HumanDecisionBoundary /> : null}
+      {showBoundary ? <HumanDecisionBoundary /> : null}
     </aside>
   );
 }

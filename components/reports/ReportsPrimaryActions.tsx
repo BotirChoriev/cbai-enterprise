@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
-import { deriveFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
+import { deriveFirstMinuteAction, translateFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
 import {
   cbaiBtnPrimarySm,
   cbaiLinkMuted,
@@ -19,6 +19,7 @@ export default function ReportsPrimaryActions() {
   const disclosure = useProgressiveDisclosure();
   const projectQuery = mission?.projectId ? `?project=${mission.projectId}` : "";
   const primary = useMemo(() => deriveFirstMinuteAction(mission), [mission]);
+  const primaryLabel = translateFirstMinuteAction(t, primary);
 
   const secondary = [
     { label: t("zeroLearningCurve.reportsReview"), href: "/knowledge" },
@@ -32,7 +33,7 @@ export default function ReportsPrimaryActions() {
     <nav className={cbaiMineralPanelMd} aria-label={t("reports.title")}>
       <p className={cbaiSectionEyebrow}>{t("zeroLearningCurve.nextAction")}</p>
       <Link href={primary.href} className={`${cbaiBtnPrimarySm} gap-1.5`}>
-        {primary.label}
+        {primaryLabel}
         <span aria-hidden="true">→</span>
       </Link>
       {disclosure.level !== "beginner" ? (

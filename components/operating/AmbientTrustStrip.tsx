@@ -3,16 +3,19 @@
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
+import { usePathname } from "next/navigation";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
+import { shouldShowAmbientTrustStrip } from "@/lib/intelligence-os/progressive-disclosure";
 
 /** Ambient trust — confidence and limitations without opening Trust page. */
 export default function AmbientTrustStrip() {
+  const pathname = usePathname();
   const { t } = useTranslation();
   const hydrated = useHydrated();
   const disclosure = useProgressiveDisclosure();
   const { evidencePulse, humanImpact } = useMissionContext();
 
-  if (!hydrated || !evidencePulse || !disclosure.showAmbientTrustStrip) return null;
+  if (!hydrated || !evidencePulse || !shouldShowAmbientTrustStrip(pathname, disclosure)) return null;
 
   const confidence =
     evidencePulse.state === "available" && evidencePulse.consensus === "aligned"

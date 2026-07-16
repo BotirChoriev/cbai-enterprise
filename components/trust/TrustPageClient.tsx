@@ -34,7 +34,7 @@ export default function TrustPageClient() {
   const trustPage = dictionary.trustPage;
 
   return (
-    <OperatingPageShell title={t("trust.title")} description={trustPage.pageDescription}>
+    <OperatingPageShell title={t("trust.title")} description={trustPage.pageDescription} showMissionContext={false}>
       <nav aria-label={trustPage.sectionsNav} className={`${cbaiGlassCard} p-4`}>
         <ul className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
           {SECTIONS.map((section) => (

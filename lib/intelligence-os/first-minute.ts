@@ -9,10 +9,21 @@ import { loadProjects } from "@/lib/project/project-store";
 
 export type FirstMinuteAction = {
   readonly label: string;
+  readonly labelKey?: keyof typeof import("@/lib/i18n/platform-copy-build020-en").ZERO_LEARNING_CURVE_EN;
   readonly href: string;
   readonly reason: string;
   readonly exposesArchitecture: false;
 };
+
+export function translateFirstMinuteAction(
+  translate: (path: string) => string,
+  action: FirstMinuteAction,
+): string {
+  if (action.labelKey) {
+    return translate(`zeroLearningCurve.${action.labelKey}`);
+  }
+  return action.label;
+}
 
 export function deriveFirstMinuteAction(mission: Mission | null): FirstMinuteAction {
   if (mission?.projectId) {
@@ -27,6 +38,7 @@ export function deriveFirstMinuteAction(mission: Mission | null): FirstMinuteAct
     }
     return {
       label: "Continue mission",
+      labelKey: "continueMission",
       href: `/my-work?project=${mission.projectId}`,
       reason: "Mission and project already linked",
       exposesArchitecture: false,
@@ -38,6 +50,7 @@ export function deriveFirstMinuteAction(mission: Mission | null): FirstMinuteAct
     const latest = projects[0];
     return {
       label: "Continue mission",
+      labelKey: "continueMission",
       href: `/my-work?project=${latest.id}`,
       reason: "Existing project on device",
       exposesArchitecture: false,
@@ -46,6 +59,7 @@ export function deriveFirstMinuteAction(mission: Mission | null): FirstMinuteAct
 
   return {
     label: "Choose a goal",
+    labelKey: "chooseGoal",
     href: "/search",
     reason: "Intelligence Gateway — choose what you want to do",
     exposesArchitecture: false,

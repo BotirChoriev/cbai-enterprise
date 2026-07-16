@@ -37,9 +37,9 @@ export default function SettingsPageClient() {
   );
 
   return (
-    <OperatingPageShell title={t("navigation.settings")} description={t("settingsPage.description")}>
-      <AssistantSettingsForm />
+    <OperatingPageShell title={t("navigation.settings")} description={t("settingsPage.description")} showMissionContext={false}>
       <AdaptiveDensityControl />
+      <AssistantSettingsForm />
       <CapabilityAssessmentOffer />
       <LivingMemoryControl />
       {disclosure.level === "expert" ? (

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import {
   cbaiChip,
   cbaiChipActive,
@@ -22,6 +23,10 @@ export default function GraphPrimaryViews({
   missionProjectId,
 }: GraphPrimaryViewsProps) {
   const { t } = useTranslation();
+  const disclosure = useProgressiveDisclosure();
+
+  if (disclosure.primaryActionOnly) return null;
+
   const projectQuery = missionProjectId ? `?project=${missionProjectId}` : "";
 
   const toggles = [
@@ -30,31 +35,33 @@ export default function GraphPrimaryViews({
     { id: "knowledge", label: t("zeroLearningCurve.graphKnowledge"), mode: "mission" as const },
   ];
 
-  const links = [
-    { id: "questions", label: t("zeroLearningCurve.graphQuestions"), href: `/my-work${projectQuery}#project-questions` },
-    { id: "impact", label: t("zeroLearningCurve.graphImpact"), href: `/my-work${projectQuery}#human-impact` },
-  ];
+  const links = disclosure.showGatewayGoalChips
+    ? [
+        { id: "questions", label: t("zeroLearningCurve.graphQuestions"), href: `/my-work${projectQuery}#project-questions` },
+        { id: "impact", label: t("zeroLearningCurve.graphImpact"), href: `/my-work${projectQuery}#human-impact` },
+      ]
+    : [];
 
   return (
     <nav className="space-y-2" aria-label={t("experienceEngineering.universeViews")}>
       <p className={cbaiSectionEyebrow}>{t("experienceEngineering.universeViews")}</p>
       <div className="flex flex-wrap gap-2">
-      {toggles.map((view) => (
-        <button
-          key={view.id}
-          type="button"
-          aria-pressed={focusMode === view.mode}
-          onClick={() => onFocusModeChange(view.mode)}
-          className={`${focusMode === view.mode ? cbaiChipActive : cbaiChip} ${cbaiFocusRing}`}
-        >
-          {view.label}
-        </button>
-      ))}
-      {links.map((link) => (
-        <Link key={link.id} href={link.href} className={cbaiChip}>
-          {link.label}
-        </Link>
-      ))}
+        {toggles.map((view) => (
+          <button
+            key={view.id}
+            type="button"
+            aria-pressed={focusMode === view.mode}
+            onClick={() => onFocusModeChange(view.mode)}
+            className={`${focusMode === view.mode ? cbaiChipActive : cbaiChip} ${cbaiFocusRing}`}
+          >
+            {view.label}
+          </button>
+        ))}
+        {links.map((link) => (
+          <Link key={link.id} href={link.href} className={cbaiChip}>
+            {link.label}
+          </Link>
+        ))}
       </div>
     </nav>
   );

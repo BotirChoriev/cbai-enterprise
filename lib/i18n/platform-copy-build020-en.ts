@@ -46,6 +46,8 @@ export const ZERO_LEARNING_CURVE_EN = {
   evidenceStatesExplainer: "Counts from your project and catalog.",
   reasoningNoMission: "Connect a mission to track reasoning against your evidence.",
   reasoningOpenNotes: "Open project notes",
+  reasoningPipelineTitle: "How evidence is reviewed",
+  reasoningPipelineLead: "From available information to your decision.",
   graphNoMission: "Start a mission to highlight related entities on the graph.",
   reportsEmptyAction: "Search a profile to generate a report",
   missionContinueBanner: "Your mission is in progress.",

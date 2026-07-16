@@ -5,6 +5,7 @@ import SearchGateway from "@/components/search/gateway/SearchGateway";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import { executeGatewaySearch } from "@/lib/search-gateway";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 
 function subscribe(onStoreChange: () => void) {
   window.addEventListener("popstate", onStoreChange);
@@ -21,6 +22,7 @@ function getServerSearchQuerySnapshot(): string {
 
 export default function SearchGatewayClient() {
   const { t } = useTranslation();
+  const disclosure = useProgressiveDisclosure();
   const query = useSyncExternalStore(
     subscribe,
     getSearchQuerySnapshot,
@@ -35,7 +37,7 @@ export default function SearchGatewayClient() {
       description={query ? undefined : t("navigation.startWithSearchBody")}
       showOperator={false}
     >
-      <SearchGateway query={query} response={response} />
+      <SearchGateway query={query} response={response} showGoalEntry={disclosure.showGatewayGoalChips} />
     </OperatingPageShell>
   );
 }

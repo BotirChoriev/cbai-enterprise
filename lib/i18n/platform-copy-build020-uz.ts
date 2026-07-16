@@ -46,6 +46,8 @@ export const ZERO_LEARNING_CURVE_UZ = {
   evidenceStatesExplainer: "Loyiha va katalog manbalaridan hisoblar.",
   reasoningNoMission: "Dalillar bo'yicha fikrlashni kuzatish uchun missiyani ulang.",
   reasoningOpenNotes: "Loyiha qaydlarini ochish",
+  reasoningPipelineTitle: "Dalillar qanday ko'rib chiqiladi",
+  reasoningPipelineLead: "Mavjud ma'lumotdan qaroringizgacha.",
   graphNoMission: "Bog'liq obyektlarni ajratish uchun missiyani boshlang.",
   reportsEmptyAction: "Hisobot uchun profil qidiring",
   missionContinueBanner: "Missiyangiz davom etmoqda.",

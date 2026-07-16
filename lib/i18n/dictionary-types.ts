@@ -1779,6 +1779,8 @@ export type TranslationDictionary = {
     evidenceStatesExplainer: string;
     reasoningNoMission: string;
     reasoningOpenNotes: string;
+    reasoningPipelineTitle: string;
+    reasoningPipelineLead: string;
     graphNoMission: string;
     reportsEmptyAction: string;
     missionContinueBanner: string;
