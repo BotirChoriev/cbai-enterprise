@@ -26,6 +26,8 @@ import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import ShareButton from "@/components/shared/ShareButton";
 import SyncStatusBadge from "@/components/shared/SyncStatusBadge";
 import GenerateReportToggleButton from "@/components/shared/GenerateReportToggleButton";
+import HumanImpactPanel from "@/components/mission/HumanImpactPanel";
+import { deriveReportReadiness } from "@/lib/intelligence-os/report-readiness";
 import EntityRelatedPanel from "@/components/shared/EntityRelatedPanel";
 import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
 import ProjectGuidePanel from "@/components/project/ProjectGuidePanel";
@@ -118,6 +120,7 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
   const [entities, setEntities] = useState<ContextEntityRef[]>(() => loadProjectEntities(project.id));
   const [evidence, setEvidence] = useState(() => loadProjectEvidence(project.id));
   const [showReport, setShowReport] = useState(false);
+  const [reportNotice, setReportNotice] = useState<string | null>(null);
   const [researchQuestionDraft, setResearchQuestionDraft] = useState(project.researchQuestion ?? "");
   const [objectivesDraft, setObjectivesDraft] = useState(project.objectives ?? "");
   const [questionObjectivesSaved, setQuestionObjectivesSaved] = useState(false);
@@ -149,6 +152,12 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
   }
 
   function handleToggleReport() {
+    const readiness = deriveReportReadiness(project.id);
+    if (!showReport && !readiness.canClaimReadiness) {
+      setReportNotice(readiness.limitation);
+      window.setTimeout(() => setReportNotice(null), 5000);
+      return;
+    }
     if (!showReport) {
       const updated = markProjectReportGenerated(project.id);
       if (updated) setProject(updated);
@@ -292,6 +301,7 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
         ) : null}
       </div>
 
+      <div id="project-evidence">
       <ProjectEvidencePanel
         projectId={project.id}
         relatedEntities={entities}
@@ -300,10 +310,13 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
           refresh();
         }}
       />
+      </div>
 
       <ProjectNotesPanel projectId={project.id} evidence={evidence} relatedEntities={entities} onAdded={refresh} />
 
-      <ProjectOpenQuestionsPanel projectId={project.id} onChange={refresh} />
+      <div id="project-questions">
+        <ProjectOpenQuestionsPanel projectId={project.id} onChange={refresh} />
+      </div>
 
       <ProjectTasksPanel projectId={project.id} onChange={refresh} />
 
@@ -330,6 +343,11 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
       </div>
 
       <div id="project-report" className="space-y-4">
+        {reportNotice ? (
+          <p className="rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-3 text-xs text-amber-300/90" role="status">
+            {reportNotice}
+          </p>
+        ) : null}
         <GenerateReportToggleButton showReport={showReport} onClick={handleToggleReport} />
         {showReport
           ? (() => {
@@ -337,6 +355,10 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
               return report ? <ProjectReportView report={report} /> : null;
             })()
           : null}
+      </div>
+
+      <div id="human-impact">
+        <HumanImpactPanel projectId={project.id} onSaved={refresh} />
       </div>
 
       <div className={`${cbaiGlassCard} space-y-3 p-4`}>

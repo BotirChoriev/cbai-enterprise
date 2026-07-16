@@ -5,6 +5,7 @@ import { useTranslation } from "@/lib/i18n/use-translation";
 import { getDictionary } from "@/lib/i18n/translate";
 import { translateDataSourceScope } from "@/lib/i18n/trust-data-sources-translation";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
+import ModuleAccountabilityPanel from "@/components/trust/ModuleAccountabilityPanel";
 import TrustVerificationStatuses from "@/components/trust/TrustVerificationStatuses";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import { DATA_SOURCE_CATEGORIES } from "@/lib/trust/data-source-categories";
@@ -82,6 +83,8 @@ export default function TrustPageClient() {
           );
         })}
       </div>
+
+      <ModuleAccountabilityPanel />
 
       <p className="text-xs text-zinc-600">
         <Link href="/#home-trust-heading" className="text-teal-400 hover:text-teal-300">

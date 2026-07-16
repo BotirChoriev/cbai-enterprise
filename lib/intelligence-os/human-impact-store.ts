@@ -18,7 +18,7 @@ function readAll(): HumanImpactAssessment[] {
     const raw = window.localStorage.getItem(resolveStorageKey(IMPACT_KEY));
     if (!raw) return [];
     const parsed: unknown = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed.filter(isImpact) : [];
+    return Array.isArray(parsed) ? parsed.filter(isImpact).map(normalizeImpact) : [];
   } catch {
     return [];
   }
@@ -35,6 +35,14 @@ function isImpact(value: unknown): value is HumanImpactAssessment {
   return typeof v.humanBenefit === "string" && typeof v.updatedAt === "string";
 }
 
+function normalizeImpact(raw: HumanImpactAssessment): HumanImpactAssessment {
+  return {
+    ...raw,
+    humanOwner: raw.humanOwner ?? "",
+    reviewStatus: raw.reviewStatus ?? (raw.isComplete ? "reviewed" : "incomplete"),
+  };
+}
+
 export function loadHumanImpactForMission(missionId: string): HumanImpactAssessment | null {
   return readAll().find((i) => i.missionId === missionId) ?? null;
 }
@@ -45,10 +53,23 @@ export function loadHumanImpactForProject(projectId: string): HumanImpactAssessm
 
 export function saveHumanImpact(draft: HumanImpactDraft): HumanImpactAssessment {
   const now = new Date().toISOString();
+  const complete = isHumanImpactComplete(draft);
   const assessment: HumanImpactAssessment = {
-    ...draft,
+    humanBenefit: draft.humanBenefit,
+    possibleHarm: draft.possibleHarm,
+    environmentalEffect: draft.environmentalEffect,
+    ethicalConcerns: draft.ethicalConcerns,
+    affectedCommunities: draft.affectedCommunities,
+    longTermConsequences: draft.longTermConsequences,
+    unknownRisks: draft.unknownRisks,
+    mitigation: draft.mitigation,
+    missingEvidence: draft.missingEvidence,
+    humanOwner: draft.humanOwner,
+    missionId: draft.missionId,
+    projectId: draft.projectId,
+    reviewStatus: complete ? "reviewed" : draft.reviewStatus ?? "incomplete",
     updatedAt: now,
-    isComplete: isHumanImpactComplete(draft),
+    isComplete: complete,
   };
   const items = readAll().filter(
     (i) =>

@@ -139,7 +139,7 @@ test("10. OperatorOrb is an original abstract SVG illustration, never a photorea
 test("11. OperatorOrb motion states are real CSS, fully disabled under the saved reduced-motion preference", () => {
   const css = read("app/globals.css");
   assert.match(css, /cbai-operator-orb\[data-operator-state="listening"\]/);
-  assert.match(css, /cbai-operator-orb\[data-operator-state="thinking"\]/);
+  assert.match(css, /cbai-operator-orb\[data-operator-state="interpreting"\]/);
   assert.match(css, /cbai-operator-orb\[data-operator-state="speaking"\]/);
   assert.match(css, /\.cbai-reduced-motion \.cbai-operator-orb \* \{\s*animation: none/);
 });
@@ -148,6 +148,8 @@ test("12. AssistantCommandCenter drives the Operator's visual state from the rea
   const content = read("components/assistant/AssistantCommandCenter.tsx");
   assert.match(content, /operatorOrbState/);
   assert.match(content, /voiceStatus === "listening"/);
+  assert.match(content, /unsupported/);
+  assert.match(content, /permission-denied/);
 });
 
 test("13. Entry Experience is genuinely skippable and respects reduced motion — never blocks the real homepage", () => {
@@ -186,40 +188,26 @@ test("16. Intelligence Cabinet is discoverable — the Sidebar/mobile nav disclo
   assert.match(read("components/layout/MobileNavDrawer.tsx"), /navigation\.intelligenceCabinet/);
 });
 
-test("17. Homepage identity: the CBAI logo appears on the first screen itself, not only in the entry cinematic overlay", () => {
+test("17. Homepage identity: Mission Center replaces marketing homepage — Operator and awakening on first screen", () => {
   const home = read("components/platform/PlatformHome.tsx");
-  assert.match(home, /<CBAILogo/);
-  assert.match(home, /<EntryExperience/);
-  assert.match(home, /<IntelligenceCompass/);
+  assert.match(home, /MissionCenter/);
+  const center = read("components/mission/MissionCenter.tsx");
+  assert.match(center, /SystemAwakeningSequence/);
+  assert.match(center, /MissionOperatorPresence/);
 });
 
-test("21. Homepage hero: the Living Intelligence Network is one environment with the Operator console, not a separate section reached after a divider", () => {
-  const home = read("components/platform/PlatformHome.tsx");
-  // The greeting and the network render inside the same overflow-guarded hero wrapper, never
-  // split by a "Your workspace" hairline divider between two independently-centered sections.
-  assert.match(home, /overflow-x-hidden/);
-  assert.doesNotMatch(home, /Your workspace/);
-  const greetingIndex = home.indexOf("<HomeAssistantGreeting");
-  const globeIndex = home.indexOf("<HomeIntelligenceGlobe");
-  assert.ok(greetingIndex > -1 && globeIndex > -1, "both hero components must render");
-  assert.ok(globeIndex - greetingIndex < 400, "greeting and network must be direct siblings in the same hero wrapper");
-
-  // BUILD-009: the Network now represents all six real intelligence domains (Research,
-  // Governance, Countries, Companies, Universities, Evidence), each hub sized by its own real
-  // registered count from buildIntelligenceHubs() — never a single "Countries only" diagram, and
-  // never a fabricated number.
-  const globe = read("components/platform/home/HomeIntelligenceGlobe.tsx");
-  assert.match(globe, /buildIntelligenceHubs/);
-  assert.match(globe, /totalIntelligenceItems/);
-  const network = read("lib/platform/intelligence-network.ts");
-  for (const domain of ["research", "governance", "countries", "companies", "universities", "evidence"]) {
-    assert.match(network, new RegExp(`id: "${domain}"`));
-  }
+test("21. Mission Center hero: Operator console and intelligence field share one operating shell — no separate marketing divider", () => {
+  const center = read("components/mission/MissionCenter.tsx");
+  assert.match(center, /cbaiOperatingShell/);
+  assert.match(center, /MissionOperatorPresence/);
+  assert.match(center, /IntelligenceField/);
+  assert.doesNotMatch(center, /HomeIntelligenceGlobe/);
+  assert.doesNotMatch(center, /Your workspace/);
 });
 
-test("18. CBAI Ecosystem entrances are visible on Home itself, not only /dashboard", () => {
-  const home = read("components/platform/PlatformHome.tsx");
-  assert.match(home, /<HomeEcosystems/);
+test("18. Intelligence Lenses are visible on Mission Center — not only secondary navigation", () => {
+  const center = read("components/mission/MissionCenter.tsx");
+  assert.match(center, /IntelligenceLensesGrid/);
 });
 
 test("19. Every role card's suggested command is a real phrase resolveAssistantCommand() actually resolves, in every language — never an invented example", async () => {

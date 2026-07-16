@@ -21,16 +21,46 @@ export type ModuleAccountabilityEntry = {
   readonly maturity: "live" | "partial" | "preview" | "planned";
 };
 
+export type ExtendedModuleAccountability = ModuleAccountabilityEntry & {
+  readonly purpose: string;
+  readonly input: string;
+  readonly processing: string;
+  readonly output: string;
+  readonly evidenceDependency: string;
+  readonly limitations: string;
+  readonly responsibleHuman: string;
+  readonly storage: string;
+  readonly nextAction: string;
+};
+
+export function toExtendedAccountability(entry: ModuleAccountabilityEntry): ExtendedModuleAccountability {
+  return {
+    ...entry,
+    purpose: entry.realWork,
+    input: entry.evidenceEnters,
+    processing: entry.reasoningHappens,
+    output: entry.knowledgeLeaves,
+    evidenceDependency: entry.evidenceEnters,
+    limitations: entry.riskExists,
+    responsibleHuman: entry.whoBenefits,
+    storage: "Local browser storage and session context unless cloud sync is connected.",
+    nextAction:
+      entry.maturity === "live" || entry.maturity === "partial"
+        ? `Continue work on ${entry.route}`
+        : `Review limits — ${entry.moduleName} is not fully active`,
+  };
+}
+
 export const MODULE_ACCOUNTABILITY: readonly ModuleAccountabilityEntry[] = [
   {
     route: "/",
-    moduleName: "Home",
-    realWork: "Resume active projects and navigate to intelligence surfaces.",
-    evidenceEnters: "Pinned and recent entity context from local session.",
-    reasoningHappens: "Operator command resolution — deterministic, not generative.",
-    knowledgeLeaves: "Navigation to the next working surface.",
-    whoBenefits: "Every user entering the one intelligence environment.",
-    riskExists: "Must not imply live activity that does not exist.",
+    moduleName: "Mission Center",
+    realWork: "Define and continue the current intelligence mission; link projects, evidence, and impact.",
+    evidenceEnters: "Mission definition, linked project artifacts, and evidence pulse from local stores.",
+    reasoningHappens: "Mission thread derivation and adaptive next-action suggestions — deterministic.",
+    knowledgeLeaves: "Mission continuity across routes and report readiness state.",
+    whoBenefits: "Every user operating the intelligence environment.",
+    riskExists: "Must not imply live external intelligence or fabricated progress.",
     maturity: "live",
   },
   {
@@ -122,15 +152,70 @@ export const MODULE_ACCOUNTABILITY: readonly ModuleAccountabilityEntry[] = [
     maturity: "partial",
   },
   {
-    route: "/analytics",
+    route: "/reports",
     moduleName: "Reports Center",
-    realWork: "Assess report readiness and view saved reports.",
-    evidenceEnters: "Connected registry facts and methodology definitions.",
-    reasoningHappens: "Readiness model — no report generated without evidence.",
-    knowledgeLeaves: "Saved report metadata; export honestly unavailable.",
+    realWork: "Assess report readiness and view saved reports from real project work.",
+    evidenceEnters: "Connected registry facts, project evidence, and human impact assessments.",
+    reasoningHappens: "Readiness model — impact review required before readiness claim.",
+    knowledgeLeaves: "Saved report metadata; export honestly unavailable until connected.",
     whoBenefits: "Anyone compiling findings for decision support.",
     riskExists: "Must not claim PDF/CSV/API export until readiness met.",
     maturity: "partial",
+  },
+  {
+    route: "/reasoning",
+    moduleName: "Reasoning",
+    realWork: "Review how official information supports decisions before acting.",
+    evidenceEnters: "Methodology definitions and linked project notes.",
+    reasoningHappens: "Human review framing — no automated verdicts.",
+    knowledgeLeaves: "Structured reasoning artifacts in projects.",
+    whoBenefits: "Researchers and decision-makers.",
+    riskExists: "Must not present AI conclusions as verified facts.",
+    maturity: "partial",
+  },
+  {
+    route: "/settings",
+    moduleName: "Settings",
+    realWork: "Configure assistant, accessibility, language, and account preferences.",
+    evidenceEnters: "User profile and saved preferences only.",
+    reasoningHappens: "None — preference persistence.",
+    knowledgeLeaves: "Updated local profile state.",
+    whoBenefits: "Every user customizing their operating environment.",
+    riskExists: "Cloud sync settings must stay honest about connection state.",
+    maturity: "live",
+  },
+  {
+    route: "/account",
+    moduleName: "Account",
+    realWork: "Manage account mode and cloud connection status.",
+    evidenceEnters: "Auth session state when connected.",
+    reasoningHappens: "None.",
+    knowledgeLeaves: "Account visibility and sync controls.",
+    whoBenefits: "Users requiring cloud persistence.",
+    riskExists: "Must not imply sync is active when local-only.",
+    maturity: "partial",
+  },
+  {
+    route: "/core",
+    moduleName: "Core (restricted)",
+    realWork: "Module catalog only — core inference not active.",
+    evidenceEnters: "None.",
+    reasoningHappens: "None.",
+    knowledgeLeaves: "Navigation to registered modules.",
+    whoBenefits: "Platform stewards reviewing module map.",
+    riskExists: "Must remain excluded from primary navigation.",
+    maturity: "planned",
+  },
+  {
+    route: "/about",
+    moduleName: "About",
+    realWork: "Explain what CBAI is, why it exists, and its operating principles.",
+    evidenceEnters: "Constitution and product documentation.",
+    reasoningHappens: "Transparency framing — no marketing claims.",
+    knowledgeLeaves: "Informed understanding of platform limits.",
+    whoBenefits: "Every user evaluating trust in the system.",
+    riskExists: "Must stay synchronized with actual product behavior.",
+    maturity: "live",
   },
   {
     route: "/trust",
@@ -213,9 +298,21 @@ export const MODULE_ACCOUNTABILITY: readonly ModuleAccountabilityEntry[] = [
 
 export function getModuleAccountability(route: string): ModuleAccountabilityEntry | undefined {
   const normalized = route.split("?")[0];
+  if (normalized === "/analytics" || normalized === "/dashboard") {
+    return MODULE_ACCOUNTABILITY.find((m) => m.route === "/reports");
+  }
   return MODULE_ACCOUNTABILITY.find((m) => m.route === normalized);
 }
 
 export function getAccountabilityGaps(): ModuleAccountabilityEntry[] {
   return MODULE_ACCOUNTABILITY.filter((m) => m.maturity === "planned" || m.maturity === "preview");
+}
+
+/** Primary navigation routes that must be registered before exposure as active product. */
+export function getUnregisteredPrimaryRoutes(routes: readonly string[]): string[] {
+  return routes.filter((route) => {
+    const normalized = route.split("?")[0];
+    const entry = getModuleAccountability(normalized);
+    return !entry || entry.maturity === "planned";
+  });
 }

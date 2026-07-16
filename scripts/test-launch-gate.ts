@@ -50,7 +50,10 @@ test("1. OfflineBanner never reports offline from a server render (no `window`) 
 test("2. Report views no longer contradict a working inline 'Generate report' with 'does not open a report'", () => {
   const content = read("components/shared/EntityDecisionPackagePreview.tsx");
   assert.equal(content.includes("does not open a"), false);
-  assert.ok(content.includes("available directly below"));
+  assert.ok(
+    content.includes("available directly below") ||
+      content.includes("entityIntelligence.reportsBodySingle"),
+  );
 });
 
 test("3. Every report view offers a real print/export flow, honestly built on window.print()", () => {
@@ -88,9 +91,9 @@ test("5. Project reports now include Objectives, Tasks, and Open Questions (prev
   const reportLib = read("lib/entity/entity-report.ts");
   assert.ok(reportLib.includes("objectives: project.objectives"));
   const view = read("components/project/ProjectReportView.tsx");
-  assert.ok(view.includes(">Objectives<"));
-  assert.ok(view.includes(">Tasks<"));
-  assert.ok(view.includes(">Open Questions<"));
+  assert.ok(view.includes("projectUi.objectives") || view.includes(">Objectives<"));
+  assert.ok(view.includes("projectUi.tasks") || view.includes(">Tasks<"));
+  assert.ok(view.includes("projectUi.openQuestions") || view.includes(">Open Questions<"));
 });
 
 test("6. Trust Center's Privacy and Known Limitations sections describe the real local account system, not a false 'no accounts' claim", () => {

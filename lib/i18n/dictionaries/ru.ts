@@ -65,6 +65,13 @@ import {
   OPERATING_CONTEXT_RU,
   SYSTEM_AWAKENING_RU,
 } from "@/lib/i18n/platform-copy-build011-ru";
+import {
+  CAPABILITY_PASSPORT_BUILD012_RU,
+  INTELLIGENCE_NETWORK_RU,
+  MISSION_THREAD_BUILD012_RU,
+  MODULE_ACCOUNTABILITY_UI_RU,
+  OPERATOR_STATES_RU,
+} from "@/lib/i18n/platform-copy-build012-ru";
 
 const ru: TranslationDictionary = {
   roles: {
@@ -518,6 +525,11 @@ const ru: TranslationDictionary = {
   intelligenceLenses: INTELLIGENCE_LENSES_RU,
   humanImpact: HUMAN_IMPACT_RU,
   operatingContext: OPERATING_CONTEXT_RU,
+  intelligenceNetwork: INTELLIGENCE_NETWORK_RU,
+  operatorStates: OPERATOR_STATES_RU,
+  moduleAccountabilityUi: MODULE_ACCOUNTABILITY_UI_RU,
+  capabilityPassportExt: CAPABILITY_PASSPORT_BUILD012_RU,
+  missionThreadUi: MISSION_THREAD_BUILD012_RU,
 };
 
 export default ru;

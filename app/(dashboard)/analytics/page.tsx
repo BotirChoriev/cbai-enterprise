@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
-import ReportsCenter from "@/components/reports/ReportsCenter";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Reports",
-  description: "Available report types by profile scope.",
+  description: "Legacy analytics route — redirects to Reports Center.",
+  robots: { index: false, follow: true },
 };
 
-export default function AnalyticsPage() {
-  return <ReportsCenter />;
+/** /analytics redirects to canonical /reports — backward compatible. */
+export default function AnalyticsRedirectPage() {
+  redirect("/reports");
 }

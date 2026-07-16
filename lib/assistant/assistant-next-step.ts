@@ -31,13 +31,14 @@ import {
   type AssistantProfile,
 } from "@/lib/assistant/assistant-profile";
 import { loadProjects } from "@/lib/project/project-store";
+import { loadCurrentMission } from "@/lib/intelligence-os/mission-store";
 import type { Project } from "@/lib/project/project-types";
 import { resolveProjectGuideStep } from "@/lib/project/project-guide";
 import en from "@/lib/i18n/dictionaries/en";
 import { translate, interpolate } from "@/lib/i18n/translate";
 
 export type NextStepAction = {
-  id: "continue-project" | "continue-work" | "open-workspace" | "complete-setup";
+  id: "continue-mission" | "continue-project" | "continue-work" | "open-workspace" | "complete-setup";
   label: string;
   href: string;
 };
@@ -67,6 +68,16 @@ export function resolveNextStep(
   // (every existing test, every other caller) get the exact same real lookup as before.
   latestProject: Project | null = loadProjects()[0] ?? null,
 ): NextStepAction {
+  const mission = loadCurrentMission();
+  if (mission) {
+    const href = mission.projectId ? `/my-work?project=${mission.projectId}` : "/";
+    return {
+      id: "continue-mission",
+      label: mission.problem,
+      href,
+    };
+  }
+
   if (latestProject) {
     const step = resolveProjectGuideStep(latestProject, t);
     return {

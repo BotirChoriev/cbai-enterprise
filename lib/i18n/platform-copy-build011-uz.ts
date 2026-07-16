@@ -154,6 +154,7 @@ export const HUMAN_IMPACT_UZ = {
   save: "Baholashni saqlash",
   requiredForReport: "Hisobotdan oldin to'ldiring",
   noFakeScores: "Sifatli baholash — soxta ballar yo'q.",
+  humanOwner: "Mas'ul shaxs (kim javobgar)",
 } as const;
 
 export const OPERATING_CONTEXT_UZ = {

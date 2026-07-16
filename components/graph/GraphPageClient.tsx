@@ -1,31 +1,48 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import {
   buildKnowledgeGraph,
   computeGraphStats,
   computeGraphSelection,
 } from "@/lib/graph/graph.builder";
+import {
+  analyzeGraphForMission,
+  filterGraphByMissionFocus,
+} from "@/lib/graph/graph-mission";
 import type { GraphNodeFilter } from "@/lib/graph/graph.types";
 import GraphCanvas from "@/components/graph/GraphCanvas";
 import GraphEntityPanel from "@/components/graph/GraphEntityPanel";
 import GraphConnectionsPanel from "@/components/graph/GraphConnectionsPanel";
 import GraphLegend from "@/components/graph/GraphLegend";
-import GraphPipeline from "@/components/graph/GraphPipeline";
-import GraphPersonas from "@/components/graph/GraphPersonas";
-import HomeSection from "@/components/platform/home/HomeSection";
+import GraphMissionInstrument from "@/components/graph/GraphMissionInstrument";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { getDictionary } from "@/lib/i18n/translate";
 import { translateGraphPlatform } from "@/lib/i18n/graph-platform-translation";
-import { translateGraphTrustPillars } from "@/lib/i18n/graph-extended-translation";
+import { useMissionContext } from "@/components/mission/MissionContextProvider";
 
 export default function GraphPageClient() {
   const { t, language } = useTranslation();
   const dictionary = getDictionary(language);
   const graphPlatform = translateGraphPlatform(dictionary);
-  const trustPillars = translateGraphTrustPillars(dictionary);
-  const graph = useMemo(() => buildKnowledgeGraph(), []);
+  const { mission } = useMissionContext();
+  const fullGraph = useMemo(() => buildKnowledgeGraph(), []);
+  const [focusMode, setFocusMode] = useState<"mission" | "evidence" | "all">("mission");
+
+  const analysis = useMemo(
+    () => analyzeGraphForMission(fullGraph, mission, focusMode),
+    [fullGraph, mission, focusMode],
+  );
+
+  const graph = useMemo(
+    () => {
+      const filtered = filterGraphByMissionFocus(fullGraph, analysis);
+      return { ...fullGraph, nodes: filtered.nodes, edges: filtered.edges };
+    },
+    [fullGraph, analysis],
+  );
+
   const stats = useMemo(() => computeGraphStats(graph), [graph]);
 
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
@@ -52,13 +69,59 @@ export default function GraphPageClient() {
     [graph.nodes, selection.connectedNodeIds],
   );
 
+  const nodeIds = useMemo(() => graph.nodes.map((n) => n.id), [graph.nodes]);
+
+  const cycleSelection = useCallback(
+    (direction: 1 | -1) => {
+      if (nodeIds.length === 0) return;
+      if (!selectedNodeId) {
+        setSelectedNodeId(nodeIds[0]);
+        return;
+      }
+      const idx = nodeIds.indexOf(selectedNodeId);
+      const next = (idx + direction + nodeIds.length) % nodeIds.length;
+      setSelectedNodeId(nodeIds[next]);
+    },
+    [nodeIds, selectedNodeId],
+  );
+
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      const target = event.target;
+      if (target instanceof HTMLElement && (target.tagName === "INPUT" || target.tagName === "TEXTAREA")) {
+        return;
+      }
+      if (event.key === "Escape") setSelectedNodeId(null);
+      if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+        event.preventDefault();
+        cycleSelection(1);
+      }
+      if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+        event.preventDefault();
+        cycleSelection(-1);
+      }
+      if (event.key === "m") setFocusMode("mission");
+      if (event.key === "e") setFocusMode("evidence");
+      if (event.key === "a") setFocusMode("all");
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [cycleSelection]);
+
   return (
     <OperatingPageShell
       title={graphPlatform.headline}
-      description={graphPlatform.explanation}
+      description={t("intelligenceNetwork.description")}
       showOperator
+      missionContextVariant="compact"
     >
-      <div className="home-page mx-auto max-w-[90rem] pb-16">
+      <div className="mx-auto max-w-[90rem] space-y-6 pb-16">
+        <GraphMissionInstrument
+          analysis={analysis}
+          focusMode={focusMode}
+          onFocusModeChange={setFocusMode}
+        />
+
         <div className="grid gap-6 xl:grid-cols-12">
           <div className="space-y-4 xl:col-span-3">
             <GraphEntityPanel
@@ -93,28 +156,6 @@ export default function GraphPageClient() {
             />
           </div>
         </div>
-
-        <HomeSection id="graph-personas" title={t("graphPage.graphByRole")}>
-          <GraphPersonas />
-        </HomeSection>
-
-        <HomeSection id="graph-pipeline" title={t("graphPage.howItWorks")}>
-          <GraphPipeline />
-        </HomeSection>
-
-        <HomeSection id="graph-trust" title={t("graphPage.trust")}>
-          <ul className="grid gap-3 sm:grid-cols-2">
-            {trustPillars.map((pillar) => (
-              <li
-                key={pillar.id}
-                className="rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-4"
-              >
-                <h3 className="text-sm font-semibold text-zinc-100">{pillar.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-zinc-400">{pillar.description}</p>
-              </li>
-            ))}
-          </ul>
-        </HomeSection>
       </div>
     </OperatingPageShell>
   );

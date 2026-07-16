@@ -61,6 +61,8 @@ export default function CapabilityPassportPanel() {
         <p className="rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-3 text-sm text-zinc-400">
           {t("capabilityPassport.notCvNotice")}
         </p>
+        <p className="text-xs text-zinc-500">{t("capabilityPassportExt.uncertaintyNotice")}</p>
+        <p className="text-xs text-zinc-600">{t("capabilityPassportExt.visibilityNote")}</p>
         <p className="text-xs font-medium uppercase tracking-wider text-teal-400">{readinessLabel}</p>
 
         <div>
@@ -100,8 +102,13 @@ export default function CapabilityPassportPanel() {
             </h3>
             <ul className="mt-2 space-y-2">
               {passport.recentSignals.slice(0, 6).map((signal) => (
-                <li key={signal.id} className="text-sm text-zinc-400">
-                  {signal.label}
+                <li key={signal.id} className="rounded-lg border border-zinc-800/60 px-3 py-2 text-sm text-zinc-400">
+                  <span>{signal.label}</span>
+                  <span className="mt-1 block text-[10px] text-zinc-600">
+                    {t("capabilityPassportExt.signalSource")}: {signal.source.replace(/_/g, " ")} ·{" "}
+                    {t("capabilityPassportExt.signalDate")}: {signal.occurredAt.slice(0, 10)} ·{" "}
+                    {t("capabilityPassportExt.developmentDirection")}
+                  </span>
                 </li>
               ))}
             </ul>

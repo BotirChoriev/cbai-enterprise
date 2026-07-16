@@ -154,6 +154,7 @@ export const HUMAN_IMPACT_RU = {
   save: "Сохранить оценку",
   requiredForReport: "Заполните перед генерацией отчётов",
   noFakeScores: "Качественная оценка — без фальшивых баллов.",
+  humanOwner: "Ответственный человек",
 } as const;
 
 export const OPERATING_CONTEXT_RU = {

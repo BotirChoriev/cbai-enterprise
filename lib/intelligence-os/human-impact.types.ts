@@ -14,17 +14,22 @@ export type HumanImpactAssessment = {
   readonly unknownRisks: string;
   readonly mitigation: string;
   readonly missingEvidence: string;
+  readonly humanOwner: string;
+  readonly reviewStatus: "draft" | "incomplete" | "reviewed" | "decision_required";
   readonly isComplete: boolean;
   readonly updatedAt: string;
 };
 
-export type HumanImpactDraft = Omit<HumanImpactAssessment, "isComplete" | "updatedAt">;
+export type HumanImpactDraft = Omit<HumanImpactAssessment, "isComplete" | "updatedAt" | "reviewStatus"> & {
+  reviewStatus?: HumanImpactAssessment["reviewStatus"];
+};
 
 export function isHumanImpactComplete(draft: HumanImpactDraft): boolean {
   return (
     draft.humanBenefit.trim().length >= 5 &&
     draft.possibleHarm.trim().length >= 3 &&
     draft.environmentalEffect.trim().length >= 3 &&
-    draft.unknownRisks.trim().length >= 3
+    draft.unknownRisks.trim().length >= 3 &&
+    draft.humanOwner.trim().length >= 2
   );
 }

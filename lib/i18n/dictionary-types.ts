@@ -1391,6 +1391,7 @@ export type TranslationDictionary = {
     save: string;
     requiredForReport: string;
     noFakeScores: string;
+    humanOwner: string;
   };
   operatingContext: {
     missionContext: string;
@@ -1398,6 +1399,73 @@ export type TranslationDictionary = {
     scope: string;
     returnPath: string;
     noMission: string;
+  };
+  intelligenceNetwork: {
+    eyebrow: string;
+    description: string;
+    missionFocus: string;
+    focusModes: string;
+    modeMission: string;
+    modeEvidence: string;
+    modeAll: string;
+    connectedEntities: string;
+    supportingEvidence: string;
+    missingEvidence: string;
+    unresolvedQuestions: string;
+    impactConcern: string;
+    linkProjectEntities: string;
+    contradiction: string;
+    returnToMission: string;
+  };
+  operatorStates: {
+    present: string;
+    listening: string;
+    transcribing: string;
+    interpreting: string;
+    clarificationRequired: string;
+    showingEvidence: string;
+    proposingAlternatives: string;
+    waitingDecision: string;
+    executing: string;
+    success: string;
+    warning: string;
+    unsupported: string;
+    permissionDenied: string;
+    error: string;
+    complete: string;
+  };
+  moduleAccountabilityUi: {
+    eyebrow: string;
+    title: string;
+    purpose: string;
+    input: string;
+    processing: string;
+    output: string;
+    evidenceDependency: string;
+    limitations: string;
+    responsibleHuman: string;
+    maturity: string;
+    storage: string;
+    nextAction: string;
+    unregisteredWarning: string;
+  };
+  capabilityPassportExt: {
+    signalSource: string;
+    signalDate: string;
+    uncertaintyNotice: string;
+    visibilityNote: string;
+    developmentDirection: string;
+    inspectSignal: string;
+  };
+  missionThreadUi: {
+    openStage: string;
+    stageMission: string;
+    stageQuestion: string;
+    stageEvidence: string;
+    stageReasoning: string;
+    stageCollaborators: string;
+    stageReport: string;
+    stageImpact: string;
   };
 };
 

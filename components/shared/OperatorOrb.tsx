@@ -1,4 +1,79 @@
-export type OperatorOrbState = "idle" | "greeting" | "listening" | "speaking" | "thinking" | "success" | "error";
+"use client";
+
+/**
+ * Abstract Operator signature — an illustrated orb, not a humanoid mascot or photorealistic avatar.
+ */
+import { useTranslation } from "@/lib/i18n/use-translation";
+
+export type OperatorOrbState =
+  | "present"
+  | "idle"
+  | "greeting"
+  | "listening"
+  | "transcribing"
+  | "interpreting"
+  | "clarification-required"
+  | "showing-evidence"
+  | "proposing-alternatives"
+  | "waiting-decision"
+  | "executing"
+  | "speaking"
+  | "success"
+  | "warning"
+  | "unsupported"
+  | "permission-denied"
+  | "error"
+  | "complete"
+  | "thinking";
+
+const STATE_I18N_KEY: Record<OperatorOrbState, keyof import("@/lib/i18n/dictionary-types").TranslationDictionary["operatorStates"]> = {
+  present: "present",
+  idle: "present",
+  greeting: "present",
+  listening: "listening",
+  transcribing: "transcribing",
+  interpreting: "interpreting",
+  "clarification-required": "clarificationRequired",
+  "showing-evidence": "showingEvidence",
+  "proposing-alternatives": "proposingAlternatives",
+  "waiting-decision": "waitingDecision",
+  executing: "executing",
+  speaking: "executing",
+  success: "success",
+  warning: "warning",
+  unsupported: "unsupported",
+  "permission-denied": "permissionDenied",
+  error: "error",
+  complete: "complete",
+  thinking: "interpreting",
+};
+
+/** Maps extended states to CSS animation keys (no fake waveform states). */
+function cssState(state: OperatorOrbState): string {
+  switch (state) {
+    case "listening":
+    case "transcribing":
+      return "listening";
+    case "interpreting":
+    case "executing":
+    case "thinking":
+      return "interpreting";
+    case "speaking":
+      return "speaking";
+    case "success":
+    case "complete":
+      return "success";
+    case "warning":
+    case "unsupported":
+    case "permission-denied":
+    case "error":
+      return "error";
+    case "greeting":
+      return "greeting";
+    default:
+      return "idle";
+  }
+}
 
 type OperatorOrbProps = {
   state?: OperatorOrbState;
@@ -6,31 +81,11 @@ type OperatorOrbProps = {
   className?: string;
 };
 
-const STATE_LABELS: Record<OperatorOrbState, string> = {
-  idle: "CBAI Operator — ready",
-  greeting: "CBAI Operator — welcoming you",
-  listening: "CBAI Operator — listening",
-  speaking: "CBAI Operator — speaking",
-  thinking: "CBAI Operator — thinking",
-  success: "CBAI Operator — confirmed",
-  error: "CBAI Operator — something needs attention",
-};
+export default function OperatorOrb({ state = "present", size = 96, className = "" }: OperatorOrbProps) {
+  const { t } = useTranslation();
+  const label = t(`operatorStates.${STATE_I18N_KEY[state]}`);
+  const dataState = cssState(state);
 
-/**
- * The CBAI Operator's visual identity — a real, always-present abstract signature, not a mascot.
- *
- * Deliberately not a face or a figure: an illustrated humanoid persona (gendered or otherwise)
- * would assume an identity this product cannot honestly back up. An orb of light carries no
- * nationality, gender, age, or species claim, cannot be mistaken for a real or deepfaked person,
- * and still reads as "alive" through motion alone — the same convention real premium voice
- * products use (a responsive instrument, not an avatar). Built from the same emerald/gold
- * identity as the CBAI mark, so it reads as one brand, not a bolted-on widget.
- *
- * Motion is driven entirely by CSS (`data-operator-state`), never JS-timed re-renders, and every
- * animation is disabled under the existing `.cbai-reduced-motion` class the platform already
- * applies from the real saved accessibility preference.
- */
-export default function OperatorOrb({ state = "idle", size = 96, className = "" }: OperatorOrbProps) {
   return (
     <svg
       width={size}
@@ -39,8 +94,8 @@ export default function OperatorOrb({ state = "idle", size = 96, className = "" 
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       role="img"
-      aria-label={STATE_LABELS[state]}
-      data-operator-state={state}
+      aria-label={label}
+      data-operator-state={dataState}
       className={`cbai-operator-orb shrink-0 ${className}`}
     >
       <defs>
@@ -64,10 +119,7 @@ export default function OperatorOrb({ state = "idle", size = 96, className = "" 
         </linearGradient>
       </defs>
 
-      {/* Ambient glow — soft, breathing halo behind the core */}
       <circle className="cbai-orb-glow" cx="48" cy="48" r="34" fill="url(#orb-core)" opacity="0.22" />
-
-      {/* Presence ring — brightens/tightens while listening, sweeps while thinking */}
       <circle className="cbai-orb-ring" cx="48" cy="48" r="40" stroke="url(#orb-core)" strokeWidth="1.5" opacity="0.3" fill="none" />
       <circle
         className="cbai-orb-sweep"
@@ -81,15 +133,9 @@ export default function OperatorOrb({ state = "idle", size = 96, className = "" 
         fill="none"
         opacity="0"
       />
-
-      {/* Core sphere */}
       <circle className="cbai-orb-core" cx="48" cy="48" r="22" fill="url(#orb-core)" />
       <circle cx="40" cy="40" r="6" fill="#ffffff" opacity="0.28" />
-
-      {/* Confirmation flash — hidden unless state=success */}
       <circle className="cbai-orb-flash" cx="48" cy="48" r="27" stroke="url(#orb-gold)" strokeWidth="2.5" fill="none" opacity="0" />
-
-      {/* Error ring — honest, non-alarming amber cue; hidden unless state=error */}
       <circle className="cbai-orb-error" cx="48" cy="48" r="40" stroke="url(#orb-error)" strokeWidth="2" fill="none" opacity="0" />
     </svg>
   );

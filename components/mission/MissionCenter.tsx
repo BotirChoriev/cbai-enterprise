@@ -1,12 +1,12 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import Link from "next/link";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { getCurrentMission } from "@/lib/intelligence-os/mission-engine";
 import { loadProjects, loadProjectEvidence } from "@/lib/project/project-store";
-import { loadHumanImpactForMission } from "@/lib/intelligence-os/human-impact-store";
+import HumanImpactPanel from "@/components/mission/HumanImpactPanel";
+import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import MissionOperatorPresence from "@/components/mission/MissionOperatorPresence";
 import MissionCreationFlow from "@/components/mission/MissionCreationFlow";
 import MissionThread from "@/components/intelligence-os/MissionThread";
@@ -24,6 +24,7 @@ import { cbaiBtnPrimary, cbaiMineralSurface, cbaiOperatingShell, cbaiSectionEyeb
 export default function MissionCenter() {
   const { t } = useTranslation();
   const hydrated = useHydrated();
+  const { refreshMissionContext } = useMissionContext();
   const [creating, setCreating] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -33,7 +34,6 @@ export default function MissionCenter() {
     (sum, p) => sum + loadProjectEvidence(p.id).length,
     0,
   );
-  const impact = mission && hydrated ? loadHumanImpactForMission(mission.id) : null;
 
   const handleMissionCreated = useCallback(() => {
     setCreating(false);
@@ -77,17 +77,21 @@ export default function MissionCenter() {
               </div>
               <div className="space-y-6 lg:col-span-4">
                 <CapabilityConstellation />
-                <div className={`${cbaiMineralSurface} space-y-3 p-5`}>
-                  <p className={cbaiSectionEyebrow}>{t("missionCenter.humanityImpact")}</p>
-                  <p className="text-sm text-zinc-400">
-                    {impact?.isComplete ? t("missionCenter.impactComplete") : t("missionCenter.impactIncomplete")}
-                  </p>
-                  {mission ? (
-                    <Link href="/my-work" className="text-xs text-teal-400 hover:text-teal-300">
-                      {t("missionCenter.openImpact")} →
-                    </Link>
-                  ) : null}
-                </div>
+                {mission ? (
+                  <HumanImpactPanel
+                    missionId={mission.id}
+                    projectId={mission.projectId}
+                    onSaved={() => {
+                      refreshMissionContext();
+                      setRefreshKey((k) => k + 1);
+                    }}
+                  />
+                ) : (
+                  <div className={`${cbaiMineralSurface} space-y-3 p-5`}>
+                    <p className={cbaiSectionEyebrow}>{t("missionCenter.humanityImpact")}</p>
+                    <p className="text-sm text-zinc-400">{t("missionCenter.impactIncomplete")}</p>
+                  </div>
+                )}
                 <LegacyTrail mission={mission} />
               </div>
             </div>

@@ -6,6 +6,7 @@ import Sidebar from "@/components/layout/Sidebar";
 import Topbar from "@/components/layout/Topbar";
 import MobileNavDrawer from "@/components/layout/MobileNavDrawer";
 import { PlatformContextProvider } from "@/components/platform/context/PlatformContextProvider";
+import { MissionContextProvider } from "@/components/mission/MissionContextProvider";
 import { AuthProvider } from "@/components/platform/context/AuthProvider";
 import PlatformContextHeaderSlot from "@/components/platform/context/PlatformContextHeaderSlot";
 import OfflineBanner from "@/components/system/OfflineBanner";
@@ -44,6 +45,7 @@ export default function DashboardLayout({
           <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
             <Suspense fallback={null}>
               <PlatformContextProvider>
+                <MissionContextProvider>
                 <OfflineBanner />
                 <MobileNavDrawer open={isMobileNavOpen} onClose={() => setIsMobileNavOpen(false)} />
                 <Topbar onMenuClick={() => setIsMobileNavOpen(true)} transparent={isHome && !isScrolled} />
@@ -59,6 +61,7 @@ export default function DashboardLayout({
                     {children}
                   </div>
                 </main>
+                </MissionContextProvider>
               </PlatformContextProvider>
             </Suspense>
           </div>

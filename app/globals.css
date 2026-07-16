@@ -338,7 +338,8 @@ html.theme-light [class*="backdrop-blur"] {
 }
 
 /* Thinking — slow rotating gradient sweep */
-.cbai-operator-orb[data-operator-state="thinking"] .cbai-orb-sweep {
+.cbai-operator-orb[data-operator-state="thinking"] .cbai-orb-sweep,
+.cbai-operator-orb[data-operator-state="interpreting"] .cbai-orb-sweep {
   opacity: 1;
   animation: cbai-orb-sweep-spin 2.4s linear infinite;
 }

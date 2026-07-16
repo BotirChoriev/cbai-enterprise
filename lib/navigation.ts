@@ -106,9 +106,9 @@ export const primaryNavSections: NavSection[] = [
     items: [
       {
         label: "Reports",
-        href: "/analytics",
+        href: "/reports",
         icon: "analytics",
-        description: "Available report types by profile scope.",
+        description: "Report readiness and saved reports from real project work.",
       },
       {
         label: "Trust",
@@ -164,10 +164,10 @@ export const secondaryNavSections: NavSection[] = [
     title: "Intelligence",
     items: [
       {
-        label: "Dashboard",
-        href: "/dashboard",
-        icon: "dashboard",
-        description: "What is available today and what you can do now.",
+        label: "Mission Center",
+        href: "/",
+        icon: "home",
+        description: "Current mission and operating state — replaces legacy dashboard.",
       },
       {
         label: "Reasoning",
@@ -219,6 +219,7 @@ export const PUBLIC_JOURNEY_ROUTES = new Set([
   "/knowledge",
   "/research",
   "/research/workspace",
+  "/reports",
   "/analytics",
   "/dashboard",
 ]);

@@ -65,6 +65,13 @@ import {
   OPERATING_CONTEXT_UZ,
   SYSTEM_AWAKENING_UZ,
 } from "@/lib/i18n/platform-copy-build011-uz";
+import {
+  CAPABILITY_PASSPORT_BUILD012_UZ,
+  INTELLIGENCE_NETWORK_UZ,
+  MISSION_THREAD_BUILD012_UZ,
+  MODULE_ACCOUNTABILITY_UI_UZ,
+  OPERATOR_STATES_UZ,
+} from "@/lib/i18n/platform-copy-build012-uz";
 
 const uz: TranslationDictionary = {
   roles: {
@@ -518,6 +525,11 @@ const uz: TranslationDictionary = {
   intelligenceLenses: INTELLIGENCE_LENSES_UZ,
   humanImpact: HUMAN_IMPACT_UZ,
   operatingContext: OPERATING_CONTEXT_UZ,
+  intelligenceNetwork: INTELLIGENCE_NETWORK_UZ,
+  operatorStates: OPERATOR_STATES_UZ,
+  moduleAccountabilityUi: MODULE_ACCOUNTABILITY_UI_UZ,
+  capabilityPassportExt: CAPABILITY_PASSPORT_BUILD012_UZ,
+  missionThreadUi: MISSION_THREAD_BUILD012_UZ,
 };
 
 export default uz;

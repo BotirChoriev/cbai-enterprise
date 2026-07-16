@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
-import DashboardPageClient from "@/components/dashboard/DashboardPageClient";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: "Dashboard",
-  description: "What is available today and what you can do now.",
+  title: "Mission Center",
+  description: "Legacy dashboard route — redirects to Mission Center.",
+  robots: { index: false, follow: true },
 };
 
-export default function DashboardPage() {
-  return <DashboardPageClient />;
+/** Mission Center replaced the legacy dashboard — redirect preserves old links. */
+export default function DashboardRedirectPage() {
+  redirect("/");
 }

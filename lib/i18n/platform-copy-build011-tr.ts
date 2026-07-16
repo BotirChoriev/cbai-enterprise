@@ -154,6 +154,7 @@ export const HUMAN_IMPACT_TR = {
   save: "Değerlendirmeyi kaydet",
   requiredForReport: "Rapor oluşturmadan önce tamamlayın",
   noFakeScores: "Nitel değerlendirme — sahte puan yok.",
+  humanOwner: "Sorumlu kişi",
 } as const;
 
 export const OPERATING_CONTEXT_TR = {

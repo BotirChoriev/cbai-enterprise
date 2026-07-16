@@ -154,6 +154,7 @@ export const HUMAN_IMPACT_EN = {
   save: "Save assessment",
   requiredForReport: "Complete before generating reports",
   noFakeScores: "Structured qualitative assessment — no fabricated impact scores.",
+  humanOwner: "Human owner (who is accountable)",
 } as const;
 
 export const OPERATING_CONTEXT_EN = {

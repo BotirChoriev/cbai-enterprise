@@ -271,13 +271,17 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
   // the one gap here — a real error now gets a real (non-alarming) visual cue too.
   const operatorOrbState: OperatorOrbState = confirmation
     ? "success"
-    : voiceStatus === "permission-denied" || voiceStatus === "network-error"
-      ? "error"
-      : voiceStatus === "listening" || voiceStatus === "requesting"
-        ? "listening"
-        : voiceStatus === "processing"
-          ? "thinking"
-          : "idle";
+    : !speechSupported && hydrated
+      ? "unsupported"
+      : voiceStatus === "permission-denied"
+        ? "permission-denied"
+        : voiceStatus === "network-error"
+          ? "warning"
+          : voiceStatus === "listening" || voiceStatus === "requesting"
+            ? voiceStatus === "requesting" ? "transcribing" : "listening"
+            : voiceStatus === "processing"
+              ? "interpreting"
+              : "present";
 
   useEffect(() => {
     onOrbStateChange?.(operatorOrbState);

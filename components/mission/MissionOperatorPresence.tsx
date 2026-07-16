@@ -22,7 +22,7 @@ export default function MissionOperatorPresence({ mission }: MissionOperatorPres
   const { profile, isActive } = useAssistantProfile();
   const { t } = useTranslation();
   const hydrated = useHydrated();
-  const [liveOrbState, setLiveOrbState] = useState<OperatorOrbState>("idle");
+  const [liveOrbState, setLiveOrbState] = useState<OperatorOrbState>("present");
   const [isGreeting, setIsGreeting] = useState(true);
 
   useEffect(() => {
