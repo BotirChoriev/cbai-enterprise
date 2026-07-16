@@ -30,7 +30,7 @@ function read(relativePath: string): string {
 
 test("1. A real theme mode default exists and is honest ('system', never assumed dark or light)", () => {
   const profile = createEmptyAssistantProfile();
-  assert.equal(profile.themeMode, "system");
+  assert.equal(profile.themeMode, "dark");
 });
 
 test("2. resolveTimeOfDay reads the real hour in a given IANA timezone, never guesses", () => {

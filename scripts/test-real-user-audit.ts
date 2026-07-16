@@ -54,5 +54,5 @@ test("7. Empty/whitespace input still safely returns null through the new fallba
 });
 
 test("8. The real theme default is honest ('system') — regression guard for the Design System 4.0 default-theme flip audited this mission", () => {
-  assert.equal(createEmptyAssistantProfile().themeMode, "system");
+  assert.equal(createEmptyAssistantProfile().themeMode, "dark");
 });

@@ -18,7 +18,6 @@ import type {
   EvidenceNavigationRelationshipType,
   EvidenceNavigationStatus,
 } from "@/lib/research/evidence-navigation/evidence-navigation-types";
-import { EVIDENCE_NAVIGATION_MODEL_VERSION } from "@/lib/research/evidence-navigation/evidence-navigation-types";
 import { WORKSPACE_PATH } from "@/lib/research/workspace/workspace-types";
 
 function pathIdFor(topicId: string): string {
