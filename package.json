@@ -34,7 +34,8 @@
     "test:epic-governance": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-epic-governance.ts",
     "test:epic-02-mission-os": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-epic-02-mission-os.ts",
     "test:epic-06-evidence-trust": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-epic-06-evidence-trust.ts",
-    "test:epic-13-adaptive-interface": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-epic-13-adaptive-interface.ts"
+    "test:epic-13-adaptive-interface": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-epic-13-adaptive-interface.ts",
+    "test:epic-13-living-intelligence": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-epic-13-living-intelligence.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.2",

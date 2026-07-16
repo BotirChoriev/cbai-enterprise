@@ -79,6 +79,7 @@ import {
 } from "@/lib/i18n/platform-copy-build013-en";
 import { EVIDENCE_RUNTIME_EN } from "@/lib/i18n/platform-copy-build014-en";
 import { INTELLIGENCE_SPACES_EN } from "@/lib/i18n/platform-copy-build015-en";
+import { LIVING_INTELLIGENCE_EN } from "@/lib/i18n/platform-copy-build016-en";
 
 const en: TranslationDictionary = {
   roles: {
@@ -543,6 +544,7 @@ const en: TranslationDictionary = {
   operatingNav: OPERATING_NAV_EN,
   evidenceRuntime: EVIDENCE_RUNTIME_EN,
   intelligenceSpaces: INTELLIGENCE_SPACES_EN,
+  livingIntelligence: LIVING_INTELLIGENCE_EN,
 };
 
 export default en;

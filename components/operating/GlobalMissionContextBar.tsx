@@ -19,14 +19,18 @@ export default function GlobalMissionContextBar() {
 
   return (
     <header
-      className="cbai-global-mission-context shrink-0 border-b border-zinc-800/80 bg-[var(--surface)]/40 px-4 py-2 sm:px-5"
+      className="cbai-global-mission-context shrink-0 border-b border-zinc-800/80 px-4 py-2 sm:px-5"
       aria-label={t("intelligenceSpaces.operatingEnvironment")}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="min-w-0 flex-1">
-          <p className={cbaiSectionEyebrow}>{t(`intelligenceSpaces.${spaceKey}`)}</p>
-          <p className="truncate text-sm text-zinc-300">
+          <p className={cbaiSectionEyebrow}>{t("livingIntelligence.intentionEyebrow")}</p>
+          <p className="truncate text-sm font-medium text-zinc-200" title={mission?.problem}>
             {mission?.problem ?? t("intelligenceSpaces.noMission")}
+          </p>
+          <p className="text-[10px] text-zinc-600">
+            {t(`intelligenceSpaces.${spaceKey}`)}
+            {pathname !== "/" ? ` · ${t("intelligenceSpaces.spatialTransition")}` : null}
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-3 text-xs">

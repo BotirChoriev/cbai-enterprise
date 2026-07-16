@@ -448,16 +448,31 @@ html.theme-light [class*="backdrop-blur"] {
   --space-density: 0.875rem;
 }
 
-.cbai-operating-main {
-  background: linear-gradient(180deg, rgba(5, 8, 16, 0.4) 0%, rgba(5, 8, 16, 0.85) 100%);
+.cbai-intelligence-atmosphere {
+  background: linear-gradient(
+    180deg,
+    rgba(var(--cbai-atmosphere-accent) / 0.04) 0%,
+    rgba(5, 8, 16, calc(var(--cbai-atmosphere-depth))) 100%
+  );
+}
+
+[data-cbai-density="dense"] .cbai-space-enter {
+  padding-inline: calc(var(--space-density, 0.875rem) * 0.85);
+}
+
+[data-cbai-density="open"] .cbai-operating-main {
+  --space-density: 1rem;
 }
 
 .cbai-global-mission-context {
   backdrop-filter: blur(8px);
+  background: rgba(5, 8, 16, calc(var(--cbai-atmosphere-depth, 0.94)));
+  border-color: rgba(var(--cbai-atmosphere-accent) / 0.12);
 }
 
 .cbai-living-context {
   --context-layer: 1;
+  background: rgba(var(--cbai-atmosphere-accent) / 0.03);
 }
 
 .cbai-continuity-timeline {

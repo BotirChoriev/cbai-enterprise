@@ -8,6 +8,8 @@ import MobileNavDrawer from "@/components/layout/MobileNavDrawer";
 import GlobalMissionContextBar from "@/components/operating/GlobalMissionContextBar";
 import LivingContextRail from "@/components/operating/LivingContextRail";
 import ContinuityTimelineStrip from "@/components/operating/ContinuityTimelineStrip";
+import IntelligenceAtmosphereShell from "@/components/operating/IntelligenceAtmosphereShell";
+import LivingContextMobileToggle from "@/components/operating/LivingContextMobileToggle";
 import { PlatformContextProvider } from "@/components/platform/context/PlatformContextProvider";
 import { MissionContextProvider } from "@/components/mission/MissionContextProvider";
 import { AuthProvider } from "@/components/platform/context/AuthProvider";
@@ -48,15 +50,18 @@ export default function DashboardLayout({
                 <GlobalMissionContextBar />
                 <main className="flex min-h-0 flex-1 flex-col overflow-y-auto" onScroll={handleMainScroll}>
                   {isHome ? (
-                    <div className="cbai-living-canvas min-h-0 flex-1">{children}</div>
+                    <IntelligenceAtmosphereShell className="cbai-living-canvas min-h-0 flex-1">
+                      {children}
+                    </IntelligenceAtmosphereShell>
                   ) : (
-                    <div className="cbai-operating-main flex min-h-0 flex-1 flex-col">
+                    <IntelligenceAtmosphereShell className="cbai-operating-main flex min-h-0 flex-1 flex-col">
                       <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[minmax(0,1fr)_15rem] xl:grid-cols-[minmax(0,1fr)_17rem]">
                         <div className="cbai-space-enter overflow-y-auto px-4 py-4 lg:px-5 lg:py-5">{children}</div>
                         <LivingContextRail className="hidden lg:flex" />
                       </div>
                       <ContinuityTimelineStrip />
-                    </div>
+                      <LivingContextMobileToggle />
+                    </IntelligenceAtmosphereShell>
                   )}
                 </main>
               </MissionContextProvider>

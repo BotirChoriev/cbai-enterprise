@@ -56,6 +56,28 @@ export default function GraphMissionInstrument({
           <dd className="text-zinc-300">{analysis.supportingEvidenceCount}</dd>
         </div>
       </dl>
+      <div className="rounded-lg border border-zinc-800/80 bg-zinc-950/50 p-3">
+        <p className={cbaiSectionEyebrow}>{t("livingIntelligence.universePulse")}</p>
+        <dl className="mt-2 grid gap-2 text-xs sm:grid-cols-2">
+          <div>
+            <dt className="text-zinc-600">{t("livingIntelligence.universeRelationships")}</dt>
+            <dd className="text-zinc-300">{analysis.connectedEntities.length}</dd>
+          </div>
+          <div>
+            <dt className="text-zinc-600">{t("livingIntelligence.universeEvidence")}</dt>
+            <dd className="text-zinc-300">{analysis.supportingEvidenceCount}</dd>
+          </div>
+          <div>
+            <dt className="text-zinc-600">{t("livingIntelligence.universeQuestions")}</dt>
+            <dd className="text-zinc-300">{analysis.unresolvedQuestions.length}</dd>
+          </div>
+          <div>
+            <dt className="text-zinc-600">{t("livingIntelligence.universeUnknowns")}</dt>
+            <dd className="text-zinc-300">{analysis.missingEvidenceLabels.length}</dd>
+          </div>
+        </dl>
+        <p className="mt-2 text-[10px] text-zinc-700">{t("livingIntelligence.noDecorativeActivity")}</p>
+      </div>
       {analysis.missingEvidenceLabels.length > 0 ? (
         <div>
           <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("intelligenceNetwork.missingEvidence")}</p>

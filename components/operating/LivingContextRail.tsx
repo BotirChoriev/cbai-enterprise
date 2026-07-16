@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
+import { usePathname } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { deriveOperatorInterventions } from "@/lib/intelligence-os/operator-awareness";
@@ -11,13 +12,22 @@ import { useAssistantProfile } from "@/components/platform/context/AssistantProf
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import HumanDecisionBoundary from "@/components/intelligence-os/HumanDecisionBoundary";
 import EvidenceTrustSurfacePanel from "@/components/evidence/EvidenceTrustSurfacePanel";
+import {
+  deriveLivingContextMemory,
+  entityStudyHref,
+} from "@/lib/intelligence-os/living-context-memory";
+import { deriveIntelligenceFlow } from "@/lib/intelligence-os/intelligence-flow";
+import {
+  intelligenceSpaceI18nKey,
+  resolveIntelligenceSpace,
+} from "@/lib/intelligence-os/intelligence-spaces";
 import { cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 export function OperatorAwarenessStrip() {
   const { t } = useTranslation();
   const hydrated = useHydrated();
   const interventions = useMemo(
-    () => (hydrated ? deriveOperatorInterventions() : []),
+    () => (hydrated ? deriveOperatorInterventions().slice(0, 2) : []),
     [hydrated],
   );
 
@@ -54,6 +64,7 @@ type LivingContextRailProps = {
 };
 
 export default function LivingContextRail({ className = "" }: LivingContextRailProps) {
+  const pathname = usePathname();
   const { t } = useTranslation();
   const hydrated = useHydrated();
   const { profile } = useAssistantProfile();
@@ -62,12 +73,21 @@ export default function LivingContextRail({ className = "" }: LivingContextRailP
     () => (hydrated ? buildCapabilityPassport(resolveOperatorName(profile)) : null),
     [hydrated, profile],
   );
+  const memory = useMemo(
+    () => (hydrated ? deriveLivingContextMemory(mission) : null),
+    [hydrated, mission],
+  );
+  const flow = useMemo(
+    () => (hydrated ? deriveIntelligenceFlow(mission) : []),
+    [hydrated, mission],
+  );
 
   const nextHref = adaptive?.suggestedRoutes[0] ?? (mission?.projectId ? `/my-work?project=${mission.projectId}` : "/my-work");
+  const currentSpace = resolveIntelligenceSpace(pathname);
 
   return (
     <aside
-      className={`cbai-living-context cbai-space-enter flex h-full flex-col gap-3 border-l border-zinc-800/80 bg-[#050810]/90 px-3 py-4 ${className}`}
+      className={`cbai-living-context cbai-space-enter flex h-full flex-col gap-3 border-l border-zinc-800/80 px-3 py-4 ${className}`}
       aria-label={t("intelligenceSpaces.livingContext")}
     >
       <p className={cbaiSectionEyebrow}>{t("intelligenceSpaces.livingContext")}</p>
@@ -75,9 +95,49 @@ export default function LivingContextRail({ className = "" }: LivingContextRailP
       <OperatorAwarenessStrip />
 
       <section className="space-y-1">
-        <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("intelligenceCanvas.missionContext")}</p>
+        <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("livingIntelligence.intentionEyebrow")}</p>
         <p className="text-sm text-zinc-200">{mission?.problem ?? t("intelligenceCanvas.noMissionPrompt")}</p>
       </section>
+
+      {memory?.hasContinuity ? (
+        <section className="space-y-2 border-t border-zinc-800/60 pt-2">
+          <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("livingIntelligence.contextMemory")}</p>
+          {memory.lastVisit && memory.lastVisit.spaceId !== currentSpace ? (
+            <p className="text-xs text-zinc-500">
+              {t("livingIntelligence.returnContinuity")}{" "}
+              <Link href={memory.lastVisit.pathname} className="text-teal-400 hover:text-teal-300">
+                {t(`intelligenceSpaces.${intelligenceSpaceI18nKey(memory.lastVisit.spaceId)}`)} →
+              </Link>
+            </p>
+          ) : null}
+          {memory.recentStudy.length > 0 ? (
+            <ul className="space-y-1">
+              <li className="text-[10px] text-zinc-600">{t("livingIntelligence.recentStudy")}</li>
+              {memory.recentStudy.map((entity) => (
+                <li key={`${entity.kind}-${entity.id}`}>
+                  <Link href={entityStudyHref(entity)} className="text-xs text-zinc-400 hover:text-teal-300">
+                    {entity.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          {memory.legacyArtifactCount > 0 ? (
+            <p className="text-xs text-zinc-500">
+              {memory.legacyArtifactCount} {t("livingIntelligence.legacyArtifacts")}
+            </p>
+          ) : null}
+        </section>
+      ) : null}
+
+      {memory?.currentFlowStage ? (
+        <section className="space-y-1">
+          <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("livingIntelligence.unfinishedFlow")}</p>
+          <Link href={memory.currentFlowStage.href} className="text-xs text-teal-400 hover:text-teal-300">
+            {memory.currentFlowStage.label}: {memory.currentFlowStage.detail} →
+          </Link>
+        </section>
+      ) : null}
 
       {evidencePulse ? (
         <section className="space-y-1">
@@ -113,6 +173,33 @@ export default function LivingContextRail({ className = "" }: LivingContextRailP
           {humanImpact?.isComplete ? t("missionCenter.impactComplete") : t("missionCenter.impactIncomplete")}
         </p>
       </section>
+
+      {flow.length > 0 ? (
+        <section className="space-y-1.5">
+          <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("livingIntelligence.flowEyebrow")}</p>
+          <ol className="flex flex-wrap gap-1">
+            {flow.map((stage) => (
+              <li key={stage.id}>
+                <Link
+                  href={stage.href}
+                  className={`inline-block rounded px-1.5 py-0.5 text-[9px] uppercase tracking-wide ${
+                    stage.status === "complete"
+                      ? "bg-emerald-500/10 text-emerald-400/80"
+                      : stage.status === "attention"
+                        ? "bg-[var(--gold)]/10 text-[var(--gold-soft)]"
+                        : stage.status === "partial"
+                          ? "bg-amber-500/10 text-amber-300/80"
+                          : "bg-zinc-800/60 text-zinc-600"
+                  }`}
+                  title={stage.detail}
+                >
+                  {stage.label}
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
 
       <section className="mt-auto space-y-1.5 border-t border-zinc-800/80 pt-3">
         <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("intelligenceCanvas.suggestedNext")}</p>

@@ -3,6 +3,7 @@
 import type { GraphNode, GraphEdge, GraphStats, GraphNodeFilter } from "@/lib/graph/graph.types";
 import { getEntityTypeLabel } from "@/lib/entity/entity.helpers";
 import { buildEntityGraphEvidenceSummary } from "@/lib/graph/graph.evidence";
+import KnowledgeLayersDisclosure from "@/components/knowledge/KnowledgeLayersDisclosure";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import Link from "next/link";
 import { getDictionary } from "@/lib/i18n/translate";
@@ -156,6 +157,19 @@ function EntityDetails({
           value={summary.availableSources.join(", ")}
         />
       </dl>
+
+      <KnowledgeLayersDisclosure
+        className="mt-4 border-t border-zinc-800 pt-4"
+        layers={{
+          surface: node.label,
+          summary: node.entity.subtitle ?? null,
+          evidence: summary.evidenceStatus,
+          reasoning: `${summary.relationshipCount} ${t("graphUi.relationshipCount").toLowerCase()}`,
+          history: summary.availableSources.length > 0 ? summary.availableSources.join(", ") : null,
+          impact: null,
+          legacy: route ? t("graphUi.openModule", { type: typeLabel }) : null,
+        }}
+      />
 
       {route ? (
         <Link
