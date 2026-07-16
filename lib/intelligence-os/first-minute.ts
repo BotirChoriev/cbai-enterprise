@@ -26,7 +26,7 @@ export function deriveFirstMinuteAction(mission: Mission | null): FirstMinuteAct
       };
     }
     return {
-      label: "Continue mission work",
+      label: "Continue mission",
       href: `/my-work?project=${mission.projectId}`,
       reason: "Mission and project already linked",
       exposesArchitecture: false,
@@ -37,7 +37,7 @@ export function deriveFirstMinuteAction(mission: Mission | null): FirstMinuteAct
   if (projects.length > 0) {
     const latest = projects[0];
     return {
-      label: "Continue your work",
+      label: "Continue mission",
       href: `/my-work?project=${latest.id}`,
       reason: "Existing project on device",
       exposesArchitecture: false,
@@ -45,7 +45,7 @@ export function deriveFirstMinuteAction(mission: Mission | null): FirstMinuteAct
   }
 
   return {
-    label: "Start with a goal",
+    label: "Choose a goal",
     href: "/search",
     reason: "Intelligence Gateway — choose what you want to do",
     exposesArchitecture: false,

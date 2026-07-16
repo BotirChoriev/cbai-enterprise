@@ -55,7 +55,7 @@ test("6. PlatformHome renders Intelligence Canvas", () => {
   assert.match(home, /IntelligenceCanvas/);
 });
 
-test("7. Graph uses Knowledge Universe framing", () => {
+test("7. Graph uses plain Knowledge Graph title", () => {
   const graph = readSource("components/graph/GraphPageClient.tsx");
-  assert.match(graph, /intelligenceCanvas\.knowledgeUniverse/);
+  assert.match(graph, /navigation\.knowledgeGraph/);
 });

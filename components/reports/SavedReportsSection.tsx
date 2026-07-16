@@ -38,6 +38,9 @@ export default function SavedReportsSection() {
           {t("reports.myReports")}
         </p>
         <p className="text-sm text-zinc-500">{t("reports.noReports")}</p>
+        <Link href="/search" className="text-xs text-teal-400 hover:text-teal-300">
+          {t("zeroLearningCurve.reportsEmptyAction")} →
+        </Link>
       </section>
     );
   }

@@ -2,7 +2,7 @@
 
 export const INTELLIGENCE_NETWORK_EN = {
   eyebrow: "Intelligence network",
-  description: "Mission-aware view of real catalog relationships and linked evidence.",
+  description: "See how countries, companies, and topics connect.",
   missionFocus: "Mission focus mode",
   focusModes: "Graph focus modes",
   modeMission: "Mission",

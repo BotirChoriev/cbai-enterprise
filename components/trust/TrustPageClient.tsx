@@ -8,6 +8,7 @@ import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import ModuleAccountabilityPanel from "@/components/trust/ModuleAccountabilityPanel";
 import OrganizationInspectorPanel from "@/components/organization/OrganizationInspectorPanel";
 import TrustVerificationStatuses from "@/components/trust/TrustVerificationStatuses";
+import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import { DATA_SOURCE_CATEGORIES } from "@/lib/trust/data-source-categories";
 import { PLATFORM_VERSION } from "@/lib/platform-home";
@@ -28,6 +29,7 @@ const SECTIONS = [
 
 export default function TrustPageClient() {
   const { t, language } = useTranslation();
+  const disclosure = useProgressiveDisclosure();
   const dictionary = getDictionary(language);
   const trustPage = dictionary.trustPage;
 
@@ -85,8 +87,12 @@ export default function TrustPageClient() {
         })}
       </div>
 
-      <OrganizationInspectorPanel />
-      <ModuleAccountabilityPanel />
+      {disclosure.showEvidenceAdvanced ? (
+        <>
+          <OrganizationInspectorPanel />
+          <ModuleAccountabilityPanel />
+        </>
+      ) : null}
 
       <p className="text-xs text-zinc-600">
         <Link href="/#home-trust-heading" className="text-teal-400 hover:text-teal-300">

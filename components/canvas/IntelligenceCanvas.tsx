@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useState } from "react";
 import Link from "next/link";
+import { useCallback, useState } from "react";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
@@ -38,19 +38,32 @@ export default function IntelligenceCanvas() {
     hydrated && mission?.projectId ? loadProjects().find((p) => p.id === mission.projectId) : null;
   const questionCount = hydrated && project ? loadProjectQuestions(project.id).length : 0;
 
+  const urlWantsCreate =
+    hydrated &&
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("create") === "1";
+  const showCreation = creating || urlWantsCreate;
+
   const handleMissionCreated = useCallback(() => {
     setCreating(false);
     setRefreshKey((k) => k + 1);
     refreshMissionContext();
+    window.history.replaceState(null, "", "/");
   }, [refreshMissionContext]);
 
   const projectQuery = mission?.projectId ? `?project=${mission.projectId}` : "";
   const firstAction = hydrated ? deriveFirstMinuteAction(mission) : null;
 
-  if (creating) {
+  if (showCreation) {
     return (
       <div className={`${cbaiOperatingShell} px-4 py-6 sm:px-6`}>
-        <MissionCreationFlow onComplete={handleMissionCreated} onCancel={() => setCreating(false)} />
+        <MissionCreationFlow
+          onComplete={handleMissionCreated}
+          onCancel={() => {
+            setCreating(false);
+            window.history.replaceState(null, "", "/");
+          }}
+        />
       </div>
     );
   }
@@ -60,8 +73,12 @@ export default function IntelligenceCanvas() {
       {disclosure.showAwakeningSequence ? <SystemAwakeningSequence hasMission={Boolean(mission)} /> : null}
 
       {!mission ? (
-        <div className="border-b border-zinc-800/80 px-4 py-3 sm:px-5">
-          <IntelligenceGatewayEntry compact />
+        <div className="space-y-3 border-b border-zinc-800/80 px-4 py-3 sm:px-5">
+          <p className="max-w-2xl text-sm text-zinc-400">{t("zeroLearningCurve.homeNoMissionLead")}</p>
+          <button type="button" onClick={() => setCreating(true)} className={`${cbaiBtnPrimary} text-xs`}>
+            {t("zeroLearningCurve.startMission")} →
+          </button>
+          <IntelligenceGatewayEntry compact variant="home" />
         </div>
       ) : firstAction && disclosure.primaryActionOnly ? (
         <div className="flex shrink-0 items-center border-b border-zinc-800/80 px-4 py-2 sm:px-5">
@@ -74,15 +91,31 @@ export default function IntelligenceCanvas() {
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-px bg-zinc-800/30 lg:grid-cols-[minmax(0,1fr)_15rem] xl:grid-cols-[minmax(0,1fr)_17rem]">
         <div className="flex min-h-0 flex-col overflow-y-auto">
           <div className="grid flex-1 grid-cols-1 gap-px bg-zinc-800/40 sm:grid-cols-2 lg:grid-cols-2">
-            <CanvasOperatingObject
-              kind="mission"
-              label={t("intelligenceCanvas.centerMission")}
-              value={mission?.problem ?? t("intelligenceCanvas.noMissionPrompt")}
-              detail={mission?.whoBenefits}
-              href={mission ? "/" : undefined}
-              status={mission ? "partial" : "attention"}
-              className="sm:col-span-2"
-            />
+            {!mission ? (
+              <button
+                type="button"
+                onClick={() => setCreating(true)}
+                className="sm:col-span-2 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40"
+              >
+                <CanvasOperatingObject
+                  kind="mission"
+                  label={t("intelligenceCanvas.centerMission")}
+                  value={t("intelligenceCanvas.noMissionPrompt")}
+                  detail={t("zeroLearningCurve.startMission")}
+                  status="attention"
+                />
+              </button>
+            ) : (
+              <CanvasOperatingObject
+                kind="mission"
+                label={t("intelligenceCanvas.centerMission")}
+                value={mission.problem}
+                detail={mission.whoBenefits}
+                href="/"
+                status="partial"
+                className="sm:col-span-2"
+              />
+            )}
 
             <CanvasOperatingObject
               kind="question"
@@ -115,7 +148,12 @@ export default function IntelligenceCanvas() {
             <CanvasOperatingObject
               kind="knowledge"
               label={t("intelligenceCanvas.centerKnowledge")}
-              value={mission?.evidenceMissing ?? t("missionCenter.missingKnowledge")}
+              value={
+                mission?.evidenceMissing
+                  ? t("missionCenter.missingKnowledge")
+                  : t("missionCenter.noMissionTitle")
+              }
+              detail={mission?.evidenceMissing ?? undefined}
               status={mission?.evidenceMissing ? "attention" : "missing"}
             >
               <CanvasKnowledgeStream />
@@ -181,7 +219,7 @@ export default function IntelligenceCanvas() {
 
       <div className="border-t border-zinc-800/80 px-4 py-2 lg:hidden">
         <Link href="/graph" className="text-xs text-teal-400">
-          {t("intelligenceSpaces.knowledgeUniverseSpace")} →
+          {t("navigation.knowledgeGraph")} →
         </Link>
       </div>
     </div>

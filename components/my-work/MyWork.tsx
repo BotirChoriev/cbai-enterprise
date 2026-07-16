@@ -21,6 +21,8 @@ import CloudProfileImportPrompt from "@/components/account/CloudProfileImportPro
 import PendingSyncNotice from "@/components/shared/PendingSyncNotice";
 import CapabilityPassportPanel from "@/components/capability/CapabilityPassportPanel";
 import CapabilityGalaxy from "@/components/capability/CapabilityGalaxy";
+import { useMissionContext } from "@/components/mission/MissionContextProvider";
+import { deriveFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
 import { loadProject } from "@/lib/project/project-store";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
@@ -107,6 +109,8 @@ function MyWorkContent() {
   const { user, isSignedIn, cloudUser, accountMode, cloudSessionRestoring } = useAuth();
   const preferredLanguage = ASSISTANT_LANGUAGES.find((l) => l.code === profile.preferredLanguage);
   const disclosure = useProgressiveDisclosure();
+  const { mission } = useMissionContext();
+  const continueAction = deriveFirstMinuteAction(mission);
 
   // Real loading state — avoids a flash of "not signed in" while a real cloud session is still
   // being restored from storage (Phase 10). Never shown when cloud accounts aren't configured, so
@@ -141,6 +145,18 @@ function MyWorkContent() {
 
   return (
     <div className="space-y-8">
+      {mission && !projectId ? (
+        <section className={`${cbaiGlassCard} flex flex-wrap items-center justify-between gap-3 border-teal-500/20 px-5 py-4`}>
+          <div>
+            <p className="text-sm text-zinc-300">{t("zeroLearningCurve.missionContinueBanner")}</p>
+            <p className="truncate text-xs text-zinc-500">{mission.problem}</p>
+          </div>
+          <Link href={continueAction.href} className="text-sm text-teal-400 hover:text-teal-300">
+            {continueAction.label} →
+          </Link>
+        </section>
+      ) : null}
+
       {isActive || isSignedIn ? (
         <div className={`${cbaiGlassCard} border-teal-500/15 px-6 py-5`}>
           <div className="flex flex-wrap items-center gap-3">

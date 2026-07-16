@@ -42,7 +42,8 @@ export default function SettingsPageClient() {
       <AdaptiveDensityControl />
       <CapabilityAssessmentOffer />
       <LivingMemoryControl />
-      <section className={`${cbaiMineralSurface} space-y-3 p-4`}>
+      {disclosure.level === "expert" ? (
+        <section className={`${cbaiMineralSurface} space-y-3 p-4`}>
         <p className={cbaiSectionEyebrow}>{t("zeroLearningCurve.simplicityAuditEyebrow")}</p>
         <p className="text-[10px] text-zinc-600">{t("zeroLearningCurve.simplicityAuditNote")}</p>
         <ul className="space-y-1 text-xs text-zinc-500">
@@ -62,6 +63,7 @@ export default function SettingsPageClient() {
           ))}
         </ul>
       </section>
+      ) : null}
     </OperatingPageShell>
   );
 }

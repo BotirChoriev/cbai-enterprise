@@ -5,7 +5,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { USER_GOALS, resolveGoalRoute } from "@/lib/intelligence-os/intelligence-gateway";
+import { USER_GOALS, resolveGoalRoute, deriveContextualGoals } from "@/lib/intelligence-os/intelligence-gateway";
 import { resolveProgressiveDisclosure } from "@/lib/intelligence-os/progressive-disclosure";
 import { deriveFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
 import { listSimplicityMetrics } from "@/lib/intelligence-os/simplicity-metrics";
@@ -144,4 +144,17 @@ test("15. EPIC-22 — screen simplicity audit architecture", () => {
   const audit = deriveScreenSimplicityAudit("home", "professional");
   assert.ok(audit.score >= audit.target - 1);
   assert.match(audit.note, /Heuristic/i);
+});
+
+test("16. EPIC-23 — mission continuity wired in page shell", () => {
+  const shell = readSource("components/shared/OperatingPageShell.tsx");
+  assert.match(shell, /MissionOperatingContextBar/);
+  const reasoning = readSource("components/reasoning/ReasoningExplorer.tsx");
+  assert.doesNotMatch(reasoning, /href="\/reasoning"/);
+});
+
+test("17. EPIC-23 — contextual goals and mission creation entry", () => {
+  assert.ok(deriveContextualGoals(null).length <= 4);
+  const gateway = readSource("lib/intelligence-os/intelligence-gateway.ts");
+  assert.match(gateway, /create=1/);
 });

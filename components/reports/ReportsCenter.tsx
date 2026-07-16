@@ -43,7 +43,7 @@ export default function ReportsCenter() {
 
   const title = entity ? entity.name : t("reports.title");
   const description = entity
-    ? `${t("reportsCenter.continuingFor")} — ${t("reportsCenter.continuingBody")}`
+    ? `${t("reportsCenter.continuingFor")} ${entity.name}`
     : t("reportsCenter.pageDescription");
 
   return (

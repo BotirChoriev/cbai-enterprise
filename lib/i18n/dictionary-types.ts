@@ -1739,6 +1739,10 @@ export type TranslationDictionary = {
     speak: string;
     type: string;
     chooseGoal: string;
+    searchGoalHint: string;
+    homeNoMissionLead: string;
+    startMission: string;
+    continueMission: string;
     goalResearch: string;
     goalVerify: string;
     goalCompare: string;
@@ -1771,6 +1775,13 @@ export type TranslationDictionary = {
     advancedDetails: string;
     noTutorial: string;
     reasoningPurpose: string;
+    evidenceMissionDescription: string;
+    evidenceStatesExplainer: string;
+    reasoningNoMission: string;
+    reasoningOpenNotes: string;
+    graphNoMission: string;
+    reportsEmptyAction: string;
+    missionContinueBanner: string;
     evidenceStatesEyebrow: string;
     evidenceNoMission: string;
     evidenceNoMissionAction: string;

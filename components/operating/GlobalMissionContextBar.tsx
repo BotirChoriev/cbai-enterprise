@@ -19,15 +19,22 @@ export default function GlobalMissionContextBar() {
     return (
       <header
         className="cbai-global-mission-context shrink-0 border-b border-zinc-800/80 px-4 py-2 sm:px-5"
-        aria-label={t("intelligenceSpaces.operatingEnvironment")}
+        aria-label={t("operatingContext.missionContext")}
       >
         <div className="flex items-center justify-between gap-2">
           <p className="truncate text-sm text-zinc-300">
-            {mission?.problem ?? t("zeroLearningCurve.nextAction")}: {firstAction.label}
+            {mission?.problem ?? firstAction.label}
           </p>
-          <Link href={firstAction.href} className="shrink-0 text-xs text-teal-400 hover:text-teal-300">
-            →
-          </Link>
+          <div className="flex shrink-0 items-center gap-2">
+            {pathname !== "/" ? (
+              <Link href="/" className="text-xs text-zinc-500 hover:text-teal-300">
+                {t("operatingContext.returnPath")}
+              </Link>
+            ) : null}
+            <Link href={firstAction.href} className="text-xs text-teal-400 hover:text-teal-300">
+              →
+            </Link>
+          </div>
         </div>
       </header>
     );

@@ -49,6 +49,7 @@ export default function EvidencePrimaryStatesPanel() {
       <p className={cbaiSectionEyebrow} id="evidence-primary-states">
         {t("zeroLearningCurve.evidenceStatesEyebrow")}
       </p>
+      <p className="text-xs text-zinc-500">{t("zeroLearningCurve.evidenceStatesExplainer")}</p>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {states.map((row) => (
           <div key={row.state} className="rounded-md border border-zinc-800/80 bg-zinc-950/40 px-3 py-2">
@@ -62,8 +63,11 @@ export default function EvidencePrimaryStatesPanel() {
           </div>
         ))}
       </div>
-      {disclosure.showEvidenceAdvanced ? (
-        <Link href="/knowledge" className="text-xs text-teal-400 hover:text-teal-300">
+      {disclosure.showEvidenceAdvanced && mission?.projectId ? (
+        <Link
+          href={`/my-work?project=${mission.projectId}#project-evidence`}
+          className="text-xs text-teal-400 hover:text-teal-300"
+        >
           {t("zeroLearningCurve.advancedDetails")} →
         </Link>
       ) : null}

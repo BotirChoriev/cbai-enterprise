@@ -108,7 +108,7 @@ export function unpinEntity(kind: ContextEntityRef["kind"], id: string): Context
 }
 
 export const RECENT_ENTITIES_ARCHITECTURE_NOTE =
-  "Recent history stores locally viewed registry entities only — no fabricated activity.";
+  "Profiles you open will appear here. Search a country, company, or university to begin.";
 
 export const PINNED_ENTITIES_ARCHITECTURE_NOTE =
-  "No entities pinned to this workspace yet — no default pins, nothing fabricated.";
+  "Nothing pinned yet. Pin a profile from search to save it here.";

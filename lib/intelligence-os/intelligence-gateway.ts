@@ -28,7 +28,7 @@ const GOAL_ROUTES: Record<UserGoal, Omit<GoalRoute, "goal">> = {
   verify: { href: "/knowledge", reason: "Evidence verification surface" },
   compare: { href: "/graph", reason: "Relationship and comparison view" },
   continue: { href: "/my-work", reason: "Resume active project work" },
-  create: { href: "/", reason: "Mission creation on Intelligence Canvas" },
+  create: { href: "/?create=1", reason: "Mission creation on Intelligence Canvas" },
   collaborate: { href: "/trust", reason: "Collaboration requirements and trust" },
   publish: { href: "/reports", reason: "Report readiness and publication" },
 };
@@ -60,6 +60,20 @@ export const USER_GOALS: readonly UserGoal[] = [
   "collaborate",
   "publish",
 ];
+
+/** Contextual goals — fewer choices, matched to mission state. */
+export function deriveContextualGoals(mission: Mission | null): readonly UserGoal[] {
+  if (mission?.projectId) {
+    return ["continue", "verify", "research", "publish"];
+  }
+  if (mission) {
+    return ["create", "research", "verify", "continue"];
+  }
+  if (loadProjects().length > 0) {
+    return ["continue", "research", "verify", "create"];
+  }
+  return ["research", "verify", "create", "continue"];
+}
 
 export function deriveGatewayEntryState(mission: Mission | null): {
   readonly primaryMode: GatewayInputMode;
