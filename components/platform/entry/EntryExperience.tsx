@@ -79,7 +79,7 @@ export default function EntryExperience() {
     <button
       type="button"
       onClick={() => setDismissed(true)}
-      aria-label="Skip entry animation"
+      aria-label={t("home.entrySkipAriaLabel")}
       className="cbai-entry-backdrop fixed inset-0 z-[100] flex flex-col items-center justify-center gap-6 text-left"
     >
       {/* Design Bible Part II.2.2/2.9: full identity strength — mark plus wordtype — presented
@@ -96,7 +96,7 @@ export default function EntryExperience() {
         {isActive ? t("home.commandPlaceholder") : t("assistant.greetingSignedOut")}
       </span>
       <span className="cbai-entry-stage cbai-entry-stage-3 text-xs text-zinc-600">
-        Tap anywhere or press Escape to skip
+        {t("home.entrySkipHint")}
       </span>
     </button>
   );

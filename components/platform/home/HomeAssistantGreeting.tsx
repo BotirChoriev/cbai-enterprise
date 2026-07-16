@@ -7,7 +7,6 @@ import { usePlatformContext } from "@/components/platform/context/PlatformContex
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import OperatorOrb, { type OperatorOrbState } from "@/components/shared/OperatorOrb";
-import StatusBadge from "@/components/shared/StatusBadge";
 import AssistantCommandCenter from "@/components/assistant/AssistantCommandCenter";
 import { resolveOperatorName } from "@/lib/assistant/assistant-profile";
 import { resolveRoleDestinations } from "@/lib/assistant/role-destinations";
@@ -149,11 +148,6 @@ export default function HomeAssistantGreeting() {
             </p>
           </>
         )}
-        {isActive ? (
-          <div className="flex justify-center lg:justify-start">
-            <StatusBadge status="live" />
-          </div>
-        ) : null}
       </div>
 
       <div className="w-full max-w-2xl">
@@ -168,7 +162,7 @@ export default function HomeAssistantGreeting() {
       ) : (
         <Link
           href={nextStep.href}
-          className="inline-flex items-center gap-2 text-sm text-zinc-500 transition-colors hover:text-cyan-300"
+          className="inline-flex items-center gap-2 text-sm text-zinc-500 transition-colors hover:text-teal-300"
         >
           <span className={cbaiSectionEyebrow}>{t("project.nextStep")}</span>
           <span className="text-zinc-300">{nextStep.label}</span>

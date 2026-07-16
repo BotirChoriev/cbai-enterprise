@@ -12,34 +12,41 @@ import HomeTrust from "@/components/platform/home/HomeTrust";
 import EntryExperience from "@/components/platform/entry/EntryExperience";
 import CBAILogo from "@/components/brand/CBAILogo";
 import IntelligenceCompass from "@/components/platform/home/IntelligenceCompass";
+import { cbaiOperatingShell, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
-// The first screen is one environment, not a widget beside a card. The console (identity,
-// Operator, voice) sits in front of the real six-domain Intelligence Network, which bleeds past
-// the console's own edge rather than being boxed beside it in a clean 50/50 grid split — you are
-// meant to read this as "standing inside the network," not "text next to a diagram." Below the
-// hero: (5) Role entry, (6) Ecosystem entrances (Research/Governance/Economic/Public Intelligence
-// — real status per ecosystem, reusing the exact same HomeEcosystems component /dashboard already
-// used), (7) Current Intelligence (Compass + Feed + Recent activity), (8) Projects, (9) Trust.
-// Capability Flow/Audience content stays on /dashboard only — redundant with what's now on Home,
-// not complementary to it.
+/**
+ * One operating environment — not a marketing landing page. Hierarchy:
+ * identity → session → Operator/voice → globe → current work → entrances → trust.
+ */
 export default function PlatformHome() {
+  const { isActive } = useAssistantProfile();
+  const { t } = useTranslation();
+
   return (
-    <div className="home-page min-h-full bg-[#050810] pb-20">
+    <div className={`home-page ${cbaiOperatingShell} pb-20`}>
       <EntryExperience />
 
-      {/* CBAI identity layer (Mission 9.A), prominent in the top section of the first page (Phase
-          5), in addition to its permanent spot in the global header. The language selector lives
-          only in the Topbar (always present, including here) — a second one on this page would be
-          the exact literal duplication this design system is meant to avoid. */}
-      <div className="mx-auto flex max-w-7xl items-center px-4 pt-4 sm:px-8">
-        <CBAILogo size="sm" showTagline className="hidden sm:flex" />
-      </div>
+      <header className="mx-auto flex max-w-7xl flex-col gap-3 px-4 pt-4 sm:px-8">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <CBAILogo size="sm" showTagline />
+          {isActive ? (
+            <p className="flex items-center gap-2 text-xs text-zinc-500">
+              <span
+                aria-hidden="true"
+                className="h-1.5 w-1.5 rounded-full bg-emerald-500"
+              />
+              <span className={cbaiSectionEyebrow}>{t("home.intelligenceSessionLabel")}</span>
+              <span className="text-zinc-400">· {t("home.intelligenceSessionActive")}</span>
+            </p>
+          ) : null}
+        </div>
+        <p className={cbaiSectionEyebrow}>{t("home.operatingEnvironmentLabel")}</p>
+      </header>
 
-      {/* overflow-x-hidden lives on this outer, full-bleed wrapper — not on the max-w-7xl
-          container inside it — so the Intelligence Network can genuinely bleed past its own
-          column edge on wide screens without ever producing a horizontal scrollbar. */}
       <div className="relative overflow-x-hidden">
-        <div className="relative mx-auto max-w-7xl px-4 pb-4 pt-8 sm:px-8 sm:pt-12 lg:pt-16">
+        <div className="relative mx-auto max-w-7xl px-4 pb-4 pt-6 sm:px-8 sm:pt-10 lg:pt-12">
           <div className="relative z-10 max-w-xl lg:max-w-lg">
             <HomeAssistantGreeting />
           </div>
@@ -50,10 +57,6 @@ export default function PlatformHome() {
         </div>
       </div>
 
-      {/* Real work continuity comes immediately after the hero's own "next step" link — before
-          role selection or ecosystem entrances — because "what was I already doing" outranks
-          "what kind of user am I" the moment real projects exist. Same real ProjectList as
-          before, just promoted; still honestly empty for a first-time visitor. */}
       <div className="mx-auto mt-16 max-w-6xl px-4 sm:mt-20 sm:px-8">
         <HomeProjectsSection />
       </div>

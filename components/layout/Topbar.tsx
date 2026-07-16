@@ -34,7 +34,7 @@ export default function Topbar({ onMenuClick, transparent = false }: TopbarProps
       className={`flex h-14 min-w-0 shrink-0 items-center gap-2 px-3 transition-colors duration-300 sm:gap-3 sm:px-6 ${
         transparent
           ? "border-b border-transparent bg-transparent"
-          : "border-b border-cyan-500/10 bg-slate-950/90 backdrop-blur-md"
+          : "border-b border-teal-500/10 bg-[var(--surface)]/90 backdrop-blur-md"
       }`}
     >
       {onMenuClick ? (
@@ -42,7 +42,7 @@ export default function Topbar({ onMenuClick, transparent = false }: TopbarProps
           type="button"
           onClick={onMenuClick}
           aria-label="Open navigation"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-400 md:hidden"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-400 md:hidden"
         >
           <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className="h-5 w-5">
             <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
@@ -63,14 +63,14 @@ export default function Topbar({ onMenuClick, transparent = false }: TopbarProps
       >
         <Link
           href="/search"
-          className="hidden shrink-0 text-sm font-medium text-cyan-400 transition-colors hover:text-cyan-300 sm:inline-flex"
+          className="hidden shrink-0 text-sm font-medium text-teal-400 transition-colors hover:text-teal-300 sm:inline-flex"
         >
           {t("navigation.search")} →
         </Link>
         <Link
           href="/my-work"
           className={`hidden shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors lg:inline-flex ${
-            transparent ? "border border-transparent hover:border-cyan-500/30 hover:text-cyan-300" : "border border-zinc-800 hover:border-cyan-500/30 hover:text-cyan-300"
+            transparent ? "border border-transparent hover:border-teal-500/30 hover:text-teal-300" : "border border-zinc-800 hover:border-teal-500/30 hover:text-teal-300"
           }`}
         >
           + {t("home.newProject")}
@@ -78,7 +78,7 @@ export default function Topbar({ onMenuClick, transparent = false }: TopbarProps
         <Link
           href="/trust"
           className={`hidden shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors lg:inline-flex ${
-            transparent ? "border border-transparent hover:border-cyan-500/30 hover:text-cyan-300" : "border border-zinc-800 hover:border-cyan-500/30 hover:text-cyan-300"
+            transparent ? "border border-transparent hover:border-teal-500/30 hover:text-teal-300" : "border border-zinc-800 hover:border-teal-500/30 hover:text-teal-300"
           }`}
         >
           {t("navigation.trust")}

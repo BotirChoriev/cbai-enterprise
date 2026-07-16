@@ -23,6 +23,17 @@ export type TrustPillar = {
 export const EVIDENCE_NOT_CONNECTED_LABEL = "Evidence Source Not Connected";
 export const PLATFORM_VERSION = "0.1.0";
 
+export const TRUST_PILLAR_I18N_KEYS = {
+  "sources-before-conclusions": "sourcesBeforeConclusions",
+  "uncertainty-visible": "uncertaintyVisible",
+  "explainable-recommendations": "explainableRecommendations",
+  "comparable-alternatives": "comparableAlternatives",
+  "consequences-shown": "consequencesShown",
+  "ai-never-the-source": "aiNeverTheSource",
+  "history-preserved": "historyPreserved",
+  "humans-decide": "humansDecide",
+} as const;
+
 export const TRUST_PILLARS: TrustPillar[] = [
   {
     id: "sources-before-conclusions",

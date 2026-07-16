@@ -21,7 +21,7 @@ export default function RoleWorkContextCards() {
       <div className="space-y-2 text-center">
         <p className={cbaiSectionEyebrow}>{t("home.workContextsHeading")}</p>
         <h2 id="home-role-contexts-heading" className="cbai-display text-2xl text-zinc-50 sm:text-3xl">
-          However you work, CBAI understands the shape of it.
+          {t("home.roleSectionHeadline")}
         </h2>
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -34,7 +34,7 @@ export default function RoleWorkContextCards() {
           />
         ))}
       </div>
-      <Link href="/dashboard" className="inline-flex text-xs font-medium text-cyan-400 hover:text-cyan-300">
+      <Link href="/dashboard" className="inline-flex text-xs font-medium text-teal-400 hover:text-teal-300">
         {t("common.viewAllCapabilities")} →
       </Link>
     </section>
