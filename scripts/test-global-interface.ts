@@ -335,3 +335,58 @@ test("22. Future languages are registered but never appear active until translat
   const assistantActive = ASSISTANT_LANGUAGES.filter((l) => l.available).map((l) => l.code).sort();
   assert.deepEqual(assistantActive, active);
 });
+
+// ---------------------------------------------------------------------------
+// 23-26. BUILD-009 — full About copy, governance principles, unified entity/graph i18n
+// ---------------------------------------------------------------------------
+
+test("23. BUILD-009 About page copy includes all restored sections in every active language", () => {
+  for (const dict of [en, uz, ru, tr]) {
+    assert.equal(dict.aboutPage.principles.length, 12);
+    assert.ok(dict.aboutPage.limitationsItems.length >= 5);
+    assert.ok(dict.aboutPage.roadmapItems.length >= 5);
+    assert.ok(dict.aboutPage.manifestoItems.length >= 15);
+    assert.ok(dict.aboutPage.trustDoes.length >= 4);
+  }
+});
+
+test("24. BUILD-009 governance constitutional principles are translated without altering IDs", () => {
+  const ids = [
+    "evidence-first",
+    "political-neutrality",
+    "zero-demo-policy",
+    "methodology-before-metrics",
+    "separation-of-evidence-and-judgment",
+    "no-social-sentiment-scoring",
+    "official-source-priority",
+    "reproducibility",
+    "governance-before-release",
+  ] as const;
+  for (const dict of [en, uz, ru, tr]) {
+    for (const id of ids) {
+      assert.ok(dict.governanceCenter.principles[id]?.title);
+      assert.ok(dict.governanceCenter.principles[id]?.description);
+    }
+  }
+});
+
+test("25. BUILD-009 shared entity intelligence and graph UI keys exist in all dictionaries", () => {
+  for (const dict of [en, uz, ru, tr]) {
+    assert.ok(dict.entityIntelligence.reportsBodySingle);
+    assert.ok(dict.entityIntelligence.benchmarkUniversity);
+    assert.ok(dict.graphUi.noSelectionConnections);
+    assert.ok(dict.graphUi.futureEvidenceDefault);
+    assert.ok(dict.reportsModel.exportFutureDescription);
+  }
+});
+
+test("26. BUILD-009 unified entity relationship and source coverage components are client-i18n wired", () => {
+  const sourcePanel = readSource("components/shared/EntitySourceCoveragePanel.tsx");
+  const relSection = readSource("components/shared/EntityRelationshipsSection.tsx");
+  const aboutClient = readSource("components/about/AboutPageClient.tsx");
+  assert.match(sourcePanel, /useTranslation/);
+  assert.match(relSection, /useTranslation/);
+  assert.match(aboutClient, /limitationsEyebrow|limitationsHeadline/);
+  assert.match(aboutClient, /roadmapEyebrow|roadmapHeadline/);
+  assert.match(aboutClient, /manifestoTitle/);
+});

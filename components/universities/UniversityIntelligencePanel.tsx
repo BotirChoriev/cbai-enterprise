@@ -27,6 +27,7 @@ import {
 import { getUniversityRelationships } from "@/lib/universities.adapter";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import CreateProjectFromEntityButton from "@/components/project/CreateProjectFromEntityButton";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type UniversityIntelligencePanelProps = {
   journey: UniversityUserJourney;
@@ -37,6 +38,7 @@ export function UniversityIntelligencePanel({
   journey,
   university,
 }: UniversityIntelligencePanelProps) {
+  const { t } = useTranslation();
   const [showReport, setShowReport] = useState(false);
   const { profile, evidenceGaps, evidenceComparison } = journey;
   const { registryFacts, coverage } = profile;
@@ -62,11 +64,11 @@ export function UniversityIntelligencePanel({
 
       <EntityHeader
         name={registryFacts.name}
-        entityType="University"
+        entityType={t("entityIntelligence.entityTypeUniversity")}
         country={registryFacts.country}
         subtitle={`${registryFacts.icon} · ${registryFacts.type} · ${registryFacts.city}`}
         availableInformation={registryFacts.sourceLabel}
-        facts={[{ label: "Founded", value: String(registryFacts.founded) }]}
+        facts={[{ label: t("entityIntelligence.factFounded"), value: String(registryFacts.founded) }]}
       />
 
       <IntelligenceContextPanel
@@ -106,7 +108,10 @@ export function UniversityIntelligencePanel({
       </div>
 
       <EntityOptionalExploration>
-        <EntityCompareSection>
+        <EntityCompareSection
+          heading={t("entityIntelligence.comparables")}
+          description={t("entityIntelligence.benchmarkUniversity")}
+        >
           <EvidenceComparisonPanel
             entityType="university"
             leftLegacyId={university.id}

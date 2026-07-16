@@ -1,37 +1,47 @@
+"use client";
+
 import { ACTIVE_EDGE_TYPE_CONFIG, NODE_TYPE_COLORS } from "@/lib/graph/graph.mock";
-import { getEntityTypeLabel } from "@/lib/entity/entity.helpers";
 import type { GraphNodeType } from "@/lib/graph/graph.types";
 import { GRAPH_ENTITY_TYPES, GRAPH_RELATIONSHIP_TYPES } from "@/lib/graph/graph-platform";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import { getDictionary } from "@/lib/i18n/translate";
+import { translateGraphEntityTypes } from "@/lib/i18n/graph-ui-translation";
 
 export default function GraphLegend() {
+  const { t, language } = useTranslation();
+  const dictionary = getDictionary(language);
+  const entityTypes = translateGraphEntityTypes(dictionary);
   const activeNodeTypes: GraphNodeType[] = ["country", "company", "university"];
+  const futureEntityCount = GRAPH_ENTITY_TYPES.filter((type) => !type.active).length;
+  const futureRelationshipCount = GRAPH_RELATIONSHIP_TYPES.filter((type) => !type.active).length;
 
   return (
     <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
-      <h3 className="mb-3 text-sm font-semibold text-zinc-50">Legend</h3>
+      <h3 className="mb-3 text-sm font-semibold text-zinc-50">{t("graphUi.legend")}</h3>
 
       <div className="mb-4">
         <p className="mb-2 text-[10px] font-medium uppercase tracking-widest text-zinc-600">
-          Active Entity Types
+          {t("graphUi.activeEntityTypes")}
         </p>
         <div className="space-y-1.5">
-          {activeNodeTypes.map((type) => (
-            <div key={type} className="flex items-center gap-2">
-              <span
-                className="h-3 w-3 rounded-full"
-                style={{ backgroundColor: NODE_TYPE_COLORS[type] }}
-              />
-              <span className="text-xs text-zinc-400">
-                {getEntityTypeLabel(type)}
-              </span>
-            </div>
-          ))}
+          {activeNodeTypes.map((type) => {
+            const copy = entityTypes.find((entry) => entry.id === type);
+            return (
+              <div key={type} className="flex items-center gap-2">
+                <span
+                  className="h-3 w-3 rounded-full"
+                  style={{ backgroundColor: NODE_TYPE_COLORS[type] }}
+                />
+                <span className="text-xs text-zinc-400">{copy?.label ?? type}</span>
+              </div>
+            );
+          })}
         </div>
       </div>
 
       <div className="mb-4">
         <p className="mb-2 text-[10px] font-medium uppercase tracking-widest text-zinc-600">
-          Verified Relationships
+          {t("graphUi.verifiedRelationships")}
         </p>
         <div className="space-y-1.5">
           {ACTIVE_EDGE_TYPE_CONFIG.map((edge) => (
@@ -55,13 +65,13 @@ export default function GraphLegend() {
 
       <div>
         <p className="mb-2 text-[10px] font-medium uppercase tracking-widest text-zinc-600">
-          Planned Types
+          {t("graphUi.plannedTypes")}
         </p>
         <p className="text-xs text-zinc-500">
-          {GRAPH_ENTITY_TYPES.filter((type) => !type.active).length} future entity
-          types ·{" "}
-          {GRAPH_RELATIONSHIP_TYPES.filter((type) => !type.active).length} relationship
-          types not connected
+          {t("graphUi.plannedTypesSummary", {
+            entityCount: String(futureEntityCount),
+            relationshipCount: String(futureRelationshipCount),
+          })}
         </p>
       </div>
     </div>

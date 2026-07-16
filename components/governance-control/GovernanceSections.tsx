@@ -16,7 +16,7 @@ type GovernanceRuleRegistryProps = {
 };
 
 export function GovernanceRuleRegistry({ categories }: GovernanceRuleRegistryProps) {
-  const { t, language } = useTranslation();
+  const { language } = useTranslation();
   const gc = getDictionary(language).governanceCenter;
 
   return (

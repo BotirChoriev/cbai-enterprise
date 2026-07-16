@@ -1,7 +1,6 @@
 "use client";
 
 import type { ReportTypeDefinition } from "@/lib/reports-center";
-import { reportStatusClass } from "@/lib/reports-center";
 import { translatedReportStatusClass } from "@/lib/i18n/reports-center-translation";
 import { getDictionary } from "@/lib/i18n/translate";
 import Link from "next/link";

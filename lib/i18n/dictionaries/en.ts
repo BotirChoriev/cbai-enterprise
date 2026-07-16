@@ -40,6 +40,13 @@ import {
   RESET_PASSWORD_PAGE_EN,
   SOURCE_COVERAGE_EN,
 } from "@/lib/i18n/platform-copy-build008-en";
+import {
+  ABOUT_PAGE_BUILD009_EN,
+  ENTITY_INTELLIGENCE_BUILD009_EN,
+  GOVERNANCE_PRINCIPLES_EN,
+  GRAPH_UI_BUILD009_EN,
+  REPORTS_MODEL_BUILD009_EN,
+} from "@/lib/i18n/platform-copy-build009-en";
 
 const en: TranslationDictionary = {
   roles: {
@@ -470,14 +477,14 @@ const en: TranslationDictionary = {
   entityUi: ENTITY_UI_EN,
   projectUi: PROJECT_UI_EN,
   governancePage: GOVERNANCE_PAGE_EN,
-  entityIntelligence: ENTITY_INTELLIGENCE_EN,
+  entityIntelligence: { ...ENTITY_INTELLIGENCE_EN, ...ENTITY_INTELLIGENCE_BUILD009_EN },
   sourceCoverage: SOURCE_COVERAGE_EN,
   entityRelationships: ENTITY_RELATIONSHIPS_EN,
   researchTopic: RESEARCH_TOPIC_EN,
-  governanceCenter: GOVERNANCE_CENTER_EN,
-  reportsModel: REPORTS_MODEL_EN,
-  graphUi: GRAPH_UI_EN,
-  aboutPage: ABOUT_PAGE_EN,
+  governanceCenter: { ...GOVERNANCE_CENTER_EN, principles: GOVERNANCE_PRINCIPLES_EN },
+  reportsModel: { ...REPORTS_MODEL_EN, ...REPORTS_MODEL_BUILD009_EN },
+  graphUi: { ...GRAPH_UI_EN, ...GRAPH_UI_BUILD009_EN },
+  aboutPage: { ...ABOUT_PAGE_EN, ...ABOUT_PAGE_BUILD009_EN },
   resetPasswordPage: RESET_PASSWORD_PAGE_EN,
 };
 

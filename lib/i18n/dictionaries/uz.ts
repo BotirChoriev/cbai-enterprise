@@ -40,6 +40,13 @@ import {
   RESET_PASSWORD_PAGE_UZ,
   SOURCE_COVERAGE_UZ,
 } from "@/lib/i18n/platform-copy-build008-uz";
+import {
+  ABOUT_PAGE_BUILD009_UZ,
+  ENTITY_INTELLIGENCE_BUILD009_UZ,
+  GOVERNANCE_PRINCIPLES_UZ,
+  GRAPH_UI_BUILD009_UZ,
+  REPORTS_MODEL_BUILD009_UZ,
+} from "@/lib/i18n/platform-copy-build009-uz";
 
 const uz: TranslationDictionary = {
   roles: {
@@ -469,14 +476,14 @@ const uz: TranslationDictionary = {
   entityUi: ENTITY_UI_UZ,
   projectUi: PROJECT_UI_UZ,
   governancePage: GOVERNANCE_PAGE_UZ,
-  entityIntelligence: ENTITY_INTELLIGENCE_UZ,
+  entityIntelligence: { ...ENTITY_INTELLIGENCE_UZ, ...ENTITY_INTELLIGENCE_BUILD009_UZ },
   sourceCoverage: SOURCE_COVERAGE_UZ,
   entityRelationships: ENTITY_RELATIONSHIPS_UZ,
   researchTopic: RESEARCH_TOPIC_UZ,
-  governanceCenter: GOVERNANCE_CENTER_UZ,
-  reportsModel: REPORTS_MODEL_UZ,
-  graphUi: GRAPH_UI_UZ,
-  aboutPage: ABOUT_PAGE_UZ,
+  governanceCenter: { ...GOVERNANCE_CENTER_UZ, principles: GOVERNANCE_PRINCIPLES_UZ },
+  reportsModel: { ...REPORTS_MODEL_UZ, ...REPORTS_MODEL_BUILD009_UZ },
+  graphUi: { ...GRAPH_UI_UZ, ...GRAPH_UI_BUILD009_UZ },
+  aboutPage: { ...ABOUT_PAGE_UZ, ...ABOUT_PAGE_BUILD009_UZ },
   resetPasswordPage: RESET_PASSWORD_PAGE_UZ,
 };
 

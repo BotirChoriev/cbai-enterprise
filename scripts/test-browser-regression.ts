@@ -197,6 +197,131 @@ if (!serverUp) {
     await page.close();
   });
 
+  test("8. No horizontal overflow at required viewports on primary routes (BUILD-009 responsive audit)", async () => {
+    const routes = [
+      "/", "/my-work", "/search", "/countries", "/companies", "/universities",
+      "/research", "/reports", "/trust", "/about", "/graph", "/settings", "/account",
+    ];
+    const viewports = [
+      { width: 320, height: 568 },
+      { width: 375, height: 812 },
+      { width: 390, height: 844 },
+      { width: 414, height: 896 },
+      { width: 768, height: 1024 },
+      { width: 1024, height: 768 },
+      { width: 1440, height: 900 },
+      { width: 1920, height: 1080 },
+    ];
+
+    for (const viewport of viewports) {
+      const page = await browser.newPage({ viewport });
+      for (const route of routes) {
+        await page.goto(BASE + route, { waitUntil: "networkidle" });
+        await page.waitForTimeout(route === "/" ? 2400 : 600);
+        const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+        const clientWidth = await page.evaluate(() => document.documentElement.clientWidth);
+        assert.ok(
+          scrollWidth <= clientWidth,
+          `${route} has horizontal overflow at ${viewport.width}px (scrollWidth=${scrollWidth}, clientWidth=${clientWidth})`,
+        );
+      }
+      await page.close();
+    }
+  });
+
+  test("9. Language sweeps (EN/UZ/RU/TR) — no raw keys on primary routes, About restored (BUILD-009)", async () => {
+    const routes = ["/", "/about", "/graph", "/reports", "/countries"];
+    const languages: { label: RegExp; marker: RegExp; code: string }[] = [
+      { code: "en", label: /English/i, marker: /My Work|Search/i },
+      { code: "uz", label: /O.zbek/i, marker: /Mening ishlarim|Qidiruv/i },
+      { code: "ru", label: /Русский/i, marker: /Моя работа|Поиск/i },
+      { code: "tr", label: /Türk/i, marker: /Çalışmam|Ara/i },
+    ];
+
+    for (const [langIndex, lang] of languages.entries()) {
+      const page = await browser.newPage();
+      await page.goto(BASE + "/", { waitUntil: "networkidle" });
+      await page.waitForTimeout(2400);
+      if (langIndex > 0) {
+        await page.locator("summary").first().click();
+        await page.waitForTimeout(300);
+        await page.locator(`text=${lang.label}`).first().click();
+        await page.waitForTimeout(600);
+      }
+
+      for (const route of routes) {
+        await page.goto(BASE + route, { waitUntil: "networkidle" });
+        await page.waitForTimeout(route === "/" ? 2400 : 800);
+        const bodyText = await page.locator("body").innerText();
+        const rawKeyLeak = bodyText.match(
+          /\b(?:home|project|navigation|common|entityIntelligence|graphUi|aboutPage|reportsModel)\.[a-zA-Z.]+\b/,
+        );
+        assert.equal(
+          rawKeyLeak,
+          null,
+          `${lang.code} ${route} leaked a raw translation key: ${rawKeyLeak?.[0]}`,
+        );
+      }
+
+      if (lang.code === "en") {
+        await page.goto(BASE + "/about", { waitUntil: "networkidle" });
+        await page.waitForTimeout(800);
+        await page.locator("#about-manifesto-heading").scrollIntoViewIfNeeded();
+        await page.waitForTimeout(400);
+        const aboutText = await page.locator("body").innerText();
+        assert.ok(aboutText.includes("Twelve principles"), "About must include full philosophy section");
+        assert.ok(
+          aboutText.includes("What CBAI does not claim to do today"),
+          "About must include limitations section",
+        );
+        assert.ok(
+          aboutText.includes("Real capabilities by maturity state"),
+          "About must include roadmap maturity section",
+        );
+        assert.ok(
+          aboutText.includes("The CBAI Manifesto") || aboutText.includes("Twenty working beliefs"),
+          "About must include manifesto section",
+        );
+      }
+
+      await page.reload({ waitUntil: "networkidle" });
+      await page.waitForTimeout(600);
+      const persisted = await page.locator("body").innerText();
+      assert.ok(lang.marker.test(persisted), `${lang.code} language must persist after reload`);
+
+      await page.close();
+    }
+  });
+
+  test("10. Graph and entity intelligence panels use translated chrome (BUILD-009 Uzbek regression)", async () => {
+    const page = await browser.newPage();
+    await page.goto(BASE + "/", { waitUntil: "networkidle" });
+    await page.waitForTimeout(2400);
+    await page.locator("summary").first().click();
+    await page.waitForTimeout(300);
+    await page.locator("text=/O.zbek/i").first().click();
+    await page.waitForTimeout(600);
+
+    await page.goto(BASE + "/graph", { waitUntil: "networkidle" });
+    await page.waitForTimeout(800);
+
+    const graphText = await page.locator("body").innerText();
+    assert.ok(graphText.includes("Afsona"), "Graph legend must render translated Uzbek heading");
+    assert.ok(graphText.includes("Barcha turlar"), "Graph type filter must render translated All Types label");
+
+    await page.goto(BASE + "/countries", { waitUntil: "networkidle" });
+    await page.waitForTimeout(800);
+    await page.getByRole("button", { name: "Japan" }).click();
+    await page.waitForTimeout(1200);
+    const countryText = await page.locator("body").innerText();
+    assert.ok(
+      countryText.includes("Intellekt konteksti") || countryText.includes("Mamlakat"),
+      "Country profile must render translated intelligence chrome",
+    );
+
+    await page.close();
+  });
+
   test("teardown", async () => {
     await browser.close();
   });

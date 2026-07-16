@@ -1,18 +1,17 @@
+"use client";
+
 import Link from "next/link";
 import type { EntityRelationship, EntityType } from "@/lib/entity/entity.types";
 import { getEntityTypePluralLabel } from "@/lib/entity/entity.helpers";
 import { cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type EntityRelatedPanelProps = {
   title?: string;
   relationships: readonly EntityRelationship[];
   emptyLabel: string;
-  /** Optional short note about how these relationships were derived (e.g. "matched by subject matter"). */
   note?: string;
-  /** Set false when the caller already renders its own section heading around this panel. */
   showHeading?: boolean;
-  /** Real, already-existing routes to offer when there are genuinely no relationships yet — never
-   * a dead end with text alone. */
   emptyActions?: readonly { label: string; href: string }[];
 };
 
@@ -47,7 +46,15 @@ function verifiedBadgeClass(verified: boolean): string {
     : "text-zinc-400 bg-zinc-800/50 border-zinc-700/50";
 }
 
-function RelationshipRow({ item }: { item: EntityRelationship }) {
+function RelationshipRow({
+  item,
+  verifiedLabel,
+  missingLabel,
+}: {
+  item: EntityRelationship;
+  verifiedLabel: string;
+  missingLabel: string;
+}) {
   return (
     <li className="flex flex-col gap-2 rounded-lg border border-zinc-800 bg-zinc-900/40 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
@@ -62,7 +69,7 @@ function RelationshipRow({ item }: { item: EntityRelationship }) {
       </div>
       {item.verified !== undefined ? (
         <span className={`self-start rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${verifiedBadgeClass(item.verified)}`}>
-          {item.verified ? "Verified local catalog" : "Evidence missing"}
+          {item.verified ? verifiedLabel : missingLabel}
         </span>
       ) : null}
     </li>
@@ -88,22 +95,18 @@ function RelationshipPill({ item }: { item: EntityRelationship }) {
   );
 }
 
-/**
- * Universal Entity Engine — one "Related Entities" panel, grouped by real target type, replacing
- * the need for a bespoke "Related Companies"/"Related Universities"/"Related Research" component
- * per entity module. Only ever renders relationships the caller actually computed via
- * lib/entity/entity-relationships.ts's buildEntityRelationships — never fabricates a group. When a
- * group's relationships carry a real label/verification status (Knowledge Graph edges), it renders
- * the richer row layout; otherwise (e.g. subject-matter-matched research topics) a compact pill.
- */
 export default function EntityRelatedPanel({
-  title = "Related Entities",
+  title,
   relationships,
   emptyLabel,
   note,
   showHeading = true,
   emptyActions,
 }: EntityRelatedPanelProps) {
+  const { t } = useTranslation();
+  const panelTitle = title ?? t("entityRelationships.relatedEntities");
+  const verifiedLabel = t("entityRelationships.verifiedCatalog");
+  const missingLabel = t("entityRelationships.evidenceMissing");
   const groups = groupByType(relationships);
 
   if (groups.length === 0) {
@@ -111,7 +114,7 @@ export default function EntityRelatedPanel({
       <section aria-labelledby="entity-related-panel-heading" className="space-y-2">
         {showHeading ? (
           <p className={cbaiSectionEyebrow} id="entity-related-panel-heading">
-            {title}
+            {panelTitle}
           </p>
         ) : null}
         <p className="text-sm text-zinc-500">{emptyLabel}</p>
@@ -138,7 +141,7 @@ export default function EntityRelatedPanel({
         <div>
           {showHeading ? (
             <p className={cbaiSectionEyebrow} id="entity-related-panel-heading">
-              {title}
+              {panelTitle}
             </p>
           ) : null}
           {note ? <p className="mt-1 text-xs text-zinc-600">{note}</p> : null}
@@ -154,15 +157,9 @@ export default function EntityRelatedPanel({
               </p>
               <ul className={useRows ? "space-y-2" : "flex flex-wrap gap-2"}>
                 {group.items.map((item, index) => {
-                  // Real bug found via actual browser testing: the same real target (e.g. a
-                  // company) can legitimately appear twice with two different real relationship
-                  // labels (e.g. "Headquartered in" and a separate real edge) — both are honest,
-                  // distinct relationships that must both render, but a key built from
-                  // type/targetType/targetId alone collided for them. `label` (when present) plus
-                  // the array index guarantee a unique key without dropping either real row.
                   const key = `${item.type}-${item.targetType}-${item.targetId}-${item.label ?? ""}-${index}`;
                   return useRows ? (
-                    <RelationshipRow key={key} item={item} />
+                    <RelationshipRow key={key} item={item} verifiedLabel={verifiedLabel} missingLabel={missingLabel} />
                   ) : (
                     <RelationshipPill key={key} item={item} />
                   );

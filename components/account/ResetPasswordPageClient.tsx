@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import ResetPasswordForm from "@/components/account/ResetPasswordForm";

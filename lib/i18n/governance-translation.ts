@@ -45,7 +45,16 @@ export function translateGovernanceControlModel(
   return {
     ...model,
     ruleCategories: model.ruleCategories.map((row) => translateGovernanceCategory(dictionary, row)),
-    principles: model.principles,
+    principles: model.principles.map((principle) => {
+      const copy = gc.principles[principle.id as keyof typeof gc.principles];
+      return copy
+        ? {
+            ...principle,
+            title: copy.title,
+            description: copy.description,
+          }
+        : principle;
+    }),
     validationPipeline: model.validationPipeline.map((step) =>
       translateGovernanceValidationStep(dictionary, step),
     ),

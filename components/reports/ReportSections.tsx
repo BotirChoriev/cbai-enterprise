@@ -7,7 +7,6 @@ import type {
 } from "@/lib/reports-center";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
 import { useTranslation } from "@/lib/i18n/use-translation";
-import { translatedReportStatusClass } from "@/lib/i18n/reports-center-translation";
 import { getDictionary } from "@/lib/i18n/translate";
 
 type ReportExportFutureProps = {
@@ -15,7 +14,7 @@ type ReportExportFutureProps = {
 };
 
 export function ReportExportFuture({ items }: ReportExportFutureProps) {
-  const { t, language } = useTranslation();
+  const { language } = useTranslation();
   const copy = getDictionary(language).reportsModel;
 
   return (
@@ -27,9 +26,7 @@ export function ReportExportFuture({ items }: ReportExportFutureProps) {
         >
           {copy.exportFutureHeading}
         </h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          Planned export formats — not available until report readiness criteria are satisfied.
-        </p>
+        <p className="mt-1 text-sm text-zinc-500">{copy.exportFutureDescription}</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -53,14 +50,9 @@ export function ReportNoFakeNotice() {
   return (
     <section className="space-y-4" aria-labelledby="report-no-fake-heading">
       <Card className="border-amber-500/20 bg-amber-500/5">
-        <CardHeader title={copy.noFakeAnalyticsNotice} description="Constitutional compliance" />
+        <CardHeader title={copy.noFakeAnalyticsNotice} description={copy.constitutionalCompliance} />
         <CardContent>
-          <p className="text-sm text-zinc-400">
-            Reports Center does not generate charts, KPIs, usage statistics, or growth metrics.
-            No report is produced unless connected evidence and documented methodology exist.
-            When data is missing, labels read Evidence Source Not Connected or Insufficient
-            Evidence.
-          </p>
+          <p className="text-sm text-zinc-400">{copy.noFakeAnalyticsBody}</p>
         </CardContent>
       </Card>
     </section>
@@ -84,9 +76,7 @@ export function ReportPersonasSection({ personas }: ReportPersonasSectionProps) 
         >
           {copy.personasHeading}
         </h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          Which report types each audience will find useful when evidence connects.
-        </p>
+        <p className="mt-1 text-sm text-zinc-500">{copy.personasSectionDescription}</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -124,9 +114,7 @@ export function ReportTrustSection({ pillars }: ReportTrustSectionProps) {
         >
           {copy.trustHeading}
         </h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          Principles governing future report generation on CBAI.
-        </p>
+        <p className="mt-1 text-sm text-zinc-500">{copy.trustSectionDescription}</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

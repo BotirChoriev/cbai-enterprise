@@ -28,6 +28,7 @@ import EntityFutureSources from "@/components/shared/EntityFutureSources";
 import CompanyTrustSection from "@/components/companies/CompanyTrustSection";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import CreateProjectFromEntityButton from "@/components/project/CreateProjectFromEntityButton";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type CompanyIntelligencePanelProps = {
   journey: CompanyUserJourney;
@@ -35,6 +36,7 @@ type CompanyIntelligencePanelProps = {
 };
 
 export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligencePanelProps) {
+  const { t } = useTranslation();
   const [showReport, setShowReport] = useState(false);
   const { context } = usePlatformContext();
   const { profile, evidenceGaps, evidenceComparison } = journey;
@@ -54,8 +56,8 @@ export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligen
   const comparablesAndCoverage = (
     <div className="space-y-6">
       <EntityCompareSection
-        heading="Comparables"
-        description="Benchmark this company against others in the registry before reading the full profile."
+        heading={t("entityIntelligence.comparables")}
+        description={t("entityUi.benchmarkCompany")}
       >
         <EvidenceComparisonPanel
           entityType="company"
@@ -84,15 +86,15 @@ export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligen
 
       <EntityHeader
         name={registryFacts.name}
-        entityType="Company"
+        entityType={t("entityIntelligence.entityTypeCompany")}
         country={registryFacts.country}
         subtitle={`${registryFacts.icon} · ${registryFacts.industry}`}
         availableInformation={registryFacts.sourceLabel}
         facts={[
-          { label: "Founded", value: String(registryFacts.founded) },
+          { label: t("entityIntelligence.factFounded"), value: String(registryFacts.founded) },
           {
-            label: "Official website",
-            value: company.website ?? "No verified data available.",
+            label: t("entityIntelligence.factOfficialWebsite"),
+            value: company.website ?? t("entityUi.noVerifiedData"),
             href: company.website,
           },
         ]}
@@ -124,12 +126,9 @@ export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligen
         <>
           <div className="rounded-xl border border-indigo-500/25 bg-indigo-500/5 px-5 py-4">
             <p className="text-[10px] font-semibold uppercase tracking-widest text-indigo-300">
-              Economic Intelligence — comparables first
+              {t("entityIntelligence.investorLensTitle")}
             </p>
-            <p className="mt-1 text-sm text-zinc-400">
-              Entered from the Investor workspace — comparables and indicator coverage below come
-              before the narrative profile.
-            </p>
+            <p className="mt-1 text-sm text-zinc-400">{t("entityIntelligence.investorLensBody")}</p>
           </div>
           {comparablesAndCoverage}
         </>

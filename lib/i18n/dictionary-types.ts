@@ -875,6 +875,12 @@ export type TranslationDictionary = {
     governanceLensBody: string;
     investorLensTitle: string;
     investorLensBody: string;
+    reportsBodySingle: string;
+    reportsBodyPlural: string;
+    openReportsCenterSr: string;
+    benchmarkUniversity: string;
+    partnerClaimsNotShownExtended: string;
+    researchPartnershipsNotShownExtended: string;
   };
   sourceCoverage: {
     countryHeading: string;
@@ -974,6 +980,18 @@ export type TranslationDictionary = {
       "no-automated-enforcement" | "no-runtime-policy-changes" | "no-hidden-ai",
       { title: string; description: string }
     >;
+    principles: Record<
+      | "evidence-first"
+      | "political-neutrality"
+      | "zero-demo-policy"
+      | "methodology-before-metrics"
+      | "separation-of-evidence-and-judgment"
+      | "no-social-sentiment-scoring"
+      | "official-source-priority"
+      | "reproducibility"
+      | "governance-before-release",
+      { title: string; description: string }
+    >;
   };
   reportsModel: {
     statuses: {
@@ -1026,6 +1044,11 @@ export type TranslationDictionary = {
     noFakeAnalyticsNotice: string;
     personasHeading: string;
     trustHeading: string;
+    exportFutureDescription: string;
+    constitutionalCompliance: string;
+    noFakeAnalyticsBody: string;
+    personasSectionDescription: string;
+    trustSectionDescription: string;
   };
   graphUi: {
     entityDetails: string;
@@ -1078,6 +1101,12 @@ export type TranslationDictionary = {
       localPlatformRegistry: string;
       partnershipVerification: string;
     };
+    noSelectionConnections: string;
+    futureEvidenceDefault: string;
+    plannedTypesSummary: string;
+    sourceAdapterCountry: string;
+    sourceAdapterCompany: string;
+    sourceAdapterUniversity: string;
   };
   aboutPage: {
     title: string;
@@ -1107,6 +1136,45 @@ export type TranslationDictionary = {
     trySearch: string;
     openTrust: string;
     exploreResearch: string;
+    audiencesServesEyebrow: string;
+    whatIsBodyExtra: string;
+    whyProblems: readonly { title: string; body: string }[];
+    whyClosingExtended: string;
+    principles: readonly { title: string; description: string }[];
+    differentiators: readonly { from: string; to: string; description: string }[];
+    audiences: readonly { role: string; need: string }[];
+    workflowSteps: readonly { step: string; detail: string }[];
+    ecosystems: readonly { name: string; description: string }[];
+    ecosystemsClosing: string;
+    exploreArrow: string;
+    trustEyebrow: string;
+    trustHeadline: string;
+    trustDoesHeading: string;
+    trustDoes: readonly string[];
+    trustNeverHeading: string;
+    trustNever: readonly string[];
+    trustClosingBefore: string;
+    trustClosingLink: string;
+    trustClosingAfter: string;
+    visionEyebrow: string;
+    visionHeadline: string;
+    visionItems: readonly string[];
+    manifestoTitle: string;
+    manifestoItems: readonly string[];
+    limitationsEyebrow: string;
+    limitationsHeadline: string;
+    limitationsItems: readonly string[];
+    roadmapEyebrow: string;
+    roadmapHeadline: string;
+    roadmapItems: readonly {
+      name: string;
+      statusKey: "live" | "partial" | "preview" | "planned" | "waiting_for_verified_data" | "not_connected" | "restricted";
+      detail: string;
+    }[];
+    closingHeadline: string;
+    closingBody: string;
+    readTrustCenter: string;
+    startProject: string;
   };
   resetPasswordPage: {
     pageDescription: string;

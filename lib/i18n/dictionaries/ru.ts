@@ -40,6 +40,13 @@ import {
   RESET_PASSWORD_PAGE_RU,
   SOURCE_COVERAGE_RU,
 } from "@/lib/i18n/platform-copy-build008-ru";
+import {
+  ABOUT_PAGE_BUILD009_RU,
+  ENTITY_INTELLIGENCE_BUILD009_RU,
+  GOVERNANCE_PRINCIPLES_RU,
+  GRAPH_UI_BUILD009_RU,
+  REPORTS_MODEL_BUILD009_RU,
+} from "@/lib/i18n/platform-copy-build009-ru";
 
 const ru: TranslationDictionary = {
   roles: {
@@ -469,14 +476,14 @@ const ru: TranslationDictionary = {
   entityUi: ENTITY_UI_RU,
   projectUi: PROJECT_UI_RU,
   governancePage: GOVERNANCE_PAGE_RU,
-  entityIntelligence: ENTITY_INTELLIGENCE_RU,
+  entityIntelligence: { ...ENTITY_INTELLIGENCE_RU, ...ENTITY_INTELLIGENCE_BUILD009_RU },
   sourceCoverage: SOURCE_COVERAGE_RU,
   entityRelationships: ENTITY_RELATIONSHIPS_RU,
   researchTopic: RESEARCH_TOPIC_RU,
-  governanceCenter: GOVERNANCE_CENTER_RU,
-  reportsModel: REPORTS_MODEL_RU,
-  graphUi: GRAPH_UI_RU,
-  aboutPage: ABOUT_PAGE_RU,
+  governanceCenter: { ...GOVERNANCE_CENTER_RU, principles: GOVERNANCE_PRINCIPLES_RU },
+  reportsModel: { ...REPORTS_MODEL_RU, ...REPORTS_MODEL_BUILD009_RU },
+  graphUi: { ...GRAPH_UI_RU, ...GRAPH_UI_BUILD009_RU },
+  aboutPage: { ...ABOUT_PAGE_RU, ...ABOUT_PAGE_BUILD009_RU },
   resetPasswordPage: RESET_PASSWORD_PAGE_RU,
 };
 

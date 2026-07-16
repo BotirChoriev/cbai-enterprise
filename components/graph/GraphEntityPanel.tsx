@@ -5,6 +5,7 @@ import { getEntityTypeLabel } from "@/lib/entity/entity.helpers";
 import { buildEntityGraphEvidenceSummary } from "@/lib/graph/graph.evidence";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import Link from "next/link";
+import { getDictionary } from "@/lib/i18n/translate";
 
 type GraphEntityPanelProps = {
   selectedNode: GraphNode | null;
@@ -17,12 +18,7 @@ type GraphEntityPanelProps = {
   onClearSelection: () => void;
 };
 
-const TYPE_OPTIONS: { value: GraphNodeFilter; label: string }[] = [
-  { value: "all", label: "All Types" },
-  { value: "country", label: "Countries" },
-  { value: "company", label: "Companies" },
-  { value: "university", label: "Universities" },
-];
+const TYPE_FILTER_VALUES: GraphNodeFilter[] = ["all", "country", "company", "university"];
 
 const MODULE_ROUTES: Record<string, string> = {
   country: "/countries",
@@ -87,24 +83,24 @@ export default function GraphEntityPanel({
         />
 
         <p className="mb-2 mt-4 text-[10px] font-medium uppercase tracking-widest text-zinc-600">
-          Entity Type
+          {t("graphUi.entityType")}
         </p>
         <div className="space-y-1">
-          {TYPE_OPTIONS.map((option) => {
+          {TYPE_FILTER_VALUES.map((option) => {
             const count =
-              option.value === "all"
+              option === "all"
                 ? stats.totalNodes
-                : option.value === "country"
+                : option === "country"
                   ? stats.countryCount
-                  : option.value === "company"
+                  : option === "company"
                     ? stats.companyCount
                     : stats.universityCount;
-            const active = typeFilter === option.value;
+            const active = typeFilter === option;
             return (
               <button
-                key={option.value}
+                key={option}
                 type="button"
-                onClick={() => onTypeFilterChange(option.value)}
+                onClick={() => onTypeFilterChange(option)}
                 className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs transition-colors ${
                   active
                     ? "bg-teal-500/10 text-teal-300 ring-1 ring-teal-500/30"
@@ -112,9 +108,7 @@ export default function GraphEntityPanel({
                 }`}
               >
                 <span>
-                  {option.value === "all"
-                    ? option.label
-                    : getEntityTypeLabel(option.value)}
+                  {option === "all" ? t("graphUi.allTypes") : getEntityTypeLabel(option)}
                 </span>
                 <span className="font-mono text-[10px] text-zinc-600">{count}</span>
               </button>
@@ -138,15 +132,16 @@ function EntityDetails({
   node: GraphNode;
   connectedEdges: GraphEdge[];
 }) {
-  const summary = buildEntityGraphEvidenceSummary(node, connectedEdges);
+  const { t, language } = useTranslation();
+  const dictionary = getDictionary(language);
+  const summary = buildEntityGraphEvidenceSummary(node, connectedEdges, dictionary);
   const route = MODULE_ROUTES[node.type];
+  const typeLabel = getEntityTypeLabel(node.type);
 
   return (
     <div className="mt-4 space-y-4">
       <div>
-        <p className="text-[10px] font-medium uppercase tracking-widest text-zinc-600">
-          {getEntityTypeLabel(node.type)}
-        </p>
+        <p className="text-[10px] font-medium uppercase tracking-widest text-zinc-600">{typeLabel}</p>
         <p className="mt-1 text-sm font-semibold text-zinc-50">{node.label}</p>
         {node.entity.subtitle ? (
           <p className="text-xs text-zinc-500">{node.entity.subtitle}</p>
@@ -154,13 +149,10 @@ function EntityDetails({
       </div>
 
       <dl className="space-y-2 text-xs">
-        <DetailRow label="Evidence Status" value={summary.evidenceStatus} />
+        <DetailRow label={t("graphUi.evidenceStatus")} value={summary.evidenceStatus} />
+        <DetailRow label={t("graphUi.relationshipCount")} value={String(summary.relationshipCount)} />
         <DetailRow
-          label="Relationship Count"
-          value={String(summary.relationshipCount)}
-        />
-        <DetailRow
-          label="Available Sources"
+          label={t("graphUi.availableSources")}
           value={summary.availableSources.join(", ")}
         />
       </dl>
@@ -170,7 +162,7 @@ function EntityDetails({
           href={`${route}?id=${node.entityId}`}
           className="block w-full rounded-lg border border-zinc-700 bg-zinc-900 py-2 text-center text-xs font-medium text-zinc-300 transition-colors hover:border-teal-500/40 hover:text-teal-300"
         >
-          Open {getEntityTypeLabel(node.type)} Module
+          {t("graphUi.openModule", { type: typeLabel })}
         </Link>
       ) : null}
     </div>
