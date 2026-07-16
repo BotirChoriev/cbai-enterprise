@@ -156,6 +156,11 @@ const ru: TranslationDictionary = {
   },
   common: {
     loading: "Загрузка…",
+    loadingProjects: "Подготавливаем ваши проекты…",
+    loadingMission: "Подготавливаем миссию…",
+    loadingEvidence: "Проверяем доказательства…",
+    loadingReport: "Загружаем отчёт…",
+    loadingKnowledge: "Открываем знания…",
     save: "Сохранить",
     saving: "Сохранение…",
     saved: "Сохранено.",

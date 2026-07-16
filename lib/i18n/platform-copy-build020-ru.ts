@@ -88,7 +88,7 @@ export const ZERO_LEARNING_CURVE_RU = {
   topicTabTimeline: "Хронология",
   topicTabEvidence: "Доказательства",
   topicSectionsAria: "Разделы темы",
-  topicWorkspaceSr: "Рабочая область темы",
+  topicWorkspaceSr: "Разделы темы",
   reviewWorkspaceEyebrow: "Проверка",
   reviewWorkspaceTitle: "Проверка: {name}",
   reviewWorkspaceLead: "Миссия, доказательства, заметки и открытые вопросы в одном потоке.",

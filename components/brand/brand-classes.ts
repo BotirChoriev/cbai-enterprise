@@ -19,6 +19,8 @@ export const cbaiPanelPaddingLg = "p-5";
 export const cbaiStackSm = "space-y-2";
 export const cbaiStackMd = "space-y-3";
 export const cbaiStackLg = "space-y-4";
+export const cbaiPageStack = "space-y-6";
+export const cbaiEntitySidebarStack = "space-y-4";
 export const cbaiGapSm = "gap-2";
 export const cbaiGapMd = "gap-3";
 
@@ -50,6 +52,15 @@ export const cbaiMineralPanelMd = `${cbaiMineralSurface} ${cbaiPanelPadding} ${c
 
 export const cbaiEmptyDashed =
   "rounded-xl border border-dashed border-zinc-800 px-5 py-12 text-center";
+
+/** Progressive disclosure panel — entity explore, optional sections. */
+export const cbaiDisclosurePanel =
+  "scroll-mt-6 rounded-xl border border-zinc-800/80 bg-[var(--surface)]/90";
+
+export const cbaiDisclosureSummary =
+  `cursor-pointer list-none px-4 py-3 text-sm font-medium text-zinc-500 marker:content-none [&::-webkit-details-marker]:hidden ${cbaiTransition}`;
+
+export const cbaiLoadingLine = `text-sm ${cbaiTextMuted}`;
 
 export const cbaiStatCell = "rounded-lg border border-zinc-800/80 bg-zinc-950/40 px-3 py-2";
 

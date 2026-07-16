@@ -8,7 +8,7 @@ import { useAssistantProfile } from "@/components/platform/context/AssistantProf
 import { buildCapabilityPassport } from "@/lib/capability/capability-passport-builder";
 import { deriveCapabilityGrowth } from "@/lib/capability/capability-growth";
 import { resolveOperatorName } from "@/lib/assistant/assistant-profile";
-import { cbaiMineralSurface, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { cbaiLoadingLine, cbaiMineralPanel, cbaiMineralSurface, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 const MATURITY_RING: Record<string, string> = {
   none: "border-zinc-700/60",
@@ -40,8 +40,8 @@ export default function CapabilityGalaxy() {
 
   if (!hydrated || !passport) {
     return (
-      <section className={`${cbaiMineralSurface} p-5`} aria-busy="true">
-        <p className="text-sm text-zinc-500">{t("common.loading")}</p>
+      <section className={cbaiMineralPanel} aria-busy="true">
+        <p className={cbaiLoadingLine}>{t("common.loadingKnowledge")}</p>
       </section>
     );
   }

@@ -156,6 +156,11 @@ const uz: TranslationDictionary = {
   },
   common: {
     loading: "Yuklanmoqda…",
+    loadingProjects: "Loyihalaringiz tayyorlanmoqda…",
+    loadingMission: "Missiya tayyorlanmoqda…",
+    loadingEvidence: "Dalillar tekshirilmoqda…",
+    loadingReport: "Hisobot yuklanmoqda…",
+    loadingKnowledge: "Bilim ochilmoqda…",
     save: "Saqlash",
     saving: "Saqlanmoqda…",
     saved: "Saqlandi.",

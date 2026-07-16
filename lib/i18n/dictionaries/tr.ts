@@ -156,6 +156,11 @@ const tr: TranslationDictionary = {
   },
   common: {
     loading: "Yükleniyor…",
+    loadingProjects: "Projeleriniz hazırlanıyor…",
+    loadingMission: "Görev hazırlanıyor…",
+    loadingEvidence: "Kanıt kontrol ediliyor…",
+    loadingReport: "Rapor yükleniyor…",
+    loadingKnowledge: "Bilgi açılıyor…",
     save: "Kaydet",
     saving: "Kaydediliyor…",
     saved: "Kaydedildi.",

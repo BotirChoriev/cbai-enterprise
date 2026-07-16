@@ -15,17 +15,13 @@ import CompanyFilters from "@/components/companies/CompanyFilters";
 import CompanyList from "@/components/companies/CompanyList";
 import CompanyRelationships from "@/components/companies/CompanyRelationships";
 import EntityOptionalExploration from "@/components/shared/EntityOptionalExploration";
-import EntityPageHeader from "@/components/shared/EntityPageHeader";
-import MissionOperatingContextBar from "@/components/mission/MissionOperatingContextBar";
+import EntityExploreShell from "@/components/shared/EntityExploreShell";
 import { CompanyIntelligencePanel } from "@/components/companies/CompanyIntelligencePanel";
-import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
 import EntityNotFoundNotice from "@/components/system/EntityNotFoundNotice";
-import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 
 export default function CompaniesPageClient() {
   const { context, setCompany, recordEntityView } = usePlatformContext();
   const { t } = useTranslation();
-  const disclosure = useProgressiveDisclosure();
   const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
   const [industry, setIndustry] = useState("All");
@@ -76,54 +72,53 @@ export default function CompaniesPageClient() {
   }
 
   return (
-    <div className="space-y-6">
-      <EntityPageHeader title={t("companies.title")} description={t("entities.companiesDescription")} />
-      <MissionOperatingContextBar variant="compact" />
-
-      {requestedCompanyNotFound && requestedCompanyId ? (
-        <EntityNotFoundNotice
-          requestedId={requestedCompanyId}
-          entityLabel="company"
-          fallbackName={selectedCompany.name}
+    <EntityExploreShell
+      title={t("companies.title")}
+      description={t("entities.companiesDescription")}
+      notFoundNotice={
+        requestedCompanyNotFound && requestedCompanyId ? (
+          <EntityNotFoundNotice
+            requestedId={requestedCompanyId}
+            entityLabel="company"
+            fallbackName={selectedCompany.name}
+          />
+        ) : null
+      }
+      filters={
+        <CompanyFilters
+          search={search}
+          industry={industry}
+          country={country}
+          industries={industries}
+          countries={countries}
+          onSearchChange={setSearch}
+          onIndustryChange={setIndustry}
+          onCountryChange={setCountry}
+          resultCount={filtered.length}
         />
-      ) : null}
-
-      {disclosure.level === "expert" ? <ContextualOperatorBanner /> : null}
-
-      <div className="grid gap-6 xl:grid-cols-12 xl:items-start">
-        <div className="space-y-4 xl:sticky xl:top-6 xl:col-span-4 xl:max-h-[calc(100vh-3rem)] xl:overflow-y-auto">
-          <CompanyFilters
-            search={search}
-            industry={industry}
-            country={country}
-            industries={industries}
-            countries={countries}
-            onSearchChange={setSearch}
-            onIndustryChange={setIndustry}
-            onCountryChange={setCountry}
-            resultCount={filtered.length}
-          />
-          <CompanyList
-            companies={filtered}
-            selectedId={selectedCompany.id}
-            onSelect={handleSelectCompany}
-            onClearFilters={() => {
-              setSearch("");
-              setIndustry("All");
-              setCountry("All");
-            }}
-            emptyMessage={t("entities.noMatchFilters")}
-            clearFiltersLabel={t("entities.clearFilters")}
-          />
-        </div>
-
-        <div className="space-y-8 xl:col-span-8">
+      }
+      list={
+        <CompanyList
+          companies={filtered}
+          selectedId={selectedCompany.id}
+          onSelect={handleSelectCompany}
+          onClearFilters={() => {
+            setSearch("");
+            setIndustry("All");
+            setCountry("All");
+          }}
+          emptyMessage={t("entities.noMatchFilters")}
+          clearFiltersLabel={t("entities.clearFilters")}
+        />
+      }
+      detail={
+        <>
           <CompanyIntelligencePanel journey={journey} company={selectedCompany} />
           <EntityOptionalExploration>
             <CompanyRelationships profile={journey.profile} />
           </EntityOptionalExploration>
-        </div>
-      </div>
-    </div>
+        </>
+      }
+    />
   );
 }

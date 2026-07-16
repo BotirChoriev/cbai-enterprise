@@ -7,7 +7,7 @@ import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { buildCapabilityPassport } from "@/lib/capability/capability-passport-builder";
 import { resolveOperatorName } from "@/lib/assistant/assistant-profile";
-import { cbaiMineralSurface, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { cbaiLoadingLine, cbaiMineralPanel, cbaiMineralSurface, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 export default function CapabilityConstellation() {
   const { t } = useTranslation();
@@ -22,8 +22,8 @@ export default function CapabilityConstellation() {
 
   if (!hydrated || !passport) {
     return (
-      <section className={`${cbaiMineralSurface} p-5`} aria-busy="true">
-        <p className="text-sm text-zinc-500">{t("common.loading")}</p>
+      <section className={cbaiMineralPanel} aria-busy="true">
+        <p className={cbaiLoadingLine}>{t("common.loadingKnowledge")}</p>
       </section>
     );
   }

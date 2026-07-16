@@ -49,6 +49,11 @@ export type TranslationDictionary = {
   };
   common: {
     loading: string;
+    loadingProjects: string;
+    loadingMission: string;
+    loadingEvidence: string;
+    loadingReport: string;
+    loadingKnowledge: string;
     save: string;
     saving: string;
     saved: string;

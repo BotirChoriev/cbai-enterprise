@@ -12,18 +12,15 @@ import CountryFilters from "@/components/countries/CountryFilters";
 import CountryList from "@/components/countries/CountryList";
 import CountryRelationships from "@/components/countries/CountryRelationships";
 import EntityOptionalExploration from "@/components/shared/EntityOptionalExploration";
-import EntityPageHeader from "@/components/shared/EntityPageHeader";
-import MissionOperatingContextBar from "@/components/mission/MissionOperatingContextBar";
+import EntityExploreShell from "@/components/shared/EntityExploreShell";
 import { CountryIntelligencePanel } from "@/components/countries/CountryIntelligencePanel";
 import WorldIntelligenceMap from "@/components/countries/WorldIntelligenceMap";
-import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
 import EntityNotFoundNotice from "@/components/system/EntityNotFoundNotice";
-import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
+import { cbaiDisclosurePanel, cbaiDisclosureSummary } from "@/components/brand/brand-classes";
 
 export default function CountriesPageClient() {
   const { context, setCountry, recordEntityView } = usePlatformContext();
   const { t } = useTranslation();
-  const disclosure = useProgressiveDisclosure();
   const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
   const [region, setRegion] = useState<CountryRegion | "All">("All");
@@ -68,54 +65,54 @@ export default function CountriesPageClient() {
   }
 
   return (
-    <div className="space-y-6">
-      <EntityPageHeader title={t("countries.title")} description={t("entities.countriesDescription")} />
-      <MissionOperatingContextBar variant="compact" />
-
-      {requestedCountryNotFound && requestedCountryId ? (
-        <EntityNotFoundNotice
-          requestedId={requestedCountryId}
-          entityLabel="country"
-          fallbackName={selectedCountry.name}
+    <EntityExploreShell
+      title={t("countries.title")}
+      description={t("entities.countriesDescription")}
+      notFoundNotice={
+        requestedCountryNotFound && requestedCountryId ? (
+          <EntityNotFoundNotice
+            requestedId={requestedCountryId}
+            entityLabel="country"
+            fallbackName={selectedCountry.name}
+          />
+        ) : null
+      }
+      beforeGrid={
+        <details className={cbaiDisclosurePanel} open={!context.country}>
+          <summary className={cbaiDisclosureSummary}>
+            {context.country
+              ? t("entities.worldMapShowing", { name: context.country.name })
+              : t("entities.worldMapTitle")}
+          </summary>
+          <div className="border-t border-zinc-800 px-4 py-4">
+            <WorldIntelligenceMap />
+          </div>
+        </details>
+      }
+      filters={
+        <CountryFilters
+          search={search}
+          region={region}
+          onSearchChange={setSearch}
+          onRegionChange={setRegion}
+          resultCount={filtered.length}
         />
-      ) : null}
-
-      {disclosure.level === "expert" ? <ContextualOperatorBanner /> : null}
-
-      <details className="scroll-mt-6 rounded-lg border border-zinc-800/60 bg-zinc-950/50" open={!context.country}>
-        <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium text-zinc-500 marker:content-none [&::-webkit-details-marker]:hidden">
-          {context.country
-            ? t("entities.worldMapShowing", { name: context.country.name })
-            : t("entities.worldMapTitle")}
-        </summary>
-        <div className="border-t border-zinc-800 px-4 py-4">
-          <WorldIntelligenceMap />
-        </div>
-      </details>
-
-      <div className="grid gap-6 xl:grid-cols-12 xl:items-start">
-        <div className="space-y-4 xl:sticky xl:top-6 xl:col-span-4 xl:max-h-[calc(100vh-3rem)] xl:overflow-y-auto">
-          <CountryFilters
-            search={search}
-            region={region}
-            onSearchChange={setSearch}
-            onRegionChange={setRegion}
-            resultCount={filtered.length}
-          />
-          <CountryList
-            countries={filtered}
-            selectedId={selectedCountry.id}
-            onSelect={handleSelectCountry}
-            onClearFilters={() => {
-              setSearch("");
-              setRegion("All");
-            }}
-            emptyMessage={t("entities.noMatchFilters")}
-            clearFiltersLabel={t("entities.clearFilters")}
-          />
-        </div>
-
-        <div className="space-y-8 xl:col-span-8">
+      }
+      list={
+        <CountryList
+          countries={filtered}
+          selectedId={selectedCountry.id}
+          onSelect={handleSelectCountry}
+          onClearFilters={() => {
+            setSearch("");
+            setRegion("All");
+          }}
+          emptyMessage={t("entities.noMatchFilters")}
+          clearFiltersLabel={t("entities.clearFilters")}
+        />
+      }
+      detail={
+        <>
           <CountryIntelligencePanel
             journey={journey}
             country={selectedCountry}
@@ -124,8 +121,8 @@ export default function CountriesPageClient() {
           <EntityOptionalExploration>
             <CountryRelationships profile={journey.profile} />
           </EntityOptionalExploration>
-        </div>
-      </div>
-    </div>
+        </>
+      }
+    />
   );
 }

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { buildEvidenceExplorerModel } from "@/lib/evidence-explorer";
 import { buildReportsCenterModel } from "@/lib/reports-center";
-import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { cbaiGlassCard, cbaiLoadingLine, cbaiMineralPanel, cbaiPageStack, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import { useAuth } from "@/components/platform/context/AuthProvider";
@@ -124,7 +124,7 @@ function MyWorkContent() {
   // the brief window before useHydrated() flips true, since `project` is honestly null in both
   // cases until then.
   if (projectId && !hydrated) {
-    return <div className={`${cbaiGlassCard} p-5 text-sm text-zinc-500`}>{t("common.loading")}</div>;
+    return <div className={`${cbaiMineralPanel} ${cbaiLoadingLine}`}>{t("common.loadingProjects")}</div>;
   }
 
   if (projectId && !project) {
@@ -140,7 +140,7 @@ function MyWorkContent() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className={cbaiPageStack}>
       {isActive || isSignedIn ? (
         <div className={`${cbaiGlassCard} border-teal-500/15 px-6 py-5`}>
           <div className="flex flex-wrap items-center gap-3">

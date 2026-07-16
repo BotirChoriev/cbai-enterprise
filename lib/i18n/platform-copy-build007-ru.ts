@@ -208,9 +208,9 @@ export const MY_WORK_EXT_RU = {
   signInBrowserHint: "чтобы отделить вашу работу от других пользователей этого браузера.",
   signInAccountHint:
     "чтобы отделить ваши проекты и закладки от других пользователей этого браузера.",
-  continueResearchWorkspace: "Исследовательское пространство",
+  continueResearchWorkspace: "Продолжить исследование",
   continueResearchWorkspaceDetail:
-    "Откройте структурированное пространство для обзора доказательств и организации знаний.",
+    "Вернитесь к проверке доказательств и заметкам с того места, где остановились.",
   continueResearchCatalog: "Исследовательский каталог",
   continueResearchCatalogDetail: "Просматривайте темы, миссии и статус доказательств.",
   continueEvidence: "Доказательства",

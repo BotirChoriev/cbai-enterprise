@@ -207,8 +207,8 @@ export const MY_WORK_EXT_UZ = {
   signInBrowserHint: "bu brauzerdan foydalanayotgan boshqalardan ishingizni ajratib saqlash uchun.",
   signInAccountHint:
     "o'z Loyihalar va Xatcho'plaringizni bu brauzerdan foydalanayotgan boshqalardan ajratib saqlash uchun.",
-  continueResearchWorkspace: "Tadqiqot ish maydoni",
-  continueResearchWorkspaceDetail: "Dalil ko'rib chiqishi va bilimni tuzish uchun tuzilgan ish maydonini oching.",
+  continueResearchWorkspace: "Tadqiqotni davom ettirish",
+  continueResearchWorkspaceDetail: "Dalil ko'rib chiqishi va eslatmalarni qoldirgan joyingizdan davom eting.",
   continueResearchCatalog: "Tadqiqot katalogi",
   continueResearchCatalogDetail: "Tadqiqot mavzulari, missiyalar va dalil holatini ko'ring.",
   continueEvidence: "Dalillar",

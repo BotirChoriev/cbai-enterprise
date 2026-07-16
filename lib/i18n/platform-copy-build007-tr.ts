@@ -207,8 +207,8 @@ export const MY_WORK_EXT_TR = {
   signInBrowserHint: "bu tarayıcıyı kullanan diğerlerinden çalışmanızı ayırmak için.",
   signInAccountHint:
     "Projelerinizi ve Yer İşaretlerinizi bu tarayıcıyı kullanan diğerlerinden ayırmak için.",
-  continueResearchWorkspace: "Araştırma Çalışma Alanı",
-  continueResearchWorkspaceDetail: "Kanıt incelemesi ve bilgi organizasyonu için yapılandırılmış çalışma alanını açın.",
+  continueResearchWorkspace: "Araştırmaya devam et",
+  continueResearchWorkspaceDetail: "Kaldığınız yerden kanıt incelemesi ve notlara devam edin.",
   continueResearchCatalog: "Araştırma Kataloğu",
   continueResearchCatalogDetail: "Araştırma konularını, görevleri ve kanıt durumunu gözden geçirin.",
   continueEvidence: "Kanıt",

@@ -88,7 +88,7 @@ export const ZERO_LEARNING_CURVE_UZ = {
   topicTabTimeline: "Vaqt chizig'i",
   topicTabEvidence: "Dalil",
   topicSectionsAria: "Mavzu bo'limlari",
-  topicWorkspaceSr: "Mavzu ish maydoni",
+  topicWorkspaceSr: "Mavzu bo'limlari",
   reviewWorkspaceEyebrow: "Ko'rib chiqish",
   reviewWorkspaceTitle: "Ko'rib chiqish: {name}",
   reviewWorkspaceLead: "Missiya, dalil, eslatmalar va ochiq savollar bir oqimda.",

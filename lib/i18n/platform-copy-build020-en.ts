@@ -88,7 +88,7 @@ export const ZERO_LEARNING_CURVE_EN = {
   topicTabTimeline: "Timeline",
   topicTabEvidence: "Evidence",
   topicSectionsAria: "Topic sections",
-  topicWorkspaceSr: "Topic workspace",
+  topicWorkspaceSr: "Topic sections",
   reviewWorkspaceEyebrow: "Review",
   reviewWorkspaceTitle: "Review {name}",
   reviewWorkspaceLead: "Mission, evidence, notes, and open questions in one flow.",

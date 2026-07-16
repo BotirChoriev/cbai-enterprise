@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
 import EntityPageHeader from "@/components/shared/EntityPageHeader";
 import MissionOperatingContextBar from "@/components/mission/MissionOperatingContextBar";
+import { cbaiStackLg } from "@/components/brand/brand-classes";
 
 type OperatingPageShellProps = {
   title: string;
@@ -28,7 +29,7 @@ export default function OperatingPageShell({
   const showMissionBar = showMissionContext && missionContextVariant;
 
   return (
-    <div className="space-y-4">
+    <div className={cbaiStackLg}>
       <EntityPageHeader title={title} description={description ?? ""} />
       {showMissionBar ? <MissionOperatingContextBar variant={missionContextVariant} /> : null}
       {action}

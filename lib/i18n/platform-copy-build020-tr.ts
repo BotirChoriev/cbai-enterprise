@@ -88,7 +88,7 @@ export const ZERO_LEARNING_CURVE_TR = {
   topicTabTimeline: "Zaman çizelgesi",
   topicTabEvidence: "Kanıt",
   topicSectionsAria: "Konu bölümleri",
-  topicWorkspaceSr: "Konu çalışma alanı",
+  topicWorkspaceSr: "Konu bölümleri",
   reviewWorkspaceEyebrow: "İnceleme",
   reviewWorkspaceTitle: "İnceleme: {name}",
   reviewWorkspaceLead: "Görev, kanıt, notlar ve açık sorular tek akışta.",

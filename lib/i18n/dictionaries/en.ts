@@ -156,6 +156,11 @@ const en: TranslationDictionary = {
   },
   common: {
     loading: "Loading…",
+    loadingProjects: "Preparing your projects…",
+    loadingMission: "Preparing mission…",
+    loadingEvidence: "Checking evidence…",
+    loadingReport: "Loading report…",
+    loadingKnowledge: "Opening knowledge…",
     save: "Save",
     saving: "Saving…",
     saved: "Saved.",

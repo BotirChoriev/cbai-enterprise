@@ -8,7 +8,7 @@ import { buildCapabilityPassport } from "@/lib/capability/capability-passport-bu
 import { deriveAdaptiveIntelligence } from "@/lib/intelligence-os/adaptive-intelligence";
 import { runDiscoveryEngine } from "@/lib/discovery/discovery-engine";
 import { resolveOperatorName } from "@/lib/assistant/assistant-profile";
-import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { cbaiGlassCard, cbaiLoadingLine, cbaiMineralPanel, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import Link from "next/link";
 
 export default function CapabilityPassportPanel() {
@@ -37,8 +37,8 @@ export default function CapabilityPassportPanel() {
 
   if (!hydrated || !passport || !discovery || !adaptive) {
     return (
-      <section className={`${cbaiGlassCard} p-6`} aria-busy="true">
-        <p className="text-sm text-zinc-500">{t("common.loading")}</p>
+      <section className={`${cbaiMineralPanel}`} aria-busy="true">
+        <p className={cbaiLoadingLine}>{t("common.loadingKnowledge")}</p>
       </section>
     );
   }
