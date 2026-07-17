@@ -7,6 +7,7 @@ import { useAssistantProfile } from "@/components/platform/context/AssistantProf
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import { ASSISTANT_COMMANDS, resolveAssistantCommand } from "@/lib/assistant/assistant-commands";
 import { resolveUniversalIntent, intentCategoryTranslationKey } from "@/lib/intelligence-os/universal-intent";
+import { recordWorkflowEvent } from "@/lib/telemetry/workflow-telemetry";
 import { resolveAssistantContext } from "@/lib/assistant/assistant-context";
 import { resolveOperatorName } from "@/lib/assistant/assistant-profile";
 import {
@@ -182,7 +183,15 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
         router.push(match.href);
         setInput("");
         setConfirmation(t(intentCategoryTranslationKey(intent.category)));
+        recordWorkflowEvent("intent_resolved", {
+          intentCategory: intent.category,
+          route: match.href,
+          outcome: "success",
+        });
       } else {
+        recordWorkflowEvent("intent_unresolved", {
+          outcome: "failure",
+        });
         // Honest fallback per the Command Center's no-fake-AI-response rule: an unmatched
         // command shows what's actually supported, never a guessed destination.
         setUnrecognized(trimmed);

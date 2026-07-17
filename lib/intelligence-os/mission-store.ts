@@ -4,6 +4,7 @@
 
 import type { Mission, MissionDraft, MissionStatus } from "@/lib/intelligence-os/mission.types";
 import { resolveStorageKey } from "@/lib/storage/namespaced-key";
+import { recordConfirmedMutation } from "@/lib/telemetry/workflow-telemetry";
 
 const MISSIONS_KEY = "cbai-missions";
 const CURRENT_MISSION_KEY = "cbai-current-mission-id";
@@ -89,6 +90,7 @@ export function createMission(draft: MissionDraft): Mission {
   const missions = readMissions();
   writeMissions([mission, ...missions.map((m) => (m.status === "active" ? { ...m, status: "paused" as MissionStatus } : m))]);
   setCurrentMission(mission.id);
+  recordConfirmedMutation("mission_started", { objectType: "mission", objectId: mission.id });
   return mission;
 }
 
