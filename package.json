@@ -28,6 +28,7 @@
     "test:browser-regression": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-browser-regression.ts",
     "test:real-user-audit": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-real-user-audit.ts",
     "test:universal-intelligence-os": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-universal-intelligence-os.ts",
+    "test:knowledge-brain": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-knowledge-brain.ts",
     "test:mission-center": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-mission-center.ts",
     "test:mission-runtime": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-mission-runtime.ts",
     "test:intelligence-canvas": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-intelligence-canvas.ts",

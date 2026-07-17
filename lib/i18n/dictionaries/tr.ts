@@ -98,6 +98,11 @@ import {
   PROJECT_HOME_COMPLETION_TR,
   COMMAND_FEEDBACK_COMPLETION_TR,
 } from "@/lib/i18n/platform-copy-build025-tr";
+import {
+  KNOWLEDGE_BRAIN_TR,
+  RESEARCH_TOPIC_COMPLETION_TR,
+  UNIVERSAL_INTENT_TR,
+} from "@/lib/i18n/platform-copy-build026-tr";
 
 const tr: TranslationDictionary = {
   roles: {
@@ -587,6 +592,9 @@ const tr: TranslationDictionary = {
   commandFeedback: { ...COMMAND_FEEDBACK_TR, ...COMMAND_FEEDBACK_COMPLETION_TR },
   projectHome: { ...PROJECT_HOME_TR, ...PROJECT_HOME_COMPLETION_TR },
   researchTopicPanels: RESEARCH_TOPIC_PANELS_TR,
+  knowledgeBrain: KNOWLEDGE_BRAIN_TR,
+  researchTopicCompletion: RESEARCH_TOPIC_COMPLETION_TR,
+  universalIntent: UNIVERSAL_INTENT_TR,
 };
 
 export default tr;

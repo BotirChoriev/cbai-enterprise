@@ -11,6 +11,7 @@ import ReportHeaderLogo from "@/components/shared/ReportHeaderLogo";
 import ReportHonestyStatement from "@/components/shared/ReportHonestyStatement";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import { useReportCommon } from "@/lib/i18n/use-report-common";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type ResearchTopicReportViewProps = {
   report: ResearchTopicReport & { dataStatus?: ProductStatus };
@@ -49,6 +50,7 @@ function LinkList({ links, emptyLabel }: { links: readonly { name: string; href:
  */
 export default function ResearchTopicReportView({ report }: ResearchTopicReportViewProps) {
   const labels = useReportCommon();
+  const { t } = useTranslation();
   const generatedDate = new Date().toLocaleString();
 
   return (
@@ -78,7 +80,9 @@ export default function ResearchTopicReportView({ report }: ResearchTopicReportV
       </div>
 
       <div className="space-y-2">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Research Question</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">
+          {t("researchTopicCompletion.reportResearchQuestion")}
+        </p>
         <p className="text-sm text-zinc-300">{report.question}</p>
       </div>
 
@@ -86,11 +90,15 @@ export default function ResearchTopicReportView({ report }: ResearchTopicReportV
         <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.overview}</p>
         <dl className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
           <div>
-            <dt className="text-[10px] uppercase tracking-wider text-zinc-600">Domain</dt>
+            <dt className="text-[10px] uppercase tracking-wider text-zinc-600">
+              {t("researchTopicCompletion.reportDomain")}
+            </dt>
             <dd className="mt-0.5 text-zinc-300">{report.domain}</dd>
           </div>
           <div className="sm:col-span-2">
-            <dt className="text-[10px] uppercase tracking-wider text-zinc-600">Description</dt>
+            <dt className="text-[10px] uppercase tracking-wider text-zinc-600">
+              {t("researchTopicCompletion.reportDescription")}
+            </dt>
             <dd className="mt-0.5 text-zinc-300">{report.description}</dd>
           </div>
         </dl>
@@ -99,13 +107,18 @@ export default function ResearchTopicReportView({ report }: ResearchTopicReportV
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
         <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.evidence}</p>
         <p className="text-sm text-zinc-400">
-          {report.evidenceConnectedCount} items connected · {report.supportingEvidence.length} supporting ·{" "}
-          {report.counterEvidence.length} counter evidence.
+          {t("researchTopicCompletion.reportEvidenceSummary", {
+            connected: String(report.evidenceConnectedCount),
+            supporting: String(report.supportingEvidence.length),
+            counter: String(report.counterEvidence.length),
+          })}
         </p>
       </div>
 
       <div className="space-y-2 border-t border-zinc-800/80 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">Research Notes</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">
+          {t("researchTopicCompletion.reportNotes")}
+        </p>
         {report.notes.length > 0 ? (
           <ul className="space-y-1.5">
             {report.notes.map((note) => (
@@ -115,7 +128,7 @@ export default function ResearchTopicReportView({ report }: ResearchTopicReportV
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-zinc-500">No research notes recorded yet.</p>
+          <p className="text-sm text-zinc-500">{t("researchTopicCompletion.reportNotesEmpty")}</p>
         )}
       </div>
 

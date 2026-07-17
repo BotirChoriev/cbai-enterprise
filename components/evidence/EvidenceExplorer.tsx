@@ -12,6 +12,7 @@ import EvidenceMethodology from "@/components/evidence/EvidenceMethodology";
 import EvidenceIndicatorMap from "@/components/evidence/EvidenceIndicatorMap";
 import EvidenceTrustSurfacePanel from "@/components/evidence/EvidenceTrustSurfacePanel";
 import EvidencePrimaryStatesPanel from "@/components/evidence/EvidencePrimaryStatesPanel";
+import KnowledgeBrainPanel from "@/components/knowledge/KnowledgeBrainPanel";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import { useTranslation } from "@/lib/i18n/use-translation";
@@ -29,6 +30,7 @@ export default function EvidenceExplorer() {
       missionContextVariant="compact"
     >
       <EvidencePrimaryStatesPanel />
+      <KnowledgeBrainPanel compact />
 
       {disclosure.showEvidenceAdvanced ? (
         <>

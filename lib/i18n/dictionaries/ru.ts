@@ -98,6 +98,11 @@ import {
   PROJECT_HOME_COMPLETION_RU,
   COMMAND_FEEDBACK_COMPLETION_RU,
 } from "@/lib/i18n/platform-copy-build025-ru";
+import {
+  KNOWLEDGE_BRAIN_RU,
+  RESEARCH_TOPIC_COMPLETION_RU,
+  UNIVERSAL_INTENT_RU,
+} from "@/lib/i18n/platform-copy-build026-ru";
 
 const ru: TranslationDictionary = {
   roles: {
@@ -587,6 +592,9 @@ const ru: TranslationDictionary = {
   commandFeedback: { ...COMMAND_FEEDBACK_RU, ...COMMAND_FEEDBACK_COMPLETION_RU },
   projectHome: { ...PROJECT_HOME_RU, ...PROJECT_HOME_COMPLETION_RU },
   researchTopicPanels: RESEARCH_TOPIC_PANELS_RU,
+  knowledgeBrain: KNOWLEDGE_BRAIN_RU,
+  researchTopicCompletion: RESEARCH_TOPIC_COMPLETION_RU,
+  universalIntent: UNIVERSAL_INTENT_RU,
 };
 
 export default ru;

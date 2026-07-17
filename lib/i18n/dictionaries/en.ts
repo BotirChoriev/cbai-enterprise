@@ -98,6 +98,11 @@ import {
   PROJECT_HOME_COMPLETION_EN,
   COMMAND_FEEDBACK_COMPLETION_EN,
 } from "@/lib/i18n/platform-copy-build025-en";
+import {
+  KNOWLEDGE_BRAIN_EN,
+  RESEARCH_TOPIC_COMPLETION_EN,
+  UNIVERSAL_INTENT_EN,
+} from "@/lib/i18n/platform-copy-build026-en";
 
 const en: TranslationDictionary = {
   roles: {
@@ -588,6 +593,9 @@ const en: TranslationDictionary = {
   commandFeedback: { ...COMMAND_FEEDBACK_EN, ...COMMAND_FEEDBACK_COMPLETION_EN },
   projectHome: { ...PROJECT_HOME_EN, ...PROJECT_HOME_COMPLETION_EN },
   researchTopicPanels: RESEARCH_TOPIC_PANELS_EN,
+  knowledgeBrain: KNOWLEDGE_BRAIN_EN,
+  researchTopicCompletion: RESEARCH_TOPIC_COMPLETION_EN,
+  universalIntent: UNIVERSAL_INTENT_EN,
 };
 
 export default en;

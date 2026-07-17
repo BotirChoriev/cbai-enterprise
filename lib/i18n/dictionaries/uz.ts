@@ -98,6 +98,11 @@ import {
   PROJECT_HOME_COMPLETION_UZ,
   COMMAND_FEEDBACK_COMPLETION_UZ,
 } from "@/lib/i18n/platform-copy-build025-uz";
+import {
+  KNOWLEDGE_BRAIN_UZ,
+  RESEARCH_TOPIC_COMPLETION_UZ,
+  UNIVERSAL_INTENT_UZ,
+} from "@/lib/i18n/platform-copy-build026-uz";
 
 const uz: TranslationDictionary = {
   roles: {
@@ -587,6 +592,9 @@ const uz: TranslationDictionary = {
   commandFeedback: { ...COMMAND_FEEDBACK_UZ, ...COMMAND_FEEDBACK_COMPLETION_UZ },
   projectHome: { ...PROJECT_HOME_UZ, ...PROJECT_HOME_COMPLETION_UZ },
   researchTopicPanels: RESEARCH_TOPIC_PANELS_UZ,
+  knowledgeBrain: KNOWLEDGE_BRAIN_UZ,
+  researchTopicCompletion: RESEARCH_TOPIC_COMPLETION_UZ,
+  universalIntent: UNIVERSAL_INTENT_UZ,
 };
 
 export default uz;

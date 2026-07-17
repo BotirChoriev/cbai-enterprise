@@ -1,0 +1,82 @@
+/** BUILD-026 — Knowledge Brain and research completion i18n. */
+
+export const KNOWLEDGE_BRAIN_EN = {
+  eyebrow: "Knowledge state",
+  whatIsThis: "What is this",
+  whyItMatters: "Why it matters",
+  missionRelevance: "Mission relevance",
+  known: "Known",
+  unknown: "Unknown",
+  conflict: "Conflict",
+  needsReview: "Needs review",
+  howWeKnow: "How we know",
+  provenance: "Provenance",
+  freshness: "Freshness",
+  supportingEvidence: "Supporting evidence",
+  contradictingEvidence: "Contradicting evidence",
+  missingEvidence: "Missing evidence",
+  limitations: "Limitations",
+  humanReviewRequired: "Human review is required before conclusions.",
+  noMission: "Start a mission to connect evidence and knowledge to a problem.",
+  emptyBucket: "Nothing recorded in this category yet.",
+  suggestedNext: "Suggested next step",
+  sourceNotConnected: "Live external source catalogs are not connected — catalog and device-local references only.",
+  evidenceStateKnownDetail: "References linked with traceable source metadata.",
+  evidenceStateUnknownDetail: "Missing sources or documented knowledge gaps.",
+  evidenceStateConflictDetail: "Detected disagreement between references.",
+  evidenceStateNeedsReviewDetail: "Human review recommended for freshness or validation.",
+} as const;
+
+export const RESEARCH_TOPIC_COMPLETION_EN = {
+  openQuestionsTitle: "Open research questions",
+  openQuestionsNotConnected:
+    "Open question records are catalog-only — live research databases are not connected yet.",
+  whyItMatters: "Why it matters",
+  status: "Status",
+  futureEvidence: "Future evidence",
+  humanReviewRequired: "Human scientific review required.",
+  genericOpenQuestions:
+    "Generic open question categories apply — topic-specific records not configured yet.",
+  negativeResultsTitle: "Negative results",
+  negativeResultsNotConnected:
+    "Negative result records are catalog-only — experiment databases are not connected yet.",
+  futureWorkspaceSupport: "Future workspace support",
+  futureExperimentTypes: "Future experiment types",
+  negativeHumanReview:
+    "Human scientific review required before any negative result supports a decision.",
+  genericNegativeResults:
+    "Generic negative result readiness applies — topic-specific records not configured yet.",
+  evidenceReadinessEyebrow: "Research evidence",
+  evidenceReadinessTitle: "Research evidence readiness",
+  evidenceReadinessDetail:
+    "Core research evidence areas for this topic — not connected yet. Available catalog information only.",
+  publications: "Publications",
+  experiments: "Experiments",
+  laboratories: "Laboratories",
+  willSupport: "Will support",
+  currentLimitation: "Current limitation",
+  humanReviewBeforeDecision: "Human review required before any future use in decisions.",
+  publicationLimitationFallback: "Publication sources are not connected yet.",
+  experimentLimitationFallback: "Experiment records are not connected yet.",
+  laboratoryLimitationFallback: "Laboratory records are not connected yet.",
+  reportResearchQuestion: "Research question",
+  reportDomain: "Domain",
+  reportDescription: "Description",
+  reportEvidenceSummary: "{connected} items connected · {supporting} supporting · {counter} counter evidence.",
+  reportNotes: "Research notes",
+  reportNotesEmpty: "No research notes recorded yet.",
+} as const;
+
+export const UNIVERSAL_INTENT_EN = {
+  categoryStartMission: "Start mission",
+  categoryContinueMission: "Continue mission",
+  categorySearchEntity: "Search",
+  categoryOpenObject: "Open object",
+  categoryCompareEntities: "Compare in graph",
+  categoryInspectEvidence: "Inspect evidence",
+  categoryOpenReasoning: "Open reasoning",
+  categoryReviewImpact: "Review impact",
+  categoryOpenReport: "Open report",
+  categoryContinueResearch: "Continue research",
+  categoryUnrecognized: "Not recognized",
+} as const;

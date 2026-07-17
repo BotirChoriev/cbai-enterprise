@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import { deriveFirstMinuteAction, translateFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
+import { deriveMissionLifecycle } from "@/lib/intelligence-os/mission-lifecycle";
 import { getDictionary } from "@/lib/i18n/translate";
 import { translateEvidencePulseLimitation } from "@/lib/i18n/evidence-pulse-translation";
 import { loadProjects, loadProjectQuestions } from "@/lib/project/project-store";
@@ -24,7 +25,8 @@ import HumanDecisionBoundary from "@/components/intelligence-os/HumanDecisionBou
 import EvidencePulsePanel from "@/components/intelligence-os/EvidencePulsePanel";
 import EvidenceTrustSurfacePanel from "@/components/evidence/EvidenceTrustSurfacePanel";
 import EvidenceJourneyPanel from "@/components/evidence/EvidenceJourneyPanel";
-import { cbaiBtnPrimary, cbaiOperatingShell } from "@/components/brand/brand-classes";
+import KnowledgeBrainPanel from "@/components/knowledge/KnowledgeBrainPanel";
+import { cbaiBtnPrimary, cbaiOperatingShell, cbaiSectionEyebrow, cbaiTextBody, cbaiTextMuted } from "@/components/brand/brand-classes";
 
 export default function IntelligenceCanvas() {
   const { t, language } = useTranslation();
@@ -58,6 +60,11 @@ export default function IntelligenceCanvas() {
 
   const projectQuery = mission?.projectId ? `?project=${mission.projectId}` : "";
   const firstAction = hydrated ? deriveFirstMinuteAction(mission) : null;
+  const lifecycle = useMemo(
+    () => (hydrated && mission ? deriveMissionLifecycle(mission) : []),
+    [hydrated, mission],
+  );
+  const currentStage = lifecycle.find((s) => s.status !== "complete") ?? lifecycle[lifecycle.length - 1];
 
   if (showCreation) {
     return (
@@ -76,14 +83,6 @@ export default function IntelligenceCanvas() {
   return (
     <div className={`cbai-intelligence-canvas cbai-living-canvas ${cbaiOperatingShell} flex min-h-full flex-col`} key={refreshKey}>
       {disclosure.showAwakeningSequence ? <SystemAwakeningSequence hasMission={Boolean(mission)} /> : null}
-
-      {mission && firstAction && disclosure.primaryActionOnly ? (
-        <div className="flex shrink-0 items-center border-b border-zinc-800/80 px-4 py-2 sm:px-5">
-          <Link href={firstAction.href} className={`${cbaiBtnPrimary} text-xs`}>
-            {translateFirstMinuteAction(t, firstAction)} →
-          </Link>
-        </div>
-      ) : null}
 
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-px bg-zinc-800/30 lg:grid-cols-[minmax(0,1fr)_15rem] xl:grid-cols-[minmax(0,1fr)_17rem]">
         <div className="flex min-h-0 flex-col overflow-y-auto">
@@ -108,6 +107,47 @@ export default function IntelligenceCanvas() {
               </div>
             ) : null}
           </div>
+        </div>
+      ) : disclosure.primaryActionOnly ? (
+        <div className="mx-auto flex w-full max-w-2xl flex-col space-y-6 px-4 py-8 sm:px-6">
+          <div className="space-y-2">
+            <p className={cbaiSectionEyebrow}>{t("intelligenceCanvas.centerMission")}</p>
+            <p className={`${cbaiTextBody} text-zinc-100`}>{mission.problem}</p>
+            <p className={cbaiTextMuted}>
+              {project?.researchQuestion ?? mission.whyExists ?? t("missionCenter.noMissionTitle")}
+            </p>
+            {currentStage ? (
+              <p className="text-xs text-teal-400/80">
+                {t("missionHome.stagesComplete", {
+                  complete: String(lifecycle.filter((s) => s.status === "complete").length),
+                  total: String(lifecycle.length),
+                })}
+                {" · "}
+                {currentStage.label}
+              </p>
+            ) : null}
+          </div>
+
+          <div className="space-y-1">
+            <p className={cbaiSectionEyebrow}>{t("intelligenceCanvas.centerEvidence")}</p>
+            <p className="text-sm text-zinc-300">{pulse?.label ?? t("evidencePulse.missing")}</p>
+            {pulseLimitation ? (
+              <p className="text-xs text-zinc-500">
+                {t("evidencePulse.limitation")}: {pulseLimitation}
+              </p>
+            ) : null}
+          </div>
+
+          {firstAction ? (
+            <Link href={firstAction.href} className={`${cbaiBtnPrimary} w-fit gap-2`}>
+              {translateFirstMinuteAction(t, firstAction)}
+              <span aria-hidden="true">→</span>
+            </Link>
+          ) : null}
+
+          <KnowledgeBrainPanel compact />
+
+          <MissionOperatorPresence mission={mission} />
         </div>
       ) : (
         <>
@@ -216,11 +256,11 @@ export default function IntelligenceCanvas() {
         </div>
 
         <div className="hidden lg:block">
-          {mission ? <LivingContextRail /> : null}
+          {mission && disclosure.showLivingContextRail ? <LivingContextRail /> : null}
         </div>
       </div>
 
-      {mission ? <CanvasMissionTimeline mission={mission} /> : null}
+      {mission && !disclosure.primaryActionOnly ? <CanvasMissionTimeline mission={mission} /> : null}
     </div>
   );
 }

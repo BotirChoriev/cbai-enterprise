@@ -7,6 +7,7 @@ import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { useUniversalWorkspace } from "@/components/platform/context/UniversalWorkspaceProvider";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import KnowledgeLayersDisclosure from "@/components/knowledge/KnowledgeLayersDisclosure";
+import KnowledgeBrainPanel from "@/components/knowledge/KnowledgeBrainPanel";
 import {
   resolveUniversalObject,
   type UniversalObjectType,
@@ -119,6 +120,8 @@ export default function UniversalInspector({ className = "" }: { className?: str
         label={t("universalWorkspace.humanJudgment")}
         value={contract.requiresHumanJudgment ? t("universalWorkspace.yes") : t("universalWorkspace.no")}
       />
+
+      <KnowledgeBrainPanel objectRef={contract.ref} compact />
 
       <KnowledgeLayersDisclosure layers={contract.layers} />
 

@@ -6,6 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import { ASSISTANT_COMMANDS, resolveAssistantCommand } from "@/lib/assistant/assistant-commands";
+import { resolveUniversalIntent, intentCategoryTranslationKey } from "@/lib/intelligence-os/universal-intent";
 import { resolveAssistantContext } from "@/lib/assistant/assistant-context";
 import { resolveOperatorName } from "@/lib/assistant/assistant-profile";
 import {
@@ -174,11 +175,13 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
         return;
       }
 
-      const match = resolveAssistantCommand(trimmed);
+      const intent = resolveUniversalIntent(trimmed);
+      const match = intent.command;
       if (match) {
         setUnrecognized(null);
         router.push(match.href);
         setInput("");
+        setConfirmation(t(intentCategoryTranslationKey(intent.category)));
       } else {
         // Honest fallback per the Command Center's no-fake-AI-response rule: an unmatched
         // command shows what's actually supported, never a guessed destination.
