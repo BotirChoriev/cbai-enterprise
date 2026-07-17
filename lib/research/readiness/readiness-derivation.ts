@@ -21,9 +21,12 @@ export function deriveMilestones(
   return [
     toMilestone("question_defined", intelligence.topic.description.trim().length > 0),
     toMilestone("evidence_catalogued", intelligence.topic.relatedEvidenceTypes.length > 0),
-    toMilestone("evidence_connected", intelligence.connectedEvidence.length > 0),
+    toMilestone("evidence_connected", intelligence.hasLiveConnectedEvidence),
     toMilestone("review_opened", intelligence.reviewStatus.reviewOpened),
     toMilestone("findings_recorded", workspace.findings.length > 0),
-    toMilestone("decision_reached", decision !== "unknown"),
+    toMilestone(
+      "decision_reached",
+      workspace.findings.length > 0 && decision === "no_action_required",
+    ),
   ];
 }

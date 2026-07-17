@@ -10,15 +10,19 @@ import type {
 
 export interface EvidenceGapIntelligence {
   topic: ResearchTopic;
-  /** Evidence categories the catalog affirms are relevant to this topic. */
+  /** Catalog evidence categories documented for this topic — not live-connected. */
+  catalogDocumentedEvidence: readonly TopicEvidenceCatalogItem[];
+  /** Evidence linked to mission via lifecycle (linked+) or saved external source. */
   connectedEvidence: readonly TopicEvidenceCatalogItem[];
-  /** Evidence categories with no source connection — the honestly detectable gaps. */
+  /** Evidence categories with no source connection. */
   disconnectedEvidence: readonly TopicEvidenceCatalogItem[];
-  /** Evidence categories gated behind human review; neither confirmed connected nor missing. */
+  /** Evidence categories gated behind human review. */
   reviewGatedEvidence: readonly TopicEvidenceCatalogItem[];
   reviewStatus: TopicReviewReadiness;
-  /** Labels of disconnected evidence categories — the same set as disconnectedEvidence. */
+  /** Labels of items without live source connection. */
   missingEvidenceCategories: readonly string[];
+  /** True when at least one item is live-connected (lifecycle linked+). */
+  hasLiveConnectedEvidence: boolean;
   researchReadiness: ResearchReadinessState;
   nextAction: ResearchNextAction;
 }

@@ -1,4 +1,5 @@
 import { deriveResearchReadiness } from "@/lib/research/readiness/readiness-engine";
+import { deriveEvidenceGapIntelligence } from "@/lib/research/intelligence/intelligence-engine";
 import { deriveHealthState } from "@/lib/research/health/health-derivation";
 import { buildHealthReasons } from "@/lib/research/health/health-reasons";
 import type { ResearchHealth } from "@/lib/research/health/health-model";
@@ -19,7 +20,11 @@ export function deriveResearchHealth(topicId: string): ResearchHealth | undefine
     return undefined;
   }
 
-  const state = deriveHealthState(readiness.stage);
+  const intelligence = deriveEvidenceGapIntelligence(topicId);
+  const state = deriveHealthState(
+    readiness.stage,
+    intelligence?.hasLiveConnectedEvidence ?? false,
+  );
 
   return {
     topic: readiness.topic,

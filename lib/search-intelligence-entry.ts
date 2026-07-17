@@ -68,9 +68,12 @@ function resolveCoverageLabel(entity: Entity): string | null {
   if (entity.type === "research_topic") {
     const intelligence = deriveEvidenceGapIntelligence(entity.id);
     if (!intelligence) return null;
-    const connected = intelligence.connectedEvidence.length;
-    const total = connected + intelligence.disconnectedEvidence.length;
-    return `${connected} of ${total} evidence items connected`;
+    const live = intelligence.connectedEvidence.length;
+    const catalog = intelligence.catalogDocumentedEvidence.length;
+    if (live > 0) {
+      return `${live} live-connected · ${catalog} catalog-documented`;
+    }
+    return `${catalog} catalog categories · no live source connected`;
   }
 
   return null;

@@ -2,8 +2,6 @@ import type { ResearchReadinessState } from "@/lib/research/intelligence/intelli
 import type { ResearchDecision } from "@/lib/research/intelligence/decision-types";
 import type { WorkflowNextAction, WorkflowStage } from "@/lib/research/workflow/workflow-types";
 
-// Deterministic: reuses the Health Engine's pass-through readiness stage — does not re-derive
-// from ResearchTopicStatus or raw evidence data directly.
 const STAGE_BY_READINESS: Record<ResearchReadinessState, WorkflowStage> = {
   needs_evidence: "evidence_connection_required",
   partially_ready: "evidence_ready_for_review",
@@ -12,7 +10,16 @@ const STAGE_BY_READINESS: Record<ResearchReadinessState, WorkflowStage> = {
   unknown: "unknown",
 };
 
-export function deriveWorkflowStage(readinessStage: ResearchReadinessState): WorkflowStage {
+export function deriveWorkflowStage(
+  readinessStage: ResearchReadinessState,
+  hasLiveConnectedEvidence: boolean,
+): WorkflowStage {
+  if (readinessStage === "partially_ready" && !hasLiveConnectedEvidence) {
+    return "evidence_connection_required";
+  }
+  if (readinessStage === "needs_evidence") {
+    return "evidence_connection_required";
+  }
   return STAGE_BY_READINESS[readinessStage];
 }
 

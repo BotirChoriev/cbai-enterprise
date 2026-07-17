@@ -1,5 +1,9 @@
 import { deriveEvidenceGapIntelligence } from "@/lib/research/intelligence/intelligence-engine";
 import { deriveResearchDecision } from "@/lib/research/intelligence/decision-engine";
+import {
+  loadResearchFindings,
+  loadResearchNotes,
+} from "@/lib/research/research-workspace-store";
 import type { EvidenceGapIntelligence } from "@/lib/research/intelligence/intelligence-model";
 import type {
   ResearchReviewWorkspaceState,
@@ -9,6 +13,13 @@ import type {
 
 function buildOpenQuestions(intelligence: EvidenceGapIntelligence): readonly ReviewOpenQuestion[] {
   const questions: ReviewOpenQuestion[] = [];
+
+  for (const item of intelligence.catalogDocumentedEvidence) {
+    questions.push({
+      questionId: `question:${item.evidenceItemId}:catalog`,
+      question: `Has a live source been connected for catalog category ${item.label}?`,
+    });
+  }
 
   for (const item of intelligence.disconnectedEvidence) {
     questions.push({
@@ -38,6 +49,7 @@ function buildProgress(intelligence: EvidenceGapIntelligence): ReviewProgress {
   return {
     connectedCount: intelligence.connectedEvidence.length,
     totalCount:
+      intelligence.catalogDocumentedEvidence.length +
       intelligence.connectedEvidence.length +
       intelligence.disconnectedEvidence.length +
       intelligence.reviewGatedEvidence.length,
@@ -67,8 +79,18 @@ export function buildResearchReviewWorkspace(
     intelligence,
     decision,
     openQuestions: buildOpenQuestions(intelligence),
-    notes: [],
-    findings: [],
+    notes: loadResearchNotes(topicId).map((note) => ({
+      noteId: note.noteId,
+      topicId: note.topicId,
+      body: note.body,
+      createdAt: note.createdAt,
+    })),
+    findings: loadResearchFindings(topicId).map((finding) => ({
+      findingId: finding.findingId,
+      topicId: finding.topicId,
+      summary: finding.summary,
+      createdAt: finding.createdAt,
+    })),
     progress: buildProgress(intelligence),
   };
 }

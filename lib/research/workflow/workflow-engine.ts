@@ -1,4 +1,5 @@
 import { deriveResearchHealth } from "@/lib/research/health/health-engine";
+import { deriveEvidenceGapIntelligence } from "@/lib/research/intelligence/intelligence-engine";
 import { deriveWorkflowNextAction, deriveWorkflowStage } from "@/lib/research/workflow/workflow-stages";
 import {
   deriveActionLink,
@@ -22,7 +23,11 @@ export function deriveResearchWorkflow(topicId: string): WorkflowResult | undefi
     return undefined;
   }
 
-  const currentStage = deriveWorkflowStage(health.stage);
+  const intelligence = deriveEvidenceGapIntelligence(topicId);
+  const currentStage = deriveWorkflowStage(
+    health.stage,
+    intelligence?.hasLiveConnectedEvidence ?? false,
+  );
   const nextAction = deriveWorkflowNextAction(health.recommendedNextAction);
 
   return {

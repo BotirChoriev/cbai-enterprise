@@ -27,6 +27,7 @@ export function deriveResearchReadiness(topicId: string): ResearchReadinessRepor
   const completedMilestones = milestones.filter((milestone) => milestone.complete);
   const remainingMilestones = milestones.filter((milestone) => !milestone.complete);
   const blockingIssues = [
+    ...intelligence.catalogDocumentedEvidence,
     ...intelligence.disconnectedEvidence,
     ...intelligence.reviewGatedEvidence,
   ];

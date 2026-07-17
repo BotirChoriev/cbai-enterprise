@@ -15,6 +15,7 @@
  */
 
 import { notifyMissionDataChanged } from "@/lib/intelligence-os/mission-activation-events";
+import { recordConfirmedMutation } from "@/lib/telemetry/workflow-telemetry";
 
 export type EvidenceLifecycleStage =
   | "collected"
@@ -151,6 +152,7 @@ export function saveResearchNote(input: Omit<PersistedResearchNote, "noteId" | "
   };
   writeList(NOTES_KEY, [...all, note]);
   notifyMissionDataChanged("research");
+  recordConfirmedMutation("note_created", { objectType: "research_note", objectId: note.noteId });
   return note;
 }
 
@@ -170,6 +172,7 @@ export function saveResearchFinding(input: Omit<PersistedResearchFinding, "findi
   };
   writeList(FINDINGS_KEY, [...all, finding]);
   notifyMissionDataChanged("research");
+  recordConfirmedMutation("finding_created", { objectType: "research_finding", objectId: finding.findingId });
   return finding;
 }
 

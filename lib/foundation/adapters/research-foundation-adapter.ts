@@ -124,8 +124,9 @@ export function toRelationships(topic: ResearchTopic): readonly Relationship[] {
 export function toAnalysis(intelligence: EvidenceGapIntelligence): Analysis {
   return {
     subjectId: intelligence.topic.topicId,
-    summary: `${intelligence.connectedEvidence.length} connected, ${intelligence.disconnectedEvidence.length} disconnected, ${intelligence.reviewGatedEvidence.length} review-gated.`,
-    reasons: intelligence.disconnectedEvidence
+    summary: `${intelligence.connectedEvidence.length} live-connected, ${intelligence.catalogDocumentedEvidence.length} catalog-documented, ${intelligence.disconnectedEvidence.length} disconnected, ${intelligence.reviewGatedEvidence.length} review-gated.`,
+    reasons: intelligence.catalogDocumentedEvidence
+      .concat(intelligence.disconnectedEvidence)
       .concat(intelligence.reviewGatedEvidence)
       .map((item) => `${item.label}: ${item.note}`),
   };

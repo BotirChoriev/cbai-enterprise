@@ -6,11 +6,11 @@ import type {
   ResearchNextAction,
   ResearchReadinessState,
 } from "@/lib/research/intelligence/intelligence-types";
+import { loadEvidenceLifecycle } from "@/lib/research/research-workspace-store";
+
+const LINKED_LIFECYCLE_STAGES = new Set(["linked", "compared", "referenced", "included_in_report"]);
 
 // Deterministic: each real ResearchTopicStatus maps to exactly one readiness state.
-// No topic in the current catalog ever produces "ready" — no evidence source is ever
-// live-connected and no review is ever opened, so claiming full readiness would be dishonest.
-// "ready" and "unknown" remain valid states for future data this engine doesn't have yet.
 const READINESS_BY_TOPIC_STATUS: Record<ResearchTopicStatus, ResearchReadinessState> = {
   catalog_available: "partially_ready",
   evidence_not_connected: "needs_evidence",
@@ -26,7 +26,9 @@ const NEXT_ACTION_BY_READINESS: Record<ResearchReadinessState, ResearchNextActio
 };
 
 function deriveIntelligenceFromReview(review: TopicEvidenceReview): EvidenceGapIntelligence {
-  const connectedEvidence = review.evidenceItems.filter(
+  const lifecycle = loadEvidenceLifecycle(review.topic.topicId);
+
+  const catalogDocumentedEvidence = review.evidenceItems.filter(
     (item) => item.status === "catalog_available",
   );
   const disconnectedEvidence = review.evidenceItems.filter(
@@ -36,15 +38,32 @@ function deriveIntelligenceFromReview(review: TopicEvidenceReview): EvidenceGapI
     (item) => item.status === "human_review_required",
   );
 
-  const researchReadiness = READINESS_BY_TOPIC_STATUS[review.topic.status];
+  const connectedEvidence = review.evidenceItems.filter((item) => {
+    const record = lifecycle[item.evidenceItemId];
+    return record !== undefined && LINKED_LIFECYCLE_STAGES.has(record.stage);
+  });
+
+  const hasLiveConnectedEvidence = connectedEvidence.length > 0;
+
+  let researchReadiness = READINESS_BY_TOPIC_STATUS[review.topic.status];
+  if (researchReadiness === "partially_ready" && !hasLiveConnectedEvidence) {
+    researchReadiness = "needs_evidence";
+  }
+
+  const missingEvidenceCategories = [
+    ...catalogDocumentedEvidence.map((item) => item.label),
+    ...disconnectedEvidence.map((item) => item.label),
+  ];
 
   return {
     topic: review.topic,
+    catalogDocumentedEvidence,
     connectedEvidence,
     disconnectedEvidence,
     reviewGatedEvidence,
     reviewStatus: review.reviewReadiness,
-    missingEvidenceCategories: disconnectedEvidence.map((item) => item.label),
+    missingEvidenceCategories,
+    hasLiveConnectedEvidence,
     researchReadiness,
     nextAction: NEXT_ACTION_BY_READINESS[researchReadiness],
   };
