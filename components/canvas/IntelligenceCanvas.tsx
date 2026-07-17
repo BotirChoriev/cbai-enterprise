@@ -77,12 +77,7 @@ export default function IntelligenceCanvas() {
     <div className={`cbai-intelligence-canvas cbai-living-canvas ${cbaiOperatingShell} flex min-h-full flex-col`} key={refreshKey}>
       {disclosure.showAwakeningSequence ? <SystemAwakeningSequence hasMission={Boolean(mission)} /> : null}
 
-      {!mission ? (
-        <div className="space-y-3 border-b border-zinc-800/80 px-4 py-3 sm:px-5">
-          <p className="max-w-2xl text-sm text-zinc-400">{t("zeroLearningCurve.homeNoMissionLead")}</p>
-          <IntelligenceGatewayEntry compact variant="home" />
-        </div>
-      ) : firstAction && disclosure.primaryActionOnly ? (
+      {mission && firstAction && disclosure.primaryActionOnly ? (
         <div className="flex shrink-0 items-center border-b border-zinc-800/80 px-4 py-2 sm:px-5">
           <Link href={firstAction.href} className={`${cbaiBtnPrimary} text-xs`}>
             {translateFirstMinuteAction(t, firstAction)} →
@@ -92,40 +87,48 @@ export default function IntelligenceCanvas() {
 
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-px bg-zinc-800/30 lg:grid-cols-[minmax(0,1fr)_15rem] xl:grid-cols-[minmax(0,1fr)_17rem]">
         <div className="flex min-h-0 flex-col overflow-y-auto">
+      {!mission ? (
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-8 sm:px-6">
+          <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center space-y-6 text-center">
+            <p className="text-base text-zinc-200 sm:text-lg">{t("intelligenceCanvas.noMissionPrompt")}</p>
+            <div className="w-full text-left">
+              <MissionOperatorPresence mission={null} />
+            </div>
+            <button
+              type="button"
+              onClick={() => setCreating(true)}
+              className={`${cbaiBtnPrimary} gap-2`}
+            >
+              {t("zeroLearningCurve.startMission")}
+              <span aria-hidden="true">→</span>
+            </button>
+            {disclosure.showGatewayGoalChips ? (
+              <div className="w-full pt-2 text-left">
+                <IntelligenceGatewayEntry compact variant="home" />
+              </div>
+            ) : null}
+          </div>
+        </div>
+      ) : (
+        <>
           <div className="grid flex-1 grid-cols-1 gap-px bg-zinc-800/40 sm:grid-cols-2 lg:grid-cols-2">
-            {!mission ? (
-              <button
-                type="button"
-                onClick={() => setCreating(true)}
-                className="sm:col-span-2 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40"
-              >
-                <CanvasOperatingObject
-                  kind="mission"
-                  label={t("intelligenceCanvas.centerMission")}
-                  value={t("intelligenceCanvas.noMissionPrompt")}
-                  detail={t("zeroLearningCurve.startMission")}
-                  status="attention"
-                />
-              </button>
-            ) : (
-              <CanvasOperatingObject
-                kind="mission"
-                label={t("intelligenceCanvas.centerMission")}
-                value={mission.problem}
-                detail={mission.whoBenefits}
-                href="/"
-                status="partial"
-                className="sm:col-span-2"
-              />
-            )}
+            <CanvasOperatingObject
+              kind="mission"
+              label={t("intelligenceCanvas.centerMission")}
+              value={mission.problem}
+              detail={mission.whoBenefits}
+              href="/"
+              status="partial"
+              className="sm:col-span-2"
+            />
 
             <CanvasOperatingObject
               kind="question"
               label={t("intelligenceCanvas.centerQuestion")}
-              value={project?.researchQuestion ?? mission?.whyExists ?? t("missionCenter.noMissionTitle")}
+              value={project?.researchQuestion ?? mission.whyExists ?? t("missionCenter.noMissionTitle")}
               detail={questionCount > 0 ? t("zeroLearningCurve.openQuestionsCount", { count: String(questionCount) }) : undefined}
-              href={mission?.projectId ? `/my-work${projectQuery}#project-questions` : "/my-work"}
-              status={questionCount > 0 || mission?.whyExists ? "partial" : "missing"}
+              href={mission.projectId ? `/my-work${projectQuery}#project-questions` : "/my-work"}
+              status={questionCount > 0 || mission.whyExists ? "partial" : "missing"}
             />
 
             <CanvasOperatingObject
@@ -133,7 +136,7 @@ export default function IntelligenceCanvas() {
               label={t("intelligenceCanvas.centerEvidence")}
               value={pulse?.label ?? t("evidencePulse.missing")}
               detail={pulseLimitation ? `${t("evidencePulse.limitation")}: ${pulseLimitation}` : undefined}
-              href={mission?.projectId ? `/my-work${projectQuery}#project-evidence` : "/knowledge"}
+              href={mission.projectId ? `/my-work${projectQuery}#project-evidence` : "/knowledge"}
               status={
                 !pulse || pulse.state === "missing"
                   ? "missing"
@@ -151,12 +154,12 @@ export default function IntelligenceCanvas() {
               kind="knowledge"
               label={t("intelligenceCanvas.centerKnowledge")}
               value={
-                mission?.evidenceMissing
+                mission.evidenceMissing
                   ? t("missionCenter.missingKnowledge")
                   : t("missionCenter.noMissionTitle")
               }
-              detail={mission?.evidenceMissing ?? undefined}
-              status={mission?.evidenceMissing ? "attention" : "missing"}
+              detail={mission.evidenceMissing ?? undefined}
+              status={mission.evidenceMissing ? "attention" : "missing"}
             >
               <CanvasKnowledgeStream />
             </CanvasOperatingObject>
@@ -165,7 +168,7 @@ export default function IntelligenceCanvas() {
               kind="impact"
               label={t("intelligenceCanvas.centerImpact")}
               value={impact?.isComplete ? t("missionCenter.impactComplete") : t("missionCenter.impactIncomplete")}
-              href={mission?.projectId ? `/my-work${projectQuery}#human-impact` : undefined}
+              href={mission.projectId ? `/my-work${projectQuery}#human-impact` : undefined}
               status={impact?.isComplete ? "complete" : impact ? "partial" : "missing"}
             />
 
@@ -178,7 +181,7 @@ export default function IntelligenceCanvas() {
 
           <MissionDnaStrip mission={mission} />
 
-          {mission && disclosure.showCanvasExpertPanels ? (
+          {disclosure.showCanvasExpertPanels ? (
             <div className="space-y-px border-t border-zinc-800/80 bg-zinc-800/20">
               <div className="p-4">
                 <EvidencePulsePanel mission={mission} />
@@ -198,26 +201,26 @@ export default function IntelligenceCanvas() {
             </div>
           ) : null}
 
-          {mission ? (
-            <div className="border-t border-zinc-800/80 p-4 lg:hidden">
-              <HumanImpactPanel
-                missionId={mission.id}
-                projectId={mission.projectId}
-                onSaved={() => {
-                  refreshMissionContext();
-                  setRefreshKey((k) => k + 1);
-                }}
-              />
-            </div>
-          ) : null}
+          <div className="border-t border-zinc-800/80 p-4 lg:hidden">
+            <HumanImpactPanel
+              missionId={mission.id}
+              projectId={mission.projectId}
+              onSaved={() => {
+                refreshMissionContext();
+                setRefreshKey((k) => k + 1);
+              }}
+            />
+          </div>
+        </>
+      )}
         </div>
 
         <div className="hidden lg:block">
-          <LivingContextRail />
+          {mission ? <LivingContextRail /> : null}
         </div>
       </div>
 
-      <CanvasMissionTimeline mission={mission} />
+      {mission ? <CanvasMissionTimeline mission={mission} /> : null}
     </div>
   );
 }

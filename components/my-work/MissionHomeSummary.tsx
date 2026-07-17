@@ -4,8 +4,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
-import { deriveMissionLifecycle, getMissionNextAction } from "@/lib/intelligence-os/mission-lifecycle";
-import { translateMissionLifecycleNext } from "@/lib/i18n/mission-lifecycle-translation";
+import { deriveMissionLifecycle } from "@/lib/intelligence-os/mission-lifecycle";
 import { loadProjects } from "@/lib/project/project-store";
 import EmptyState from "@/components/shared/EmptyState";
 import ActivationStatusLine from "@/components/shared/ActivationStatusLine";
@@ -13,14 +12,13 @@ import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useMissionDataRevision } from "@/lib/hooks/use-mission-data-revision";
 import {
   cbaiGlassCard,
-  cbaiLinkMuted,
   cbaiProminentAction,
   cbaiSectionEyebrow,
   cbaiTextBody,
   cbaiTextMuted,
 } from "@/components/brand/brand-classes";
 
-/** Mission Home — progress, next action, and resume point from real mission data. */
+/** Mission Home — progress and resume point from real mission data (next action lives in page companion). */
 export default function MissionHomeSummary() {
   const { t } = useTranslation();
   const { mission, evidencePulse, humanImpact } = useMissionContext();
@@ -28,7 +26,6 @@ export default function MissionHomeSummary() {
   useMissionDataRevision();
 
   const lifecycle = useMemo(() => deriveMissionLifecycle(mission), [mission]);
-  const next = useMemo(() => getMissionNextAction(mission), [mission]);
   const completeCount = lifecycle.filter((s) => s.status === "complete").length;
   const project =
     hydrated && mission?.projectId
@@ -86,17 +83,7 @@ export default function MissionHomeSummary() {
         ) : null}
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
-        <div className="space-y-0.5">
-          <p className={cbaiSectionEyebrow}>{t("missionCenter.nextAction")}</p>
-          {next ? (
-            <Link href={next.href} className={cbaiLinkMuted}>
-              {translateMissionLifecycleNext(t, next.nextActionKey, next.nextAction)} →
-            </Link>
-          ) : (
-            <p className={cbaiTextMuted}>{t("missionCenter.continueMission")}</p>
-          )}
-        </div>
+      <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-0.5">
           <p className={cbaiSectionEyebrow}>{t("missionCenter.evidenceNetwork")}</p>
           <p className={cbaiTextMuted}>{evidenceLabel}</p>

@@ -440,7 +440,7 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
           className="mt-2 space-y-2 rounded-lg border border-zinc-800 bg-slate-950/90 p-3"
         >
           <p className="text-xs text-zinc-400">
-            {`"${unrecognized}" is not a recognized command yet — no reasoning is applied, so unmatched input is never guessed at.`}
+            {t("commandFeedback.unrecognized", { input: unrecognized })}
           </p>
           <div className="flex flex-wrap gap-1.5">
             {assistantContext ? (
@@ -452,7 +452,7 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
                 }}
                 className="rounded-full border border-teal-500/30 bg-teal-500/10 px-2.5 py-1 text-[11px] text-teal-300 transition-colors hover:border-teal-500/50"
               >
-                {`Open ${assistantContext.name}`}
+                {t("commandFeedback.openEntity", { name: assistantContext.name })}
               </button>
             ) : null}
             {SUGGESTED_COMMANDS.map((command) => (
