@@ -87,6 +87,11 @@ import { ZERO_LEARNING_CURVE_EN, MISSION_LIFECYCLE_NEXT_EN } from "@/lib/i18n/pl
 import { ACTIVATION_EN } from "@/lib/i18n/platform-copy-build021-en";
 import { MISSION_HOME_EN, RESEARCH_DASHBOARD_EN, SAVED_EVIDENCE_EN, PROJECT_PANEL_EN } from "@/lib/i18n/platform-copy-build022-en";
 import { RESEARCH_NOTES_EN, EVIDENCE_LIFECYCLE_COPY_EN } from "@/lib/i18n/platform-copy-build023-en";
+import {
+  RESEARCH_TOPIC_DEPTH_EN,
+  COMMAND_FEEDBACK_EN,
+  PROJECT_HOME_EN,
+} from "@/lib/i18n/platform-copy-build024-en";
 
 const en: TranslationDictionary = {
   roles: {
@@ -573,6 +578,9 @@ const en: TranslationDictionary = {
   projectPanel: PROJECT_PANEL_EN,
   researchNotes: RESEARCH_NOTES_EN,
   evidenceLifecycle: EVIDENCE_LIFECYCLE_COPY_EN,
+  researchTopicDepth: RESEARCH_TOPIC_DEPTH_EN,
+  commandFeedback: COMMAND_FEEDBACK_EN,
+  projectHome: PROJECT_HOME_EN,
 };
 
 export default en;

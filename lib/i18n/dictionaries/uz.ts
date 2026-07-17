@@ -87,6 +87,11 @@ import { ZERO_LEARNING_CURVE_UZ, MISSION_LIFECYCLE_NEXT_UZ } from "@/lib/i18n/pl
 import { ACTIVATION_UZ } from "@/lib/i18n/platform-copy-build021-uz";
 import { MISSION_HOME_UZ, RESEARCH_DASHBOARD_UZ, SAVED_EVIDENCE_UZ, PROJECT_PANEL_UZ } from "@/lib/i18n/platform-copy-build022-uz";
 import { RESEARCH_NOTES_UZ, EVIDENCE_LIFECYCLE_COPY_UZ } from "@/lib/i18n/platform-copy-build023-uz";
+import {
+  RESEARCH_TOPIC_DEPTH_UZ,
+  COMMAND_FEEDBACK_UZ,
+  PROJECT_HOME_UZ,
+} from "@/lib/i18n/platform-copy-build024-uz";
 
 const uz: TranslationDictionary = {
   roles: {
@@ -572,6 +577,9 @@ const uz: TranslationDictionary = {
   projectPanel: PROJECT_PANEL_UZ,
   researchNotes: RESEARCH_NOTES_UZ,
   evidenceLifecycle: EVIDENCE_LIFECYCLE_COPY_UZ,
+  researchTopicDepth: RESEARCH_TOPIC_DEPTH_UZ,
+  commandFeedback: COMMAND_FEEDBACK_UZ,
+  projectHome: PROJECT_HOME_UZ,
 };
 
 export default uz;

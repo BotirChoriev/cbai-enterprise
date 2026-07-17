@@ -87,6 +87,11 @@ import { ZERO_LEARNING_CURVE_TR, MISSION_LIFECYCLE_NEXT_TR } from "@/lib/i18n/pl
 import { ACTIVATION_TR } from "@/lib/i18n/platform-copy-build021-tr";
 import { MISSION_HOME_TR, RESEARCH_DASHBOARD_TR, SAVED_EVIDENCE_TR, PROJECT_PANEL_TR } from "@/lib/i18n/platform-copy-build022-tr";
 import { RESEARCH_NOTES_TR, EVIDENCE_LIFECYCLE_COPY_TR } from "@/lib/i18n/platform-copy-build023-tr";
+import {
+  RESEARCH_TOPIC_DEPTH_TR,
+  COMMAND_FEEDBACK_TR,
+  PROJECT_HOME_TR,
+} from "@/lib/i18n/platform-copy-build024-tr";
 
 const tr: TranslationDictionary = {
   roles: {
@@ -572,6 +577,9 @@ const tr: TranslationDictionary = {
   projectPanel: PROJECT_PANEL_TR,
   researchNotes: RESEARCH_NOTES_TR,
   evidenceLifecycle: EVIDENCE_LIFECYCLE_COPY_TR,
+  researchTopicDepth: RESEARCH_TOPIC_DEPTH_TR,
+  commandFeedback: COMMAND_FEEDBACK_TR,
+  projectHome: PROJECT_HOME_TR,
 };
 
 export default tr;

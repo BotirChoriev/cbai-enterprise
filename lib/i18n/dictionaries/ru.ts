@@ -87,6 +87,11 @@ import { ZERO_LEARNING_CURVE_RU, MISSION_LIFECYCLE_NEXT_RU } from "@/lib/i18n/pl
 import { ACTIVATION_RU } from "@/lib/i18n/platform-copy-build021-ru";
 import { MISSION_HOME_RU, RESEARCH_DASHBOARD_RU, SAVED_EVIDENCE_RU, PROJECT_PANEL_RU } from "@/lib/i18n/platform-copy-build022-ru";
 import { RESEARCH_NOTES_RU, EVIDENCE_LIFECYCLE_COPY_RU } from "@/lib/i18n/platform-copy-build023-ru";
+import {
+  RESEARCH_TOPIC_DEPTH_RU,
+  COMMAND_FEEDBACK_RU,
+  PROJECT_HOME_RU,
+} from "@/lib/i18n/platform-copy-build024-ru";
 
 const ru: TranslationDictionary = {
   roles: {
@@ -572,6 +577,9 @@ const ru: TranslationDictionary = {
   projectPanel: PROJECT_PANEL_RU,
   researchNotes: RESEARCH_NOTES_RU,
   evidenceLifecycle: EVIDENCE_LIFECYCLE_COPY_RU,
+  researchTopicDepth: RESEARCH_TOPIC_DEPTH_RU,
+  commandFeedback: COMMAND_FEEDBACK_RU,
+  projectHome: PROJECT_HOME_RU,
 };
 
 export default ru;
