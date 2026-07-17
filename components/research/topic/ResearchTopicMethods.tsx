@@ -1,4 +1,7 @@
+"use client";
+
 import type { ResearchTopic } from "@/lib/research/research-topics";
+import { useTranslation } from "@/lib/i18n/use-translation";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type ResearchTopicMethodsProps = {
@@ -6,16 +9,16 @@ type ResearchTopicMethodsProps = {
 };
 
 export default function ResearchTopicMethods({ topic }: ResearchTopicMethodsProps) {
+  const { t } = useTranslation();
+
   return (
     <section aria-labelledby="topic-methods-heading" className="space-y-4">
       <div>
-        <p className={cbaiSectionEyebrow}>Methods</p>
+        <p className={cbaiSectionEyebrow}>{t("researchTopicPanels.methodsEyebrow")}</p>
         <h2 id="topic-methods-heading" className="text-xl font-semibold text-zinc-100">
-          Related methods
+          {t("researchTopicPanels.methodsTitle")}
         </h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          Methods associated with this research topic in the catalog — not live study records.
-        </p>
+        <p className="mt-1 text-sm text-zinc-500">{t("researchTopicPanels.methodsDetail")}</p>
       </div>
 
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

@@ -76,6 +76,7 @@ function methodologyDetail(t: ReturnType<typeof useTranslation>["t"], id: (typeo
 }
 
 function LinkEntityForm({ projectId, onLinked }: { projectId: string; onLinked: (entity: ContextEntityRef) => void }) {
+  const { t } = useTranslation();
   const [kind, setKind] = useState<"country" | "company" | "university" | "research_topic">("country");
   const [id, setId] = useState("");
 
@@ -108,17 +109,17 @@ function LinkEntityForm({ projectId, onLinked }: { projectId: string; onLinked: 
         }}
         className="rounded-md border border-zinc-800 bg-zinc-950/80 px-2 py-1 text-[11px] text-zinc-400"
       >
-        <option value="country">Country</option>
-        <option value="company">Company</option>
-        <option value="university">University</option>
-        <option value="research_topic">Research Topic</option>
+        <option value="country">{t("projectHome.entityKindCountry")}</option>
+        <option value="company">{t("projectHome.entityKindCompany")}</option>
+        <option value="university">{t("projectHome.entityKindUniversity")}</option>
+        <option value="research_topic">{t("projectHome.entityKindResearchTopic")}</option>
       </select>
       <select
         value={id}
         onChange={(e) => setId(e.target.value)}
         className="rounded-md border border-zinc-800 bg-zinc-950/80 px-2 py-1 text-[11px] text-zinc-400"
       >
-        <option value="">Select…</option>
+        <option value="">{t("projectHome.entitySelectPlaceholder")}</option>
         {options.map((o) => (
           <option key={o.id} value={o.id}>
             {o.name}
@@ -130,7 +131,7 @@ function LinkEntityForm({ projectId, onLinked }: { projectId: string; onLinked: 
         disabled={!id}
         className="rounded-md border border-teal-500/30 bg-teal-500/10 px-3 py-1 text-[11px] font-medium text-teal-300 hover:border-teal-500/50 disabled:opacity-40"
       >
-        Link entity
+        {t("projectHome.linkEntity")}
       </button>
     </form>
   );
@@ -196,7 +197,7 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <Link href="/my-work" className="text-xs text-teal-400 hover:text-teal-300">
-            ← My Work
+            {t("projectHome.backToMyWork")}
           </Link>
           <h1 className="cbai-display mt-2 text-2xl text-zinc-50">{project.title}</h1>
           <p className="mt-1 text-sm text-zinc-500">{project.description}</p>
@@ -223,23 +224,23 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
       <ProjectDashboard project={project} />
 
       <div className={`${cbaiGlassCard} space-y-3 p-4`}>
-        <p className={cbaiSectionEyebrow}>Research Question &amp; Objectives</p>
+        <p className={cbaiSectionEyebrow}>{t("projectHome.questionObjectivesEyebrow")}</p>
         <div>
           <label htmlFor="project-question" className="text-xs text-zinc-500">
-            Research Question
+            {t("projectHome.researchQuestionLabel")}
           </label>
           <textarea
             id="project-question"
             value={researchQuestionDraft}
             onChange={(e) => setResearchQuestionDraft(e.target.value)}
             rows={2}
-            placeholder="What question is this project answering?"
+            placeholder={t("projectHome.questionFieldPlaceholder")}
             className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30"
           />
         </div>
         <div>
           <label htmlFor="project-objectives" className="text-xs text-zinc-500">
-            Objectives
+            {t("projectHome.objectivesLabel")}
           </label>
           <textarea
             id="project-objectives"
@@ -292,9 +293,17 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
                           ? unpinEntityFromWorkspace(entity.kind, entity.id)
                           : pinEntityToWorkspace(entity)
                       }
-                      aria-label={pinned ? `Remove ${entity.name} bookmark` : `Bookmark ${entity.name}`}
+                      aria-label={
+                        pinned
+                          ? t("projectHome.removeBookmark", { name: entity.name })
+                          : t("projectHome.addBookmark", { name: entity.name })
+                      }
                       aria-pressed={pinned}
-                      title={pinned ? `Remove ${entity.name} bookmark` : `Bookmark ${entity.name}`}
+                      title={
+                        pinned
+                          ? t("projectHome.removeBookmark", { name: entity.name })
+                          : t("projectHome.addBookmark", { name: entity.name })
+                      }
                       className={`rounded-full px-1.5 py-0.5 ${pinned ? "text-teal-300" : "text-zinc-600 hover:text-teal-300"}`}
                     >
                       <span aria-hidden="true">{pinned ? "★" : "☆"}</span>
@@ -302,8 +311,8 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
                     <button
                       type="button"
                       onClick={() => handleUnlink(entity)}
-                      aria-label={`Unlink ${entity.name}`}
-                      title={`Unlink ${entity.name}`}
+                      aria-label={t("projectHome.unlinkEntity", { name: entity.name })}
+                      title={t("projectHome.unlinkEntity", { name: entity.name })}
                       className="rounded-full px-1.5 py-0.5 text-zinc-600 hover:text-amber-400"
                     >
                       <span aria-hidden="true">×</span>
@@ -335,7 +344,7 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
       <ProjectTimelinePanel project={project} />
 
       <div className={`${cbaiGlassCard} space-y-2 p-4`}>
-        <p className={cbaiSectionEyebrow}>Bookmarks</p>
+        <p className={cbaiSectionEyebrow}>{t("projectHome.bookmarksEyebrow")}</p>
         {entities.filter((e) => isEntityPinned(e.kind, e.id)).length > 0 ? (
           <ul className="flex flex-wrap gap-2">
             {entities
@@ -347,10 +356,7 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
               ))}
           </ul>
         ) : (
-          <p className="text-xs text-zinc-600">
-            None of this project&apos;s linked entities are bookmarked yet — use the ☆ next to a
-            linked entity above to bookmark it.
-          </p>
+          <p className="text-xs text-zinc-600">{t("projectHome.bookmarksEmpty")}</p>
         )}
       </div>
 
@@ -374,11 +380,8 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
       </div>
 
       <div className={`${cbaiGlassCard} space-y-3 p-4`}>
-        <p className={cbaiSectionEyebrow}>Trust &amp; Methodology</p>
-        <p className="text-xs text-zinc-500">
-          CBAI provides evidence-based project intelligence. Every entity link, note, and evidence
-          reference in this project was added by the user — never inferred or fabricated.
-        </p>
+        <p className={cbaiSectionEyebrow}>{t("projectHome.trustMethodologyEyebrow")}</p>
+        <p className="text-xs text-zinc-500">{t("projectHome.trustMethodologyIntro")}</p>
         <div className="grid gap-3 sm:grid-cols-2">
           {METHODOLOGY_POINT_IDS.map((pointId) => (
             <div key={pointId} className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-3">

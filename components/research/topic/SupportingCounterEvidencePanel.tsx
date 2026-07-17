@@ -1,5 +1,8 @@
+"use client";
+
 import type { Evidence } from "@/lib/foundation/foundation-model";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
+import { useTranslation } from "@/lib/i18n/use-translation";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type SupportingCounterEvidencePanelProps = {
@@ -7,7 +10,17 @@ type SupportingCounterEvidencePanelProps = {
   counterEvidence: readonly Evidence[];
 };
 
-function EvidenceColumn({ title, items, emptyLabel }: { title: string; items: readonly Evidence[]; emptyLabel: string }) {
+function EvidenceColumn({
+  title,
+  items,
+  emptyLabel,
+  statusLabel,
+}: {
+  title: string;
+  items: readonly Evidence[];
+  emptyLabel: string;
+  statusLabel: (status: string) => string;
+}) {
   return (
     <div className={`${cbaiGlassCard} space-y-2 p-4`}>
       <p className={cbaiSectionEyebrow}>{title}</p>
@@ -22,7 +35,7 @@ function EvidenceColumn({ title, items, emptyLabel }: { title: string; items: re
                   className="!px-2 !py-0.5 !text-[10px]"
                 />
               </div>
-              <p className="mt-0.5 text-[10px] text-zinc-600">Status: {item.status}</p>
+              <p className="mt-0.5 text-[10px] text-zinc-600">{statusLabel(item.status)}</p>
               {item.note ? <p className="mt-0.5 text-[10px] text-zinc-600">{item.note}</p> : null}
             </li>
           ))}
@@ -34,39 +47,33 @@ function EvidenceColumn({ title, items, emptyLabel }: { title: string; items: re
   );
 }
 
-/**
- * Real Supporting vs. Counter Evidence — sourced from
- * ResearchWorkspaceContract.evidenceSummary.supportingEvidence/conflictingEvidence, computed by
- * the Reasoning Engine from real `contradicts` relationships (never inferred). Already computed
- * platform-wide but previously dropped by research-mission-builder.ts's evidence field and never
- * rendered anywhere — this surfaces it. "Never assume one conclusion": both columns render with
- * equal weight, neither implies the other is wrong.
- */
 export default function SupportingCounterEvidencePanel({
   supportingEvidence,
   counterEvidence,
 }: SupportingCounterEvidencePanelProps) {
+  const { t } = useTranslation();
+  const statusLabel = (status: string) => t("researchTopicPanels.evidenceStatusLabel", { status });
+
   return (
     <section aria-labelledby="supporting-counter-evidence-heading" className="space-y-3">
       <div>
         <p className={cbaiSectionEyebrow} id="supporting-counter-evidence-heading">
-          Supporting &amp; Counter Evidence
+          {t("researchTopicPanels.supportingCounterEyebrow")}
         </p>
-        <p className="mt-1 text-xs text-zinc-600">
-          Real evidence only — counter evidence is never inferred, only shown when a verified
-          contradicting relationship exists. Neither column implies a conclusion.
-        </p>
+        <p className="mt-1 text-xs text-zinc-600">{t("researchTopicPanels.supportingCounterDetail")}</p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <EvidenceColumn
-          title="Supporting Evidence"
+          title={t("researchTopicPanels.supportingEvidence")}
           items={supportingEvidence}
-          emptyLabel="No supporting evidence connected yet."
+          emptyLabel={t("researchTopicPanels.noSupportingEvidence")}
+          statusLabel={statusLabel}
         />
         <EvidenceColumn
-          title="Counter Evidence"
+          title={t("researchTopicPanels.counterEvidence")}
           items={counterEvidence}
-          emptyLabel="No counter evidence connected yet — this does not mean none exists, only that none is verified in this catalog."
+          emptyLabel={t("researchTopicPanels.noCounterEvidence")}
+          statusLabel={statusLabel}
         />
       </div>
     </section>

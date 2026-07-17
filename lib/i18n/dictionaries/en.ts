@@ -92,6 +92,12 @@ import {
   COMMAND_FEEDBACK_EN,
   PROJECT_HOME_EN,
 } from "@/lib/i18n/platform-copy-build024-en";
+import {
+  CANVAS_COMPLETION_EN,
+  RESEARCH_TOPIC_PANELS_EN,
+  PROJECT_HOME_COMPLETION_EN,
+  COMMAND_FEEDBACK_COMPLETION_EN,
+} from "@/lib/i18n/platform-copy-build025-en";
 
 const en: TranslationDictionary = {
   roles: {
@@ -560,7 +566,7 @@ const en: TranslationDictionary = {
   moduleAccountabilityUi: MODULE_ACCOUNTABILITY_UI_EN,
   capabilityPassportExt: CAPABILITY_PASSPORT_BUILD012_EN,
   missionThreadUi: MISSION_THREAD_BUILD012_EN,
-  intelligenceCanvas: INTELLIGENCE_CANVAS_EN,
+  intelligenceCanvas: { ...INTELLIGENCE_CANVAS_EN, ...CANVAS_COMPLETION_EN },
   operatorAwareness: OPERATOR_AWARENESS_EN,
   operatingNav: OPERATING_NAV_EN,
   evidenceRuntime: EVIDENCE_RUNTIME_EN,
@@ -579,8 +585,9 @@ const en: TranslationDictionary = {
   researchNotes: RESEARCH_NOTES_EN,
   evidenceLifecycle: EVIDENCE_LIFECYCLE_COPY_EN,
   researchTopicDepth: RESEARCH_TOPIC_DEPTH_EN,
-  commandFeedback: COMMAND_FEEDBACK_EN,
-  projectHome: PROJECT_HOME_EN,
+  commandFeedback: { ...COMMAND_FEEDBACK_EN, ...COMMAND_FEEDBACK_COMPLETION_EN },
+  projectHome: { ...PROJECT_HOME_EN, ...PROJECT_HOME_COMPLETION_EN },
+  researchTopicPanels: RESEARCH_TOPIC_PANELS_EN,
 };
 
 export default en;

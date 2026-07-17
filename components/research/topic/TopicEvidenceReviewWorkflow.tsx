@@ -1,16 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import type {
   TopicEvidenceCatalogItem,
   TopicEvidenceCatalogStatus,
   TopicEvidenceReview,
 } from "@/lib/research/evidence/evidence-topic-builder";
+import { useTranslation } from "@/lib/i18n/use-translation";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
-
-const STATUS_LABELS: Record<TopicEvidenceCatalogStatus, string> = {
-  catalog_available: "Catalog evidence",
-  source_not_connected: "Source not connected",
-  human_review_required: "Human scientific review required",
-};
 
 function statusAccent(status: TopicEvidenceCatalogStatus): string {
   switch (status) {
@@ -25,7 +22,6 @@ function statusAccent(status: TopicEvidenceCatalogStatus): string {
 
 type TopicEvidenceReviewWorkflowProps = {
   review: TopicEvidenceReview;
-  /** The evidence item to show in the detail column — resolved by the caller (e.g. from ?evidence=). */
   selectedEvidence: TopicEvidenceCatalogItem | undefined;
 };
 
@@ -33,27 +29,33 @@ export default function TopicEvidenceReviewWorkflow({
   review,
   selectedEvidence,
 }: TopicEvidenceReviewWorkflowProps) {
+  const { t } = useTranslation();
   const { topic, evidenceItems, reviewReadiness, limitations, nextActions } = review;
+
+  function statusLabel(status: TopicEvidenceCatalogStatus): string {
+    switch (status) {
+      case "catalog_available":
+        return t("researchTopicPanels.statusCatalogEvidence");
+      case "source_not_connected":
+        return t("researchTopicPanels.statusSourceNotConnected");
+      case "human_review_required":
+        return t("researchTopicPanels.statusHumanReviewRequired");
+    }
+  }
 
   return (
     <section aria-labelledby="topic-evidence-review-heading" className="space-y-4">
       <div className="space-y-1">
-        <p className={cbaiSectionEyebrow}>Evidence &amp; review workflow</p>
-        <h2
-          id="topic-evidence-review-heading"
-          className="text-xl font-semibold tracking-tight text-zinc-100"
-        >
+        <p className={cbaiSectionEyebrow}>{t("researchTopicPanels.evidenceReviewEyebrow")}</p>
+        <h2 id="topic-evidence-review-heading" className="text-xl font-semibold tracking-tight text-zinc-100">
           {topic.topicName}
         </h2>
-        <p className="max-w-3xl text-sm text-zinc-500">
-          Available topic information — from catalog evidence categories through review
-          readiness and the next research action.
-        </p>
+        <p className="max-w-3xl text-sm text-zinc-500">{t("researchTopicPanels.evidenceReviewDetail")}</p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[minmax(200px,240px)_minmax(0,1fr)_minmax(220px,260px)]">
-        <nav aria-label="Available catalog evidence" className={`${cbaiGlassCard} space-y-3 p-4`}>
-          <p className={cbaiSectionEyebrow}>Available evidence</p>
+        <nav aria-label={t("researchTopicPanels.availableEvidenceNav")} className={`${cbaiGlassCard} space-y-3 p-4`}>
+          <p className={cbaiSectionEyebrow}>{t("researchTopicPanels.availableEvidence")}</p>
           {evidenceItems.length > 0 ? (
             <ul className="space-y-2">
               {evidenceItems.map((item) => {
@@ -74,7 +76,7 @@ export default function TopicEvidenceReviewWorkflow({
                       <span
                         className={`mt-1 inline-flex rounded-md border px-1.5 py-0.5 text-[10px] font-medium ${statusAccent(item.status)}`}
                       >
-                        {STATUS_LABELS[item.status]}
+                        {statusLabel(item.status)}
                       </span>
                     </Link>
                   </li>
@@ -82,32 +84,32 @@ export default function TopicEvidenceReviewWorkflow({
               })}
             </ul>
           ) : (
-            <p className="text-xs text-zinc-500">No catalog evidence categories listed.</p>
+            <p className="text-xs text-zinc-500">{t("researchTopicPanels.noCatalogEvidence")}</p>
           )}
         </nav>
 
         <article
-          aria-label="Selected evidence detail"
+          aria-label={t("researchTopicPanels.selectedEvidenceDetail")}
           className={`${cbaiGlassCard} space-y-3 p-5`}
         >
-          <p className={cbaiSectionEyebrow}>Selected evidence</p>
+          <p className={cbaiSectionEyebrow}>{t("researchTopicPanels.selectedEvidence")}</p>
           {selectedEvidence ? (
             <>
               <h3 className="text-lg font-semibold text-zinc-100">{selectedEvidence.label}</h3>
               <span
                 className={`inline-flex rounded-md border px-2 py-0.5 text-xs font-medium ${statusAccent(selectedEvidence.status)}`}
               >
-                {STATUS_LABELS[selectedEvidence.status]}
+                {statusLabel(selectedEvidence.status)}
               </span>
               <p className="text-sm leading-relaxed text-zinc-400">{selectedEvidence.note}</p>
             </>
           ) : (
-            <p className="text-sm text-zinc-500">No evidence category is available to select.</p>
+            <p className="text-sm text-zinc-500">{t("researchTopicPanels.noEvidenceToSelect")}</p>
           )}
 
           <div className="border-t border-zinc-800/80 pt-3">
             <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
-              Future evidence connection
+              {t("researchTopicPanels.futureEvidenceConnection")}
             </p>
             <ul className="mt-2 space-y-1.5">
               {limitations.map((limitation) => (
@@ -120,15 +122,15 @@ export default function TopicEvidenceReviewWorkflow({
           </div>
         </article>
 
-        <aside aria-label="Review readiness and next actions" className="space-y-4">
+        <aside aria-label={t("researchTopicPanels.reviewReadinessNav")} className="space-y-4">
           <div className={`${cbaiGlassCard} space-y-2 p-4`}>
-            <p className={cbaiSectionEyebrow}>Review readiness</p>
+            <p className={cbaiSectionEyebrow}>{t("researchTopicPanels.reviewReadiness")}</p>
             <p className="text-sm font-medium text-zinc-200">{reviewReadiness.statusLabel}</p>
             <p className="text-xs leading-relaxed text-zinc-500">{reviewReadiness.note}</p>
           </div>
 
           <div className={`${cbaiGlassCard} space-y-2 p-4`}>
-            <p className={cbaiSectionEyebrow}>Next research action</p>
+            <p className={cbaiSectionEyebrow}>{t("researchTopicPanels.nextResearchAction")}</p>
             <ul className="space-y-1.5">
               {nextActions.map((action) => (
                 <li key={action} className="flex items-start gap-2 text-xs text-zinc-400">

@@ -404,7 +404,7 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
                 d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13"
               />
             </svg>
-            <span className="sr-only">Upload</span>
+            <span className="sr-only">{t("commandFeedback.uploadLabel")}</span>
           </button>
         ) : null}
       </form>
@@ -470,7 +470,7 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
             href={`/search?q=${encodeURIComponent(unrecognized)}`}
             className="inline-flex text-xs font-medium text-teal-400 hover:text-teal-300"
           >
-            Search Global Search for &quot;{unrecognized}&quot; →
+            {t("commandFeedback.searchUnrecognized", { input: unrecognized })}
           </Link>
         </div>
       ) : null}

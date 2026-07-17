@@ -274,6 +274,7 @@ export function linkEntityToProject(projectId: string, entity: ContextEntityRef)
   const link: ProjectEntityLink = { projectId, entity };
   writeList(PROJECT_ENTITIES_KEY, [...all, link]);
   syncEntityLinkRow(link);
+  notifyMissionDataChanged("project");
 }
 
 export function unlinkEntityFromProject(projectId: string, kind: ContextEntityRef["kind"], id: string): void {
@@ -281,6 +282,7 @@ export function unlinkEntityFromProject(projectId: string, kind: ContextEntityRe
   const next = all.filter((link) => !(link.projectId === projectId && link.entity.kind === kind && link.entity.id === id));
   writeList(PROJECT_ENTITIES_KEY, next);
   syncDeleteEntityLink(projectId, kind, id);
+  notifyMissionDataChanged("project");
 }
 
 /** Reverse lookup — real Projects that link to a given real entity, for that entity's own Related panel. */

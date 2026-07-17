@@ -92,6 +92,12 @@ import {
   COMMAND_FEEDBACK_RU,
   PROJECT_HOME_RU,
 } from "@/lib/i18n/platform-copy-build024-ru";
+import {
+  CANVAS_COMPLETION_RU,
+  RESEARCH_TOPIC_PANELS_RU,
+  PROJECT_HOME_COMPLETION_RU,
+  COMMAND_FEEDBACK_COMPLETION_RU,
+} from "@/lib/i18n/platform-copy-build025-ru";
 
 const ru: TranslationDictionary = {
   roles: {
@@ -559,7 +565,7 @@ const ru: TranslationDictionary = {
   moduleAccountabilityUi: MODULE_ACCOUNTABILITY_UI_RU,
   capabilityPassportExt: CAPABILITY_PASSPORT_BUILD012_RU,
   missionThreadUi: MISSION_THREAD_BUILD012_RU,
-  intelligenceCanvas: INTELLIGENCE_CANVAS_RU,
+  intelligenceCanvas: { ...INTELLIGENCE_CANVAS_RU, ...CANVAS_COMPLETION_RU },
   operatorAwareness: OPERATOR_AWARENESS_RU,
   operatingNav: OPERATING_NAV_RU,
   evidenceRuntime: EVIDENCE_RUNTIME_RU,
@@ -578,8 +584,9 @@ const ru: TranslationDictionary = {
   researchNotes: RESEARCH_NOTES_RU,
   evidenceLifecycle: EVIDENCE_LIFECYCLE_COPY_RU,
   researchTopicDepth: RESEARCH_TOPIC_DEPTH_RU,
-  commandFeedback: COMMAND_FEEDBACK_RU,
-  projectHome: PROJECT_HOME_RU,
+  commandFeedback: { ...COMMAND_FEEDBACK_RU, ...COMMAND_FEEDBACK_COMPLETION_RU },
+  projectHome: { ...PROJECT_HOME_RU, ...PROJECT_HOME_COMPLETION_RU },
+  researchTopicPanels: RESEARCH_TOPIC_PANELS_RU,
 };
 
 export default ru;

@@ -36,7 +36,7 @@ export default function ResearchCockpit({ topic, workflow }: ResearchCockpitProp
       <div className="space-y-3">
         <div>
           <p className={cbaiSectionEyebrow}>{t("researchTopicDepth.cockpitEyebrow")}</p>
-          <p className="mt-1 text-sm text-zinc-200">{buildMissionStatement(topic)}</p>
+          <p className="mt-1 text-sm text-zinc-200">{buildMissionStatement(topic, t)}</p>
         </div>
 
         <dl className="flex flex-wrap gap-2">

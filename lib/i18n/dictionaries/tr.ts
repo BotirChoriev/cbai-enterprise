@@ -92,6 +92,12 @@ import {
   COMMAND_FEEDBACK_TR,
   PROJECT_HOME_TR,
 } from "@/lib/i18n/platform-copy-build024-tr";
+import {
+  CANVAS_COMPLETION_TR,
+  RESEARCH_TOPIC_PANELS_TR,
+  PROJECT_HOME_COMPLETION_TR,
+  COMMAND_FEEDBACK_COMPLETION_TR,
+} from "@/lib/i18n/platform-copy-build025-tr";
 
 const tr: TranslationDictionary = {
   roles: {
@@ -559,7 +565,7 @@ const tr: TranslationDictionary = {
   moduleAccountabilityUi: MODULE_ACCOUNTABILITY_UI_TR,
   capabilityPassportExt: CAPABILITY_PASSPORT_BUILD012_TR,
   missionThreadUi: MISSION_THREAD_BUILD012_TR,
-  intelligenceCanvas: INTELLIGENCE_CANVAS_TR,
+  intelligenceCanvas: { ...INTELLIGENCE_CANVAS_TR, ...CANVAS_COMPLETION_TR },
   operatorAwareness: OPERATOR_AWARENESS_TR,
   operatingNav: OPERATING_NAV_TR,
   evidenceRuntime: EVIDENCE_RUNTIME_TR,
@@ -578,8 +584,9 @@ const tr: TranslationDictionary = {
   researchNotes: RESEARCH_NOTES_TR,
   evidenceLifecycle: EVIDENCE_LIFECYCLE_COPY_TR,
   researchTopicDepth: RESEARCH_TOPIC_DEPTH_TR,
-  commandFeedback: COMMAND_FEEDBACK_TR,
-  projectHome: PROJECT_HOME_TR,
+  commandFeedback: { ...COMMAND_FEEDBACK_TR, ...COMMAND_FEEDBACK_COMPLETION_TR },
+  projectHome: { ...PROJECT_HOME_TR, ...PROJECT_HOME_COMPLETION_TR },
+  researchTopicPanels: RESEARCH_TOPIC_PANELS_TR,
 };
 
 export default tr;

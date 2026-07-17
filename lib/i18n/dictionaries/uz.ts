@@ -92,6 +92,12 @@ import {
   COMMAND_FEEDBACK_UZ,
   PROJECT_HOME_UZ,
 } from "@/lib/i18n/platform-copy-build024-uz";
+import {
+  CANVAS_COMPLETION_UZ,
+  RESEARCH_TOPIC_PANELS_UZ,
+  PROJECT_HOME_COMPLETION_UZ,
+  COMMAND_FEEDBACK_COMPLETION_UZ,
+} from "@/lib/i18n/platform-copy-build025-uz";
 
 const uz: TranslationDictionary = {
   roles: {
@@ -559,7 +565,7 @@ const uz: TranslationDictionary = {
   moduleAccountabilityUi: MODULE_ACCOUNTABILITY_UI_UZ,
   capabilityPassportExt: CAPABILITY_PASSPORT_BUILD012_UZ,
   missionThreadUi: MISSION_THREAD_BUILD012_UZ,
-  intelligenceCanvas: INTELLIGENCE_CANVAS_UZ,
+  intelligenceCanvas: { ...INTELLIGENCE_CANVAS_UZ, ...CANVAS_COMPLETION_UZ },
   operatorAwareness: OPERATOR_AWARENESS_UZ,
   operatingNav: OPERATING_NAV_UZ,
   evidenceRuntime: EVIDENCE_RUNTIME_UZ,
@@ -578,8 +584,9 @@ const uz: TranslationDictionary = {
   researchNotes: RESEARCH_NOTES_UZ,
   evidenceLifecycle: EVIDENCE_LIFECYCLE_COPY_UZ,
   researchTopicDepth: RESEARCH_TOPIC_DEPTH_UZ,
-  commandFeedback: COMMAND_FEEDBACK_UZ,
-  projectHome: PROJECT_HOME_UZ,
+  commandFeedback: { ...COMMAND_FEEDBACK_UZ, ...COMMAND_FEEDBACK_COMPLETION_UZ },
+  projectHome: { ...PROJECT_HOME_UZ, ...PROJECT_HOME_COMPLETION_UZ },
+  researchTopicPanels: RESEARCH_TOPIC_PANELS_UZ,
 };
 
 export default uz;

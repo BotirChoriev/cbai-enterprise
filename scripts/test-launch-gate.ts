@@ -141,14 +141,15 @@ test("11. CreateProjectForm surfaces the real, translated Project Type descripti
 
 test("12. ProjectHome distinguishes Linked entities from Bookmarks and allows bookmarking directly", () => {
   const content = read("components/project/ProjectHome.tsx");
-  assert.ok(content.includes("Bookmarking is separate"));
+  assert.ok(content.includes("projectHome.entitiesBookmarkNote"));
   assert.ok(content.includes("pinEntityToWorkspace"));
 });
 
 test("13. Saving Research Question/Objectives gives a real, visible confirmation", () => {
   const content = read("components/project/ProjectHome.tsx");
   assert.ok(content.includes("questionObjectivesSaved"));
-  assert.ok(content.includes(">Saved.<") || content.includes("Saved."));
+  assert.ok(content.includes("ActivationStatusLine"));
+  assert.ok(content.includes("projectHome.questionSaved"));
 });
 
 test("14. Countries page no longer forces the World Map open when a country is already selected", () => {

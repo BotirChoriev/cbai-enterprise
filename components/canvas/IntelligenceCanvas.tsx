@@ -90,7 +90,7 @@ export default function IntelligenceCanvas() {
       {!mission ? (
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-8 sm:px-6">
           <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center space-y-6 text-center">
-            <p className="text-base text-zinc-200 sm:text-lg">{t("intelligenceCanvas.noMissionPrompt")}</p>
+            <p className="text-base text-zinc-200 sm:text-lg">{t("intelligenceCanvas.homeIntelligenceLead")}</p>
             <div className="w-full text-left">
               <MissionOperatorPresence mission={null} />
             </div>
