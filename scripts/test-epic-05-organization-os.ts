@@ -137,6 +137,8 @@ test("13. Cloud adapter honest — not connected", async () => {
     name: "Test Lab",
     kind: "independent_laboratory",
     missionStatement: null,
+    identityKind: "workspace_organization",
+    version: 1,
     createdAt: "2026-01-01T00:00:00.000Z",
     updatedAt: "2026-01-01T00:00:00.000Z",
     maturity: "architecture_only",

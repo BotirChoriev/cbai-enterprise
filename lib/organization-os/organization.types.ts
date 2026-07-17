@@ -3,6 +3,8 @@
  * Architecture foundation — no fabricated organizations or members.
  */
 
+import type { OrganizationIdentityKind } from "@/lib/organization-os/organization-identity.types";
+
 export type OrganizationKind =
   | "company"
   | "university"
@@ -25,7 +27,12 @@ export type Organization = {
   readonly id: string;
   readonly name: string;
   readonly kind: OrganizationKind;
+  readonly identityKind: OrganizationIdentityKind;
   readonly missionStatement: string | null;
+  readonly website?: string | null;
+  readonly country?: string | null;
+  readonly createdBy?: string | null;
+  readonly version: number;
   readonly createdAt: string;
   readonly updatedAt: string;
   readonly maturity: OrganizationMaturity;
