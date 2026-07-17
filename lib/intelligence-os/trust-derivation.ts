@@ -146,3 +146,29 @@ export function deriveKnowledgeTrustStateFromExplanation(
     nextActionLabel: explanation.suggestedAction?.label ?? null,
   };
 }
+
+export type UnifiedTrustInput =
+  | { readonly kind: "canonical_source"; readonly source: CanonicalKnowledgeSource }
+  | { readonly kind: "saved_source"; readonly source: SavedKnowledgeSource }
+  | { readonly kind: "explanation"; readonly explanation: KnowledgeExplanation }
+  | { readonly kind: "living_object"; readonly lifecycleState: string; readonly trustState: KnowledgeTrustState; readonly limitations?: readonly string[] };
+
+/** BUILD-032 — Single entry point delegating to existing derivations. */
+export function deriveKnowledgeTrustState(input: UnifiedTrustInput): TrustDerivation {
+  switch (input.kind) {
+    case "canonical_source":
+      return deriveKnowledgeTrustStateFromSource(input.source);
+    case "saved_source":
+      return deriveKnowledgeTrustStateFromSavedSource(input.source);
+    case "explanation":
+      return deriveKnowledgeTrustStateFromExplanation(input.explanation);
+    case "living_object":
+      return {
+        state: input.trustState,
+        reasons: [{ code: "lifecycle", message: `Lifecycle: ${input.lifecycleState}.` }],
+        limitations: input.limitations ?? [],
+        requiredReview: input.trustState === "needs_review" ? "required" : "none",
+        nextActionLabel: null,
+      };
+  }
+}

@@ -22,6 +22,10 @@ import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { useUniversalWorkspace } from "@/components/platform/context/UniversalWorkspaceProvider";
+import LivingGraphStructuredView from "@/components/graph/LivingGraphStructuredView";
+import { buildLivingGraphProjection } from "@/lib/living-graph/living-graph-projection";
+import { getCurrentUserId } from "@/lib/auth/auth-store";
+import { backfillLivingRelationships } from "@/lib/living-object-network/living-relationship-backfill";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 
 export default function GraphPageClient() {
@@ -93,6 +97,18 @@ export default function GraphPageClient() {
     },
     [nodeIds, selectedNodeId],
   );
+
+  const [livingNodeId, setLivingNodeId] = useState<string | null>(null);
+
+  const livingProjection = useMemo(() => {
+    void mission;
+    backfillLivingRelationships(getCurrentUserId() ?? "device-local");
+    return buildLivingGraphProjection({
+      missionId: mission?.id ?? null,
+      actorId: getCurrentUserId(),
+      depth: 2,
+    });
+  }, [mission]);
 
   useEffect(() => {
     if (!selectedNode) {
@@ -200,6 +216,12 @@ export default function GraphPageClient() {
             />
           </div>
         </div>
+
+        <LivingGraphStructuredView
+          projection={livingProjection}
+          selectedNodeId={livingNodeId}
+          onSelectNode={setLivingNodeId}
+        />
       </div>
     </OperatingPageShell>
   );
