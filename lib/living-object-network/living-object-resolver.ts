@@ -8,6 +8,7 @@ import { loadMission } from "@/lib/intelligence-os/mission-store";
 import { loadProject, loadProjectEvidence, loadProjects } from "@/lib/project/project-store";
 import { loadOrganization } from "@/lib/organization-os/organization-store";
 import { authorizeOrganizationAction } from "@/lib/organization-os/authorization-policy";
+import { loadCollaboration } from "@/lib/collaboration/collaboration-store";
 import { loadLivingRelationships } from "@/lib/living-object-network/living-relationship-store";
 import type {
   LivingObjectReference,
@@ -95,6 +96,25 @@ export function resolveLivingObject(
           limitations: [],
           missionRelevance: null,
           nextAction: ev.reviewOutcome === "accepted_as_evidence" ? null : "Complete review",
+          accessDenied: false,
+        },
+        relationships,
+      };
+    }
+    case "collaboration": {
+      const collab = loadCollaboration(reference.objectId);
+      if (!collab) return { ok: false, code: "not_found", message: "Collaboration not found." };
+      return {
+        ok: true,
+        object: {
+          reference,
+          label: collab.title,
+          lifecycleState: collab.status,
+          trustState: "needs_review",
+          provenanceAvailable: false,
+          limitations: ["Collaboration access is participant-scoped."],
+          missionRelevance: collab.missionId ? `Mission ${collab.missionId}` : null,
+          nextAction: "Open collaboration workspace",
           accessDenied: false,
         },
         relationships,

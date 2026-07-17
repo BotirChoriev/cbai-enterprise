@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
+import { cbaiBtnSecondary } from "@/components/brand/brand-classes";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
@@ -41,8 +42,12 @@ export default function IntelligenceCanvas() {
   const pulseLimitation = pulse
     ? translateEvidencePulseLimitation(getDictionary(language), pulse.limitationKey)
     : undefined;
+  const projects = hydrated ? loadProjects() : [];
+  const continuingProject = hydrated && !mission && projects.length > 0 ? projects[0] : null;
   const project =
-    hydrated && mission?.projectId ? loadProjects().find((p) => p.id === mission.projectId) : null;
+    hydrated && mission?.projectId
+      ? projects.find((p) => p.id === mission.projectId) ?? null
+      : continuingProject;
   const questionCount = hydrated && project ? loadProjectQuestions(project.id).length : 0;
 
   const urlWantsCreate =
@@ -88,24 +93,53 @@ export default function IntelligenceCanvas() {
         <div className="flex min-h-0 flex-col overflow-y-auto">
       {!mission ? (
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-8 sm:px-6">
-          <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center space-y-6 text-center">
-            <p className="text-base text-zinc-200 sm:text-lg">{t("intelligenceCanvas.homeIntelligenceLead")}</p>
-            <div className="w-full text-left">
-              <MissionOperatorPresence mission={null} />
-            </div>
-            <button
-              type="button"
-              onClick={() => setCreating(true)}
-              className={`${cbaiBtnPrimary} gap-2`}
-            >
-              {t("zeroLearningCurve.startMission")}
-              <span aria-hidden="true">→</span>
-            </button>
-            {disclosure.showGatewayGoalChips ? (
-              <div className="w-full pt-2 text-left">
-                <IntelligenceGatewayEntry compact variant="home" />
+          <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col space-y-6">
+            {continuingProject ? (
+              <section aria-labelledby="home-continuing-heading" className="space-y-3">
+                <p id="home-continuing-heading" className={cbaiSectionEyebrow}>
+                  {t("home.continuingEyebrow")}
+                </p>
+                <div className="rounded-lg border border-zinc-800 bg-zinc-950/40 p-4 text-left">
+                  <p className="text-base font-medium text-zinc-100">{continuingProject.title}</p>
+                  <p className="mt-1 text-sm text-zinc-400">{t("home.continuingEntitySubtitle")}</p>
+                  {continuingProject.description ? (
+                    <p className="mt-2 text-sm text-zinc-500">{continuingProject.description}</p>
+                  ) : null}
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Link
+                      href={`/my-work?project=${continuingProject.id}`}
+                      className={`${cbaiBtnPrimary} gap-2`}
+                    >
+                      {t("home.continueWorkspace")}
+                      <span aria-hidden="true">→</span>
+                    </Link>
+                    <button type="button" onClick={() => setCreating(true)} className={cbaiBtnSecondary}>
+                      {t("zeroLearningCurve.startMission")}
+                    </button>
+                  </div>
+                </div>
+              </section>
+            ) : (
+              <div className="flex flex-1 flex-col items-center justify-center space-y-6 text-center">
+                <p className="text-base text-zinc-200 sm:text-lg">{t("intelligenceCanvas.homeIntelligenceLead")}</p>
+                <div className="w-full text-left">
+                  <MissionOperatorPresence mission={null} />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setCreating(true)}
+                  className={`${cbaiBtnPrimary} gap-2`}
+                >
+                  {t("zeroLearningCurve.startMission")}
+                  <span aria-hidden="true">→</span>
+                </button>
+                {disclosure.showGatewayGoalChips ? (
+                  <div className="w-full pt-2 text-left">
+                    <IntelligenceGatewayEntry compact variant="home" />
+                  </div>
+                ) : null}
               </div>
-            ) : null}
+            )}
           </div>
         </div>
       ) : disclosure.primaryActionOnly ? (

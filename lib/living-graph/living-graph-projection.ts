@@ -39,11 +39,15 @@ export type LivingGraphProjection = {
   readonly edges: readonly LivingGraphEdge[];
   readonly emptyReason: string | null;
   readonly projectionMs: number;
+  readonly filteredUnauthorizedCount: number;
 };
 
 function nodeId(ref: LivingObjectReference): string {
   return `${ref.objectType}:${ref.objectId}`;
 }
+
+const DEFAULT_MAX_NODES = 250;
+const DEFAULT_MAX_EDGES = 500;
 
 export function buildLivingGraphProjection(input: {
   readonly focusObject?: LivingObjectReference | null;
@@ -53,9 +57,13 @@ export function buildLivingGraphProjection(input: {
   readonly depth?: number;
   readonly actorId: string | null;
   readonly includeArchived?: boolean;
+  readonly maxNodes?: number;
+  readonly maxEdges?: number;
 }): LivingGraphProjection {
   const start = performance.now();
-  const depth = input.depth ?? 2;
+  const depth = Math.min(input.depth ?? 2, 4);
+  const maxNodes = input.maxNodes ?? DEFAULT_MAX_NODES;
+  const maxEdges = input.maxEdges ?? DEFAULT_MAX_EDGES;
 
   let relationships = loadLivingRelationships({
     missionId: input.missionId ?? undefined,
@@ -69,12 +77,21 @@ export function buildLivingGraphProjection(input: {
 
   const nodeMap = new Map<string, LivingGraphNode>();
   const edges: LivingGraphEdge[] = [];
+  let filteredUnauthorizedCount = 0;
 
-  function addNode(ref: LivingObjectReference): void {
+  function addNode(ref: LivingObjectReference): boolean {
+    if (nodeMap.size >= maxNodes) return false;
     const id = nodeId(ref);
-    if (nodeMap.has(id)) return;
+    if (nodeMap.has(id)) return true;
     const resolved = resolveLivingObject(ref, input.actorId);
-    if (!resolved.ok) return;
+    if (!resolved.ok) {
+      filteredUnauthorizedCount += 1;
+      return false;
+    }
+    if (resolved.object.accessDenied) {
+      filteredUnauthorizedCount += 1;
+      return false;
+    }
     nodeMap.set(id, {
       id,
       reference: ref,
@@ -86,13 +103,19 @@ export function buildLivingGraphProjection(input: {
       contradictionCount: resolved.relationships.filter((r) => r.status === "contradicted").length,
       limitationCount: resolved.object.limitations.length,
       missionRelevance: resolved.object.missionRelevance,
-      accessState: resolved.object.accessDenied ? "limited" : "full",
+      accessState: "full",
     });
+    return true;
   }
 
   for (const rel of relationships) {
-    addNode(rel.source);
-    addNode(rel.target);
+    if (edges.length >= maxEdges) break;
+    const sourceOk = addNode(rel.source);
+    const targetOk = addNode(rel.target);
+    if (!sourceOk || !targetOk) {
+      filteredUnauthorizedCount += 1;
+      continue;
+    }
     edges.push({
       id: rel.id,
       relationshipId: rel.id,
@@ -123,5 +146,6 @@ export function buildLivingGraphProjection(input: {
     edges,
     emptyReason,
     projectionMs: performance.now() - start,
+    filteredUnauthorizedCount,
   };
 }
