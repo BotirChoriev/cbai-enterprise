@@ -8,6 +8,11 @@ import { saveOrganization, createOrganizationDraft } from "@/lib/organization-os
 import { authorizeOrganizationAction } from "@/lib/organization-os/authorization-policy";
 import { recordOrganizationAudit } from "@/lib/organization-os/organization-audit-store";
 import { resolveStorageKey } from "@/lib/storage/namespaced-key";
+import {
+  generateInvitationTokenSync,
+  hashInvitationTokenSync,
+  isLegacyPlainToken,
+} from "@/lib/organization-os/invitation-token";
 
 export type OrganizationRole =
   | "owner"
@@ -44,13 +49,20 @@ export type OrganizationInvitation = {
   readonly inviterId: string;
   readonly inviteeEmail: string;
   readonly role: OrganizationRole;
-  readonly token: string;
+  /** SHA-256 hash — raw token is never persisted after creation. */
+  readonly tokenHash: string;
+  /** @deprecated legacy device-local records only */
+  readonly token?: string;
   readonly status: InvitationStatus;
   readonly expiresAt: string;
   readonly createdAt: string;
   readonly updatedAt: string;
   readonly acceptedByUserId?: string | null;
   readonly acceptedAt?: string | null;
+};
+
+export type OrganizationInvitationCreated = OrganizationInvitation & {
+  readonly rawToken: string;
 };
 
 const MEMBERS_KEY = "cbai-organization-memberships";
@@ -117,8 +129,15 @@ function isInvitation(v: unknown): v is OrganizationInvitation {
   );
 }
 
-function newToken(): string {
-  return `invtok-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+function newTokenPair(): { readonly rawToken: string; readonly tokenHash: string } {
+  return generateInvitationTokenSync();
+}
+
+function matchesInvitationToken(invitation: OrganizationInvitation, rawToken: string): boolean {
+  const hash = hashInvitationTokenSync(rawToken);
+  if (invitation.tokenHash && invitation.tokenHash === hash) return true;
+  if (invitation.token && invitation.token === rawToken) return true;
+  return false;
 }
 
 function normalizeMembership(m: OrganizationMembership): OrganizationMembership {
@@ -200,7 +219,7 @@ export function inviteOrganizationMember(input: {
   readonly inviterDisplayName: string;
   readonly inviteeEmail: string;
   readonly role: OrganizationRole;
-}): OrganizationInvitation | { readonly error: string } {
+}): OrganizationInvitationCreated | { readonly error: string } {
   const auth = authorizeOrganizationAction({
     actorId: input.inviterId,
     organizationId: input.organizationId,
@@ -209,13 +228,14 @@ export function inviteOrganizationMember(input: {
   if (!auth.ok) return { error: auth.message };
 
   const now = new Date().toISOString();
+  const { rawToken, tokenHash } = newTokenPair();
   const invitation: OrganizationInvitation = {
     id: `inv-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     organizationId: input.organizationId,
     inviterId: input.inviterId,
     inviteeEmail: input.inviteeEmail.trim().toLowerCase(),
     role: input.role,
-    token: newToken(),
+    tokenHash,
     status: "pending",
     expiresAt: new Date(Date.now() + INVITE_TTL_MS).toISOString(),
     createdAt: now,
@@ -230,11 +250,12 @@ export function inviteOrganizationMember(input: {
     targetId: invitation.id,
     metadata: { role: input.role },
   });
-  return invitation;
+  return { ...invitation, rawToken };
 }
 
 export function loadInvitationByToken(token: string): OrganizationInvitation | null {
-  const invite = readList(INVITES_KEY, isInvitation).find((i) => i.token === token) ?? null;
+  const invite =
+    readList(INVITES_KEY, isInvitation).find((i) => matchesInvitationToken(i, token)) ?? null;
   if (!invite) return null;
   if (invite.status === "pending" && new Date(invite.expiresAt).getTime() < Date.now()) {
     return { ...invite, status: "expired" };
@@ -261,7 +282,7 @@ export function acceptOrganizationInvitationByToken(
   writeList(
     INVITES_KEY,
     invites.map((i) =>
-      i.token === token
+      matchesInvitationToken(i, token)
         ? { ...i, status: "accepted" as const, updatedAt: now, acceptedByUserId: userId, acceptedAt: now }
         : i,
     ),
@@ -296,12 +317,16 @@ export function acceptOrganizationInvitation(
   const invites = readList(INVITES_KEY, isInvitation);
   const invitation = invites.find((i) => i.id === invitationId);
   if (!invitation || invitation.status !== "pending") return null;
-  return acceptOrganizationInvitationByToken(
-    invitation.token,
-    userId,
-    userDisplayName,
-    invitation.inviteeEmail,
-  ) as OrganizationMembership;
+  const legacyToken = invitation.token;
+  if (legacyToken && isLegacyPlainToken(legacyToken)) {
+    return acceptOrganizationInvitationByToken(
+      legacyToken,
+      userId,
+      userDisplayName,
+      invitation.inviteeEmail,
+    ) as OrganizationMembership;
+  }
+  return null;
 }
 
 export function declineOrganizationInvitation(
@@ -310,12 +335,14 @@ export function declineOrganizationInvitation(
   userDisplayName: string,
 ): boolean {
   const invites = readList(INVITES_KEY, isInvitation);
-  const invitation = invites.find((i) => i.token === token);
+  const invitation = invites.find((i) => matchesInvitationToken(i, token));
   if (!invitation || invitation.status !== "pending") return false;
   const now = new Date().toISOString();
   writeList(
     INVITES_KEY,
-    invites.map((i) => (i.token === token ? { ...i, status: "declined" as const, updatedAt: now } : i)),
+    invites.map((i) =>
+      matchesInvitationToken(i, token) ? { ...i, status: "declined" as const, updatedAt: now } : i,
+    ),
   );
   recordOrganizationAudit({
     organizationId: invitation.organizationId,

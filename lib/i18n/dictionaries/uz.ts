@@ -83,6 +83,7 @@ import { LIVING_INTELLIGENCE_UZ } from "@/lib/i18n/platform-copy-build016-uz";
 import { EXPERIENCE_ENGINEERING_UZ } from "@/lib/i18n/platform-copy-build017-uz";
 import { UNIVERSAL_WORKSPACE_UZ } from "@/lib/i18n/platform-copy-build018-uz";
 import { ORGANIZATION_OS_UZ } from "@/lib/i18n/platform-copy-build019-uz";
+import { ORG_WORKSPACE_UZ } from "@/lib/i18n/platform-copy-build034-uz";
 import { ZERO_LEARNING_CURVE_UZ, MISSION_LIFECYCLE_NEXT_UZ } from "@/lib/i18n/platform-copy-build020-uz";
 import { ACTIVATION_UZ } from "@/lib/i18n/platform-copy-build021-uz";
 import { MISSION_HOME_UZ, RESEARCH_DASHBOARD_UZ, SAVED_EVIDENCE_UZ, PROJECT_PANEL_UZ } from "@/lib/i18n/platform-copy-build022-uz";
@@ -579,7 +580,7 @@ const uz: TranslationDictionary = {
   livingIntelligence: LIVING_INTELLIGENCE_UZ,
   experienceEngineering: EXPERIENCE_ENGINEERING_UZ,
   universalWorkspace: UNIVERSAL_WORKSPACE_UZ,
-  organizationOs: ORGANIZATION_OS_UZ,
+  organizationOs: { ...ORGANIZATION_OS_UZ, ...ORG_WORKSPACE_UZ },
   zeroLearningCurve: ZERO_LEARNING_CURVE_UZ,
   missionLifecycle: MISSION_LIFECYCLE_NEXT_UZ,
   activation: ACTIVATION_UZ,

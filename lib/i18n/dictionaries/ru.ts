@@ -83,6 +83,7 @@ import { LIVING_INTELLIGENCE_RU } from "@/lib/i18n/platform-copy-build016-ru";
 import { EXPERIENCE_ENGINEERING_RU } from "@/lib/i18n/platform-copy-build017-ru";
 import { UNIVERSAL_WORKSPACE_RU } from "@/lib/i18n/platform-copy-build018-ru";
 import { ORGANIZATION_OS_RU } from "@/lib/i18n/platform-copy-build019-ru";
+import { ORG_WORKSPACE_RU } from "@/lib/i18n/platform-copy-build034-ru";
 import { ZERO_LEARNING_CURVE_RU, MISSION_LIFECYCLE_NEXT_RU } from "@/lib/i18n/platform-copy-build020-ru";
 import { ACTIVATION_RU } from "@/lib/i18n/platform-copy-build021-ru";
 import { MISSION_HOME_RU, RESEARCH_DASHBOARD_RU, SAVED_EVIDENCE_RU, PROJECT_PANEL_RU } from "@/lib/i18n/platform-copy-build022-ru";
@@ -579,7 +580,7 @@ const ru: TranslationDictionary = {
   livingIntelligence: LIVING_INTELLIGENCE_RU,
   experienceEngineering: EXPERIENCE_ENGINEERING_RU,
   universalWorkspace: UNIVERSAL_WORKSPACE_RU,
-  organizationOs: ORGANIZATION_OS_RU,
+  organizationOs: { ...ORGANIZATION_OS_RU, ...ORG_WORKSPACE_RU },
   zeroLearningCurve: ZERO_LEARNING_CURVE_RU,
   missionLifecycle: MISSION_LIFECYCLE_NEXT_RU,
   activation: ACTIVATION_RU,
