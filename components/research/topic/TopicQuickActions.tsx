@@ -1,7 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import type { ResearchTopic } from "@/lib/research/research-topics";
 import { WORKSPACE_PATH } from "@/lib/research/workspace/workspace-types";
 import type { TopicTabId } from "@/components/research/topic/TopicSectionTabs";
+import { useTranslation } from "@/lib/i18n/use-translation";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 function workspacePathForTopic(topicId: string): string {
@@ -14,53 +17,55 @@ type TopicQuickActionsProps = {
 };
 
 type ActionItem = {
-  label: string;
-  description: string;
+  labelKey: "openWorkspace" | "exploreRelated" | "viewGraph" | "reviewNotebook";
+  detailKey: "openWorkspaceDetail" | "exploreRelatedDetail" | "viewGraphDetail" | "reviewNotebookDetail";
   onClick?: () => void;
   href?: string;
 };
 
 export default function TopicQuickActions({ topic, onTabChange }: TopicQuickActionsProps) {
+  const { t } = useTranslation();
+
   const actions: ActionItem[] = [
     {
-      label: "Open workspace",
-      description: "Continue research review for this topic",
+      labelKey: "openWorkspace",
+      detailKey: "openWorkspaceDetail",
       href: workspacePathForTopic(topic.topicId),
     },
     {
-      label: "Explore related topics",
-      description: "Catalog connections in overview",
+      labelKey: "exploreRelated",
+      detailKey: "exploreRelatedDetail",
       onClick: () => onTabChange("overview"),
     },
     {
-      label: "View research graph",
-      description: "Knowledge connections",
+      labelKey: "viewGraph",
+      detailKey: "viewGraphDetail",
       onClick: () => onTabChange("graph"),
     },
     {
-      label: "Review notebook",
-      description: "Structured research notebook",
+      labelKey: "reviewNotebook",
+      detailKey: "reviewNotebookDetail",
       onClick: () => onTabChange("notebook"),
     },
   ];
 
   return (
-    <aside aria-label="Quick actions" className="space-y-3">
+    <aside aria-label={t("researchTopicDepth.quickActionsAriaLabel")} className="space-y-3">
       <div>
-        <p className={cbaiSectionEyebrow}>Next steps</p>
-        <h2 className="text-sm font-semibold text-zinc-100">Quick actions</h2>
+        <p className={cbaiSectionEyebrow}>{t("researchTopicDepth.quickActionsEyebrow")}</p>
+        <h2 className="text-sm font-semibold text-zinc-100">{t("researchTopicDepth.quickActionsTitle")}</h2>
       </div>
 
       <ul className="space-y-2">
         {actions.map((action) => (
-          <li key={action.label}>
+          <li key={action.labelKey}>
             {action.href ? (
               <Link
                 href={action.href}
                 className={`${cbaiGlassCard} block p-3 transition-colors hover:border-teal-500/25`}
               >
-                <p className="text-xs font-medium text-teal-400">{action.label} →</p>
-                <p className="mt-0.5 text-[11px] text-zinc-600">{action.description}</p>
+                <p className="text-xs font-medium text-teal-400">{t(`researchTopicDepth.${action.labelKey}`)} →</p>
+                <p className="mt-0.5 text-[11px] text-zinc-600">{t(`researchTopicDepth.${action.detailKey}`)}</p>
               </Link>
             ) : (
               <button
@@ -68,8 +73,8 @@ export default function TopicQuickActions({ topic, onTabChange }: TopicQuickActi
                 onClick={action.onClick}
                 className={`${cbaiGlassCard} w-full p-3 text-left transition-colors hover:border-teal-500/25`}
               >
-                <p className="text-xs font-medium text-teal-400">{action.label} →</p>
-                <p className="mt-0.5 text-[11px] text-zinc-600">{action.description}</p>
+                <p className="text-xs font-medium text-teal-400">{t(`researchTopicDepth.${action.labelKey}`)} →</p>
+                <p className="mt-0.5 text-[11px] text-zinc-600">{t(`researchTopicDepth.${action.detailKey}`)}</p>
               </button>
             )}
           </li>
@@ -77,7 +82,7 @@ export default function TopicQuickActions({ topic, onTabChange }: TopicQuickActi
       </ul>
 
       <p className="text-[10px] text-zinc-600">
-        Topic: <span className="text-zinc-500">{topic.topicName}</span>
+        {t("researchTopicDepth.topicLabel", { name: topic.topicName })}
       </p>
     </aside>
   );

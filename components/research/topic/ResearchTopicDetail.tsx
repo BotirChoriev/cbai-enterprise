@@ -6,7 +6,7 @@ import ResearchTopicHero from "@/components/research/topic/ResearchTopicHero";
 import ResearchFutureWorkspace from "@/components/research/topic/ResearchFutureWorkspace";
 import ResearchLandscape from "@/components/research/landscape/ResearchLandscape";
 import ResearchGapExplorer from "@/components/research/gaps/ResearchGapExplorer";
-import TopicQuickOverview, { TOPIC_EXPERIENCE_NOTICE } from "@/components/research/topic/TopicQuickOverview";
+import TopicQuickOverview from "@/components/research/topic/TopicQuickOverview";
 import TopicQuickActions from "@/components/research/topic/TopicQuickActions";
 import TopicInsightsPanel from "@/components/research/topic/TopicInsightsPanel";
 import TopicSectionTabs, { type TopicTabId } from "@/components/research/topic/TopicSectionTabs";
@@ -26,6 +26,7 @@ import { deriveResearchWorkflow } from "@/lib/research/workflow/workflow-engine"
 import { buildEntityReport } from "@/lib/entity/entity-report";
 import { buildTopicEvidenceReview } from "@/lib/research/evidence/evidence-topic-builder";
 import { buildResearchMission } from "@/lib/research-mission/research-mission-builder";
+import { useTranslation } from "@/lib/i18n/use-translation";
 import { cbaiHeroGlow } from "@/components/brand/brand-classes";
 
 type ResearchTopicDetailProps = {
@@ -33,6 +34,7 @@ type ResearchTopicDetailProps = {
 };
 
 export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TopicTabId>("overview");
   const [showReport, setShowReport] = useState(false);
   const workflow = deriveResearchWorkflow(topic.topicId);
@@ -58,7 +60,7 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
       <ResearchCockpit topic={topic} workflow={workflow} />
 
       <p className="rounded-lg border border-zinc-800/80 bg-zinc-900/40 px-4 py-3 text-sm text-zinc-500">
-        {TOPIC_EXPERIENCE_NOTICE}
+        {t("researchTopic.experienceNotice")}
       </p>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_240px]">

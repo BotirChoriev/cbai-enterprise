@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import type { Project } from "@/lib/project/project-types";
 import { useTranslation } from "@/lib/i18n/use-translation";
@@ -8,6 +8,7 @@ import { translateProjectStatus } from "@/lib/i18n/project-translation";
 import {
   loadProjectEntities,
   loadProjectEvidence,
+  loadProject,
   linkEntityToProject,
   unlinkEntityFromProject,
   updateProject,
@@ -38,18 +39,41 @@ import ProjectOpenQuestionsPanel from "@/components/project/ProjectOpenQuestions
 import ProjectEvidencePanel from "@/components/project/ProjectEvidencePanel";
 import ProjectTimelinePanel from "@/components/project/ProjectTimelinePanel";
 import ProjectReportView from "@/components/project/ProjectReportView";
+import ActivationStatusLine from "@/components/shared/ActivationStatusLine";
+import { useMissionDataRevision } from "@/lib/hooks/use-mission-data-revision";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type ProjectHomeProps = {
   project: Project;
 };
 
-const METHODOLOGY_POINTS = [
-  { id: "user-created", title: "User-created, not AI-generated", description: "Projects, notes, tasks, and evidence references are created only by the user — never auto-generated or fabricated." },
-  { id: "real-links-only", title: "Real entity links only", description: "Related Countries/Companies/Universities/Research topics are only ever real catalog entries the user explicitly linked." },
-  { id: "no-score", title: "No project score", description: "CBAI does not compute a fabricated project quality or completion score — progress is a real count of completed real milestones." },
-  { id: "local-only", title: "Storage", description: "Signed into a cloud account, Projects sync across your devices; otherwise they stay in this browser only. Never shared with other users." },
-];
+const METHODOLOGY_POINT_IDS = ["user-created", "real-links-only", "no-score", "local-only"] as const;
+
+function methodologyTitle(t: ReturnType<typeof useTranslation>["t"], id: (typeof METHODOLOGY_POINT_IDS)[number]) {
+  switch (id) {
+    case "user-created":
+      return t("projectHome.methodologyUserCreated");
+    case "real-links-only":
+      return t("projectHome.methodologyRealLinks");
+    case "no-score":
+      return t("projectHome.methodologyNoScore");
+    case "local-only":
+      return t("projectHome.methodologyStorage");
+  }
+}
+
+function methodologyDetail(t: ReturnType<typeof useTranslation>["t"], id: (typeof METHODOLOGY_POINT_IDS)[number]) {
+  switch (id) {
+    case "user-created":
+      return t("projectHome.methodologyUserCreatedDetail");
+    case "real-links-only":
+      return t("projectHome.methodologyRealLinksDetail");
+    case "no-score":
+      return t("projectHome.methodologyNoScoreDetail");
+    case "local-only":
+      return t("projectHome.methodologyStorageDetail");
+  }
+}
 
 function LinkEntityForm({ projectId, onLinked }: { projectId: string; onLinked: (entity: ContextEntityRef) => void }) {
   const [kind, setKind] = useState<"country" | "company" | "university" | "research_topic">("country");
@@ -116,25 +140,28 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
   const { isEntityPinned, pinEntityToWorkspace, unpinEntityFromWorkspace } = usePlatformContext();
   const { accountMode } = useAuth();
   const { t } = useTranslation();
-  const [project, setProject] = useState(initialProject);
-  const [entities, setEntities] = useState<ContextEntityRef[]>(() => loadProjectEntities(project.id));
-  const [evidence, setEvidence] = useState(() => loadProjectEvidence(project.id));
+  const missionRevision = useMissionDataRevision();
+  const [localRevision, setLocalRevision] = useState(0);
+  const dataRevision = missionRevision + localRevision;
+  const refresh = () => setLocalRevision((n) => n + 1);
+
+  const project = useMemo(
+    () => loadProject(initialProject.id) ?? initialProject,
+    [initialProject.id, initialProject, dataRevision],
+  );
+  const entities = useMemo(() => loadProjectEntities(project.id), [project.id, dataRevision]);
+  const evidence = useMemo(() => loadProjectEvidence(project.id), [project.id, dataRevision]);
+
   const [showReport, setShowReport] = useState(false);
   const [reportNotice, setReportNotice] = useState<string | null>(null);
   const [researchQuestionDraft, setResearchQuestionDraft] = useState(project.researchQuestion ?? "");
   const [objectivesDraft, setObjectivesDraft] = useState(project.objectives ?? "");
   const [questionObjectivesSaved, setQuestionObjectivesSaved] = useState(false);
-  // A pure re-render trigger — Dashboard/Guide/Health/Timeline read directly from the store on
-  // every render (no internal caching), so bumping this after any sibling panel's mutation is
-  // enough to keep them honest and current within the same session.
-  const [, bumpRefresh] = useState(0);
-  const refresh = () => bumpRefresh((n) => n + 1);
 
   const relationships = buildEntityRelationships("project", project.id);
 
   function handleUnlink(entity: ContextEntityRef) {
     unlinkEntityFromProject(project.id, entity.kind, entity.id);
-    setEntities((current) => current.filter((e) => !(e.kind === entity.kind && e.id === entity.id)));
     refresh();
   }
 
@@ -144,7 +171,6 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
       objectives: objectivesDraft.trim() || undefined,
     });
     if (updated) {
-      setProject(updated);
       refresh();
       setQuestionObjectivesSaved(true);
       window.setTimeout(() => setQuestionObjectivesSaved(false), 3000);
@@ -160,7 +186,7 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
     }
     if (!showReport) {
       const updated = markProjectReportGenerated(project.id);
-      if (updated) setProject(updated);
+      if (updated) refresh();
     }
     setShowReport((current) => !current);
   }
@@ -220,7 +246,7 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
             value={objectivesDraft}
             onChange={(e) => setObjectivesDraft(e.target.value)}
             rows={2}
-            placeholder="What does this project need to accomplish?"
+            placeholder={t("projectHome.questionPlaceholder")}
             className="mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30"
           />
         </div>
@@ -230,37 +256,26 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
             onClick={handleSaveQuestionObjectives}
             className="rounded-md border border-teal-500/30 bg-teal-500/10 px-3 py-1 text-[11px] font-medium text-teal-300 hover:border-teal-500/50"
           >
-            Save
+            {t("projectHome.saveQuestionObjectives")}
           </button>
           {questionObjectivesSaved ? (
-            <p role="status" className="text-[11px] text-emerald-400">
-              Saved.
-            </p>
+            <ActivationStatusLine compact message={t("projectHome.questionSaved")} />
           ) : null}
           {accountMode === "cloud" ? <SyncStatusBadge table="projects" localId={project.id} /> : null}
         </div>
       </div>
 
       <div id="project-entities" className={`${cbaiGlassCard} space-y-3 p-4`}>
-        <p className={cbaiSectionEyebrow}>Related Entities</p>
-        <LinkEntityForm
-          projectId={project.id}
-          onLinked={(entity) => {
-            setEntities((current) => [...current, entity]);
-            refresh();
-          }}
-        />
+        <p className={cbaiSectionEyebrow}>{t("projectHome.relatedEntities")}</p>
+        <LinkEntityForm projectId={project.id} onLinked={() => refresh()} />
         <EntityRelatedPanel
           showHeading={false}
           relationships={relationships}
-          emptyLabel="No entities linked yet. Link a Country, Company, or University this project is about."
+          emptyLabel={t("projectHome.entitiesEmpty")}
         />
         {entities.length > 0 ? (
           <div className="space-y-1.5 border-t border-zinc-800/80 pt-2">
-            <p className="text-[10px] text-zinc-600">
-              Linked entities belong to this project. Bookmarking is separate — it saves an entity
-              to your workspace everywhere, not just here.
-            </p>
+            <p className="text-[10px] text-zinc-600">{t("projectHome.entitiesBookmarkNote")}</p>
             <div className="flex flex-wrap gap-2">
               {entities.map((entity) => {
                 const pinned = isEntityPinned(entity.kind, entity.id);
@@ -305,10 +320,7 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
       <ProjectEvidencePanel
         projectId={project.id}
         relatedEntities={entities}
-        onAdded={(item) => {
-          setEvidence((current) => [item, ...current]);
-          refresh();
-        }}
+        onAdded={() => refresh()}
       />
       </div>
 
@@ -368,10 +380,10 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
           reference in this project was added by the user — never inferred or fabricated.
         </p>
         <div className="grid gap-3 sm:grid-cols-2">
-          {METHODOLOGY_POINTS.map((point) => (
-            <div key={point.id} className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-3">
-              <p className="text-xs font-medium text-zinc-300">{point.title}</p>
-              <p className="mt-1 text-[11px] text-zinc-500">{point.description}</p>
+          {METHODOLOGY_POINT_IDS.map((pointId) => (
+            <div key={pointId} className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-3">
+              <p className="text-xs font-medium text-zinc-300">{methodologyTitle(t, pointId)}</p>
+              <p className="mt-1 text-[11px] text-zinc-500">{methodologyDetail(t, pointId)}</p>
             </div>
           ))}
         </div>

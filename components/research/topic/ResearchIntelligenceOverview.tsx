@@ -1,33 +1,19 @@
+"use client";
+
 import Link from "next/link";
 import { buildResearchMission } from "@/lib/research-mission/research-mission-builder";
 import { MISSION_LIFECYCLE_STATE_LABELS } from "@/lib/research-mission/research-mission-engine";
 import { WORKFLOW_STATE_LABELS } from "@/lib/foundation/workflow-types";
 import { VERIFICATION_STATUS_LABELS } from "@/lib/foundation/evidence-types";
+import { useTranslation } from "@/lib/i18n/use-translation";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type ResearchIntelligenceOverviewProps = {
   topicId: string;
 };
 
-/**
- * The one live consumer of the full Research Intelligence chain — Research Domain (Phase 1/2) →
- * Research Mission (Phase 4) → Research Workspace Contract (Phase 3) → Orchestration Pipeline →
- * Evidence/Relationships/Reasoning/Workflow → Global Intelligence Network. Server component: no
- * client state, no hooks. Calls `buildResearchMission` exactly once — the single Workspace
- * object this section renders from — and reads everything else off its already-computed
- * `workspaceContract` and mission-lifecycle fields; this file contains no evidence, relationship,
- * reasoning, or workflow logic of its own, and never calls a lower-level engine directly.
- *
- * Deliberately does not duplicate ResearchCockpit (current stage / blocking factors / latest
- * workspace activity, all from the pre-existing legacy engines), the Review Workspace, or the
- * Evidence Workspace — this section shows what the Platform Core + Research Domain layers
- * specifically add: the Evidence Center's per-item verification status, the Reasoning
- * Framework's known-unknowns and observed facts, the new universal Workflow's own state, the
- * Research Mission's own project lifecycle, and real Research Domain connections (organizations,
- * datasets). Where the Contract has no real data yet, an honest empty-state sentence is shown —
- * never a fabricated value.
- */
 export default function ResearchIntelligenceOverview({ topicId }: ResearchIntelligenceOverviewProps) {
+  const { t } = useTranslation();
   const mission = buildResearchMission({ missionId: topicId });
   const contract = mission.workspaceContract;
 
@@ -35,8 +21,7 @@ export default function ResearchIntelligenceOverview({ topicId }: ResearchIntell
     return null;
   }
 
-  const { missionSummary, missionProgress, evidenceSummary, researchQuestions, researchTimeline, activityTimeline } =
-    contract;
+  const { missionSummary, missionProgress, evidenceSummary, researchQuestions, researchTimeline } = contract;
 
   const relatedEntities = [
     ...contract.relatedOrganizations.organizations,
@@ -60,7 +45,7 @@ export default function ResearchIntelligenceOverview({ topicId }: ResearchIntell
   return (
     <section aria-labelledby="research-intelligence-overview-heading" className={`${cbaiGlassCard} space-y-5 p-4 sm:p-5`}>
       <div>
-        <p className={cbaiSectionEyebrow}>Research intelligence</p>
+        <p className={cbaiSectionEyebrow}>{t("researchTopicDepth.intelligenceEyebrow")}</p>
         <h2 id="research-intelligence-overview-heading" className="mt-1 text-base font-semibold text-zinc-100">
           {missionSummary.missionCenter.question.question}
         </h2>
@@ -68,53 +53,69 @@ export default function ResearchIntelligenceOverview({ topicId }: ResearchIntell
 
       <dl className="flex flex-wrap gap-2">
         <div className="rounded-md border border-zinc-800/80 bg-slate-950/50 px-2.5 py-1">
-          <dt className="text-[9px] font-medium uppercase tracking-wider text-zinc-600">Mission lifecycle</dt>
+          <dt className="text-[9px] font-medium uppercase tracking-wider text-zinc-600">
+            {t("researchTopicDepth.missionLifecycle")}
+          </dt>
           <dd className="mt-0.5 text-xs font-medium text-zinc-200">
             {MISSION_LIFECYCLE_STATE_LABELS[mission.currentState]}
           </dd>
         </div>
         <div className="rounded-md border border-zinc-800/80 bg-slate-950/50 px-2.5 py-1">
-          <dt className="text-[9px] font-medium uppercase tracking-wider text-zinc-600">Workflow state</dt>
+          <dt className="text-[9px] font-medium uppercase tracking-wider text-zinc-600">
+            {t("researchTopicDepth.workflowState")}
+          </dt>
           <dd className="mt-0.5 text-xs font-medium text-zinc-200">
             {missionProgress.monitoring.currentState
               ? WORKFLOW_STATE_LABELS[missionProgress.monitoring.currentState]
-              : "Unknown"}
+              : t("researchTopicDepth.unknown")}
           </dd>
         </div>
         <div className="rounded-md border border-zinc-800/80 bg-slate-950/50 px-2.5 py-1">
-          <dt className="text-[9px] font-medium uppercase tracking-wider text-zinc-600">Evidence connected</dt>
+          <dt className="text-[9px] font-medium uppercase tracking-wider text-zinc-600">
+            {t("researchTopicDepth.evidenceConnected")}
+          </dt>
           <dd className="mt-0.5 text-xs font-medium text-zinc-200">{evidenceSummary.evidence.length}</dd>
         </div>
         <div className="rounded-md border border-zinc-800/80 bg-slate-950/50 px-2.5 py-1">
-          <dt className="text-[9px] font-medium uppercase tracking-wider text-zinc-600">Open questions</dt>
+          <dt className="text-[9px] font-medium uppercase tracking-wider text-zinc-600">
+            {t("researchTopicDepth.openQuestions")}
+          </dt>
           <dd className="mt-0.5 text-xs font-medium text-zinc-200">{researchQuestions.questions.length}</dd>
         </div>
         <div className="rounded-md border border-zinc-800/80 bg-slate-950/50 px-2.5 py-1">
-          <dt className="text-[9px] font-medium uppercase tracking-wider text-zinc-600">Analysis steps run</dt>
-          <dd className="mt-0.5 text-xs font-medium text-zinc-200">{activityTimeline.pipelineTrace.length}</dd>
+          <dt className="text-[9px] font-medium uppercase tracking-wider text-zinc-600">
+            {t("researchTopicDepth.analysisSteps")}
+          </dt>
+          <dd className="mt-0.5 text-xs font-medium text-zinc-200">{contract.activityTimeline.pipelineTrace.length}</dd>
         </div>
       </dl>
 
       <div className="grid gap-5 lg:grid-cols-2">
         <div id="evidence" className="space-y-4">
           <div>
-            <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">Evidence status</p>
+            <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
+              {t("researchTopicDepth.evidenceStatus")}
+            </p>
             {evidenceSummary.evidence.length > 0 ? (
               <ul className="mt-1.5 space-y-1">
                 {evidenceSummary.evidence.map((item) => (
                   <li key={item.evidenceId} className="text-xs text-zinc-500">
                     {item.label} —{" "}
-                    {item.verificationStatus ? VERIFICATION_STATUS_LABELS[item.verificationStatus] : "Unknown"}
+                    {item.verificationStatus
+                      ? VERIFICATION_STATUS_LABELS[item.verificationStatus]
+                      : t("researchTopicDepth.unknown")}
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="mt-1.5 text-xs text-zinc-600">No evidence connected yet.</p>
+              <p className="mt-1.5 text-xs text-zinc-600">{t("researchTopicDepth.noEvidenceConnected")}</p>
             )}
           </div>
 
           <div>
-            <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">Known evidence gaps</p>
+            <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
+              {t("researchTopicDepth.knownEvidenceGaps")}
+            </p>
             {missionSummary.intelligenceBrief && missionSummary.intelligenceBrief.knownUnknowns.length > 0 ? (
               <ul className="mt-1.5 space-y-1">
                 {missionSummary.intelligenceBrief.knownUnknowns.map((gap) => (
@@ -124,12 +125,14 @@ export default function ResearchIntelligenceOverview({ topicId }: ResearchIntell
                 ))}
               </ul>
             ) : (
-              <p className="mt-1.5 text-xs text-zinc-600">No known evidence gaps recorded.</p>
+              <p className="mt-1.5 text-xs text-zinc-600">{t("researchTopicDepth.noKnownEvidenceGaps")}</p>
             )}
           </div>
 
           <div>
-            <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">Reasoning summary</p>
+            <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
+              {t("researchTopicDepth.reasoningSummary")}
+            </p>
             {missionSummary.intelligenceBrief && missionSummary.intelligenceBrief.observedFacts.length > 0 ? (
               <ul className="mt-1.5 space-y-1">
                 {missionSummary.intelligenceBrief.observedFacts.map((fact) => (
@@ -139,17 +142,16 @@ export default function ResearchIntelligenceOverview({ topicId }: ResearchIntell
                 ))}
               </ul>
             ) : (
-              <p className="mt-1.5 text-xs text-zinc-600">
-                No facts have been independently verified yet — nothing connected has reached &ldquo;verified&rdquo;
-                status.
-              </p>
+              <p className="mt-1.5 text-xs text-zinc-600">{t("researchTopicDepth.noVerifiedFacts")}</p>
             )}
           </div>
         </div>
 
         <div className="space-y-4">
           <div>
-            <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">Recommended next step</p>
+            <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
+              {t("researchTopicDepth.recommendedNextStep")}
+            </p>
             {missionProgress.recommendedNextStep ? (
               missionProgress.recommendedNextStep.href ? (
                 <Link
@@ -162,13 +164,13 @@ export default function ResearchIntelligenceOverview({ topicId }: ResearchIntell
                 <p className="mt-1.5 text-xs text-zinc-500">{missionProgress.recommendedNextStep.reason}</p>
               )
             ) : (
-              <p className="mt-1.5 text-xs text-zinc-600">No further action is recommended right now.</p>
+              <p className="mt-1.5 text-xs text-zinc-600">{t("researchTopicDepth.noFurtherAction")}</p>
             )}
           </div>
 
           <div>
             <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
-              Related entities and network connections
+              {t("researchTopicDepth.relatedEntitiesNetwork")}
             </p>
             {relatedEntities.length > 0 ? (
               <ul className="mt-1.5 space-y-1">
@@ -179,13 +181,13 @@ export default function ResearchIntelligenceOverview({ topicId }: ResearchIntell
                 ))}
               </ul>
             ) : (
-              <p className="mt-1.5 text-xs text-zinc-600">No related organizations or datasets connected yet.</p>
+              <p className="mt-1.5 text-xs text-zinc-600">{t("researchTopicDepth.noRelatedEntities")}</p>
             )}
           </div>
 
           <div>
             <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
-              Recent real timeline activity
+              {t("researchTopicDepth.recentTimelineActivity")}
             </p>
             {researchTimeline.events.length > 0 ? (
               <ol className="mt-1.5 space-y-1">
@@ -196,7 +198,7 @@ export default function ResearchIntelligenceOverview({ topicId }: ResearchIntell
                 ))}
               </ol>
             ) : (
-              <p className="mt-1.5 text-xs text-zinc-600">No research activity recorded yet.</p>
+              <p className="mt-1.5 text-xs text-zinc-600">{t("researchTopicDepth.noResearchActivity")}</p>
             )}
           </div>
         </div>
@@ -204,7 +206,7 @@ export default function ResearchIntelligenceOverview({ topicId }: ResearchIntell
 
       {emptySections.length > 0 ? (
         <p className="border-t border-zinc-800/80 pt-3 text-[11px] text-zinc-600">
-          No {emptySections.join(", ")} are connected yet — honestly empty, not an error.
+          {t("researchTopicDepth.emptySections", { sections: emptySections.join(", ") })}
         </p>
       ) : null}
     </section>

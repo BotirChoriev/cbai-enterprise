@@ -9,8 +9,6 @@ import { useTranslation } from "@/lib/i18n/use-translation";
 import { getDictionary } from "@/lib/i18n/translate";
 import { translateResearchTopicStatus } from "@/lib/i18n/research-topic-status-translation";
 
-export const TOPIC_EXPERIENCE_NOTICE = "Research Intelligence currently uses catalog information and verified platform models. Live scientific databases are not connected yet.";
-
 type TopicQuickOverviewProps = {
   topic: ResearchTopic;
 };

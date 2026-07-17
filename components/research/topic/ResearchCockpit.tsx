@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import type { ResearchTopic } from "@/lib/research/research-topics";
 import type { WorkflowResult } from "@/lib/research/workflow/workflow-model";
@@ -11,6 +13,7 @@ import {
 } from "@/lib/research/intelligence/workspace-shell-engine";
 import { WORKSPACE_TIMELINE_EVENT_LABELS } from "@/lib/research/intelligence/workspace-shell-model";
 import { buildMissionStatement } from "@/components/research/topic/ResearchMissionWorkspace";
+import { useTranslation } from "@/lib/i18n/use-translation";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type ResearchCockpitProps = {
@@ -18,13 +21,8 @@ type ResearchCockpitProps = {
   workflow: WorkflowResult | undefined;
 };
 
-// The operational center of a research mission. Purely presentational — every field is read
-// from the Workflow and Health engines (which already compose Readiness, Gap, Decision, and
-// Review Workspace beneath them); nothing is calculated here. Replaces MissionControlPanel
-// and the Workspace Timeline section that previously lived inside TopicReviewWorkspace, so
-// "current situation" is answered in one place instead of two. `workflow` is derived once by
-// the parent and shared with TopicReviewWorkspace so both cards never disagree.
 export default function ResearchCockpit({ topic, workflow }: ResearchCockpitProps) {
+  const { t } = useTranslation();
   const health = deriveResearchHealth(topic.topicId);
   const timeline = getWorkspaceTimeline(topic.topicId);
   const memory = getWorkspaceMemory(topic.topicId);
@@ -37,14 +35,14 @@ export default function ResearchCockpit({ topic, workflow }: ResearchCockpitProp
     <div className={`${cbaiGlassCard} space-y-5 p-4 sm:p-5`}>
       <div className="space-y-3">
         <div>
-          <p className={cbaiSectionEyebrow}>Research cockpit</p>
+          <p className={cbaiSectionEyebrow}>{t("researchTopicDepth.cockpitEyebrow")}</p>
           <p className="mt-1 text-sm text-zinc-200">{buildMissionStatement(topic)}</p>
         </div>
 
         <dl className="flex flex-wrap gap-2">
           <div className="rounded-md border border-zinc-800/80 bg-slate-950/50 px-2.5 py-1">
             <dt className="text-[9px] font-medium uppercase tracking-wider text-zinc-600">
-              Current stage
+              {t("researchTopicDepth.currentStage")}
             </dt>
             <dd className="mt-0.5 text-xs font-medium text-zinc-200">
               {WORKFLOW_STAGE_LABELS[workflow.currentStage]}
@@ -52,7 +50,7 @@ export default function ResearchCockpit({ topic, workflow }: ResearchCockpitProp
           </div>
           <div className="rounded-md border border-zinc-800/80 bg-slate-950/50 px-2.5 py-1">
             <dt className="text-[9px] font-medium uppercase tracking-wider text-zinc-600">
-              Research readiness
+              {t("researchTopicDepth.researchReadiness")}
             </dt>
             <dd className="mt-0.5 text-xs font-medium text-zinc-200">
               {RESEARCH_READINESS_LABELS[health.stage]}
@@ -60,7 +58,7 @@ export default function ResearchCockpit({ topic, workflow }: ResearchCockpitProp
           </div>
           <div className="rounded-md border border-zinc-800/80 bg-slate-950/50 px-2.5 py-1">
             <dt className="text-[9px] font-medium uppercase tracking-wider text-zinc-600">
-              Research health
+              {t("researchTopicDepth.researchHealth")}
             </dt>
             <dd className="mt-0.5 text-xs font-medium text-zinc-200">
               {RESEARCH_HEALTH_LABELS[health.state]}
@@ -73,14 +71,14 @@ export default function ResearchCockpit({ topic, workflow }: ResearchCockpitProp
         <div className="space-y-4">
           <div>
             <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
-              Current workflow
+              {t("researchTopicDepth.currentWorkflow")}
             </p>
             <p className="mt-1 text-xs leading-relaxed text-zinc-400">{workflow.reason}</p>
           </div>
 
           <div>
             <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
-              Blocking factors
+              {t("researchTopicDepth.blockingFactors")}
             </p>
             {workflow.blockingFactors.length > 0 ? (
               <ul className="mt-1.5 space-y-1">
@@ -91,7 +89,7 @@ export default function ResearchCockpit({ topic, workflow }: ResearchCockpitProp
                 ))}
               </ul>
             ) : (
-              <p className="mt-1.5 text-xs text-zinc-600">No blocking factors detected.</p>
+              <p className="mt-1.5 text-xs text-zinc-600">{t("researchTopicDepth.noBlockingFactors")}</p>
             )}
           </div>
         </div>
@@ -99,7 +97,7 @@ export default function ResearchCockpit({ topic, workflow }: ResearchCockpitProp
         <div className="space-y-4">
           <div>
             <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
-              Recommended next action
+              {t("researchTopicDepth.recommendedNext")}
             </p>
             {workflow.actionLink ? (
               <Link
@@ -124,7 +122,7 @@ export default function ResearchCockpit({ topic, workflow }: ResearchCockpitProp
 
           <div>
             <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
-              Latest research activity
+              {t("researchTopicDepth.latestActivity")}
             </p>
             {timeline.length > 0 ? (
               <ol className="mt-1.5 space-y-1">
@@ -138,7 +136,7 @@ export default function ResearchCockpit({ topic, workflow }: ResearchCockpitProp
                 ))}
               </ol>
             ) : (
-              <p className="mt-1.5 text-xs text-zinc-600">No workspace activity recorded yet.</p>
+              <p className="mt-1.5 text-xs text-zinc-600">{t("researchTopicDepth.noWorkspaceActivity")}</p>
             )}
           </div>
         </div>
@@ -146,8 +144,10 @@ export default function ResearchCockpit({ topic, workflow }: ResearchCockpitProp
 
       <p className="border-t border-zinc-800/80 pt-3 text-[11px] text-zinc-600">
         {memory
-          ? `Continue where you left off — last visited stage: ${RESEARCH_READINESS_LABELS[memory.lastStage]}.`
-          : "No previous session recorded yet."}
+          ? t("researchTopicDepth.resumeSession", {
+              stage: RESEARCH_READINESS_LABELS[memory.lastStage],
+            })
+          : t("researchTopicDepth.noPreviousSession")}
       </p>
     </div>
   );
