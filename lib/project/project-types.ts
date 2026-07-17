@@ -137,4 +137,9 @@ export type ProjectEvidenceReference = {
   linkedEntityId?: string;
   linkedEntityName?: string;
   createdAt: string;
+  /** BUILD-028.5 — link to persisted saved Crossref/source record. */
+  savedSourceId?: string;
+  reviewId?: string;
+  reviewOutcome?: "accepted_as_evidence" | "context_only" | "insufficient" | "rejected";
+  evidenceRelation?: "supports" | "contradicts" | "contextual" | "insufficient";
 };

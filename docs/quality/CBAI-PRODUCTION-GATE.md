@@ -29,6 +29,15 @@ Closed Alpha gate checklist — updated per build.
 - [ ] Search results not auto-labeled reviewed evidence
 - [ ] Integration registry updated
 
+## BUILD-028.5 gate
+
+- [x] Source lifecycle persisted (save → link → review)
+- [x] Deduplication by DOI
+- [x] Qualifying evidence for report readiness
+- [x] EN/UZ/RU/TR sourceIngestion strings
+- [x] `test:source-ingestion` passes
+- [ ] Playwright full journey (requires dev server)
+
 ## Closed Alpha (BUILD-033)
 
 Not started — see program section 18.

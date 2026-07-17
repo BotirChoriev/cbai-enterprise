@@ -103,6 +103,7 @@ import {
   RESEARCH_TOPIC_COMPLETION_UZ,
   UNIVERSAL_INTENT_UZ,
 } from "@/lib/i18n/platform-copy-build026-uz";
+import { SOURCE_INGESTION_UZ } from "@/lib/i18n/platform-copy-build0285-uz";
 
 const uz: TranslationDictionary = {
   roles: {
@@ -593,6 +594,7 @@ const uz: TranslationDictionary = {
   projectHome: { ...PROJECT_HOME_UZ, ...PROJECT_HOME_COMPLETION_UZ },
   researchTopicPanels: RESEARCH_TOPIC_PANELS_UZ,
   knowledgeBrain: KNOWLEDGE_BRAIN_UZ,
+  sourceIngestion: SOURCE_INGESTION_UZ,
   researchTopicCompletion: RESEARCH_TOPIC_COMPLETION_UZ,
   universalIntent: UNIVERSAL_INTENT_UZ,
 };

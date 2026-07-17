@@ -103,6 +103,7 @@ import {
   RESEARCH_TOPIC_COMPLETION_EN,
   UNIVERSAL_INTENT_EN,
 } from "@/lib/i18n/platform-copy-build026-en";
+import { SOURCE_INGESTION_EN } from "@/lib/i18n/platform-copy-build0285-en";
 
 const en: TranslationDictionary = {
   roles: {
@@ -594,6 +595,7 @@ const en: TranslationDictionary = {
   projectHome: { ...PROJECT_HOME_EN, ...PROJECT_HOME_COMPLETION_EN },
   researchTopicPanels: RESEARCH_TOPIC_PANELS_EN,
   knowledgeBrain: KNOWLEDGE_BRAIN_EN,
+  sourceIngestion: SOURCE_INGESTION_EN,
   researchTopicCompletion: RESEARCH_TOPIC_COMPLETION_EN,
   universalIntent: UNIVERSAL_INTENT_EN,
 };

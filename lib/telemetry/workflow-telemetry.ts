@@ -83,6 +83,12 @@ export function recordConfirmedMutation(
     | "finding_created"
     | "report_saved"
     | "source_search_completed"
+    | "source_saved"
+    | "source_linked_to_mission"
+    | "source_review_requested"
+    | "source_review_completed"
+    | "source_review_rejected"
+    | "source_archived"
   >,
   fields: Omit<WorkflowEventPayload, "event" | "timestamp"> = {},
 ): WorkflowEventPayload {

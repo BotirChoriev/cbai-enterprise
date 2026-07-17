@@ -5,6 +5,7 @@
 
 import type { CanonicalKnowledgeSource, KnowledgeTrustState } from "@/lib/knowledge-connectors/types";
 import type { KnowledgeExplanation } from "@/lib/intelligence-os/knowledge-brain.types";
+import type { SavedKnowledgeSource } from "@/lib/knowledge-ingestion/source-ingestion.types";
 
 export type TrustReason = {
   readonly code: string;
@@ -28,7 +29,7 @@ export function deriveKnowledgeTrustStateFromSource(
     { code: "retrieved", message: `Retrieved from ${source.provenance.originalSourceName}.` },
   ];
   const limitations = [...source.limitations, ...source.provenance.provenanceLimitations];
-  let requiredReview: HumanReviewRequirement = "required";
+  const requiredReview: HumanReviewRequirement = "required";
   let state: KnowledgeTrustState = source.trustState;
 
   if (source.connectionState === "unavailable" || source.connectionState === "not_implemented") {
@@ -48,6 +49,70 @@ export function deriveKnowledgeTrustStateFromSource(
     requiredReview,
     nextActionLabel: requiredReview === "required" ? "Review before linking to mission" : null,
   };
+}
+
+export function deriveKnowledgeTrustStateFromSavedSource(
+  source: SavedKnowledgeSource,
+): TrustDerivation {
+  const reasons: TrustReason[] = [
+    {
+      code: "provider",
+      message: `Saved from ${source.provenance.originalSourceName}.`,
+    },
+    { code: "saved", message: `Saved ${source.savedAt.slice(0, 10)}.` },
+  ];
+  const limitations = source.limitations.map((l) => l.message);
+
+  let state: KnowledgeTrustState = source.trustState;
+  let requiredReview: HumanReviewRequirement = "required";
+  let nextActionLabel: string | null = "Send for human review";
+
+  switch (source.lifecycleState) {
+    case "search_result":
+    case "inspected":
+      state = "retrieved";
+      nextActionLabel = "Save source";
+      break;
+    case "saved_source":
+      state = "source_available";
+      nextActionLabel = "Link to mission";
+      break;
+    case "linked_to_mission":
+      state = "needs_review";
+      nextActionLabel = "Send for review";
+      break;
+    case "awaiting_review":
+      state = "needs_review";
+      nextActionLabel = "Begin review";
+      break;
+    case "reviewed_evidence":
+      state = source.trustState;
+      requiredReview = "none";
+      nextActionLabel = "Open evidence context";
+      break;
+    case "rejected":
+      state = "rejected";
+      requiredReview = "none";
+      nextActionLabel = null;
+      break;
+    case "superseded":
+      state = "superseded";
+      requiredReview = "none";
+      nextActionLabel = null;
+      break;
+    case "archived":
+      state = "archived";
+      requiredReview = "none";
+      nextActionLabel = null;
+      break;
+  }
+
+  if (source.humanReviewState === "accepted" && source.lifecycleState === "linked_to_mission") {
+    requiredReview = "none";
+    nextActionLabel = null;
+  }
+
+  return { state, reasons, limitations, requiredReview, nextActionLabel };
 }
 
 export function deriveKnowledgeTrustStateFromExplanation(

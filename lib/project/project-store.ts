@@ -34,12 +34,17 @@ const PROJECT_TASKS_KEY = "cbai-project-tasks";
 const PROJECT_QUESTIONS_KEY = "cbai-project-questions";
 const PROJECT_EVIDENCE_KEY = "cbai-project-evidence-refs";
 
+const memoryProjectEvidence: ProjectEvidenceReference[] = [];
+
 function isBrowser(): boolean {
   return typeof window !== "undefined";
 }
 
 function readList<T>(key: string, isValid: (value: unknown) => value is T): T[] {
-  if (!isBrowser()) return [];
+  if (!isBrowser()) {
+    if (key === PROJECT_EVIDENCE_KEY) return memoryProjectEvidence.filter(isValid) as T[];
+    return [];
+  }
   try {
     const raw = window.localStorage.getItem(resolveStorageKey(key));
     if (!raw) return [];
@@ -52,7 +57,13 @@ function readList<T>(key: string, isValid: (value: unknown) => value is T): T[] 
 }
 
 function writeList<T>(key: string, items: readonly T[]): void {
-  if (!isBrowser()) return;
+  if (!isBrowser()) {
+    if (key === PROJECT_EVIDENCE_KEY) {
+      memoryProjectEvidence.length = 0;
+      memoryProjectEvidence.push(...(items as unknown as ProjectEvidenceReference[]));
+    }
+    return;
+  }
   window.localStorage.setItem(resolveStorageKey(key), JSON.stringify(items));
 }
 
@@ -446,3 +457,10 @@ export function saveProjectEvidence(input: Omit<ProjectEvidenceReference, "evide
 
 export const NO_PROJECTS_NOTE =
   "No projects created yet — no fabricated activity, create the first one below.";
+
+/** Test helper — clear in-memory project evidence refs. */
+export function clearProjectEvidenceForTests(): void {
+  memoryProjectEvidence.length = 0;
+  if (!isBrowser()) return;
+  window.localStorage.removeItem(resolveStorageKey(PROJECT_EVIDENCE_KEY));
+}

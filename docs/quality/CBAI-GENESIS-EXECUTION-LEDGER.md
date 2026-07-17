@@ -5,6 +5,7 @@
 | Phase 0 | in_progress | — | Baseline recorded |
 | BUILD-027 | implemented | — | Truth fixes + telemetry |
 | BUILD-028 | implemented | — | Crossref client adapter (static export) |
+| BUILD-028.5 | unit_verified | — | Source ingestion lifecycle, save/link/review, qualifying evidence |
 | BUILD-029 | implemented | — | Org membership + permissions |
 | BUILD-030 | not_started | — | Collaboration |
 | BUILD-031 | not_started | — | Graph provenance |
