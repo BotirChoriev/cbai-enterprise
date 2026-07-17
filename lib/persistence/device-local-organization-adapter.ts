@@ -85,6 +85,3 @@ export class DeviceLocalOrganizationRepository implements OrganizationRepository
   }
 }
 
-export function resolveOrganizationRepository(): OrganizationRepository {
-  return new DeviceLocalOrganizationRepository();
-}

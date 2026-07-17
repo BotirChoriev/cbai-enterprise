@@ -3,6 +3,8 @@
  */
 
 import { resolveStorageKey } from "@/lib/storage/namespaced-key";
+import { getSharedAuditMirror } from "@/lib/persistence/shared-org-session-cache";
+import { isOrganizationCollaborationShared } from "@/lib/persistence/persistence-capability";
 
 export type OrganizationAuditEventName =
   | "organization_created"
@@ -63,6 +65,9 @@ function writeAudit(records: readonly OrganizationAuditRecord[]): void {
 }
 
 export function loadOrganizationAudit(organizationId?: string): OrganizationAuditRecord[] {
+  if (isOrganizationCollaborationShared() && organizationId) {
+    return [...(getSharedAuditMirror(organizationId) ?? [])];
+  }
   const all = readAudit();
   return organizationId ? all.filter((r) => r.organizationId === organizationId) : all;
 }

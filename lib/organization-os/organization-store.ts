@@ -5,6 +5,8 @@
 import type { Organization, OrganizationKind } from "@/lib/organization-os/organization.types";
 import type { OrganizationIdentityKind } from "@/lib/organization-os/organization-identity.types";
 import { resolveStorageKey } from "@/lib/storage/namespaced-key";
+import { getSharedOrganizationsMirror } from "@/lib/persistence/shared-org-session-cache";
+import { isOrganizationCollaborationShared } from "@/lib/persistence/persistence-capability";
 
 const STORAGE_KEY = "cbai-organizations";
 const memoryOrganizations: Organization[] = [];
@@ -32,6 +34,10 @@ function normalizeOrganization(org: Organization): Organization {
 }
 
 export function loadOrganizations(): readonly Organization[] {
+  const shared = getSharedOrganizationsMirror();
+  if (isOrganizationCollaborationShared() && shared) {
+    return shared.map(normalizeOrganization);
+  }
   if (!isBrowser()) return memoryOrganizations.map(normalizeOrganization);
   try {
     const raw = window.localStorage.getItem(resolveStorageKey(STORAGE_KEY));

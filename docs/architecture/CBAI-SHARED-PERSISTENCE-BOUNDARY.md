@@ -1,14 +1,15 @@
 # CBAI Shared Persistence Boundary
 
-## Verdict (BUILD-034)
+## Verdict (BUILD-039)
 
 ```text
-device-local adapter: active (development_only · single_device · not_collaboration_safe)
-shared backend configured: no (default dev — NEXT_PUBLIC_SUPABASE_* unset)
-Supabase migrations: 0005 + 0006 created (not applied in this environment)
-RLS policies: defined in 0006_rls_organization_collaboration.sql
+device-local adapter: active when NEXT_PUBLIC_SUPABASE_* unset
+shared backend configured: no (this environment)
+Supabase migrations: 0005–0007 created (not applied live)
+Supabase organization adapter: implemented (lib/persistence/supabase-organization-adapter.ts)
+RLS policies: defined in 0006; RPC in 0007
 multi-device verified: no
-multi-user verified: no
+multi-user verified: no — INFRASTRUCTURE BLOCKED
 ```
 
 ## Architecture

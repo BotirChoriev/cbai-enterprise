@@ -1,33 +1,31 @@
-# CBAI Production Gate — BUILD-034–038
+# CBAI Production Gate — BUILD-039
 
-## Verified commands (this environment)
+## Verified (this environment)
 
 | Command | Result |
 |---------|--------|
-| `npm run lint` | pass (warnings only) |
 | `npx tsc --noEmit` | pass |
 | `npm run build` | pass |
-| `npm run test:genesis-truth` | 7/7 |
-| `npm run test:source-ingestion` | 7/7 |
-| `npm run test:genesis-build029-033` | 9/9 |
+| `npm run test:shared-persistence` | 5/5 (live tests skip) |
+| `npm run test:rls` | 1/1 (skip — no credentials) |
 | `npm run test:genesis-build034-038` | 9/9 |
-| `npm run test:browser-regression` | 12/12 Chromium |
+| `npm run test:organization-multi-user` | skip |
+| `npm run test:collaboration-multi-user` | skip |
 
-## Not run / blocked
+## BUILD-039 gate
 
-| Gate | Blocker |
-|------|---------|
-| Firefox/WebKit journeys | Not executed this build |
-| Two-user Playwright org/collab | No Supabase credentials |
-| Live RLS verification | No Supabase credentials |
-| Dedicated Playwright journeys A–F | Partial overlap with browser regression only |
-| Full responsive matrix all routes | Partial (test 8 covers primary routes) |
-| `npm audit` fix-all | Record at deploy time |
+- [x] Supabase organization adapter implemented
+- [x] Repository factory + session mirror
+- [x] Migration 0007 RPC functions
+- [x] Local→shared org migration workflow
+- [x] Test scripts with honest skip
+- [ ] Supabase env configured
+- [ ] Migrations applied live
+- [ ] RLS directly verified
+- [ ] Two-user browser journeys
 
 ## Verdict
 
-**LOCAL INTEGRATION READY**
-
-Not **CONTROLLED CLOSED ALPHA READY** — shared persistence and two-user verification blocked.
+**INFRASTRUCTURE BLOCKED** — not SHARED BACKEND VERIFIED
 
 Push: not pushed | Deploy: not deployed | Cloudflare: unchanged

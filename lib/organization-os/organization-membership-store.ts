@@ -13,6 +13,8 @@ import {
   hashInvitationTokenSync,
   isLegacyPlainToken,
 } from "@/lib/organization-os/invitation-token";
+import { getSharedMembershipMirror, getSharedInvitationsMirror } from "@/lib/persistence/shared-org-session-cache";
+import { isOrganizationCollaborationShared } from "@/lib/persistence/persistence-capability";
 
 export type OrganizationRole =
   | "owner"
@@ -145,6 +147,11 @@ function normalizeMembership(m: OrganizationMembership): OrganizationMembership 
 }
 
 export function loadOrganizationMemberships(organizationId?: string): OrganizationMembership[] {
+  const shared = getSharedMembershipMirror();
+  if (isOrganizationCollaborationShared() && shared) {
+    const all = shared.map(normalizeMembership);
+    return organizationId ? all.filter((m) => m.organizationId === organizationId) : all;
+  }
   const all = readList(MEMBERS_KEY, isMembership).map(normalizeMembership);
   return organizationId ? all.filter((m) => m.organizationId === organizationId) : all;
 }
@@ -484,6 +491,10 @@ export function loadPendingInvitations(email: string): OrganizationInvitation[] 
 }
 
 export function loadOrganizationInvitations(organizationId: string): OrganizationInvitation[] {
+  const shared = getSharedInvitationsMirror();
+  if (isOrganizationCollaborationShared() && shared) {
+    return shared.filter((i) => i.organizationId === organizationId);
+  }
   return readList(INVITES_KEY, isInvitation).filter((i) => i.organizationId === organizationId);
 }
 

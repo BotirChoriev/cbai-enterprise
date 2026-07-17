@@ -169,6 +169,64 @@ export type ActivityEventRow = {
   created_at: string;
 };
 
+export type OrganizationRow = {
+  id: string;
+  name: string;
+  normalized_name: string;
+  organization_type: string;
+  identity_kind: string;
+  official_website: string | null;
+  country_code: string | null;
+  verification_state: string;
+  version: number;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+  archived_at: string | null;
+};
+
+export type OrganizationMembershipRow = {
+  id: string;
+  organization_id: string;
+  user_id: string;
+  role: string;
+  status: string;
+  version: number;
+  invited_by: string | null;
+  joined_at: string | null;
+  revoked_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type OrganizationInvitationRow = {
+  id: string;
+  organization_id: string;
+  recipient_email_normalized: string;
+  intended_role: string;
+  token_hash: string;
+  status: string;
+  expires_at: string;
+  created_by: string;
+  accepted_by: string | null;
+  accepted_at: string | null;
+  revoked_at: string | null;
+  version: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type OrganizationAuditEventRow = {
+  id: string;
+  organization_id: string;
+  actor_id: string | null;
+  action: string;
+  target_type: string;
+  target_id: string | null;
+  safe_metadata: Record<string, unknown>;
+  created_at: string;
+};
+
 type Insertable<Row, DefaultedKeys extends keyof Row> = Omit<Row, DefaultedKeys> &
   Partial<Pick<Row, DefaultedKeys>>;
 
@@ -243,8 +301,43 @@ export type Database = {
         Insertable<ActivityEventRow, "id" | "created_at">,
         Partial<Omit<ActivityEventRow, "id" | "owner_id">>
       >;
+      organizations: TableDef<
+        OrganizationRow,
+        Insertable<OrganizationRow, "id" | "created_at" | "updated_at" | "version" | "verification_state" | "identity_kind" | "organization_type" | "normalized_name">,
+        Partial<Omit<OrganizationRow, "id">>
+      >;
+      organization_memberships: TableDef<
+        OrganizationMembershipRow,
+        Insertable<OrganizationMembershipRow, "id" | "created_at" | "updated_at" | "version" | "status">,
+        Partial<Omit<OrganizationMembershipRow, "id">>
+      >;
+      organization_invitations: TableDef<
+        OrganizationInvitationRow,
+        Insertable<OrganizationInvitationRow, "id" | "created_at" | "updated_at" | "version" | "status">,
+        Partial<Omit<OrganizationInvitationRow, "id">>
+      >;
+      organization_audit_events: TableDef<
+        OrganizationAuditEventRow,
+        Insertable<OrganizationAuditEventRow, "id" | "created_at" | "safe_metadata" | "target_type">,
+        Partial<Omit<OrganizationAuditEventRow, "id">>
+      >;
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      create_organization_with_owner: {
+        Args: {
+          p_name: string;
+          p_organization_type?: string;
+          p_identity_kind?: string;
+          p_official_website?: string | null;
+          p_country_code?: string | null;
+        };
+        Returns: unknown;
+      };
+      accept_organization_invitation_by_token: {
+        Args: { p_raw_token: string };
+        Returns: unknown;
+      };
+    };
   };
 };

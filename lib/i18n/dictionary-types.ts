@@ -2171,6 +2171,17 @@ export type TranslationDictionary = {
     inviteCreated: string;
     auditHeading: string;
     workspaceOrganization: string;
+    signInRequired: string;
+    saving: string;
+    inviteAccepted: string;
+    sessionExpired: string;
+    migrationPreviewTitle: string;
+    migrationPreviewBody: string;
+    migrationStart: string;
+    migrationCompleted: string;
+    migrationFailed: string;
+    accessRevoked: string;
+    conflictRetry: string;
   };
   zeroLearningCurve: {
     gatewayEyebrow: string;
