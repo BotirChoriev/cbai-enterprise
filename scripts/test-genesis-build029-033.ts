@@ -102,7 +102,7 @@ test("ORG-T002 invitation accept grants role; guest cannot edit", () => {
   });
   assert.ok(!("error" in inv));
   if ("error" in inv) return;
-  const member = acceptOrganizationInvitationByToken(inv.token, "user-b", "User B", "b@test.local");
+  const member = acceptOrganizationInvitationByToken(inv.rawToken, "user-b", "User B", "b@test.local");
   assert.ok(!("error" in member));
   if ("error" in member) return;
   assert.equal(member.role, "researcher");
@@ -195,15 +195,27 @@ test("COL-T001 collaboration share and revoke boundaries", () => {
 
 test("GRAPH-T001 every edge maps to relationship record", () => {
   clearLivingRelationshipsForTests();
-  createLivingRelationship({
-    source: { objectType: "mission", objectId: "m1" },
-    target: { objectType: "project", objectId: "p1" },
-    relationshipType: "contains",
+  clearCollaborationForTests();
+  clearSavedKnowledgeSourcesForTests();
+  const saved = saveKnowledgeSourceFromCanonical(fixtureSource());
+  if (!saved.ok) return;
+  const collab = createMissionCollaboration({
+    missionId: "m-graph",
     createdBy: "user-a",
-    missionId: "m1",
+    title: "Graph test collab",
+  });
+  if ("error" in collab) return;
+  createLivingRelationship({
+    source: { objectType: "source", objectId: saved.source.id },
+    target: { objectType: "collaboration", objectId: collab.id },
+    relationshipType: "shared_with",
+    createdBy: "user-a",
+    missionId: "m-graph",
+    collaborationId: collab.id,
   });
   const projection = buildLivingGraphProjection({
-    missionId: "m1",
+    missionId: "m-graph",
+    collaborationId: collab.id,
     actorId: "user-a",
   });
   assert.equal(projection.edges.length, 1);

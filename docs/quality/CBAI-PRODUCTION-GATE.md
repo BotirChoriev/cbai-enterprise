@@ -1,49 +1,33 @@
-# CBAI Production Gate
+# CBAI Production Gate — BUILD-034–038
 
-Closed Alpha gate checklist — updated per build.
+## Verified commands (this environment)
 
-## Required commands
+| Command | Result |
+|---------|--------|
+| `npm run lint` | pass (warnings only) |
+| `npx tsc --noEmit` | pass |
+| `npm run build` | pass |
+| `npm run test:genesis-truth` | 7/7 |
+| `npm run test:source-ingestion` | 7/7 |
+| `npm run test:genesis-build029-033` | 9/9 |
+| `npm run test:genesis-build034-038` | 9/9 |
+| `npm run test:browser-regression` | 12/12 Chromium |
 
-| Command | BUILD-027 | Notes |
-|---------|-----------|-------|
-| `npm run lint` | required | |
-| `npx tsc --noEmit` | required | |
-| `npm run build` | required | |
-| All `test:*` | required | browser test needs dev server |
-| Playwright browser install | recommended | `npx playwright install chromium` |
+## Not run / blocked
 
-## BUILD-027 gate
+| Gate | Blocker |
+|------|---------|
+| Firefox/WebKit journeys | Not executed this build |
+| Two-user Playwright org/collab | No Supabase credentials |
+| Live RLS verification | No Supabase credentials |
+| Dedicated Playwright journeys A–F | Partial overlap with browser regression only |
+| Full responsive matrix all routes | Partial (test 8 covers primary routes) |
+| `npm audit` fix-all | Record at deploy time |
 
-- [ ] Truth ledger GEN-T001–T006 fixed with regression tests
-- [ ] Workflow telemetry typed and emitting on core journeys
-- [ ] No sensitive content in telemetry
-- [ ] User-test task mode functional
-- [ ] `test:genesis-truth` passes
-- [ ] `test:workflow-telemetry` passes
+## Verdict
 
-## BUILD-028 gate
+**LOCAL INTEGRATION READY**
 
-- [ ] Crossref adapter with real network smoke test
-- [ ] API route server-side only
-- [ ] Provenance preserved in canonical records
-- [ ] Search results not auto-labeled reviewed evidence
-- [ ] Integration registry updated
-
-## BUILD-028.5 gate
-
-- [x] Source lifecycle persisted (save → link → review)
-- [x] Deduplication by DOI
-- [x] Qualifying evidence for report readiness
-- [x] EN/UZ/RU/TR sourceIngestion strings
-- [x] `test:source-ingestion` passes
-- [ ] Playwright full journey (requires dev server)
-
-## Closed Alpha (BUILD-033)
-
-Not started — see program section 18.
-
-## Current verdict
-
-**NOT READY** for Closed Alpha — BUILD-027–033 in progress.
+Not **CONTROLLED CLOSED ALPHA READY** — shared persistence and two-user verification blocked.
 
 Push: not pushed | Deploy: not deployed | Cloudflare: unchanged
