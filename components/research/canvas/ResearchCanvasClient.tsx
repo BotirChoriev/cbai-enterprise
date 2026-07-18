@@ -20,12 +20,15 @@ import {
   addSmartIdeaArtifact,
   confirmExtractedItem,
   buildIdeaModel,
+  canBuildIdeaModel,
+  addManualInterpretationDraft,
   confirmExternalSearch,
   linkSmartIdeaToMission,
   recordHumanDecision,
   getSanitizedSearchConcepts,
   revokeExternalSearch,
   setExternalSearchQueryOverride,
+  updateSmartIdeaStage,
 } from "@/lib/research-canvas/smart-idea-store";
 import {
   createMeasurementPlan,
@@ -52,8 +55,18 @@ import {
 } from "@/lib/research-canvas/research-canvas-reports";
 import { parseMolecularFormula } from "@/lib/research-canvas/molecular-formula-analyzer";
 import { deriveCanvasStageStatuses, deriveActiveStageNextAction } from "@/lib/research-canvas/canvas-stage-status";
+import { CANVAS_STAGES, prerequisiteStageFor, stagePanelId } from "@/lib/research-canvas/canvas-stage-navigation";
+import {
+  actionCopyKey,
+  blockedCopyKey,
+  persistenceCopyKey,
+  stageCopyKey,
+  stagePurposeCopyKey,
+  statusCopyKey,
+} from "@/lib/research-canvas/canvas-stage-i18n";
+import { loadMission } from "@/lib/intelligence-os/mission-store";
 import { buildExternalSearchConsent, IP_BOUNDARY_NOTICE, visibilityEnforcementNote } from "@/lib/research-canvas/privacy-boundary";
-import { resolvePersistenceMode, persistenceModeDisclaimer } from "@/lib/product/persistence-mode";
+import { resolvePersistenceMode } from "@/lib/product/persistence-mode";
 import { appendGenesisOperatingParamsToHref } from "@/lib/genesis/genesis-operating-context";
 import { createExecutionTask } from "@/lib/genesis/execution-store";
 import type { ResearchCanvasStage } from "@/lib/research-canvas/research-canvas-types";
@@ -64,19 +77,20 @@ import {
   cbaiSectionEyebrow,
 } from "@/components/brand/brand-classes";
 
-const STAGES: ResearchCanvasStage[] = ["IDEA", "INTERPRET", "MEASURE", "DISCOVER", "COMPARE", "MISSION", "EXECUTE", "DECIDE"];
-
 function defaultTaskDeadlineIso(daysFromNow: number): string {
   return new Date(Date.now() + daysFromNow * 86400000).toISOString().slice(0, 10);
 }
 
 export default function ResearchCanvasClient() {
   const { t } = useTranslation();
+  const rc = (key: string) => t(`researchCanvas.${key}`);
   const hydrated = useHydrated();
   const { profile } = useAssistantProfile();
   const operator = resolveOperatorName(profile);
   const searchParams = useSearchParams();
   const fileRef = useRef<HTMLInputElement>(null);
+  const stagePanelRef = useRef<HTMLElement | null>(null);
+  const manualDescRef = useRef<HTMLTextAreaElement>(null);
   const [tick, setTick] = useState(0);
   const bump = useCallback(() => setTick((n) => n + 1), []);
 
@@ -110,6 +124,8 @@ export default function ResearchCanvasClient() {
 
   const [executeTaskTitle, setExecuteTaskTitle] = useState("");
   const [sanitizedQueryEdit, setSanitizedQueryEdit] = useState("");
+  const [manualDescription, setManualDescription] = useState("");
+  const [interpretFocus, setInterpretFocus] = useState<"upload" | "manual" | null>(null);
 
   const urlSmartIdeaId = searchParams.get("smartIdea");
   const resolvedActiveId = activeId ?? urlSmartIdeaId;
@@ -140,8 +156,31 @@ export default function ResearchCanvasClient() {
   const [decisionReason, setDecisionReason] = useState("");
 
   const stageStatuses = useMemo(() => deriveCanvasStageStatuses(idea), [idea]);
-  const nextActionHint = useMemo(() => deriveActiveStageNextAction(idea), [idea]);
-  const persistenceNote = persistenceModeDisclaimer(resolvePersistenceMode());
+  const nextActionKey = useMemo(() => deriveActiveStageNextAction(idea), [idea]);
+  const persistenceNote = rc(persistenceCopyKey(resolvePersistenceMode()));
+  const linkedMission = useMemo(() => {
+    void tick;
+    return idea?.missionId ? loadMission(idea.missionId) : null;
+  }, [idea?.missionId, tick]);
+  const ideaModelGate = idea ? canBuildIdeaModel(idea) : null;
+
+  const selectStage = (target: ResearchCanvasStage) => {
+    setStage(target);
+    if (idea) updateSmartIdeaStage(idea.id, target);
+    requestAnimationFrame(() => {
+      stagePanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
+
+  const decisionSectionLabel = (key: "facts" | "options" | "unknown" | "requiredValidation") => {
+    const map = {
+      facts: t("researchCanvas.factsLabel"),
+      options: t("researchCanvas.optionsLabel"),
+      unknown: t("researchCanvas.unknownLabel"),
+      requiredValidation: t("researchCanvas.requiredValidationLabel"),
+    } as const;
+    return map[key];
+  };
 
   const contextHref = (path: string) => {
     if (!idea) return path;
@@ -164,7 +203,7 @@ export default function ResearchCanvasClient() {
       visibility: "Private",
     });
     setActiveId(created.id);
-    setStage("IDEA");
+    selectStage("IDEA");
     setFeedback(t("researchCanvas.savedPrivate"));
     bump();
   };
@@ -199,7 +238,7 @@ export default function ResearchCanvasClient() {
       pixelWidth,
       pixelHeight,
     });
-    setStage("INTERPRET");
+    selectStage("INTERPRET");
     setFeedback(t("researchCanvas.artifactAnalyzed"));
     bump();
   };
@@ -213,6 +252,11 @@ export default function ResearchCanvasClient() {
 
   const createModel = () => {
     if (!idea) return;
+    const gate = canBuildIdeaModel(idea);
+    if (!gate.ok) {
+      setFeedback(t("researchCanvas.confirmBeforeIdeaModel"));
+      return;
+    }
     buildIdeaModel(idea.id, {
       researchQuestions: [problem],
       humanityBenefit: purpose,
@@ -354,7 +398,19 @@ export default function ResearchCanvasClient() {
       approvalState: "none",
     });
     notifyMissionDataChanged("task");
-    setFeedback("Execution task created — device-local.");
+    setFeedback(t("researchCanvas.executeTaskCreated"));
+    bump();
+  };
+
+  const createManualDraft = () => {
+    if (!idea) return;
+    if (manualDescription.trim().length < 30) {
+      setFeedback(t("researchCanvas.manualDescriptionTooShort"));
+      return;
+    }
+    addManualInterpretationDraft(idea.id, manualDescription, operator);
+    setFeedback(t("researchCanvas.draftInterpretationCreated"));
+    selectStage("INTERPRET");
     bump();
   };
 
@@ -474,51 +530,69 @@ export default function ResearchCanvasClient() {
     bump();
   };
 
+  const renderBlockedBanner = (targetStage: ResearchCanvasStage) => {
+    const status = stageStatuses.find((s) => s.stage === targetStage);
+    if (!status?.blockedReasonKey && !status?.blockedReason) return null;
+    const prereq = prerequisiteStageFor(targetStage, status);
+    return (
+      <div
+        role="alert"
+        className="rounded-lg border border-amber-900/50 bg-amber-950/20 p-4 text-sm"
+      >
+        <p className="font-semibold text-amber-300">{t("researchCanvas.blockedStageTitle")}</p>
+        <p className="mt-1 text-zinc-300">
+          {status.blockedReasonKey
+            ? rc(blockedCopyKey(status.blockedReasonKey))
+            : status.blockedReason}
+        </p>
+        <p className="mt-2 text-xs text-zinc-500">
+          {t("researchCanvas.nextActionLabel")}: {rc(actionCopyKey(status.nextActionKey))}
+        </p>
+        {prereq && prereq !== targetStage ? (
+          <button
+            type="button"
+            className={`${cbaiBtnPrimary} mt-3`}
+            onClick={() => selectStage(prereq)}
+          >
+            {t("researchCanvas.goToPrerequisite")} — {rc(stageCopyKey(prereq))}
+          </button>
+        ) : null}
+      </div>
+    );
+  };
+
   if (!hydrated) return null;
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 px-4 py-8">
-      <div className={`${cbaiGlassCard} space-y-3 p-6`}>
+    <div className="mx-auto max-w-6xl space-y-4 px-4 py-4">
+      <div className={`${cbaiGlassCard} space-y-2 p-4`}>
         <p className={cbaiSectionEyebrow}>{t("researchCanvas.eyebrow")}</p>
-        <h1 className="text-xl font-semibold text-zinc-100">{t("researchCanvas.pageTitle")}</h1>
-        <p className="text-sm text-zinc-400">{t("researchCanvas.purpose")}</p>
-        <p className="text-xs text-amber-400/90">{t("researchCanvas.deviceLocal")}</p>
+        <p className="text-sm text-zinc-400">{t("researchCanvas.deviceLocal")}</p>
         <p className="text-xs text-zinc-600">{t("researchCanvas.humanDecision")}</p>
         <p className="text-xs text-zinc-500">{persistenceNote}</p>
         {idea ? (
-          <p className="text-xs text-teal-400/90">Next action: {nextActionHint}</p>
+          <p className="text-xs text-teal-400/90">
+            {t("researchCanvas.nextActionLabel")}: {rc(actionCopyKey(nextActionKey))}
+          </p>
         ) : null}
       </div>
 
       {idea ? (
-        <section className={`${cbaiGlassCard} p-4`} aria-label="Stage status">
-          <p className="text-xs font-semibold text-zinc-300">Workflow status</p>
-          <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-            {stageStatuses.map((s) => (
-              <li key={s.stage} className="rounded border border-zinc-800 px-2 py-1.5 text-[11px]">
-                <span className="font-medium text-zinc-200">{s.stage}</span>
-                <span className="ml-1 text-zinc-500">· {s.status}</span>
-                {s.blockedReason ? <p className="text-amber-400/80">{s.blockedReason}</p> : null}
-              </li>
-            ))}
-          </ul>
-        </section>
+        <div className={`${cbaiGlassCard} p-4 text-sm`}>
+          <p className="text-xs font-semibold text-zinc-400">{t("researchCanvas.activeSmartIdea")}</p>
+          <p className="font-medium text-zinc-100">{idea.title}</p>
+          <p className="text-xs text-zinc-500">{idea.problem}</p>
+          {linkedMission ? (
+            <p className="mt-2 text-xs text-teal-400/90">
+              {t("researchCanvas.missionBannerLabel")}: {linkedMission.problem}
+            </p>
+          ) : (
+            <p className="mt-2 text-xs text-zinc-500">{t("researchCanvas.noMissionBanner")}</p>
+          )}
+        </div>
       ) : null}
 
-      <nav className="flex flex-wrap gap-2" aria-label="Canvas stages">
-        {STAGES.map((s) => (
-          <button
-            key={s}
-            type="button"
-            onClick={() => setStage(s)}
-            className={`rounded-md px-3 py-1 text-xs ${stage === s ? "bg-teal-900/40 text-teal-300" : "bg-zinc-900 text-zinc-400"}`}
-          >
-            {s}
-          </button>
-        ))}
-      </nav>
-
-      {(stage === "IDEA" || !resolvedActiveId) && (
+      {!resolvedActiveId ? (
         <section className={`${cbaiGlassCard} space-y-4 p-6`}>
           <h2 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.smartIdeaIntake")}</h2>
           <p className="text-xs text-zinc-500">{t("researchCanvas.defaultPrivate")}</p>
@@ -527,246 +601,362 @@ export default function ResearchCanvasClient() {
           <input value={problem} onChange={(e) => setProblem(e.target.value)} placeholder={t("researchCanvas.problem")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
           <input value={purpose} onChange={(e) => setPurpose(e.target.value)} placeholder={t("researchCanvas.purposeField")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
           <button type="button" onClick={createIdea} className={cbaiBtnPrimary}>{t("researchCanvas.createSmartIdea")}</button>
-          {ideas.length > 0 ? (
-            <ul className="space-y-1 text-xs text-zinc-400">
-              {ideas.map((i) => (
-                <li key={i.id}>
-                  <button type="button" className="text-teal-400 hover:text-teal-300" onClick={() => { setActiveId(i.id); setStage(i.stage); }}>
-                    {i.title} — {i.stage} — {i.visibility}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : null}
         </section>
-      )}
+      ) : null}
 
-      {idea && stage === "IDEA" && (
-        <section className={`${cbaiGlassCard} space-y-3 p-6`}>
-          <h2 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.artifactUpload")}</h2>
-          <input ref={fileRef} type="file" accept="image/*,.svg,.pdf" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) void onFileSelected(f); }} />
-          <button type="button" onClick={() => fileRef.current?.click()} className={cbaiBtnPrimary}>{t("researchCanvas.uploadArtifact")}</button>
-          <p className="text-xs text-zinc-500">{t("researchCanvas.ocrUnavailable")}</p>
-        </section>
-      )}
+      {ideas.length > 0 ? (
+        <details className={`${cbaiGlassCard} p-3 text-xs text-zinc-400`}>
+          <summary className="cursor-pointer text-zinc-300">{t("researchCanvas.switchSmartIdea")}</summary>
+          <ul className="mt-2 space-y-1">
+            {ideas.map((i) => (
+              <li key={i.id}>
+                <button
+                  type="button"
+                  className={`${cbaiFocusRing} text-teal-400 hover:text-teal-300`}
+                  onClick={() => { setActiveId(i.id); selectStage(i.stage); }}
+                >
+                  {i.title} — {rc(stageCopyKey(i.stage))}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </details>
+      ) : null}
 
-      {idea && stage === "INTERPRET" && (
-        <section className={`${cbaiGlassCard} space-y-4 p-6`}>
-          <h2 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.interpretationReview")}</h2>
-          <p className="text-sm text-zinc-300">{t("researchCanvas.confirmPrompt")}</p>
-          {idea.extractedItems.length === 0 ? <p className="text-xs text-zinc-500">{t("researchCanvas.noExtractions")}</p> : null}
-          {idea.extractedItems.map((item) => (
-            <div key={item.id} className="rounded-lg border border-zinc-800 p-3 text-xs">
-              <p className="font-medium text-zinc-200">{item.field}</p>
-              <p className="text-zinc-400">{item.extractedValue}</p>
-              <p className="text-zinc-600">AI confidence: {item.aiConfidence} — {t("researchCanvas.notUncertainty")}</p>
-              <p className="text-amber-400/80">{item.limitation}</p>
-              <button type="button" className="mt-2 text-teal-400" onClick={() => confirmItem(item.id)}>{t("researchCanvas.confirm")}</button>
-            </div>
-          ))}
-          <button type="button" onClick={createModel} className={cbaiBtnPrimary}>{t("researchCanvas.buildIdeaModel")}</button>
-        </section>
-      )}
-
-      {idea && stage === "MEASURE" && (
-        <div className="grid gap-4 lg:grid-cols-2">
-          <section className={`${cbaiGlassCard} space-y-3 p-6`}>
-            <h2 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.measurementPlan")}</h2>
-            <input value={measurand} onChange={(e) => setMeasurand(e.target.value)} placeholder="Measurand" className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
-            <select value={unitId} onChange={(e) => setUnitId(e.target.value)} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`}>
-              {UNIT_REGISTRY.filter((u) => u.conversionSupported).map((u) => (
-                <option key={u.id} value={u.id}>{u.symbol} — {u.name}</option>
-              ))}
-            </select>
-            <select value={methodId} onChange={(e) => setMethodId(e.target.value)} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`}>
-              {METHOD_REGISTRY.map((m) => (
-                <option key={m.id} value={m.id}>{m.name} ({m.capabilityState})</option>
-              ))}
-            </select>
-            <input value={calibration} onChange={(e) => setCalibration(e.target.value)} placeholder="Calibration / reference" className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
-            <button type="button" onClick={addPlan} className={cbaiBtnPrimary}>{t("researchCanvas.createPlan")}</button>
-          </section>
-          <section className={`${cbaiGlassCard} space-y-3 p-6`}>
-            <h2 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.unitConverter")}</h2>
-            <div className="flex gap-2">
-              <input value={convValue} onChange={(e) => setConvValue(e.target.value)} className={`${cbaiFocusRing} w-20 rounded-md border border-zinc-800 bg-zinc-950/60 px-2 py-2 text-sm`} />
-              <select value={convFrom} onChange={(e) => setConvFrom(e.target.value)} className={`${cbaiFocusRing} rounded-md border border-zinc-800 bg-zinc-950/60 px-2 py-2 text-sm`}>
-                {UNIT_REGISTRY.map((u) => <option key={u.id} value={u.id}>{u.symbol}</option>)}
-              </select>
-              <span className="self-center text-zinc-500">→</span>
-              <select value={convTo} onChange={(e) => setConvTo(e.target.value)} className={`${cbaiFocusRing} rounded-md border border-zinc-800 bg-zinc-950/60 px-2 py-2 text-sm`}>
-                {UNIT_REGISTRY.map((u) => <option key={u.id} value={u.id}>{u.symbol}</option>)}
-              </select>
-            </div>
-            <button type="button" onClick={runConvert} className={cbaiBtnPrimary}>{t("researchCanvas.convert")}</button>
-          </section>
-          <section className={`${cbaiGlassCard} space-y-3 p-6`}>
-            <h2 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.imageMeasurement")} (Preview)</h2>
-            <input value={refPixels} onChange={(e) => setRefPixels(e.target.value)} placeholder="Reference pixels" className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
-            <input value={refReal} onChange={(e) => setRefReal(e.target.value)} placeholder="Reference real (cm)" className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
-            <input value={pixelLength} onChange={(e) => setPixelLength(e.target.value)} placeholder="Pixel length" className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
-            <button type="button" onClick={runGeometryCalc} className={cbaiBtnPrimary}>{t("researchCanvas.calculateDistance")}</button>
-          </section>
-          <section className={`${cbaiGlassCard} space-y-3 p-6`}>
-            <h2 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.measurementPassport")}</h2>
-            <input value={measureResult} onChange={(e) => setMeasureResult(e.target.value)} placeholder="Result value" className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
-            <input value={rawDataRef} onChange={(e) => setRawDataRef(e.target.value)} placeholder="Raw data reference" className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
-            <input value={uncertainty} onChange={(e) => setUncertainty(e.target.value)} placeholder="Uncertainty or limitation" className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
-            <button type="button" onClick={addPassport} className={cbaiBtnPrimary}>{t("researchCanvas.createPassport")}</button>
-            <p className="text-xs text-zinc-500">{loadMeasurementPassports(idea.id).length} passport(s)</p>
-          </section>
-          <section className={`${cbaiGlassCard} space-y-3 p-6`}>
-            <h2 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.molecularFormula")}</h2>
-            <input value={molecularFormula} onChange={(e) => setMolecularFormula(e.target.value)} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
-            <pre className="text-xs text-zinc-400">{JSON.stringify(parseMolecularFormula(molecularFormula), null, 2)}</pre>
-          </section>
-        </div>
-      )}
-
-      {idea && stage === "DISCOVER" && (
-        <section className={`${cbaiGlassCard} space-y-4 p-6`}>
-          <h2 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.researchDiscovery")}</h2>
-          <p className="text-xs text-zinc-500">{visibilityEnforcementNote(idea.visibility)}</p>
-          <p className="text-xs text-zinc-500">{IP_BOUNDARY_NOTICE}</p>
-          <p className="text-xs text-zinc-500">{buildExternalSearchConsent(idea).confirmed ? "External search authorized." : "External search not authorized."}</p>
-          <p className="text-xs text-zinc-500">{t("researchCanvas.sanitizedConcepts")}: {getSanitizedSearchConcepts(idea).join(" · ")}</p>
-          <input
-            value={sanitizedQueryEdit}
-            onChange={(e) => {
-              setSanitizedQueryEdit(e.target.value);
-              setExternalSearchQueryOverride(idea.id, e.target.value);
-              bump();
-            }}
-            placeholder="Edit sanitized search query (optional)"
-            className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`}
-          />
-          {!idea.externalSearchConfirmed || idea.externalSearchRevoked ? (
+      <div
+        role="tablist"
+        aria-label={t("researchCanvas.stageNavAria")}
+        className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4"
+      >
+        {CANVAS_STAGES.map((s) => {
+          const st = stageStatuses.find((x) => x.stage === s);
+          const selected = stage === s;
+          const disabled = !idea && s !== "IDEA";
+          return (
             <button
+              key={s}
               type="button"
-              onClick={() => {
-                confirmExternalSearch(idea.id, operator, { queryOverride: sanitizedQueryEdit || undefined });
-                bump();
-                setFeedback(t("researchCanvas.searchConfirmed"));
-              }}
-              className={cbaiBtnPrimary}
+              role="tab"
+              id={`stage-tab-${s}`}
+              aria-selected={selected}
+              aria-controls={stagePanelId(s)}
+              disabled={disabled}
+              onClick={() => selectStage(s)}
+              className={`${cbaiFocusRing} rounded-lg border px-3 py-2 text-left text-xs transition ${
+                selected
+                  ? "border-teal-700/60 bg-teal-950/30 text-teal-200"
+                  : "border-zinc-800 bg-zinc-950/40 text-zinc-400 hover:border-zinc-700"
+              } ${disabled ? "opacity-50" : ""}`}
             >
-              {t("researchCanvas.confirmExternalSearch")}
+              <span className="block font-semibold">{rc(stageCopyKey(s))}</span>
+              {st ? (
+                <span className="mt-0.5 block text-[10px] text-zinc-500">
+                  {rc(statusCopyKey(st.status))}
+                </span>
+              ) : null}
             </button>
-          ) : (
+          );
+        })}
+      </div>
+
+      {idea ? (
+        <section
+          ref={stagePanelRef}
+          id={stagePanelId(stage)}
+          role="tabpanel"
+          aria-labelledby={`stage-tab-${stage}`}
+          className={`${cbaiGlassCard} space-y-4 p-6`}
+        >
+          <div>
+            <h2 className="text-sm font-semibold text-zinc-200">{rc(stageCopyKey(stage))}</h2>
+            <p className="text-xs text-zinc-500">{rc(stagePurposeCopyKey(stage))}</p>
+          </div>
+          {renderBlockedBanner(stage)}
+
+          {stage === "IDEA" && (
             <>
-              <input value={searchKeyword} onChange={(e) => setSearchKeyword(e.target.value)} placeholder={t("researchCanvas.searchKeyword")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
-              <div className="flex flex-wrap gap-2">
-                <button type="button" onClick={() => void runSearch()} className={cbaiBtnPrimary}>{t("researchCanvas.searchCrossref")}</button>
-                <button type="button" onClick={() => void runSearchAll()} className={cbaiBtnPrimary}>Search all connected providers</button>
-                <button type="button" onClick={() => { revokeExternalSearch(idea.id, operator); bump(); setFeedback("External search consent revoked."); }} className="text-xs text-amber-400">Revoke consent</button>
-              </div>
+              <p className="text-xs text-zinc-400">{t("researchCanvas.ideaSummary")}: {idea.title}</p>
+              <h3 className="text-sm font-medium text-zinc-300">{t("researchCanvas.artifactUpload")}</h3>
+              <input ref={fileRef} type="file" accept="image/*,.svg,.pdf" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) void onFileSelected(f); }} />
+              <button type="button" onClick={() => fileRef.current?.click()} className={cbaiBtnPrimary}>{t("researchCanvas.uploadArtifact")}</button>
+              <p className="text-xs text-zinc-500">{t("researchCanvas.supportedFileTypes")}</p>
+              <p className="text-xs text-zinc-500">{t("researchCanvas.ocrUnavailable")}</p>
             </>
           )}
-          <ul className="space-y-2 text-xs text-zinc-400">
-            {listOpenScienceProviders().map((p) => (
-              <li key={p.id}>{p.name}: {p.connectionStatus}</li>
-            ))}
-          </ul>
-          {discoveries.map((d) => (
-            <div key={d.id} className="rounded border border-zinc-800 p-2">
-              <p className="text-zinc-200">{d.title}</p>
-              <p>{d.authors.join(", ")} · {d.date} · {d.projectStatus}</p>
-            </div>
-          ))}
-          <h3 className="text-xs font-semibold text-zinc-300">{t("researchCanvas.timeline")}</h3>
-          <ul className="text-xs text-zinc-500">
-            {buildHistoricalTimeline(idea.id).map((t) => (
-              <li key={t.id}>{t.date}: {t.title}</li>
-            ))}
-          </ul>
-        </section>
-      )}
 
-      {idea && stage === "COMPARE" && (
-        <section className={`${cbaiGlassCard} space-y-3 p-6`}>
-          <h2 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.comparison")}</h2>
-          {discoveries.slice(0, 3).map((d) => {
-            const c = compareIdeaToRecord(idea, d);
-            return (
-              <div key={d.id} className="rounded border border-zinc-800 p-3 text-xs">
-                <p className="font-medium text-zinc-200">{d.title}</p>
-                <p className="text-teal-400/90">{c.similarities.join("; ")}</p>
-                <p className="text-zinc-400">{c.differences.join("; ")}</p>
-                <p className="text-amber-400/80">{c.patentNote}</p>
-              </div>
-            );
-          })}
-          <h3 className="text-xs font-semibold">{t("researchCanvas.landscape")}</h3>
-          <ul className="text-xs text-zinc-500">
-            {buildCurrentLandscape(idea.id).map((l, i) => (
-              <li key={i}>{l.kind}: {l.label} — {l.limitation}</li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {idea && stage === "MISSION" && (
-        <section className={`${cbaiGlassCard} space-y-3 p-6`}>
-          <h2 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.missionBuilder")}</h2>
-          <p className="text-xs text-zinc-500">{t("researchCanvas.missionNote")}</p>
-          <button type="button" onClick={createMissionFromIdea} className={cbaiBtnPrimary}>{t("researchCanvas.createResearchMission")}</button>
-          {idea.missionId ? (
-            <Link href={contextHref(`/my-work?mission=${idea.missionId}`)} className="text-xs text-teal-400">{t("researchCanvas.openMission")} →</Link>
-          ) : null}
-        </section>
-      )}
-
-      {idea && stage === "EXECUTE" && (
-        <section className={`${cbaiGlassCard} space-y-4 p-6`}>
-          <h2 className="text-sm font-semibold text-zinc-200">Execute — tasks, progress, evidence</h2>
-          {!idea.missionId ? (
-            <p className="text-xs text-amber-400/90">Create a research mission first (MISSION stage).</p>
-          ) : (
+          {stage === "INTERPRET" && (
             <>
+              {idea.extractedItems.length === 0 ? (
+                <div className="space-y-3 rounded-lg border border-zinc-800 p-4">
+                  <p className="font-medium text-zinc-200">{t("researchCanvas.interpretRequiresEvidence")}</p>
+                  <p className="text-xs text-zinc-500">{t("researchCanvas.supportedFileTypes")}</p>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      className={cbaiBtnPrimary}
+                      onClick={() => { selectStage("IDEA"); setInterpretFocus("upload"); fileRef.current?.click(); }}
+                    >
+                      {t("researchCanvas.interpretOptionUpload")}
+                    </button>
+                    <button
+                      type="button"
+                      className={`${cbaiFocusRing} rounded-md border border-zinc-700 px-3 py-2 text-xs text-zinc-300`}
+                      onClick={() => { setInterpretFocus("manual"); manualDescRef.current?.focus(); }}
+                    >
+                      {t("researchCanvas.interpretOptionManual")}
+                    </button>
+                  </div>
+                  {(interpretFocus === "manual" || manualDescription.length > 0) && (
+                    <div className="space-y-2">
+                      <label className="text-xs text-zinc-400" htmlFor="manual-desc">{t("researchCanvas.manualDescriptionLabel")}</label>
+                      <textarea
+                        id="manual-desc"
+                        ref={manualDescRef}
+                        value={manualDescription}
+                        onChange={(e) => setManualDescription(e.target.value)}
+                        placeholder={t("researchCanvas.manualDescriptionPlaceholder")}
+                        className={`${cbaiFocusRing} min-h-24 w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`}
+                      />
+                      <button type="button" onClick={createManualDraft} className={cbaiBtnPrimary}>
+                        {t("researchCanvas.createDraftInterpretation")}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <h3 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.interpretationReview")}</h3>
+                  <p className="text-sm text-zinc-300">{t("researchCanvas.confirmPrompt")}</p>
+                  {idea.extractedItems.map((item) => (
+                    <div key={item.id} className="rounded-lg border border-zinc-800 p-3 text-xs">
+                      <p className="font-medium text-zinc-200">{item.field}</p>
+                      <p className="text-zinc-400">{item.extractedValue}</p>
+                      <p className="text-zinc-600">{t("researchCanvas.aiConfidenceLabel")}: {item.aiConfidence} — {t("researchCanvas.notUncertainty")}</p>
+                      <p className="text-amber-400/80">{item.limitation}</p>
+                      <button type="button" className={`${cbaiFocusRing} mt-2 text-teal-400`} onClick={() => confirmItem(item.id)}>{t("researchCanvas.confirm")}</button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={createModel}
+                    className={cbaiBtnPrimary}
+                    disabled={!ideaModelGate?.ok}
+                  >
+                    {t("researchCanvas.buildIdeaModel")}
+                  </button>
+                  {!ideaModelGate?.ok ? (
+                    <p className="text-xs text-amber-400/90">{t("researchCanvas.confirmBeforeIdeaModel")}</p>
+                  ) : null}
+                </>
+              )}
+            </>
+          )}
+
+          {stage === "MEASURE" && (
+            <div className="grid gap-4 lg:grid-cols-2">
+              <section className="space-y-3">
+                <h3 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.measurementPlan")}</h3>
+                <input value={measurand} onChange={(e) => setMeasurand(e.target.value)} placeholder={t("researchCanvas.measurandPlaceholder")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
+                <select value={unitId} onChange={(e) => setUnitId(e.target.value)} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`}>
+                  {UNIT_REGISTRY.filter((u) => u.conversionSupported).map((u) => (
+                    <option key={u.id} value={u.id}>{u.symbol} — {u.name}</option>
+                  ))}
+                </select>
+                <select value={methodId} onChange={(e) => setMethodId(e.target.value)} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`}>
+                  {METHOD_REGISTRY.map((m) => (
+                    <option key={m.id} value={m.id}>{m.name} ({m.capabilityState})</option>
+                  ))}
+                </select>
+                <input value={calibration} onChange={(e) => setCalibration(e.target.value)} placeholder={t("researchCanvas.calibrationPlaceholder")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
+                <button type="button" onClick={addPlan} className={cbaiBtnPrimary}>{t("researchCanvas.createPlan")}</button>
+              </section>
+              <section className="space-y-3">
+                <h3 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.unitConverter")}</h3>
+                <div className="flex gap-2">
+                  <input value={convValue} onChange={(e) => setConvValue(e.target.value)} className={`${cbaiFocusRing} w-20 rounded-md border border-zinc-800 bg-zinc-950/60 px-2 py-2 text-sm`} />
+                  <select value={convFrom} onChange={(e) => setConvFrom(e.target.value)} className={`${cbaiFocusRing} rounded-md border border-zinc-800 bg-zinc-950/60 px-2 py-2 text-sm`}>
+                    {UNIT_REGISTRY.map((u) => <option key={u.id} value={u.id}>{u.symbol}</option>)}
+                  </select>
+                  <span className="self-center text-zinc-500">→</span>
+                  <select value={convTo} onChange={(e) => setConvTo(e.target.value)} className={`${cbaiFocusRing} rounded-md border border-zinc-800 bg-zinc-950/60 px-2 py-2 text-sm`}>
+                    {UNIT_REGISTRY.map((u) => <option key={u.id} value={u.id}>{u.symbol}</option>)}
+                  </select>
+                </div>
+                <button type="button" onClick={runConvert} className={cbaiBtnPrimary}>{t("researchCanvas.convert")}</button>
+              </section>
+              <section className="space-y-3">
+                <h3 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.imageMeasurementPreview")}</h3>
+                <input value={refPixels} onChange={(e) => setRefPixels(e.target.value)} placeholder={t("researchCanvas.referencePixelsPlaceholder")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
+                <input value={refReal} onChange={(e) => setRefReal(e.target.value)} placeholder={t("researchCanvas.referenceRealPlaceholder")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
+                <input value={pixelLength} onChange={(e) => setPixelLength(e.target.value)} placeholder={t("researchCanvas.pixelLengthPlaceholder")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
+                <button type="button" onClick={runGeometryCalc} className={cbaiBtnPrimary}>{t("researchCanvas.calculateDistance")}</button>
+              </section>
+              <section className="space-y-3">
+                <h3 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.measurementPassport")}</h3>
+                <input value={measureResult} onChange={(e) => setMeasureResult(e.target.value)} placeholder={t("researchCanvas.resultValuePlaceholder")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
+                <input value={rawDataRef} onChange={(e) => setRawDataRef(e.target.value)} placeholder={t("researchCanvas.rawDataPlaceholder")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
+                <input value={uncertainty} onChange={(e) => setUncertainty(e.target.value)} placeholder={t("researchCanvas.uncertaintyPlaceholder")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
+                <button type="button" onClick={addPassport} className={cbaiBtnPrimary}>{t("researchCanvas.createPassport")}</button>
+                <p className="text-xs text-zinc-500">{loadMeasurementPassports(idea.id).length} {t("researchCanvas.passports").toLowerCase()}</p>
+              </section>
+              <section className="space-y-3">
+                <h3 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.molecularFormula")}</h3>
+                <input value={molecularFormula} onChange={(e) => setMolecularFormula(e.target.value)} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
+                <pre className="text-xs text-zinc-400">{JSON.stringify(parseMolecularFormula(molecularFormula), null, 2)}</pre>
+              </section>
+            </div>
+          )}
+
+          {stage === "DISCOVER" && (
+            <>
+              <h3 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.researchDiscovery")}</h3>
+              <p className="text-xs text-zinc-500">{visibilityEnforcementNote(idea.visibility)}</p>
+              <p className="text-xs text-zinc-500">{IP_BOUNDARY_NOTICE}</p>
+              <p className="text-xs text-zinc-500">
+                {buildExternalSearchConsent(idea).confirmed
+                  ? t("researchCanvas.externalSearchAuthorized")
+                  : t("researchCanvas.externalSearchNotAuthorized")}
+              </p>
+              <p className="text-xs text-zinc-500">{t("researchCanvas.sanitizedConcepts")}: {getSanitizedSearchConcepts(idea).join(" · ")}</p>
               <input
-                value={executeTaskTitle}
-                onChange={(e) => setExecuteTaskTitle(e.target.value)}
-                placeholder="Execution task title"
+                value={sanitizedQueryEdit}
+                onChange={(e) => {
+                  setSanitizedQueryEdit(e.target.value);
+                  setExternalSearchQueryOverride(idea.id, e.target.value);
+                  bump();
+                }}
+                placeholder={t("researchCanvas.editSanitizedQuery")}
                 className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`}
               />
-              <button type="button" onClick={addExecuteTask} className={cbaiBtnPrimary}>Create execution task</button>
-              <div className="flex flex-wrap gap-3 text-xs">
-                <Link href={contextHref(`/my-work?mission=${idea.missionId}`)} className="text-teal-400">My Work →</Link>
-                <Link href={contextHref("/reasoning")} className="text-teal-400">Reasoning →</Link>
-                <Link href={contextHref("/reports")} className="text-teal-400">Reports →</Link>
-              </div>
+              {!idea.externalSearchConfirmed || idea.externalSearchRevoked ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    confirmExternalSearch(idea.id, operator, { queryOverride: sanitizedQueryEdit || undefined });
+                    bump();
+                    setFeedback(t("researchCanvas.searchConfirmed"));
+                  }}
+                  className={cbaiBtnPrimary}
+                >
+                  {t("researchCanvas.confirmExternalSearch")}
+                </button>
+              ) : (
+                <>
+                  <input value={searchKeyword} onChange={(e) => setSearchKeyword(e.target.value)} placeholder={t("researchCanvas.searchKeyword")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
+                  <div className="flex flex-wrap gap-2">
+                    <button type="button" onClick={() => void runSearch()} className={cbaiBtnPrimary}>{t("researchCanvas.searchCrossref")}</button>
+                    <button type="button" onClick={() => void runSearchAll()} className={cbaiBtnPrimary}>{t("researchCanvas.searchAllProviders")}</button>
+                    <button type="button" onClick={() => { revokeExternalSearch(idea.id, operator); bump(); setFeedback(t("researchCanvas.revokeConsent")); }} className={`${cbaiFocusRing} text-xs text-amber-400`}>{t("researchCanvas.revokeConsent")}</button>
+                  </div>
+                </>
+              )}
+              <ul className="space-y-2 text-xs text-zinc-400">
+                {listOpenScienceProviders().map((p) => (
+                  <li key={p.id}>{p.name}: {p.connectionStatus}</li>
+                ))}
+              </ul>
+              {discoveries.map((d) => (
+                <div key={d.id} className="rounded border border-zinc-800 p-2">
+                  <p className="text-zinc-200">{d.title}</p>
+                  <p>{d.authors.join(", ")} · {d.date} · {d.projectStatus}</p>
+                </div>
+              ))}
+              <h3 className="text-xs font-semibold text-zinc-300">{t("researchCanvas.timeline")}</h3>
+              <ul className="text-xs text-zinc-500">
+                {buildHistoricalTimeline(idea.id).map((row) => (
+                  <li key={row.id}>{row.date}: {row.title}</li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {stage === "COMPARE" && (
+            <>
+              <h3 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.comparison")}</h3>
+              {discoveries.slice(0, 3).map((d) => {
+                const c = compareIdeaToRecord(idea, d);
+                return (
+                  <div key={d.id} className="rounded border border-zinc-800 p-3 text-xs">
+                    <p className="font-medium text-zinc-200">{d.title}</p>
+                    <p className="text-teal-400/90">{c.similarities.join("; ")}</p>
+                    <p className="text-zinc-400">{c.differences.join("; ")}</p>
+                    <p className="text-amber-400/80">{c.patentNote}</p>
+                  </div>
+                );
+              })}
+              <h3 className="text-xs font-semibold">{t("researchCanvas.landscape")}</h3>
+              <ul className="text-xs text-zinc-500">
+                {buildCurrentLandscape(idea.id).map((l, i) => (
+                  <li key={i}>{l.kind}: {l.label} — {l.limitation}</li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {stage === "MISSION" && (
+            <>
+              <h3 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.missionBuilder")}</h3>
+              <p className="text-xs text-zinc-500">{t("researchCanvas.missionNote")}</p>
+              <button type="button" onClick={createMissionFromIdea} className={cbaiBtnPrimary}>{t("researchCanvas.createResearchMission")}</button>
+              {idea.missionId ? (
+                <Link href={contextHref(`/my-work?mission=${idea.missionId}`)} className={`${cbaiFocusRing} text-xs text-teal-400`}>{t("researchCanvas.openMission")} →</Link>
+              ) : null}
+            </>
+          )}
+
+          {stage === "EXECUTE" && (
+            <>
+              <h3 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.executeTitle")}</h3>
+              {!idea.missionId ? (
+                <p className="text-xs text-amber-400/90">{t("researchCanvas.executeNeedsMission")}</p>
+              ) : (
+                <>
+                  <input
+                    value={executeTaskTitle}
+                    onChange={(e) => setExecuteTaskTitle(e.target.value)}
+                    placeholder={t("researchCanvas.executeTaskPlaceholder")}
+                    className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`}
+                  />
+                  <button type="button" onClick={addExecuteTask} className={cbaiBtnPrimary}>{t("researchCanvas.executeCreateTask")}</button>
+                  <div className="flex flex-wrap gap-3 text-xs">
+                    <Link href={contextHref(`/my-work?mission=${idea.missionId}`)} className={`${cbaiFocusRing} text-teal-400`}>My Work →</Link>
+                    <Link href={contextHref("/reasoning")} className={`${cbaiFocusRing} text-teal-400`}>Reasoning →</Link>
+                    <Link href={contextHref("/reports")} className={`${cbaiFocusRing} text-teal-400`}>Reports →</Link>
+                  </div>
+                </>
+              )}
+            </>
+          )}
+
+          {stage === "DECIDE" && decisionPkg && (
+            <>
+              <h3 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.decisionSupport")}</h3>
+              {(["facts", "options", "unknown", "requiredValidation"] as const).map((key) => (
+                <div key={key}>
+                  <p className="text-xs font-semibold uppercase text-zinc-500">{decisionSectionLabel(key)}</p>
+                  <ul className="list-disc pl-4 text-xs text-zinc-400">
+                    {decisionPkg[key].map((line) => <li key={line}>{line}</li>)}
+                  </ul>
+                </div>
+              ))}
+              <p className="text-xs text-amber-400/90">{decisionPkg.humanDecisionBoundary}</p>
+              <input value={decisionPath} onChange={(e) => setDecisionPath(e.target.value)} placeholder={t("researchCanvas.selectedPath")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
+              <input value={decisionReason} onChange={(e) => setDecisionReason(e.target.value)} placeholder={t("researchCanvas.decisionReason")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
+              <button type="button" onClick={saveDecision} className={cbaiBtnPrimary}>{t("researchCanvas.recordDecision")}</button>
+              <button type="button" onClick={() => setFeedback(buildDecisionSupportReport(idea).kind)} className={`${cbaiFocusRing} text-xs text-teal-400`}>{t("researchCanvas.generateReport")}</button>
             </>
           )}
         </section>
-      )}
+      ) : null}
 
-      {idea && stage === "DECIDE" && decisionPkg && (
-        <section className={`${cbaiGlassCard} space-y-4 p-6`}>
-          <h2 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.decisionSupport")}</h2>
-          {(["facts", "options", "unknown", "requiredValidation"] as const).map((key) => (
-            <div key={key}>
-              <p className="text-xs font-semibold uppercase text-zinc-500">{key}</p>
-              <ul className="list-disc pl-4 text-xs text-zinc-400">
-                {decisionPkg[key].map((line) => <li key={line}>{line}</li>)}
-              </ul>
-            </div>
-          ))}
-          <p className="text-xs text-amber-400/90">{decisionPkg.humanDecisionBoundary}</p>
-          <input value={decisionPath} onChange={(e) => setDecisionPath(e.target.value)} placeholder={t("researchCanvas.selectedPath")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
-          <input value={decisionReason} onChange={(e) => setDecisionReason(e.target.value)} placeholder={t("researchCanvas.decisionReason")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
-          <button type="button" onClick={saveDecision} className={cbaiBtnPrimary}>{t("researchCanvas.recordDecision")}</button>
-          <button type="button" onClick={() => setFeedback(buildDecisionSupportReport(idea).kind)} className="text-xs text-teal-400">{t("researchCanvas.generateReport")}</button>
-        </section>
-      )}
-
-      {idea && (
+      {idea ? (
         <section className={`${cbaiGlassCard} p-4 text-xs text-zinc-500`}>
           <p>{t("researchCanvas.instruments")}: {VIRTUAL_INSTRUMENT_REGISTRY.filter((i) => i.capabilityState === "Working").length} working / {VIRTUAL_INSTRUMENT_REGISTRY.length} registered</p>
           <p>{t("researchCanvas.plans")}: {loadMeasurementPlans(idea.id).length} · {t("researchCanvas.passports")}: {loadMeasurementPassports(idea.id).length}</p>
         </section>
-      )}
+      ) : null}
 
-      {feedback ? <p className="text-sm text-teal-400">{feedback}</p> : null}
+      {feedback ? <p className="text-sm text-teal-400" role="status">{feedback}</p> : null}
     </div>
   );
 }

@@ -10,8 +10,9 @@ export default function ResearchCanvasPageClient() {
   return (
     <OperatingPageShell
       title={t("researchCanvas.pageTitle")}
+      description={t("researchCanvas.purpose")}
       showOperator
-      missionContextVariant="compact"
+      showMissionContext={false}
     >
       <ResearchCanvasClient />
     </OperatingPageShell>

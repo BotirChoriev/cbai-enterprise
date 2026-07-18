@@ -212,11 +212,74 @@ export function confirmExtractedItem(
   return updated;
 }
 
+export function canBuildIdeaModel(idea: SmartIdea): {
+  readonly ok: boolean;
+  readonly reasonKey: "no_extractions" | "pending_confirmation" | "none_confirmed";
+} {
+  if (idea.extractedItems.length === 0) {
+    return { ok: false, reasonKey: "no_extractions" };
+  }
+  const pending = idea.extractedItems.filter(
+    (e) => e.confirmationStatus === "Awaiting Human Confirmation" || e.confirmationStatus === "Machine-Extracted",
+  );
+  if (pending.length > 0) {
+    return { ok: false, reasonKey: "pending_confirmation" };
+  }
+  const confirmed = idea.extractedItems.filter((e) => e.confirmationStatus === "Confirmed");
+  if (confirmed.length === 0) {
+    return { ok: false, reasonKey: "none_confirmed" };
+  }
+  return { ok: true, reasonKey: "none_confirmed" };
+}
+
+export function addManualInterpretationDraft(
+  ideaId: string,
+  detailedDescription: string,
+  actor: string,
+): SmartIdea | null {
+  const trimmed = detailedDescription.trim();
+  if (trimmed.length < 30) return null;
+
+  const all = loadSmartIdeas();
+  const idx = all.findIndex((i) => i.id === ideaId);
+  if (idx < 0) return null;
+  const prev = all[idx]!;
+
+  const draftItems: ExtractedItem[] = [
+    makeExtracted("manual description", trimmed, "user-manual", 1),
+    makeExtracted("problem statement", prev.problem, "intake", 1),
+    makeExtracted("purpose", prev.purpose, "intake", 1),
+  ];
+  if (prev.originalDescription.trim()) {
+    draftItems.push(makeExtracted("original description", prev.originalDescription, "intake", 1));
+  }
+
+  const extractedItems = draftItems.map((e) => ({
+    ...e,
+    confirmationStatus: "Awaiting Human Confirmation" as InterpretationStatus,
+    limitation: "Draft interpretation from manual description — requires human confirmation before scientific claims.",
+  }));
+
+  const updated: SmartIdea = {
+    ...prev,
+    extractedItems,
+    stage: "INTERPRET",
+    updatedAt: new Date().toISOString(),
+  };
+  const next = [...all];
+  next[idx] = updated;
+  persist(next);
+  audit("manual_interpretation_draft", ideaId, actor, "draft");
+  return updated;
+}
+
 export function buildIdeaModel(ideaId: string, input: Partial<IdeaModel>): SmartIdea | null {
   const all = loadSmartIdeas();
   const idx = all.findIndex((i) => i.id === ideaId);
   if (idx < 0) return null;
   const prev = all[idx]!;
+  const gate = canBuildIdeaModel(prev);
+  if (!gate.ok) return null;
 
   const model: IdeaModel = {
     workingPrinciple: input.workingPrinciple ?? prev.purpose,

@@ -10,6 +10,24 @@ import { HUMAN_DECISION_BOUNDARY } from "@/lib/product/product-constitution";
 import { resolvePersistenceMode, persistenceModeDisclaimer } from "@/lib/product/persistence-mode";
 import type { GenesisCommandMatch } from "@/lib/genesis/genesis-operator-commands";
 
+import type { CanvasActionKey } from "@/lib/research-canvas/canvas-stage-status";
+
+const ACTION_LABELS: Record<CanvasActionKey, string> = {
+  createSmartIdea: "Create private Smart Idea",
+  uploadArtifact: "Upload artifact",
+  confirmInterpretation: "Confirm interpretation",
+  buildIdeaModel: "Build Idea Model",
+  createMeasurementPlan: "Create measurement plan",
+  createPassport: "Create Measurement Passport",
+  confirmExternalSearch: "Confirm external metadata search",
+  searchProviders: "Search connected providers",
+  reviewComparison: "Review comparison and gaps",
+  createMission: "Create research mission",
+  addExecutionTask: "Add execution task",
+  recordDecision: "Record human decision",
+  openStage: "Open this stage",
+};
+
 function canvasHref(smartIdeaId?: string): string {
   return smartIdeaId ? `/research/canvas?smartIdea=${smartIdeaId}` : "/research/canvas";
 }
@@ -23,7 +41,7 @@ export function resolveFlagshipOperatorCommand(input: string): GenesisCommandMat
     const next = deriveActiveStageNextAction(active);
     const mission = getCurrentMission();
     const lines = [
-      `Next: ${next}`,
+      `Next: ${ACTION_LABELS[next]}`,
       active ? `Smart Idea: ${active.title} (${active.stage})` : "No Smart Idea yet — start on Research Canvas.",
       mission ? `Active mission: ${mission.problem.slice(0, 80)}` : "No active mission.",
       `Persistence: ${persistenceModeDisclaimer(resolvePersistenceMode())}`,

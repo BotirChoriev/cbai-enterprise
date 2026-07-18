@@ -7,6 +7,7 @@ import { join } from "node:path";
 import {
   createSmartIdea,
   addSmartIdeaArtifact,
+  addManualInterpretationDraft,
   confirmExtractedItem,
   buildIdeaModel,
   confirmExternalSearch,
@@ -490,6 +491,15 @@ test("24. comparison explanation and patent note", () => {
     purpose: "energy storage",
     owner: OPERATOR,
   });
+  addManualInterpretationDraft(
+    idea.id,
+    "Detailed description of low loss capacitor research comparing materials and measurement needs.",
+    OPERATOR,
+  );
+  const loadedForConfirm = loadSmartIdea(idea.id)!;
+  for (const item of loadedForConfirm.extractedItems) {
+    confirmExtractedItem(idea.id, item.id, { status: "Confirmed", actor: OPERATOR });
+  }
   buildIdeaModel(idea.id, { materials: ["graphene"], unknowns: ["dielectric constant"] });
   const loaded = loadSmartIdea(idea.id)!;
   const cmp = compareIdeaToRecord(loaded, {
@@ -522,6 +532,15 @@ test("25. Decision Support Package and human decision boundary", () => {
     purpose: "test",
     owner: OPERATOR,
   });
+  addManualInterpretationDraft(
+    idea.id,
+    "Detailed manual description for decision support package human boundary verification test.",
+    OPERATOR,
+  );
+  const loadedItems = loadSmartIdea(idea.id)!;
+  for (const item of loadedItems.extractedItems) {
+    confirmExtractedItem(idea.id, item.id, { status: "Confirmed", actor: OPERATOR });
+  }
   buildIdeaModel(idea.id, { humanityBenefit: "Cleaner energy", natureImpact: "Material sourcing review needed" });
   const pkg = buildDecisionSupportPackage(loadSmartIdea(idea.id)!);
   assert.match(pkg.humanDecisionBoundary, /human/i);

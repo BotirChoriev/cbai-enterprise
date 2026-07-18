@@ -7,26 +7,42 @@ import { loadMeasurementPlans, loadMeasurementPassports } from "@/lib/research-c
 import { loadDiscoveryResults } from "@/lib/research-canvas/research-discovery";
 import type { ProductStatusLabel } from "@/lib/product/status-vocabulary";
 
+export type CanvasBlockedReasonKey =
+  | "completeIdeaFirst"
+  | "interpretUploadOrManual"
+  | "interpretPendingConfirmation"
+  | "ideaModelRequired"
+  | "discoveryRequired"
+  | "externalSearchConsent"
+  | "missionRequired"
+  | "missionContext";
+
+export type CanvasActionKey =
+  | "createSmartIdea"
+  | "uploadArtifact"
+  | "confirmInterpretation"
+  | "buildIdeaModel"
+  | "createMeasurementPlan"
+  | "createPassport"
+  | "confirmExternalSearch"
+  | "searchProviders"
+  | "reviewComparison"
+  | "createMission"
+  | "addExecutionTask"
+  | "recordDecision"
+  | "openStage";
+
 export type CanvasStageStatus = {
   readonly stage: ResearchCanvasStage;
-  readonly purpose: string;
+  readonly purposeKey: CanvasActionKey | "stagePurpose";
   readonly status: ProductStatusLabel;
-  readonly primaryAction: string;
+  readonly primaryActionKey: CanvasActionKey;
   readonly blockedReason: string | null;
+  readonly blockedReasonKey: CanvasBlockedReasonKey | null;
   readonly completed: boolean;
-  readonly nextAction: string;
+  readonly nextActionKey: CanvasActionKey;
 };
 
-const STAGE_PURPOSES: Record<ResearchCanvasStage, string> = {
-  IDEA: "Record a private Smart Idea and optional artifact.",
-  INTERPRET: "Confirm or correct what CBAI extracted before scientific claims.",
-  MEASURE: "Define measurand, method, units, and measurement records.",
-  DISCOVER: "Search connected open-science metadata with sanitized queries.",
-  COMPARE: "Compare your idea with sourced prior work and knowledge gaps.",
-  MISSION: "Create or link a research Mission and Project.",
-  EXECUTE: "Track tasks, progress, blockers, evidence, and reasoning.",
-  DECIDE: "Review options and record your human decision.",
-};
 
 function normalizeStage(stage: string): ResearchCanvasStage {
   if (stage === "PLAN") return "EXECUTE";
@@ -48,12 +64,13 @@ export function deriveCanvasStageStatuses(idea: SmartIdea | null): CanvasStageSt
   if (!idea) {
     return stages.map((stage) => ({
       stage,
-      purpose: STAGE_PURPOSES[stage],
+      purposeKey: "stagePurpose" as const,
       status: stage === "IDEA" ? "Ready for input" : "Draft",
-      primaryAction: stage === "IDEA" ? "Create private Smart Idea" : "Complete IDEA first",
+      primaryActionKey: stage === "IDEA" ? "createSmartIdea" : "openStage",
       blockedReason: stage === "IDEA" ? null : "No Smart Idea selected.",
+      blockedReasonKey: stage === "IDEA" ? null : "completeIdeaFirst",
       completed: false,
-      nextAction: "Create a private Smart Idea on this page.",
+      nextActionKey: stage === "IDEA" ? "createSmartIdea" : "openStage",
     }));
   }
 
@@ -68,113 +85,149 @@ export function deriveCanvasStageStatuses(idea: SmartIdea | null): CanvasStageSt
 
   return stages.map((stage) => {
     let status: ProductStatusLabel = "Draft";
-    let primaryAction = STAGE_PURPOSES[stage];
+    let primaryActionKey: CanvasActionKey = "openStage";
     let blockedReason: string | null = null;
+    let blockedReasonKey: CanvasBlockedReasonKey | null = null;
     let completed = false;
-    let nextAction = `Open ${stage} stage.`;
+    let nextActionKey: CanvasActionKey = "openStage";
 
     switch (stage) {
       case "IDEA":
         completed = Boolean(idea.title.trim() && idea.problem.trim());
         status = completed ? "Completed" : "Ready for input";
-        primaryAction = completed ? "Upload or describe artifact" : "Create private Smart Idea";
-        nextAction = completed ? "Add artifact or continue to INTERPRET." : "Enter title and problem.";
+        primaryActionKey = completed ? "uploadArtifact" : "createSmartIdea";
+        nextActionKey = completed ? "uploadArtifact" : "createSmartIdea";
         break;
       case "INTERPRET":
         if (idea.extractedItems.length === 0) {
           status = "Evidence missing";
+          blockedReasonKey = "interpretUploadOrManual";
           blockedReason = "Upload a supported artifact or add manual description.";
-          primaryAction = "Upload artifact";
+          primaryActionKey = "uploadArtifact";
+          nextActionKey = "uploadArtifact";
         } else if (pendingConfirm.length > 0) {
           status = "Needs confirmation";
-          primaryAction = "Confirm or correct extractions";
-          nextAction = `${pendingConfirm.length} item(s) awaiting confirmation.`;
+          blockedReasonKey = "interpretPendingConfirmation";
+          primaryActionKey = "confirmInterpretation";
+          nextActionKey = "confirmInterpretation";
         } else if (confirmed.length > 0 || idea.ideaModel) {
           completed = Boolean(idea.ideaModel);
           status = completed ? "Completed" : "Ready for input";
-          primaryAction = "Build Idea Model";
+          primaryActionKey = "buildIdeaModel";
+          nextActionKey = "buildIdeaModel";
         }
-        if (!idea.title.trim()) blockedReason = "Complete IDEA intake first.";
+        if (!idea.title.trim()) {
+          blockedReasonKey = "completeIdeaFirst";
+          blockedReason = "Complete IDEA intake first.";
+        }
         break;
       case "MEASURE":
         if (!idea.ideaModel) {
+          blockedReasonKey = "ideaModelRequired";
           blockedReason = "Confirm interpretation and build Idea Model first.";
           status = "Needs confirmation";
+          primaryActionKey = "buildIdeaModel";
+          nextActionKey = "buildIdeaModel";
         } else if (plans.length === 0) {
           status = "Ready for input";
-          primaryAction = "Create measurement plan";
+          primaryActionKey = "createMeasurementPlan";
+          nextActionKey = "createMeasurementPlan";
         } else if (passports.length === 0) {
           status = "Evidence missing";
-          primaryAction = "Create Measurement Passport";
+          primaryActionKey = "createPassport";
+          nextActionKey = "createPassport";
         } else {
           completed = passports.some((p) => p.validationStatus === "Validated" || p.validationStatus === "Measured");
           status = completed ? "Completed" : "Under human review";
-          primaryAction = "Validate measurement record";
+          primaryActionKey = "createPassport";
+          nextActionKey = "createPassport";
         }
         break;
       case "DISCOVER":
         if (!idea.externalSearchConfirmed) {
           status = "Needs confirmation";
-          primaryAction = "Confirm external metadata search";
+          primaryActionKey = "confirmExternalSearch";
+          blockedReasonKey = "externalSearchConsent";
           blockedReason = "Sanitized query consent required before transmission.";
+          nextActionKey = "confirmExternalSearch";
         } else if (discoveries.length === 0) {
           status = "Connector required";
-          primaryAction = "Search connected providers";
-          nextAction = "Crossref available; other providers may require connector or backend.";
+          primaryActionKey = "searchProviders";
+          nextActionKey = "searchProviders";
         } else {
           completed = true;
           status = "Supported";
-          primaryAction = "Review discovery results";
+          primaryActionKey = "searchProviders";
+          nextActionKey = "searchProviders";
         }
         break;
       case "COMPARE":
         if (discoveries.length === 0) {
+          blockedReasonKey = "discoveryRequired";
           blockedReason = "Run discovery or import metadata first.";
           status = "Evidence missing";
+          primaryActionKey = "searchProviders";
+          nextActionKey = "searchProviders";
         } else {
           completed = current === "COMPARE" || Boolean(idea.missionId);
           status = "Supported";
-          primaryAction = "Review comparison and gaps";
+          primaryActionKey = "reviewComparison";
+          nextActionKey = "reviewComparison";
         }
         break;
       case "MISSION":
-        if (!idea.ideaModel) blockedReason = "Idea Model required.";
+        if (!idea.ideaModel) {
+          blockedReasonKey = "ideaModelRequired";
+          blockedReason = "Idea Model required.";
+        }
         completed = Boolean(idea.missionId);
         status = completed ? "Completed" : idea.ideaModel ? "Ready for input" : "Needs confirmation";
-        primaryAction = "Create research mission";
-        nextAction = completed ? "Open linked mission in My Work." : "Link Mission, Project, and LRO.";
+        primaryActionKey = "createMission";
+        nextActionKey = completed ? "openStage" : "createMission";
         break;
       case "EXECUTE":
         if (!idea.missionId) {
+          blockedReasonKey = "missionRequired";
           blockedReason = "Create Mission first.";
           status = "Draft";
+          primaryActionKey = "createMission";
+          nextActionKey = "createMission";
         } else {
           status = "Ready for input";
-          primaryAction = "Add task, progress, or open Reasoning";
-          nextAction = "Use My Work and Reasoning with mission context preserved.";
+          primaryActionKey = "addExecutionTask";
+          nextActionKey = "addExecutionTask";
         }
         break;
       case "DECIDE":
-        if (!idea.missionId) blockedReason = "Mission context helps decision support.";
+        if (!idea.missionId) {
+          blockedReasonKey = "missionContext";
+          blockedReason = "Mission context helps decision support.";
+        }
         completed = Boolean(idea.humanDecision);
         status = completed ? "Completed" : "Under human review";
-        primaryAction = "Record human decision";
-        nextAction = HUMAN_DECISION_HINT;
+        primaryActionKey = "recordDecision";
+        nextActionKey = "recordDecision";
         break;
     }
 
-    return { stage, purpose: STAGE_PURPOSES[stage], status, primaryAction, blockedReason, completed, nextAction };
+    return {
+      stage,
+      purposeKey: "stagePurpose" as const,
+      status,
+      primaryActionKey,
+      blockedReason,
+      blockedReasonKey,
+      completed,
+      nextActionKey,
+    };
   });
 }
 
-const HUMAN_DECISION_HINT =
-  "Review Decision Support Package — CBAI does not choose the final path.";
-
-export function deriveActiveStageNextAction(idea: SmartIdea | null): string {
+export function deriveActiveStageNextAction(idea: SmartIdea | null): CanvasActionKey {
   const statuses = deriveCanvasStageStatuses(idea);
   const current = idea ? normalizeStage(idea.stage) : "IDEA";
   const active = statuses.find((s) => s.stage === current);
-  return active?.nextAction ?? statuses[0]!.nextAction;
+  return active?.nextActionKey ?? statuses[0]!.nextActionKey;
 }
 
 export { normalizeStage as normalizeCanvasStage };

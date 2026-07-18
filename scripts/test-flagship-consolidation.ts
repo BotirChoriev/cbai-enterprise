@@ -296,11 +296,13 @@ test("23. Priority open-science providers configured", () => {
   assert.deepEqual(PRIORITY_OPEN_SCIENCE_PROVIDERS, ["crossref", "openalex", "europepmc", "datacite"]);
 });
 
-test("24. UI wiring — Research Canvas stage status panel", () => {
+test("24. UI wiring — Research Canvas operational stage navigation", () => {
   const src = readFileSync(join(process.cwd(), "components/research/canvas/ResearchCanvasClient.tsx"), "utf-8");
   assert.match(src, /deriveCanvasStageStatuses/);
-  assert.match(src, /EXECUTE/);
-  assert.match(src, /Revoke consent/);
+  assert.match(src, /role="tablist"/);
+  assert.match(src, /stagePanelId/);
+  assert.match(src, /interpretRequiresEvidence/);
+  assert.match(src, /revokeConsent/);
 });
 
 test("25. IP boundary notice present", () => {
