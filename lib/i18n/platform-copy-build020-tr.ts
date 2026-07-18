@@ -109,6 +109,10 @@ export const ZERO_LEARNING_CURVE_TR = {
   researchSearchAria: "Konu ara",
   researchExploreTopic: "Ara",
   researchSearchFootnote: "Aşağıdaki kataloğu filtreler — canlı veritabanları bağlı değil.",
+  researchUniversitiesLinkPrefix: "Üniversite profilleri bugün şurada mevcut",
+  researchUniversitiesLinkLabel: "Kamusal Zekâ → Üniversiteler",
+  researchCatalogLatticeNote:
+    "{domains} gerçek alanda {topics} katalog konusu — düğüm boyutu gerçek konu sayısını yansıtır.",
   reportsAlsoAvailable: "Ayrıca mevcut",
 } as const;
 

@@ -156,10 +156,11 @@ test("12. Unsupported-browser and permission-denied copy exists (non-empty) in e
   }
 });
 
-test("13. AssistantCommandCenter places the recognized transcript in the visible input before routing", () => {
+test("13. AssistantCommandCenter shows transcript review before any routing", () => {
   const source = readSource("components/assistant/AssistantCommandCenter.tsx");
-  assert.match(source, /setInput\(transcript\)/);
-  assert.match(source, /onstart/); // real requesting->listening transition, not assumed instant
+  assert.match(source, /setInput\(result\.transcript\)/);
+  assert.match(source, /VoiceTranscriptReviewPanel/);
+  assert.ok(!source.includes("route(transcript)"));
 });
 
 // ---------------------------------------------------------------------------

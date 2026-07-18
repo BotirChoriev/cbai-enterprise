@@ -4,6 +4,10 @@
 
 import type { SmartIdea } from "@/lib/research-canvas/research-canvas-types";
 import { getSanitizedSearchConcepts } from "@/lib/research-canvas/smart-idea-store";
+import {
+  getResearchCanvasRuntimeCopy,
+  type ResearchCanvasRuntimeCopy,
+} from "@/lib/i18n/research-canvas-runtime-copy";
 
 export type ExternalSearchConsent = {
   readonly confirmed: boolean;
@@ -44,13 +48,17 @@ export function assertNoPrivateArtifactInQuery(query: string, idea: SmartIdea): 
   return { ok: true };
 }
 
-export const IP_BOUNDARY_NOTICE =
-  "Searching public databases does not create legal intellectual-property protection. Consider professional review for patents and licensing.";
+export const IP_BOUNDARY_NOTICE = getResearchCanvasRuntimeCopy("en").ipBoundaryNotice;
 
-export function visibilityEnforcementNote(visibility: SmartIdea["visibility"]): string {
-  if (visibility === "Private") return "Private — device-local unless shared mode with real permissions is configured.";
-  if (visibility === "Team Only" || visibility === "Organization") {
-    return `${visibility} — full secure sharing requires authenticated backend enforcement; device-local mode stores locally only.`;
-  }
-  return `${visibility} — publication requires explicit human action; nothing is auto-published.`;
+export function getIpBoundaryNotice(copy: ResearchCanvasRuntimeCopy = getResearchCanvasRuntimeCopy("en")): string {
+  return copy.ipBoundaryNotice;
+}
+
+export function visibilityEnforcementNote(
+  visibility: SmartIdea["visibility"],
+  copy: ResearchCanvasRuntimeCopy = getResearchCanvasRuntimeCopy("en"),
+): string {
+  if (visibility === "Private") return copy.visibilityPrivate;
+  if (visibility === "Team Only" || visibility === "Organization") return copy.visibilityTeam;
+  return copy.visibilityPublic;
 }

@@ -36,7 +36,13 @@ function canvasHref(smartIdeaId?: string): string {
 export function resolveFlagshipOperatorCommand(input: string): GenesisCommandMatch | null {
   const q = input.toLowerCase().trim();
 
-  if (q.includes("what should i do next") || q.includes("what's next") || q.includes("whats next")) {
+  if (
+    q.includes("what should i do next") ||
+    q.includes("what's next") ||
+    q.includes("whats next") ||
+    q.includes("keyingi qadam nima") ||
+    q.includes("keyingi qadam")
+  ) {
     const ideas = loadSmartIdeas();
     const active = ideas[ideas.length - 1] ?? null;
     const next = deriveActiveStageNextAction(active);
@@ -56,7 +62,11 @@ export function resolveFlagshipOperatorCommand(input: string): GenesisCommandMat
     };
   }
 
-  if (q.includes("what is blocked") || q.includes("what's blocked")) {
+  if (
+    q.includes("what is blocked") ||
+    q.includes("what's blocked") ||
+    q.includes("nima bloklangan")
+  ) {
     const ideas = loadSmartIdeas();
     const active = ideas[ideas.length - 1] ?? null;
     const statuses = deriveCanvasStageStatuses(active);

@@ -109,6 +109,10 @@ export const ZERO_LEARNING_CURVE_EN = {
   researchSearchAria: "Search topics",
   researchExploreTopic: "Explore",
   researchSearchFootnote: "Filters the catalog below — live databases not connected.",
+  researchUniversitiesLinkPrefix: "University profiles available today in",
+  researchUniversitiesLinkLabel: "Public Intelligence → Universities",
+  researchCatalogLatticeNote:
+    "{topics} catalog topics across {domains} real domains — node size reflects real topic count, never an invented score.",
   reportsAlsoAvailable: "Also available",
 } as const;
 

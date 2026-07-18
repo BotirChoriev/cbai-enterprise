@@ -247,6 +247,72 @@ export const ASSISTANT_COMMANDS: readonly AssistantCommand[] = [
     ],
   },
   {
+    id: "open-home",
+    phrase: "Open home",
+    href: "/",
+    keywords: [
+      "open home", "go home", "home page",
+      "bosh sahifani och", "bosh sahifa",
+      "открой главную", "главная",
+      "ana sayfayı aç", "ana sayfa",
+    ],
+  },
+  {
+    id: "open-research-canvas",
+    phrase: "Open Research Canvas",
+    href: "/research/canvas",
+    keywords: [
+      "open research canvas", "research canvas",
+      "tadqiqot kanvasini och", "research canvasni och",
+      "открой research canvas",
+      "research canvas aç",
+    ],
+  },
+  {
+    id: "what-next",
+    phrase: "What should I do next?",
+    href: "/research/canvas",
+    keywords: [
+      "what should i do next", "what's next", "whats next",
+      "keyingi qadam nima", "keyingi qadam",
+      "что дальше", "следующий шаг",
+      "sıradaki ne", "sonraki adım",
+    ],
+  },
+  {
+    id: "what-blocked",
+    phrase: "What is blocked?",
+    href: "/research/canvas",
+    keywords: [
+      "what is blocked", "what's blocked",
+      "nima bloklangan", "bloklangan",
+      "что заблокировано",
+      "ne engellendi",
+    ],
+  },
+  {
+    id: "open-measurement-plan",
+    phrase: "Open measurement plan",
+    href: "/research/canvas",
+    keywords: [
+      "open measurement plan", "measurement plan",
+      "o'lchash rejasini och", "olchash rejasini och",
+      "открой план измерений",
+      "ölçüm planını aç",
+    ],
+  },
+  {
+    id: "continue-mission",
+    phrase: "Continue mission",
+    href: "/my-work",
+    keywords: [
+      "continue mission", "continue my mission",
+      "missiyani davom ettir", "missiyani davom et",
+      "продолжить миссию",
+      "göreve devam et",
+    ],
+  },
+  {
     id: "create-project",
     phrase: "Create Project",
     href: "/my-work",
@@ -269,6 +335,40 @@ export const ASSISTANT_COMMANDS: readonly AssistantCommand[] = [
     ],
   },
 ] as const;
+
+const COMMAND_DISPLAY_BY_LANG: Record<string, Record<string, string>> = {
+  uz: {
+    "open-my-work": "Mening ishlarimni och",
+    "continue-research": "Tadqiqotni davom ettir",
+    "open-evidence": "Dalillarni och",
+    "open-trust": "Ishonch markazini och",
+    "open-research": "Tadqiqotni och",
+    "open-reports": "Hisobotlarni och",
+    "open-reasoning": "Mulohazani och",
+  },
+  ru: {
+    "open-my-work": "Открой мою работу",
+    "continue-research": "Продолжить исследование",
+    "open-evidence": "Открой доказательства",
+    "open-trust": "Центр доверия",
+    "open-research": "Открой исследования",
+    "open-reports": "Открой отчёты",
+    "open-reasoning": "Открой рассуждение",
+  },
+  tr: {
+    "open-my-work": "Çalışmalarımı aç",
+    "continue-research": "Araştırmaya devam et",
+    "open-evidence": "Kanıtları aç",
+    "open-trust": "Güven merkezi",
+    "open-research": "Araştırmayı aç",
+    "open-reports": "Raporları aç",
+    "open-reasoning": "Akıl yürütmeyi aç",
+  },
+};
+
+export function displayCommandPhrase(command: AssistantCommand, lang: string): string {
+  return COMMAND_DISPLAY_BY_LANG[lang]?.[command.id] ?? command.phrase;
+}
 
 export type AssistantCommandMatch =
   | { kind: "fixed"; label: string; href: string; matchedKeyword: string }

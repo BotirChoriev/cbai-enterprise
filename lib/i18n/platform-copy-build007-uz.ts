@@ -96,6 +96,13 @@ export const RESEARCH_WORKSPACE_UZ = {
 } as const;
 
 export const RESEARCH_HOME_UZ = {
+  title: "Tadqiqot intellekti",
+  subheadline:
+    "Tadqiqot mavzulari, tajribalar, nashrlar, laboratoriyalar, universitetlar va dalillarni bog'lang.",
+  searchPlaceholder: "Tadqiqot mavzulari, usullar, organizmlar, kasalliklar, texnologiyalar...",
+  coreMessage:
+    "Tadqiqot intellekti ijtimoiy lenta emas. Bu ilmiy ko'rib chiqish uchun tuzilgan dalil ish maydoni.",
+  searchButton: "Tadqiqot qidirish",
   statusHeading: "Tadqiqot intellekti holati",
   availableToday: "Bugun mavjud",
   notAvailableYet: "Hali mavjud emas",

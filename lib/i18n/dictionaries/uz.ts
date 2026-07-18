@@ -1,4 +1,7 @@
 import type { TranslationDictionary } from "@/lib/i18n/dictionary-types";
+import {
+  VOICE_CONTROL_UZ,
+} from "@/lib/i18n/platform-copy-voice-control";
 import { COMPASS_COPY_UZ, ENTITIES_UZ, MY_WORK_UZ, PRODUCT_STATUS_UZ, SYSTEM_UZ } from "@/lib/i18n/platform-copy-uz";
 import {
   DASHBOARD_UZ,
@@ -542,6 +545,7 @@ const uz: TranslationDictionary = {
   previewPages: PREVIEW_PAGES_UZ,
   validation: VALIDATION_UZ,
   assistantVoice: ASSISTANT_VOICE_UZ,
+  voiceControl: VOICE_CONTROL_UZ,
   myWorkExt: MY_WORK_EXT_UZ,
   researchCatalog: RESEARCH_CATALOG_UZ,
   graphExtended: GRAPH_EXTENDED_UZ,

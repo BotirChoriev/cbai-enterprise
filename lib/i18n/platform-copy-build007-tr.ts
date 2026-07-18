@@ -96,6 +96,13 @@ export const RESEARCH_WORKSPACE_TR = {
 } as const;
 
 export const RESEARCH_HOME_TR = {
+  title: "Araştırma Zekâsı",
+  subheadline:
+    "Araştırma konularını, deneyleri, yayınları, laboratuvarları, üniversiteleri ve kanıtları bağlayın.",
+  searchPlaceholder: "Araştırma konuları, yöntemler, organizmalar, hastalıklar, teknolojiler...",
+  coreMessage:
+    "Araştırma Zekâsı bir sosyal akış değildir. Bilimsel inceleme için yapılandırılmış bir kanıt çalışma alanıdır.",
+  searchButton: "Araştırma ara",
   statusHeading: "Araştırma İstihbaratı durumu",
   availableToday: "Bugün mevcut",
   notAvailableYet: "Henüz mevcut değil",

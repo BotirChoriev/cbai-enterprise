@@ -67,7 +67,8 @@ import ManualInterpretationInputPanel from "@/components/research/canvas/ManualI
 import IdeaModelReviewPanel from "@/components/research/canvas/IdeaModelReviewPanel";
 import MeasurementWorkflowPanel from "@/components/research/canvas/MeasurementWorkflowPanel";
 import { manualInterpretationDraftStore } from "@/lib/research-canvas/manual-interpretation-draft";
-import { buildExternalSearchConsent, IP_BOUNDARY_NOTICE, visibilityEnforcementNote } from "@/lib/research-canvas/privacy-boundary";
+import { buildExternalSearchConsent, getIpBoundaryNotice, visibilityEnforcementNote } from "@/lib/research-canvas/privacy-boundary";
+import { getResearchCanvasRuntimeCopy } from "@/lib/i18n/research-canvas-runtime-copy";
 import { resolvePersistenceMode } from "@/lib/product/persistence-mode";
 import { appendGenesisOperatingParamsToHref } from "@/lib/genesis/genesis-operating-context";
 import { createExecutionTask } from "@/lib/genesis/execution-store";
@@ -85,10 +86,11 @@ function defaultTaskDeadlineIso(daysFromNow: number): string {
 }
 
 export default function ResearchCanvasClient() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const rc = (key: string) => t(`researchCanvas.${key}`);
   const hydrated = useHydrated();
   const { profile } = useAssistantProfile();
+  const runtimeCopy = useMemo(() => getResearchCanvasRuntimeCopy(language), [language]);
   const operator = resolveOperatorName(profile);
   const searchParams = useSearchParams();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -282,7 +284,10 @@ export default function ResearchCanvasClient() {
     bump();
   };
 
-  const decisionPkg = useMemo(() => (idea ? buildDecisionSupportPackage(idea) : null), [idea]);
+  const decisionPkg = useMemo(
+    () => (idea ? buildDecisionSupportPackage(idea, runtimeCopy) : null),
+    [idea, runtimeCopy],
+  );
 
   const runSearchAll = async () => {
     if (!idea) return;
@@ -720,8 +725,8 @@ export default function ResearchCanvasClient() {
           {stage === "DISCOVER" && (
             <>
               <h3 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.researchDiscovery")}</h3>
-              <p className="text-xs text-zinc-500">{visibilityEnforcementNote(idea.visibility)}</p>
-              <p className="text-xs text-zinc-500">{IP_BOUNDARY_NOTICE}</p>
+              <p className="text-xs text-zinc-500">{visibilityEnforcementNote(idea.visibility, runtimeCopy)}</p>
+              <p className="text-xs text-zinc-500">{getIpBoundaryNotice(runtimeCopy)}</p>
               <p className="text-xs text-zinc-500">
                 {buildExternalSearchConsent(idea).confirmed
                   ? t("researchCanvas.externalSearchAuthorized")
@@ -784,7 +789,7 @@ export default function ResearchCanvasClient() {
             <>
               <h3 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.comparison")}</h3>
               {discoveries.slice(0, 3).map((d) => {
-                const c = compareIdeaToRecord(idea, d);
+                const c = compareIdeaToRecord(idea, d, runtimeCopy);
                 return (
                   <div key={d.id} className="rounded border border-zinc-800 p-3 text-xs">
                     <p className="font-medium text-zinc-200">{d.title}</p>
@@ -796,7 +801,7 @@ export default function ResearchCanvasClient() {
               })}
               <h3 className="text-xs font-semibold">{t("researchCanvas.landscape")}</h3>
               <ul className="text-xs text-zinc-500">
-                {buildCurrentLandscape(idea.id).map((l, i) => (
+                {buildCurrentLandscape(idea.id, runtimeCopy).map((l, i) => (
                   <li key={i}>{l.kind}: {l.label} — {l.limitation}</li>
                 ))}
               </ul>

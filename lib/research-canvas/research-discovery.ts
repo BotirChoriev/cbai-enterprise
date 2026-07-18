@@ -9,6 +9,10 @@ import type { DiscoveryResultRecord, ProjectEvidenceStatus, SmartIdea } from "@/
 import { genesisId, readGenesisList, writeGenesisList, notifyGenesisChanged } from "@/lib/genesis/genesis-storage";
 import { buildExternalSearchQuery } from "@/lib/research-canvas/smart-idea-store";
 import { recordGenesisAudit } from "@/lib/genesis/genesis-audit-store";
+import {
+  getResearchCanvasRuntimeCopy,
+  type ResearchCanvasRuntimeCopy,
+} from "@/lib/i18n/research-canvas-runtime-copy";
 
 const DISCOVERY_KEY = "cbai-research-canvas-discovery";
 const memoryDiscovery: DiscoveryResultRecord[] = [];
@@ -197,14 +201,17 @@ export type LandscapeItem = {
   readonly limitation: string;
 };
 
-export function buildCurrentLandscape(smartIdeaId: string): LandscapeItem[] {
+export function buildCurrentLandscape(
+  smartIdeaId: string,
+  copy: ResearchCanvasRuntimeCopy = getResearchCanvasRuntimeCopy("en"),
+): LandscapeItem[] {
   const results = loadDiscoveryResults(smartIdeaId);
   const items: LandscapeItem[] = results.slice(0, 6).map((r) => ({
     kind: "publication" as const,
     label: r.title,
     source: r.provider,
-    reason: "Matched sanitized search concepts",
-    limitation: "Found in currently connected CBAI sources.",
+    reason: copy.matchedSanitizedConcepts,
+    limitation: copy.foundInConnectedSources,
   }));
 
   for (const author of results.flatMap((r) => r.authors).slice(0, 4)) {
@@ -212,18 +219,18 @@ export function buildCurrentLandscape(smartIdeaId: string): LandscapeItem[] {
       kind: "author",
       label: author,
       source: "publication metadata",
-      reason: "Author on connected record",
-      limitation: "Employment and affiliation may be outdated.",
+      reason: copy.authorOnConnectedRecord,
+      limitation: copy.affiliationOutdated,
     });
   }
 
   if (results.length === 0) {
     items.push({
       kind: "gap",
-      label: "No connected records yet",
+      label: copy.gapNoConnectedRecords,
       source: "local",
-      reason: "Run a confirmed open-science search or import DOI metadata",
-      limitation: "CBAI does not claim global completeness.",
+      reason: copy.gapRunSearchHint,
+      limitation: copy.gapCompletenessLimitation,
     });
   }
 
@@ -239,7 +246,11 @@ export type ComparisonResult = {
   readonly patentNote: string;
 };
 
-export function compareIdeaToRecord(idea: SmartIdea, record: DiscoveryResultRecord): ComparisonResult {
+export function compareIdeaToRecord(
+  idea: SmartIdea,
+  record: DiscoveryResultRecord,
+  copy: ResearchCanvasRuntimeCopy = getResearchCanvasRuntimeCopy("en"),
+): ComparisonResult {
   const ideaText = [idea.problem, idea.purpose, idea.expectedResult, ...(idea.ideaModel?.materials ?? [])]
     .join(" ")
     .toLowerCase();
@@ -248,12 +259,15 @@ export function compareIdeaToRecord(idea: SmartIdea, record: DiscoveryResultReco
   const overlap = tokens.filter((t) => recordText.includes(t));
 
   return {
-    similarities: overlap.length > 0 ? [`Shared concepts: ${overlap.slice(0, 5).join(", ")}`] : ["No strong token overlap detected."],
-    differences: [`Record focuses on: ${record.title.slice(0, 80)}`],
+    similarities:
+      overlap.length > 0
+        ? [`${copy.sharedConcepts}: ${overlap.slice(0, 5).join(", ")}`]
+        : [copy.noStrongOverlap],
+    differences: [`${copy.recordFocus}: ${record.title.slice(0, 80)}`],
     unsupportedAssumptions: idea.ideaModel?.assumptions ?? [],
-    knowledgeGaps: ["Replication status unknown unless source states it."],
-    validationNeeded: idea.ideaModel?.requiredValidation ?? ["Independent measurement required."],
-    patentNote: "Patentability requires professional legal review — CBAI does not provide legal opinions.",
+    knowledgeGaps: [copy.replicationUnknown],
+    validationNeeded: idea.ideaModel?.requiredValidation ?? [copy.independentMeasurementRequired],
+    patentNote: copy.patentLegalReview,
   };
 }
 

@@ -75,7 +75,7 @@ export default function OperatingNavigator() {
             const live = hydrated ? deriveNavLiveState(item.href, pathname) : "neutral";
             return (
               <li key={item.href}>
-                <NavRow href={moduleHref(item.href)} label={item.label} icon={item.icon} live={live} t={t} />
+                <NavRow href={moduleHref(item.href)} label={translateNavLabel(t, item.href, item.label)} icon={item.icon} live={live} t={t} />
               </li>
             );
           })}

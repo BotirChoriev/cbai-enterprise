@@ -109,6 +109,10 @@ export const ZERO_LEARNING_CURVE_UZ = {
   researchSearchAria: "Mavzularni qidirish",
   researchExploreTopic: "Qidirish",
   researchSearchFootnote: "Pastdagi katalogni filtrlaydi — jonli bazalar ulanmagan.",
+  researchUniversitiesLinkPrefix: "Universitet profillari bugun mavjud",
+  researchUniversitiesLinkLabel: "Ommaviy intellekt → Universitetlar",
+  researchCatalogLatticeNote:
+    "{topics} katalog mavzulari {domains} haqiqiy sohalar bo'ylab — tugun hajmi haqiqiy mavzu sonini aks ettiradi.",
   reportsAlsoAvailable: "Shuningdek mavjud",
 } as const;
 

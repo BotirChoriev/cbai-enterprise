@@ -55,7 +55,7 @@ export const RESEARCH_CANVAS_UZ = {
   createResearchMission: "Research mission yaratish",
   openMission: "My Work'da missionni ochish",
   missionCreated: "Mission va bog'liq yozuvlar yaratildi.",
-  decisionSupport: "Decision Support Package",
+  decisionSupport: "Qarorni qo'llab-quvvatlash paketi",
   selectedPath: "Tanlangan yo'l (sizning qaroringiz)",
   decisionReason: "Sabab",
   recordDecision: "Inson qarorini yozish",

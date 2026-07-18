@@ -56,8 +56,8 @@ export default function MeasurementWorkflowPanel({ idea, operator, rc, onFeedbac
 
   const suggestedTypes = useMemo(() => inferSuggestedMeasurementTypes(idea), [idea]);
   const readiness = useMemo(() => evaluateMeasurementPlanReadiness(draft), [draft]);
-  const passports = useMemo(() => loadMeasurementPassports(idea.id), [idea.id, onBump]);
-  const plans = useMemo(() => loadMeasurementPlans(idea.id), [idea.id, onBump]);
+  const passports = loadMeasurementPassports(idea.id);
+  const plans = loadMeasurementPlans(idea.id);
 
   const patchDraft = useCallback(
     (partial: Partial<MeasurementWorkflowDraft>) => {

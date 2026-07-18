@@ -109,6 +109,10 @@ export const ZERO_LEARNING_CURVE_RU = {
   researchSearchAria: "Поиск тем",
   researchExploreTopic: "Искать",
   researchSearchFootnote: "Фильтрует каталог ниже — живые базы не подключены.",
+  researchUniversitiesLinkPrefix: "Профили университетов доступны сегодня в",
+  researchUniversitiesLinkLabel: "Публичная аналитика → Университеты",
+  researchCatalogLatticeNote:
+    "{topics} каталожных тем в {domains} реальных областях — размер узла отражает реальное число тем.",
   reportsAlsoAvailable: "Также доступно",
 } as const;
 

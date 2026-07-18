@@ -5,95 +5,89 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
-import { ASSISTANT_COMMANDS } from "@/lib/assistant/assistant-commands";
-import { resolveUniversalIntent, intentCategoryTranslationKey } from "@/lib/intelligence-os/universal-intent";
+import { ASSISTANT_COMMANDS, displayCommandPhrase } from "@/lib/assistant/assistant-commands";
 import { recordWorkflowEvent } from "@/lib/telemetry/workflow-telemetry";
 import { resolveAssistantContext } from "@/lib/assistant/assistant-context";
 import { resolveOperatorName } from "@/lib/assistant/assistant-profile";
-import {
-  resolveRelationshipCommand,
-  type RelationshipFocus,
-} from "@/lib/assistant/assistant-relationship-commands";
-import { resolveProjectCommand } from "@/lib/project/project-commands";
-import { resolveGenesisCommand } from "@/lib/genesis/genesis-operator-commands";
-import { resolveResearchCanvasCommand } from "@/lib/research-canvas/research-canvas-operator-commands";
-import { resolveFlagshipOperatorCommand } from "@/lib/product/flagship-operator-commands";
-import { resolveLanguageCommand } from "@/lib/i18n/language-command";
+import type { RelationshipFocus } from "@/lib/assistant/assistant-relationship-commands";
 import { getResearchTopicById } from "@/lib/research/research-topics";
 import { getPrimaryEntity } from "@/lib/context";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
+import { getLanguageDefinition } from "@/lib/i18n/languages";
 import OperatorOrb, { type OperatorOrbState } from "@/components/shared/OperatorOrb";
+import VoiceTranscriptReviewPanel from "@/components/assistant/VoiceTranscriptReviewPanel";
+import VoiceActionReviewPanel from "@/components/assistant/VoiceActionReviewPanel";
+import {
+  resolveVoiceAction,
+  voiceActionRequiresConfirmation,
+  clearPendingVoiceActionStorage,
+} from "@/lib/voice/voice-action-resolver";
+import { executeVoiceAction } from "@/lib/voice/execute-voice-action";
+import {
+  SPEECH_LANGUAGE_OPTIONS,
+  resolveActiveSpeechLanguage,
+  writeSpeechLanguageOverride,
+} from "@/lib/voice/speech-language-preference";
+import {
+  getSpeechRecognitionConstructor,
+  SpeechRecognitionSession,
+} from "@/lib/voice/speech-recognition-session";
+import { looksLikeLowConfidenceTranscript } from "@/lib/voice/voice-blocklist";
+import {
+  appendVoiceTranscriptRecord,
+  createVoiceTranscriptRecord,
+  markVoiceTranscriptConfirmed,
+} from "@/lib/voice/voice-transcript-provenance";
+import type { VoiceActionProposal, VoiceControlPhase } from "@/lib/voice/voice-control-types";
 
 const SUGGESTED_COMMAND_IDS = ["open-my-work", "continue-research", "open-evidence", "open-trust"];
 const SUGGESTED_COMMANDS = ASSISTANT_COMMANDS.filter((command) =>
   SUGGESTED_COMMAND_IDS.includes(command.id),
 );
 
-// Minimal ambient shape for the Web Speech API — not part of TypeScript's DOM lib. Only the
-// members this component actually reads/calls are declared; everything routes through the same
-// deterministic resolveAssistantCommand() as typed input, never a separate reasoning path.
-type SpeechRecognitionResultLike = { transcript: string };
-type SpeechRecognitionErrorLike = { error: string };
-type SpeechRecognitionLike = {
-  lang: string;
-  interimResults: boolean;
-  maxAlternatives: number;
-  onstart: (() => void) | null;
-  onresult: ((event: { results: ArrayLike<ArrayLike<SpeechRecognitionResultLike>> }) => void) | null;
-  onerror: ((event: SpeechRecognitionErrorLike) => void) | null;
-  onend: (() => void) | null;
-  start: () => void;
-  stop: () => void;
-};
-type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
-
-function getSpeechRecognitionConstructor(): SpeechRecognitionConstructor | null {
-  if (typeof window === "undefined") return null;
-  const w = window as unknown as {
-    SpeechRecognition?: SpeechRecognitionConstructor;
-    webkitSpeechRecognition?: SpeechRecognitionConstructor;
-  };
-  return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
-}
-
-// Real voice states (Phase 8) — never fabricated, always reflects what the Web Speech API
-// actually reported via onstart/onresult/onerror/onend.
 type VoiceStatus = "idle" | "requesting" | "listening" | "processing" | "permission-denied" | "network-error";
 
 type AssistantCommandCenterProps = {
-  /** "compact" (default) — the persistent Topbar rendering. "prominent" — the first-screen
-   * command bar (Phase 1/8), larger input and mic target. Both share the exact same resolution
-   * logic; only sizing/copy differ. */
   size?: "compact" | "prominent";
-  /** Hides this instance's own inline orb — for the one case (the homepage hero) where a much
-   * larger orb already represents the Operator immediately above this input; a second, smaller
-   * orb right next to it would read as two competing Operators, not one. */
   hideOrb?: boolean;
-  /** Reports this instance's real, derived Operator state up to a parent that wants to drive a
-   * larger orb from the same live voice/confirmation state, instead of duplicating the orb. */
   onOrbStateChange?: (state: OperatorOrbState) => void;
 };
 
-export default function AssistantCommandCenter({ size = "compact", hideOrb = false, onOrbStateChange }: AssistantCommandCenterProps) {
+export default function AssistantCommandCenter({
+  size = "compact",
+  hideOrb = false,
+  onOrbStateChange,
+}: AssistantCommandCenterProps) {
   const router = useRouter();
   const pathname = usePathname();
   const { profile, isActive, updateProfile } = useAssistantProfile();
   const { context, pinEntityToWorkspace } = usePlatformContext();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const inputId = useId();
+  const speechLangId = useId();
   const [input, setInput] = useState("");
   const [voiceStatus, setVoiceStatus] = useState<VoiceStatus>("idle");
+  const [voicePhase, setVoicePhase] = useState<VoiceControlPhase>("idle");
   const [uploadNotice, setUploadNotice] = useState<string | null>(null);
   const [unrecognized, setUnrecognized] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState<string | null>(null);
-  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
+  const [transcriptReview, setTranscriptReview] = useState<{
+    text: string;
+    confidence: number | null;
+    lang: string;
+    capturedAt: string;
+  } | null>(null);
+  const [actionProposal, setActionProposal] = useState<VoiceActionProposal | null>(null);
+  const defaultSpeechLanguage = useMemo(
+    () => resolveActiveSpeechLanguage(language, profile.speechLanguage),
+    [language, profile.speechLanguage],
+  );
+  const [speechLanguageOverride, setSpeechLanguageOverride] = useState<string | null>(null);
+  const speechLanguage = speechLanguageOverride ?? defaultSpeechLanguage;
+  const sessionRef = useRef<SpeechRecognitionSession | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // The Assistant always knows where the user currently is — derived from the same real Entity
-  // Context the platform already tracks (getPrimaryEntity, the one canonical accessor for
-  // "whichever entity is focused"), never a separate tracking system and never a question asked
-  // of the user.
   const focusedEntity = getPrimaryEntity(context);
 
   const assistantContext = useMemo(
@@ -101,9 +95,6 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
     [pathname, focusedEntity],
   );
 
-  // The same focus resolveAssistantContext derives, reshaped for the relationship resolver
-  // (which needs a real catalog id, not just a display href) — a research topic path takes
-  // priority, exactly mirroring resolveAssistantContext's own precedence.
   const relationshipFocus = useMemo<RelationshipFocus | null>(() => {
     const topicMatch = /^\/research\/([^/]+)$/.exec(pathname);
     if (topicMatch && getResearchTopicById(topicMatch[1])) {
@@ -112,139 +103,101 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
     return focusedEntity ? { kind: focusedEntity.kind, id: focusedEntity.id } : null;
   }, [pathname, focusedEntity]);
 
-  const route = useCallback(
-    (rawInput: string) => {
-      const trimmed = rawInput.trim();
-      if (!trimmed) return;
+  const voiceResolverContext = useMemo(
+    () => ({
+      relationshipFocus,
+      operatorName: resolveOperatorName(profile),
+      focusedEntityName: focusedEntity?.name,
+    }),
+    [relationshipFocus, profile, focusedEntity?.name],
+  );
+
+  const executeDeps = useMemo(
+    () => ({
+      router,
+      focusedEntity,
+      pinEntityToWorkspace,
+      updateProfile,
+      t,
+    }),
+    [router, focusedEntity, pinEntityToWorkspace, updateProfile, t],
+  );
+
+  useEffect(() => {
+    clearPendingVoiceActionStorage();
+  }, []);
+
+  const parseInput = useCallback(
+    (rawInput: string) => resolveVoiceAction(rawInput, voiceResolverContext),
+    [voiceResolverContext],
+  );
+
+  const resetVoiceFlow = useCallback(() => {
+    setTranscriptReview(null);
+    setActionProposal(null);
+    setVoicePhase("idle");
+    setVoiceStatus("idle");
+    sessionRef.current?.stop();
+  }, []);
+
+  const presentProposal = useCallback(
+    (proposal: VoiceActionProposal, fromVoice: boolean) => {
+      setUnrecognized(null);
       setConfirmation(null);
 
-      // "Save workspace" is a real action (pin the current entity), not a navigation — handled
-      // here rather than in the pure resolver, using the same focused platform entity the
-      // Contextual Operator already shows. Never fabricates something to save.
-      const normalized = trimmed.toLowerCase();
-      if (["save workspace", "save to workspace", "bookmark", "save company"].some((phrase) => normalized.includes(phrase))) {
-        if (focusedEntity) {
-          pinEntityToWorkspace(focusedEntity);
-          setConfirmation(t("assistantVoice.savedToWorkspace", { name: focusedEntity.name }));
-        } else {
-          setConfirmation(t("assistantVoice.nothingToSaveYet"));
-        }
-        setUnrecognized(null);
-        setInput("");
+      if (proposal.status === "blocked") {
+        resetVoiceFlow();
+        setUnrecognized(proposal.understoodText);
+        setConfirmation(t("voiceControl.blockedTranscript"));
         return;
       }
 
-      // "Change interface/voice language" (Phase 9/10) — a real profile update, confirmed
-      // visibly, never applied silently.
-      const languageMatch = resolveLanguageCommand(trimmed);
-      if (languageMatch) {
-        setUnrecognized(null);
-        setInput("");
-        if (languageMatch.type === "set-interface-language") {
-          updateProfile({ preferredLanguage: languageMatch.code });
-        } else if (languageMatch.type === "set-voice-language") {
-          updateProfile({ speechLanguage: languageMatch.voiceLocale });
-        } else {
-          router.push(languageMatch.href);
-        }
-        setConfirmation(languageMatch.message);
+      if (proposal.status === "unknown") {
+        resetVoiceFlow();
+        setUnrecognized(proposal.understoodText);
+        recordWorkflowEvent("intent_unresolved", { outcome: "failure" });
         return;
       }
 
-      // Relationship-aware commands ("open related research/company/university/evidence", "open
-      // country") resolve against whichever real entity is currently focused — real data only,
-      // an honest message when nothing is connected. Checked before the pure fixed-phrase table
-      // so it can supersede the generic, context-blind "open evidence" entry with a real anchor.
-      const relationshipMatch = resolveRelationshipCommand(trimmed, relationshipFocus);
-      if (relationshipMatch) {
-        setUnrecognized(null);
-        setInput("");
-        if (relationshipMatch.type === "navigate") {
-          router.push(relationshipMatch.href);
-        }
-        setConfirmation(relationshipMatch.message);
+      if (voiceActionRequiresConfirmation(proposal) || fromVoice) {
+        setActionProposal(proposal);
+        setVoicePhase("action_review");
         return;
       }
 
-      // "Continue project"/"add evidence"/"open notes" operate on the real most-recently-updated
-      // project — the Command Center has no per-page project focus (see project-commands.ts).
-      const projectMatch = resolveProjectCommand(trimmed);
-      if (projectMatch) {
-        setUnrecognized(null);
-        setInput("");
-        if (projectMatch.type === "navigate") {
-          router.push(projectMatch.href);
-        }
-        setConfirmation(projectMatch.message);
-        return;
-      }
-
-      const flagshipMatch = resolveFlagshipOperatorCommand(trimmed);
-      if (flagshipMatch) {
-        setUnrecognized(null);
-        setInput("");
-        setConfirmation(flagshipMatch.message);
-        if (flagshipMatch.href) router.push(flagshipMatch.href);
-        recordWorkflowEvent("intent_resolved", {
-          outcome: "success",
-          intentCategory: "flagship_workflow",
-        });
-        return;
-      }
-
-      const canvasMatch = resolveResearchCanvasCommand(trimmed);
-      if (canvasMatch) {
-        setUnrecognized(null);
-        setInput("");
-        setConfirmation(canvasMatch.message);
-        if (canvasMatch.href) router.push(canvasMatch.href);
-        recordWorkflowEvent("intent_resolved", {
-          outcome: "success",
-          intentCategory: "research_canvas",
-        });
-        return;
-      }
-
-      const genesisMatch = resolveGenesisCommand(trimmed, resolveOperatorName(profile));
-      if (genesisMatch) {
-        setUnrecognized(null);
-        setInput("");
-        setConfirmation(genesisMatch.message);
-        if (genesisMatch.href) router.push(genesisMatch.href);
-        recordWorkflowEvent("intent_resolved", {
-          outcome: "success",
-          intentCategory: "genesis_attention",
-        });
-        return;
-      }
-
-      const intent = resolveUniversalIntent(trimmed);
-      const match = intent.command;
-      if (match) {
-        setUnrecognized(null);
-        router.push(match.href);
-        setInput("");
-        setConfirmation(t(intentCategoryTranslationKey(intent.category)));
-        recordWorkflowEvent("intent_resolved", {
-          intentCategory: intent.category,
-          route: match.href,
-          outcome: "success",
-        });
-      } else {
-        recordWorkflowEvent("intent_unresolved", {
-          outcome: "failure",
-        });
-        // Honest fallback per the Command Center's no-fake-AI-response rule: an unmatched
-        // command shows what's actually supported, never a guessed destination.
-        setUnrecognized(trimmed);
-      }
+      const message = executeVoiceAction(proposal, executeDeps);
+      resetVoiceFlow();
+      setInput("");
+      if (message) setConfirmation(message);
     },
-    [router, focusedEntity, pinEntityToWorkspace, relationshipFocus, updateProfile, t, profile],
+    [executeDeps, resetVoiceFlow, t],
+  );
+
+  const handleConfirmedAction = useCallback(() => {
+    if (!actionProposal || actionProposal.status !== "known") return;
+    setVoicePhase("executing");
+    const message = executeVoiceAction(actionProposal, executeDeps);
+    if (transcriptReview) {
+      markVoiceTranscriptConfirmed(transcriptReview.text, transcriptReview.capturedAt);
+    }
+    resetVoiceFlow();
+    setInput("");
+    if (message) setConfirmation(message);
+  }, [actionProposal, executeDeps, resetVoiceFlow, transcriptReview]);
+
+  const route = useCallback(
+    (rawInput: string, fromVoice = false) => {
+      const trimmed = rawInput.trim();
+      if (!trimmed) return;
+      presentProposal(parseInput(trimmed), fromVoice);
+    },
+    [parseInput, presentProposal],
   );
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    route(input);
+    if (voicePhase === "transcript_review" || voicePhase === "action_review") return;
+    route(input, false);
   }
 
   function handleVoiceClick() {
@@ -252,45 +205,75 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
     if (!Recognition) return;
 
     if (voiceStatus === "listening" || voiceStatus === "requesting") {
-      recognitionRef.current?.stop();
-      setVoiceStatus("idle");
+      sessionRef.current?.stop();
+      resetVoiceFlow();
       return;
     }
 
-    const recognition = new Recognition();
-    recognition.lang = profile.speechLanguage || "en-US";
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-    recognition.onstart = () => setVoiceStatus("listening");
-    recognition.onresult = (event) => {
-      const transcript = event.results[0]?.[0]?.transcript;
-      setVoiceStatus("processing");
-      if (transcript) {
-        // Real, editable transcript (Phase 10): the recognized text is placed in the visible,
-        // editable input — never executed invisibly — before routing. Navigation commands still
-        // route immediately per Phase 10 ("navigation commands may execute immediately with
-        // visible confirmation"); the confirmation banner below is that visible confirmation.
-        setInput(transcript);
-        route(transcript);
-      }
-      setVoiceStatus("idle");
-    };
-    recognition.onerror = (event) => {
-      if (event.error === "not-allowed" || event.error === "permission-denied" || event.error === "service-not-allowed") {
-        setVoiceStatus("permission-denied");
-      } else if (event.error === "network") {
-        setVoiceStatus("network-error");
-      } else {
-        setVoiceStatus("idle");
-      }
-    };
-    recognition.onend = () => {
-      setVoiceStatus((current) => (current === "listening" || current === "requesting" ? "idle" : current));
-    };
-
-    recognitionRef.current = recognition;
+    resetVoiceFlow();
     setVoiceStatus("requesting");
-    recognition.start();
+    setVoicePhase("listening");
+
+    const session = new SpeechRecognitionSession({
+      onPhaseChange: (phase) => {
+        if (phase === "listening") {
+          setVoiceStatus("listening");
+          setVoicePhase("listening");
+        }
+        if (phase === "transcript_review") {
+          setVoiceStatus("processing");
+          const result = session.consumeResult();
+          if (!result) {
+            setVoiceStatus("idle");
+            setVoicePhase("idle");
+            return;
+          }
+          const capturedAt = new Date().toISOString();
+          appendVoiceTranscriptRecord(
+            createVoiceTranscriptRecord({
+              transcript: result.transcript,
+              requestedLang: result.lang,
+              confidence: result.confidence,
+              humanConfirmed: false,
+            }),
+          );
+          setTranscriptReview({
+            text: result.transcript,
+            confidence: result.confidence,
+            lang: result.lang,
+            capturedAt,
+          });
+          setInput(result.transcript);
+          setVoicePhase("transcript_review");
+          setVoiceStatus("idle");
+        }
+        if (phase === "error") setVoiceStatus("permission-denied");
+        if (phase === "idle") setVoiceStatus("idle");
+      },
+      onError: (code) => {
+        if (code === "not-allowed" || code === "permission-denied" || code === "service-not-allowed") {
+          setVoiceStatus("permission-denied");
+        } else if (code === "network") {
+          setVoiceStatus("network-error");
+        } else {
+          setVoiceStatus("idle");
+        }
+        setVoicePhase("error");
+      },
+    });
+
+    sessionRef.current = session;
+    const started = session.start(speechLanguage);
+    if (!started) {
+      setVoiceStatus("idle");
+      setVoicePhase("idle");
+    }
+  }
+
+  function handleTranscriptConfirm() {
+    if (!transcriptReview?.text.trim()) return;
+    markVoiceTranscriptConfirmed(transcriptReview.text, transcriptReview.capturedAt);
+    route(transcriptReview.text, true);
   }
 
   function handleFileSelected(event: React.ChangeEvent<HTMLInputElement>) {
@@ -300,15 +283,17 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
     event.target.value = "";
   }
 
-  // getSpeechRecognitionConstructor() reads a real browser-only API — honestly absent during the
-  // server's pre-render pass, which would otherwise disagree with the client's real capability on
-  // the very first paint now that the mic button is visible by default. useHydrated() keeps the
-  // server and the client's first render byte-identical (button starts as "checking", never a
-  // false "unsupported"), then the real capability appears in the next commit, same pattern as
-  // every other browser-only read in this codebase.
   const hydrated = useHydrated();
   const speechSupported = hydrated && getSpeechRecognitionConstructor() !== null;
   const isProminent = size === "prominent";
+  const voiceSupport = getLanguageDefinition(language).voiceSupport;
+  const lowConfidence = transcriptReview
+    ? looksLikeLowConfidenceTranscript(transcriptReview.text, transcriptReview.confidence)
+    : false;
+  const showUzbekWarning =
+    Boolean(transcriptReview) &&
+    speechLanguage.startsWith("uz") &&
+    (lowConfidence || transcriptReview!.confidence === null);
 
   const voiceStatusLabel: Record<VoiceStatus, string> = {
     idle: t("assistant.micReady"),
@@ -319,23 +304,23 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
     "network-error": t("assistant.micNetworkError"),
   };
 
-  // Real Operator visual state — driven only by the actual Web Speech API status and the actual
-  // confirmation banner, never a decorative loop. permission-denied/network-error already had
-  // real, honest text below the input; the orb previously stayed "idle" through them, which is
-  // the one gap here — a real error now gets a real (non-alarming) visual cue too.
   const operatorOrbState: OperatorOrbState = confirmation
     ? "success"
-    : !speechSupported && hydrated
-      ? "unsupported"
-      : voiceStatus === "permission-denied"
-        ? "permission-denied"
-        : voiceStatus === "network-error"
-          ? "warning"
-          : voiceStatus === "listening" || voiceStatus === "requesting"
-            ? voiceStatus === "requesting" ? "transcribing" : "listening"
-            : voiceStatus === "processing"
-              ? "interpreting"
-              : "present";
+    : voicePhase === "transcript_review" || voicePhase === "action_review"
+      ? "interpreting"
+      : !speechSupported && hydrated
+        ? "unsupported"
+        : voiceStatus === "permission-denied"
+          ? "permission-denied"
+          : voiceStatus === "network-error"
+            ? "warning"
+            : voiceStatus === "listening" || voiceStatus === "requesting"
+              ? voiceStatus === "requesting"
+                ? "transcribing"
+                : "listening"
+              : voiceStatus === "processing"
+                ? "interpreting"
+                : "present";
 
   useEffect(() => {
     onOrbStateChange?.(operatorOrbState);
@@ -404,36 +389,59 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
         </div>
 
         {profile.voiceInputEnabled ? (
-          <button
-            type="button"
-            onClick={handleVoiceClick}
-            disabled={!speechSupported}
-            aria-disabled={!speechSupported}
-            aria-label={speechSupported ? voiceStatusLabel[voiceStatus] : t("assistant.micUnsupportedBrowser")}
-            title={speechSupported ? voiceStatusLabel[voiceStatus] : t("assistant.micUnsupportedBrowser")}
-            className={`flex shrink-0 items-center justify-center border text-zinc-400 transition-all disabled:cursor-not-allowed disabled:opacity-40 ${
-              isProminent ? "order-1 h-14 w-14 rounded-full" : "h-9 w-9 rounded-lg"
-            } ${
-              voiceStatus === "listening" || voiceStatus === "requesting"
-                ? isProminent
-                  ? "scale-105 border-teal-400/60 bg-teal-500/20 text-teal-200 shadow-[0_0_24px_-4px_rgba(45,212,191,0.5)]"
-                  : "border-teal-500/40 bg-teal-500/10 text-teal-300"
-                : voiceStatus === "permission-denied" || voiceStatus === "network-error"
-                  ? "border-amber-500/40 bg-amber-500/10 text-amber-300"
-                  : isProminent
-                    ? "border-transparent bg-[#005810] text-white shadow-[0_8px_24px_-8px_rgba(0,88,16,0.6)] hover:bg-[#00470d]"
-                    : "border-zinc-800 bg-slate-900/80 hover:text-zinc-100"
-            }`}
-          >
-            <svg className={isProminent ? "h-6 w-6" : "h-4 w-4"} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"
-              />
-            </svg>
-            <span className="sr-only">{voiceStatusLabel[voiceStatus]}</span>
-          </button>
+          <div className={`flex shrink-0 items-center gap-1 ${isProminent ? "order-1" : ""}`}>
+            <label htmlFor={speechLangId} className="sr-only">
+              {t("voiceControl.speechLanguageLabel")}
+            </label>
+            <select
+              id={speechLangId}
+              value={speechLanguage}
+              onChange={(event) => {
+                setSpeechLanguageOverride(event.target.value);
+                writeSpeechLanguageOverride(event.target.value);
+              }}
+              className={`rounded-lg border border-zinc-800 bg-slate-900/80 text-zinc-400 outline-none focus:border-teal-500/30 ${
+                isProminent ? "h-14 px-2 text-xs" : "h-9 px-1.5 text-[10px]"
+              }`}
+              aria-label={t("voiceControl.speechLanguageLabel")}
+            >
+              {SPEECH_LANGUAGE_OPTIONS.map((option) => (
+                <option key={option.code} value={option.code}>
+                  {t(option.labelKey)}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={handleVoiceClick}
+              disabled={!speechSupported}
+              aria-disabled={!speechSupported}
+              aria-label={speechSupported ? voiceStatusLabel[voiceStatus] : t("assistant.micUnsupportedBrowser")}
+              title={speechSupported ? voiceStatusLabel[voiceStatus] : t("assistant.micUnsupportedBrowser")}
+              className={`flex shrink-0 items-center justify-center border text-zinc-400 transition-all disabled:cursor-not-allowed disabled:opacity-40 ${
+                isProminent ? "h-14 w-14 rounded-full" : "h-9 w-9 rounded-lg"
+              } ${
+                voiceStatus === "listening" || voiceStatus === "requesting"
+                  ? isProminent
+                    ? "scale-105 border-teal-400/60 bg-teal-500/20 text-teal-200 shadow-[0_0_24px_-4px_rgba(45,212,191,0.5)]"
+                    : "border-teal-500/40 bg-teal-500/10 text-teal-300"
+                  : voiceStatus === "permission-denied" || voiceStatus === "network-error"
+                    ? "border-amber-500/40 bg-amber-500/10 text-amber-300"
+                    : isProminent
+                      ? "border-transparent bg-[#005810] text-white shadow-[0_8px_24px_-8px_rgba(0,88,16,0.6)] hover:bg-[#00470d]"
+                      : "border-zinc-800 bg-slate-900/80 hover:text-zinc-100"
+              }`}
+            >
+              <svg className={isProminent ? "h-6 w-6" : "h-4 w-4"} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"
+                />
+              </svg>
+              <span className="sr-only">{voiceStatusLabel[voiceStatus]}</span>
+            </button>
+          </div>
         ) : null}
 
         <input
@@ -463,8 +471,18 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
         ) : null}
       </form>
 
+      {profile.voiceInputEnabled && speechSupported ? (
+        <p className="mt-1.5 text-[11px] text-zinc-600">
+          {voiceSupport === "partial" || voiceSupport === "unverified"
+            ? t("voiceControl.capabilityBrowserDependent")
+            : t("voiceControl.capabilityAvailable")}
+        </p>
+      ) : null}
       {profile.voiceInputEnabled && !speechSupported ? (
         <p className="mt-1.5 text-[11px] text-zinc-600">{t("activation.voiceUnsupportedRecovery")}</p>
+      ) : null}
+      {voicePhase === "transcript_review" || voicePhase === "action_review" ? (
+        <p className="mt-1.5 text-[11px] text-zinc-500">{t("voiceControl.noNavigationUntilConfirmed")}</p>
       ) : null}
       {voiceStatus === "permission-denied" ? (
         <p role="alert" className="mt-1.5 text-[11px] text-amber-400">
@@ -472,7 +490,45 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
         </p>
       ) : null}
       {voiceStatus === "network-error" ? (
-        <p role="alert" className="mt-1.5 text-[11px] text-amber-400">{t("assistant.micNetworkError")}</p>
+        <p role="alert" className="mt-1.5 text-[11px] text-amber-400">
+          {t("assistant.micNetworkError")}
+        </p>
+      ) : null}
+
+      {transcriptReview && voicePhase === "transcript_review" ? (
+        <VoiceTranscriptReviewPanel
+          recognitionLang={transcriptReview.lang}
+          transcript={transcriptReview.text}
+          confidence={transcriptReview.confidence}
+          lowConfidence={lowConfidence}
+          showUzbekWarning={showUzbekWarning}
+          onTranscriptChange={(value) => {
+            setTranscriptReview((current) => (current ? { ...current, text: value } : current));
+            setInput(value);
+          }}
+          onClear={() => {
+            setTranscriptReview((current) => (current ? { ...current, text: "" } : current));
+            setInput("");
+          }}
+          onTryAgain={() => {
+            resetVoiceFlow();
+            handleVoiceClick();
+          }}
+          onUseText={handleTranscriptConfirm}
+          onCancel={resetVoiceFlow}
+        />
+      ) : null}
+
+      {actionProposal && voicePhase === "action_review" ? (
+        <VoiceActionReviewPanel
+          proposal={actionProposal}
+          onConfirm={handleConfirmedAction}
+          onEdit={() => {
+            setVoicePhase("transcript_review");
+            setActionProposal(null);
+          }}
+          onCancel={resetVoiceFlow}
+        />
       ) : null}
 
       {uploadNotice ? (
@@ -502,7 +558,11 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
                 type="button"
                 onClick={() => {
                   setUnrecognized(null);
-                  router.push(assistantContext.href);
+                  const proposal = parseInput(`open ${assistantContext.name}`);
+                  if (proposal.status === "known" && proposal.href) {
+                    setActionProposal(proposal);
+                    setVoicePhase("action_review");
+                  }
                 }}
                 className="rounded-full border border-teal-500/30 bg-teal-500/10 px-2.5 py-1 text-[11px] text-teal-300 transition-colors hover:border-teal-500/50"
               >
@@ -513,10 +573,10 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
               <button
                 key={command.id}
                 type="button"
-                onClick={() => route(command.phrase)}
+                onClick={() => route(displayCommandPhrase(command, language), false)}
                 className="rounded-full border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 text-[11px] text-zinc-400 transition-colors hover:text-zinc-100"
               >
-                {command.phrase}
+                {displayCommandPhrase(command, language)}
               </button>
             ))}
           </div>

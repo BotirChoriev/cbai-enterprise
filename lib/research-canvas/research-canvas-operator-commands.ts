@@ -11,7 +11,12 @@ import type { GenesisCommandMatch } from "@/lib/genesis/genesis-operator-command
 export function resolveResearchCanvasCommand(input: string): GenesisCommandMatch | null {
   const q = input.toLowerCase().trim();
 
-  if (q.includes("open research canvas") || q.includes("research canvas")) {
+  if (
+    q.includes("open research canvas") ||
+    q.includes("research canvas") ||
+    q.includes("tadqiqot kanvasini och") ||
+    q.includes("research canvasni och")
+  ) {
     return {
       type: "answer",
       message: "Open the Smart Idea & Research Canvas to upload a sketch, define measurements, and discover connected research.",

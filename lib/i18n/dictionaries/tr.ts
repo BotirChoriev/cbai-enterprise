@@ -1,4 +1,7 @@
 import type { TranslationDictionary } from "@/lib/i18n/dictionary-types";
+import {
+  VOICE_CONTROL_TR,
+} from "@/lib/i18n/platform-copy-voice-control";
 import { COMPASS_COPY_TR, ENTITIES_TR, MY_WORK_TR, PRODUCT_STATUS_TR, SYSTEM_TR } from "@/lib/i18n/platform-copy-tr";
 import {
   DASHBOARD_TR,
@@ -542,6 +545,7 @@ const tr: TranslationDictionary = {
   previewPages: PREVIEW_PAGES_TR,
   validation: VALIDATION_TR,
   assistantVoice: ASSISTANT_VOICE_TR,
+  voiceControl: VOICE_CONTROL_TR,
   myWorkExt: MY_WORK_EXT_TR,
   researchCatalog: RESEARCH_CATALOG_TR,
   graphExtended: GRAPH_EXTENDED_TR,

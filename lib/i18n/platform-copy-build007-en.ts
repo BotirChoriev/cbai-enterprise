@@ -92,6 +92,13 @@ export const RESEARCH_WORKSPACE_EN = {
 } as const;
 
 export const RESEARCH_HOME_EN = {
+  title: "Research Intelligence",
+  subheadline:
+    "Connect research topics, experiments, publications, laboratories, universities, and evidence.",
+  searchPlaceholder: "Search research topics, methods, organisms, diseases, technologies...",
+  coreMessage:
+    "Research Intelligence is not a social feed. It is a structured evidence workspace for scientific review.",
+  searchButton: "Search research",
   statusHeading: "Research Intelligence status",
   availableToday: "Available today",
   notAvailableYet: "Not available yet",
