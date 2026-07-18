@@ -383,7 +383,7 @@ test("18. method and virtual instrument capability states", () => {
 test("19. provider registry — honest connection states", () => {
   const providers = listOpenScienceProviders();
   assert.ok(providers.length >= 3);
-  assert.ok(providers.some((p) => p.connectionStatus === "not_implemented"));
+  assert.ok(providers.every((p) => p.connectionStatus === "configured" || p.connectionStatus === "available"));
   const connected = getConnectedProviders();
   assert.ok(Array.isArray(connected));
 });

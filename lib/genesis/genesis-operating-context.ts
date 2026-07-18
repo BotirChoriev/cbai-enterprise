@@ -19,6 +19,7 @@ export const GENESIS_OPERATING_PARAM_KEYS = {
   task: "task",
   outcome: "outcome",
   researchObject: "researchObject",
+  smartIdea: "smartIdea",
   opportunity: "opportunity",
   entityKind: "entityKind",
   entityId: "entityId",
@@ -31,6 +32,7 @@ export type GenesisOperatingParams = OperatingUrlParams & {
   taskId?: string | null;
   outcomeId?: string | null;
   researchObjectId?: string | null;
+  smartIdeaId?: string | null;
   opportunityId?: string | null;
   entityKind?: string | null;
   entityId?: string | null;
@@ -45,6 +47,7 @@ export function parseGenesisOperatingParams(searchParams: URLSearchParams): Gene
     taskId: searchParams.get(GENESIS_OPERATING_PARAM_KEYS.task),
     outcomeId: searchParams.get(GENESIS_OPERATING_PARAM_KEYS.outcome),
     researchObjectId: searchParams.get(GENESIS_OPERATING_PARAM_KEYS.researchObject),
+    smartIdeaId: searchParams.get(GENESIS_OPERATING_PARAM_KEYS.smartIdea),
     opportunityId: searchParams.get(GENESIS_OPERATING_PARAM_KEYS.opportunity),
     entityKind: searchParams.get(GENESIS_OPERATING_PARAM_KEYS.entityKind),
     entityId: searchParams.get(GENESIS_OPERATING_PARAM_KEYS.entityId),
@@ -59,6 +62,7 @@ export function serializeGenesisOperatingParams(params: GenesisOperatingParams):
   if (params.taskId) out[GENESIS_OPERATING_PARAM_KEYS.task] = params.taskId;
   if (params.outcomeId) out[GENESIS_OPERATING_PARAM_KEYS.outcome] = params.outcomeId;
   if (params.researchObjectId) out[GENESIS_OPERATING_PARAM_KEYS.researchObject] = params.researchObjectId;
+  if (params.smartIdeaId) out[GENESIS_OPERATING_PARAM_KEYS.smartIdea] = params.smartIdeaId;
   if (params.opportunityId) out[GENESIS_OPERATING_PARAM_KEYS.opportunity] = params.opportunityId;
   if (params.entityKind) out[GENESIS_OPERATING_PARAM_KEYS.entityKind] = params.entityKind;
   if (params.entityId) out[GENESIS_OPERATING_PARAM_KEYS.entityId] = params.entityId;

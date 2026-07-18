@@ -6,8 +6,8 @@ export const RESEARCH_CANVAS_STAGES = [
   "MEASURE",
   "DISCOVER",
   "COMPARE",
-  "PLAN",
   "MISSION",
+  "EXECUTE",
   "DECIDE",
 ] as const;
 
@@ -155,6 +155,10 @@ export type SmartIdea = {
   readonly extractedItems: readonly ExtractedItem[];
   readonly ideaModel?: IdeaModel | null;
   readonly externalSearchConfirmed: boolean;
+  readonly externalSearchConsentAt?: string | null;
+  readonly externalSearchRevoked?: boolean;
+  readonly externalSearchRevokedAt?: string | null;
+  readonly externalSearchQueryOverride?: string | null;
   readonly humanDecision?: string | null;
   readonly createdAt: string;
   readonly updatedAt: string;

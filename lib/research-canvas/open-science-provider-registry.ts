@@ -1,9 +1,12 @@
 /**
- * Open Science Provider Registry — honest connection status.
+ * Open Science Provider Registry — honest connection status from connector registry.
  */
 
-import { listConnectorRegistrations } from "@/lib/knowledge-connectors/connector-registry";
-import type { ConnectorRegistration } from "@/lib/knowledge-connectors/types";
+import {
+  listConnectorRegistrations,
+  PRIORITY_OPEN_SCIENCE_PROVIDERS,
+} from "@/lib/knowledge-connectors/connector-registry";
+import type { ConnectorRegistration, KnowledgeProviderId } from "@/lib/knowledge-connectors/types";
 
 export type OpenScienceProviderRecord = {
   readonly id: string;
@@ -19,65 +22,83 @@ export type OpenScienceProviderRecord = {
   readonly limitation: string;
 };
 
-const EXTENDED_PROVIDERS: readonly OpenScienceProviderRecord[] = [
-  {
-    id: "openalex",
-    name: "OpenAlex",
+const PROVIDER_META: Record<
+  KnowledgeProviderId,
+  { name: string; officialUrl: string; providerType: string; openAccessScope: string }
+> = {
+  crossref: {
+    name: "Crossref",
+    officialUrl: "https://www.crossref.org",
     providerType: "metadata",
+    openAccessScope: "Bibliographic metadata",
+  },
+  openalex: {
+    name: "OpenAlex",
     officialUrl: "https://openalex.org",
-    apiCapability: "metadata_search",
+    providerType: "metadata",
     openAccessScope: "Open bibliographic metadata",
-    authenticationRequired: false,
-    rateLimitNote: "Polite pool recommended",
-    licenseNote: "https://openalex.org/license",
-    connectionStatus: "not_implemented",
-    limitation: "Connector not implemented — use Crossref or manual DOI import.",
   },
-  {
-    id: "datacite",
-    name: "DataCite",
-    providerType: "dataset_metadata",
-    officialUrl: "https://datacite.org",
-    apiCapability: "doi_metadata",
-    openAccessScope: "Dataset DOI metadata",
-    authenticationRequired: false,
-    rateLimitNote: "Public API limits apply",
-    licenseNote: "Metadata only",
-    connectionStatus: "not_implemented",
-    limitation: "Connector not implemented in this build.",
-  },
-  {
-    id: "europepmc",
+  europepmc: {
     name: "Europe PMC",
-    providerType: "biomedical_metadata",
     officialUrl: "https://europepmc.org",
-    apiCapability: "metadata_search",
+    providerType: "biomedical_metadata",
     openAccessScope: "Biomedical abstracts/metadata",
-    authenticationRequired: false,
-    rateLimitNote: "Public API",
-    licenseNote: "Metadata — not full text",
-    connectionStatus: "not_implemented",
-    limitation: "Connector not implemented — Crossref may overlap for DOIs.",
   },
-];
+  datacite: {
+    name: "DataCite",
+    officialUrl: "https://datacite.org",
+    providerType: "dataset_metadata",
+    openAccessScope: "Dataset DOI metadata",
+  },
+  arxiv: {
+    name: "arXiv",
+    officialUrl: "https://arxiv.org",
+    providerType: "preprint",
+    openAccessScope: "Preprint metadata",
+  },
+  pubmed: {
+    name: "PubMed",
+    officialUrl: "https://pubmed.ncbi.nlm.nih.gov",
+    providerType: "biomedical_metadata",
+    openAccessScope: "Biomedical metadata",
+  },
+  catalog: {
+    name: "CBAI Catalog",
+    officialUrl: "",
+    providerType: "internal",
+    openAccessScope: "Internal catalog",
+  },
+};
+
+function toRecord(reg: ConnectorRegistration): OpenScienceProviderRecord {
+  const meta = PROVIDER_META[reg.provider];
+  return {
+    id: reg.provider,
+    name: meta.name,
+    providerType: meta.providerType,
+    officialUrl: meta.officialUrl,
+    apiCapability: reg.capabilities.join(", ") || "none",
+    openAccessScope: meta.openAccessScope,
+    authenticationRequired: false,
+    rateLimitNote: "Provider rate limits apply — browser CORS may block in some environments.",
+    licenseNote: reg.licenseNotes ?? "",
+    connectionStatus: reg.connectionState,
+    limitation:
+      reg.connectionState === "configured"
+        ? "Metadata only — not verified evidence. CORS/backend may affect live browser requests."
+        : "Not connected in this build.",
+  };
+}
 
 export function listOpenScienceProviders(): OpenScienceProviderRecord[] {
-  const connected = listConnectorRegistrations().map((c) => ({
-    id: c.provider,
-    name: c.provider.charAt(0).toUpperCase() + c.provider.slice(1),
-    providerType: "metadata",
-    officialUrl: c.termsUrl ?? "",
-    apiCapability: c.capabilities.join(", ") || "none",
-    openAccessScope: "Metadata via registered connector",
-    authenticationRequired: false,
-    rateLimitNote: "Provider rate limits apply",
-    licenseNote: c.licenseNotes ?? "",
-    connectionStatus: c.connectionState,
-    limitation: c.connectionState === "configured" ? "Metadata only — not verified evidence." : "Not connected.",
-  }));
-  return [...connected, ...EXTENDED_PROVIDERS];
+  const registered = new Set(listConnectorRegistrations().map((c) => c.provider));
+  return PRIORITY_OPEN_SCIENCE_PROVIDERS.filter((p) => registered.has(p))
+    .map((p) => listConnectorRegistrations().find((c) => c.provider === p)!)
+    .map(toRecord);
 }
 
 export function getConnectedProviders(): OpenScienceProviderRecord[] {
-  return listOpenScienceProviders().filter((p) => p.connectionStatus === "configured" || p.connectionStatus === "available");
+  return listOpenScienceProviders().filter(
+    (p) => p.connectionStatus === "configured" || p.connectionStatus === "available",
+  );
 }

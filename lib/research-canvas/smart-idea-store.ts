@@ -58,7 +58,9 @@ function makeExtracted(field: string, value: string, source: string, confidence:
 }
 
 export function loadSmartIdeas(): SmartIdea[] {
-  return readGenesisList(IDEAS_KEY, isSmartIdea, memoryIdeas);
+  return readGenesisList(IDEAS_KEY, isSmartIdea, memoryIdeas).map((idea) =>
+    (idea.stage as string) === "PLAN" ? { ...idea, stage: "EXECUTE" } : idea,
+  );
 }
 
 export function loadSmartIdea(id: string): SmartIdea | null {
@@ -95,6 +97,7 @@ export function createSmartIdea(input: {
     extractedItems: [],
     ideaModel: null,
     externalSearchConfirmed: false,
+    externalSearchRevoked: false,
     createdAt: now,
     updatedAt: now,
   };
@@ -259,14 +262,55 @@ export function updateSmartIdeaStage(ideaId: string, stage: ResearchCanvasStage)
   return next[idx]!;
 }
 
-export function confirmExternalSearch(ideaId: string, actor: string): SmartIdea | null {
+export function confirmExternalSearch(
+  ideaId: string,
+  actor: string,
+  input?: { queryOverride?: string },
+): SmartIdea | null {
+  const all = loadSmartIdeas();
+  const idx = all.findIndex((i) => i.id === ideaId);
+  if (idx < 0) return null;
+  const now = new Date().toISOString();
+  const next = [...all];
+  next[idx] = {
+    ...all[idx]!,
+    externalSearchConfirmed: true,
+    externalSearchConsentAt: now,
+    externalSearchRevoked: false,
+    externalSearchRevokedAt: null,
+    externalSearchQueryOverride: input?.queryOverride?.trim() || all[idx]!.externalSearchQueryOverride || null,
+    updatedAt: now,
+  };
+  persist(next);
+  audit("external_search_confirmed", ideaId, actor, "confirmed");
+  return next[idx]!;
+}
+
+export function revokeExternalSearch(ideaId: string, actor: string): SmartIdea | null {
+  const all = loadSmartIdeas();
+  const idx = all.findIndex((i) => i.id === ideaId);
+  if (idx < 0) return null;
+  const now = new Date().toISOString();
+  const next = [...all];
+  next[idx] = {
+    ...all[idx]!,
+    externalSearchConfirmed: false,
+    externalSearchRevoked: true,
+    externalSearchRevokedAt: now,
+    updatedAt: now,
+  };
+  persist(next);
+  audit("external_search_revoked", ideaId, actor, "revoked");
+  return next[idx]!;
+}
+
+export function setExternalSearchQueryOverride(ideaId: string, query: string): SmartIdea | null {
   const all = loadSmartIdeas();
   const idx = all.findIndex((i) => i.id === ideaId);
   if (idx < 0) return null;
   const next = [...all];
-  next[idx] = { ...all[idx]!, externalSearchConfirmed: true, updatedAt: new Date().toISOString() };
+  next[idx] = { ...all[idx]!, externalSearchQueryOverride: query.trim(), updatedAt: new Date().toISOString() };
   persist(next);
-  audit("external_search_confirmed", ideaId, actor, "confirmed");
   return next[idx]!;
 }
 
@@ -314,5 +358,6 @@ export function getSanitizedSearchConcepts(idea: SmartIdea): string[] {
 
 export function buildExternalSearchQuery(idea: SmartIdea, keyword?: string): string {
   if (keyword?.trim()) return keyword.trim();
+  if (idea.externalSearchQueryOverride?.trim()) return idea.externalSearchQueryOverride.trim();
   return getSanitizedSearchConcepts(idea).slice(0, 3).join(" ");
 }

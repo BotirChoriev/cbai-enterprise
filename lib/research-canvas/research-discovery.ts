@@ -2,8 +2,9 @@
  * Research discovery — wraps existing connectors with normalization and honest limits.
  */
 
-import { searchKnowledgeProvider } from "@/lib/knowledge-connectors/connector-registry";
-import type { CanonicalKnowledgeSource } from "@/lib/knowledge-connectors/types";
+import { searchKnowledgeProvider, PRIORITY_OPEN_SCIENCE_PROVIDERS } from "@/lib/knowledge-connectors/connector-registry";
+import type { CanonicalKnowledgeSource, KnowledgeProviderId } from "@/lib/knowledge-connectors/types";
+import { assertNoPrivateArtifactInQuery } from "@/lib/research-canvas/privacy-boundary";
 import type { DiscoveryResultRecord, ProjectEvidenceStatus, SmartIdea } from "@/lib/research-canvas/research-canvas-types";
 import { genesisId, readGenesisList, writeGenesisList, notifyGenesisChanged } from "@/lib/genesis/genesis-storage";
 import { buildExternalSearchQuery } from "@/lib/research-canvas/smart-idea-store";
@@ -64,7 +65,7 @@ export function deduplicateByDoi(records: DiscoveryResultRecord[]): DiscoveryRes
 export async function searchOpenScienceForIdea(input: {
   idea: SmartIdea;
   keyword?: string;
-  provider?: "crossref";
+  provider?: KnowledgeProviderId;
   limit?: number;
   externalSearchConfirmed: boolean;
 }): Promise<{
@@ -73,7 +74,7 @@ export async function searchOpenScienceForIdea(input: {
   connectionState: string;
   sanitizedQuery: string;
 }> {
-  if (!input.externalSearchConfirmed) {
+  if (!input.externalSearchConfirmed || input.idea.externalSearchRevoked) {
     return {
       records: [],
       limitations: ["External search requires user confirmation — private artifact content is not transmitted."],
@@ -83,6 +84,16 @@ export async function searchOpenScienceForIdea(input: {
   }
 
   const sanitizedQuery = buildExternalSearchQuery(input.idea, input.keyword);
+  const queryCheck = assertNoPrivateArtifactInQuery(sanitizedQuery, input.idea);
+  if (!queryCheck.ok) {
+    return {
+      records: [],
+      limitations: [queryCheck.reason ?? "Invalid search query."],
+      connectionState: "blocked",
+      sanitizedQuery: "",
+    };
+  }
+
   const provider = input.provider ?? "crossref";
   const result = await searchKnowledgeProvider(provider, sanitizedQuery, input.limit ?? 8);
 
@@ -92,7 +103,7 @@ export async function searchOpenScienceForIdea(input: {
     recordType: "smart_idea",
     recordId: input.idea.id,
     actorId: input.idea.owner,
-    newState: sanitizedQuery,
+    newState: `${provider}:${sanitizedQuery}`,
   });
 
   const normalized = result.records.map((r) => normalizeRecord(r, input.idea.id));
@@ -110,6 +121,44 @@ export async function searchOpenScienceForIdea(input: {
     ],
     connectionState: result.connectionState,
     sanitizedQuery,
+  };
+}
+
+export async function searchAllOpenScienceForIdea(input: {
+  idea: SmartIdea;
+  keyword?: string;
+  limit?: number;
+  externalSearchConfirmed: boolean;
+}): Promise<{
+  records: DiscoveryResultRecord[];
+  limitations: string[];
+  providerStates: ReadonlyArray<{ provider: KnowledgeProviderId; connectionState: string; count: number }>;
+  sanitizedQuery: string;
+}> {
+  const limitations: string[] = [];
+  const providerStates: Array<{ provider: KnowledgeProviderId; connectionState: string; count: number }> = [];
+  let allRecords: DiscoveryResultRecord[] = [];
+
+  for (const provider of PRIORITY_OPEN_SCIENCE_PROVIDERS) {
+    const result = await searchOpenScienceForIdea({
+      ...input,
+      provider,
+      limit: input.limit ?? 5,
+    });
+    limitations.push(...result.limitations);
+    providerStates.push({
+      provider,
+      connectionState: result.connectionState,
+      count: result.records.length,
+    });
+    allRecords = deduplicateByDoi([...allRecords, ...result.records]);
+  }
+
+  return {
+    records: allRecords,
+    limitations: [...new Set(limitations)],
+    providerStates,
+    sanitizedQuery: buildExternalSearchQuery(input.idea, input.keyword),
   };
 }
 

@@ -132,6 +132,13 @@ export default function IntelligenceCanvas() {
             ) : (
               <div className="flex flex-1 flex-col items-center justify-center space-y-6 text-center">
                 <p className="text-base text-zinc-200 sm:text-lg">{t("intelligenceCanvas.homeIntelligenceLead")}</p>
+                <Link href="/research/canvas" className={`${cbaiBtnPrimary} gap-2`}>
+                  Start with an Idea — Open Research Canvas
+                  <span aria-hidden="true">→</span>
+                </Link>
+                <p className="max-w-lg text-xs text-zinc-500">
+                  CBAI turns an idea, sketch, or scientific question into an evidence-based mission — measurement, open science, execution, and human decision.
+                </p>
                 <div className="w-full max-w-xl text-left">
                   <QuickStartMissionForm />
                 </div>

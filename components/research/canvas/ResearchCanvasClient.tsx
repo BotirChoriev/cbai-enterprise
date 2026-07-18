@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
@@ -23,6 +24,8 @@ import {
   linkSmartIdeaToMission,
   recordHumanDecision,
   getSanitizedSearchConcepts,
+  revokeExternalSearch,
+  setExternalSearchQueryOverride,
 } from "@/lib/research-canvas/smart-idea-store";
 import {
   createMeasurementPlan,
@@ -37,6 +40,7 @@ import { METHOD_REGISTRY, VIRTUAL_INSTRUMENT_REGISTRY } from "@/lib/research-can
 import { listOpenScienceProviders } from "@/lib/research-canvas/open-science-provider-registry";
 import {
   searchOpenScienceForIdea,
+  searchAllOpenScienceForIdea,
   loadDiscoveryResults,
   buildHistoricalTimeline,
   buildCurrentLandscape,
@@ -47,6 +51,11 @@ import {
   buildDecisionSupportReport,
 } from "@/lib/research-canvas/research-canvas-reports";
 import { parseMolecularFormula } from "@/lib/research-canvas/molecular-formula-analyzer";
+import { deriveCanvasStageStatuses, deriveActiveStageNextAction } from "@/lib/research-canvas/canvas-stage-status";
+import { buildExternalSearchConsent, IP_BOUNDARY_NOTICE, visibilityEnforcementNote } from "@/lib/research-canvas/privacy-boundary";
+import { resolvePersistenceMode, persistenceModeDisclaimer } from "@/lib/product/persistence-mode";
+import { appendGenesisOperatingParamsToHref } from "@/lib/genesis/genesis-operating-context";
+import { createExecutionTask } from "@/lib/genesis/execution-store";
 import type { ResearchCanvasStage } from "@/lib/research-canvas/research-canvas-types";
 import {
   cbaiBtnPrimary,
@@ -55,13 +64,18 @@ import {
   cbaiSectionEyebrow,
 } from "@/components/brand/brand-classes";
 
-const STAGES: ResearchCanvasStage[] = ["IDEA", "INTERPRET", "MEASURE", "DISCOVER", "COMPARE", "PLAN", "MISSION", "DECIDE"];
+const STAGES: ResearchCanvasStage[] = ["IDEA", "INTERPRET", "MEASURE", "DISCOVER", "COMPARE", "MISSION", "EXECUTE", "DECIDE"];
+
+function defaultTaskDeadlineIso(daysFromNow: number): string {
+  return new Date(Date.now() + daysFromNow * 86400000).toISOString().slice(0, 10);
+}
 
 export default function ResearchCanvasClient() {
   const { t } = useTranslation();
   const hydrated = useHydrated();
   const { profile } = useAssistantProfile();
   const operator = resolveOperatorName(profile);
+  const searchParams = useSearchParams();
   const fileRef = useRef<HTMLInputElement>(null);
   const [tick, setTick] = useState(0);
   const bump = useCallback(() => setTick((n) => n + 1), []);
@@ -94,8 +108,11 @@ export default function ResearchCanvasClient() {
   const [refReal, setRefReal] = useState("10");
   const [pixelLength, setPixelLength] = useState("250");
 
-  const [decisionPath, setDecisionPath] = useState("");
-  const [decisionReason, setDecisionReason] = useState("");
+  const [executeTaskTitle, setExecuteTaskTitle] = useState("");
+  const [sanitizedQueryEdit, setSanitizedQueryEdit] = useState("");
+
+  const urlSmartIdeaId = searchParams.get("smartIdea");
+  const resolvedActiveId = activeId ?? urlSmartIdeaId;
 
   useEffect(() => {
     const onChange = () => bump();
@@ -110,16 +127,31 @@ export default function ResearchCanvasClient() {
 
   const idea = useMemo(() => {
     void tick;
-    if (!hydrated || !activeId) return null;
-    return loadSmartIdea(activeId);
-  }, [hydrated, activeId, tick]);
+    if (!hydrated || !resolvedActiveId) return null;
+    return loadSmartIdea(resolvedActiveId);
+  }, [hydrated, resolvedActiveId, tick]);
 
   const discoveries = useMemo(() => {
     void tick;
     return idea ? loadDiscoveryResults(idea.id) : [];
   }, [idea, tick]);
 
-  const decisionPkg = useMemo(() => (idea ? buildDecisionSupportPackage(idea) : null), [idea]);
+  const [decisionPath, setDecisionPath] = useState("");
+  const [decisionReason, setDecisionReason] = useState("");
+
+  const stageStatuses = useMemo(() => deriveCanvasStageStatuses(idea), [idea]);
+  const nextActionHint = useMemo(() => deriveActiveStageNextAction(idea), [idea]);
+  const persistenceNote = persistenceModeDisclaimer(resolvePersistenceMode());
+
+  const contextHref = (path: string) => {
+    if (!idea) return path;
+    return appendGenesisOperatingParamsToHref(path, {
+      missionId: idea.missionId ?? undefined,
+      projectId: idea.projectId ?? undefined,
+      smartIdeaId: idea.id,
+      researchObjectId: idea.livingResearchObjectId ?? undefined,
+    });
+  };
 
   const createIdea = () => {
     if (!title.trim() || !problem.trim()) return;
@@ -277,16 +309,65 @@ export default function ResearchCanvasClient() {
     bump();
   };
 
+  const decisionPkg = useMemo(() => (idea ? buildDecisionSupportPackage(idea) : null), [idea]);
+
+  const runSearchAll = async () => {
+    if (!idea) return;
+    if (!idea.externalSearchConfirmed || idea.externalSearchRevoked) {
+      setFeedback(t("researchCanvas.confirmSearchFirst"));
+      return;
+    }
+    setFeedback(t("researchCanvas.searching"));
+    const res = await searchAllOpenScienceForIdea({
+      idea,
+      keyword: searchKeyword || sanitizedQueryEdit,
+      externalSearchConfirmed: true,
+    });
+    setStage("DISCOVER");
+    setFeedback(
+      res.records.length > 0
+        ? `${res.records.length} unique record(s) from ${res.providerStates.filter((p) => p.count > 0).length} provider(s).`
+        : res.limitations.slice(0, 2).join(" "),
+    );
+    bump();
+  };
+
+  const addExecuteTask = () => {
+    if (!idea?.missionId || !executeTaskTitle.trim()) return;
+    const deadline = defaultTaskDeadlineIso(14);
+    createExecutionTask({
+      planId: "research-canvas-adhoc",
+      directiveId: "research-canvas-adhoc",
+      organizationId: "device-local",
+      missionId: idea.missionId,
+      projectId: idea.projectId ?? null,
+      title: executeTaskTitle.trim(),
+      assignee: operator,
+      accountableOwner: operator,
+      collaborators: [],
+      priority: "medium",
+      deadline,
+      status: "Active",
+      expectedResult: executeTaskTitle.trim(),
+      evidenceRequirement: "Document completion evidence before marking complete.",
+      progressNote: "",
+      approvalState: "none",
+    });
+    notifyMissionDataChanged("task");
+    setFeedback("Execution task created — device-local.");
+    bump();
+  };
+
   const runSearch = async () => {
     if (!idea) return;
-    if (!idea.externalSearchConfirmed) {
+    if (!idea.externalSearchConfirmed || idea.externalSearchRevoked) {
       setFeedback(t("researchCanvas.confirmSearchFirst"));
       return;
     }
     setFeedback(t("researchCanvas.searching"));
     const res = await searchOpenScienceForIdea({
       idea,
-      keyword: searchKeyword,
+      keyword: searchKeyword || sanitizedQueryEdit,
       externalSearchConfirmed: true,
     });
     setStage("DISCOVER");
@@ -403,7 +484,26 @@ export default function ResearchCanvasClient() {
         <p className="text-sm text-zinc-400">{t("researchCanvas.purpose")}</p>
         <p className="text-xs text-amber-400/90">{t("researchCanvas.deviceLocal")}</p>
         <p className="text-xs text-zinc-600">{t("researchCanvas.humanDecision")}</p>
+        <p className="text-xs text-zinc-500">{persistenceNote}</p>
+        {idea ? (
+          <p className="text-xs text-teal-400/90">Next action: {nextActionHint}</p>
+        ) : null}
       </div>
+
+      {idea ? (
+        <section className={`${cbaiGlassCard} p-4`} aria-label="Stage status">
+          <p className="text-xs font-semibold text-zinc-300">Workflow status</p>
+          <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            {stageStatuses.map((s) => (
+              <li key={s.stage} className="rounded border border-zinc-800 px-2 py-1.5 text-[11px]">
+                <span className="font-medium text-zinc-200">{s.stage}</span>
+                <span className="ml-1 text-zinc-500">· {s.status}</span>
+                {s.blockedReason ? <p className="text-amber-400/80">{s.blockedReason}</p> : null}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <nav className="flex flex-wrap gap-2" aria-label="Canvas stages">
         {STAGES.map((s) => (
@@ -418,7 +518,7 @@ export default function ResearchCanvasClient() {
         ))}
       </nav>
 
-      {(stage === "IDEA" || !activeId) && (
+      {(stage === "IDEA" || !resolvedActiveId) && (
         <section className={`${cbaiGlassCard} space-y-4 p-6`}>
           <h2 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.smartIdeaIntake")}</h2>
           <p className="text-xs text-zinc-500">{t("researchCanvas.defaultPrivate")}</p>
@@ -526,15 +626,40 @@ export default function ResearchCanvasClient() {
       {idea && stage === "DISCOVER" && (
         <section className={`${cbaiGlassCard} space-y-4 p-6`}>
           <h2 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.researchDiscovery")}</h2>
+          <p className="text-xs text-zinc-500">{visibilityEnforcementNote(idea.visibility)}</p>
+          <p className="text-xs text-zinc-500">{IP_BOUNDARY_NOTICE}</p>
+          <p className="text-xs text-zinc-500">{buildExternalSearchConsent(idea).confirmed ? "External search authorized." : "External search not authorized."}</p>
           <p className="text-xs text-zinc-500">{t("researchCanvas.sanitizedConcepts")}: {getSanitizedSearchConcepts(idea).join(" · ")}</p>
-          {!idea.externalSearchConfirmed ? (
-            <button type="button" onClick={() => { confirmExternalSearch(idea.id, operator); bump(); setFeedback(t("researchCanvas.searchConfirmed")); }} className={cbaiBtnPrimary}>
+          <input
+            value={sanitizedQueryEdit}
+            onChange={(e) => {
+              setSanitizedQueryEdit(e.target.value);
+              setExternalSearchQueryOverride(idea.id, e.target.value);
+              bump();
+            }}
+            placeholder="Edit sanitized search query (optional)"
+            className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`}
+          />
+          {!idea.externalSearchConfirmed || idea.externalSearchRevoked ? (
+            <button
+              type="button"
+              onClick={() => {
+                confirmExternalSearch(idea.id, operator, { queryOverride: sanitizedQueryEdit || undefined });
+                bump();
+                setFeedback(t("researchCanvas.searchConfirmed"));
+              }}
+              className={cbaiBtnPrimary}
+            >
               {t("researchCanvas.confirmExternalSearch")}
             </button>
           ) : (
             <>
               <input value={searchKeyword} onChange={(e) => setSearchKeyword(e.target.value)} placeholder={t("researchCanvas.searchKeyword")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
-              <button type="button" onClick={() => void runSearch()} className={cbaiBtnPrimary}>{t("researchCanvas.searchCrossref")}</button>
+              <div className="flex flex-wrap gap-2">
+                <button type="button" onClick={() => void runSearch()} className={cbaiBtnPrimary}>{t("researchCanvas.searchCrossref")}</button>
+                <button type="button" onClick={() => void runSearchAll()} className={cbaiBtnPrimary}>Search all connected providers</button>
+                <button type="button" onClick={() => { revokeExternalSearch(idea.id, operator); bump(); setFeedback("External search consent revoked."); }} className="text-xs text-amber-400">Revoke consent</button>
+              </div>
             </>
           )}
           <ul className="space-y-2 text-xs text-zinc-400">
@@ -586,8 +711,32 @@ export default function ResearchCanvasClient() {
           <p className="text-xs text-zinc-500">{t("researchCanvas.missionNote")}</p>
           <button type="button" onClick={createMissionFromIdea} className={cbaiBtnPrimary}>{t("researchCanvas.createResearchMission")}</button>
           {idea.missionId ? (
-            <Link href={`/my-work?mission=${idea.missionId}`} className="text-xs text-teal-400">{t("researchCanvas.openMission")} →</Link>
+            <Link href={contextHref(`/my-work?mission=${idea.missionId}`)} className="text-xs text-teal-400">{t("researchCanvas.openMission")} →</Link>
           ) : null}
+        </section>
+      )}
+
+      {idea && stage === "EXECUTE" && (
+        <section className={`${cbaiGlassCard} space-y-4 p-6`}>
+          <h2 className="text-sm font-semibold text-zinc-200">Execute — tasks, progress, evidence</h2>
+          {!idea.missionId ? (
+            <p className="text-xs text-amber-400/90">Create a research mission first (MISSION stage).</p>
+          ) : (
+            <>
+              <input
+                value={executeTaskTitle}
+                onChange={(e) => setExecuteTaskTitle(e.target.value)}
+                placeholder="Execution task title"
+                className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`}
+              />
+              <button type="button" onClick={addExecuteTask} className={cbaiBtnPrimary}>Create execution task</button>
+              <div className="flex flex-wrap gap-3 text-xs">
+                <Link href={contextHref(`/my-work?mission=${idea.missionId}`)} className="text-teal-400">My Work →</Link>
+                <Link href={contextHref("/reasoning")} className="text-teal-400">Reasoning →</Link>
+                <Link href={contextHref("/reports")} className="text-teal-400">Reports →</Link>
+              </div>
+            </>
+          )}
         </section>
       )}
 

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
-import { ASSISTANT_COMMANDS, resolveAssistantCommand } from "@/lib/assistant/assistant-commands";
+import { ASSISTANT_COMMANDS } from "@/lib/assistant/assistant-commands";
 import { resolveUniversalIntent, intentCategoryTranslationKey } from "@/lib/intelligence-os/universal-intent";
 import { recordWorkflowEvent } from "@/lib/telemetry/workflow-telemetry";
 import { resolveAssistantContext } from "@/lib/assistant/assistant-context";
@@ -17,6 +17,7 @@ import {
 import { resolveProjectCommand } from "@/lib/project/project-commands";
 import { resolveGenesisCommand } from "@/lib/genesis/genesis-operator-commands";
 import { resolveResearchCanvasCommand } from "@/lib/research-canvas/research-canvas-operator-commands";
+import { resolveFlagshipOperatorCommand } from "@/lib/product/flagship-operator-commands";
 import { resolveLanguageCommand } from "@/lib/i18n/language-command";
 import { getResearchTopicById } from "@/lib/research/research-topics";
 import { getPrimaryEntity } from "@/lib/context";
@@ -175,6 +176,19 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
           router.push(projectMatch.href);
         }
         setConfirmation(projectMatch.message);
+        return;
+      }
+
+      const flagshipMatch = resolveFlagshipOperatorCommand(trimmed);
+      if (flagshipMatch) {
+        setUnrecognized(null);
+        setInput("");
+        setConfirmation(flagshipMatch.message);
+        if (flagshipMatch.href) router.push(flagshipMatch.href);
+        recordWorkflowEvent("intent_resolved", {
+          outcome: "success",
+          intentCategory: "flagship_workflow",
+        });
         return;
       }
 

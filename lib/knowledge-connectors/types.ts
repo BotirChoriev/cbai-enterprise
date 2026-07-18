@@ -3,6 +3,8 @@
 export type KnowledgeProviderId =
   | "crossref"
   | "openalex"
+  | "europepmc"
+  | "datacite"
   | "arxiv"
   | "pubmed"
   | "catalog";

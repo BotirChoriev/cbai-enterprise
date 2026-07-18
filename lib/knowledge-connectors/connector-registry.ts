@@ -1,5 +1,8 @@
 import type { ConnectorRegistration, KnowledgeProviderId } from "@/lib/knowledge-connectors/types";
 import { searchCrossref } from "@/lib/knowledge-connectors/crossref/crossref-adapter";
+import { searchOpenAlex } from "@/lib/knowledge-connectors/openalex/openalex-adapter";
+import { searchEuropePmc } from "@/lib/knowledge-connectors/europepmc/europepmc-adapter";
+import { searchDataCite } from "@/lib/knowledge-connectors/datacite/datacite-adapter";
 
 const REGISTRY: readonly ConnectorRegistration[] = [
   {
@@ -13,12 +16,30 @@ const REGISTRY: readonly ConnectorRegistration[] = [
   },
   {
     provider: "openalex",
-    enabled: false,
-    configured: false,
-    capabilities: [],
-    connectionState: "not_implemented",
+    enabled: true,
+    configured: true,
+    capabilities: ["metadata_search", "metadata_retrieve", "abstract_retrieve"],
+    connectionState: "configured",
     termsUrl: "https://openalex.org/license",
-    licenseNotes: null,
+    licenseNotes: "OpenAlex bibliographic metadata — polite pool recommended.",
+  },
+  {
+    provider: "europepmc",
+    enabled: true,
+    configured: true,
+    capabilities: ["metadata_search", "abstract_retrieve"],
+    connectionState: "configured",
+    termsUrl: "https://europepmc.org/TermsOfUse",
+    licenseNotes: "Europe PMC metadata — biomedical publications.",
+  },
+  {
+    provider: "datacite",
+    enabled: true,
+    configured: true,
+    capabilities: ["metadata_search", "metadata_retrieve"],
+    connectionState: "configured",
+    termsUrl: "https://datacite.org/policies",
+    licenseNotes: "DataCite DOI metadata for datasets and related works.",
   },
   {
     provider: "arxiv",
@@ -53,17 +74,33 @@ export async function searchKnowledgeProvider(
   query: string,
   limit = 10,
 ) {
-  if (provider === "crossref") {
-    return searchCrossref({ query, limit });
+  const q = { query, limit };
+  switch (provider) {
+    case "crossref":
+      return searchCrossref(q);
+    case "openalex":
+      return searchOpenAlex(q);
+    case "europepmc":
+      return searchEuropePmc(q);
+    case "datacite":
+      return searchDataCite(q);
+    default:
+      return {
+        provider,
+        retrievedAt: new Date().toISOString(),
+        query,
+        totalResults: null,
+        records: [],
+        limitations: [`Provider "${provider}" is not implemented yet.`],
+        connectionState: "not_implemented" as const,
+        errorCategory: "not_implemented",
+      };
   }
-  return {
-    provider,
-    retrievedAt: new Date().toISOString(),
-    query,
-    totalResults: null,
-    records: [],
-    limitations: [`Provider "${provider}" is not implemented yet.`],
-    connectionState: "not_implemented" as const,
-    errorCategory: "not_implemented",
-  };
 }
+
+export const PRIORITY_OPEN_SCIENCE_PROVIDERS: readonly KnowledgeProviderId[] = [
+  "crossref",
+  "openalex",
+  "europepmc",
+  "datacite",
+];
