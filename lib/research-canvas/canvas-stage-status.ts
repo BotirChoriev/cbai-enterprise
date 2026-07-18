@@ -76,7 +76,13 @@ export function deriveCanvasStageStatuses(idea: SmartIdea | null): CanvasStageSt
 
   const confirmed = idea.extractedItems.filter((e) => e.confirmationStatus === "Confirmed");
   const pendingConfirm = idea.extractedItems.filter(
-    (e) => e.confirmationStatus === "Awaiting Human Confirmation" || e.confirmationStatus === "Machine-Extracted",
+    (e) =>
+      e.confirmationStatus === "Awaiting Human Confirmation" ||
+      e.confirmationStatus === "Machine-Extracted" ||
+      e.confirmationStatus === "Human-Corrected" ||
+      e.confirmationStatus === "Insufficient Quality" ||
+      e.confirmationStatus === "Needs Human Review" ||
+      e.confirmationStatus === "Needs Correction",
   );
   const plans = loadMeasurementPlans(idea.id);
   const passports = loadMeasurementPassports(idea.id);

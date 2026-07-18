@@ -11,6 +11,14 @@ import {
 import { recordGenesisAudit } from "@/lib/genesis/genesis-audit-store";
 import { analyzeSvgContent } from "@/lib/research-canvas/svg-geometry-analyzer";
 import { analyzeImageMetadata } from "@/lib/research-canvas/image-metadata-analyzer";
+import {
+  buildManualDescriptionItem,
+  buildMappedFieldItem,
+  buildMachineExtractedItem,
+  evaluateIdeaModelGate,
+  migrateExtractedItem,
+  type IdeaModelGateResult,
+} from "@/lib/research-canvas/interpretation-integrity";
 import type {
   ExtractedItem,
   IdeaModel,
@@ -45,22 +53,31 @@ function audit(action: string, recordId: string, actorId: string, next: string |
   });
 }
 
-function makeExtracted(field: string, value: string, source: string, confidence: number): ExtractedItem {
+function migrateIdea(idea: SmartIdea): SmartIdea {
+  const stage = (idea.stage as string) === "PLAN" ? "EXECUTE" : idea.stage;
   return {
-    id: genesisId("extract"),
-    field,
-    extractedValue: value,
-    aiConfidence: confidence,
-    sourceLocation: source,
-    confirmationStatus: "Machine-Extracted",
-    limitation: "Machine-extracted — requires human confirmation. AI confidence is not measurement uncertainty.",
+    ...idea,
+    stage,
+    extractedItems: idea.extractedItems.map(migrateExtractedItem),
   };
 }
 
+function withId(item: ExtractedItem): ExtractedItem {
+  return { ...item, id: item.id || genesisId("extract") };
+}
+
+function updateIdea(ideaId: string, updater: (prev: SmartIdea) => SmartIdea): SmartIdea | null {
+  const all = loadSmartIdeas();
+  const idx = all.findIndex((i) => i.id === ideaId);
+  if (idx < 0) return null;
+  const next = [...all];
+  next[idx] = updater(all[idx]!);
+  persist(next);
+  return next[idx]!;
+}
+
 export function loadSmartIdeas(): SmartIdea[] {
-  return readGenesisList(IDEAS_KEY, isSmartIdea, memoryIdeas).map((idea) =>
-    (idea.stage as string) === "PLAN" ? { ...idea, stage: "EXECUTE" } : idea,
-  );
+  return readGenesisList(IDEAS_KEY, isSmartIdea, memoryIdeas).map(migrateIdea);
 }
 
 export function loadSmartIdea(id: string): SmartIdea | null {
@@ -119,117 +136,174 @@ export function addSmartIdeaArtifact(
     pixelHeight?: number | null;
   },
 ): SmartIdea | null {
-  const all = loadSmartIdeas();
-  const idx = all.findIndex((i) => i.id === ideaId);
-  if (idx < 0) return null;
-  const prev = all[idx]!;
+  return updateIdea(ideaId, (prev) => {
+    let metadata: Record<string, string | number | boolean | null> = {};
+    const extractedItems: ExtractedItem[] = [...prev.extractedItems];
 
-  let metadata: Record<string, string | number | boolean | null> = {};
-  const extractedItems: ExtractedItem[] = [...prev.extractedItems];
+    if (input.kind === "svg" && input.textContent) {
+      const svg = analyzeSvgContent(input.textContent);
+      metadata = { elementCount: svg.elementCount, viewBox: svg.viewBox ?? null, unsupportedPaths: svg.unsupportedPaths };
+      for (const el of svg.elements.slice(0, 5)) {
+        extractedItems.push(
+          withId(
+            buildMachineExtractedItem({
+              field: `${el.tag} geometry`,
+              value: JSON.stringify(el),
+              sourceLocation: "svg-analyzer",
+              method: "svg_geometry_parser",
+            }),
+          ),
+        );
+      }
+      for (const label of svg.textLabels.slice(0, 5)) {
+        extractedItems.push(
+          withId(
+            buildMachineExtractedItem({
+              field: "text label",
+              value: label,
+              sourceLocation: "svg-text",
+              method: "svg_geometry_parser",
+            }),
+          ),
+        );
+      }
+    } else if (input.kind === "image") {
+      const img = analyzeImageMetadata({
+        fileName: input.fileName,
+        mimeType: input.mimeType,
+        fileSizeBytes: input.fileSizeBytes,
+        pixelWidth: input.pixelWidth,
+        pixelHeight: input.pixelHeight,
+      });
+      metadata = {
+        pixelWidth: img.pixelWidth ?? null,
+        pixelHeight: img.pixelHeight ?? null,
+        aspectRatio: img.aspectRatio ?? null,
+        hasScale: img.hasScaleInformation,
+      };
+      extractedItems.push(
+        withId(
+          buildMachineExtractedItem({
+            field: "image dimensions",
+            value: `${img.pixelWidth ?? "?"}×${img.pixelHeight ?? "?"} px`,
+            sourceLocation: "file-metadata",
+            method: "file_metadata",
+          }),
+        ),
+      );
+    }
 
-  if (input.kind === "svg" && input.textContent) {
-    const svg = analyzeSvgContent(input.textContent);
-    metadata = { elementCount: svg.elementCount, viewBox: svg.viewBox ?? null, unsupportedPaths: svg.unsupportedPaths };
-    for (const el of svg.elements.slice(0, 5)) {
-      extractedItems.push(makeExtracted(`${el.tag} geometry`, JSON.stringify(el), "svg-analyzer", 0.6));
-    }
-    for (const label of svg.textLabels.slice(0, 5)) {
-      extractedItems.push(makeExtracted("text label", label, "svg-text", 0.7));
-    }
-  } else if (input.kind === "image") {
-    const img = analyzeImageMetadata({
+    const artifact: SmartIdeaArtifact = {
+      id: genesisId("artifact"),
       fileName: input.fileName,
       mimeType: input.mimeType,
       fileSizeBytes: input.fileSizeBytes,
-      pixelWidth: input.pixelWidth,
-      pixelHeight: input.pixelHeight,
-    });
-    metadata = {
-      pixelWidth: img.pixelWidth ?? null,
-      pixelHeight: img.pixelHeight ?? null,
-      aspectRatio: img.aspectRatio ?? null,
-      hasScale: img.hasScaleInformation,
+      kind: input.kind,
+      dataUrl: input.dataUrl ?? null,
+      metadata,
     };
-    extractedItems.push(
-      makeExtracted("image dimensions", `${img.pixelWidth ?? "?"}×${img.pixelHeight ?? "?"} px`, "file-metadata", 0.95),
-    );
-  }
 
-  const artifact: SmartIdeaArtifact = {
-    id: genesisId("artifact"),
-    fileName: input.fileName,
-    mimeType: input.mimeType,
-    fileSizeBytes: input.fileSizeBytes,
-    kind: input.kind,
-    dataUrl: input.dataUrl ?? null,
-    metadata,
-  };
-
-  const updated: SmartIdea = {
-    ...prev,
-    artifacts: [...prev.artifacts, artifact],
-    extractedItems: extractedItems.map((e) => ({ ...e, confirmationStatus: "Awaiting Human Confirmation" as InterpretationStatus })),
-    stage: "INTERPRET",
-    updatedAt: new Date().toISOString(),
-  };
-  const next = [...all];
-  next[idx] = updated;
-  persist(next);
-  audit("artifact_added", ideaId, prev.owner, artifact.fileName);
-  return updated;
+    audit("artifact_added", ideaId, prev.owner, artifact.fileName);
+    return {
+      ...prev,
+      artifacts: [...prev.artifacts, artifact],
+      extractedItems,
+      stage: "INTERPRET",
+      updatedAt: new Date().toISOString(),
+    };
+  });
 }
 
 export function confirmExtractedItem(
   ideaId: string,
   itemId: string,
-  input: { correctedValue?: string; status: InterpretationStatus; actor: string },
+  input: { correctedValue?: string; status?: InterpretationStatus; actor: string },
 ): SmartIdea | null {
-  const all = loadSmartIdeas();
-  const idx = all.findIndex((i) => i.id === ideaId);
-  if (idx < 0) return null;
-  const prev = all[idx]!;
-  const items = prev.extractedItems.map((item) =>
-    item.id !== itemId
-      ? item
-      : {
-          ...item,
-          userCorrection: input.correctedValue ?? item.userCorrection,
-          confirmationStatus: input.status,
-          correctedAt: new Date().toISOString(),
-          correctedBy: input.actor,
-        },
-  );
-  const updated: SmartIdea = {
-    ...prev,
-    extractedItems: items,
-    stage: items.every((i) => i.confirmationStatus === "Confirmed" || i.confirmationStatus === "Rejected") ? "MEASURE" : "INTERPRET",
-    updatedAt: new Date().toISOString(),
-  };
-  const next = [...all];
-  next[idx] = updated;
-  persist(next);
-  audit("interpretation_confirmed", itemId, input.actor, input.status);
-  return updated;
+  return updateIdea(ideaId, (prev) => {
+    const items = prev.extractedItems.map((item) => {
+      if (item.id !== itemId) return item;
+      const migrated = migrateExtractedItem(item);
+      const nextStatus = input.status ?? "Confirmed";
+      if (nextStatus === "Confirmed" && migrated.confirmationStatus === "Insufficient Quality") {
+        return migrated;
+      }
+      return {
+        ...migrated,
+        userCorrection: input.correctedValue ?? migrated.userCorrection,
+        confirmationStatus: nextStatus,
+        reviewedByHuman: nextStatus === "Confirmed",
+        correctedAt: new Date().toISOString(),
+        correctedBy: input.actor,
+      };
+    });
+    audit("interpretation_confirmed", itemId, input.actor, input.status ?? "Confirmed");
+    return {
+      ...prev,
+      extractedItems: items,
+      stage: evaluateIdeaModelGate({ ...prev, extractedItems: items }).ok ? "INTERPRET" : "INTERPRET",
+      updatedAt: new Date().toISOString(),
+    };
+  });
 }
 
-export function canBuildIdeaModel(idea: SmartIdea): {
-  readonly ok: boolean;
-  readonly reasonKey: "no_extractions" | "pending_confirmation" | "none_confirmed";
-} {
-  if (idea.extractedItems.length === 0) {
-    return { ok: false, reasonKey: "no_extractions" };
-  }
-  const pending = idea.extractedItems.filter(
-    (e) => e.confirmationStatus === "Awaiting Human Confirmation" || e.confirmationStatus === "Machine-Extracted",
-  );
-  if (pending.length > 0) {
-    return { ok: false, reasonKey: "pending_confirmation" };
-  }
-  const confirmed = idea.extractedItems.filter((e) => e.confirmationStatus === "Confirmed");
-  if (confirmed.length === 0) {
-    return { ok: false, reasonKey: "none_confirmed" };
-  }
-  return { ok: true, reasonKey: "none_confirmed" };
+export function correctExtractedItem(
+  ideaId: string,
+  itemId: string,
+  input: { correctedValue: string; actor: string },
+): SmartIdea | null {
+  const correctedValue = input.correctedValue.trim();
+  if (!correctedValue) return null;
+
+  return updateIdea(ideaId, (prev) => {
+    const items = prev.extractedItems.map((item) => {
+      if (item.id !== itemId) return item;
+      const migrated = migrateExtractedItem(item);
+      const history = [...(migrated.correctionHistory ?? [])];
+      if (migrated.userCorrection?.trim()) {
+        history.push({ value: migrated.userCorrection.trim(), at: migrated.correctedAt ?? new Date().toISOString(), by: migrated.correctedBy ?? input.actor });
+      }
+      return {
+        ...migrated,
+        originalText: migrated.originalText ?? migrated.extractedValue,
+        userCorrection: correctedValue,
+        confirmationStatus: "Human-Corrected" as InterpretationStatus,
+        reviewedByHuman: false,
+        correctedAt: new Date().toISOString(),
+        correctedBy: input.actor,
+        correctionHistory: history,
+        limitationKey: "interpretHumanConfirmationRequired",
+      };
+    });
+    audit("interpretation_corrected", itemId, input.actor, correctedValue.slice(0, 120));
+    return { ...prev, extractedItems: items, updatedAt: new Date().toISOString() };
+  });
+}
+
+export function rejectExtractedItem(
+  ideaId: string,
+  itemId: string,
+  input: { reason?: string; actor: string },
+): SmartIdea | null {
+  return updateIdea(ideaId, (prev) => {
+    const items = prev.extractedItems.map((item) => {
+      if (item.id !== itemId) return item;
+      const migrated = migrateExtractedItem(item);
+      return {
+        ...migrated,
+        confirmationStatus: "Rejected" as InterpretationStatus,
+        rejectionReason: input.reason?.trim() || null,
+        reviewedByHuman: false,
+        correctedAt: new Date().toISOString(),
+        correctedBy: input.actor,
+      };
+    });
+    audit("interpretation_rejected", itemId, input.actor, input.reason?.trim() || "rejected");
+    return { ...prev, extractedItems: items, updatedAt: new Date().toISOString() };
+  });
+}
+
+export function canBuildIdeaModel(idea: SmartIdea): IdeaModelGateResult {
+  return evaluateIdeaModelGate(idea);
 }
 
 export function addManualInterpretationDraft(
@@ -240,37 +314,26 @@ export function addManualInterpretationDraft(
   const trimmed = detailedDescription.trim();
   if (trimmed.length < 30) return null;
 
-  const all = loadSmartIdeas();
-  const idx = all.findIndex((i) => i.id === ideaId);
-  if (idx < 0) return null;
-  const prev = all[idx]!;
+  return updateIdea(ideaId, (prev) => {
+    const extractedItems: ExtractedItem[] = [withId(buildManualDescriptionItem(trimmed))];
+    const mapped = [
+      buildMappedFieldItem({ fieldKey: "problem_statement", fieldLabel: "problem statement", value: prev.problem }),
+      buildMappedFieldItem({ fieldKey: "purpose", fieldLabel: "purpose", value: prev.purpose }),
+      buildMappedFieldItem({ fieldKey: "original_description", fieldLabel: "original description", value: prev.originalDescription }),
+    ].filter((item): item is ExtractedItem => item != null);
 
-  const draftItems: ExtractedItem[] = [
-    makeExtracted("manual description", trimmed, "user-manual", 1),
-    makeExtracted("problem statement", prev.problem, "intake", 1),
-    makeExtracted("purpose", prev.purpose, "intake", 1),
-  ];
-  if (prev.originalDescription.trim()) {
-    draftItems.push(makeExtracted("original description", prev.originalDescription, "intake", 1));
-  }
+    for (const item of mapped) {
+      extractedItems.push(withId(item));
+    }
 
-  const extractedItems = draftItems.map((e) => ({
-    ...e,
-    confirmationStatus: "Awaiting Human Confirmation" as InterpretationStatus,
-    limitation: "Draft interpretation from manual description — requires human confirmation before scientific claims.",
-  }));
-
-  const updated: SmartIdea = {
-    ...prev,
-    extractedItems,
-    stage: "INTERPRET",
-    updatedAt: new Date().toISOString(),
-  };
-  const next = [...all];
-  next[idx] = updated;
-  persist(next);
-  audit("manual_interpretation_draft", ideaId, actor, "draft");
-  return updated;
+    audit("interpretation_draft_created", ideaId, actor, "manual_description");
+    return {
+      ...prev,
+      extractedItems,
+      stage: "INTERPRET",
+      updatedAt: new Date().toISOString(),
+    };
+  });
 }
 
 export function buildIdeaModel(ideaId: string, input: Partial<IdeaModel>): SmartIdea | null {
@@ -278,7 +341,7 @@ export function buildIdeaModel(ideaId: string, input: Partial<IdeaModel>): Smart
   const idx = all.findIndex((i) => i.id === ideaId);
   if (idx < 0) return null;
   const prev = all[idx]!;
-  const gate = canBuildIdeaModel(prev);
+  const gate = evaluateIdeaModelGate(prev);
   if (!gate.ok) return null;
 
   const model: IdeaModel = {
@@ -316,13 +379,7 @@ export function buildIdeaModel(ideaId: string, input: Partial<IdeaModel>): Smart
 }
 
 export function updateSmartIdeaStage(ideaId: string, stage: ResearchCanvasStage): SmartIdea | null {
-  const all = loadSmartIdeas();
-  const idx = all.findIndex((i) => i.id === ideaId);
-  if (idx < 0) return null;
-  const next = [...all];
-  next[idx] = { ...all[idx]!, stage, updatedAt: new Date().toISOString() };
-  persist(next);
-  return next[idx]!;
+  return updateIdea(ideaId, (prev) => ({ ...prev, stage, updatedAt: new Date().toISOString() }));
 }
 
 export function confirmExternalSearch(
@@ -330,83 +387,63 @@ export function confirmExternalSearch(
   actor: string,
   input?: { queryOverride?: string },
 ): SmartIdea | null {
-  const all = loadSmartIdeas();
-  const idx = all.findIndex((i) => i.id === ideaId);
-  if (idx < 0) return null;
-  const now = new Date().toISOString();
-  const next = [...all];
-  next[idx] = {
-    ...all[idx]!,
-    externalSearchConfirmed: true,
-    externalSearchConsentAt: now,
-    externalSearchRevoked: false,
-    externalSearchRevokedAt: null,
-    externalSearchQueryOverride: input?.queryOverride?.trim() || all[idx]!.externalSearchQueryOverride || null,
-    updatedAt: now,
-  };
-  persist(next);
-  audit("external_search_confirmed", ideaId, actor, "confirmed");
-  return next[idx]!;
+  return updateIdea(ideaId, (prev) => {
+    const now = new Date().toISOString();
+    audit("external_search_confirmed", ideaId, actor, "confirmed");
+    return {
+      ...prev,
+      externalSearchConfirmed: true,
+      externalSearchConsentAt: now,
+      externalSearchRevoked: false,
+      externalSearchRevokedAt: null,
+      externalSearchQueryOverride: input?.queryOverride?.trim() || prev.externalSearchQueryOverride || null,
+      updatedAt: now,
+    };
+  });
 }
 
 export function revokeExternalSearch(ideaId: string, actor: string): SmartIdea | null {
-  const all = loadSmartIdeas();
-  const idx = all.findIndex((i) => i.id === ideaId);
-  if (idx < 0) return null;
-  const now = new Date().toISOString();
-  const next = [...all];
-  next[idx] = {
-    ...all[idx]!,
-    externalSearchConfirmed: false,
-    externalSearchRevoked: true,
-    externalSearchRevokedAt: now,
-    updatedAt: now,
-  };
-  persist(next);
-  audit("external_search_revoked", ideaId, actor, "revoked");
-  return next[idx]!;
+  return updateIdea(ideaId, (prev) => {
+    const now = new Date().toISOString();
+    audit("external_search_revoked", ideaId, actor, "revoked");
+    return {
+      ...prev,
+      externalSearchConfirmed: false,
+      externalSearchRevoked: true,
+      externalSearchRevokedAt: now,
+      updatedAt: now,
+    };
+  });
 }
 
 export function setExternalSearchQueryOverride(ideaId: string, query: string): SmartIdea | null {
-  const all = loadSmartIdeas();
-  const idx = all.findIndex((i) => i.id === ideaId);
-  if (idx < 0) return null;
-  const next = [...all];
-  next[idx] = { ...all[idx]!, externalSearchQueryOverride: query.trim(), updatedAt: new Date().toISOString() };
-  persist(next);
-  return next[idx]!;
+  return updateIdea(ideaId, (prev) => ({
+    ...prev,
+    externalSearchQueryOverride: query.trim(),
+    updatedAt: new Date().toISOString(),
+  }));
 }
 
 export function linkSmartIdeaToMission(
   ideaId: string,
   links: { missionId?: string; projectId?: string; livingResearchObjectId?: string },
 ): SmartIdea | null {
-  const all = loadSmartIdeas();
-  const idx = all.findIndex((i) => i.id === ideaId);
-  if (idx < 0) return null;
-  const next = [...all];
-  next[idx] = { ...all[idx]!, ...links, stage: "MISSION", updatedAt: new Date().toISOString() };
-  persist(next);
-  return next[idx]!;
+  return updateIdea(ideaId, (prev) => ({ ...prev, ...links, stage: "MISSION", updatedAt: new Date().toISOString() }));
 }
 
 export function recordHumanDecision(
   ideaId: string,
   input: { selectedPath: string; reason: string; actor: string },
 ): SmartIdea | null {
-  const all = loadSmartIdeas();
-  const idx = all.findIndex((i) => i.id === ideaId);
-  if (idx < 0) return null;
-  const next = [...all];
-  next[idx] = {
-    ...all[idx]!,
-    humanDecision: `${input.selectedPath} — ${input.reason}`,
-    stage: "DECIDE",
-    updatedAt: new Date().toISOString(),
-  };
-  persist(next);
-  audit("human_decision_recorded", ideaId, input.actor, input.selectedPath);
-  return next[idx]!;
+  return updateIdea(ideaId, (prev) => {
+    audit("human_decision_recorded", ideaId, input.actor, input.selectedPath);
+    return {
+      ...prev,
+      humanDecision: `${input.selectedPath} — ${input.reason}`,
+      stage: "DECIDE",
+      updatedAt: new Date().toISOString(),
+    };
+  });
 }
 
 export function getSanitizedSearchConcepts(idea: SmartIdea): string[] {
@@ -424,3 +461,5 @@ export function buildExternalSearchQuery(idea: SmartIdea, keyword?: string): str
   if (idea.externalSearchQueryOverride?.trim()) return idea.externalSearchQueryOverride.trim();
   return getSanitizedSearchConcepts(idea).slice(0, 3).join(" ");
 }
+
+export { migrateExtractedItem };

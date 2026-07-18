@@ -9,6 +9,7 @@ import {
   addSmartIdeaArtifact,
   addManualInterpretationDraft,
   confirmExtractedItem,
+  correctExtractedItem,
   buildIdeaModel,
   confirmExternalSearch,
   getSanitizedSearchConcepts,
@@ -147,15 +148,13 @@ test("6. correction history preserved on extracted item", () => {
     textContent: '<svg><line x1="0" y1="0" x2="3" y2="4"/></svg>',
   });
   const itemId = loadSmartIdea(idea.id)!.extractedItems[0]!.id;
-  confirmExtractedItem(idea.id, itemId, {
-    status: "Human-Corrected",
-    correctedValue: "5 user units",
-    actor: OPERATOR,
-  });
+  correctExtractedItem(idea.id, itemId, { correctedValue: "5 user units", actor: OPERATOR });
   const item = loadSmartIdea(idea.id)!.extractedItems.find((e) => e.id === itemId)!;
   assert.equal(item.userCorrection, "5 user units");
   assert.equal(item.correctedBy, OPERATOR);
   assert.ok(item.correctedAt);
+  assert.equal(item.confirmationStatus, "Human-Corrected");
+  assert.equal(item.originalText, item.extractedValue);
 });
 
 test("7. SI base dimensions present in unit registry", () => {
@@ -363,8 +362,8 @@ test("16. AI confidence separated from measurement uncertainty in extraction", (
     pixelHeight: 10,
   });
   const item = loadSmartIdea(idea.id)!.extractedItems[0]!;
-  assert.ok(typeof item.aiConfidence === "number");
-  assert.match(item.limitation, /not measurement uncertainty/i);
+  assert.equal(item.aiConfidence, null);
+  assert.equal(item.limitationKey, "interpretMachineExtractedNotice");
 });
 
 test("17. molecular formula parsing and no photo-to-chemistry", () => {

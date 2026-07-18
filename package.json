@@ -47,6 +47,7 @@
     "test:research-canvas": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-research-canvas.ts",
     "test:flagship-consolidation": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-flagship-consolidation.ts",
     "test:research-canvas-stage-navigation": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-research-canvas-stage-navigation.ts",
+    "test:interpretation-integrity": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-interpretation-integrity.ts",
     "test:intelligence-canvas": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-intelligence-canvas.ts",
     "test:epic-governance": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-epic-governance.ts",
     "test:epic-02-mission-os": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-epic-02-mission-os.ts",

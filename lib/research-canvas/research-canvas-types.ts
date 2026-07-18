@@ -27,6 +27,8 @@ export const INTERPRETATION_STATUSES = [
   "Not Analyzed",
   "Machine-Extracted",
   "Awaiting Human Confirmation",
+  "Needs Human Review",
+  "Needs Correction",
   "Human-Corrected",
   "Confirmed",
   "Rejected",
@@ -103,15 +105,24 @@ export type SmartIdeaArtifact = {
 export type ExtractedItem = {
   readonly id: string;
   readonly field: string;
+  readonly fieldKey?: string | null;
   readonly extractedValue: string;
-  /** AI interpretation confidence — NOT measurement uncertainty. */
-  readonly aiConfidence: number;
+  readonly originalText?: string | null;
+  /** Documented model confidence only — null when no probabilistic model produced the value. */
+  readonly aiConfidence: number | null;
+  readonly provenance?: string | null;
+  readonly method?: string | null;
+  readonly required?: boolean;
   readonly sourceLocation?: string | null;
   readonly userCorrection?: string | null;
+  readonly correctionHistory?: readonly Readonly<{ value: string; at: string; by: string }>[];
+  readonly rejectionReason?: string | null;
   readonly confirmationStatus: InterpretationStatus;
-  readonly limitation: string;
+  readonly limitationKey?: string | null;
+  readonly limitation?: string | null;
   readonly correctedAt?: string | null;
   readonly correctedBy?: string | null;
+  readonly reviewedByHuman?: boolean;
 };
 
 export type IdeaModel = {

@@ -19,6 +19,8 @@ import {
   loadSmartIdea,
   addSmartIdeaArtifact,
   confirmExtractedItem,
+  correctExtractedItem,
+  rejectExtractedItem,
   buildIdeaModel,
   canBuildIdeaModel,
   addManualInterpretationDraft,
@@ -65,6 +67,7 @@ import {
   statusCopyKey,
 } from "@/lib/research-canvas/canvas-stage-i18n";
 import { loadMission } from "@/lib/intelligence-os/mission-store";
+import InterpretationReviewCard from "@/components/research/canvas/InterpretationReviewCard";
 import { buildExternalSearchConsent, IP_BOUNDARY_NOTICE, visibilityEnforcementNote } from "@/lib/research-canvas/privacy-boundary";
 import { resolvePersistenceMode } from "@/lib/product/persistence-mode";
 import { appendGenesisOperatingParamsToHref } from "@/lib/genesis/genesis-operating-context";
@@ -158,10 +161,7 @@ export default function ResearchCanvasClient() {
   const stageStatuses = useMemo(() => deriveCanvasStageStatuses(idea), [idea]);
   const nextActionKey = useMemo(() => deriveActiveStageNextAction(idea), [idea]);
   const persistenceNote = rc(persistenceCopyKey(resolvePersistenceMode()));
-  const linkedMission = useMemo(() => {
-    void tick;
-    return idea?.missionId ? loadMission(idea.missionId) : null;
-  }, [idea?.missionId, tick]);
+  const linkedMission = useMemo(() => (idea?.missionId ? loadMission(idea.missionId) : null), [idea]);
   const ideaModelGate = idea ? canBuildIdeaModel(idea) : null;
 
   const selectStage = (target: ResearchCanvasStage) => {
@@ -243,10 +243,24 @@ export default function ResearchCanvasClient() {
     bump();
   };
 
-  const confirmItem = (itemId: string, corrected?: string) => {
+  const confirmItem = (itemId: string) => {
     if (!idea) return;
-    confirmExtractedItem(idea.id, itemId, { correctedValue: corrected, status: "Confirmed", actor: operator });
+    confirmExtractedItem(idea.id, itemId, { status: "Confirmed", actor: operator });
     setFeedback(t("researchCanvas.confirmed"));
+    bump();
+  };
+
+  const correctItem = (itemId: string, value: string) => {
+    if (!idea) return;
+    correctExtractedItem(idea.id, itemId, { correctedValue: value, actor: operator });
+    setFeedback(t("researchCanvas.interpretCorrectionSaved"));
+    bump();
+  };
+
+  const rejectItem = (itemId: string, reason: string) => {
+    if (!idea) return;
+    rejectExtractedItem(idea.id, itemId, { reason, actor: operator });
+    setFeedback(t("researchCanvas.interpretRejected"));
     bump();
   };
 
@@ -727,14 +741,16 @@ export default function ResearchCanvasClient() {
                 <>
                   <h3 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.interpretationReview")}</h3>
                   <p className="text-sm text-zinc-300">{t("researchCanvas.confirmPrompt")}</p>
+                  <p className="text-xs text-zinc-500">{t("researchCanvas.interpretManualInputNotice")}</p>
                   {idea.extractedItems.map((item) => (
-                    <div key={item.id} className="rounded-lg border border-zinc-800 p-3 text-xs">
-                      <p className="font-medium text-zinc-200">{item.field}</p>
-                      <p className="text-zinc-400">{item.extractedValue}</p>
-                      <p className="text-zinc-600">{t("researchCanvas.aiConfidenceLabel")}: {item.aiConfidence} — {t("researchCanvas.notUncertainty")}</p>
-                      <p className="text-amber-400/80">{item.limitation}</p>
-                      <button type="button" className={`${cbaiFocusRing} mt-2 text-teal-400`} onClick={() => confirmItem(item.id)}>{t("researchCanvas.confirm")}</button>
-                    </div>
+                    <InterpretationReviewCard
+                      key={item.id}
+                      item={item}
+                      rc={rc}
+                      onConfirm={confirmItem}
+                      onCorrect={correctItem}
+                      onReject={rejectItem}
+                    />
                   ))}
                   <button
                     type="button"
@@ -744,8 +760,12 @@ export default function ResearchCanvasClient() {
                   >
                     {t("researchCanvas.buildIdeaModel")}
                   </button>
-                  {!ideaModelGate?.ok ? (
-                    <p className="text-xs text-amber-400/90">{t("researchCanvas.confirmBeforeIdeaModel")}</p>
+                  {!ideaModelGate?.ok && ideaModelGate ? (
+                    <ul className="list-disc pl-4 text-xs text-amber-400/90">
+                      {ideaModelGate.reasonKeys.map((key) => (
+                        <li key={key}>{rc(`ideaModelGate_${key}`)}</li>
+                      ))}
+                    </ul>
                   ) : null}
                 </>
               )}
