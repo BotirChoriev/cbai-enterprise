@@ -20,6 +20,8 @@ import {
 import { deriveLeadershipMetrics } from "@/lib/genesis/monitoring-metrics";
 import { loadUnifiedAuditTrail } from "@/lib/genesis/genesis-audit-store";
 import { createTeam, loadTeams } from "@/lib/genesis/team-store";
+import { createOrganizationUnit, loadOrganizationUnits } from "@/lib/genesis/organization-unit-store";
+import OperationalLoopPanel from "@/components/genesis/OperationalLoopPanel";
 import { cbaiBtnPrimary, cbaiFocusRing, cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type Props = {
@@ -43,6 +45,7 @@ export default function ExecutionOsPanel({ organizationId, operatorName }: Props
   const [selectedDirectiveId, setSelectedDirectiveId] = useState("");
   const [taskEvidence, setTaskEvidence] = useState("");
   const [teamName, setTeamName] = useState("");
+  const [unitName, setUnitName] = useState("");
   const [feedback, setFeedback] = useState<string | null>(null);
 
   useEffect(() => {
@@ -89,6 +92,11 @@ export default function ExecutionOsPanel({ organizationId, operatorName }: Props
   const teams = useMemo(() => {
     void tick;
     return hydrated ? loadTeams(organizationId) : [];
+  }, [hydrated, organizationId, tick]);
+
+  const units = useMemo(() => {
+    void tick;
+    return hydrated ? loadOrganizationUnits(organizationId) : [];
   }, [hydrated, organizationId, tick]);
 
   if (!hydrated) return null;
@@ -229,6 +237,20 @@ export default function ExecutionOsPanel({ organizationId, operatorName }: Props
     bump();
   };
 
+  const addUnit = () => {
+    if (!unitName.trim()) return;
+    createOrganizationUnit({
+      organizationId,
+      name: unitName.trim(),
+      kind: "department",
+      description: "Organization unit",
+      missionIds: mission ? [mission.id] : [],
+    });
+    setUnitName("");
+    setFeedback(t("genesisOs.saved"));
+    bump();
+  };
+
   return (
     <section className="space-y-4" aria-labelledby="execution-os-heading">
       <div className={`${cbaiGlassCard} space-y-2 p-4`}>
@@ -251,6 +273,25 @@ export default function ExecutionOsPanel({ organizationId, operatorName }: Props
         <button type="button" onClick={addTeam} className={`${cbaiBtnPrimary} min-h-10`}>
           {t("genesisOs.createTeam")}
         </button>
+        {teams.length > 0 ? (
+          <p className="text-xs text-zinc-500">Teams: {teams.map((t) => t.name).join(", ")}</p>
+        ) : null}
+      </div>
+
+      <div className={`${cbaiGlassCard} space-y-3 p-4`}>
+        <h3 className="text-sm font-semibold text-zinc-200">Organization unit</h3>
+        <input
+          value={unitName}
+          onChange={(e) => setUnitName(e.target.value)}
+          placeholder="Unit or department name"
+          className={`min-h-10 w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 text-sm ${cbaiFocusRing}`}
+        />
+        <button type="button" onClick={addUnit} className={`${cbaiBtnPrimary} min-h-10`}>
+          Create unit
+        </button>
+        {units.length > 0 ? (
+          <p className="text-xs text-zinc-500">Units: {units.map((u) => u.name).join(", ")}</p>
+        ) : null}
       </div>
 
       <div className={`${cbaiGlassCard} grid gap-4 p-4 lg:grid-cols-2`}>
@@ -362,6 +403,8 @@ export default function ExecutionOsPanel({ organizationId, operatorName }: Props
         </div>
       )}
 
+      <OperationalLoopPanel organizationId={organizationId} operatorName={operatorName} />
+
       <div className={`${cbaiGlassCard} space-y-3 p-4`}>
         <h3 className="text-sm font-semibold text-zinc-200">{t("genesisOs.monitoringTitle")}</h3>
         <p className="text-xs text-zinc-500">{t("genesisOs.monitoringPurpose")}</p>
@@ -372,6 +415,9 @@ export default function ExecutionOsPanel({ organizationId, operatorName }: Props
                 {m.label}: {m.value}
               </p>
               <p className="mt-1 text-[10px] text-zinc-600">{m.limitation}</p>
+              {m.recordIds && m.recordIds.length > 0 ? (
+                <p className="mt-1 text-[10px] text-zinc-500">Records: {m.recordIds.slice(0, 3).join(", ")}</p>
+              ) : null}
             </div>
           ))}
         </div>

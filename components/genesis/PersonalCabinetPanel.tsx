@@ -56,6 +56,31 @@ export default function PersonalCabinetPanel() {
         <p className="text-xs text-zinc-600">{t("genesisOs.noUniversalScore")}</p>
       </div>
 
+      {snapshot.activeMission.mission ? (
+        <div className={`${cbaiGlassCard} space-y-3 p-5`} id="my-active-mission">
+          <h3 className="text-sm font-semibold text-zinc-200">{t("genesisOs.myActiveMission")}</h3>
+          <p className="text-sm text-zinc-300">{snapshot.activeMission.mission.problem.slice(0, 200)}</p>
+          <dl className="grid gap-2 text-xs text-zinc-400 sm:grid-cols-2">
+            <div>
+              <dt className="text-zinc-600">{t("genesisOs.activeMissionProject")}</dt>
+              <dd>{snapshot.activeMission.projectTitle ?? "—"}</dd>
+            </div>
+            <div>
+              <dt className="text-zinc-600">{t("genesisOs.activeMissionStage")}</dt>
+              <dd>{snapshot.activeMission.stage}</dd>
+            </div>
+          </dl>
+          {snapshot.activeMission.nextAction ? (
+            <Link
+              href={moduleHref(snapshot.activeMission.nextAction.href)}
+              className="inline-block text-xs text-teal-400 hover:text-teal-300"
+            >
+              {snapshot.activeMission.nextAction.label} →
+            </Link>
+          ) : null}
+        </div>
+      ) : null}
+
       <div className="grid gap-4 lg:grid-cols-2">
         <div className={`${cbaiGlassCard} space-y-3 p-5`}>
           <h3 className="text-sm font-semibold text-zinc-200">{t("genesisOs.myMissions")}</h3>
@@ -148,14 +173,27 @@ export default function PersonalCabinetPanel() {
 
       <div className={`${cbaiGlassCard} space-y-3 p-5`} id="attention">
         <h3 className="text-sm font-semibold text-zinc-200">{t("genesisOs.whatNeedsAttention")}</h3>
-        {snapshot.attention.items.length === 0 ? (
+        {snapshot.attention.items.length === 0 && snapshot.attention.structured.length === 0 ? (
           <p className="text-xs text-zinc-500">{t("genesisOs.emptyAttention")}</p>
         ) : (
-          <ul className="list-disc space-y-1 pl-4 text-xs text-amber-300/90">
-            {snapshot.attention.items.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
+          <>
+            <ul className="list-disc space-y-1 pl-4 text-xs text-amber-300/90">
+              {snapshot.attention.items.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+            {snapshot.attention.structured.length > 0 ? (
+              <ul className="mt-2 space-y-1">
+                {snapshot.attention.structured.map((item) => (
+                  <li key={item.id}>
+                    <Link href={moduleHref(item.href)} className="text-xs text-teal-400 hover:text-teal-300">
+                      {item.label} →
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </>
         )}
         {snapshot.attention.nextAction ? (
           <div className="rounded-lg border border-teal-500/20 bg-teal-950/20 px-4 py-3">

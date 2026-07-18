@@ -42,6 +42,8 @@
     "test:mission-operating-context": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-mission-operating-context.ts",
     "test:context-continuity-hotfix": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-context-continuity-hotfix.ts",
     "test:genesis-sprint": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-genesis-sprint.ts",
+    "test:genesis-operational-loop": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-genesis-operational-loop.ts",
+    "test:genesis-master-activation": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-genesis-master-activation.ts",
     "test:intelligence-canvas": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-intelligence-canvas.ts",
     "test:epic-governance": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-epic-governance.ts",
     "test:epic-02-mission-os": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-epic-02-mission-os.ts",

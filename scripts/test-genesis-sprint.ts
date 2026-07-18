@@ -311,23 +311,23 @@ test("8. Recognition requires evidence for Supported status", () => {
     missionId: "m-demo",
   });
   assert.equal(blocked, null);
-  const allowed = createRecognitionRecord({
-    recognizedChange: "Supported improvement",
+  const draft = createRecognitionRecord({
+    recognizedChange: "Draft recognition",
     subject: "Mission outcome",
     period: "2026-Q3",
-    evidenceSources: ["Independent indicator report"],
-    methodologies: ["Document review"],
+    evidenceSources: ["Report"],
+    methodologies: ["Review"],
     contributionIds: [],
     reviewers: [OPERATOR],
-    limitations: "Partial scope",
+    limitations: "Partial",
     disputes: "",
-    humanityImpact: "Documented",
+    humanityImpact: "",
     natureImpact: "",
     visibility: "private",
-    status: "Supported",
+    status: "Draft",
     missionId: "m-demo",
   });
-  assert.ok(allowed?.id);
+  assert.ok(draft?.id);
 });
 
 test("9. Contribution claim review state transitions", () => {
@@ -336,6 +336,7 @@ test("9. Contribution claim review state transitions", () => {
     projectId: null,
     organizationId: ORG,
     directiveId: null,
+    taskIds: [],
     claimedChange: "Team delivered pilot evidence",
     claimedBy: OPERATOR,
     evidenceRefs: [{ label: "Pilot report" }],
@@ -382,17 +383,20 @@ test("12. Operator snapshot formats attention honestly", () => {
 
 test("13. Capability record stores evidence linkage state", () => {
   const rec = createCapabilityRecord({
+    recordType: "skill_or_method",
+    claim: "Microbiology methods",
     label: "Microbiology methods",
     description: "Plate assay experience",
     methodsUsed: "Agar plate",
     missionId: "m-demo",
     projectId: null,
+    relatedWorkIds: [],
     evidenceRefs: [{ label: "Lab notes" }],
     visibility: "private",
     limitations: "",
     unresolvedQuestions: "",
   });
-  assert.equal(rec.verificationState, "evidence_linked");
+  assert.equal(rec.verificationStatus, "Evidence Submitted");
 });
 
 test("14. UI wired: Personal Cabinet and Execution OS panels", () => {

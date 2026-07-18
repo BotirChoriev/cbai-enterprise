@@ -266,6 +266,10 @@ export function loadExecutionPlans(organizationId?: string): GenesisExecutionPla
   }) : all;
 }
 
+export function loadExecutionTask(taskId: string): GenesisExecutionTask | null {
+  return readGenesisList(TASKS_KEY, isTask, memoryTasks).find((t) => t.id === taskId) ?? null;
+}
+
 export function loadExecutionTasks(organizationId?: string): GenesisExecutionTask[] {
   const all = readGenesisList(TASKS_KEY, isTask, memoryTasks);
   return organizationId ? all.filter((t) => t.organizationId === organizationId) : all;

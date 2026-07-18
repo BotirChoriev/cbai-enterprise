@@ -15,6 +15,7 @@ import {
   type RelationshipFocus,
 } from "@/lib/assistant/assistant-relationship-commands";
 import { resolveProjectCommand } from "@/lib/project/project-commands";
+import { resolveGenesisCommand } from "@/lib/genesis/genesis-operator-commands";
 import { resolveLanguageCommand } from "@/lib/i18n/language-command";
 import { getResearchTopicById } from "@/lib/research/research-topics";
 import { getPrimaryEntity } from "@/lib/context";
@@ -176,6 +177,18 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
         return;
       }
 
+      const genesisMatch = resolveGenesisCommand(trimmed, resolveOperatorName(profile));
+      if (genesisMatch) {
+        setUnrecognized(null);
+        setInput("");
+        setConfirmation(genesisMatch.message);
+        recordWorkflowEvent("intent_resolved", {
+          outcome: "success",
+          intentCategory: "genesis_attention",
+        });
+        return;
+      }
+
       const intent = resolveUniversalIntent(trimmed);
       const match = intent.command;
       if (match) {
@@ -197,7 +210,7 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
         setUnrecognized(trimmed);
       }
     },
-    [router, focusedEntity, pinEntityToWorkspace, relationshipFocus, updateProfile, t],
+    [router, focusedEntity, pinEntityToWorkspace, relationshipFocus, updateProfile, t, profile],
   );
 
   function handleSubmit(event: React.FormEvent) {

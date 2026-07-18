@@ -83,12 +83,85 @@ export const RECOGNITION_STATUSES = [
 
 export type RecognitionStatus = (typeof RECOGNITION_STATUSES)[number];
 
+export const BLOCKER_TYPES = [
+  "Missing Information",
+  "Missing Evidence",
+  "Dependency Delay",
+  "Capacity Issue",
+  "Technical Issue",
+  "Policy or Procedure",
+  "External Dependency",
+  "Human Decision Required",
+  "Other",
+] as const;
+
+export type BlockerType = (typeof BLOCKER_TYPES)[number];
+
+export const BLOCKER_STATUSES = [
+  "Open",
+  "Under Review",
+  "Action Required",
+  "Resolved",
+  "Closed",
+] as const;
+
+export type BlockerStatus = (typeof BLOCKER_STATUSES)[number];
+
+export const OUTCOME_VERIFICATION_STATUSES = [
+  "Draft",
+  "Evidence Missing",
+  "Submitted for Review",
+  "Partially Supported",
+  "Supported",
+  "Disputed",
+  "Rejected",
+  "Archived",
+] as const;
+
+export type OutcomeVerificationStatus = (typeof OUTCOME_VERIFICATION_STATUSES)[number];
+
+export const PROGRESS_HUMAN_REVIEW_STATUSES = ["none", "pending", "reviewed"] as const;
+
+export type ProgressHumanReviewStatus = (typeof PROGRESS_HUMAN_REVIEW_STATUSES)[number];
+
 export type GenesisEvidenceRef = {
   readonly label: string;
   readonly sourceUrl?: string | null;
   readonly projectEvidenceId?: string | null;
   readonly noteId?: string | null;
 };
+
+export const CAPABILITY_RECORD_TYPES = [
+  "declared_goal",
+  "interest",
+  "skill_or_method",
+  "completed_project",
+  "completed_mission",
+  "research_contribution",
+  "evidence_review",
+  "prototype",
+  "technical_work",
+  "team_contribution",
+  "verified_outcome",
+  "independent_review",
+  "learning_milestone",
+  "unresolved_limitation",
+] as const;
+
+export type CapabilityRecordType = (typeof CAPABILITY_RECORD_TYPES)[number];
+
+export const CAPABILITY_VERIFICATION_STATUSES = [
+  "Self-Declared",
+  "Evidence Submitted",
+  "Under Review",
+  "Partially Verified",
+  "Verified",
+  "Disputed",
+  "Expired",
+  "Archived",
+] as const;
+
+export type CapabilityVerificationStatus = (typeof CAPABILITY_VERIFICATION_STATUSES)[number];
 
 export type GenesisAuditRecord = {
   readonly id: string;

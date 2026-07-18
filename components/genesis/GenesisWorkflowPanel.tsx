@@ -208,6 +208,7 @@ export default function GenesisWorkflowPanel() {
       projectId: mission?.projectId ?? null,
       organizationId: null,
       directiveId: null,
+      taskIds: [],
       claimedChange: contributionClaim.trim(),
       claimedBy: operatorName,
       evidenceRefs: [],
@@ -224,11 +225,14 @@ export default function GenesisWorkflowPanel() {
   const addCapabilityRecord = () => {
     if (!mission) return;
     createCapabilityRecord({
+      recordType: "skill_or_method",
+      claim: `Mission work: ${mission.problem.slice(0, 40)}`,
       label: `Mission work: ${mission.problem.slice(0, 40)}`,
       description: "Evidence-backed capability from mission work.",
       methodsUsed: "",
       projectId: mission.projectId ?? null,
       missionId: mission.id,
+      relatedWorkIds: mission.projectId ? [mission.projectId] : [],
       evidenceRefs: [],
       visibility: "private",
       limitations: "Unverified until evidence linked.",

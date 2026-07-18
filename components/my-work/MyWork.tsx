@@ -25,6 +25,8 @@ import CapabilityPassportPanel from "@/components/capability/CapabilityPassportP
 import CapabilityGalaxy from "@/components/capability/CapabilityGalaxy";
 import PersonalCabinetPanel from "@/components/genesis/PersonalCabinetPanel";
 import GenesisWorkflowPanel from "@/components/genesis/GenesisWorkflowPanel";
+import CapabilityPassportGenesisPanel from "@/components/genesis/CapabilityPassportGenesisPanel";
+import GenesisReportsPanel from "@/components/genesis/GenesisReportsPanel";
 import { loadProject } from "@/lib/project/project-store";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
@@ -218,8 +220,10 @@ function MyWorkContent() {
       {disclosure.showMyWorkCapabilityPanels ? (
         <>
           <CapabilityPassportPanel />
+          <CapabilityPassportGenesisPanel />
           <CapabilityGalaxy />
           <GenesisWorkflowPanel />
+          <GenesisReportsPanel />
         </>
       ) : null}
 
