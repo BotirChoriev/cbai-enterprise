@@ -9,7 +9,12 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { EvidenceResultsPayload, VoiceDockState, VoicePermissionIssue } from "@/lib/voice-operator/types";
+import type {
+  EvidenceResultsPayload,
+  VoiceBrokerIssue,
+  VoiceDockState,
+  VoicePermissionIssue,
+} from "@/lib/voice-operator/types";
 import {
   clearVoiceSessionMemory,
   createVoiceSessionMemory,
@@ -20,6 +25,10 @@ import {
   processConversationInput,
   resolveOperatorMode,
 } from "@/lib/voice-operator/conversation-engine";
+import {
+  mapSpeechRecognitionError,
+  requestMicrophoneAccess,
+} from "@/lib/voice-operator/microphone-access";
 import { revokeExternalSearchConsent } from "@/lib/voice-operator/tools/voice-tools";
 import { SpeechRecognitionSession } from "@/lib/voice/speech-recognition-session";
 import { resolveActiveSpeechLanguage } from "@/lib/voice/speech-language-preference";
@@ -30,6 +39,7 @@ type VoiceOperatorContextValue = {
   readonly dockOpen: boolean;
   readonly dockState: VoiceDockState;
   readonly permissionIssue: VoicePermissionIssue | null;
+  readonly brokerIssue: VoiceBrokerIssue | null;
   readonly transcriptVisible: boolean;
   readonly textInput: string;
   readonly evidenceResults: EvidenceResultsPayload | null;
@@ -43,7 +53,7 @@ type VoiceOperatorContextValue = {
   toggleTranscript: () => void;
   setTextInput: (value: string) => void;
   sendTextMessage: () => Promise<void>;
-  startListening: () => void;
+  startListening: () => Promise<void>;
   stopListening: () => void;
   endSession: () => void;
   dismissPermission: () => void;
@@ -63,12 +73,55 @@ export function useVoiceOperator(): VoiceOperatorContextValue {
   return ctx;
 }
 
+function startBrowserSpeechSession(
+  language: string,
+  profileSpeechLanguage: string | undefined,
+  applyResponse: (text: string) => Promise<void>,
+  sessionRef: React.MutableRefObject<SpeechRecognitionSession | null>,
+  onIssue: (issue: VoicePermissionIssue) => void,
+  onDockState: (state: VoiceDockState) => void,
+): boolean {
+  const speechLang = resolveActiveSpeechLanguage(language, profileSpeechLanguage);
+  const session = new SpeechRecognitionSession({
+    onPhaseChange: (phase) => {
+      if (phase === "listening") onDockState("listening");
+      if (phase === "transcript_review") {
+        const result = session.consumeResult();
+        onDockState("thinking");
+        if (result?.transcript) {
+          void applyResponse(result.transcript);
+        } else {
+          onDockState("ready");
+        }
+      }
+      if (phase === "error") onDockState("error");
+    },
+    onError: (code) => {
+      const issue = mapSpeechRecognitionError(code);
+      if (issue) {
+        onIssue(issue);
+        onDockState(issue === "network_disconnected" ? "error" : "permission_required");
+      } else {
+        onDockState("error");
+      }
+    },
+  });
+  sessionRef.current = session;
+  if (!session.start(speechLang)) {
+    onIssue("unsupported");
+    onDockState("permission_required");
+    return false;
+  }
+  return true;
+}
+
 export default function VoiceOperatorProvider({ children }: { children: ReactNode }) {
   const { language } = useTranslation();
   const { profile } = useAssistantProfile();
   const [dockOpen, setDockOpen] = useState(false);
   const [dockState, setDockState] = useState<VoiceDockState>("closed");
   const [permissionIssue, setPermissionIssue] = useState<VoicePermissionIssue | null>(null);
+  const [brokerIssue, setBrokerIssue] = useState<VoiceBrokerIssue | null>(null);
   const [transcriptVisible, setTranscriptVisible] = useState(false);
   const [textInput, setTextInput] = useState("");
   const [evidenceResults, setEvidenceResults] = useState<EvidenceResultsPayload | null>(null);
@@ -106,15 +159,20 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
     [toolContext, sessionActive],
   );
 
+  const syncBrokerIssue = useCallback(() => {
+    setBrokerIssue(operatorMode.backendRequired ? "required" : null);
+  }, [operatorMode.backendRequired]);
+
   const openDock = useCallback(() => {
     setDockOpen(true);
+    syncBrokerIssue();
     if (!sessionActive) {
       createVoiceSessionMemory(language, operatorMode.mode);
       setDockState(operatorMode.backendRequired ? "backend_required" : "ready");
     } else {
       setDockState("ready");
     }
-  }, [language, operatorMode, sessionActive]);
+  }, [language, operatorMode, sessionActive, syncBrokerIssue]);
 
   const closeDock = useCallback(() => {
     setDockOpen(false);
@@ -131,9 +189,11 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
     setEvidenceOpen(false);
     setEvidenceResults(null);
     setAwaitingConsent(false);
+    setPermissionIssue(null);
     setDockState("closed");
     setDockOpen(false);
-  }, []);
+    syncBrokerIssue();
+  }, [syncBrokerIssue]);
 
   const sendTextMessage = useCallback(async () => {
     const text = textInput.trim();
@@ -144,42 +204,46 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
     await applyResponse(text);
   }, [textInput, applyResponse]);
 
-  const startListening = useCallback(() => {
-    if (muted || permissionIssue) return;
+  const startListening = useCallback(async () => {
+    if (muted) return;
+
+    setPermissionIssue(null);
     setSessionActive(true);
     setTranscriptVisible(true);
-    setDockState("listening");
-    const speechLang = resolveActiveSpeechLanguage(language, profile.speechLanguage);
-    const session = new SpeechRecognitionSession({
-      onPhaseChange: (phase) => {
-        if (phase === "listening") setDockState("listening");
-        if (phase === "transcript_review") {
-          const result = session.consumeResult();
-          setDockState("thinking");
-          if (result?.transcript) {
-            void applyResponse(result.transcript);
-          } else {
-            setDockState("ready");
-          }
-        }
-        if (phase === "error") setDockState("error");
-      },
-      onError: (code) => {
-        if (code === "not-allowed" || code === "permission-denied" || code === "service-not-allowed") {
-          setPermissionIssue("denied");
-          setDockState("permission_required");
-        } else if (code === "network") {
-          setPermissionIssue("network_disconnected");
-          setDockState("error");
-        }
-      },
-    });
-    sessionRef.current = session;
-    if (!session.start(speechLang)) {
-      setPermissionIssue("unsupported");
+    setDockState("connecting");
+
+    const micAccess = await requestMicrophoneAccess();
+    if (!micAccess.ok) {
+      setPermissionIssue(micAccess.issue);
       setDockState("permission_required");
+      return;
     }
-  }, [muted, permissionIssue, language, profile.speechLanguage, applyResponse]);
+
+    // Realtime path requires broker — independent from microphone permission.
+    if (operatorMode.mode === "realtime") {
+      setDockState("listening");
+      // Broker-backed Realtime session wiring lands here; mic probe already succeeded.
+      startBrowserSpeechSession(
+        language,
+        profile.speechLanguage,
+        applyResponse,
+        sessionRef,
+        setPermissionIssue,
+        setDockState,
+      );
+      return;
+    }
+
+    setDockState("listening");
+    startBrowserSpeechSession(
+      language,
+      profile.speechLanguage,
+      applyResponse,
+      sessionRef,
+      setPermissionIssue,
+      setDockState,
+    );
+  }, [muted, operatorMode.mode, language, profile.speechLanguage, applyResponse]);
 
   const stopListening = useCallback(() => {
     sessionRef.current?.stop();
@@ -188,12 +252,12 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
 
   const dismissPermission = useCallback(() => {
     setPermissionIssue(null);
-    setDockState(dockOpen ? "ready" : "closed");
-  }, [dockOpen]);
+    setDockState(dockOpen ? (brokerIssue ? "backend_required" : "ready") : "closed");
+  }, [dockOpen, brokerIssue]);
 
   const retryPermission = useCallback(() => {
     setPermissionIssue(null);
-    startListening();
+    void startListening();
   }, [startListening]);
 
   const confirmConsent = useCallback(async () => {
@@ -204,13 +268,14 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
   const cancelConsent = useCallback(() => {
     clearConversationPendingState();
     setAwaitingConsent(false);
-    setDockState("ready");
-  }, []);
+    setDockState(brokerIssue ? "backend_required" : "ready");
+  }, [brokerIssue]);
 
   const value: VoiceOperatorContextValue = {
     dockOpen,
     dockState,
     permissionIssue,
+    brokerIssue,
     transcriptVisible,
     textInput,
     evidenceResults,

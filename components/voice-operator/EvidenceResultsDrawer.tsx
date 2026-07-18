@@ -48,13 +48,13 @@ export default function EvidenceResultsDrawer() {
                     </a>
                   ) : null}
                   <p className="mt-2 text-[11px] text-zinc-500">{item.relevanceNote}</p>
-                  <p className="text-[10px] text-amber-400/80">{t("voiceOperator.evidenceMetadataOnly")}</p>
+                  <p className="text-[10px] font-medium text-amber-950 dark:text-amber-100">{t("voiceOperator.evidenceMetadataOnly")}</p>
                 </li>
               ))}
             </ul>
           )}
           {providerFailures.length > 0 ? (
-            <p className="mt-3 text-[11px] text-amber-400">
+            <p className="mt-3 text-[11px] font-medium text-red-950 dark:text-red-200">
               {t("voiceOperator.evidenceProviderFailed")}: {providerFailures.join(", ")}
             </p>
           ) : null}

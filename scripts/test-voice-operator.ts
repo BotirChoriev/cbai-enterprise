@@ -105,7 +105,9 @@ test("7. text fallback input exists in dock", () => {
 test("8. permission card shows retry and does not claim code overrides Safari", () => {
   const card = readSource("components/voice-operator/VoiceOperatorPermissionCard.tsx");
   assert.match(card, /permissionRetry/);
-  assert.match(card, /o‘zgartirib bo‘lmaydi|o'zgartirib bo'lmaydi/);
+  assert.match(card, /permissionDeniedHelp/);
+  const uz = readSource("lib/i18n/platform-copy-voice-operator.ts");
+  assert.match(uz, /o'zgartirib bo'lmaydi/);
 });
 
 test("9. retry permission is wired in provider", () => {
@@ -113,10 +115,21 @@ test("9. retry permission is wired in provider", () => {
   assert.match(provider, /retryPermission/);
 });
 
-test("10. permission denied maps to permission_required dock state", () => {
+test("10. microphone denial comes from getUserMedia mapping not SpeechRecognition alone", () => {
   const provider = readSource("components/voice-operator/VoiceOperatorProvider.tsx");
-  assert.match(provider, /permission_required/);
-  assert.match(provider, /setPermissionIssue\("denied"\)/);
+  assert.match(provider, /requestMicrophoneAccess/);
+  assert.match(provider, /mapSpeechRecognitionError/);
+  const mic = readSource("lib/voice-operator/microphone-access.ts");
+  assert.match(mic, /NotAllowedError/);
+  assert.match(mic, /speech_unavailable/);
+});
+
+test("10b. broker and microphone states are independent", () => {
+  const provider = readSource("components/voice-operator/VoiceOperatorProvider.tsx");
+  assert.match(provider, /brokerIssue/);
+  assert.match(provider, /VoiceOperatorBrokerNotice|brokerIssue/);
+  const dock = readSource("components/voice-operator/VoiceOperatorDock.tsx");
+  assert.match(dock, /VoiceOperatorBrokerNotice/);
 });
 
 // --- Realtime architecture ---

@@ -3,13 +3,16 @@
 import { useVoiceOperator } from "@/components/voice-operator/VoiceOperatorProvider";
 import EvidenceResultsDrawer from "@/components/voice-operator/EvidenceResultsDrawer";
 import VoiceOperatorPermissionCard from "@/components/voice-operator/VoiceOperatorPermissionCard";
+import VoiceOperatorBrokerNotice from "@/components/voice-operator/VoiceOperatorBrokerNotice";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { dockStateLabel } from "@/lib/i18n/platform-copy-voice-operator";
+import { getDictionary } from "@/lib/i18n/translate";
 import { readVoiceSessionMemory } from "@/lib/voice-operator/session-memory";
 
 export default function VoiceOperatorDock() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const vo = useVoiceOperator();
+  const voiceCopy = getDictionary(language).voiceOperator;
   const copy = {
     dockTitle: t("voiceOperator.dockTitle"),
     stateClosed: t("voiceOperator.stateClosed"),
@@ -66,7 +69,7 @@ export default function VoiceOperatorDock() {
   };
 
   const session = readVoiceSessionMemory();
-  const stateLabel = dockStateLabel(copy, vo.dockState);
+  const stateLabel = dockStateLabel(voiceCopy, vo.dockState);
 
   if (!vo.dockOpen && vo.dockState === "closed") {
     return (
@@ -125,11 +128,11 @@ export default function VoiceOperatorDock() {
               </button>
             </div>
 
-            {vo.backendRequired ? (
-              <p className="mb-2 text-[11px] text-amber-400/90">{copy.backendRequiredNotice}</p>
-            ) : (
+            {vo.brokerIssue ? <VoiceOperatorBrokerNotice issue={vo.brokerIssue} /> : null}
+
+            {!vo.brokerIssue && !vo.backendRequired ? (
               <p className="mb-2 text-[11px] text-zinc-500">{copy.browserFallbackNotice}</p>
-            )}
+            ) : null}
 
             {vo.permissionIssue ? (
               <VoiceOperatorPermissionCard issue={vo.permissionIssue} onDismiss={vo.dismissPermission} onRetry={vo.retryPermission} />
@@ -162,7 +165,7 @@ export default function VoiceOperatorDock() {
               </button>
               <button
                 type="button"
-                onClick={vo.dockState === "listening" ? vo.stopListening : vo.startListening}
+                onClick={() => void (vo.dockState === "listening" ? vo.stopListening() : vo.startListening())}
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-teal-500/30 bg-teal-500/10 text-teal-300"
                 aria-label={vo.dockState === "listening" ? copy.interrupt : copy.startConversation}
               >

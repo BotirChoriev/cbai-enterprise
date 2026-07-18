@@ -24,8 +24,10 @@ export type VoicePermissionIssue =
   | "device_busy"
   | "insecure_origin"
   | "unsupported"
-  | "backend_unavailable"
+  | "speech_unavailable"
   | "network_disconnected";
+
+export type VoiceBrokerIssue = "required" | "unreachable";
 
 export type ToolRiskClass = "read_only" | "external_read" | "draft_write" | "consequential";
 
