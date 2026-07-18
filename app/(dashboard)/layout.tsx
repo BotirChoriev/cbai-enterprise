@@ -18,6 +18,8 @@ import { PlatformContextProvider } from "@/components/platform/context/PlatformC
 import { UniversalWorkspaceProvider } from "@/components/platform/context/UniversalWorkspaceProvider";
 import { MissionContextProvider } from "@/components/mission/MissionContextProvider";
 import { AuthProvider } from "@/components/platform/context/AuthProvider";
+import VoiceOperatorProvider from "@/components/voice-operator/VoiceOperatorProvider";
+import VoiceOperatorDock from "@/components/voice-operator/VoiceOperatorDock";
 import OfflineBanner from "@/components/system/OfflineBanner";
 import RouteChromeFallback from "@/components/system/RouteChromeFallback";
 
@@ -51,6 +53,7 @@ export default function DashboardLayout({
             <PlatformContextProvider>
               <MissionContextProvider>
                 <UniversalWorkspaceProvider>
+                <VoiceOperatorProvider>
                 <OfflineBanner />
                 <MobileNavDrawer open={isMobileNavOpen} onClose={() => setIsMobileNavOpen(false)} />
                 <Topbar onMenuClick={() => setIsMobileNavOpen(true)} transparent={isHome && !isScrolled} />
@@ -58,7 +61,7 @@ export default function DashboardLayout({
                 <AmbientTrustStrip />
                 <MentalModelStrip />
                 <FloatingIntelligencePresence />
-                <main className="flex min-h-0 flex-1 flex-col overflow-y-auto" onScroll={handleMainScroll}>
+                <main className="flex min-h-0 flex-1 flex-col overflow-y-auto pb-24" onScroll={handleMainScroll}>
                   {isHome ? (
                     <IntelligenceAtmosphereShell className="cbai-living-canvas min-h-0 flex-1">
                       {children}
@@ -76,6 +79,8 @@ export default function DashboardLayout({
                     </MobileIntelligenceShell>
                   )}
                 </main>
+                <VoiceOperatorDock />
+                </VoiceOperatorProvider>
                 </UniversalWorkspaceProvider>
               </MissionContextProvider>
             </PlatformContextProvider>

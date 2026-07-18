@@ -51,12 +51,15 @@ type VoiceStatus = "idle" | "requesting" | "listening" | "processing" | "permiss
 type AssistantCommandCenterProps = {
   size?: "compact" | "prominent";
   hideOrb?: boolean;
+  /** When true, text command bar only — voice lives in VoiceOperatorDock. */
+  textOnly?: boolean;
   onOrbStateChange?: (state: OperatorOrbState) => void;
 };
 
 export default function AssistantCommandCenter({
   size = "compact",
   hideOrb = false,
+  textOnly = true,
   onOrbStateChange,
 }: AssistantCommandCenterProps) {
   const router = useRouter();
@@ -388,7 +391,7 @@ export default function AssistantCommandCenter({
           />
         </div>
 
-        {profile.voiceInputEnabled ? (
+        {profile.voiceInputEnabled && !textOnly ? (
           <div className={`flex shrink-0 items-center gap-1 ${isProminent ? "order-1" : ""}`}>
             <label htmlFor={speechLangId} className="sr-only">
               {t("voiceControl.speechLanguageLabel")}
@@ -471,31 +474,31 @@ export default function AssistantCommandCenter({
         ) : null}
       </form>
 
-      {profile.voiceInputEnabled && speechSupported ? (
+      {!textOnly && profile.voiceInputEnabled && speechSupported ? (
         <p className="mt-1.5 text-[11px] text-zinc-600">
           {voiceSupport === "partial" || voiceSupport === "unverified"
             ? t("voiceControl.capabilityBrowserDependent")
             : t("voiceControl.capabilityAvailable")}
         </p>
       ) : null}
-      {profile.voiceInputEnabled && !speechSupported ? (
+      {!textOnly && profile.voiceInputEnabled && !speechSupported ? (
         <p className="mt-1.5 text-[11px] text-zinc-600">{t("activation.voiceUnsupportedRecovery")}</p>
       ) : null}
-      {voicePhase === "transcript_review" || voicePhase === "action_review" ? (
+      {!textOnly && (voicePhase === "transcript_review" || voicePhase === "action_review") ? (
         <p className="mt-1.5 text-[11px] text-zinc-500">{t("voiceControl.noNavigationUntilConfirmed")}</p>
       ) : null}
-      {voiceStatus === "permission-denied" ? (
+      {!textOnly && voiceStatus === "permission-denied" ? (
         <p role="alert" className="mt-1.5 text-[11px] text-amber-400">
           {t("assistant.micPermissionDenied")} {t("activation.voicePermissionRecovery")}
         </p>
       ) : null}
-      {voiceStatus === "network-error" ? (
+      {!textOnly && voiceStatus === "network-error" ? (
         <p role="alert" className="mt-1.5 text-[11px] text-amber-400">
           {t("assistant.micNetworkError")}
         </p>
       ) : null}
 
-      {transcriptReview && voicePhase === "transcript_review" ? (
+      {!textOnly && transcriptReview && voicePhase === "transcript_review" ? (
         <VoiceTranscriptReviewPanel
           recognitionLang={transcriptReview.lang}
           transcript={transcriptReview.text}
@@ -519,7 +522,7 @@ export default function AssistantCommandCenter({
         />
       ) : null}
 
-      {actionProposal && voicePhase === "action_review" ? (
+      {!textOnly && actionProposal && voicePhase === "action_review" ? (
         <VoiceActionReviewPanel
           proposal={actionProposal}
           onConfirm={handleConfirmedAction}

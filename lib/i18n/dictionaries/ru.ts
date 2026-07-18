@@ -2,6 +2,7 @@ import type { TranslationDictionary } from "@/lib/i18n/dictionary-types";
 import {
   VOICE_CONTROL_RU,
 } from "@/lib/i18n/platform-copy-voice-control";
+import { VOICE_OPERATOR_RU } from "@/lib/i18n/platform-copy-voice-operator";
 import { COMPASS_COPY_RU, ENTITIES_RU, MY_WORK_RU, PRODUCT_STATUS_RU, SYSTEM_RU } from "@/lib/i18n/platform-copy-ru";
 import {
   DASHBOARD_RU,
@@ -546,6 +547,7 @@ const ru: TranslationDictionary = {
   validation: VALIDATION_RU,
   assistantVoice: ASSISTANT_VOICE_RU,
   voiceControl: VOICE_CONTROL_RU,
+  voiceOperator: VOICE_OPERATOR_RU,
   myWorkExt: MY_WORK_EXT_RU,
   researchCatalog: RESEARCH_CATALOG_RU,
   graphExtended: GRAPH_EXTENDED_RU,
