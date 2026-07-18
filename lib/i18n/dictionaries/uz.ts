@@ -86,6 +86,7 @@ import { ORGANIZATION_OS_UZ } from "@/lib/i18n/platform-copy-build019-uz";
 import { ORG_WORKSPACE_UZ } from "@/lib/i18n/platform-copy-build034-uz";
 import { SHARED_BACKEND_UZ } from "@/lib/i18n/platform-copy-build039-uz";
 import { GENESIS_OS_UZ } from "@/lib/i18n/platform-copy-genesis-uz";
+import { RESEARCH_CANVAS_UZ } from "@/lib/i18n/platform-copy-research-canvas-uz";
 import { ZERO_LEARNING_CURVE_UZ, MISSION_LIFECYCLE_NEXT_UZ } from "@/lib/i18n/platform-copy-build020-uz";
 import { ACTIVATION_UZ } from "@/lib/i18n/platform-copy-build021-uz";
 import { MISSION_HOME_UZ, RESEARCH_DASHBOARD_UZ, SAVED_EVIDENCE_UZ, PROJECT_PANEL_UZ } from "@/lib/i18n/platform-copy-build022-uz";
@@ -603,6 +604,7 @@ const uz: TranslationDictionary = {
   universalIntent: UNIVERSAL_INTENT_UZ,
   missionOperating: MISSION_OPERATING_UZ,
   genesisOs: GENESIS_OS_UZ,
+  researchCanvas: RESEARCH_CANVAS_UZ,
 };
 
 export default uz;

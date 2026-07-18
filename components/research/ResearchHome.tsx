@@ -8,7 +8,7 @@ import ResearchEcosystemOverview from "@/components/research/ResearchEcosystemOv
 import ResearchTopicCatalog from "@/components/research/ResearchTopicCatalog";
 import ResearchGraphPanel from "@/components/research/graph/ResearchGraphPanel";
 import ResearchPrinciples from "@/components/research/ResearchPrinciples";
-import { cbaiBtnSecondary, cbaiGlassCard, cbaiHeroGlow, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { cbaiBtnPrimary, cbaiBtnSecondary, cbaiGlassCard, cbaiHeroGlow, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import { WORKSPACE_PATH } from "@/lib/research/workspace";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { getDictionary } from "@/lib/i18n/translate";
@@ -70,6 +70,22 @@ export default function ResearchHome() {
       <div
         className={`mx-auto max-w-6xl space-y-14 px-4 pb-10 sm:px-6 sm:pb-14 ${cbaiHeroGlow}`}
       >
+        <section aria-labelledby="research-canvas-cta-heading" className="space-y-3">
+          <p className={cbaiSectionEyebrow}>{t("researchCanvas.eyebrow")}</p>
+          <div className={`${cbaiGlassCard} flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between`}>
+            <div>
+              <h2 id="research-canvas-cta-heading" className="text-lg font-semibold text-zinc-100">
+                {t("researchCanvas.pageTitle")}
+              </h2>
+              <p className="mt-1 text-sm text-zinc-500">{t("researchCanvas.purpose")}</p>
+              <p className="mt-2 text-xs text-zinc-600">{t("researchCanvas.defaultPrivate")}</p>
+            </div>
+            <Link href="/research/canvas" className={`${cbaiBtnPrimary} shrink-0`}>
+              {t("researchCanvas.createSmartIdea")} →
+            </Link>
+          </div>
+        </section>
+
         <section aria-labelledby="research-workspace-cta-heading" className="space-y-3">
           <p className={cbaiSectionEyebrow}>{researchHome.workspaceEyebrow}</p>
           <div className={`${cbaiGlassCard} flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between`}>

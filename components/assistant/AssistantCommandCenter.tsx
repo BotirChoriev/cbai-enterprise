@@ -16,6 +16,7 @@ import {
 } from "@/lib/assistant/assistant-relationship-commands";
 import { resolveProjectCommand } from "@/lib/project/project-commands";
 import { resolveGenesisCommand } from "@/lib/genesis/genesis-operator-commands";
+import { resolveResearchCanvasCommand } from "@/lib/research-canvas/research-canvas-operator-commands";
 import { resolveLanguageCommand } from "@/lib/i18n/language-command";
 import { getResearchTopicById } from "@/lib/research/research-topics";
 import { getPrimaryEntity } from "@/lib/context";
@@ -177,11 +178,25 @@ export default function AssistantCommandCenter({ size = "compact", hideOrb = fal
         return;
       }
 
+      const canvasMatch = resolveResearchCanvasCommand(trimmed);
+      if (canvasMatch) {
+        setUnrecognized(null);
+        setInput("");
+        setConfirmation(canvasMatch.message);
+        if (canvasMatch.href) router.push(canvasMatch.href);
+        recordWorkflowEvent("intent_resolved", {
+          outcome: "success",
+          intentCategory: "research_canvas",
+        });
+        return;
+      }
+
       const genesisMatch = resolveGenesisCommand(trimmed, resolveOperatorName(profile));
       if (genesisMatch) {
         setUnrecognized(null);
         setInput("");
         setConfirmation(genesisMatch.message);
+        if (genesisMatch.href) router.push(genesisMatch.href);
         recordWorkflowEvent("intent_resolved", {
           outcome: "success",
           intentCategory: "genesis_attention",

@@ -86,6 +86,7 @@ import { ORGANIZATION_OS_EN } from "@/lib/i18n/platform-copy-build019-en";
 import { ORG_WORKSPACE_EN } from "@/lib/i18n/platform-copy-build034-en";
 import { SHARED_BACKEND_EN } from "@/lib/i18n/platform-copy-build039-en";
 import { GENESIS_OS_EN } from "@/lib/i18n/platform-copy-genesis-en";
+import { RESEARCH_CANVAS_EN } from "@/lib/i18n/platform-copy-research-canvas-en";
 import { ZERO_LEARNING_CURVE_EN, MISSION_LIFECYCLE_NEXT_EN } from "@/lib/i18n/platform-copy-build020-en";
 import { ACTIVATION_EN } from "@/lib/i18n/platform-copy-build021-en";
 import { MISSION_HOME_EN, RESEARCH_DASHBOARD_EN, SAVED_EVIDENCE_EN, PROJECT_PANEL_EN } from "@/lib/i18n/platform-copy-build022-en";
@@ -604,6 +605,7 @@ const en: TranslationDictionary = {
   universalIntent: UNIVERSAL_INTENT_EN,
   missionOperating: MISSION_OPERATING_EN,
   genesisOs: GENESIS_OS_EN,
+  researchCanvas: RESEARCH_CANVAS_EN,
 };
 
 export default en;

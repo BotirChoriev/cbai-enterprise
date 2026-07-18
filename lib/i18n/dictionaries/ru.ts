@@ -86,6 +86,7 @@ import { ORGANIZATION_OS_RU } from "@/lib/i18n/platform-copy-build019-ru";
 import { ORG_WORKSPACE_RU } from "@/lib/i18n/platform-copy-build034-ru";
 import { SHARED_BACKEND_RU } from "@/lib/i18n/platform-copy-build039-ru";
 import { GENESIS_OS_RU } from "@/lib/i18n/platform-copy-genesis-ru";
+import { RESEARCH_CANVAS_RU } from "@/lib/i18n/platform-copy-research-canvas-ru";
 import { ZERO_LEARNING_CURVE_RU, MISSION_LIFECYCLE_NEXT_RU } from "@/lib/i18n/platform-copy-build020-ru";
 import { ACTIVATION_RU } from "@/lib/i18n/platform-copy-build021-ru";
 import { MISSION_HOME_RU, RESEARCH_DASHBOARD_RU, SAVED_EVIDENCE_RU, PROJECT_PANEL_RU } from "@/lib/i18n/platform-copy-build022-ru";
@@ -603,6 +604,7 @@ const ru: TranslationDictionary = {
   universalIntent: UNIVERSAL_INTENT_RU,
   missionOperating: MISSION_OPERATING_RU,
   genesisOs: GENESIS_OS_RU,
+  researchCanvas: RESEARCH_CANVAS_RU,
 };
 
 export default ru;
