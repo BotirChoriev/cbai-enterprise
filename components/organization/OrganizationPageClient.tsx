@@ -25,6 +25,7 @@ import { getSyncedCloudUserId } from "@/lib/supabase/cloud-session-sync";
 import { getCloudSession } from "@/lib/supabase/cloud-auth";
 import { isOrganizationCollaborationShared } from "@/lib/persistence/persistence-capability";
 import { cbaiBtnPrimary, cbaiFocusRing, cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import ExecutionOsPanel from "@/components/genesis/ExecutionOsPanel";
 import { MISSION_DATA_CHANGED } from "@/lib/intelligence-os/mission-activation-events";
 import type { OrganizationKind } from "@/lib/organization-os/organization.types";
 import { ORGANIZATION_KINDS } from "@/lib/organization-os/organization.types";
@@ -345,6 +346,8 @@ export default function OrganizationPageClient() {
               ))}
             </ul>
           </section>
+
+          <ExecutionOsPanel organizationId={selectedOrg.id} operatorName={displayName} />
         </>
       ) : null}
 

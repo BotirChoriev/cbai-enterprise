@@ -23,6 +23,8 @@ import CloudProfileImportPrompt from "@/components/account/CloudProfileImportPro
 import PendingSyncNotice from "@/components/shared/PendingSyncNotice";
 import CapabilityPassportPanel from "@/components/capability/CapabilityPassportPanel";
 import CapabilityGalaxy from "@/components/capability/CapabilityGalaxy";
+import PersonalCabinetPanel from "@/components/genesis/PersonalCabinetPanel";
+import GenesisWorkflowPanel from "@/components/genesis/GenesisWorkflowPanel";
 import { loadProject } from "@/lib/project/project-store";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
@@ -206,6 +208,7 @@ function MyWorkContent() {
       {accountMode === "cloud" ? <LocalWorkMigrationPrompt /> : null}
 
       <MissionHomeSummary />
+      <PersonalCabinetPanel />
       <MissionLinkedEntitiesPanel />
 
       <CreateProjectForm initialPrimaryEntity={initialPrimaryEntity} initialType={initialType} />
@@ -216,6 +219,7 @@ function MyWorkContent() {
         <>
           <CapabilityPassportPanel />
           <CapabilityGalaxy />
+          <GenesisWorkflowPanel />
         </>
       ) : null}
 

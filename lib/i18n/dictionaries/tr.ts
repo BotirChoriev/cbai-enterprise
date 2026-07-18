@@ -85,6 +85,7 @@ import { UNIVERSAL_WORKSPACE_TR } from "@/lib/i18n/platform-copy-build018-tr";
 import { ORGANIZATION_OS_TR } from "@/lib/i18n/platform-copy-build019-tr";
 import { ORG_WORKSPACE_TR } from "@/lib/i18n/platform-copy-build034-tr";
 import { SHARED_BACKEND_TR } from "@/lib/i18n/platform-copy-build039-tr";
+import { GENESIS_OS_TR } from "@/lib/i18n/platform-copy-genesis-tr";
 import { ZERO_LEARNING_CURVE_TR, MISSION_LIFECYCLE_NEXT_TR } from "@/lib/i18n/platform-copy-build020-tr";
 import { ACTIVATION_TR } from "@/lib/i18n/platform-copy-build021-tr";
 import { MISSION_HOME_TR, RESEARCH_DASHBOARD_TR, SAVED_EVIDENCE_TR, PROJECT_PANEL_TR } from "@/lib/i18n/platform-copy-build022-tr";
@@ -601,6 +602,7 @@ const tr: TranslationDictionary = {
   researchTopicCompletion: RESEARCH_TOPIC_COMPLETION_TR,
   universalIntent: UNIVERSAL_INTENT_TR,
   missionOperating: MISSION_OPERATING_TR,
+  genesisOs: GENESIS_OS_TR,
 };
 
 export default tr;
