@@ -9,6 +9,12 @@ import {
   writeGenesisList,
 } from "@/lib/genesis/genesis-storage";
 import { recordGenesisAudit } from "@/lib/genesis/genesis-audit-store";
+import type { MeasurementProvenanceKind } from "@/lib/research-canvas/measurement-provenance";
+import {
+  canCreateMeasurementPassport,
+  isBlankOrDemo,
+  passportValidationStatusForProvenance,
+} from "@/lib/research-canvas/measurement-truth";
 import type { MeasurementPassport, MeasurementPlan, MeasurementResultState } from "@/lib/research-canvas/research-canvas-types";
 
 const PLANS_KEY = "cbai-research-canvas-measurement-plans";
@@ -43,7 +49,8 @@ export function loadMeasurementPlans(smartIdeaId?: string): MeasurementPlan[] {
 
 export function createMeasurementPlan(
   input: Omit<MeasurementPlan, "id" | "createdAt" | "updatedAt" | "state"> & { state?: MeasurementResultState },
-): MeasurementPlan {
+): MeasurementPlan | null {
+  if (isBlankOrDemo(input.measurand)) return null;
   const now = new Date().toISOString();
   const gaps: string[] = [];
   if (!input.measurand.trim()) gaps.push("Measurand required.");
@@ -79,15 +86,28 @@ export function loadMeasurementPassports(smartIdeaId?: string): MeasurementPassp
 export function createMeasurementPassport(
   input: Omit<MeasurementPassport, "id" | "createdAt" | "updatedAt" | "validationStatus"> & {
     validationStatus?: MeasurementResultState;
+    provenanceKind?: MeasurementProvenanceKind;
   },
 ): MeasurementPassport | null {
-  if (!input.result.trim() || !input.unit.trim() || !input.methodId.trim()) return null;
-  if (!input.rawDataReference.trim()) return null;
+  const provenanceKind: MeasurementProvenanceKind = input.provenanceKind ?? "USER-PROVIDED";
+  const gate = canCreateMeasurementPassport({
+    planId: input.measurementPlanId ?? null,
+    result: input.result,
+    unit: input.unit,
+    methodId: input.methodId,
+    rawDataReference: input.rawDataReference,
+    provenanceKind,
+    limitations: input.limitations,
+    reviewer: input.reviewer ?? undefined,
+  });
+  if (!gate.ok) return null;
+  if (isBlankOrDemo(input.result) || isBlankOrDemo(input.rawDataReference)) return null;
 
   const now = new Date().toISOString();
   const passport: MeasurementPassport = {
     ...input,
-    validationStatus: input.validationStatus ?? "Measured",
+    provenanceKind,
+    validationStatus: input.validationStatus ?? passportValidationStatusForProvenance(provenanceKind),
     id: genesisId("mpass"),
     createdAt: now,
     updatedAt: now,
@@ -140,5 +160,7 @@ export function canValidatePassport(passport: MeasurementPassport): { ok: boolea
   if (!passport.uncertainty.trim() && !passport.uncertaintyLimitation.trim()) {
     gaps.push("Uncertainty or explicit uncertainty limitation required.");
   }
+  if (!passport.limitations.trim()) gaps.push("Limitations required.");
+  if (!passport.provenanceKind?.trim()) gaps.push("Provenance required.");
   return { ok: gaps.length === 0, gaps };
 }

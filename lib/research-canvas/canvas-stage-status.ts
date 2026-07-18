@@ -12,6 +12,7 @@ export type CanvasBlockedReasonKey =
   | "interpretUploadOrManual"
   | "interpretPendingConfirmation"
   | "ideaModelRequired"
+  | "measurementPlanningRequired"
   | "discoveryRequired"
   | "externalSearchConsent"
   | "missionRequired"
@@ -22,6 +23,7 @@ export type CanvasActionKey =
   | "uploadArtifact"
   | "confirmInterpretation"
   | "buildIdeaModel"
+  | "approveMeasurementPlanning"
   | "createMeasurementPlan"
   | "createPassport"
   | "confirmExternalSearch"
@@ -117,10 +119,14 @@ export function deriveCanvasStageStatuses(idea: SmartIdea | null): CanvasStageSt
           primaryActionKey = "confirmInterpretation";
           nextActionKey = "confirmInterpretation";
         } else if (confirmed.length > 0 || idea.ideaModel) {
-          completed = Boolean(idea.ideaModel);
-          status = completed ? "Completed" : "Ready for input";
-          primaryActionKey = "buildIdeaModel";
-          nextActionKey = "buildIdeaModel";
+          completed = Boolean(idea.ideaModel && idea.measurementPlanningApproved);
+          status = idea.ideaModel
+            ? idea.measurementPlanningApproved
+              ? "Completed"
+              : "Under human review"
+            : "Ready for input";
+          primaryActionKey = idea.ideaModel ? "approveMeasurementPlanning" : "buildIdeaModel";
+          nextActionKey = idea.ideaModel ? "approveMeasurementPlanning" : "buildIdeaModel";
         }
         if (!idea.title.trim()) {
           blockedReasonKey = "completeIdeaFirst";
@@ -134,6 +140,12 @@ export function deriveCanvasStageStatuses(idea: SmartIdea | null): CanvasStageSt
           status = "Needs confirmation";
           primaryActionKey = "buildIdeaModel";
           nextActionKey = "buildIdeaModel";
+        } else if (!idea.measurementPlanningApproved) {
+          blockedReasonKey = "measurementPlanningRequired";
+          blockedReason = "Review Idea Model and approve measurement planning first.";
+          status = "Under human review";
+          primaryActionKey = "approveMeasurementPlanning";
+          nextActionKey = "approveMeasurementPlanning";
         } else if (plans.length === 0) {
           status = "Ready for input";
           primaryActionKey = "createMeasurementPlan";

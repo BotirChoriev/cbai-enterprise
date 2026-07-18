@@ -23,6 +23,7 @@ import {
   rejectExtractedItem,
   buildIdeaModel,
   canBuildIdeaModel,
+  approveMeasurementPlanning,
   addManualInterpretationDraft,
   confirmExternalSearch,
   linkSmartIdeaToMission,
@@ -33,16 +34,11 @@ import {
   updateSmartIdeaStage,
 } from "@/lib/research-canvas/smart-idea-store";
 import {
-  createMeasurementPlan,
-  createMeasurementPassport,
-  loadMeasurementPlans,
   loadMeasurementPassports,
+  loadMeasurementPlans,
 } from "@/lib/research-canvas/measurement-store";
-import { convertUnits, buildConversionRecord } from "@/lib/research-canvas/unit-converter";
-import { getUnit, UNIT_REGISTRY } from "@/lib/research-canvas/unit-registry";
-import { runCalculation } from "@/lib/research-canvas/scientific-calculator";
-import { METHOD_REGISTRY, VIRTUAL_INSTRUMENT_REGISTRY } from "@/lib/research-canvas/instrument-registry";
 import { listOpenScienceProviders } from "@/lib/research-canvas/open-science-provider-registry";
+import { VIRTUAL_INSTRUMENT_REGISTRY } from "@/lib/research-canvas/instrument-registry";
 import {
   searchOpenScienceForIdea,
   searchAllOpenScienceForIdea,
@@ -55,7 +51,6 @@ import { buildDecisionSupportPackage } from "@/lib/research-canvas/decision-supp
 import {
   buildDecisionSupportReport,
 } from "@/lib/research-canvas/research-canvas-reports";
-import { parseMolecularFormula } from "@/lib/research-canvas/molecular-formula-analyzer";
 import { deriveCanvasStageStatuses, deriveActiveStageNextAction } from "@/lib/research-canvas/canvas-stage-status";
 import { CANVAS_STAGES, prerequisiteStageFor, stagePanelId } from "@/lib/research-canvas/canvas-stage-navigation";
 import {
@@ -69,6 +64,8 @@ import {
 import { loadMission } from "@/lib/intelligence-os/mission-store";
 import InterpretationReviewCard from "@/components/research/canvas/InterpretationReviewCard";
 import ManualInterpretationInputPanel from "@/components/research/canvas/ManualInterpretationInputPanel";
+import IdeaModelReviewPanel from "@/components/research/canvas/IdeaModelReviewPanel";
+import MeasurementWorkflowPanel from "@/components/research/canvas/MeasurementWorkflowPanel";
 import { manualInterpretationDraftStore } from "@/lib/research-canvas/manual-interpretation-draft";
 import { buildExternalSearchConsent, IP_BOUNDARY_NOTICE, visibilityEnforcementNote } from "@/lib/research-canvas/privacy-boundary";
 import { resolvePersistenceMode } from "@/lib/product/persistence-mode";
@@ -109,25 +106,7 @@ export default function ResearchCanvasClient() {
   const [problem, setProblem] = useState("");
   const [purpose, setPurpose] = useState("");
 
-  const [measurand, setMeasurand] = useState("");
-  const [unitId, setUnitId] = useState("m");
-  const [methodId, setMethodId] = useState("manual-entry");
-  const [calibration, setCalibration] = useState("");
-  const [measureResult, setMeasureResult] = useState("");
-  const [rawDataRef, setRawDataRef] = useState("");
-  const [uncertainty, setUncertainty] = useState("");
-
-  const [convValue, setConvValue] = useState("100");
-  const [convFrom, setConvFrom] = useState("cm");
-  const [convTo, setConvTo] = useState("m");
-
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [molecularFormula, setMolecularFormula] = useState("H2O");
-
-  const [refPixels, setRefPixels] = useState("100");
-  const [refReal, setRefReal] = useState("10");
-  const [pixelLength, setPixelLength] = useState("250");
-
   const [executeTaskTitle, setExecuteTaskTitle] = useState("");
   const [sanitizedQueryEdit, setSanitizedQueryEdit] = useState("");
   const [manualDescription, setManualDescription] = useState("");
@@ -287,96 +266,19 @@ export default function ResearchCanvasClient() {
     buildIdeaModel(idea.id, {
       researchQuestions: [problem],
       humanityBenefit: purpose,
-      requiredValidation: ["Calibration documented", "Raw data reference"],
+      requiredValidation: [],
+      assumptions: [],
+      unknowns: [],
     });
-    setStage("MEASURE");
     setFeedback(t("researchCanvas.ideaModelCreated"));
     bump();
   };
 
-  const addPlan = () => {
-    if (!idea || !measurand.trim()) return;
-    createMeasurementPlan({
-      smartIdeaId: idea.id,
-      measurand,
-      purpose: purpose || idea.purpose,
-      domain: idea.domain,
-      sampleOrObject: idea.title,
-      methodId,
-      instrumentId: METHOD_REGISTRY.find((m) => m.id === methodId)?.instrumentId ?? "manual-entry",
-      unitId,
-      calibration,
-      referenceStandard: "",
-      conditions: "",
-      rawDataReference: rawDataRef,
-      processingModel: "",
-      uncertaintyNote: uncertainty,
-      validationNote: "",
-      humanReviewRequired: true,
-    });
-    setFeedback(t("researchCanvas.planCreated"));
-    bump();
-  };
-
-  const addPassport = () => {
-    if (!idea) return;
-    const p = createMeasurementPassport({
-      smartIdeaId: idea.id,
-      measuredObject: idea.title,
-      measurand: measurand || "length",
-      result: measureResult,
-      unit: getUnit(unitId)?.symbol ?? unitId,
-      uncertainty,
-      uncertaintyType: "manual",
-      uncertaintyLimitation: uncertainty ? "" : "Explicit uncertainty limitation required if value unknown.",
-      methodId,
-      instrumentId: "image-measurement-tool",
-      instrumentModel: "manual",
-      calibrationStatus: calibration ? "user-defined" : "missing",
-      referenceStandard: calibration,
-      rawDataReference: rawDataRef,
-      processingSoftware: "cbai-research-canvas",
-      algorithmVersion: "1.0",
-      environmentalConditions: "",
-      operator,
-      laboratory: "device-local",
-      limitations: "Manual or calibrated image measurement — approximate unless metrology documented.",
-      reproducibilityStatus: "not replicated",
-    });
-    setFeedback(p ? t("researchCanvas.passportCreated") : t("researchCanvas.passportGateFailed"));
-    bump();
-  };
-
-  const runConvert = () => {
-    if (!idea) return;
-    const result = convertUnits({
-      value: Number(convValue),
-      fromUnitId: convFrom,
-      toUnitId: convTo,
-      smartIdeaId: idea.id,
-    });
-    if (!result.ok) {
-      setFeedback(result.reason);
-      return;
-    }
-    buildConversionRecord(result.record);
-    setFeedback(`${result.convertedValue} ${convTo} (${result.formula})`);
-    bump();
-  };
-
-  const runGeometryCalc = () => {
-    if (!idea) return;
-    const calc = runCalculation({
-      smartIdeaId: idea.id,
-      formulaId: "pixel-distance",
-      variables: {
-        pixelLength: Number(pixelLength),
-        referenceReal: Number(refReal),
-        referencePixels: Number(refPixels),
-      },
-      variableUnits: { pixelLength: "px", referenceReal: "cm", referencePixels: "px" },
-    });
-    setFeedback(calc.ok ? `Distance: ${calc.record.result} (see units in record)` : calc.reason);
+  const advanceToMeasurement = () => {
+    if (!idea?.ideaModel) return;
+    approveMeasurementPlanning(idea.id, operator);
+    selectStage("MEASURE");
+    setFeedback(t("researchCanvas.measurementPlanningApproved"));
     bump();
   };
 
@@ -498,7 +400,7 @@ export default function ResearchCanvasClient() {
       researchQuestion: idea.problem,
       hypothesis: idea.purpose,
       domain: idea.domain,
-      methods: methodId,
+      methods: loadMeasurementPlans(idea.id)[0]?.methodId ?? "undefined",
       limitations: "Created from Smart Idea — evidence in progress.",
       openQuestions: idea.ideaModel?.unknowns.join("; ") ?? "",
       missionId: mission.id,
@@ -782,64 +684,37 @@ export default function ResearchCanvasClient() {
                       ))}
                     </ul>
                   ) : null}
+                  {idea.ideaModel && !idea.measurementPlanningApproved ? (
+                    <IdeaModelReviewPanel
+                      idea={idea}
+                      rc={rc}
+                      onAdvanceToMeasurement={advanceToMeasurement}
+                      canAdvance
+                    />
+                  ) : null}
                 </>
               )}
             </>
           )}
 
           {stage === "MEASURE" && (
-            <div className="grid gap-4 lg:grid-cols-2">
-              <section className="space-y-3">
-                <h3 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.measurementPlan")}</h3>
-                <input value={measurand} onChange={(e) => setMeasurand(e.target.value)} placeholder={t("researchCanvas.measurandPlaceholder")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
-                <select value={unitId} onChange={(e) => setUnitId(e.target.value)} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`}>
-                  {UNIT_REGISTRY.filter((u) => u.conversionSupported).map((u) => (
-                    <option key={u.id} value={u.id}>{u.symbol} — {u.name}</option>
-                  ))}
-                </select>
-                <select value={methodId} onChange={(e) => setMethodId(e.target.value)} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`}>
-                  {METHOD_REGISTRY.map((m) => (
-                    <option key={m.id} value={m.id}>{m.name} ({m.capabilityState})</option>
-                  ))}
-                </select>
-                <input value={calibration} onChange={(e) => setCalibration(e.target.value)} placeholder={t("researchCanvas.calibrationPlaceholder")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
-                <button type="button" onClick={addPlan} className={cbaiBtnPrimary}>{t("researchCanvas.createPlan")}</button>
-              </section>
-              <section className="space-y-3">
-                <h3 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.unitConverter")}</h3>
-                <div className="flex gap-2">
-                  <input value={convValue} onChange={(e) => setConvValue(e.target.value)} className={`${cbaiFocusRing} w-20 rounded-md border border-zinc-800 bg-zinc-950/60 px-2 py-2 text-sm`} />
-                  <select value={convFrom} onChange={(e) => setConvFrom(e.target.value)} className={`${cbaiFocusRing} rounded-md border border-zinc-800 bg-zinc-950/60 px-2 py-2 text-sm`}>
-                    {UNIT_REGISTRY.map((u) => <option key={u.id} value={u.id}>{u.symbol}</option>)}
-                  </select>
-                  <span className="self-center text-zinc-500">→</span>
-                  <select value={convTo} onChange={(e) => setConvTo(e.target.value)} className={`${cbaiFocusRing} rounded-md border border-zinc-800 bg-zinc-950/60 px-2 py-2 text-sm`}>
-                    {UNIT_REGISTRY.map((u) => <option key={u.id} value={u.id}>{u.symbol}</option>)}
-                  </select>
-                </div>
-                <button type="button" onClick={runConvert} className={cbaiBtnPrimary}>{t("researchCanvas.convert")}</button>
-              </section>
-              <section className="space-y-3">
-                <h3 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.imageMeasurementPreview")}</h3>
-                <input value={refPixels} onChange={(e) => setRefPixels(e.target.value)} placeholder={t("researchCanvas.referencePixelsPlaceholder")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
-                <input value={refReal} onChange={(e) => setRefReal(e.target.value)} placeholder={t("researchCanvas.referenceRealPlaceholder")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
-                <input value={pixelLength} onChange={(e) => setPixelLength(e.target.value)} placeholder={t("researchCanvas.pixelLengthPlaceholder")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
-                <button type="button" onClick={runGeometryCalc} className={cbaiBtnPrimary}>{t("researchCanvas.calculateDistance")}</button>
-              </section>
-              <section className="space-y-3">
-                <h3 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.measurementPassport")}</h3>
-                <input value={measureResult} onChange={(e) => setMeasureResult(e.target.value)} placeholder={t("researchCanvas.resultValuePlaceholder")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
-                <input value={rawDataRef} onChange={(e) => setRawDataRef(e.target.value)} placeholder={t("researchCanvas.rawDataPlaceholder")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
-                <input value={uncertainty} onChange={(e) => setUncertainty(e.target.value)} placeholder={t("researchCanvas.uncertaintyPlaceholder")} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
-                <button type="button" onClick={addPassport} className={cbaiBtnPrimary}>{t("researchCanvas.createPassport")}</button>
-                <p className="text-xs text-zinc-500">{loadMeasurementPassports(idea.id).length} {t("researchCanvas.passports").toLowerCase()}</p>
-              </section>
-              <section className="space-y-3">
-                <h3 className="text-sm font-semibold text-zinc-200">{t("researchCanvas.molecularFormula")}</h3>
-                <input value={molecularFormula} onChange={(e) => setMolecularFormula(e.target.value)} className={`${cbaiFocusRing} w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`} />
-                <pre className="text-xs text-zinc-400">{JSON.stringify(parseMolecularFormula(molecularFormula), null, 2)}</pre>
-              </section>
-            </div>
+            idea.measurementPlanningApproved ? (
+              <MeasurementWorkflowPanel
+                key={idea.id}
+                idea={idea}
+                operator={operator}
+                rc={rc}
+                onFeedback={setFeedback}
+                onBump={bump}
+              />
+            ) : (
+              <IdeaModelReviewPanel
+                idea={idea}
+                rc={rc}
+                onAdvanceToMeasurement={advanceToMeasurement}
+                canAdvance={Boolean(idea.ideaModel)}
+              />
+            )
           )}
 
           {stage === "DISCOVER" && (

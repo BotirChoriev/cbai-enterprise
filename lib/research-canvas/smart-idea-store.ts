@@ -113,6 +113,8 @@ export function createSmartIdea(input: {
     artifacts: [],
     extractedItems: [],
     ideaModel: null,
+    measurementPlanningApproved: false,
+    measurementPlanningApprovedAt: null,
     externalSearchConfirmed: false,
     externalSearchRevoked: false,
     createdAt: now,
@@ -370,12 +372,33 @@ export function buildIdeaModel(ideaId: string, input: Partial<IdeaModel>): Smart
     },
   };
 
-  const updated: SmartIdea = { ...prev, ideaModel: model, stage: "MEASURE", updatedAt: new Date().toISOString() };
+  const updated: SmartIdea = {
+    ...prev,
+    ideaModel: model,
+    measurementPlanningApproved: false,
+    measurementPlanningApprovedAt: null,
+    stage: "INTERPRET",
+    updatedAt: new Date().toISOString(),
+  };
   const next = [...all];
   next[idx] = updated;
   persist(next);
   audit("idea_model_created", ideaId, prev.owner, "IdeaModel");
   return updated;
+}
+
+export function approveMeasurementPlanning(ideaId: string, actor: string): SmartIdea | null {
+  return updateIdea(ideaId, (prev) => {
+    if (!prev.ideaModel) return prev;
+    audit("measurement_planning_approved", ideaId, actor, "MEASURE");
+    return {
+      ...prev,
+      measurementPlanningApproved: true,
+      measurementPlanningApprovedAt: new Date().toISOString(),
+      stage: "MEASURE",
+      updatedAt: new Date().toISOString(),
+    };
+  });
 }
 
 export function updateSmartIdeaStage(ideaId: string, stage: ResearchCanvasStage): SmartIdea | null {

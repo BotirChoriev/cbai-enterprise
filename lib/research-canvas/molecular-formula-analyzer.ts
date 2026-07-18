@@ -28,17 +28,19 @@ export type MolecularAnalysisResult = {
   readonly totalAtomCount: number;
   readonly molecularMass: number | null;
   readonly parseError?: string | null;
-  readonly limitations: readonly string[];
+  readonly limitationKeys: readonly string[];
 };
+
+const MOLECULAR_LIMITATION_KEYS = [
+  "no_structure_inference",
+  "no_safety_claims",
+  "no_smiles_parser",
+] as const;
 
 const FORMULA_PATTERN = /([A-Z][a-z]?)(\d*)/g;
 
 export function parseMolecularFormula(formula: string): MolecularAnalysisResult {
-  const limitations = [
-    "Formula analysis only — no structure inference from images.",
-    "No synthesis, toxicity, or clinical claims.",
-    "Advanced structure analysis (SMILES/InChI) unavailable without verified parser.",
-  ];
+  const limitationKeys = [...MOLECULAR_LIMITATION_KEYS];
 
   const trimmed = formula.replace(/\s+/g, "");
   if (!trimmed) {
@@ -49,7 +51,7 @@ export function parseMolecularFormula(formula: string): MolecularAnalysisResult 
       totalAtomCount: 0,
       molecularMass: null,
       parseError: "Empty formula.",
-      limitations,
+      limitationKeys,
     };
   }
 
@@ -69,7 +71,7 @@ export function parseMolecularFormula(formula: string): MolecularAnalysisResult 
         totalAtomCount: total,
         molecularMass: null,
         parseError: `Unknown element: ${element}`,
-        limitations,
+        limitationKeys,
       };
     }
     counts[element] = (counts[element] ?? 0) + count;
@@ -84,7 +86,7 @@ export function parseMolecularFormula(formula: string): MolecularAnalysisResult 
       totalAtomCount: 0,
       molecularMass: null,
       parseError: "Could not parse formula.",
-      limitations,
+      limitationKeys,
     };
   }
 
@@ -105,7 +107,7 @@ export function parseMolecularFormula(formula: string): MolecularAnalysisResult 
     totalAtomCount: total,
     molecularMass: Number(mass.toFixed(4)),
     parseError: null,
-    limitations,
+    limitationKeys,
   };
 }
 

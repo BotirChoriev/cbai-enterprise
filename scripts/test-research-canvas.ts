@@ -248,9 +248,9 @@ test("13. measurement state gates — incomplete plan", () => {
     purpose: "test",
     domain: "general",
     sampleOrObject: "sample",
-    methodId: "",
+    methodId: "manual-entry",
     instrumentId: "manual",
-    unitId: "",
+    unitId: "m",
     calibration: "",
     referenceStandard: "",
     conditions: "",
@@ -260,7 +260,7 @@ test("13. measurement state gates — incomplete plan", () => {
     validationNote: "",
     humanReviewRequired: true,
   });
-  assert.equal(plan.state, "Input Incomplete");
+  assert.equal(plan, null);
 });
 
 test("14. Measurement Passport validation reviewer gate", () => {
@@ -271,8 +271,28 @@ test("14. Measurement Passport validation reviewer gate", () => {
     purpose: "test",
     owner: OPERATOR,
   });
+  const plan = createMeasurementPlan({
+    smartIdeaId: idea.id,
+    measurand: "wire length",
+    purpose: "test",
+    domain: "general",
+    sampleOrObject: "wire",
+    methodId: "manual-entry",
+    instrumentId: "measurement-passport",
+    unitId: "m",
+    calibration: "ruler",
+    referenceStandard: "ruler",
+    conditions: "lab bench",
+    rawDataReference: "manual measurement log",
+    processingModel: "manual",
+    uncertaintyNote: "User estimated",
+    validationNote: "",
+    humanReviewRequired: true,
+  });
+  assert.ok(plan);
   const passport = createMeasurementPassport({
     smartIdeaId: idea.id,
+    measurementPlanId: plan!.id,
     missionId: null,
     projectId: null,
     researchObjectId: null,
@@ -289,7 +309,7 @@ test("14. Measurement Passport validation reviewer gate", () => {
     calibrationStatus: "user-defined",
     calibrationDate: null,
     referenceStandard: "ruler",
-    rawDataReference: "manual measurement log",
+    rawDataReference: "manual measurement log entry 2026-04-01",
     processingSoftware: "none",
     algorithmVersion: "1",
     environmentalConditions: "lab bench",
@@ -297,6 +317,8 @@ test("14. Measurement Passport validation reviewer gate", () => {
     laboratory: "local",
     limitations: "Approximate — user measured.",
     reproducibilityStatus: "unknown",
+    provenanceKind: "USER-PROVIDED",
+    reviewer: OPERATOR,
   });
   assert.ok(passport);
   const validated = validateMeasurementPassport(passport!.id, {

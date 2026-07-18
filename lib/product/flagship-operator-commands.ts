@@ -17,6 +17,7 @@ const ACTION_LABELS: Record<CanvasActionKey, string> = {
   uploadArtifact: "Upload artifact",
   confirmInterpretation: "Confirm interpretation",
   buildIdeaModel: "Build Idea Model",
+  approveMeasurementPlanning: "Approve measurement planning",
   createMeasurementPlan: "Create measurement plan",
   createPassport: "Create Measurement Passport",
   confirmExternalSearch: "Confirm external metadata search",

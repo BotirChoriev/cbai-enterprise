@@ -165,6 +165,8 @@ export type SmartIdea = {
   readonly artifacts: readonly SmartIdeaArtifact[];
   readonly extractedItems: readonly ExtractedItem[];
   readonly ideaModel?: IdeaModel | null;
+  readonly measurementPlanningApproved?: boolean;
+  readonly measurementPlanningApprovedAt?: string | null;
   readonly externalSearchConfirmed: boolean;
   readonly externalSearchConsentAt?: string | null;
   readonly externalSearchRevoked?: boolean;
@@ -225,6 +227,7 @@ export type MeasurementPassport = {
   readonly operator: string;
   readonly laboratory: string;
   readonly validationStatus: MeasurementResultState;
+  readonly provenanceKind?: string | null;
   readonly reviewer?: string | null;
   readonly limitations: string;
   readonly reproducibilityStatus: string;
