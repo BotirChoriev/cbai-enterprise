@@ -104,6 +104,7 @@ import {
   KNOWLEDGE_BRAIN_UZ,
   RESEARCH_TOPIC_COMPLETION_UZ,
   UNIVERSAL_INTENT_UZ,
+  MISSION_OPERATING_UZ,
 } from "@/lib/i18n/platform-copy-build026-uz";
 import { SOURCE_INGESTION_UZ } from "@/lib/i18n/platform-copy-build0285-uz";
 
@@ -599,6 +600,7 @@ const uz: TranslationDictionary = {
   sourceIngestion: SOURCE_INGESTION_UZ,
   researchTopicCompletion: RESEARCH_TOPIC_COMPLETION_UZ,
   universalIntent: UNIVERSAL_INTENT_UZ,
+  missionOperating: MISSION_OPERATING_UZ,
 };
 
 export default uz;

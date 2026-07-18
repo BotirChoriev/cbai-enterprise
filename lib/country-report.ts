@@ -12,13 +12,22 @@ import { countConnectedSources } from "@/components/shared/entity-profile-copy";
 import { companyHrefByName, universityHrefByName } from "@/components/shared/resolve-entity-link";
 import type { IndicatorDomainId } from "@/lib/indicator-framework/types";
 import { getProjectsLinkedToEntity } from "@/lib/project/project-store";
+import { loadCurrentMission } from "@/lib/intelligence-os/mission-store";
+import { loadProject } from "@/lib/project/project-store";
 
 export type CountryReportLimitation = string;
 
 export type CountryReportLink = { name: string; href: string | null };
 
+export type CountryReportMissionContext = {
+  problem: string;
+  researchQuestion: string | null;
+};
+
 export type CountryReport = {
   country: Country;
+  /** Active mission context when report is generated in-browser — null on server/static paths. */
+  missionContext: CountryReportMissionContext | null;
   overview: {
     name: string;
     code: string;
@@ -64,8 +73,19 @@ export function buildCountryReport(country: Country, journey: CountryUserJourney
     "No verified link between countries and research topics exists yet in this catalog.",
   ];
 
+  const activeMission = typeof window !== "undefined" ? loadCurrentMission() : null;
+  const linkedProject = activeMission?.projectId ? loadProject(activeMission.projectId) : null;
+  const missionContext =
+    activeMission && typeof window !== "undefined"
+      ? {
+          problem: activeMission.problem,
+          researchQuestion: linkedProject?.researchQuestion ?? null,
+        }
+      : null;
+
   return {
     country,
+    missionContext,
     overview: {
       name: country.name,
       code: country.code,

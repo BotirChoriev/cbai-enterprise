@@ -104,6 +104,7 @@ import {
   KNOWLEDGE_BRAIN_TR,
   RESEARCH_TOPIC_COMPLETION_TR,
   UNIVERSAL_INTENT_TR,
+  MISSION_OPERATING_TR,
 } from "@/lib/i18n/platform-copy-build026-tr";
 import { SOURCE_INGESTION_TR } from "@/lib/i18n/platform-copy-build0285-tr";
 
@@ -599,6 +600,7 @@ const tr: TranslationDictionary = {
   sourceIngestion: SOURCE_INGESTION_TR,
   researchTopicCompletion: RESEARCH_TOPIC_COMPLETION_TR,
   universalIntent: UNIVERSAL_INTENT_TR,
+  missionOperating: MISSION_OPERATING_TR,
 };
 
 export default tr;

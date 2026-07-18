@@ -48,8 +48,15 @@ function buildQueryString(
     PlatformContextSnapshot,
     "country" | "company" | "university" | "workspace" | "searchQuery"
   >,
+  operating?: { missionId?: string | null; projectId?: string | null },
 ): string {
-  const params = new URLSearchParams(serializeContextToParams(snapshot));
+  const params = new URLSearchParams(
+    serializeContextToParams({
+      ...snapshot,
+      missionId: operating?.missionId ?? null,
+      projectId: operating?.projectId ?? null,
+    }),
+  );
   return params.toString();
 }
 
@@ -84,6 +91,14 @@ export function PlatformContextProvider({ children }: { children: ReactNode }) {
     };
   }, [params, pathname, recentEntities, pinnedEntities]);
 
+  const operatingParams = useMemo(
+    () => ({
+      missionId: params.mission ?? null,
+      projectId: params.project ?? null,
+    }),
+    [params.mission, params.project],
+  );
+
   const pushContext = useCallback(
     (
       next: Pick<
@@ -91,10 +106,10 @@ export function PlatformContextProvider({ children }: { children: ReactNode }) {
         "country" | "company" | "university" | "workspace" | "searchQuery"
       >,
     ) => {
-      const query = buildQueryString(next);
+      const query = buildQueryString(next, operatingParams);
       router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
     },
-    [pathname, router],
+    [pathname, router, operatingParams],
   );
 
   const setEntity = useCallback(
@@ -178,10 +193,10 @@ export function PlatformContextProvider({ children }: { children: ReactNode }) {
         workspace: overrides?.workspace ?? context.workspace,
         searchQuery: overrides?.searchQuery ?? context.searchQuery,
       };
-      const query = buildQueryString(merged);
+      const query = buildQueryString(merged, operatingParams);
       router.push(query ? `${path}?${query}` : path);
     },
-    [context, router],
+    [context, router, operatingParams],
   );
 
   const value = useMemo<PlatformContextValue>(

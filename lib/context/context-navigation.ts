@@ -161,6 +161,8 @@ function buildHref(
   overrides?: Partial<{
     workspace: WorkspaceId | null;
     preserveSearch: boolean;
+    missionId: string | null;
+    projectId: string | null;
   }>,
 ): string {
   const params = serializeContextToParams({
@@ -169,6 +171,8 @@ function buildHref(
     university: snapshot.university,
     workspace: overrides?.workspace ?? snapshot.workspace,
     searchQuery: overrides?.preserveSearch === false ? "" : snapshot.searchQuery,
+    missionId: overrides?.missionId ?? null,
+    projectId: overrides?.projectId ?? null,
   });
 
   const query = new URLSearchParams(params).toString();
@@ -178,8 +182,12 @@ function buildHref(
 export function buildContextualHref(
   path: string,
   snapshot: PlatformContextSnapshot,
+  operating?: { missionId?: string | null; projectId?: string | null },
 ): string {
-  return buildHref(path, snapshot);
+  return buildHref(path, snapshot, {
+    missionId: operating?.missionId ?? null,
+    projectId: operating?.projectId ?? null,
+  });
 }
 
 function entityPrimaryModules(kind: "country" | "company" | "university"): PlatformModuleId[] {

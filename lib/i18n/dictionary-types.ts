@@ -2126,6 +2126,25 @@ export type TranslationDictionary = {
     categoryContinueResearch: string;
     categoryUnrecognized: string;
   };
+  missionOperating: {
+    addToMission: string;
+    added: string;
+    alreadyLinked: string;
+    noMission: string;
+    noProject: string;
+    startToAdd: string;
+    viewInMyWork: string;
+    problemPlaceholder: string;
+    problemTooShort: string;
+    reasoningTitle: string;
+    reasoningEmpty: string;
+    reasoningHumanReview: string;
+    linkedEntities: string;
+    nextHonestAction: string;
+    notesLabel: string;
+    questionsLabel: string;
+    evidenceLabel: string;
+  };
   organizationOs: {
     inspectorEyebrow: string;
     architecturePreview: string;

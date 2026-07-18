@@ -48,7 +48,7 @@ function resolveContextualActions(context: AssistantContextEntity, t: ReturnType
       ];
     case "research_topic":
       return [
-        { labelKey: "assistant.continueWorkspace", href: "/research/workspace" },
+        { labelKey: "assistant.continueWorkspace", href: "/research/microbiology" },
         { labelKey: "assistant.openEvidence", href: profileSectionHref(context.href, "evidence") },
         { labelKey: "assistant.reviewQuestions", href: profileSectionHref(context.href, "review") },
       ];

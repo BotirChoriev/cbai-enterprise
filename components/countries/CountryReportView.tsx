@@ -11,6 +11,7 @@ import ReportHeaderLogo from "@/components/shared/ReportHeaderLogo";
 import ReportHonestyStatement from "@/components/shared/ReportHonestyStatement";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import { useReportCommon } from "@/lib/i18n/use-report-common";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type CountryReportViewProps = {
   report: CountryReport & { dataStatus?: ProductStatus };
@@ -44,6 +45,7 @@ function LinkList({ links, emptyLabel }: { links: readonly CountryReportLink[]; 
 
 export default function CountryReportView({ report }: CountryReportViewProps) {
   const labels = useReportCommon();
+  const { t } = useTranslation();
   const generatedDate = new Date().toLocaleString();
 
   return (
@@ -71,6 +73,17 @@ export default function CountryReportView({ report }: CountryReportViewProps) {
           <ReportPrintButton />
         </div>
       </div>
+
+      {report.missionContext ? (
+        <div className="space-y-2 rounded-lg border border-teal-500/20 bg-teal-950/20 px-4 py-3">
+          <p className="text-xs font-medium uppercase tracking-wider text-teal-400/80">{t("missionCreation.problemLabel")}</p>
+          <p className="text-sm text-zinc-200">{report.missionContext.problem}</p>
+          {report.missionContext.researchQuestion &&
+          report.missionContext.researchQuestion !== report.missionContext.problem ? (
+            <p className="text-xs text-zinc-500">{report.missionContext.researchQuestion}</p>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="space-y-2">
         <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">{labels.overview}</p>

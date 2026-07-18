@@ -9,6 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useSearchParams } from "next/navigation";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { getCurrentMission } from "@/lib/intelligence-os/mission-engine";
 import { deriveEvidencePulse } from "@/lib/intelligence-os/evidence-pulse";
@@ -17,6 +18,7 @@ import { deriveAdaptiveIntelligence } from "@/lib/intelligence-os/adaptive-intel
 import { buildCapabilityPassport } from "@/lib/capability/capability-passport-builder";
 import { loadHumanImpactForMission } from "@/lib/intelligence-os/human-impact-store";
 import { MISSION_DATA_CHANGED } from "@/lib/intelligence-os/mission-activation-events";
+import { syncMissionFromOperatingParams, parseOperatingParams } from "@/lib/intelligence-os/mission-operating-context";
 import type { Mission } from "@/lib/intelligence-os/mission.types";
 import type { EvidencePulseReading } from "@/lib/intelligence-os/evidence-pulse";
 import type { MissionThreadState } from "@/lib/intelligence-os/mission.types";
@@ -38,6 +40,7 @@ const MissionContext = createContext<MissionContextValue | null>(null);
 
 export function MissionContextProvider({ children }: { children: ReactNode }) {
   const hydrated = useHydrated();
+  const searchParams = useSearchParams();
   const { profile } = useAssistantProfile();
   const [tick, setTick] = useState(0);
   const refreshMissionContext = useCallback(() => setTick((n) => n + 1), []);
@@ -63,6 +66,7 @@ export function MissionContextProvider({ children }: { children: ReactNode }) {
       };
     }
     void tick;
+    syncMissionFromOperatingParams(parseOperatingParams(searchParams));
     const mission = getCurrentMission();
     const passport = buildCapabilityPassport(operatorName);
     return {
@@ -73,7 +77,7 @@ export function MissionContextProvider({ children }: { children: ReactNode }) {
       humanImpact: mission ? loadHumanImpactForMission(mission.id) : null,
       refreshMissionContext,
     };
-  }, [hydrated, workspaceRole, operatorName, tick, refreshMissionContext]);
+  }, [hydrated, workspaceRole, operatorName, tick, refreshMissionContext, searchParams]);
 
   return <MissionContext.Provider value={value}>{children}</MissionContext.Provider>;
 }

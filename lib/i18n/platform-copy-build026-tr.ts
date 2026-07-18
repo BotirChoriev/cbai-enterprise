@@ -82,3 +82,23 @@ export const UNIVERSAL_INTENT_TR = {
   categoryContinueResearch: "Araştırmaya devam",
   categoryUnrecognized: "Tanınmadı",
 } as const;
+
+export const MISSION_OPERATING_TR = {
+  addToMission: "Göreve ekle",
+  added: "{name} aktif görevinize eklendi.",
+  alreadyLinked: "{name} zaten bu göreve bağlı.",
+  noMission: "Varlık eklemek için önce bir görev başlatın.",
+  noProject: "Varlık eklemeden önce göreve bir proje bağlayın.",
+  startToAdd: "Eklemek için görev başlat",
+  viewInMyWork: "Çalışmalarımda gör",
+  problemPlaceholder: "Hangi sorunu anlamak veya çözmek istiyorsunuz?",
+  problemTooShort: "Sorununuzu en az on karakterle açıklayın.",
+  reasoningTitle: "Görev akıl yürütmesi",
+  reasoningEmpty: "Akıl yürütme oluşturmak için Çalışmalarım'da kanıt veya not ekleyin.",
+  reasoningHumanReview: "CBAI yollar önerir — son karar sizindir.",
+  linkedEntities: "Bu görevdeki varlıklar",
+  nextHonestAction: "Sonraki dürüst adım",
+  notesLabel: "Notlar",
+  questionsLabel: "Sorular",
+  evidenceLabel: "Kanıt bağlantıları",
+} as const;

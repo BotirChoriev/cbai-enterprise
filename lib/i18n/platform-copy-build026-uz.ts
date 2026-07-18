@@ -82,3 +82,23 @@ export const UNIVERSAL_INTENT_UZ = {
   categoryContinueResearch: "Tadqiqotni davom ettirish",
   categoryUnrecognized: "Tanilmadi",
 } as const;
+
+export const MISSION_OPERATING_UZ = {
+  addToMission: "Missiyaga qo'shish",
+  added: "{name} faol missiyangizga qo'shildi.",
+  alreadyLinked: "{name} allaqachon bu missiyaga bog'langan.",
+  noMission: "Ob'ektlarni qo'shish uchun avval missiyani boshlang.",
+  noProject: "Ob'ektlarni qo'shishdan oldin missiyaga loyiha ulang.",
+  startToAdd: "Qo'shish uchun missiyani boshlang",
+  viewInMyWork: "Mening ishlarimda ko'rish",
+  problemPlaceholder: "Qanday muammoni tushunmoqchi yoki hal qilmoqchisiz?",
+  problemTooShort: "Muammoni kamida o'n belgida yozing.",
+  reasoningTitle: "Missiya mantiqiy tahlili",
+  reasoningEmpty: "Mantiqiy artefaktlar uchun Mening ishlarimda dalil yoki eslatma qo'shing.",
+  reasoningHumanReview: "CBAI yo'llar taklif qiladi — yakuniy qaror sizniki.",
+  linkedEntities: "Ushbu missiyadagi ob'ektlar",
+  nextHonestAction: "Keyingi halol qadam",
+  notesLabel: "Eslatmalar",
+  questionsLabel: "Savollar",
+  evidenceLabel: "Dalil havolalari",
+} as const;

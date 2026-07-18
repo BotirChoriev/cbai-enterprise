@@ -82,3 +82,23 @@ export const UNIVERSAL_INTENT_RU = {
   categoryContinueResearch: "Продолжить исследование",
   categoryUnrecognized: "Не распознано",
 } as const;
+
+export const MISSION_OPERATING_RU = {
+  addToMission: "Добавить в миссию",
+  added: "{name} добавлен в активную миссию.",
+  alreadyLinked: "{name} уже связан с этой миссией.",
+  noMission: "Сначала начните миссию, чтобы добавлять объекты.",
+  noProject: "Подключите проект к миссии перед добавлением объектов.",
+  startToAdd: "Начать миссию для добавления",
+  viewInMyWork: "Открыть в Моей работе",
+  problemPlaceholder: "Какую проблему вы хотите понять или решить?",
+  problemTooShort: "Опишите проблему не менее чем в десяти символах.",
+  reasoningTitle: "Рассуждение миссии",
+  reasoningEmpty: "Добавьте доказательства или заметки в Моей работе.",
+  reasoningHumanReview: "CBAI предлагает пути — решение остаётся за вами.",
+  linkedEntities: "Объекты в этой миссии",
+  nextHonestAction: "Следующее честное действие",
+  notesLabel: "Заметки",
+  questionsLabel: "Вопросы",
+  evidenceLabel: "Ссылки на доказательства",
+} as const;

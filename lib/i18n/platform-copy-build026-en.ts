@@ -80,3 +80,23 @@ export const UNIVERSAL_INTENT_EN = {
   categoryContinueResearch: "Continue research",
   categoryUnrecognized: "Not recognized",
 } as const;
+
+export const MISSION_OPERATING_EN = {
+  addToMission: "Add to mission",
+  added: "{name} added to your active mission.",
+  alreadyLinked: "{name} is already linked to this mission.",
+  noMission: "Start a mission first to add entities to your work.",
+  noProject: "Connect a project to this mission before adding entities.",
+  startToAdd: "Start mission to add",
+  viewInMyWork: "View in My Work",
+  problemPlaceholder: "What problem do you want to understand or solve?",
+  problemTooShort: "Describe your problem in at least ten characters.",
+  reasoningTitle: "Mission reasoning",
+  reasoningEmpty: "Add evidence or notes in My Work to build reasoning artifacts.",
+  reasoningHumanReview: "CBAI proposes paths — you make the final decision.",
+  linkedEntities: "Entities in this mission",
+  nextHonestAction: "Next honest action",
+  notesLabel: "Notes",
+  questionsLabel: "Questions",
+  evidenceLabel: "Evidence links",
+} as const;

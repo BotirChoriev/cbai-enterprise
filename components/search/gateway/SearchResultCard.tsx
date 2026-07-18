@@ -5,6 +5,7 @@ import type { SearchResultEntry } from "@/lib/search-intelligence-entry";
 import { isUnavailableRoute } from "@/lib/search-intelligence-entry";
 import StatusBadge from "@/components/shared/StatusBadge";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
+import AddToMissionButton from "@/components/mission/MissionOperatingActions";
 import VoiceSummaryButton from "@/components/shared/VoiceSummaryButton";
 import type { ProductStatus } from "@/lib/product-status";
 import { useTranslation } from "@/lib/i18n/use-translation";
@@ -59,11 +60,12 @@ export default function SearchResultCard({ entry }: SearchResultCardProps) {
       <p className="mt-1 text-xs text-zinc-400">{entry.shortDescription}</p>
       {entry.coverageLabel ? <p className="mt-1 text-[11px] text-zinc-600">{entry.coverageLabel}</p> : null}
 
-      <div className="mt-3">
+      <div className="mt-3 flex flex-wrap items-center gap-2">
         <Link href={entry.href} className={`${cbaiProminentAction} gap-1.5`}>
           {t("search.openProfile")}
           <span aria-hidden="true">→</span>
         </Link>
+        {entry.entityRef ? <AddToMissionButton entity={entry.entityRef} compact /> : null}
       </div>
 
       {showSecondary ? (

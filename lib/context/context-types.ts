@@ -56,6 +56,8 @@ export type PlatformContextParams = {
   university?: string | null;
   workspace?: string | null;
   q?: string | null;
+  mission?: string | null;
+  project?: string | null;
 };
 
 export type RelatedModuleLink = {
@@ -93,4 +95,6 @@ export const CONTEXT_PARAM_KEYS = {
   university: "university",
   workspace: "workspace",
   search: "q",
+  mission: "mission",
+  project: "project",
 } as const;

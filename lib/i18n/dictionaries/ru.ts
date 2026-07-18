@@ -104,6 +104,7 @@ import {
   KNOWLEDGE_BRAIN_RU,
   RESEARCH_TOPIC_COMPLETION_RU,
   UNIVERSAL_INTENT_RU,
+  MISSION_OPERATING_RU,
 } from "@/lib/i18n/platform-copy-build026-ru";
 import { SOURCE_INGESTION_RU } from "@/lib/i18n/platform-copy-build0285-ru";
 
@@ -599,6 +600,7 @@ const ru: TranslationDictionary = {
   sourceIngestion: SOURCE_INGESTION_RU,
   researchTopicCompletion: RESEARCH_TOPIC_COMPLETION_RU,
   universalIntent: UNIVERSAL_INTENT_RU,
+  missionOperating: MISSION_OPERATING_RU,
 };
 
 export default ru;

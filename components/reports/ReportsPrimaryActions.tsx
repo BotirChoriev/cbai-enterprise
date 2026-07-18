@@ -13,6 +13,11 @@ import {
 } from "@/lib/context";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import { buildEntityReport } from "@/lib/entity/entity-report";
+import {
+  mergeQueryParams,
+  operatingParamsFromMission,
+  serializeOperatingParams,
+} from "@/lib/intelligence-os/mission-operating-context";
 import { cbaiLinkMuted, cbaiMineralPanelMd, cbaiProminentAction } from "@/components/brand/brand-classes";
 
 function entityProfilePath(entity: PrimaryEntityRef): string {
@@ -48,13 +53,13 @@ export default function ReportsPrimaryActions() {
   const { context } = usePlatformContext();
   const disclosure = useProgressiveDisclosure();
   const entity = getPrimaryEntity(context);
-  const projectQuery = mission?.projectId ? `?project=${mission.projectId}` : "";
+  const operating = operatingParamsFromMission(mission);
 
   const primary = useMemo(() => {
     if (mission?.projectId) {
       return {
         label: t("entityIntelligence.generateReport"),
-        href: `/my-work${projectQuery}#project-report`,
+        href: `/my-work${mergeQueryParams(serializeOperatingParams(operating))}#project-report`,
       };
     }
 
@@ -62,21 +67,21 @@ export default function ReportsPrimaryActions() {
       if (canGenerateEntityReport(entity)) {
         return {
           label: t("entityIntelligence.generateReport"),
-          href: `${buildContextualHref(entityProfilePath(entity), context)}#reports`,
+          href: `${buildContextualHref(entityProfilePath(entity), context, operating)}#reports`,
         };
       }
 
       return {
         label: t("zeroLearningCurve.reportsReview"),
-        href: buildContextualHref(PLATFORM_MODULES.evidence.path, context),
+        href: buildContextualHref(PLATFORM_MODULES.evidence.path, context, operating),
       };
     }
 
     return {
       label: t("zeroLearningCurve.reportsReview"),
-      href: buildContextualHref(PLATFORM_MODULES.evidence.path, context),
+      href: buildContextualHref(PLATFORM_MODULES.evidence.path, context, operating),
     };
-  }, [context, entity, mission?.projectId, projectQuery, t]);
+  }, [context, entity, mission, operating, t]);
 
   if (disclosure.level === "beginner") return null;
 
@@ -88,7 +93,7 @@ export default function ReportsPrimaryActions() {
         </Link>
         {entity ? (
           <Link
-            href={buildContextualHref(entityProfilePath(entity), context)}
+            href={buildContextualHref(entityProfilePath(entity), context, operating)}
             className={cbaiLinkMuted}
           >
             {t("reportsCenter.backToProfile")}

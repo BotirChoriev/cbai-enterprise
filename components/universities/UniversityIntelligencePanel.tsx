@@ -26,6 +26,7 @@ import {
 } from "@/components/shared/entity-profile-copy";
 import { getUniversityRelationships } from "@/lib/universities.adapter";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
+import AddToMissionButton from "@/components/mission/MissionOperatingActions";
 import CreateProjectFromEntityButton from "@/components/project/CreateProjectFromEntityButton";
 import { useTranslation } from "@/lib/i18n/use-translation";
 
@@ -49,7 +50,11 @@ export function UniversityIntelligencePanel({
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end gap-2">
+      <div className="flex flex-wrap justify-end gap-2">
+        <AddToMissionButton
+          entity={{ kind: "university", id: university.id, name: university.name, code: university.icon, countryName: university.country }}
+          compact
+        />
         <CreateProjectFromEntityButton entity={{ kind: "university", id: university.id, name: university.name, code: university.icon, countryName: university.country }} />
         <SaveToWorkspaceButton
           entity={{

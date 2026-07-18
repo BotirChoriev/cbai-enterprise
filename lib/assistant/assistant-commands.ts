@@ -34,6 +34,56 @@ export type AssistantCommand = {
 
 export const ASSISTANT_COMMANDS: readonly AssistantCommand[] = [
   {
+    id: "start-mission",
+    phrase: "Start a mission",
+    href: "/?create=1",
+    keywords: [
+      "start mission", "start a mission", "new mission", "create mission",
+      "missiyani boshlash", "yangi missiya",
+      "начать миссию", "новая миссия",
+      "görev başlat", "yeni görev",
+    ],
+  },
+  {
+    id: "open-reasoning",
+    phrase: "Open reasoning",
+    href: "/reasoning",
+    keywords: [
+      "open reasoning", "reasoning", "structured reasoning",
+      "mulohazani och", "mulohaza",
+      "открой рассуждение", "рассуждение",
+      "akıl yürütmeyi aç", "akıl yürütme",
+    ],
+  },
+  {
+    id: "show-missing-evidence",
+    phrase: "Show missing evidence",
+    href: "/knowledge",
+    keywords: [
+      "show missing evidence", "missing evidence", "evidence gaps",
+      "yetishmayotgan dalillar", "dalil bo'shliqlari",
+      "покажи недостающие доказательства", "недостающие доказательства",
+      "eksik kanıtları göster", "eksik kanıtlar",
+    ],
+  },
+  {
+    id: "search-japan",
+    phrase: "Search Japan",
+    href: "/countries?country=japan&q=Japan",
+    keywords: ["search japan", "find japan", "open japan", "япония", "japonya"],
+  },
+  {
+    id: "add-to-mission",
+    phrase: "Add to my mission",
+    href: "/my-work",
+    keywords: [
+      "add to mission", "add this to my mission", "add to my mission",
+      "missiyaga qo'shish", "missiyamga qo'sh",
+      "добавить в миссию", "добавь в миссию",
+      "göreve ekle", "görevime ekle",
+    ],
+  },
+  {
     id: "open-my-work",
     phrase: "Open my work",
     href: "/my-work",
@@ -58,7 +108,7 @@ export const ASSISTANT_COMMANDS: readonly AssistantCommand[] = [
   {
     id: "continue-research",
     phrase: "Continue research",
-    href: "/research/workspace",
+    href: "/research/microbiology",
     keywords: [
       "continue research", "research workspace", "continue my research",
       "tadqiqotni davom ettir",
@@ -86,8 +136,8 @@ export const ASSISTANT_COMMANDS: readonly AssistantCommand[] = [
   {
     id: "mission-status",
     phrase: "Show mission status",
-    href: "/research",
-    keywords: ["mission status", "show mission", "my missions"],
+    href: "/my-work",
+    keywords: ["mission status", "show mission", "my missions", "what is incomplete", "what should i do next"],
   },
   {
     id: "compare-countries",
@@ -115,7 +165,7 @@ export const ASSISTANT_COMMANDS: readonly AssistantCommand[] = [
   {
     id: "start-analysis",
     phrase: "Start analysis",
-    href: "/research/workspace",
+    href: "/research/microbiology",
     keywords: ["start analysis", "begin analysis", "analyze"],
   },
   {

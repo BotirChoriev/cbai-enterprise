@@ -85,6 +85,8 @@ export function parseContextParams(
       university: searchParams.get("university"),
       workspace: searchParams.get("workspace"),
       q: searchParams.get("q"),
+      mission: searchParams.get("mission"),
+      project: searchParams.get("project"),
     };
   }
   return searchParams;
@@ -128,12 +130,15 @@ export function getPrimaryEntity(
   return (snapshot.country ?? snapshot.company ?? snapshot.university) as PrimaryEntityRef | null;
 }
 
-export function serializeContextToParams(
-  snapshot: Pick<
-    PlatformContextSnapshot,
-    "country" | "company" | "university" | "workspace" | "searchQuery"
-  >,
-): Record<string, string> {
+export type ContextSerializationInput = Pick<
+  PlatformContextSnapshot,
+  "country" | "company" | "university" | "workspace" | "searchQuery"
+> & {
+  missionId?: string | null;
+  projectId?: string | null;
+};
+
+export function serializeContextToParams(snapshot: ContextSerializationInput): Record<string, string> {
   const params: Record<string, string> = {};
 
   if (snapshot.country) {
@@ -150,6 +155,12 @@ export function serializeContextToParams(
   }
   if (snapshot.searchQuery.trim()) {
     params.q = snapshot.searchQuery.trim();
+  }
+  if (snapshot.missionId) {
+    params.mission = snapshot.missionId;
+  }
+  if (snapshot.projectId) {
+    params.project = snapshot.projectId;
   }
 
   return params;

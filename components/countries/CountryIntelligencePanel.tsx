@@ -34,6 +34,7 @@ import {
 } from "@/components/shared/entity-profile-copy";
 import { getCountryRelationships } from "@/lib/countries.adapter";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
+import AddToMissionButton from "@/components/mission/MissionOperatingActions";
 import CreateProjectFromEntityButton from "@/components/project/CreateProjectFromEntityButton";
 import { useTranslation } from "@/lib/i18n/use-translation";
 
@@ -98,7 +99,11 @@ export function CountryIntelligencePanel({
         </p>
       ) : null}
 
-      <div className="flex justify-end gap-2">
+      <div className="flex flex-wrap justify-end gap-2">
+        <AddToMissionButton
+          entity={{ kind: "country", id: country.id, name: country.name, code: country.code }}
+          compact
+        />
         <CreateProjectFromEntityButton entity={{ kind: "country", id: country.id, name: country.name, code: country.code }} />
         <SaveToWorkspaceButton
           entity={{

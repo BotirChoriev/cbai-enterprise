@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { buildReasoningExplorerModel } from "@/lib/reasoning-explorer";
 import ReasoningPipelineOverview from "@/components/reasoning/ReasoningPipelineOverview";
 import ReasoningEvidenceIndicatorMap from "@/components/reasoning/ReasoningEvidenceIndicatorMap";
+import MissionReasoningPanel from "@/components/reasoning/MissionReasoningPanel";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import { cbaiStatCell } from "@/components/brand/brand-classes";
 import { useTranslation } from "@/lib/i18n/use-translation";
@@ -20,6 +21,7 @@ export default function ReasoningExplorer() {
       showOperator={false}
       missionContextVariant={disclosure.showInlineHumanDecisionBoundary ? "full" : "compact"}
     >
+      <MissionReasoningPanel />
       {disclosure.showReasoningStats ? (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div className={`${cbaiStatCell} py-3`}>

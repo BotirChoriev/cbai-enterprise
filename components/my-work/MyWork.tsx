@@ -14,6 +14,7 @@ import PinnedEntities from "@/components/platform/context/PinnedEntities";
 import SavedEvidence from "@/components/my-work/SavedEvidence";
 import Avatar from "@/components/shared/Avatar";
 import MissionHomeSummary from "@/components/my-work/MissionHomeSummary";
+import MissionLinkedEntitiesPanel from "@/components/my-work/MissionLinkedEntitiesPanel";
 import CreateProjectForm from "@/components/project/CreateProjectForm";
 import ProjectList from "@/components/project/ProjectList";
 import ProjectHome from "@/components/project/ProjectHome";
@@ -28,6 +29,7 @@ import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { PROJECT_TYPES, type ProjectTypeId } from "@/lib/project/project-types";
 import type { ContextEntityRef } from "@/lib/context/context-types";
+import { ACTIVATED_RESEARCH_TOPIC_PATH } from "@/lib/intelligence-os/mission-operating-context";
 import {
   ASSISTANT_LANGUAGES,
   resolveOperatorName,
@@ -42,7 +44,7 @@ function MyWorkContent() {
       [
         {
           label: t("myWorkExt.continueResearchWorkspace"),
-          href: "/research/workspace",
+          href: ACTIVATED_RESEARCH_TOPIC_PATH,
           detail: t("myWorkExt.continueResearchWorkspaceDetail"),
         },
         {
@@ -202,6 +204,7 @@ function MyWorkContent() {
       {accountMode === "cloud" ? <LocalWorkMigrationPrompt /> : null}
 
       <MissionHomeSummary />
+      <MissionLinkedEntitiesPanel />
 
       <CreateProjectForm initialPrimaryEntity={initialPrimaryEntity} initialType={initialType} />
 

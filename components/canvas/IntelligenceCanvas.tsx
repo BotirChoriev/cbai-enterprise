@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { cbaiBtnSecondary } from "@/components/brand/brand-classes";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useTranslation } from "@/lib/i18n/use-translation";
@@ -14,6 +15,9 @@ import { translateEvidencePulseLimitation } from "@/lib/i18n/evidence-pulse-tran
 import { loadProjects, loadProjectQuestions } from "@/lib/project/project-store";
 import IntelligenceGatewayEntry from "@/components/gateway/IntelligenceGatewayEntry";
 import MissionCreationFlow from "@/components/mission/MissionCreationFlow";
+import { QuickStartMissionForm } from "@/components/mission/MissionOperatingActions";
+import { getCurrentMission } from "@/lib/intelligence-os/mission-engine";
+import { myWorkHrefForMission } from "@/lib/intelligence-os/mission-operating-context";
 import MissionOperatorPresence from "@/components/mission/MissionOperatorPresence";
 import HumanImpactPanel from "@/components/mission/HumanImpactPanel";
 import SystemAwakeningSequence from "@/components/platform/entry/SystemAwakeningSequence";
@@ -31,6 +35,7 @@ import { cbaiBtnPrimary, cbaiOperatingShell, cbaiSectionEyebrow, cbaiTextBody, c
 
 export default function IntelligenceCanvas() {
   const { t, language } = useTranslation();
+  const router = useRouter();
   const hydrated = useHydrated();
   const { mission, evidencePulse, humanImpact, refreshMissionContext } = useMissionContext();
   const disclosure = useProgressiveDisclosure();
@@ -60,8 +65,13 @@ export default function IntelligenceCanvas() {
     setCreating(false);
     setRefreshKey((k) => k + 1);
     refreshMissionContext();
+    const active = getCurrentMission();
+    if (active?.projectId) {
+      router.push(myWorkHrefForMission(active));
+      return;
+    }
     window.history.replaceState(null, "", "/");
-  }, [refreshMissionContext]);
+  }, [refreshMissionContext, router]);
 
   const projectQuery = mission?.projectId ? `?project=${mission.projectId}` : "";
   const firstAction = hydrated ? deriveFirstMinuteAction(mission) : null;
@@ -122,16 +132,18 @@ export default function IntelligenceCanvas() {
             ) : (
               <div className="flex flex-1 flex-col items-center justify-center space-y-6 text-center">
                 <p className="text-base text-zinc-200 sm:text-lg">{t("intelligenceCanvas.homeIntelligenceLead")}</p>
+                <div className="w-full max-w-xl text-left">
+                  <QuickStartMissionForm />
+                </div>
                 <div className="w-full text-left">
                   <MissionOperatorPresence mission={null} />
                 </div>
                 <button
                   type="button"
                   onClick={() => setCreating(true)}
-                  className={`${cbaiBtnPrimary} gap-2`}
+                  className={cbaiBtnSecondary}
                 >
-                  {t("zeroLearningCurve.startMission")}
-                  <span aria-hidden="true">→</span>
+                  {t("missionCreation.eyebrow")}
                 </button>
                 {disclosure.showGatewayGoalChips ? (
                   <div className="w-full pt-2 text-left">

@@ -27,6 +27,7 @@ import CompanyMethodology from "@/components/companies/CompanyMethodology";
 import EntityFutureSources from "@/components/shared/EntityFutureSources";
 import CompanyTrustSection from "@/components/companies/CompanyTrustSection";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
+import AddToMissionButton from "@/components/mission/MissionOperatingActions";
 import CreateProjectFromEntityButton from "@/components/project/CreateProjectFromEntityButton";
 import { useTranslation } from "@/lib/i18n/use-translation";
 
@@ -71,7 +72,11 @@ export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligen
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end gap-2">
+      <div className="flex flex-wrap justify-end gap-2">
+        <AddToMissionButton
+          entity={{ kind: "company", id: company.id, name: company.name, code: company.icon, countryName: company.country }}
+          compact
+        />
         <CreateProjectFromEntityButton entity={{ kind: "company", id: company.id, name: company.name, code: company.icon, countryName: company.country }} />
         <SaveToWorkspaceButton
           entity={{

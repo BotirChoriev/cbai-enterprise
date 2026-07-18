@@ -21,8 +21,12 @@ export type MissionLifecycleStage = MissionThreadState & {
   readonly href: string;
 };
 
-function projectQuery(projectId: string | undefined): string {
-  return projectId ? `?project=${projectId}` : "";
+function projectQuery(mission: Mission | null, projectId: string | undefined): string {
+  const params = new URLSearchParams();
+  if (projectId) params.set("project", projectId);
+  if (mission?.id) params.set("mission", mission.id);
+  const query = params.toString();
+  return query ? `?${query}` : "";
 }
 
 function resolveProject(mission: Mission | null) {
@@ -40,7 +44,7 @@ export function deriveMissionLifecycle(mission: Mission | null): readonly Missio
 
   const project = resolveProject(mission);
   const projectId = project?.id ?? mission.projectId;
-  const q = projectQuery(projectId);
+  const q = projectQuery(mission, projectId);
   const evidence = project ? loadProjectEvidence(project.id) : [];
   const notes = project ? loadProjectNotes(project.id) : [];
   const questions = project ? loadProjectQuestions(project.id) : [];
