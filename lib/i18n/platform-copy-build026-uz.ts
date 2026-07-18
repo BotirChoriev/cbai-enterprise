@@ -86,6 +86,8 @@ export const UNIVERSAL_INTENT_UZ = {
 export const MISSION_OPERATING_UZ = {
   addToMission: "Missiyaga qo'shish",
   added: "{name} faol missiyangizga qo'shildi.",
+  addedToMissionLabel: "Missiyaga qo'shilgan",
+  addedToMission: "{name} allaqachon bu missiyada.",
   alreadyLinked: "{name} allaqachon bu missiyaga bog'langan.",
   noMission: "Ob'ektlarni qo'shish uchun avval missiyani boshlang.",
   noProject: "Ob'ektlarni qo'shishdan oldin missiyaga loyiha ulang.",

@@ -86,6 +86,8 @@ export const UNIVERSAL_INTENT_RU = {
 export const MISSION_OPERATING_RU = {
   addToMission: "Добавить в миссию",
   added: "{name} добавлен в активную миссию.",
+  addedToMissionLabel: "Добавлено в миссию",
+  addedToMission: "{name} уже в этой миссии.",
   alreadyLinked: "{name} уже связан с этой миссией.",
   noMission: "Сначала начните миссию, чтобы добавлять объекты.",
   noProject: "Подключите проект к миссии перед добавлением объектов.",

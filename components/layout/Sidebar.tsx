@@ -5,10 +5,12 @@ import { usePathname } from "next/navigation";
 import OperatingNavigator from "@/components/operating/OperatingNavigator";
 import CBAILogo, { CBAIMark } from "@/components/brand/CBAILogo";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { useContextualHref } from "@/lib/context/use-contextual-href";
 
 export default function Sidebar() {
   const pathname = usePathname();
   const { t } = useTranslation();
+  const { moduleHref } = useContextualHref();
   const isHome = pathname === "/";
 
   return (
@@ -37,7 +39,7 @@ export default function Sidebar() {
           <div className="rounded-xl border border-teal-500/10 bg-slate-950/60 p-3">
             <p className="text-xs font-medium text-zinc-300">{t("navigation.startWithSearch")}</p>
             <p className="mt-1 text-xs text-zinc-500">{t("navigation.startWithSearchBody")}</p>
-            <Link href="/search" className="mt-3 inline-flex text-xs font-medium text-teal-400 hover:text-teal-300">
+            <Link href={moduleHref("/search")} className="mt-3 inline-flex text-xs font-medium text-teal-400 hover:text-teal-300">
               {t("navigation.openSearch")} →
             </Link>
           </div>

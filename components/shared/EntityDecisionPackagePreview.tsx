@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import type { ReportTypeDefinition } from "@/lib/reports-center";
-import { buildContextualHref } from "@/lib/context";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
+import { useContextualHref } from "@/lib/context/use-contextual-href";
 import { useTranslation } from "@/lib/i18n/use-translation";
 
 type EntityReportsAvailableProps = {
@@ -13,11 +13,12 @@ type EntityReportsAvailableProps = {
 
 export function EntityReportsAvailable({ reports, entityLabel }: EntityReportsAvailableProps) {
   const { context } = usePlatformContext();
+  const { contextualHref } = useContextualHref();
   const { t } = useTranslation();
 
   if (reports.length === 0) return null;
 
-  const reportsHref = buildContextualHref("/reports", context);
+  const reportsHref = contextualHref("/reports", context);
   const entityTypeLabel =
     entityLabel === "country"
       ? t("entityIntelligence.entityTypeCountry")

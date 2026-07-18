@@ -8,6 +8,7 @@ import LanguageSelector from "@/components/i18n/LanguageSelector";
 import ThemeToggle from "@/components/shared/ThemeToggle";
 import { CBAIMark } from "@/components/brand/CBAILogo";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { useContextualHref } from "@/lib/context/use-contextual-href";
 
 type TopbarProps = {
   onMenuClick?: () => void;
@@ -24,6 +25,7 @@ type TopbarProps = {
 export default function Topbar({ onMenuClick, transparent = false }: TopbarProps) {
   const { t } = useTranslation();
   const pathname = usePathname();
+  const { moduleHref } = useContextualHref();
   // The homepage already carries one prominent Operator + command bar (HomeAssistantGreeting) —
   // showing the compact one here too would be the exact literal duplication this platform's
   // design system is meant to avoid, so it steps aside there and reappears on every other route.
@@ -62,13 +64,13 @@ export default function Topbar({ onMenuClick, transparent = false }: TopbarProps
         }`}
       >
         <Link
-          href="/search"
+          href={moduleHref("/search")}
           className="hidden shrink-0 text-sm font-medium text-teal-400 transition-colors hover:text-teal-300 sm:inline-flex"
         >
           {t("navigation.search")} →
         </Link>
         <Link
-          href="/my-work"
+          href={moduleHref("/my-work")}
           className={`hidden shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors lg:inline-flex ${
             transparent ? "border border-transparent hover:border-teal-500/30 hover:text-teal-300" : "border border-zinc-800 hover:border-teal-500/30 hover:text-teal-300"
           }`}

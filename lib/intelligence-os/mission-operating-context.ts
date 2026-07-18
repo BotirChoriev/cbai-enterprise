@@ -162,5 +162,51 @@ export function myWorkHrefForMission(mission: Mission | null | undefined): strin
   return buildOperatingHref("/my-work", serializeOperatingParams(operatingParamsFromMission(mission)));
 }
 
+/** Append mission/project params to an existing href without dropping entity or search params. */
+export function appendOperatingParamsToHref(
+  href: string,
+  operating: OperatingUrlParams,
+): string {
+  if (!operating.missionId && !operating.projectId) return href;
+
+  const hashIndex = href.indexOf("#");
+  const hash = hashIndex >= 0 ? href.slice(hashIndex) : "";
+  const withoutHash = hashIndex >= 0 ? href.slice(0, hashIndex) : href;
+  const [path, query = ""] = withoutHash.split("?");
+  const params = new URLSearchParams(query);
+  if (operating.missionId) params.set(OPERATING_PARAM_KEYS.mission, operating.missionId);
+  if (operating.projectId) params.set(OPERATING_PARAM_KEYS.project, operating.projectId);
+  const q = params.toString();
+  return `${q ? `${path}?${q}` : path}${hash}`;
+}
+
+/** Entity kinds that can be linked to an active mission project from search and profiles. */
+export const MISSION_LINKABLE_ENTITY_KINDS = [
+  "country",
+  "company",
+  "university",
+  "research_topic",
+] as const satisfies readonly ContextEntityRef["kind"][];
+
+export function isMissionLinkableEntity(entity: ContextEntityRef): boolean {
+  return (MISSION_LINKABLE_ENTITY_KINDS as readonly string[]).includes(entity.kind);
+}
+
+export function isEntityLinkedToProject(
+  projectId: string,
+  entity: ContextEntityRef,
+): boolean {
+  return loadProjectEntities(projectId).some(
+    (linked) => linked.kind === entity.kind && linked.id === entity.id,
+  );
+}
+
+export function isEntityLinkedToActiveMission(entity: ContextEntityRef): boolean {
+  if (typeof window === "undefined") return false;
+  const mission = loadCurrentMission();
+  if (!mission?.projectId) return false;
+  return isEntityLinkedToProject(mission.projectId, entity);
+}
+
 /** Canonical activated research topic — microbiology has the richest real workflow today. */
 export const ACTIVATED_RESEARCH_TOPIC_PATH = "/research/microbiology" as const;

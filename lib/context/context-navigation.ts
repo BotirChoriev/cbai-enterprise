@@ -211,6 +211,7 @@ function entityPrimaryModules(kind: "country" | "company" | "university"): Platf
 
 export function buildRelatedModules(
   snapshot: PlatformContextSnapshot,
+  operating?: { missionId?: string | null; projectId?: string | null },
 ): RelatedModuleLink[] {
   const primary = getPrimaryEntity(snapshot);
 
@@ -223,7 +224,7 @@ export function buildRelatedModules(
     ].map((mod) => ({
       id: mod.id,
       label: mod.label,
-      href: buildHref(mod.path, snapshot),
+      href: buildHref(mod.path, snapshot, operating),
       description: mod.description,
     }));
   }
@@ -233,7 +234,7 @@ export function buildRelatedModules(
     return {
       id: mod.id,
       label: mod.label,
-      href: buildHref(mod.path, snapshot),
+      href: buildHref(mod.path, snapshot, operating),
       description: mod.description,
     };
   });
@@ -241,6 +242,7 @@ export function buildRelatedModules(
 
 export function buildQuickActions(
   snapshot: PlatformContextSnapshot,
+  operating?: { missionId?: string | null; projectId?: string | null },
 ): RelatedModuleLink[] {
   const links: RelatedModuleLink[] = [];
 
@@ -248,7 +250,7 @@ export function buildQuickActions(
     links.push({
       id: "open-country",
       label: "Open Country",
-      href: buildHref(PLATFORM_MODULES.countries.path, snapshot),
+      href: buildHref(PLATFORM_MODULES.countries.path, snapshot, operating),
       description: "View country intelligence profile.",
     });
   }
@@ -256,7 +258,7 @@ export function buildQuickActions(
     links.push({
       id: "open-company",
       label: "Open Company",
-      href: buildHref(PLATFORM_MODULES.companies.path, snapshot),
+      href: buildHref(PLATFORM_MODULES.companies.path, snapshot, operating),
       description: "View company intelligence profile.",
     });
   }
@@ -264,7 +266,7 @@ export function buildQuickActions(
     links.push({
       id: "open-university",
       label: "Open University",
-      href: buildHref(PLATFORM_MODULES.universities.path, snapshot),
+      href: buildHref(PLATFORM_MODULES.universities.path, snapshot, operating),
       description: "View university intelligence profile.",
     });
   }
@@ -272,7 +274,7 @@ export function buildQuickActions(
   links.push({
     id: "open-evidence",
     label: "Open Evidence",
-    href: buildHref(PLATFORM_MODULES.evidence.path, snapshot),
+    href: buildHref(PLATFORM_MODULES.evidence.path, snapshot, operating),
     description: "Review evidence architecture for current context.",
   });
 
@@ -280,7 +282,7 @@ export function buildQuickActions(
     links.push({
       id: "open-search",
       label: "Continue Search",
-      href: buildHref(PLATFORM_MODULES.search.path, snapshot, { preserveSearch: true }),
+      href: buildHref(PLATFORM_MODULES.search.path, snapshot, { preserveSearch: true, ...operating }),
       description: "Return to search with current query and entity context.",
     });
   }
@@ -291,6 +293,7 @@ export function buildQuickActions(
 export function buildContextBreadcrumbs(
   snapshot: PlatformContextSnapshot,
   currentModuleLabel: string,
+  operating?: { missionId?: string | null; projectId?: string | null },
 ): ContextBreadcrumbSegment[] {
   const crumbs: ContextBreadcrumbSegment[] = [];
   const primary = getPrimaryEntity(snapshot);
@@ -305,11 +308,11 @@ export function buildContextBreadcrumbs(
 
     crumbs.push({
       label: primary.name,
-      href: buildHref(entityModule.path, snapshot),
+      href: buildHref(entityModule.path, snapshot, operating),
     });
     crumbs.push({
       label: entityModule.label,
-      href: buildHref(entityModule.path, snapshot),
+      href: buildHref(entityModule.path, snapshot, operating),
     });
   }
 
@@ -332,15 +335,16 @@ export function snapshotWithEntityFocus(
 export function buildContextHeaderModel(
   snapshot: PlatformContextSnapshot,
   currentModuleLabel: string,
+  operating?: { missionId?: string | null; projectId?: string | null },
 ): PlatformContextHeaderModel {
   const primary = getPrimaryEntity(snapshot);
 
   return {
     primaryEntity: primary,
     primaryEntityLabel: primary?.name ?? "No entity selected",
-    breadcrumbs: buildContextBreadcrumbs(snapshot, currentModuleLabel),
-    relatedModules: buildRelatedModules(snapshot),
-    quickActions: buildQuickActions(snapshot),
+    breadcrumbs: buildContextBreadcrumbs(snapshot, currentModuleLabel, operating),
+    relatedModules: buildRelatedModules(snapshot, operating),
+    quickActions: buildQuickActions(snapshot, operating),
     timelineStatus: snapshot.timelineStatus,
     timelineMessage: snapshot.timelineMessage,
     recentEntities: snapshot.recentEntities,

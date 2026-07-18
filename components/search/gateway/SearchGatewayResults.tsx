@@ -11,12 +11,14 @@ import {
 import { profileSectionHref } from "@/components/shared/entity-profile-path";
 import type { Entity } from "@/lib/entity/entity.types";
 import TopicResultCard from "@/components/search/gateway/SearchResultCard";
+import AddToMissionButton from "@/components/mission/MissionOperatingActions";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import VoiceSummaryButton from "@/components/shared/VoiceSummaryButton";
 import EmptyState from "@/components/shared/EmptyState";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
+import { useContextualHref } from "@/lib/context/use-contextual-href";
 import { cbaiLinkMuted, cbaiMineralPanel, cbaiProminentAction } from "@/components/brand/brand-classes";
 
 type SearchGatewayResultsProps = {
@@ -136,10 +138,16 @@ type EntityMatchCardProps = {
 
 function EntityMatchCard({ entry, matchedLabel, prominent = false }: EntityMatchCardProps) {
   const { t } = useTranslation();
-  const { recordEntityView } = usePlatformContext();
+  const { recordEntityView, context } = usePlatformContext();
+  const { entityProfileHref, contextualHref } = useContextualHref();
   const disclosure = useProgressiveDisclosure();
   const showSecondary = disclosure.level === "expert";
   const showCountryInHeader = entry.type !== "Country" && entry.countryLabel;
+
+  const profileHref = useMemo(
+    () => entityProfileHref(entry.href),
+    [entityProfileHref, entry.href],
+  );
 
   function handleOpenProfile() {
     if (entry.entityRef) recordEntityView(entry.entityRef);
@@ -174,9 +182,9 @@ function EntityMatchCard({ entry, matchedLabel, prominent = false }: EntityMatch
         <p className="mt-1 text-xs text-teal-400/80">{entry.coverageLabel}</p>
       ) : null}
 
-      <div className="mt-3">
+      <div className="mt-3 flex flex-wrap items-center gap-2">
         <Link
-          href={entry.href}
+          href={profileHref}
           onClick={handleOpenProfile}
           className={
             prominent
@@ -187,6 +195,7 @@ function EntityMatchCard({ entry, matchedLabel, prominent = false }: EntityMatch
           {t("search.openProfile")}
           <span aria-hidden="true">→</span>
         </Link>
+        {entry.entityRef ? <AddToMissionButton entity={entry.entityRef} compact /> : null}
       </div>
 
       {showSecondary ? (
@@ -194,12 +203,12 @@ function EntityMatchCard({ entry, matchedLabel, prominent = false }: EntityMatch
           <summary className={cbaiLinkMuted}>{t("zeroLearningCurve.advancedDetails")}</summary>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             {entry.showCompare ? (
-              <Link href={profileSectionHref(entry.href, "compare")} className={cbaiLinkMuted}>
+              <Link href={profileSectionHref(profileHref, "compare")} className={cbaiLinkMuted}>
                 {t("search.compareArrow")}
               </Link>
             ) : null}
             {entry.showReports ? (
-              <Link href={profileSectionHref(entry.href, "reports")} className={cbaiLinkMuted}>
+              <Link href={contextualHref("/reports", context)} className={cbaiLinkMuted}>
                 {t("search.openReportsArrow")}
               </Link>
             ) : null}

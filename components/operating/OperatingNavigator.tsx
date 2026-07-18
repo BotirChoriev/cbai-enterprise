@@ -9,6 +9,7 @@ import { operatingNavigationItems } from "@/lib/navigation-operating";
 import { deriveNavLiveState, type NavLiveState } from "@/lib/intelligence-os/nav-live-state";
 import { translateNavLabel, translateNavSectionTitle } from "@/lib/i18n/nav-translation";
 import NavIcon from "@/components/layout/NavIcon";
+import { useContextualHref } from "@/lib/context/use-contextual-href";
 import {
   cbaiNavEyebrow,
   cbaiNavRow,
@@ -62,6 +63,7 @@ export default function OperatingNavigator() {
   const pathname = usePathname();
   const { t } = useTranslation();
   const hydrated = useHydrated();
+  const { moduleHref } = useContextualHref();
   const isHome = pathname === "/";
 
   if (isHome) {
@@ -73,7 +75,7 @@ export default function OperatingNavigator() {
             const live = hydrated ? deriveNavLiveState(item.href, pathname) : "neutral";
             return (
               <li key={item.href}>
-                <NavRow href={item.href} label={item.label} icon={item.icon} live={live} t={t} />
+                <NavRow href={moduleHref(item.href)} label={item.label} icon={item.icon} live={live} t={t} />
               </li>
             );
           })}
@@ -98,7 +100,7 @@ export default function OperatingNavigator() {
               return (
                 <li key={item.href}>
                   <NavRow
-                    href={item.href}
+                    href={moduleHref(item.href)}
                     label={translateNavLabel(t, item.href, item.label)}
                     icon={item.icon}
                     live={live}
@@ -125,7 +127,7 @@ export default function OperatingNavigator() {
                 return (
                   <li key={item.href}>
                     <NavRow
-                      href={item.href}
+                      href={moduleHref(item.href)}
                       label={translateNavLabel(t, item.href, item.label)}
                       icon={item.icon}
                       live={live}

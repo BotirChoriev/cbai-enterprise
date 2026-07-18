@@ -3,6 +3,8 @@
 import { useMemo } from "react";
 import { buildContextHeaderModel } from "@/lib/context";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
+import { useMissionContext } from "@/components/mission/MissionContextProvider";
+import { operatingParamsFromMission } from "@/lib/intelligence-os/mission-operating-context";
 import PlatformBreadcrumb from "@/components/platform/context/PlatformBreadcrumb";
 import PlatformQuickActions from "@/components/platform/context/PlatformQuickActions";
 import RelatedModules from "@/components/platform/context/RelatedModules";
@@ -15,10 +17,11 @@ type PlatformContextHeaderProps = {
 
 export default function PlatformContextHeader({ moduleLabel }: PlatformContextHeaderProps) {
   const { context } = usePlatformContext();
+  const { mission } = useMissionContext();
 
   const model = useMemo(
-    () => buildContextHeaderModel(context, moduleLabel),
-    [context, moduleLabel],
+    () => buildContextHeaderModel(context, moduleLabel, operatingParamsFromMission(mission)),
+    [context, moduleLabel, mission],
   );
 
   return (

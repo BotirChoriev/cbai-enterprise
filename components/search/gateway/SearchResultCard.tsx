@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo } from "react";
 import type { SearchResultEntry } from "@/lib/search-intelligence-entry";
 import { isUnavailableRoute } from "@/lib/search-intelligence-entry";
 import StatusBadge from "@/components/shared/StatusBadge";
@@ -10,6 +11,7 @@ import VoiceSummaryButton from "@/components/shared/VoiceSummaryButton";
 import type { ProductStatus } from "@/lib/product-status";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
+import { useContextualHref } from "@/lib/context/use-contextual-href";
 import { cbaiLinkMuted, cbaiProminentAction } from "@/components/brand/brand-classes";
 
 const cardShell = "rounded-lg bg-zinc-900/50 px-4 py-3 transition-colors hover:bg-zinc-900/80";
@@ -28,8 +30,13 @@ type SearchResultCardProps = {
 export default function SearchResultCard({ entry }: SearchResultCardProps) {
   const { t } = useTranslation();
   const disclosure = useProgressiveDisclosure();
+  const { entityProfileHref } = useContextualHref();
   const disabled = !entry.linked || isUnavailableRoute(entry.route);
   const showSecondary = disclosure.level === "expert" && !disabled;
+  const profileHref = useMemo(
+    () => entityProfileHref(entry.href),
+    [entityProfileHref, entry.href],
+  );
   const voiceSummaryText = [entry.name, entry.type, entry.shortDescription, entry.coverageLabel]
     .filter((part): part is string => Boolean(part))
     .join(". ");
@@ -61,7 +68,7 @@ export default function SearchResultCard({ entry }: SearchResultCardProps) {
       {entry.coverageLabel ? <p className="mt-1 text-[11px] text-zinc-600">{entry.coverageLabel}</p> : null}
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        <Link href={entry.href} className={`${cbaiProminentAction} gap-1.5`}>
+        <Link href={profileHref} className={`${cbaiProminentAction} gap-1.5`}>
           {t("search.openProfile")}
           <span aria-hidden="true">→</span>
         </Link>

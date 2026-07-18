@@ -2129,6 +2129,8 @@ export type TranslationDictionary = {
   missionOperating: {
     addToMission: string;
     added: string;
+    addedToMissionLabel: string;
+    addedToMission: string;
     alreadyLinked: string;
     noMission: string;
     noProject: string;

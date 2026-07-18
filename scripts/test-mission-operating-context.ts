@@ -83,11 +83,14 @@ test("7. Japan timeline never fabricates verified year-level evidence", () => {
 });
 
 test("8. Add to Mission UI wired on search and entity profiles", () => {
-  const search = readSource("components/search/gateway/SearchResultCard.tsx");
+  const searchGateway = readSource("components/search/gateway/SearchGatewayResults.tsx");
+  const searchCard = readSource("components/search/gateway/SearchResultCard.tsx");
   const country = readSource("components/countries/CountryIntelligencePanel.tsx");
   const company = readSource("components/companies/CompanyIntelligencePanel.tsx");
   const university = readSource("components/universities/UniversityIntelligencePanel.tsx");
-  for (const src of [search, country, company, university]) {
+  assert.match(searchGateway, /AddToMissionButton/);
+  assert.match(searchCard, /AddToMissionButton/);
+  for (const src of [country, company, university]) {
     assert.match(src, /AddToMissionButton/);
   }
 });

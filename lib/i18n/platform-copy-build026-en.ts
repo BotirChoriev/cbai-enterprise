@@ -84,6 +84,8 @@ export const UNIVERSAL_INTENT_EN = {
 export const MISSION_OPERATING_EN = {
   addToMission: "Add to mission",
   added: "{name} added to your active mission.",
+  addedToMissionLabel: "Added to mission",
+  addedToMission: "{name} is already in this mission.",
   alreadyLinked: "{name} is already linked to this mission.",
   noMission: "Start a mission first to add entities to your work.",
   noProject: "Connect a project to this mission before adding entities.",

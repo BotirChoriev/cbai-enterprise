@@ -1,15 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ContextEntityRef } from "@/lib/context";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import {
   addEntityToActiveMission,
+  isEntityLinkedToActiveMission,
+  isMissionLinkableEntity,
   myWorkHrefForMission,
   startMissionFromProblem,
 } from "@/lib/intelligence-os/mission-operating-context";
+import { MISSION_DATA_CHANGED } from "@/lib/intelligence-os/mission-activation-events";
 import ActivationStatusLine from "@/components/shared/ActivationStatusLine";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { cbaiBtnSecondary, cbaiProminentAction } from "@/components/brand/brand-classes";
@@ -30,10 +33,31 @@ export default function AddToMissionButton({
   const { t } = useTranslation();
   const { mission, refreshMissionContext } = useMissionContext();
   const [status, setStatus] = useState<string | null>(null);
+  const [linkedRevision, setLinkedRevision] = useState(0);
+
+  useEffect(() => {
+    const onChanged = () => setLinkedRevision((n) => n + 1);
+    window.addEventListener(MISSION_DATA_CHANGED, onChanged);
+    return () => window.removeEventListener(MISSION_DATA_CHANGED, onChanged);
+  }, []);
+
+  const alreadyLinked = useMemo(() => {
+    void linkedRevision;
+    return isEntityLinkedToActiveMission(entity);
+  }, [entity, linkedRevision, mission?.id, mission?.projectId]);
+
+  if (!isMissionLinkableEntity(entity)) {
+    return null;
+  }
 
   function handleAdd() {
     if (!mission) {
       setStatus(t("missionOperating.noMission"));
+      return;
+    }
+
+    if (alreadyLinked) {
+      setStatus(t("missionOperating.addedToMission", { name: entity.name }));
       return;
     }
 
@@ -44,9 +68,10 @@ export default function AddToMissionButton({
     }
 
     refreshMissionContext();
+    setLinkedRevision((n) => n + 1);
     setStatus(
       result.alreadyLinked
-        ? t("missionOperating.alreadyLinked", { name: entity.name })
+        ? t("missionOperating.addedToMission", { name: entity.name })
         : t("missionOperating.added", { name: entity.name }),
     );
   }
@@ -64,13 +89,22 @@ export default function AddToMissionButton({
   return (
     <div className={className}>
       <div className="flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          onClick={handleAdd}
-          className={compact ? cbaiBtnSecondary : cbaiProminentAction}
-        >
-          {t("missionOperating.addToMission")}
-        </button>
+        {alreadyLinked ? (
+          <span
+            className={`${compact ? cbaiBtnSecondary : cbaiProminentAction} cursor-default opacity-80`}
+            aria-disabled="true"
+          >
+            {t("missionOperating.addedToMissionLabel")}
+          </span>
+        ) : (
+          <button
+            type="button"
+            onClick={handleAdd}
+            className={compact ? cbaiBtnSecondary : cbaiProminentAction}
+          >
+            {t("missionOperating.addToMission")}
+          </button>
+        )}
         <Link href={myWorkHrefForMission(mission)} className="text-xs text-teal-400 hover:text-teal-300">
           {t("missionOperating.viewInMyWork")} →
         </Link>

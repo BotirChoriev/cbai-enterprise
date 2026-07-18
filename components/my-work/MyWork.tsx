@@ -30,6 +30,7 @@ import { useTranslation } from "@/lib/i18n/use-translation";
 import { PROJECT_TYPES, type ProjectTypeId } from "@/lib/project/project-types";
 import type { ContextEntityRef } from "@/lib/context/context-types";
 import { ACTIVATED_RESEARCH_TOPIC_PATH } from "@/lib/intelligence-os/mission-operating-context";
+import { useContextualHref } from "@/lib/context/use-contextual-href";
 import {
   ASSISTANT_LANGUAGES,
   resolveOperatorName,
@@ -38,39 +39,40 @@ import {
 function MyWorkContent() {
   const searchParams = useSearchParams();
   const { t } = useTranslation();
+  const { moduleHref } = useContextualHref();
 
   const continueLinks = useMemo(
     () =>
       [
         {
           label: t("myWorkExt.continueResearchWorkspace"),
-          href: ACTIVATED_RESEARCH_TOPIC_PATH,
+          href: moduleHref(ACTIVATED_RESEARCH_TOPIC_PATH),
           detail: t("myWorkExt.continueResearchWorkspaceDetail"),
         },
         {
           label: t("myWorkExt.continueResearchCatalog"),
-          href: "/research",
+          href: moduleHref("/research"),
           detail: t("myWorkExt.continueResearchCatalogDetail"),
         },
         {
           label: t("myWorkExt.continueEvidence"),
-          href: "/knowledge",
+          href: moduleHref("/knowledge"),
           detail: t("myWorkExt.continueEvidenceDetail"),
         },
       ] as const,
-    [t],
+    [moduleHref, t],
   );
 
   const onboardingLinks = useMemo(
     () =>
       [
-        { label: t("myWorkExt.onboardingExploreResearch"), href: "/research" },
-        { label: t("myWorkExt.onboardingExploreCountries"), href: "/countries" },
-        { label: t("myWorkExt.onboardingSearchEvidence"), href: "/knowledge" },
-        { label: t("myWorkExt.onboardingConfigureOperator"), href: "/settings" },
-        { label: t("myWorkExt.onboardingOpenTrust"), href: "/trust" },
+        { label: t("myWorkExt.onboardingExploreResearch"), href: moduleHref("/research") },
+        { label: t("myWorkExt.onboardingExploreCountries"), href: moduleHref("/countries") },
+        { label: t("myWorkExt.onboardingSearchEvidence"), href: moduleHref("/knowledge") },
+        { label: t("myWorkExt.onboardingConfigureOperator"), href: moduleHref("/settings") },
+        { label: t("myWorkExt.onboardingOpenTrust"), href: moduleHref("/trust") },
       ] as const,
-    [t],
+    [moduleHref, t],
   );
   const projectId = searchParams.get("project");
   // Real hydration-mismatch fix (found via actual browser testing): loadProject() is honestly
@@ -249,7 +251,7 @@ function MyWorkContent() {
           {t("myWorkExt.reportsSection")}
         </p>
         <Link
-          href="/reports"
+          href={moduleHref("/reports")}
           className={`${cbaiGlassCard} flex flex-col px-5 py-4 transition-colors hover:border-teal-500/25 sm:max-w-sm`}
         >
           <span className="text-sm font-semibold text-teal-400">{t("myWorkExt.reportsCenterLink")}</span>
@@ -272,7 +274,7 @@ function MyWorkContent() {
               connected: String(evidence.summary.connectedSources),
               total: String(evidence.summary.totalSources),
             })}{" "}
-            <Link href="/knowledge" className="text-teal-400 hover:text-teal-300">
+            <Link href={moduleHref("/knowledge")} className="text-teal-400 hover:text-teal-300">
               {t("myWorkExt.evidenceLink")}
             </Link>{" "}
             {t("myWorkExt.evidenceReviewsSuffix")}

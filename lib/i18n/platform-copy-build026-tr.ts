@@ -86,6 +86,8 @@ export const UNIVERSAL_INTENT_TR = {
 export const MISSION_OPERATING_TR = {
   addToMission: "Göreve ekle",
   added: "{name} aktif görevinize eklendi.",
+  addedToMissionLabel: "Göreve eklendi",
+  addedToMission: "{name} zaten bu görevde.",
   alreadyLinked: "{name} zaten bu göreve bağlı.",
   noMission: "Varlık eklemek için önce bir görev başlatın.",
   noProject: "Varlık eklemeden önce göreve bir proje bağlayın.",
