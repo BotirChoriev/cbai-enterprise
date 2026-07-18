@@ -68,6 +68,8 @@ import {
 } from "@/lib/research-canvas/canvas-stage-i18n";
 import { loadMission } from "@/lib/intelligence-os/mission-store";
 import InterpretationReviewCard from "@/components/research/canvas/InterpretationReviewCard";
+import ManualInterpretationInputPanel from "@/components/research/canvas/ManualInterpretationInputPanel";
+import { manualInterpretationDraftStore } from "@/lib/research-canvas/manual-interpretation-draft";
 import { buildExternalSearchConsent, IP_BOUNDARY_NOTICE, visibilityEnforcementNote } from "@/lib/research-canvas/privacy-boundary";
 import { resolvePersistenceMode } from "@/lib/product/persistence-mode";
 import { appendGenesisOperatingParamsToHref } from "@/lib/genesis/genesis-operating-context";
@@ -77,6 +79,7 @@ import {
   cbaiBtnPrimary,
   cbaiFocusRing,
   cbaiGlassCard,
+  cbaiMineralSurface,
   cbaiSectionEyebrow,
 } from "@/components/brand/brand-classes";
 
@@ -93,7 +96,7 @@ export default function ResearchCanvasClient() {
   const searchParams = useSearchParams();
   const fileRef = useRef<HTMLInputElement>(null);
   const stagePanelRef = useRef<HTMLElement | null>(null);
-  const manualDescRef = useRef<HTMLTextAreaElement>(null);
+  const manualDraftIdeaRef = useRef<string | null>(null);
   const [tick, setTick] = useState(0);
   const bump = useCallback(() => setTick((n) => n + 1), []);
 
@@ -164,9 +167,19 @@ export default function ResearchCanvasClient() {
   const linkedMission = useMemo(() => (idea?.missionId ? loadMission(idea.missionId) : null), [idea]);
   const ideaModelGate = idea ? canBuildIdeaModel(idea) : null;
 
+  useEffect(() => {
+    if (!idea?.id) return;
+    if (manualDraftIdeaRef.current === idea.id) return;
+    manualDraftIdeaRef.current = idea.id;
+    setManualDescription(manualInterpretationDraftStore.read(idea.id));
+    setInterpretFocus(null);
+  }, [idea?.id]);
+
   const selectStage = (target: ResearchCanvasStage) => {
+    const changed = stage !== target;
     setStage(target);
-    if (idea) updateSmartIdeaStage(idea.id, target);
+    if (idea && changed) updateSmartIdeaStage(idea.id, target);
+    if (!changed) return;
     requestAnimationFrame(() => {
       stagePanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
@@ -418,13 +431,17 @@ export default function ResearchCanvasClient() {
 
   const createManualDraft = () => {
     if (!idea) return;
-    if (manualDescription.trim().length < 30) {
+    const trimmed = manualDescription.trim();
+    if (trimmed.length < 30) {
       setFeedback(t("researchCanvas.manualDescriptionTooShort"));
       return;
     }
-    addManualInterpretationDraft(idea.id, manualDescription, operator);
+    addManualInterpretationDraft(idea.id, trimmed, operator);
+    manualInterpretationDraftStore.clear(idea.id);
+    setManualDescription("");
+    setInterpretFocus(null);
     setFeedback(t("researchCanvas.draftInterpretationCreated"));
-    selectStage("INTERPRET");
+    if (stage !== "INTERPRET") selectStage("INTERPRET");
     bump();
   };
 
@@ -627,7 +644,7 @@ export default function ResearchCanvasClient() {
                 <button
                   type="button"
                   className={`${cbaiFocusRing} text-teal-400 hover:text-teal-300`}
-                  onClick={() => { setActiveId(i.id); selectStage(i.stage); }}
+                  onClick={() => { setActiveId(i.id); selectStage(i.stage); setInterpretFocus(null); }}
                 >
                   {i.title} — {rc(stageCopyKey(i.stage))}
                 </button>
@@ -679,7 +696,7 @@ export default function ResearchCanvasClient() {
           id={stagePanelId(stage)}
           role="tabpanel"
           aria-labelledby={`stage-tab-${stage}`}
-          className={`${cbaiGlassCard} space-y-4 p-6`}
+          className={`${stage === "INTERPRET" ? cbaiMineralSurface : cbaiGlassCard} relative isolate space-y-4 p-6`}
         >
           <div>
             <h2 className="text-sm font-semibold text-zinc-200">{rc(stageCopyKey(stage))}</h2>
@@ -715,27 +732,25 @@ export default function ResearchCanvasClient() {
                     <button
                       type="button"
                       className={`${cbaiFocusRing} rounded-md border border-zinc-700 px-3 py-2 text-xs text-zinc-300`}
-                      onClick={() => { setInterpretFocus("manual"); manualDescRef.current?.focus(); }}
+                      onClick={() => setInterpretFocus("manual")}
                     >
                       {t("researchCanvas.interpretOptionManual")}
                     </button>
                   </div>
-                  {(interpretFocus === "manual" || manualDescription.length > 0) && (
-                    <div className="space-y-2">
-                      <label className="text-xs text-zinc-400" htmlFor="manual-desc">{t("researchCanvas.manualDescriptionLabel")}</label>
-                      <textarea
-                        id="manual-desc"
-                        ref={manualDescRef}
-                        value={manualDescription}
-                        onChange={(e) => setManualDescription(e.target.value)}
-                        placeholder={t("researchCanvas.manualDescriptionPlaceholder")}
-                        className={`${cbaiFocusRing} min-h-24 w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-sm`}
-                      />
-                      <button type="button" onClick={createManualDraft} className={cbaiBtnPrimary}>
-                        {t("researchCanvas.createDraftInterpretation")}
-                      </button>
-                    </div>
-                  )}
+                  <ManualInterpretationInputPanel
+                    smartIdeaId={idea.id}
+                    open={interpretFocus === "manual" || manualDescription.length > 0}
+                    value={manualDescription}
+                    onValueChange={(next) => {
+                      manualInterpretationDraftStore.write(idea.id, next);
+                      setManualDescription(next);
+                    }}
+                    label={t("researchCanvas.manualDescriptionLabel")}
+                    placeholder={t("researchCanvas.manualDescriptionPlaceholder")}
+                    validationMessage={t("researchCanvas.manualDescriptionTooShort")}
+                    submitLabel={t("researchCanvas.createDraftInterpretation")}
+                    onSubmit={createManualDraft}
+                  />
                 </div>
               ) : (
                 <>
