@@ -51,6 +51,7 @@
     "test:manual-interpretation-input": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-manual-interpretation-input.ts",
     "test:measurement-truth": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-measurement-truth.ts",
     "test:voice-safety": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-voice-safety.ts",
+    "test:voice-operator": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-voice-operator.ts",
     "test:locale-completeness": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-locale-completeness.ts",
     "test:intelligence-canvas": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-intelligence-canvas.ts",
     "test:epic-governance": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-epic-governance.ts",

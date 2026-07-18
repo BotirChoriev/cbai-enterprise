@@ -81,10 +81,11 @@ test("OperatingNavigator home branch uses translateNavLabel", () => {
   assert.ok(source.includes("translateNavLabel(t, item.href, item.label)"));
 });
 
-test("EN/RU/TR dictionaries include voiceControl keys", () => {
+test("EN/RU/TR/UZ dictionaries include voiceOperator keys", () => {
   for (const lang of ["en", "ru", "tr", "uz"] as const) {
     const dict = getDictionary(lang);
     assert.ok(dict.voiceControl.confirmAction);
+    assert.ok(dict.voiceOperator.dockTitle);
     assert.ok(dict.researchHome.title);
   }
 });
