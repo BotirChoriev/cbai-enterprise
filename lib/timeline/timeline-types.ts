@@ -151,3 +151,7 @@ export const TIMELINE_DEFAULT_YEAR_SPAN = 10 as const;
 
 export const TIMELINE_EVIDENCE_NOT_CONNECTED_LABEL =
   "Evidence not connected." as const;
+
+/** Shown when year slots exist structurally but no verified year-level evidence is linked. */
+export const TIMELINE_YEAR_STRUCTURE_PREPARED_LABEL =
+  "Year structure prepared — verified year-level evidence is not connected yet." as const;

@@ -138,7 +138,7 @@ export const ASSISTANT_COMMANDS: readonly AssistantCommand[] = [
   {
     id: "open-reports",
     phrase: "Open Reports",
-    href: "/analytics",
+    href: "/reports",
     keywords: [
       "open reports", "reports",
       "hisobotlarni och", "hisobotlar",
@@ -188,7 +188,7 @@ export const ASSISTANT_COMMANDS: readonly AssistantCommand[] = [
   {
     id: "generate-report",
     phrase: "Generate report",
-    href: "/analytics",
+    href: "/reports",
     keywords: [
       "generate report", "generate a report", "create report",
       "hisobot yarat",

@@ -14,6 +14,8 @@ import { buildCountryReport } from "@/lib/country-report";
 import { companyHrefByName, universityHrefByName } from "@/components/shared/resolve-entity-link";
 import { resolveAssistantCommand } from "@/lib/assistant/assistant-commands";
 import { loadPinnedEntities, pinEntity } from "@/lib/context";
+import { buildCountryTimelineModel } from "@/lib/timeline";
+import { TIMELINE_YEAR_STRUCTURE_PREPARED_LABEL } from "@/lib/timeline/timeline-types";
 
 const USA = countries.find((c) => c.id === "usa")!;
 const JAPAN = countries.find((c) => c.id === "japan")!;
@@ -112,7 +114,7 @@ test('8. Command Center resolves "find country <name>" to a real country profile
 test('9. Command Center resolves "generate report"', () => {
   const match = resolveAssistantCommand("generate report");
   assert.ok(match);
-  assert.equal(match!.href, "/analytics");
+  assert.equal(match!.href, "/reports");
 });
 
 test('10. "save workspace" is not a pure-resolver navigation — it is a real action handled with context', () => {
@@ -135,4 +137,14 @@ test("12. Every real country resolves to a real profile route", () => {
       buildCountryUserJourney(country, relationships);
     });
   }
+});
+
+test("13. Timeline never counts structural year slots as verified evidence (Japan regression)", () => {
+  const model = buildCountryTimelineModel(JAPAN);
+
+  assert.equal(model.availableEvidenceYears.length, 0);
+  assert.equal(model.missingEvidenceYears.length, model.supportedYears.length);
+  assert.equal(model.evidenceNotConnected, true);
+  assert.equal(model.emptyStateMessage, TIMELINE_YEAR_STRUCTURE_PREPARED_LABEL);
+  assert.notEqual(model.readinessStatus, "verified");
 });

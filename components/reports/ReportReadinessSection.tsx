@@ -6,6 +6,8 @@ import { getDictionary } from "@/lib/i18n/translate";
 import Link from "next/link";
 import { cbaiGraphPanel, cbaiTextCaption } from "@/components/brand/brand-classes";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { buildContextualHref } from "@/lib/context";
+import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 
 type ReportReadinessSectionProps = {
   reportTypes: readonly ReportTypeDefinition[];
@@ -39,8 +41,6 @@ function resolveReportProcessSteps(
   return [
     t("activation.reportCollectingEvidence"),
     t("activation.reportCheckingReadiness"),
-    t("activation.reportCheckingImpact"),
-    t("activation.reportReady"),
   ];
 }
 
@@ -48,6 +48,7 @@ export default function ReportReadinessSection({
   reportTypes,
 }: ReportReadinessSectionProps) {
   const { t, language } = useTranslation();
+  const { context } = usePlatformContext();
 
   return (
     <section className="space-y-4" aria-labelledby="report-readiness-heading">
@@ -84,7 +85,7 @@ export default function ReportReadinessSection({
                 {report.relatedRoute ? (
                   <div>
                     <Link
-                      href={report.relatedRoute}
+                      href={buildContextualHref(report.relatedRoute, context)}
                       className="inline-flex min-h-10 w-full items-center justify-center rounded-lg border border-zinc-700 bg-zinc-900 px-4 text-sm font-medium text-teal-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800 sm:w-auto"
                     >
                       {t("reportsCenter.openRelatedProfile")}

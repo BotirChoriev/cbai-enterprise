@@ -21,6 +21,7 @@ const NAV_LABEL_KEYS: Record<string, string> = {
   "/research": "navigation.research",
   "/knowledge": "navigation.evidence",
   "/analytics": "navigation.reports",
+  "/reports": "navigation.reports",
   "/trust": "navigation.trust",
   "/settings": "navigation.settings",
   "/government": "navigation.government",
@@ -30,6 +31,7 @@ const NAV_LABEL_KEYS: Record<string, string> = {
   "/reasoning": "navigation.reasoning",
   "/graph": "navigation.knowledgeGraph",
   "/ai-control": "navigation.governance",
+  "/governance": "navigation.governance",
   "/research/workspace": "navigation.researchWorkspace",
 };
 

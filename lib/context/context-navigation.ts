@@ -54,7 +54,7 @@ export const PLATFORM_MODULES: Record<PlatformModuleId, PlatformModuleDefinition
   reports: {
     id: "reports",
     label: "Reports",
-    path: "/analytics",
+    path: "/reports",
     description: "Report readiness center.",
   },
   reasoning: {
@@ -102,7 +102,7 @@ export const PLATFORM_MODULES: Record<PlatformModuleId, PlatformModuleDefinition
   governance: {
     id: "governance",
     label: "Governance",
-    path: "/ai-control",
+    path: "/governance",
     description: "Constitutional governance control.",
   },
   dashboard: {
@@ -129,6 +129,8 @@ export const CONTEXT_HEADER_ROUTES = new Set<string>([
   "/investor",
   "/citizen",
   "/analytics",
+  "/reports",
+  "/governance",
   "/reasoning",
   "/search",
   "/graph",

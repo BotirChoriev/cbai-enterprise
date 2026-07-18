@@ -51,12 +51,8 @@ export default function TimelineReadinessPanel({ model }: TimelineReadinessPanel
       <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-5 py-4">
         <dl className="grid gap-3 text-sm sm:grid-cols-3">
           <div>
-            <dt className="text-xs uppercase tracking-wider text-zinc-600">Supported years</dt>
-            <dd className="mt-1 font-mono text-zinc-200">{model.supportedYears.length}</dd>
-          </div>
-          <div>
             <dt className="text-xs uppercase tracking-wider text-zinc-600">
-              Available evidence years
+              Verified evidence years
             </dt>
             <dd className="mt-1 font-mono text-zinc-200">
               {model.availableEvidenceYears.length}
@@ -65,6 +61,12 @@ export default function TimelineReadinessPanel({ model }: TimelineReadinessPanel
           <div>
             <dt className="text-xs uppercase tracking-wider text-zinc-600">Missing years</dt>
             <dd className="mt-1 font-mono text-zinc-200">{model.missingEvidenceYears.length}</dd>
+          </div>
+          <div>
+            <dt className="text-xs uppercase tracking-wider text-zinc-600">
+              Structural year slots
+            </dt>
+            <dd className="mt-1 font-mono text-zinc-200">{model.supportedYears.length}</dd>
           </div>
         </dl>
       </div>

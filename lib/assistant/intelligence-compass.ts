@@ -15,7 +15,7 @@ export const COMPASS_DIRECTION_HREFS: Record<CompassDirectionId, string> = {
   evidence: "/knowledge",
   analyze: "/research/workspace",
   organize: "/my-work",
-  report: "/analytics",
+  report: "/reports",
 };
 
 export const COMPASS_DIRECTION_ORDER: readonly CompassDirectionId[] = [

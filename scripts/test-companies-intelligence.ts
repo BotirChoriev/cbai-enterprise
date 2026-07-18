@@ -122,7 +122,7 @@ test('12. Command Center resolves "open company" and "compare companies"', () =>
 test('13. Command Center resolves "generate report"', () => {
   const match = resolveAssistantCommand("generate report");
   assert.ok(match);
-  assert.equal(match!.href, "/analytics");
+  assert.equal(match!.href, "/reports");
 });
 
 test('14. "save workspace" is not a pure-resolver navigation — it is a real action handled with context, never faked', () => {

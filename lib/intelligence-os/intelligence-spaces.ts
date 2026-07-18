@@ -40,6 +40,7 @@ const ROUTE_SPACE: Readonly<Record<string, IntelligenceSpaceId>> = {
   "/settings": "settings",
   "/account": "account",
   "/ai-control": "governance",
+  "/governance": "governance",
   "/countries": "entity",
   "/companies": "entity",
   "/universities": "entity",

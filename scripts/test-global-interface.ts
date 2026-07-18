@@ -177,7 +177,7 @@ test("14. Supported multilingual commands resolve to real routes in all 4 langua
 
   const trReport = resolveAssistantCommand("Rapor oluştur");
   assert.ok(trReport);
-  assert.equal(trReport!.href, "/analytics");
+  assert.equal(trReport!.href, "/reports");
 
   const enMyWork = resolveAssistantCommand("Open my work");
   assert.ok(enMyWork);
@@ -274,6 +274,8 @@ test("19. Every canonical route's page.tsx exists, including the routes this mis
     "app/(dashboard)/knowledge/page.tsx",
     "app/(dashboard)/reports/page.tsx",
     "app/(dashboard)/analytics/page.tsx",
+    "app/(dashboard)/governance/page.tsx",
+    "app/(dashboard)/ai-control/page.tsx",
     "app/(dashboard)/trust/page.tsx",
     "app/(dashboard)/settings/page.tsx",
     "app/(dashboard)/account/page.tsx",

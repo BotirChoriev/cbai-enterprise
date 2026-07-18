@@ -183,7 +183,7 @@ export const secondaryNavSections: NavSection[] = [
       },
       {
         label: "Governance",
-        href: "/ai-control",
+        href: "/governance",
         icon: "ai-control",
         description: "Platform rules, standards, and review process.",
       },
@@ -221,6 +221,8 @@ export const PUBLIC_JOURNEY_ROUTES = new Set([
   "/research/workspace",
   "/reports",
   "/analytics",
+  "/governance",
+  "/ai-control",
   "/dashboard",
 ]);
 

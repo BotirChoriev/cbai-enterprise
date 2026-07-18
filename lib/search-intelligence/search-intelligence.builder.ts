@@ -159,7 +159,7 @@ function buildNavigationHub(
     {
       moduleId: "reports",
       label: "Reports",
-      href: "/analytics",
+      href: "/reports",
       description: "Report readiness center and methodology definitions.",
       available: true,
     },

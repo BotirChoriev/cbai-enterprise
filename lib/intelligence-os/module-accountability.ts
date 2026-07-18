@@ -269,7 +269,7 @@ export const MODULE_ACCOUNTABILITY: readonly ModuleAccountabilityEntry[] = [
     maturity: "preview",
   },
   {
-    route: "/ai-control",
+    route: "/governance",
     moduleName: "Governance Control",
     realWork: "Review constitutional rules, validation pipeline, and limits.",
     evidenceEnters: "Governance rule registry.",
@@ -277,6 +277,17 @@ export const MODULE_ACCOUNTABILITY: readonly ModuleAccountabilityEntry[] = [
     knowledgeLeaves: "Compliance understanding for releases.",
     whoBenefits: "Platform stewards and auditors.",
     riskExists: "Must not imply rules are auto-enforced when declarative only.",
+    maturity: "partial",
+  },
+  {
+    route: "/ai-control",
+    moduleName: "Governance Control (legacy alias)",
+    realWork: "Same Governance Control Center as /governance — backward-compatible route.",
+    evidenceEnters: "Governance rule registry.",
+    reasoningHappens: "Manual audit model — not automated enforcement.",
+    knowledgeLeaves: "Compliance understanding for releases.",
+    whoBenefits: "Platform stewards and auditors.",
+    riskExists: "Legacy route alias only — canonical path is /governance.",
     maturity: "partial",
   },
   {

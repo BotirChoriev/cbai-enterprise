@@ -74,6 +74,7 @@ export const ROUTE_EPIC_MAP: Readonly<Record<string, EpicId>> = {
   "/account": "EPIC-15",
   "/about": "EPIC-01",
   "/ai-control": "EPIC-01",
+  "/governance": "EPIC-01",
   "/government": "EPIC-14",
   "/investor": "EPIC-14",
   "/citizen": "EPIC-14",

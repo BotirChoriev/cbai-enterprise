@@ -42,6 +42,7 @@ const PRIMARY_ROUTES_WITH_CONTEXT = new Set([
   "/analytics",
   "/trust",
   "/ai-control",
+  "/governance",
   "/settings",
   "/account",
 ]);

@@ -17,7 +17,7 @@ export function EntityReportsAvailable({ reports, entityLabel }: EntityReportsAv
 
   if (reports.length === 0) return null;
 
-  const reportsHref = buildContextualHref("/analytics", context);
+  const reportsHref = buildContextualHref("/reports", context);
   const entityTypeLabel =
     entityLabel === "country"
       ? t("entityIntelligence.entityTypeCountry")

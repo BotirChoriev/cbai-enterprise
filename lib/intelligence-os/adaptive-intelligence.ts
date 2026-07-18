@@ -20,7 +20,7 @@ const DOMAIN_ROUTES: Record<string, string[]> = {
   research: ["/research/workspace", "/research", "/knowledge"],
   evidence: ["/knowledge", "/countries", "/companies"],
   analysis: ["/countries", "/companies", "/universities"],
-  governance: ["/government", "/trust", "/ai-control"],
+  governance: ["/government", "/trust", "/governance", "/ai-control"],
   synthesis: ["/my-work", "/analytics", "/research/workspace"],
   collaboration: ["/my-work", "/graph", "/search"],
 };
@@ -37,7 +37,7 @@ const ROLE_FALLBACK_ROUTES: Record<WorkspaceRole, string[]> = {
   university: ["/universities", "/research", "/knowledge"],
   research_center: ["/research/workspace", "/graph", "/research"],
   government: ["/government", "/countries", "/trust"],
-  administrator: ["/dashboard", "/ai-control", "/trust"],
+  administrator: ["/dashboard", "/governance", "/ai-control", "/trust"],
   economist: ["/investor", "/countries", "/companies"],
   legal: ["/knowledge", "/trust", "/analytics"],
   social_sector: ["/citizen", "/knowledge", "/countries"],

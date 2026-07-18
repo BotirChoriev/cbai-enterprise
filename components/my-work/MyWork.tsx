@@ -246,7 +246,7 @@ function MyWorkContent() {
           {t("myWorkExt.reportsSection")}
         </p>
         <Link
-          href="/analytics"
+          href="/reports"
           className={`${cbaiGlassCard} flex flex-col px-5 py-4 transition-colors hover:border-teal-500/25 sm:max-w-sm`}
         >
           <span className="text-sm font-semibold text-teal-400">{t("myWorkExt.reportsCenterLink")}</span>

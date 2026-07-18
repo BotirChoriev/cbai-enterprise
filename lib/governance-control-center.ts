@@ -305,7 +305,7 @@ export function buildGovernanceControlModel(): GovernanceControlModel {
     complianceReportTemplate: createComplianceReportTemplate({
       moduleId: "platform-alpha-0.2",
       moduleName: "CBAI Alpha 0.2 Core Intelligence Sprint",
-      targetRoute: "/ai-control",
+      targetRoute: "/governance",
       evaluatedBy: "not-evaluated",
     }),
     personas: buildPersonas(),

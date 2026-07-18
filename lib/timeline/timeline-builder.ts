@@ -16,6 +16,7 @@ import {
   TIMELINE_DEFAULT_YEAR_SPAN,
   TIMELINE_EVIDENCE_NOT_CONNECTED_LABEL,
   TIMELINE_RECORD_VERSION,
+  TIMELINE_YEAR_STRUCTURE_PREPARED_LABEL,
 } from "@/lib/timeline/timeline-types";
 import type {
   CountryTimelineModel,
@@ -57,13 +58,15 @@ function resolveAvailableEvidenceYears(
   indicators: TimelineIndicatorCoverageEntry[],
   supportedYears: readonly number[],
 ): number[] {
-  const hasConnectedIndicator = indicators.some(
-    (entry) => entry.statusLabel === "Connected" && entry.availableYears.length > 0,
-  );
-  if (!hasConnectedIndicator) return [];
-  return supportedYears.filter((year) =>
-    indicators.some((entry) => entry.availableYears.includes(year)),
-  );
+  const verifiedYears = new Set<number>();
+  for (const entry of indicators) {
+    for (const year of entry.availableYears) {
+      if (supportedYears.includes(year)) {
+        verifiedYears.add(year);
+      }
+    }
+  }
+  return supportedYears.filter((year) => verifiedYears.has(year));
 }
 
 function buildIndicatorCoverage(
@@ -75,8 +78,9 @@ function buildIndicatorCoverage(
   return coverage.indicatorsByDomain.flatMap((group) =>
     group.indicators.map((indicator) => {
       const statusLabel = indicator.statusLabel;
-      const availableYears =
-        statusLabel === "Connected" ? [...supportedYears] : ([] as number[]);
+      // Year slots count only when traceable year-level evidence exists — never inferred from
+      // indicator connection status, registry metadata, or structural placeholders.
+      const availableYears: number[] = [];
       const missingYears = supportedYears.filter((y) => !availableYears.includes(y));
 
       return {
@@ -189,7 +193,9 @@ export function buildCountryTimelineModel(country: Country): CountryTimelineMode
     ...record,
     evidenceNotConnected,
     emptyStateMessage: evidenceNotConnected
-      ? TIMELINE_EVIDENCE_NOT_CONNECTED_LABEL
+      ? record.supportedYears.length > 0
+        ? TIMELINE_YEAR_STRUCTURE_PREPARED_LABEL
+        : TIMELINE_EVIDENCE_NOT_CONNECTED_LABEL
       : `${record.availableEvidenceYears.length} of ${record.supportedYears.length} year slots have connected evidence.`,
   };
 }

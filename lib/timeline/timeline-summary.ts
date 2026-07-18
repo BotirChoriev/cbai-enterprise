@@ -2,6 +2,7 @@ import { timelineReadinessLabel } from "@/lib/timeline/timeline-readiness";
 import {
   TIMELINE_EVIDENCE_NOT_CONNECTED_LABEL,
   TIMELINE_RECORD_VERSION,
+  TIMELINE_YEAR_STRUCTURE_PREPARED_LABEL,
 } from "@/lib/timeline/timeline-types";
 import type {
   TimelineRecord,
@@ -27,11 +28,19 @@ function buildVerifiedEvidenceSection(record: TimelineRecord): TimelineSummarySe
 }
 
 function buildEvidenceCoverageSection(record: TimelineRecord): TimelineSummarySection {
-  const content = [
-    `${record.availableEvidenceYears.length} of ${record.supportedYears.length} year slots have connected time-series evidence.`,
-    `${record.indicatorCoverage.filter((i) => i.statusLabel === "Connected").length} of ${record.indicatorCoverage.length} applicable indicators connected.`,
-    `Supported year range: ${record.supportedYears[0]}–${record.supportedYears[record.supportedYears.length - 1]}.`,
-  ];
+  const verifiedYearCount = record.availableEvidenceYears.length;
+  const content =
+    verifiedYearCount === 0
+      ? [
+          TIMELINE_YEAR_STRUCTURE_PREPARED_LABEL,
+          `${record.indicatorCoverage.filter((i) => i.statusLabel === "Connected").length} of ${record.indicatorCoverage.length} applicable indicators connected at framework level — year-level time-series evidence not connected.`,
+          `Supported year range: ${record.supportedYears[0]}–${record.supportedYears[record.supportedYears.length - 1]} (structural slots only).`,
+        ]
+      : [
+          `${verifiedYearCount} of ${record.supportedYears.length} year slots have connected time-series evidence.`,
+          `${record.indicatorCoverage.filter((i) => i.statusLabel === "Connected").length} of ${record.indicatorCoverage.length} applicable indicators connected.`,
+          `Supported year range: ${record.supportedYears[0]}–${record.supportedYears[record.supportedYears.length - 1]}.`,
+        ];
 
   return {
     id: "evidence-coverage",
@@ -42,9 +51,13 @@ function buildEvidenceCoverageSection(record: TimelineRecord): TimelineSummarySe
 
 function buildMissingYearsSection(record: TimelineRecord): TimelineSummarySection {
   const content =
-    record.missingEvidenceYears.length === 0
-      ? ["All supported year slots have connected evidence."]
-      : record.missingEvidenceYears.map((year) => `${year}: ${TIMELINE_EVIDENCE_NOT_CONNECTED_LABEL}`);
+    record.availableEvidenceYears.length === 0
+      ? record.supportedYears.map(
+          (year) => `${year}: ${TIMELINE_EVIDENCE_NOT_CONNECTED_LABEL}`,
+        )
+      : record.missingEvidenceYears.length === 0
+        ? ["All supported year slots have connected evidence."]
+        : record.missingEvidenceYears.map((year) => `${year}: ${TIMELINE_EVIDENCE_NOT_CONNECTED_LABEL}`);
 
   return {
     id: "missing-years",

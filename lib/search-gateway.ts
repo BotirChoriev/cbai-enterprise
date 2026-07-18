@@ -365,10 +365,10 @@ export const SEARCH_TOPICS: SearchTopicDefinition[] = [
     platformArea: "Reports module",
     resultGroup: "knowledge",
     connected: true,
-    href: "/analytics",
+    href: "/reports",
     evidenceStatus: "Available now",
     availableInformation: "Available report types by profile scope.",
-    route: "/analytics",
+    route: "/reports",
   },
   {
     id: "governance",
