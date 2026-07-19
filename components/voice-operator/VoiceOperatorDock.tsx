@@ -169,8 +169,8 @@ export default function VoiceOperatorDock() {
                 onClick={() => void (vo.micLive ? vo.stopListening() : vo.startListening())}
                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border ${
                   vo.micLive
-                    ? "border-red-500/40 bg-red-950/40 text-red-200"
-                    : "border-teal-500/30 bg-teal-500/10 text-teal-300"
+                    ? "animate-pulse border-red-500/50 bg-red-950/50 text-red-300 ring-2 ring-red-500/25"
+                    : "border-zinc-700/60 bg-zinc-900/70 text-zinc-500"
                 }`}
                 aria-label={vo.micLive ? copy.muteMic : copy.unmuteMic}
                 aria-pressed={vo.micLive}
@@ -182,7 +182,6 @@ export default function VoiceOperatorDock() {
                       strokeLinejoin="round"
                       d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"
                     />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 4.5l15 15" />
                   </svg>
                 ) : (
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
@@ -191,6 +190,7 @@ export default function VoiceOperatorDock() {
                       strokeLinejoin="round"
                       d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"
                     />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 4.5l15 15" />
                   </svg>
                 )}
               </button>

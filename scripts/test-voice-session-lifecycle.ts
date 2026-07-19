@@ -186,13 +186,24 @@ test("endSession performs full cleanup and clears transcript memory", () => {
   assert.match(provider, /clearVoiceSessionMemory\(\)/);
 });
 
-test("mic-off button stops live capture immediately", () => {
+test("mic toggle UI: active unslashed red mic stops capture; inactive slashed mic starts", () => {
   const provider = readSource("components/voice-operator/VoiceOperatorProvider.tsx");
   assert.match(provider, /const stopListening = useCallback\(\(\) => \{[\s\S]*stopLiveAudioCapture\(\)/);
+  assert.match(provider, /startListening/);
+
   const dock = readSource("components/voice-operator/VoiceOperatorDock.tsx");
   assert.match(dock, /vo\.micLive \? vo\.stopListening\(\) : vo\.startListening\(\)/);
-  assert.match(dock, /copy\.muteMic/);
-  assert.match(dock, /M4\.5 4\.5l15 15/);
+  assert.match(dock, /vo\.micLive \? copy\.muteMic : copy\.unmuteMic/);
+  assert.match(dock, /border-red-500/);
+  assert.match(dock, /border-zinc-700/);
+
+  const micIconTernary = dock.match(/\{vo\.micLive \?\s*\([\s\S]*?\)\s*:\s*\([\s\S]*?\)\s*\}/);
+  assert.ok(micIconTernary, "mic icon ternary");
+  const [, activeIcon, inactiveIcon] =
+    micIconTernary![0].match(/vo\.micLive \?\s*\(([\s\S]*?)\)\s*:\s*\(([\s\S]*?)\)\s*\}/) ?? [];
+  assert.ok(activeIcon && inactiveIcon, "mic icon branches");
+  assert.doesNotMatch(activeIcon, /M4\.5 4\.5l15 15/, "active listening shows unslashed microphone");
+  assert.match(inactiveIcon, /M4\.5 4\.5l15 15/, "inactive ready shows slashed microphone");
 });
 
 test("late broker connect cannot apply after capture cancelled", () => {
