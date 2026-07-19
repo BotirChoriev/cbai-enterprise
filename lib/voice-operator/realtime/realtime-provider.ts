@@ -3,6 +3,13 @@
  * No long-lived API keys in the browser; ephemeral credentials only.
  */
 
+import {
+  connectOpenAiWebRtcSession,
+  RealtimeMicrophoneError,
+  type RealtimeStateListener,
+  type RealtimeTranscriptListener,
+  type WebRtcSessionHandle,
+} from "@/lib/voice-operator/realtime/openai-webrtc-session";
 import type { EphemeralRealtimeCredential } from "@/lib/voice-operator/types";
 import { VOICE_VAD_CONFIG } from "@/lib/voice-operator/vad-config";
 import { buildVoiceOperatorInstructions } from "@/lib/voice-operator/instructions";
@@ -13,9 +20,12 @@ export type RealtimeConnectionState =
   | "connected"
   | "listening"
   | "user_speaking"
+  | "thinking"
   | "responding"
   | "disconnected"
   | "backend_required"
+  | "authentication_failed"
+  | "connection_failed"
   | "error";
 
 export type RealtimeVoiceProvider = {
@@ -25,7 +35,8 @@ export type RealtimeVoiceProvider = {
   interrupt: () => void;
   setMuted: (muted: boolean) => void;
   getState: () => RealtimeConnectionState;
-  onStateChange: (listener: (state: RealtimeConnectionState) => void) => () => void;
+  onStateChange: (listener: RealtimeStateListener) => () => void;
+  onTranscript: (listener: RealtimeTranscriptListener) => () => void;
 };
 
 type StateListener = (state: RealtimeConnectionState) => void;
@@ -49,6 +60,7 @@ function createStateHolder(initial: RealtimeConnectionState) {
 /** Honest unavailable provider when broker/credentials are missing. */
 export function createUnavailableRealtimeProvider(): RealtimeVoiceProvider {
   const holder = createStateHolder("backend_required");
+  const noop = () => () => {};
   return {
     kind: "unavailable",
     async connect() {
@@ -61,6 +73,7 @@ export function createUnavailableRealtimeProvider(): RealtimeVoiceProvider {
     setMuted() {},
     getState: holder.get,
     onStateChange: holder.subscribe,
+    onTranscript: noop,
   };
 }
 
@@ -69,13 +82,13 @@ export function createMockRealtimeProvider(options?: {
   connectSucceeds?: boolean;
 }): RealtimeVoiceProvider {
   const holder = createStateHolder("idle");
-  let interrupted = false;
+  const transcriptListeners = new Set<RealtimeTranscriptListener>();
   return {
     kind: "mock",
     async connect(credential, language) {
       holder.set("connecting");
       if (options?.connectSucceeds === false) {
-        holder.set("error");
+        holder.set("connection_failed");
         return;
       }
       if (!credential.clientSecret || credential.clientSecret.startsWith("sk-")) {
@@ -84,7 +97,6 @@ export function createMockRealtimeProvider(options?: {
       }
       void buildVoiceOperatorInstructions(language);
       void VOICE_VAD_CONFIG;
-      interrupted = false;
       holder.set("connected");
       holder.set("listening");
     },
@@ -93,72 +105,117 @@ export function createMockRealtimeProvider(options?: {
       holder.set("idle");
     },
     interrupt() {
-      interrupted = true;
       if (holder.get() === "responding") holder.set("listening");
     },
     setMuted() {},
     getState: holder.get,
     onStateChange: holder.subscribe,
+    onTranscript(listener) {
+      transcriptListeners.add(listener);
+      return () => transcriptListeners.delete(listener);
+    },
   };
 }
 
 /**
  * OpenAI Realtime via WebRTC — GA shapes: client_secrets + /v1/realtime/calls.
- * Browser receives ephemeral credential only; actual WebRTC wiring requires broker + user gesture.
  */
 export function createOpenAiWebRtcRealtimeProvider(): RealtimeVoiceProvider {
+  if (typeof window === "undefined" || typeof RTCPeerConnection === "undefined") {
+    return createUnavailableRealtimeProvider();
+  }
+
+  let activeSession: WebRtcSessionHandle | null = null;
+  let connectPromise: Promise<void> | null = null;
   const holder = createStateHolder("idle");
-  let peer: RTCPeerConnection | null = null;
-  let audioEl: HTMLAudioElement | null = null;
+  const transcriptListeners = new Set<RealtimeTranscriptListener>();
+  let sessionUnsubs: Array<() => void> = [];
+
+  const clearSessionBindings = () => {
+    sessionUnsubs.forEach((unsub) => unsub());
+    sessionUnsubs = [];
+  };
+
+  const bindSession = (session: WebRtcSessionHandle) => {
+    clearSessionBindings();
+    sessionUnsubs.push(
+      session.onStateChange((state) => holder.set(state)),
+      session.onTranscript((event) => {
+        transcriptListeners.forEach((listener) => listener(event));
+      }),
+    );
+  };
+
+  const disconnect = () => {
+    connectPromise = null;
+    clearSessionBindings();
+    activeSession?.disconnect();
+    activeSession = null;
+    holder.set("idle");
+  };
 
   return {
     kind: "openai_webrtc",
     async connect(credential, language) {
-      if (typeof window === "undefined" || typeof RTCPeerConnection === "undefined") {
-        holder.set("backend_required");
+      if (!credential.clientSecret || credential.clientSecret.startsWith("sk-")) {
+        holder.set("error");
         return;
       }
-      holder.set("connecting");
+
+      if (connectPromise) {
+        await connectPromise;
+        return;
+      }
+
+      connectPromise = (async () => {
+        activeSession?.disconnect();
+        clearSessionBindings();
+
+        const session = await connectOpenAiWebRtcSession({
+          credential,
+          language,
+          deps: {
+            RTCPeerConnection,
+            fetch: window.fetch.bind(window),
+            getUserMedia: (constraints) => navigator.mediaDevices.getUserMedia(constraints),
+            createAudioElement: () => {
+              const audio = document.createElement("audio");
+              audio.autoplay = true;
+              audio.setAttribute("playsinline", "true");
+              return audio;
+            },
+          },
+        });
+
+        activeSession = session;
+        bindSession(session);
+        holder.set(session.getState());
+      })();
+
       try {
-        peer = new RTCPeerConnection();
-        audioEl = document.createElement("audio");
-        audioEl.autoplay = true;
-        peer.ontrack = (event) => {
-          if (audioEl) audioEl.srcObject = event.streams[0] ?? null;
-        };
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach((track) => peer!.addTrack(track, stream));
-        void buildVoiceOperatorInstructions(language);
-        void credential.sessionId;
-        holder.set("connected");
-        holder.set("listening");
-      } catch {
-        holder.set("error");
+        await connectPromise;
+      } catch (error) {
+        if (error instanceof RealtimeMicrophoneError) throw error;
+        holder.set("connection_failed");
+      } finally {
+        connectPromise = null;
       }
     },
-    disconnect() {
-      peer?.close();
-      peer = null;
-      if (audioEl) {
-        audioEl.srcObject = null;
-        audioEl = null;
-      }
-      holder.set("disconnected");
-      holder.set("idle");
-    },
+    disconnect,
     interrupt() {
-      if (audioEl) audioEl.pause();
-      if (holder.get() === "responding") holder.set("listening");
+      activeSession?.interrupt();
     },
-    setMuted(muted: boolean) {
-      if (!peer) return;
-      peer.getSenders().forEach((sender) => {
-        const track = sender.track;
-        if (track) track.enabled = !muted;
-      });
+    setMuted(muted) {
+      activeSession?.setMuted(muted);
     },
-    getState: holder.get,
-    onStateChange: holder.subscribe,
+    getState: () => activeSession?.getState() ?? holder.get(),
+    onStateChange(listener) {
+      return holder.subscribe(listener);
+    },
+    onTranscript(listener) {
+      transcriptListeners.add(listener);
+      return () => transcriptListeners.delete(listener);
+    },
   };
 }
 
@@ -169,3 +226,6 @@ export function resolveRealtimeProvider(brokerConfigured: boolean): RealtimeVoic
   }
   return createOpenAiWebRtcRealtimeProvider();
 }
+
+export { RealtimeMicrophoneError } from "@/lib/voice-operator/realtime/openai-webrtc-session";
+export { mapRealtimeStateToDockState } from "@/lib/voice-operator/realtime/realtime-events";

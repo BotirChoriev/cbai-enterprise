@@ -44,6 +44,8 @@ export const VOICE_OPERATOR_EN = {
   permissionClose: "Close",
   backendRequiredNotice: "Live voice conversation requires a secure backend connection.",
   brokerUnavailableNotice: "The secure voice backend is unreachable. Text chat remains available.",
+  brokerAuthenticationFailedNotice:
+    "Voice backend authentication failed. Sign in to the preview environment and try again.",
   browserFallbackNotice: "Browser transcription is unreliable for Uzbek. Edit text before sending.",
   externalSearchActive: "External search active",
   revokeExternalSearch: "Revoke search consent",
@@ -108,6 +110,8 @@ export const VOICE_OPERATOR_UZ = {
   permissionClose: "Yopish",
   backendRequiredNotice: "Jonli ovozli suhbat uchun xavfsiz backend ulanishi kerak.",
   brokerUnavailableNotice: "Xavfsiz ovoz backendiga ulanib bo'lmadi. Matnli suhbat ishlayveradi.",
+  brokerAuthenticationFailedNotice:
+    "Ovoz backend autentifikatsiyasi muvaffaqiyatsiz. Preview muhitiga kiring va qayta urinib ko'ring.",
   browserFallbackNotice: "Brauzer transkripti o'zbekcha uchun ishonchsiz. Yuborishdan oldin matnni tahrirlang.",
   externalSearchActive: "Tashqi qidiruv faol",
   revokeExternalSearch: "Qidiruv roziligini bekor qilish",
@@ -172,6 +176,8 @@ export const VOICE_OPERATOR_RU = {
   permissionClose: "Закрыть",
   backendRequiredNotice: "Для живого голосового разговора нужно безопасное backend-подключение.",
   brokerUnavailableNotice: "Безопасный голосовой backend недоступен. Текстовый чат работает.",
+  brokerAuthenticationFailedNotice:
+    "Не удалось пройти аутентификацию голосового backend. Войдите в preview-среду и повторите попытку.",
   browserFallbackNotice: "Транскрипция браузера ненадёжна. Отредактируйте текст перед отправкой.",
   externalSearchActive: "Внешний поиск активен",
   revokeExternalSearch: "Отозвать согласие на поиск",
@@ -236,6 +242,8 @@ export const VOICE_OPERATOR_TR = {
   permissionClose: "Kapat",
   backendRequiredNotice: "Canlı sesli konuşma için güvenli backend bağlantısı gerekir.",
   brokerUnavailableNotice: "Güvenli ses backend'ine ulaşılamıyor. Metin sohbeti kullanılabilir.",
+  brokerAuthenticationFailedNotice:
+    "Ses backend kimlik doğrulaması başarısız. Preview ortamına giriş yapın ve tekrar deneyin.",
   browserFallbackNotice: "Tarayıcı transkripti güvenilir değil. Göndermeden önce metni düzenleyin.",
   externalSearchActive: "Harici arama aktif",
   revokeExternalSearch: "Arama onayını iptal et",

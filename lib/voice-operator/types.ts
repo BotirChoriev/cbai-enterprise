@@ -27,7 +27,7 @@ export type VoicePermissionIssue =
   | "speech_unavailable"
   | "network_disconnected";
 
-export type VoiceBrokerIssue = "required" | "unreachable";
+export type VoiceBrokerIssue = "required" | "unreachable" | "authentication_failed";
 
 export type ToolRiskClass = "read_only" | "external_read" | "draft_write" | "consequential";
 

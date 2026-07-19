@@ -53,6 +53,7 @@
     "test:voice-safety": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-voice-safety.ts",
     "test:voice-operator": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-voice-operator.ts",
     "test:voice-session-broker": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-voice-session-broker.ts",
+    "test:voice-realtime-webrtc": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-voice-realtime-webrtc.ts",
     "test:microphone-access": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-microphone-access.ts",
     "test:locale-completeness": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-locale-completeness.ts",
     "test:intelligence-canvas": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-intelligence-canvas.ts",

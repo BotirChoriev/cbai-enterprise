@@ -852,6 +852,7 @@ export type TranslationDictionary = {
     permissionClose: string;
     backendRequiredNotice: string;
     brokerUnavailableNotice: string;
+    brokerAuthenticationFailedNotice: string;
     browserFallbackNotice: string;
     externalSearchActive: string;
     revokeExternalSearch: string;

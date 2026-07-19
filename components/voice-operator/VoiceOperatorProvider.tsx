@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -16,6 +17,7 @@ import type {
   VoicePermissionIssue,
 } from "@/lib/voice-operator/types";
 import {
+  appendConversationTurn,
   clearVoiceSessionMemory,
   createVoiceSessionMemory,
   readVoiceSessionMemory,
@@ -29,6 +31,16 @@ import {
   mapSpeechRecognitionError,
   requestMicrophoneAccess,
 } from "@/lib/voice-operator/microphone-access";
+import { requestRealtimeSessionCredential } from "@/lib/voice-operator/session-broker/client";
+import {
+  mapBrokerCodeToIssue,
+  mapRealtimeStateToDockState,
+} from "@/lib/voice-operator/realtime/realtime-events";
+import {
+  RealtimeMicrophoneError,
+  type RealtimeVoiceProvider,
+  resolveRealtimeProvider,
+} from "@/lib/voice-operator/realtime/realtime-provider";
 import { revokeExternalSearchConsent } from "@/lib/voice-operator/tools/voice-tools";
 import { SpeechRecognitionSession } from "@/lib/voice/speech-recognition-session";
 import { resolveActiveSpeechLanguage } from "@/lib/voice/speech-language-preference";
@@ -41,6 +53,7 @@ type VoiceOperatorContextValue = {
   readonly permissionIssue: VoicePermissionIssue | null;
   readonly brokerIssue: VoiceBrokerIssue | null;
   readonly transcriptVisible: boolean;
+  readonly transcriptRevision: number;
   readonly textInput: string;
   readonly evidenceResults: EvidenceResultsPayload | null;
   readonly evidenceOpen: boolean;
@@ -123,6 +136,7 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
   const [permissionIssue, setPermissionIssue] = useState<VoicePermissionIssue | null>(null);
   const [brokerIssue, setBrokerIssue] = useState<VoiceBrokerIssue | null>(null);
   const [transcriptVisible, setTranscriptVisible] = useState(false);
+  const [transcriptRevision, setTranscriptRevision] = useState(0);
   const [textInput, setTextInput] = useState("");
   const [evidenceResults, setEvidenceResults] = useState<EvidenceResultsPayload | null>(null);
   const [evidenceOpen, setEvidenceOpen] = useState(false);
@@ -130,8 +144,12 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
   const [muted] = useState(false);
   const [awaitingConsent, setAwaitingConsent] = useState(false);
   const sessionRef = useRef<SpeechRecognitionSession | null>(null);
+  const realtimeProviderRef = useRef<RealtimeVoiceProvider | null>(null);
+  const realtimeStartingRef = useRef(false);
+  const realtimeUnsubsRef = useRef<Array<() => void>>([]);
 
   const operatorMode = useMemo(() => resolveOperatorMode(language), [language]);
+  const brokerConfigured = !operatorMode.backendRequired;
 
   const toolContext = useMemo(
     () => ({
@@ -139,8 +157,30 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
       language,
       smartIdeaId: null,
     }),
-    [language],
+    [language, transcriptRevision],
   );
+
+  const clearRealtimeBindings = useCallback(() => {
+    realtimeUnsubsRef.current.forEach((unsub) => unsub());
+    realtimeUnsubsRef.current = [];
+  }, []);
+
+  const disconnectRealtime = useCallback(() => {
+    clearRealtimeBindings();
+    realtimeProviderRef.current?.disconnect();
+  }, [clearRealtimeBindings]);
+
+  useEffect(() => {
+    realtimeProviderRef.current = resolveRealtimeProvider(brokerConfigured);
+    return () => {
+      disconnectRealtime();
+      realtimeProviderRef.current = null;
+    };
+  }, [brokerConfigured, disconnectRealtime]);
+
+  const bumpTranscript = useCallback(() => {
+    setTranscriptRevision((value) => value + 1);
+  }, []);
 
   const applyResponse = useCallback(
     async (userText: string) => {
@@ -163,6 +203,98 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
     setBrokerIssue(operatorMode.backendRequired ? "required" : null);
   }, [operatorMode.backendRequired]);
 
+  const startBrowserFallbackListening = useCallback(async () => {
+    setPermissionIssue(null);
+    setDockState("connecting");
+
+    const micAccess = await requestMicrophoneAccess();
+    if (!micAccess.ok) {
+      setPermissionIssue(micAccess.issue);
+      setDockState("permission_required");
+      return;
+    }
+
+    setDockState("listening");
+    startBrowserSpeechSession(
+      language,
+      profile.speechLanguage,
+      applyResponse,
+      sessionRef,
+      setPermissionIssue,
+      setDockState,
+    );
+  }, [language, profile.speechLanguage, applyResponse]);
+
+  const startRealtimeListening = useCallback(async () => {
+    if (realtimeStartingRef.current) return;
+    realtimeStartingRef.current = true;
+
+    setPermissionIssue(null);
+    setBrokerIssue(null);
+    setDockState("connecting");
+
+    const provider = realtimeProviderRef.current ?? resolveRealtimeProvider(true);
+    realtimeProviderRef.current = provider;
+
+    try {
+      const sessionMemory =
+        readVoiceSessionMemory() ?? createVoiceSessionMemory(language, "realtime");
+
+      const brokerRes = await requestRealtimeSessionCredential({
+        language,
+        origin: typeof window !== "undefined" ? window.location.origin : "",
+        sessionHint: sessionMemory.sessionId,
+      });
+
+      if (!brokerRes.ok) {
+        setBrokerIssue(mapBrokerCodeToIssue(brokerRes.code));
+        setDockState("error");
+        return;
+      }
+
+      clearRealtimeBindings();
+      realtimeUnsubsRef.current.push(
+        provider.onStateChange((state) => {
+          setDockState(mapRealtimeStateToDockState(state));
+        }),
+        provider.onTranscript((event) => {
+          if (!event.final || !event.text.trim()) return;
+          appendConversationTurn({ role: event.role, text: event.text.trim() });
+          bumpTranscript();
+        }),
+      );
+
+      await provider.connect(brokerRes.credential, language);
+
+      const state = provider.getState();
+      if (state === "authentication_failed") {
+        setBrokerIssue("authentication_failed");
+        setDockState("error");
+        disconnectRealtime();
+        return;
+      }
+      if (state === "connection_failed" || state === "error" || state === "backend_required") {
+        setBrokerIssue("unreachable");
+        setDockState("error");
+        disconnectRealtime();
+        return;
+      }
+
+      setDockState(mapRealtimeStateToDockState(state));
+    } catch (error) {
+      if (error instanceof RealtimeMicrophoneError) {
+        setPermissionIssue(error.issue);
+        setDockState("permission_required");
+      } else {
+        setBrokerIssue("unreachable");
+        setDockState("error");
+      }
+      disconnectRealtime();
+    } finally {
+      realtimeStartingRef.current = false;
+    }
+  }, [language, bumpTranscript, clearRealtimeBindings, disconnectRealtime]);
+
   const openDock = useCallback(() => {
     setDockOpen(true);
     syncBrokerIssue();
@@ -183,6 +315,8 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
 
   const endSession = useCallback(() => {
     sessionRef.current?.stop();
+    sessionRef.current = null;
+    disconnectRealtime();
     clearVoiceSessionMemory();
     clearConversationPendingState();
     setSessionActive(false);
@@ -193,7 +327,7 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
     setDockState("closed");
     setDockOpen(false);
     syncBrokerIssue();
-  }, [syncBrokerIssue]);
+  }, [disconnectRealtime, syncBrokerIssue]);
 
   const sendTextMessage = useCallback(async () => {
     const text = textInput.trim();
@@ -201,54 +335,36 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
     setTextInput("");
     setSessionActive(true);
     setTranscriptVisible(true);
+    appendConversationTurn({ role: "user", text });
+    bumpTranscript();
     await applyResponse(text);
-  }, [textInput, applyResponse]);
+  }, [textInput, applyResponse, bumpTranscript]);
 
   const startListening = useCallback(async () => {
-    if (muted) return;
+    if (muted || realtimeStartingRef.current) return;
 
-    setPermissionIssue(null);
     setSessionActive(true);
     setTranscriptVisible(true);
-    setDockState("connecting");
 
-    const micAccess = await requestMicrophoneAccess();
-    if (!micAccess.ok) {
-      setPermissionIssue(micAccess.issue);
-      setDockState("permission_required");
-      return;
-    }
-
-    // Realtime path requires broker — independent from microphone permission.
     if (operatorMode.mode === "realtime") {
-      setDockState("listening");
-      // Broker-backed Realtime session wiring lands here; mic probe already succeeded.
-      startBrowserSpeechSession(
-        language,
-        profile.speechLanguage,
-        applyResponse,
-        sessionRef,
-        setPermissionIssue,
-        setDockState,
-      );
+      await startRealtimeListening();
       return;
     }
 
-    setDockState("listening");
-    startBrowserSpeechSession(
-      language,
-      profile.speechLanguage,
-      applyResponse,
-      sessionRef,
-      setPermissionIssue,
-      setDockState,
-    );
-  }, [muted, operatorMode.mode, language, profile.speechLanguage, applyResponse]);
+    await startBrowserFallbackListening();
+  }, [muted, operatorMode.mode, startRealtimeListening, startBrowserFallbackListening]);
 
   const stopListening = useCallback(() => {
+    if (operatorMode.mode === "realtime") {
+      realtimeProviderRef.current?.interrupt();
+      setDockState("ready");
+      return;
+    }
+
     sessionRef.current?.stop();
+    sessionRef.current = null;
     setDockState("ready");
-  }, []);
+  }, [operatorMode.mode]);
 
   const dismissPermission = useCallback(() => {
     setPermissionIssue(null);
@@ -271,12 +387,17 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
     setDockState(brokerIssue ? "backend_required" : "ready");
   }, [brokerIssue]);
 
+  useEffect(() => {
+    realtimeProviderRef.current?.setMuted(muted);
+  }, [muted]);
+
   const value: VoiceOperatorContextValue = {
     dockOpen,
     dockState,
     permissionIssue,
     brokerIssue,
     transcriptVisible,
+    transcriptRevision,
     textInput,
     evidenceResults,
     evidenceOpen,

@@ -10,9 +10,11 @@ type Props = {
 export default function VoiceOperatorBrokerNotice({ issue }: Props) {
   const { t } = useTranslation();
   const message =
-    issue === "unreachable"
-      ? t("voiceOperator.brokerUnavailableNotice")
-      : t("voiceOperator.backendRequiredNotice");
+    issue === "authentication_failed"
+      ? t("voiceOperator.brokerAuthenticationFailedNotice")
+      : issue === "unreachable"
+        ? t("voiceOperator.brokerUnavailableNotice")
+        : t("voiceOperator.backendRequiredNotice");
 
   return (
     <p

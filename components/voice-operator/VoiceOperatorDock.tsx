@@ -69,6 +69,7 @@ export default function VoiceOperatorDock() {
   };
 
   const session = readVoiceSessionMemory();
+  void vo.transcriptRevision;
   const stateLabel = dockStateLabel(voiceCopy, vo.dockState);
 
   if (!vo.dockOpen && vo.dockState === "closed") {

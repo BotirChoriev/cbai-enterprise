@@ -132,6 +132,13 @@ test("10b. broker and microphone states are independent", () => {
   assert.match(dock, /VoiceOperatorBrokerNotice/);
 });
 
+test("10c. realtime path uses broker credential not browser SpeechRecognition", () => {
+  const provider = readSource("components/voice-operator/VoiceOperatorProvider.tsx");
+  assert.match(provider, /startRealtimeListening/);
+  assert.match(provider, /requestRealtimeSessionCredential/);
+  assert.doesNotMatch(provider, /operatorMode\.mode === "realtime"[\s\S]*startBrowserSpeechSession/);
+});
+
 // --- Realtime architecture ---
 
 test("12. long-lived API key guard rejects sk- prefix in client", () => {
@@ -403,6 +410,8 @@ test("35. domain terminology preserved in instructions", () => {
   assert.ok(VOICE_OPERATOR_DOMAIN_VOCABULARY.includes("Smart Idea"));
   const instructions = buildVoiceOperatorInstructions("uz");
   assert.match(instructions, /Crossref/);
+  assert.match(instructions, /CBAI ovoz operatori/);
+  assert.match(instructions, /qaror qilmang/);
 });
 
 test("36. unclear input triggers clarification", async () => {

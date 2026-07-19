@@ -1,5 +1,6 @@
 /** Session broker client — ephemeral credentials only, never long-lived API keys. */
 
+import { classifyBrokerHttpResponse } from "@/lib/voice-operator/session-broker/broker-response";
 import type { EphemeralRealtimeCredential, VoiceBrokerStatus } from "@/lib/voice-operator/types";
 
 export type SessionBrokerRequest = {
@@ -10,7 +11,16 @@ export type SessionBrokerRequest = {
 
 export type SessionBrokerResponse =
   | { readonly ok: true; readonly credential: EphemeralRealtimeCredential }
-  | { readonly ok: false; readonly code: "BACKEND_REQUIRED" | "ORIGIN_BLOCKED" | "RATE_LIMITED" | "ERROR"; readonly message: string };
+  | {
+      readonly ok: false;
+      readonly code:
+        | "BACKEND_REQUIRED"
+        | "ORIGIN_BLOCKED"
+        | "RATE_LIMITED"
+        | "AUTHENTICATION_FAILED"
+        | "ERROR";
+      readonly message: string;
+    };
 
 export function resolveVoiceBrokerUrl(): string | null {
   const url = process.env.NEXT_PUBLIC_VOICE_BROKER_URL?.trim();
@@ -50,7 +60,8 @@ export async function requestRealtimeSessionCredential(
   try {
     const response = await fetch(`${brokerUrl.replace(/\/$/, "")}/session`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      redirect: "manual",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({
         language: request.language,
         origin: request.origin,
@@ -58,21 +69,12 @@ export async function requestRealtimeSessionCredential(
       }),
     });
 
-    if (response.status === 403) {
-      return { ok: false, code: "ORIGIN_BLOCKED", message: "Origin not allowed." };
-    }
-    if (response.status === 429) {
-      return { ok: false, code: "RATE_LIMITED", message: "Rate limit exceeded." };
-    }
-    if (!response.ok) {
-      return { ok: false, code: "ERROR", message: `Broker error (${response.status}).` };
-    }
-
-    const payload = (await response.json()) as EphemeralRealtimeCredential;
-    if (!payload.clientSecret || !payload.expiresAt) {
-      return { ok: false, code: "ERROR", message: "Invalid broker response shape." };
-    }
-    return { ok: true, credential: payload };
+    const bodyText = await response.text();
+    return classifyBrokerHttpResponse({
+      status: response.status,
+      contentType: response.headers.get("Content-Type"),
+      bodyText,
+    });
   } catch {
     return { ok: false, code: "ERROR", message: "Network error reaching voice broker." };
   }
