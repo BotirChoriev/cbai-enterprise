@@ -7,6 +7,11 @@ import { buildVoiceOperatorInstructions } from "@/lib/voice-operator/instruction
 import { parseRealtimeServerEvent } from "@/lib/voice-operator/realtime/realtime-events";
 import type { RealtimeConnectionState } from "@/lib/voice-operator/realtime/realtime-provider";
 import type { EphemeralRealtimeCredential, VoicePermissionIssue } from "@/lib/voice-operator/types";
+import {
+  areAllTracksEnded,
+  disposeAudioElement,
+  stopMediaStreamTracks,
+} from "@/lib/voice-operator/voice-session-lifecycle";
 
 export const OPENAI_REALTIME_CALLS_URL = "https://api.openai.com/v1/realtime/calls";
 
@@ -42,16 +47,21 @@ export type WebRtcSessionHandle = {
   readonly getState: () => RealtimeConnectionState;
   readonly onStateChange: (listener: RealtimeStateListener) => () => void;
   readonly onTranscript: (listener: RealtimeTranscriptListener) => () => void;
+  readonly getLocalStream: () => MediaStream | null;
+  readonly getRemoteStream: () => MediaStream | null;
 };
 
 type MutableSession = {
   peer: RTCPeerConnection | null;
   dataChannel: RTCDataChannel | null;
   localStream: MediaStream | null;
+  remoteStream: MediaStream | null;
   audioEl: HTMLAudioElement | null;
+  abortController: AbortController | null;
   state: RealtimeConnectionState;
   assistantPartial: string;
   connectGeneration: number;
+  disconnected: boolean;
 };
 
 const TERMINAL_FAILURE_STATES = new Set<RealtimeConnectionState>([
@@ -100,19 +110,6 @@ function createTranscriptEmitter() {
   };
 }
 
-function stopMediaStream(stream: MediaStream | null): void {
-  stream?.getTracks().forEach((track) => {
-    track.stop();
-  });
-}
-
-function disposeAudioElement(audioEl: HTMLAudioElement | null): void {
-  if (!audioEl) return;
-  audioEl.pause();
-  audioEl.srcObject = null;
-  audioEl.remove();
-}
-
 function isSdpAnswer(contentType: string | null, bodyText: string): boolean {
   const normalized = contentType?.split(";")[0]?.trim().toLowerCase() ?? "";
   if (normalized.includes("application/sdp")) return true;
@@ -149,6 +146,43 @@ export function classifyRealtimeCallsResponse(input: {
   return "answer";
 }
 
+export function cleanupWebRtcSessionResources(session: MutableSession): void {
+  session.abortController?.abort();
+  session.abortController = null;
+
+  if (session.dataChannel) {
+    try {
+      session.dataChannel.close();
+    } catch {
+      /* ignore */
+    }
+    session.dataChannel = null;
+  }
+
+  if (session.peer) {
+    try {
+      session.peer.close();
+    } catch {
+      /* ignore */
+    }
+    session.peer = null;
+  }
+
+  stopMediaStreamTracks(session.localStream);
+  session.localStream = null;
+
+  stopMediaStreamTracks(session.remoteStream);
+  session.remoteStream = null;
+
+  disposeAudioElement(session.audioEl);
+  session.audioEl = null;
+  session.assistantPartial = "";
+}
+
+export function verifyWebRtcSessionTracksEnded(session: Pick<MutableSession, "localStream" | "remoteStream">): boolean {
+  return areAllTracksEnded(session.localStream, session.remoteStream);
+}
+
 export async function connectOpenAiWebRtcSession(options: {
   readonly credential: EphemeralRealtimeCredential;
   readonly language: string;
@@ -158,35 +192,31 @@ export async function connectOpenAiWebRtcSession(options: {
     peer: null,
     dataChannel: null,
     localStream: null,
+    remoteStream: null,
     audioEl: null,
+    abortController: null,
     state: "idle",
     assistantPartial: "",
     connectGeneration: 0,
+    disconnected: false,
   };
 
   const stateEmitter = createStateEmitter(session);
   const transcriptEmitter = createTranscriptEmitter();
 
-  const cleanup = () => {
-    session.dataChannel?.close();
-    session.dataChannel = null;
-    session.peer?.close();
-    session.peer = null;
-    stopMediaStream(session.localStream);
-    session.localStream = null;
-    disposeAudioElement(session.audioEl);
-    session.audioEl = null;
-    session.assistantPartial = "";
-  };
-
   const disconnect = () => {
+    if (session.disconnected && session.state === "idle") return;
+    session.disconnected = true;
     session.connectGeneration += 1;
-    cleanup();
-    stateEmitter.set("disconnected");
-    stateEmitter.set("idle");
+    cleanupWebRtcSessionResources(session);
+    if (session.state !== "idle") {
+      stateEmitter.set("disconnected");
+      stateEmitter.set("idle");
+    }
   };
 
   const handleDataChannelMessage = (raw: string) => {
+    if (session.disconnected) return;
     const parsed = parseRealtimeServerEvent(raw);
     if (!parsed) return;
     if (parsed.state) stateEmitter.set(parsed.state);
@@ -214,6 +244,7 @@ export async function connectOpenAiWebRtcSession(options: {
   const handle: WebRtcSessionHandle = {
     disconnect,
     interrupt() {
+      if (session.disconnected) return;
       if (session.dataChannel?.readyState === "open") {
         session.dataChannel.send(JSON.stringify({ type: "response.cancel" }));
       }
@@ -228,6 +259,8 @@ export async function connectOpenAiWebRtcSession(options: {
     getState: stateEmitter.get,
     onStateChange: stateEmitter.subscribe,
     onTranscript: transcriptEmitter.subscribe,
+    getLocalStream: () => session.localStream,
+    getRemoteStream: () => session.remoteStream,
   };
 
   if (!options.credential.clientSecret || options.credential.clientSecret.startsWith("sk-")) {
@@ -235,9 +268,11 @@ export async function connectOpenAiWebRtcSession(options: {
     return handle;
   }
 
-  cleanup();
+  cleanupWebRtcSessionResources(session);
+  session.disconnected = false;
   session.connectGeneration += 1;
   const generation = session.connectGeneration;
+  session.abortController = new AbortController();
   stateEmitter.set("connecting");
 
   try {
@@ -252,13 +287,15 @@ export async function connectOpenAiWebRtcSession(options: {
     session.audioEl = audioEl;
 
     peer.ontrack = (event) => {
+      if (session.disconnected || generation !== session.connectGeneration) return;
+      session.remoteStream = event.streams[0] ?? null;
       if (session.audioEl) {
-        session.audioEl.srcObject = event.streams[0] ?? null;
+        session.audioEl.srcObject = session.remoteStream;
       }
     };
 
     peer.onconnectionstatechange = () => {
-      if (generation !== session.connectGeneration) return;
+      if (generation !== session.connectGeneration || session.disconnected) return;
       if (peer.connectionState === "failed") stateEmitter.set("connection_failed");
       if (peer.connectionState === "disconnected") stateEmitter.set("disconnected");
     };
@@ -270,8 +307,8 @@ export async function connectOpenAiWebRtcSession(options: {
       throw new RealtimeMicrophoneError(mapGetUserMediaError(error));
     }
 
-    if (generation !== session.connectGeneration) {
-      stopMediaStream(localStream);
+    if (generation !== session.connectGeneration || session.disconnected) {
+      stopMediaStreamTracks(localStream);
       return handle;
     }
 
@@ -286,18 +323,19 @@ export async function connectOpenAiWebRtcSession(options: {
 
     const offer = await peer.createOffer();
     await peer.setLocalDescription(offer);
-    if (generation !== session.connectGeneration) return handle;
+    if (generation !== session.connectGeneration || session.disconnected) return handle;
 
     const sdpResponse = await fetch(OPENAI_REALTIME_CALLS_URL, {
       method: "POST",
       body: offer.sdp ?? "",
+      signal: session.abortController?.signal,
       headers: {
         Authorization: `Bearer ${options.credential.clientSecret}`,
         "Content-Type": "application/sdp",
       },
     });
 
-    if (generation !== session.connectGeneration) return handle;
+    if (generation !== session.connectGeneration || session.disconnected) return handle;
 
     const bodyText = await sdpResponse.text();
     const classification = classifyRealtimeCallsResponse({
@@ -307,28 +345,34 @@ export async function connectOpenAiWebRtcSession(options: {
     });
 
     if (classification === "authentication_failed") {
-      cleanup();
+      cleanupWebRtcSessionResources(session);
       stateEmitter.set("authentication_failed");
       return handle;
     }
     if (classification === "connection_failed") {
-      cleanup();
+      cleanupWebRtcSessionResources(session);
       stateEmitter.set("connection_failed");
       return handle;
     }
 
     await peer.setRemoteDescription({ type: "answer", sdp: bodyText });
-    if (generation !== session.connectGeneration) return handle;
+    if (generation !== session.connectGeneration || session.disconnected) return handle;
 
     stateEmitter.set("connected");
     stateEmitter.set("listening");
   } catch (error) {
-    if (generation !== session.connectGeneration) return handle;
-    cleanup();
+    if (generation !== session.connectGeneration || session.disconnected) return handle;
+    cleanupWebRtcSessionResources(session);
     if (error instanceof RealtimeMicrophoneError) throw error;
+    if (error instanceof DOMException && error.name === "AbortError") {
+      stateEmitter.set("idle");
+      return handle;
+    }
     stateEmitter.set("connection_failed");
   }
 
   await stateEmitter.waitForConnect();
   return handle;
 }
+
+export type { MutableSession };

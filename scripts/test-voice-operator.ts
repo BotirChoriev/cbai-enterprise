@@ -41,7 +41,7 @@ import {
   createUnavailableRealtimeProvider,
   resolveRealtimeProvider,
 } from "@/lib/voice-operator/realtime/realtime-provider";
-import { buildVoiceOperatorInstructions, VOICE_OPERATOR_DOMAIN_VOCABULARY } from "@/lib/voice-operator/instructions";
+import { buildVoiceOperatorInstructions, getVoiceOperatorIntroPhrase, VOICE_OPERATOR_DOMAIN_VOCABULARY, VOICE_OPERATOR_INTRO_PHRASES } from "@/lib/voice-operator/instructions";
 import { getDictionary } from "@/lib/i18n/translate";
 import { createSmartIdea } from "@/lib/research-canvas/smart-idea-store";
 
@@ -410,8 +410,49 @@ test("35. domain terminology preserved in instructions", () => {
   assert.ok(VOICE_OPERATOR_DOMAIN_VOCABULARY.includes("Smart Idea"));
   const instructions = buildVoiceOperatorInstructions("uz");
   assert.match(instructions, /Crossref/);
-  assert.match(instructions, /CBAI ovoz operatori/);
-  assert.match(instructions, /qaror qilmang/);
+  assert.match(instructions, /CBAI Ovoz Operatoriman/);
+  assert.match(instructions, /qaror qilmang|never make decisions/i);
+});
+
+test("35b. Uzbek identity intro phrase is canonical and non-generic", () => {
+  const intro = getVoiceOperatorIntroPhrase("uz");
+  assert.equal(
+    intro,
+    "Men CBAI Ovoz Operatoriman. Sizga tadqiqot, dalillar va platformadagi ishlaringiz bo'yicha yordam beraman.",
+  );
+  const instructions = buildVoiceOperatorInstructions("uz");
+  assert.match(instructions, /Men CBAI Ovoz Operatoriman/);
+  assert.match(instructions, /Do NOT repeat this full introduction/i);
+  assert.match(instructions, /Never claim to be human/i);
+  assert.match(instructions, /AI-powered ONLY if the user explicitly asks/i);
+  assert.match(instructions, /Men sun'iy intellektman/);
+});
+
+test("35c. English identity instructions use CBAI Voice Operator intro", () => {
+  const intro = getVoiceOperatorIntroPhrase("en");
+  assert.equal(intro, VOICE_OPERATOR_INTRO_PHRASES.en);
+  const instructions = buildVoiceOperatorInstructions("en");
+  assert.match(instructions, /I am the CBAI Voice Operator/);
+  assert.match(instructions, /Never claim to be human/i);
+  assert.match(instructions, /Do NOT repeat this full introduction/i);
+});
+
+test("35d. Russian identity instructions use CBAI Voice Operator intro", () => {
+  const intro = getVoiceOperatorIntroPhrase("ru");
+  assert.equal(intro, VOICE_OPERATOR_INTRO_PHRASES.ru);
+  const instructions = buildVoiceOperatorInstructions("ru");
+  assert.match(instructions, /CBAI Голосовой Оператор/);
+  assert.match(instructions, /Never claim to be human/i);
+  assert.match(instructions, /AI-powered ONLY if the user explicitly asks/i);
+});
+
+test("35e. Turkish identity instructions use CBAI Voice Operator intro", () => {
+  const intro = getVoiceOperatorIntroPhrase("tr");
+  assert.equal(intro, VOICE_OPERATOR_INTRO_PHRASES.tr);
+  const instructions = buildVoiceOperatorInstructions("tr");
+  assert.match(instructions, /CBAI Ses Operatörüyüm/);
+  assert.match(instructions, /Never claim to be human/i);
+  assert.match(instructions, /Advise only/i);
 });
 
 test("36. unclear input triggers clarification", async () => {

@@ -404,7 +404,7 @@ test("VoiceOperatorProvider appends realtime transcripts to session memory", () 
   const provider = readSource("components/voice-operator/VoiceOperatorProvider.tsx");
   assert.match(provider, /onTranscript/);
   assert.match(provider, /appendConversationTurn/);
-  assert.match(provider, /disconnectRealtime/);
+  assert.match(provider, /stopLiveAudioCapture/);
 });
 
 test("broker client uses manual redirect and JSON accept headers", () => {

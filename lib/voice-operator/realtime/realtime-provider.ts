@@ -127,6 +127,7 @@ export function createOpenAiWebRtcRealtimeProvider(): RealtimeVoiceProvider {
 
   let activeSession: WebRtcSessionHandle | null = null;
   let connectPromise: Promise<void> | null = null;
+  let connectEpoch = 0;
   const holder = createStateHolder("idle");
   const transcriptListeners = new Set<RealtimeTranscriptListener>();
   let sessionUnsubs: Array<() => void> = [];
@@ -147,6 +148,7 @@ export function createOpenAiWebRtcRealtimeProvider(): RealtimeVoiceProvider {
   };
 
   const disconnect = () => {
+    connectEpoch += 1;
     connectPromise = null;
     clearSessionBindings();
     activeSession?.disconnect();
@@ -167,6 +169,7 @@ export function createOpenAiWebRtcRealtimeProvider(): RealtimeVoiceProvider {
         return;
       }
 
+      const epoch = connectEpoch;
       connectPromise = (async () => {
         activeSession?.disconnect();
         clearSessionBindings();
@@ -187,6 +190,11 @@ export function createOpenAiWebRtcRealtimeProvider(): RealtimeVoiceProvider {
           },
         });
 
+        if (epoch !== connectEpoch) {
+          session.disconnect();
+          return;
+        }
+
         activeSession = session;
         bindSession(session);
         holder.set(session.getState());
@@ -195,8 +203,10 @@ export function createOpenAiWebRtcRealtimeProvider(): RealtimeVoiceProvider {
       try {
         await connectPromise;
       } catch (error) {
-        if (error instanceof RealtimeMicrophoneError) throw error;
-        holder.set("connection_failed");
+        if (epoch === connectEpoch) {
+          if (error instanceof RealtimeMicrophoneError) throw error;
+          holder.set("connection_failed");
+        }
       } finally {
         connectPromise = null;
       }

@@ -10,6 +10,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { usePathname } from "next/navigation";
 import type {
   EvidenceResultsPayload,
   VoiceBrokerIssue,
@@ -41,6 +42,7 @@ import {
   type RealtimeVoiceProvider,
   resolveRealtimeProvider,
 } from "@/lib/voice-operator/realtime/realtime-provider";
+import { createLiveCaptureGate, isLiveMicDockState } from "@/lib/voice-operator/voice-session-lifecycle";
 import { revokeExternalSearchConsent } from "@/lib/voice-operator/tools/voice-tools";
 import { SpeechRecognitionSession } from "@/lib/voice/speech-recognition-session";
 import { resolveActiveSpeechLanguage } from "@/lib/voice/speech-language-preference";
@@ -50,6 +52,7 @@ import { useAssistantProfile } from "@/components/platform/context/AssistantProf
 type VoiceOperatorContextValue = {
   readonly dockOpen: boolean;
   readonly dockState: VoiceDockState;
+  readonly micLive: boolean;
   readonly permissionIssue: VoicePermissionIssue | null;
   readonly brokerIssue: VoiceBrokerIssue | null;
   readonly transcriptVisible: boolean;
@@ -129,6 +132,7 @@ function startBrowserSpeechSession(
 }
 
 export default function VoiceOperatorProvider({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
   const { language } = useTranslation();
   const { profile } = useAssistantProfile();
   const [dockOpen, setDockOpen] = useState(false);
@@ -147,9 +151,11 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
   const realtimeProviderRef = useRef<RealtimeVoiceProvider | null>(null);
   const realtimeStartingRef = useRef(false);
   const realtimeUnsubsRef = useRef<Array<() => void>>([]);
+  const liveCaptureGenerationRef = useRef(0);
 
   const operatorMode = useMemo(() => resolveOperatorMode(language), [language]);
   const brokerConfigured = !operatorMode.backendRequired;
+  const micLive = isLiveMicDockState(dockState);
 
   const toolContext = useMemo(
     () => ({
@@ -165,18 +171,34 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
     realtimeUnsubsRef.current = [];
   }, []);
 
-  const disconnectRealtime = useCallback(() => {
+  const releaseLiveAudioResources = useCallback(() => {
+    liveCaptureGenerationRef.current += 1;
+    realtimeStartingRef.current = false;
+    sessionRef.current?.stop();
+    sessionRef.current = null;
     clearRealtimeBindings();
     realtimeProviderRef.current?.disconnect();
   }, [clearRealtimeBindings]);
 
+  const stopLiveAudioCapture = useCallback(() => {
+    releaseLiveAudioResources();
+    setDockState((state) => (isLiveMicDockState(state) ? "ready" : state));
+  }, [releaseLiveAudioResources]);
+
   useEffect(() => {
     realtimeProviderRef.current = resolveRealtimeProvider(brokerConfigured);
     return () => {
-      disconnectRealtime();
+      releaseLiveAudioResources();
       realtimeProviderRef.current = null;
     };
-  }, [brokerConfigured, disconnectRealtime]);
+  }, [brokerConfigured, releaseLiveAudioResources]);
+
+  useEffect(() => {
+    return () => {
+      releaseLiveAudioResources();
+      setDockState((state) => (isLiveMicDockState(state) ? "ready" : state));
+    };
+  }, [pathname, releaseLiveAudioResources]);
 
   const bumpTranscript = useCallback(() => {
     setTranscriptRevision((value) => value + 1);
@@ -203,97 +225,113 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
     setBrokerIssue(operatorMode.backendRequired ? "required" : null);
   }, [operatorMode.backendRequired]);
 
-  const startBrowserFallbackListening = useCallback(async () => {
-    setPermissionIssue(null);
-    setDockState("connecting");
+  const startBrowserFallbackListening = useCallback(
+    async (gate: ReturnType<typeof createLiveCaptureGate>) => {
+      setPermissionIssue(null);
+      setDockState("connecting");
 
-    const micAccess = await requestMicrophoneAccess();
-    if (!micAccess.ok) {
-      setPermissionIssue(micAccess.issue);
-      setDockState("permission_required");
-      return;
-    }
-
-    setDockState("listening");
-    startBrowserSpeechSession(
-      language,
-      profile.speechLanguage,
-      applyResponse,
-      sessionRef,
-      setPermissionIssue,
-      setDockState,
-    );
-  }, [language, profile.speechLanguage, applyResponse]);
-
-  const startRealtimeListening = useCallback(async () => {
-    if (realtimeStartingRef.current) return;
-    realtimeStartingRef.current = true;
-
-    setPermissionIssue(null);
-    setBrokerIssue(null);
-    setDockState("connecting");
-
-    const provider = realtimeProviderRef.current ?? resolveRealtimeProvider(true);
-    realtimeProviderRef.current = provider;
-
-    try {
-      const sessionMemory =
-        readVoiceSessionMemory() ?? createVoiceSessionMemory(language, "realtime");
-
-      const brokerRes = await requestRealtimeSessionCredential({
-        language,
-        origin: typeof window !== "undefined" ? window.location.origin : "",
-        sessionHint: sessionMemory.sessionId,
-      });
-
-      if (!brokerRes.ok) {
-        setBrokerIssue(mapBrokerCodeToIssue(brokerRes.code));
-        setDockState("error");
-        return;
-      }
-
-      clearRealtimeBindings();
-      realtimeUnsubsRef.current.push(
-        provider.onStateChange((state) => {
-          setDockState(mapRealtimeStateToDockState(state));
-        }),
-        provider.onTranscript((event) => {
-          if (!event.final || !event.text.trim()) return;
-          appendConversationTurn({ role: event.role, text: event.text.trim() });
-          bumpTranscript();
-        }),
-      );
-
-      await provider.connect(brokerRes.credential, language);
-
-      const state = provider.getState();
-      if (state === "authentication_failed") {
-        setBrokerIssue("authentication_failed");
-        setDockState("error");
-        disconnectRealtime();
-        return;
-      }
-      if (state === "connection_failed" || state === "error" || state === "backend_required") {
-        setBrokerIssue("unreachable");
-        setDockState("error");
-        disconnectRealtime();
-        return;
-      }
-
-      setDockState(mapRealtimeStateToDockState(state));
-    } catch (error) {
-      if (error instanceof RealtimeMicrophoneError) {
-        setPermissionIssue(error.issue);
+      const micAccess = await requestMicrophoneAccess();
+      if (!gate.isCurrent()) return;
+      if (!micAccess.ok) {
+        setPermissionIssue(micAccess.issue);
         setDockState("permission_required");
-      } else {
-        setBrokerIssue("unreachable");
-        setDockState("error");
+        return;
       }
-      disconnectRealtime();
-    } finally {
-      realtimeStartingRef.current = false;
-    }
-  }, [language, bumpTranscript, clearRealtimeBindings, disconnectRealtime]);
+
+      setDockState("listening");
+      startBrowserSpeechSession(
+        language,
+        profile.speechLanguage,
+        applyResponse,
+        sessionRef,
+        setPermissionIssue,
+        setDockState,
+      );
+    },
+    [language, profile.speechLanguage, applyResponse],
+  );
+
+  const startRealtimeListening = useCallback(
+    async (gate: ReturnType<typeof createLiveCaptureGate>) => {
+      if (realtimeStartingRef.current) return;
+      realtimeStartingRef.current = true;
+
+      setPermissionIssue(null);
+      setBrokerIssue(null);
+      setDockState("connecting");
+
+      const provider = realtimeProviderRef.current ?? resolveRealtimeProvider(true);
+      realtimeProviderRef.current = provider;
+
+      try {
+        const sessionMemory =
+          readVoiceSessionMemory() ?? createVoiceSessionMemory(language, "realtime");
+
+        const brokerRes = await requestRealtimeSessionCredential({
+          language,
+          origin: typeof window !== "undefined" ? window.location.origin : "",
+          sessionHint: sessionMemory.sessionId,
+        });
+
+        if (!gate.isCurrent()) return;
+
+        if (!brokerRes.ok) {
+          setBrokerIssue(mapBrokerCodeToIssue(brokerRes.code));
+          setDockState("error");
+          return;
+        }
+
+        clearRealtimeBindings();
+        realtimeUnsubsRef.current.push(
+          provider.onStateChange((state) => {
+            if (!gate.isCurrent()) return;
+            setDockState(mapRealtimeStateToDockState(state));
+          }),
+          provider.onTranscript((event) => {
+            if (!gate.isCurrent()) return;
+            if (!event.final || !event.text.trim()) return;
+            appendConversationTurn({ role: event.role, text: event.text.trim() });
+            bumpTranscript();
+          }),
+        );
+
+        await provider.connect(brokerRes.credential, language);
+        if (!gate.isCurrent()) {
+          provider.disconnect();
+          return;
+        }
+
+        const state = provider.getState();
+        if (state === "authentication_failed") {
+          setBrokerIssue("authentication_failed");
+          setDockState("error");
+          stopLiveAudioCapture();
+          return;
+        }
+        if (state === "connection_failed" || state === "error" || state === "backend_required") {
+          setBrokerIssue("unreachable");
+          setDockState("error");
+          stopLiveAudioCapture();
+          return;
+        }
+
+        setDockState(mapRealtimeStateToDockState(state));
+      } catch (error) {
+        if (!gate.isCurrent()) return;
+        if (error instanceof RealtimeMicrophoneError) {
+          setPermissionIssue(error.issue);
+          setDockState("permission_required");
+        } else {
+          setBrokerIssue("unreachable");
+          setDockState("error");
+        }
+        stopLiveAudioCapture();
+      } finally {
+        realtimeStartingRef.current = false;
+      }
+    },
+    [language, bumpTranscript, clearRealtimeBindings, stopLiveAudioCapture],
+  );
 
   const openDock = useCallback(() => {
     setDockOpen(true);
@@ -302,21 +340,20 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
       createVoiceSessionMemory(language, operatorMode.mode);
       setDockState(operatorMode.backendRequired ? "backend_required" : "ready");
     } else {
-      setDockState("ready");
+      setDockState(micLive ? "listening" : "ready");
     }
-  }, [language, operatorMode, sessionActive, syncBrokerIssue]);
+  }, [language, operatorMode, sessionActive, syncBrokerIssue, micLive]);
 
   const closeDock = useCallback(() => {
+    releaseLiveAudioResources();
+    setAwaitingConsent(false);
+    setPermissionIssue(null);
     setDockOpen(false);
     setDockState("closed");
-    setPermissionIssue(null);
-    setAwaitingConsent(false);
-  }, []);
+  }, [releaseLiveAudioResources]);
 
   const endSession = useCallback(() => {
-    sessionRef.current?.stop();
-    sessionRef.current = null;
-    disconnectRealtime();
+    stopLiveAudioCapture();
     clearVoiceSessionMemory();
     clearConversationPendingState();
     setSessionActive(false);
@@ -327,7 +364,7 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
     setDockState("closed");
     setDockOpen(false);
     syncBrokerIssue();
-  }, [disconnectRealtime, syncBrokerIssue]);
+  }, [stopLiveAudioCapture, syncBrokerIssue]);
 
   const sendTextMessage = useCallback(async () => {
     const text = textInput.trim();
@@ -341,30 +378,24 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
   }, [textInput, applyResponse, bumpTranscript]);
 
   const startListening = useCallback(async () => {
-    if (muted || realtimeStartingRef.current) return;
+    if (muted || micLive || realtimeStartingRef.current) return;
 
+    const gate = createLiveCaptureGate(() => liveCaptureGenerationRef.current);
     setSessionActive(true);
     setTranscriptVisible(true);
 
     if (operatorMode.mode === "realtime") {
-      await startRealtimeListening();
+      await startRealtimeListening(gate);
       return;
     }
 
-    await startBrowserFallbackListening();
-  }, [muted, operatorMode.mode, startRealtimeListening, startBrowserFallbackListening]);
+    await startBrowserFallbackListening(gate);
+  }, [muted, micLive, operatorMode.mode, startRealtimeListening, startBrowserFallbackListening]);
 
   const stopListening = useCallback(() => {
-    if (operatorMode.mode === "realtime") {
-      realtimeProviderRef.current?.interrupt();
-      setDockState("ready");
-      return;
-    }
-
-    sessionRef.current?.stop();
-    sessionRef.current = null;
-    setDockState("ready");
-  }, [operatorMode.mode]);
+    stopLiveAudioCapture();
+    setDockState(dockOpen ? "ready" : "closed");
+  }, [dockOpen, stopLiveAudioCapture]);
 
   const dismissPermission = useCallback(() => {
     setPermissionIssue(null);
@@ -387,13 +418,10 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
     setDockState(brokerIssue ? "backend_required" : "ready");
   }, [brokerIssue]);
 
-  useEffect(() => {
-    realtimeProviderRef.current?.setMuted(muted);
-  }, [muted]);
-
   const value: VoiceOperatorContextValue = {
     dockOpen,
     dockState,
+    micLive,
     permissionIssue,
     brokerIssue,
     transcriptVisible,

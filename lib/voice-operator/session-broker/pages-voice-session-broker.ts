@@ -3,6 +3,8 @@
  * Creates ephemeral OpenAI Realtime client secrets; never exposes long-lived API keys.
  */
 
+import { buildVoiceOperatorInstructions } from "@/lib/voice-operator/instructions";
+
 export const OPENAI_REALTIME_CLIENT_SECRETS_URL = "https://api.openai.com/v1/realtime/client_secrets";
 export const REALTIME_MODEL = "gpt-realtime";
 export const MAX_VOICE_SESSION_BODY_BYTES = 4096;
@@ -107,18 +109,6 @@ function mapUpstreamResponse(
   };
 }
 
-function instructionsForLanguage(language: string | undefined): string {
-  switch (language?.trim().toLowerCase()) {
-    case "uz":
-      return "Siz CBAI ovoz operatorisiz. Tabiiy zamonaviy o'zbek tilida javob bering. Manba, DOI va provayder nomlarini o'zgartirmang.";
-    case "ru":
-      return "Вы голосовой оператор CBAI. Отвечайте на русском языке.";
-    case "tr":
-      return "CBAI ses operatörüsünüz. Türkçe yanıt verin.";
-    default:
-      return "You are the CBAI Voice Operator. Respond concisely in the user's language.";
-  }
-}
 
 export async function createOpenAiClientSecret(
   apiKey: string,
@@ -139,7 +129,7 @@ export async function createOpenAiClientSecret(
       session: {
         type: "realtime",
         model: REALTIME_MODEL,
-        instructions: instructionsForLanguage(language),
+        instructions: buildVoiceOperatorInstructions(language ?? "en"),
         audio: {
           input: {
             turn_detection: {
