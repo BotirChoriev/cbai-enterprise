@@ -100,10 +100,16 @@ test("7. text fallback input exists in dock", () => {
   assert.match(dock, /sendTextMessage/);
 });
 
-test("7b. mic toggle icons: active unslashed stops capture, inactive slashed starts capture", () => {
+test("7b. mic toggle icons: active unslashed teal stops capture, inactive slashed starts capture", () => {
   const dock = readSource("components/voice-operator/VoiceOperatorDock.tsx");
   assert.match(dock, /vo\.micLive \? vo\.stopListening\(\) : vo\.startListening\(\)/);
   assert.match(dock, /vo\.micLive \? copy\.muteMic : copy\.unmuteMic/);
+  assert.match(dock, /copy\.stopLiveListening/);
+  assert.match(dock, /copy\.liveListeningActive/);
+  assert.match(dock, /copy\.liveListeningScope/);
+  assert.doesNotMatch(dock, /animate-pulse/);
+  assert.doesNotMatch(dock, /border-red-500/);
+  assert.doesNotMatch(dock, /ring-red-500/);
 
   const micIconTernary = dock.match(/\{vo\.micLive \?\s*\([\s\S]*?\)\s*:\s*\([\s\S]*?\)\s*\}/);
   assert.ok(micIconTernary, "mic icon ternary");
@@ -112,8 +118,13 @@ test("7b. mic toggle icons: active unslashed stops capture, inactive slashed sta
   assert.ok(activeIcon && inactiveIcon, "mic icon branches");
   assert.doesNotMatch(activeIcon, /M4\.5 4\.5l15 15/);
   assert.match(inactiveIcon, /M4\.5 4\.5l15 15/);
-  assert.match(dock, /border-red-500/);
+  assert.match(dock, /border-teal-500/);
   assert.match(dock, /border-zinc-700/);
+
+  const uz = readSource("lib/i18n/platform-copy-voice-operator.ts");
+  assert.match(uz, /liveListeningActive: "Jonli tinglash faol"/);
+  assert.match(uz, /liveListeningScope: "Mikrofon faqat ushbu suhbat davomida ishlaydi\."/);
+  assert.match(uz, /stopLiveListening: "To'xtatish"/);
 });
 
 // --- Permission ---

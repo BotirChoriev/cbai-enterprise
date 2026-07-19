@@ -36,6 +36,9 @@ export default function VoiceOperatorDock() {
     stopConversation: t("voiceOperator.stopConversation"),
     muteMic: t("voiceOperator.muteMic"),
     unmuteMic: t("voiceOperator.unmuteMic"),
+    liveListeningActive: t("voiceOperator.liveListeningActive"),
+    liveListeningScope: t("voiceOperator.liveListeningScope"),
+    stopLiveListening: t("voiceOperator.stopLiveListening"),
     interrupt: t("voiceOperator.interrupt"),
     showTranscript: t("voiceOperator.showTranscript"),
     hideTranscript: t("voiceOperator.hideTranscript"),
@@ -169,7 +172,7 @@ export default function VoiceOperatorDock() {
                 onClick={() => void (vo.micLive ? vo.stopListening() : vo.startListening())}
                 className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border ${
                   vo.micLive
-                    ? "animate-pulse border-red-500/50 bg-red-950/50 text-red-300 ring-2 ring-red-500/25"
+                    ? "border-teal-500/40 bg-teal-950/40 text-teal-300"
                     : "border-zinc-700/60 bg-zinc-900/70 text-zinc-500"
                 }`}
                 aria-label={vo.micLive ? copy.muteMic : copy.unmuteMic}
@@ -194,7 +197,23 @@ export default function VoiceOperatorDock() {
                   </svg>
                 )}
               </button>
+              {vo.micLive ? (
+                <button
+                  type="button"
+                  onClick={() => void vo.stopListening()}
+                  className="shrink-0 rounded-lg border border-teal-500/30 bg-teal-600/15 px-3 py-2 text-xs font-medium text-teal-200 hover:bg-teal-600/25"
+                >
+                  {copy.stopLiveListening}
+                </button>
+              ) : null}
             </div>
+
+            {vo.micLive ? (
+              <div className="mt-2 rounded-lg border border-teal-500/20 bg-teal-950/20 px-3 py-2">
+                <p className="text-xs font-medium text-teal-200">{copy.liveListeningActive}</p>
+                <p className="mt-0.5 text-[11px] text-teal-300/75">{copy.liveListeningScope}</p>
+              </div>
+            ) : null}
 
             <div className="mt-2 flex flex-wrap gap-2">
               <button type="button" onClick={vo.toggleTranscript} className="text-[11px] text-zinc-500 hover:text-zinc-300">

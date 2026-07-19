@@ -831,6 +831,9 @@ export type TranslationDictionary = {
     stopConversation: string;
     muteMic: string;
     unmuteMic: string;
+    liveListeningActive: string;
+    liveListeningScope: string;
+    stopLiveListening: string;
     interrupt: string;
     showTranscript: string;
     hideTranscript: string;
