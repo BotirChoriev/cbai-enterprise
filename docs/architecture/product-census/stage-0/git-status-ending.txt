@@ -1,0 +1,228 @@
+## preview/spatial-world-intelligence
+ M .env.example
+ M .gitignore
+ M app/(dashboard)/layout.tsx
+ M app/globals.css
+ M app/icon.svg
+ M components/assistant/AccountMenu.tsx
+ M components/assistant/AssistantCommandCenter.tsx
+ M components/brand/CBAILogo.tsx
+ M components/brand/brand-classes.ts
+ M components/canvas/CanvasMissionTimeline.tsx
+ M components/companies/CompanyCard.tsx
+ M components/countries/CountryCard.tsx
+ M components/countries/CountryFilters.tsx
+ M components/countries/CountryIntelligencePanel.tsx
+ M components/countries/WorldIntelligenceMap.tsx
+ M components/evidence/EntityEvidenceCoverage.tsx
+ M components/evidence/EvidenceExplorer.tsx
+ M components/evidence/EvidenceOperatingStatus.tsx
+ M components/evidence/EvidencePrimaryStatesPanel.tsx
+ M components/evidence/EvidenceSourceCoverage.tsx
+ M components/genesis/PersonalCabinetPanel.tsx
+ M components/governance-control/GovernancePageClient.tsx
+ M components/governance-control/GovernancePillars.tsx
+ M components/governance-control/GovernanceSections.tsx
+ M components/graph/GraphEntityPanel.tsx
+ M components/graph/GraphPageClient.tsx
+ M components/indicator-explorer/IndicatorCoverage.tsx
+ M components/indicator-explorer/IndicatorSources.tsx
+ M components/knowledge/KnowledgeBrainPanel.tsx
+ M components/layout/Sidebar.tsx
+ M components/layout/Topbar.tsx
+ M components/mission/MissionOperatingContextBar.tsx
+ M components/my-work/MissionHomeSummary.tsx
+ M components/my-work/MyWork.tsx
+ M components/my-work/MyWorkPageClient.tsx
+ M components/operating/AdaptiveDensityControl.tsx
+ M components/operating/GlobalMissionContextBar.tsx
+ M components/operating/OperatingNavigator.tsx
+ M components/platform/PlatformHome.tsx
+ M components/project/CreateProjectForm.tsx
+ M components/project/CreateProjectFromEntityButton.tsx
+ M components/reasoning/MissionReasoningPanel.tsx
+ M components/reasoning/ReasoningEvidenceIndicatorMap.tsx
+ M components/reasoning/ReasoningExplorer.tsx
+ M components/reports/ReportsCenter.tsx
+ M components/reports/ReportsPrimaryActions.tsx
+ M components/reports/SavedReportsSection.tsx
+ M components/research/ResearchHome.tsx
+ M components/research/ResearchPageClient.tsx
+ M components/research/discovery/DiscoveryTopicCard.tsx
+ M components/research/network/ResearchNetworkFocusPanel.tsx
+ M components/research/network/ResearchNetworkLegend.tsx
+ M components/research/review/ReviewTimeline.tsx
+ M components/research/workspace/WorkspaceTopicNavigator.tsx
+ M components/search/gateway/SearchGatewayClient.tsx
+ M components/settings/SettingsPageClient.tsx
+ M components/shared/EntityExploreShell.tsx
+ M components/shared/EntityOverviewSection.tsx
+ M components/shared/EntityPageHeader.tsx
+ M components/shared/OperatingPageShell.tsx
+ M components/shared/ShareButton.tsx
+ M components/shared/entity-profile-copy.ts
+ M components/system/EntityNotFoundNotice.tsx
+ M components/universities/UniversityCard.tsx
+ M components/universities/UniversityFilters.tsx
+ M components/voice-operator/VoiceOperatorBrokerNotice.tsx
+ M components/voice-operator/VoiceOperatorDock.tsx
+ M components/voice-operator/VoiceOperatorProvider.tsx
+ M components/workspaces/GovernmentPageClient.tsx
+ M components/workspaces/InvestorLedger.tsx
+ M components/workspaces/InvestorWorkspace.tsx
+ M components/workspaces/WorkspaceCoverageGrid.tsx
+ M components/workspaces/WorkspaceEntityLinks.tsx
+ M components/workspaces/WorkspaceSourceCoverage.tsx
+ M lib/i18n/dictionaries/en.ts
+ M lib/i18n/dictionaries/ru.ts
+ M lib/i18n/dictionaries/tr.ts
+ M lib/i18n/dictionaries/uz.ts
+ M lib/i18n/dictionary-types.ts
+ M lib/i18n/graph-ui-translation.ts
+ M lib/i18n/nav-translation.ts
+ M lib/i18n/platform-copy-build006-en.ts
+ M lib/i18n/platform-copy-build006-ru.ts
+ M lib/i18n/platform-copy-build006-tr.ts
+ M lib/i18n/platform-copy-build006-uz.ts
+ M lib/i18n/platform-copy-build007-en.ts
+ M lib/i18n/platform-copy-build007-ru.ts
+ M lib/i18n/platform-copy-build007-tr.ts
+ M lib/i18n/platform-copy-build007-uz.ts
+ M lib/i18n/platform-copy-build008-en.ts
+ M lib/i18n/platform-copy-build008-ru.ts
+ M lib/i18n/platform-copy-build008-tr.ts
+ M lib/i18n/platform-copy-build008-uz.ts
+ M lib/i18n/platform-copy-build020-en.ts
+ M lib/i18n/platform-copy-build020-ru.ts
+ M lib/i18n/platform-copy-build020-tr.ts
+ M lib/i18n/platform-copy-build020-uz.ts
+ M lib/i18n/platform-copy-en.ts
+ M lib/i18n/platform-copy-genesis-en.ts
+ M lib/i18n/platform-copy-genesis-ru.ts
+ M lib/i18n/platform-copy-genesis-tr.ts
+ M lib/i18n/platform-copy-genesis-uz.ts
+ M lib/i18n/platform-copy-ru.ts
+ M lib/i18n/platform-copy-tr.ts
+ M lib/i18n/platform-copy-uz.ts
+ M lib/i18n/platform-copy-voice-operator.ts
+ M lib/intelligence-os/first-minute.ts
+ M lib/intelligence-os/intelligence-atmosphere.ts
+ M lib/intelligence-os/knowledge-brain.ts
+ M lib/intelligence-os/knowledge-brain.types.ts
+ M lib/intelligence-os/living-memory.ts
+ M lib/intelligence-os/progressive-disclosure.ts
+ M lib/intelligence-os/simplicity-metrics.ts
+ M lib/intelligence-os/universal-object.ts
+ M lib/navigation.ts
+ M lib/research/domain-lens.ts
+ M lib/voice-operator/conversation-engine.ts
+ M lib/voice-operator/instructions.ts
+ M lib/voice-operator/realtime/openai-webrtc-session.ts
+ M lib/voice-operator/realtime/realtime-events.ts
+ M lib/voice-operator/realtime/realtime-provider.ts
+ M lib/voice-operator/session-broker/broker-response.ts
+ M lib/voice-operator/session-broker/client.ts
+ M lib/voice-operator/session-broker/pages-voice-session-broker.ts
+ M lib/voice-operator/types.ts
+ M package-lock.json
+ M package.json
+ M scripts/test-epic-13-adaptive-interface.ts
+ M scripts/test-epic-21-zero-learning-curve.ts
+ M scripts/test-intelligence-canvas.ts
+ M scripts/test-locale-completeness.ts
+ M scripts/test-mission-center.ts
+ M scripts/test-platform-activation.ts
+ M scripts/test-voice-operator.ts
+ M scripts/test-voice-realtime-webrtc.ts
+ M scripts/test-voice-session-broker.ts
+ M scripts/test-voice-session-lifecycle.ts
+?? .dev.vars.example
+?? app/(dashboard)/files/
+?? app/(dashboard)/messages/
+?? app/(dashboard)/notifications/
+?? app/(dashboard)/publications/
+?? app/(dashboard)/scientific-documents/
+?? app/(dashboard)/teams/
+?? app/(dashboard)/workspace/
+?? components/forward-deployed/
+?? components/operating/LivingContextRibbon.tsx
+?? components/operational-objects/
+?? components/publications/
+?? components/reports/ReportsEmptyIntro.tsx
+?? components/scientific-intake/
+?? components/settings/VoiceDiagnosticsPanel.tsx
+?? components/spatial-world/
+?? components/teams/
+?? components/voice-operator/OperatorActionStatus.tsx
+?? components/voice-operator/OperatorCommandClarifyCard.tsx
+?? components/voice-operator/OperatorGuidanceCard.tsx
+?? components/voice-operator/VoiceOperatorDeveloperDiagnostics.tsx
+?? components/workspace/
+?? docs/architecture/auth-collaboration-voice-os-decisions.md
+?? docs/architecture/cbai-ontology.md
+?? docs/architecture/engine-security-boundaries.md
+?? docs/architecture/forward-deployed-engines.md
+?? docs/architecture/locale-provenance-policy.md
+?? docs/architecture/multilingual-interpreter-mode.md
+?? docs/architecture/ontology-forward-deployed-engines-decisions.md
+?? docs/architecture/ontology-forward-deployed-engines-gap-report.md
+?? docs/architecture/ontology-migration-policy.md
+?? docs/architecture/product-census/
+?? docs/architecture/voice-operating-navigator-decisions.md
+?? docs/design/
+?? docs/verification/
+?? lib/forward-deployed-engines/
+?? lib/i18n/entity-ui-translation.ts
+?? lib/i18n/investor-translation.ts
+?? lib/i18n/operational-object-translation.ts
+?? lib/i18n/platform-copy-auth-collab.ts
+?? lib/i18n/platform-copy-forward-deployed-en.ts
+?? lib/i18n/platform-copy-forward-deployed-ru.ts
+?? lib/i18n/platform-copy-forward-deployed-tr.ts
+?? lib/i18n/platform-copy-forward-deployed-uz.ts
+?? lib/i18n/platform-copy-investor.ts
+?? lib/i18n/platform-copy-operational-objects.ts
+?? lib/i18n/platform-copy-platform-actions.ts
+?? lib/i18n/platform-copy-spatial-world.ts
+?? lib/i18n/platform-copy-voice-command.ts
+?? lib/ontology/
+?? lib/operational-objects/
+?? lib/platform-actions/
+?? lib/scientific-intake/
+?? lib/spatial-world/
+?? lib/voice-operator/auth-action-policy.ts
+?? lib/voice-operator/commands/
+?? lib/voice-operator/identity/
+?? lib/voice-operator/preflight.ts
+?? lib/voice-operator/session-broker/upstream-diagnostics.ts
+?? scripts/dev-voice.mjs
+?? scripts/doctor-voice.mjs
+?? scripts/local-voice-broker.mjs
+?? scripts/test-auth-collaboration-voice-os.ts
+?? scripts/test-command-pipeline.ts
+?? scripts/test-composer.ts
+?? scripts/test-final-product-completion.ts
+?? scripts/test-localization-closure.ts
+?? scripts/test-ontology-forward-deployed-engines.ts
+?? scripts/test-operational-objects.ts
+?? scripts/test-platform-shell.ts
+?? scripts/test-rendered-uz-leakage.ts
+?? scripts/test-spatial-world-intelligence.ts
+?? scripts/test-voice-command-orchestrator.ts
+?? scripts/test-voice-operating-navigator.ts
+?? scripts/test-voice-platform-operator.ts
+?? scripts/test-voice-upstream.mjs
+?? scripts/verify-auth-collaboration-voice-os-ui.mjs
+?? scripts/verify-final-intelligence-os.mjs
+?? scripts/verify-final-product-closure.mjs
+?? scripts/verify-final-product-completion.mjs
+?? scripts/verify-final-system-completion.mjs
+?? scripts/verify-localization-final.mjs
+?? scripts/verify-ontology-forward-deployed-engines-ui.mjs
+?? scripts/verify-operational-object-system.mjs
+?? scripts/verify-platform-ui.mjs
+?? scripts/verify-safari-reality.mjs
+?? scripts/verify-spatial-world-ui.mjs
+?? scripts/verify-voice-command-orchestrator-ui.mjs
+?? scripts/verify-voice-operating-navigator-ui.mjs
+?? scripts/voice-dev-utils.mjs

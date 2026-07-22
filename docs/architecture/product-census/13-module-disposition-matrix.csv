@@ -1,0 +1,37 @@
+module,recommendation,reason,canonical_replacement,data_migration_need,dependent_routes,dependent_tests,risk,estimated_effort,approval_required
+spatial-world,KEEP,canonical home globe,n/a,no,/; PlatformHome,test-spatial-world-intelligence,low,S,no
+voice-operator,KEEP,canonical voice UX,n/a,session keys only if migrate,layout dock,test-voice-*,broker abuse medium,M,yes for broker auth change
+platform-actions,KEEP,canonical action registry,n/a,no,voice+assistant,test-voice-platform-operator,low,S,no
+forward-deployed-engines,KEEP,canonical engine UI,n/a,engine-runs key,many routes strips,test-ontology-forward-deployed-engines,medium confirmation bypass,M,yes Level3
+intelligence-os,KEEP,canonical missions/memory,n/a,preserve mission keys,shell,test-mission-*,privacy medium,M,yes retention
+project,KEEP,canonical projects,n/a,preserve project keys,/my-work,test-project-engine,low,S,no
+operational-objects,KEEP,canonical OO,merge ontology carefully,preserve OO+ontology keys,/my-work,test-operational-objects,medium schema,L,yes
+evidence-explorer+infra+gap+comparison+runtime,KEEP,canonical evidence UI stack,merge research evidence types later,map research keys,/knowledge + entity panels,test-knowledge-brain; epic-06,misuse as forensics,L,yes forensics separate
+evidence-pipeline,MERGE,into evidence-infrastructure/readiness,evidence-infrastructure,read-only models,pipeline-readiness,docs,low,S,no
+lib/evidence (core),MERGE,behind evidence-runtime,evidence-runtime,API only,lib consumers,epic-06,low,S,no
+lib/research/evidence,MERGE,unify with platform evidence types,CAP-009 model,preserve research lifecycle keys,/research,research tests,data loss if naive,L,yes
+lib/intelligence/evidence,QUARANTINE,no UI; tip only,CAP-009,none expected,*.intelligence.ts,entity intel scripts,dead code,M,yes
+lib/intelligence (orchestrator/agents/runtime),QUARANTINE,orphaned ~200 files,voice+FDE+platform-actions,none,none app import,none orchestrator tests in UI,confusion/docs overclaim,L,yes archive plan
+lib/intelligence/graph,QUARANTINE,orphaned duplicate,lib/graph + LON,none,none,none,low,S,yes
+lib/graph + living-graph + LON,KEEP,canonical graph,n/a,preserve living-relationships,/graph,genesis graph tests,low,S,no
+GraphPersonas/KnowledgeUniverseViews,DELETE_CANDIDATE,no importers,lib/graph UI,none,none,design registry only,low,S,yes
+components/agents + lib/agents.ts,QUARANTINE,stub runtime_not_connected,none or docs,none,/agents,none,misleading,S,yes hide
+organization-os,KEEP,canonical org,n/a,preserve org keys,/organization,epic-05; multi-user,invitation abuse,M,yes
+lib/collaboration,QUARANTINE,no component imports,organization-os,preserve collab keys; do not delete,scripts only,test-collaboration-multi-user,dual model drift,M,yes
+components/workspace shells,REFACTOR,honest empty → Stage3-5,Personal Cabinet plan,preserve intake, /workspace /files /messages /notifications,auth-collab tests,placeholder confusion,L,yes
+teams/publications/scientific-intake,REFACTOR,complete Stage4-6,same,preserve drafts/intake,those routes,auth-collab,publication rights incomplete,L,yes
+investor/government/citizen workspaces,KEEP,role lenses,n/a,no,those routes,launch-gate,advisory misuse,S,no
+governance-control,REFACTOR,preview → enforceable later,n/a,no,/governance,epic-governance,UI≠authz,M,yes
+trust,KEEP,constitutional reference,n/a,no,/trust,platform-shell,legal text review,S,counsel
+i18n,KEEP,canonical locales,n/a,provenance migrations,global,locale tests,leakage,M,no
+auth dual-stack,REFACTOR,explicit trust tiers,cloud for privileged,preserve users carefully,/account,auth-platform,device-local unsafe prod,L,yes
+supabase migrations,KEEP,cloud system of record path,n/a,idempotent,cloud mode,test-rls,misconfig,M,ops
+genesis stores,MERGE,into project/mission/OO where useful,intelligence-os/project,preserve all genesis keys,PersonalCabinetPanel,genesis tests,PII sprawl,L,yes
+reports,KEEP,canonical reports,n/a,preserve saved-reports,/reports,product tests,low,S,no
+search modules,MERGE,single search gateway,search-gateway,none,/search,acceptance search,low,S,no
+reasoning,KEEP,epistemic explorer,n/a,no,/reasoning,indirect,overclaim,S,no
+legacy routes dashboard/core/workflows/analytics,ARCHIVE or REFACTOR,reduce IA clutter,Home/My Work/Reports,none,those routes,varied,user confusion,M,yes
+docs/build-* numbered reports,ARCHIVE,historical; not proof,this census,n/a,docs/,n/a,stale claims,S,no delete yet
+verification screenshot packs,KEEP,baselines,n/a,n/a,docs/verification/**,n/a,drift,S,no
+forensic workspace,ARCHIVE design-only until Stage7,must not ship fake forensics,future design in 09-*.md,n/a,none,n/a,legal risk if premature,L,counsel
+feedback system,DELETE_CANDIDATE n/a — missing,implement Stage8 new,new module,n/a,none,n/a,none,M,yes

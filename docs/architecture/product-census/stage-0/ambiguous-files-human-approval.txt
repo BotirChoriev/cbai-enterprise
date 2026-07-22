@@ -1,0 +1,26 @@
+# Ambiguous / unknown classification — requires human approval before Stage 1
+# Auto-classifier marked these unknown; recommended human labels in parentheses.
+
+package-lock.json  (recommended: local configuration / dependency lock)
+package.json  (recommended: local configuration / product config)
+
+# Voice / UI verification tooling scripts (recommended: test)
+scripts/dev-voice.mjs
+scripts/doctor-voice.mjs
+scripts/local-voice-broker.mjs
+scripts/voice-dev-utils.mjs
+scripts/verify-auth-collaboration-voice-os-ui.mjs
+scripts/verify-final-intelligence-os.mjs
+scripts/verify-final-product-closure.mjs
+scripts/verify-final-product-completion.mjs
+scripts/verify-final-system-completion.mjs
+scripts/verify-localization-final.mjs
+scripts/verify-ontology-forward-deployed-engines-ui.mjs
+scripts/verify-operational-object-system.mjs
+scripts/verify-platform-ui.mjs
+scripts/verify-safari-reality.mjs
+scripts/verify-spatial-world-ui.mjs
+scripts/verify-voice-command-orchestrator-ui.mjs
+scripts/verify-voice-operating-navigator-ui.mjs
+
+# Human must explicitly approve reclassification; Stage 0 does not rewrite the CSV classes in place after baseline.

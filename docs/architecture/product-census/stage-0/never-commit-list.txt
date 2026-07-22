@@ -1,0 +1,23 @@
+# Files / patterns that must never be committed
+# (names only; values never included in Stage 0 package)
+
+# Present locally and gitignored (CONFIRMED EXISTS — do not open/copy):
+.dev.vars
+.env.local
+
+# Policy patterns:
+.env
+.env.*.local
+**/credentials*
+**/*secret*
+*.pem
+node_modules/
+.next/
+out/
+.wrangler/
+coverage/
+reference/
+
+# Templates ARE allowed (no secrets):
+# .env.example
+# .dev.vars.example

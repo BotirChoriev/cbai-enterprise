@@ -1,0 +1,3 @@
+path,note
+changed-file-manifest.csv,Authoritative Stage 0 complete inventory (652 inventoried files). Stage 0.5 brief named this file 01-complete-file-manifest.csv; content lives in changed-file-manifest.csv.
+13-ambiguous-file-resolution.csv,Resolutions for the 19 paths previously labeled unknown/requires human review.

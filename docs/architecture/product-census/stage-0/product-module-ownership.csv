@@ -1,0 +1,50 @@
+module_owner,path_count,sample_paths
+docs,365,docs/architecture/auth-collaboration-voice-os-decisions.md; docs/architecture/cbai-ontology.md; docs/architecture/engine-security-boundaries.md; docs/architecture/forward-deployed-engines.md; docs/architecture/locale-provenance-policy.md
+lib/i18n,45,lib/i18n/dictionaries/en.ts; lib/i18n/dictionaries/ru.ts; lib/i18n/dictionaries/tr.ts; lib/i18n/dictionaries/uz.ts; lib/i18n/dictionary-types.ts
+scripts,41,scripts/dev-voice.mjs; scripts/doctor-voice.mjs; scripts/local-voice-broker.mjs; scripts/test-auth-collaboration-voice-os.ts; scripts/test-command-pipeline.ts
+lib/voice-operator,25,lib/voice-operator/auth-action-policy.ts; lib/voice-operator/commands/index.ts; lib/voice-operator/commands/voice-command-context.ts; lib/voice-operator/commands/voice-command-executor.ts; lib/voice-operator/commands/voice-command-parser.ts
+forward-deployed,13,components/forward-deployed/ConfirmationPanel.tsx; components/forward-deployed/ContextPanel.tsx; components/forward-deployed/EngineResultPanel.tsx; components/forward-deployed/EngineRouteEntryStrip.tsx; components/forward-deployed/EngineStatusBadge.tsx
+lib/ontology,13,lib/ontology/index.ts; lib/ontology/legacy-adapters.ts; lib/ontology/migrations.ts; lib/ontology/normalization.ts; lib/ontology/object-kinds.ts
+lib/platform-actions,13,lib/platform-actions/action-registry.ts; lib/platform-actions/apply-platform-action.ts; lib/platform-actions/domain-resolver.ts; lib/platform-actions/engine-intent-matcher.ts; lib/platform-actions/guidance.ts
+lib/forward-deployed-engines,11,lib/forward-deployed-engines/engine-audit.ts; lib/forward-deployed-engines/engine-bridge.ts; lib/forward-deployed-engines/engine-context.ts; lib/forward-deployed-engines/engine-events.ts; lib/forward-deployed-engines/engine-planner.ts
+app,10,app/(dashboard)/files/page.tsx; app/(dashboard)/layout.tsx; app/(dashboard)/messages/page.tsx; app/(dashboard)/notifications/page.tsx; app/(dashboard)/publications/page.tsx
+lib/intelligence-os,8,lib/intelligence-os/first-minute.ts; lib/intelligence-os/intelligence-atmosphere.ts; lib/intelligence-os/knowledge-brain.ts; lib/intelligence-os/knowledge-brain.types.ts; lib/intelligence-os/living-memory.ts
+research,7,components/research/ResearchHome.tsx; components/research/ResearchPageClient.tsx; components/research/discovery/DiscoveryTopicCard.tsx; components/research/network/ResearchNetworkFocusPanel.tsx; components/research/network/ResearchNetworkLegend.tsx
+voice-operator,7,components/voice-operator/OperatorActionStatus.tsx; components/voice-operator/OperatorCommandClarifyCard.tsx; components/voice-operator/OperatorGuidanceCard.tsx; components/voice-operator/VoiceOperatorBrokerNotice.tsx; components/voice-operator/VoiceOperatorDeveloperDiagnostics.tsx
+operational-objects,6,components/operational-objects/CommandClarifyCard.tsx; components/operational-objects/CreateLinkedWorkButton.tsx; components/operational-objects/OperationalObjectComposer.tsx; components/operational-objects/OperationalObjectIndex.tsx; components/operational-objects/OperationalObjectProvider.tsx
+shared,6,components/shared/EntityExploreShell.tsx; components/shared/EntityOverviewSection.tsx; components/shared/EntityPageHeader.tsx; components/shared/OperatingPageShell.tsx; components/shared/ShareButton.tsx
+workspaces,6,components/workspaces/GovernmentPageClient.tsx; components/workspaces/InvestorLedger.tsx; components/workspaces/InvestorWorkspace.tsx; components/workspaces/WorkspaceCoverageGrid.tsx; components/workspaces/WorkspaceEntityLinks.tsx
+evidence,5,components/evidence/EntityEvidenceCoverage.tsx; components/evidence/EvidenceExplorer.tsx; components/evidence/EvidenceOperatingStatus.tsx; components/evidence/EvidencePrimaryStatesPanel.tsx; components/evidence/EvidenceSourceCoverage.tsx
+lib/operational-objects,5,lib/operational-objects/command-interpreter.ts; lib/operational-objects/linked-work-draft.ts; lib/operational-objects/operational-object-routing.ts; lib/operational-objects/operational-object-store.ts; lib/operational-objects/operational-object.types.ts
+lib/spatial-world,5,lib/spatial-world/NATURAL-EARTH-ATTRIBUTION.md; lib/spatial-world/data/ne_110m_coastline.json; lib/spatial-world/data/ne_110m_land.json; lib/spatial-world/globe-geography.ts; lib/spatial-world/globe-natural-earth-texture.ts
+unknown,5,.dev.vars.example; .env.example; .gitignore; package-lock.json; package.json
+countries,4,components/countries/CountryCard.tsx; components/countries/CountryFilters.tsx; components/countries/CountryIntelligencePanel.tsx; components/countries/WorldIntelligenceMap.tsx
+operating,4,components/operating/AdaptiveDensityControl.tsx; components/operating/GlobalMissionContextBar.tsx; components/operating/LivingContextRibbon.tsx; components/operating/OperatingNavigator.tsx
+reports,4,components/reports/ReportsCenter.tsx; components/reports/ReportsEmptyIntro.tsx; components/reports/ReportsPrimaryActions.tsx; components/reports/SavedReportsSection.tsx
+governance-control,3,components/governance-control/GovernancePageClient.tsx; components/governance-control/GovernancePillars.tsx; components/governance-control/GovernanceSections.tsx
+my-work,3,components/my-work/MissionHomeSummary.tsx; components/my-work/MyWork.tsx; components/my-work/MyWorkPageClient.tsx
+reasoning,3,components/reasoning/MissionReasoningPanel.tsx; components/reasoning/ReasoningEvidenceIndicatorMap.tsx; components/reasoning/ReasoningExplorer.tsx
+spatial-world,3,components/spatial-world/InteractiveIntelligenceGlobe.tsx; components/spatial-world/SpatialCountryContextPanel.tsx; components/spatial-world/SpatialWorldIntelligenceHome.tsx
+assistant,2,components/assistant/AccountMenu.tsx; components/assistant/AssistantCommandCenter.tsx
+brand,2,components/brand/CBAILogo.tsx; components/brand/brand-classes.ts
+graph,2,components/graph/GraphEntityPanel.tsx; components/graph/GraphPageClient.tsx
+indicator-explorer,2,components/indicator-explorer/IndicatorCoverage.tsx; components/indicator-explorer/IndicatorSources.tsx
+layout,2,components/layout/Sidebar.tsx; components/layout/Topbar.tsx
+project,2,components/project/CreateProjectForm.tsx; components/project/CreateProjectFromEntityButton.tsx
+settings,2,components/settings/SettingsPageClient.tsx; components/settings/VoiceDiagnosticsPanel.tsx
+universities,2,components/universities/UniversityCard.tsx; components/universities/UniversityFilters.tsx
+workspace,2,components/workspace/PersonalWorkspaceHome.tsx; components/workspace/SimpleEmptyWorkspace.tsx
+canvas,1,components/canvas/CanvasMissionTimeline.tsx
+companies,1,components/companies/CompanyCard.tsx
+genesis,1,components/genesis/PersonalCabinetPanel.tsx
+knowledge,1,components/knowledge/KnowledgeBrainPanel.tsx
+lib/navigation.ts,1,lib/navigation.ts
+lib/research,1,lib/research/domain-lens.ts
+lib/scientific-intake,1,lib/scientific-intake/scientific-intake.ts
+mission,1,components/mission/MissionOperatingContextBar.tsx
+platform,1,components/platform/PlatformHome.tsx
+publications,1,components/publications/PublicationReadinessClient.tsx
+scientific-intake,1,components/scientific-intake/ScientificDocumentIntakeClient.tsx
+search,1,components/search/gateway/SearchGatewayClient.tsx
+system,1,components/system/EntityNotFoundNotice.tsx
+teams,1,components/teams/TeamsWorkspaceClient.tsx

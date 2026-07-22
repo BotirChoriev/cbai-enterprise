@@ -1,0 +1,67 @@
+CBAI PRODUCT CENSUS — ENDING SAFETY MANIFEST
+Generated: 2026-07-22 (local)
+Mode: AUDIT-ONLY Phases A–P complete (documentation outputs only)
+
+BRANCH: preview/spatial-world-intelligence
+HEAD: 2d1558995f355a899100a6ca15c7d924e913c690
+UPSTREAM: NO_UPSTREAM
+
+COMPARISON TO STARTING MANIFEST:
+  starting_total_changed_paths: 226
+  ending_total_changed_paths_porcelain: 227
+  starting_modified_tracked: 137
+  ending_modified_tracked: 137
+  starting_untracked_porcelain: 89
+  ending_untracked_porcelain: 90
+  starting_staged: 0
+  ending_staged: 0
+  ending_untracked_files_expanded: 514
+  ending_status_digest_sha256: a05bcd39e89446c18399275faa87a18d9fa40f88678868ca99e01c6425d2427d
+  modified_tracked_path_list_digest_sha256: 2a14896168dc6a6160e20a15a36467a5278538fa43a02d8dd73efb4610d6bf5f
+
+HEAD UNCHANGED: YES
+BRANCH UNCHANGED: YES
+STAGED REMAINS ZERO: YES
+
+PRODUCT SOURCE CHANGE CHECK (this audit session):
+  Intentional writes restricted to: docs/architecture/product-census/
+  Census files on disk: 21
+  Missing required (excl ending): none
+  git diff --cached names: (empty)
+  NOTE: Working tree already contained 137 modified tracked product/docs files BEFORE this audit.
+  This audit did not stage, commit, or rewrite those paths.
+  New/updated paths introduced by this audit are under docs/architecture/product-census/ only.
+
+CENSUS ARTIFACTS:
+  - docs/architecture/product-census/00-executive-summary.md
+  - docs/architecture/product-census/01-capability-inventory.csv
+  - docs/architecture/product-census/02-build-to-capability-crosswalk.csv
+  - docs/architecture/product-census/03-route-and-capability-map.md
+  - docs/architecture/product-census/04-canonical-domain-model.md
+  - docs/architecture/product-census/05-duplication-and-conflict-register.md
+  - docs/architecture/product-census/06-data-storage-and-migration-map.md
+  - docs/architecture/product-census/07-security-threat-model.md
+  - docs/architecture/product-census/08-privacy-legal-copyright-model.md
+  - docs/architecture/product-census/09-evidence-integrity-and-forensics.md
+  - docs/architecture/product-census/10-feedback-and-incident-loop.md
+  - docs/architecture/product-census/11-accessibility-and-inclusive-input.md
+  - docs/architecture/product-census/12-canonical-information-architecture.md
+  - docs/architecture/product-census/13-module-disposition-matrix.csv
+  - docs/architecture/product-census/14-retention-and-deprecation-roadmap.md
+  - docs/architecture/product-census/15-phased-implementation-plan.md
+  - docs/architecture/product-census/16-unknowns-and-blockers.md
+  - docs/architecture/product-census/decision-register.md
+  - docs/architecture/product-census/ending-safety-manifest.txt
+  - docs/architecture/product-census/inventory.json
+  - docs/architecture/product-census/starting-safety-manifest.txt
+
+EXPLICIT CONFIRMATIONS:
+  no product code changed by this audit: YES (writes only under docs/architecture/product-census/)
+  no commit: YES
+  no push: YES
+  no deploy: YES
+  main untouched: YES (branch remains preview/spatial-world-intelligence)
+  secrets not exposed: YES (env names only; .dev.vars values not read)
+  user data preserved: YES (no data migrations/deletes)
+
+STOP: Awaiting explicit human approval before Stages 0–2 implementation.

@@ -1,0 +1,11 @@
+top_level_or_prefix,file_count
+docs,365
+lib,128
+components,103
+scripts,41
+app,10
+.dev.vars.example,1
+.env.example,1
+.gitignore,1
+package-lock.json,1
+package.json,1

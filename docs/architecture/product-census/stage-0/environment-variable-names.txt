@@ -1,0 +1,20 @@
+# Environment variable names only
+
+Source: `.env.example`, `.dev.vars.example` (values stripped / never read from live secret files).
+
+```
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+NEXT_PUBLIC_VOICE_BROKER_URL
+OPENAI_API_KEY
+VOICE_ALLOWED_ORIGINS
+CBAI_TEST_USER_A_EMAIL
+CBAI_TEST_USER_A_PASSWORD
+CBAI_TEST_USER_B_EMAIL
+CBAI_TEST_USER_B_PASSWORD
+CBAI_TEST_USER_C_EMAIL
+CBAI_TEST_USER_C_PASSWORD
+CBAI_TEST_BASE_URL
+```
+
+Live files `.dev.vars` and `.env.local` exist on disk but are **not** opened for this inventory.

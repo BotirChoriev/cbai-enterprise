@@ -1,0 +1,27 @@
+{
+  "stage": 0,
+  "branch": "preview/spatial-world-intelligence",
+  "head": "2d1558995f355a899100a6ca15c7d924e913c690",
+  "head_expected": "2d1558995f355a899100a6ca15c7d924e913c690",
+  "head_match": true,
+  "upstream": "NO_UPSTREAM",
+  "porcelain_paths": 227,
+  "modified_tracked": 137,
+  "untracked_expanded_files": 515,
+  "total_inventoried_files": 652,
+  "staged": 0,
+  "deleted": 0,
+  "renamed": 0,
+  "classification_counts": {
+    "local configuration": 3,
+    "product implementation": 196,
+    "documentation": 61,
+    "localization": 46,
+    "verification screenshot": 303,
+    "unknown/requires human review": 19,
+    "test": 24
+  },
+  "issues_count": 0,
+  "skipped_hash_count": 0,
+  "package_lock_sha256": "8c8c53e2d676cd3d757f157e1cca6840e421f0da12266b7aa89506ac122db564"
+}
