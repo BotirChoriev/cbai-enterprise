@@ -9,6 +9,7 @@ import {
   type ProjectVisibility,
 } from "@/lib/project/project-types";
 import { createProject } from "@/lib/project/project-store";
+import { useOperationalObjectsOptional } from "@/components/operational-objects/OperationalObjectProvider";
 import type { ContextEntityRef } from "@/lib/context/context-types";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import { useTranslation } from "@/lib/i18n/use-translation";
@@ -44,7 +45,8 @@ function isProjectTypeId(value: string | undefined): value is ProjectTypeId {
  */
 export default function CreateProjectForm({ initialPrimaryEntity, initialType, onCreated }: CreateProjectFormProps) {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+  const operationalObjects = useOperationalObjectsOptional();
   const [title, setTitle] = useState("");
   const [type, setType] = useState<ProjectTypeId>(isProjectTypeId(initialType) ? initialType : PROJECT_TYPES[0].id);
   const [description, setDescription] = useState("");
@@ -70,6 +72,32 @@ export default function CreateProjectForm({ initialPrimaryEntity, initialType, o
       .split(",")
       .map((tag) => tag.trim())
       .filter((tag) => tag.length > 0);
+
+    if (operationalObjects) {
+      operationalObjects.openComposer(
+        {
+          type: "project",
+          title: trimmedTitle,
+          summary: trimmedDescription,
+          objective: trimmedDescription,
+          rationale: "",
+          expectedOutcome: "",
+          domain: initialPrimaryEntity?.kind === "country" ? "countries" : "general",
+          status: "draft",
+          priority: "normal",
+          requiredInputs: tags.length > 0 ? tags : [],
+          evidenceRequirements: [],
+          nextAction: t("operationalObject.fieldNextAction"),
+          humanDecision: "",
+          relatedObjectIds: [],
+          locale: language,
+          provenance: { source: "manual", routePath: "/my-work" },
+        },
+        ["title", "objective", "type"],
+        "manual",
+      );
+      return;
+    }
 
     const project = createProject({
       title: trimmedTitle,

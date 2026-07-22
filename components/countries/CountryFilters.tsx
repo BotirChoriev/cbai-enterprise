@@ -4,6 +4,8 @@ import type { CountryRegion } from "@/lib/countries";
 import { regions } from "@/lib/countries";
 import { cbaiGlassCard } from "@/components/brand/brand-classes";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { translateCountryRegion } from "@/lib/i18n/entity-ui-translation";
+import { getDictionary } from "@/lib/i18n/translate";
 
 type CountryFiltersProps = {
   search: string;
@@ -20,7 +22,8 @@ export default function CountryFilters({
   onRegionChange,
   resultCount,
 }: CountryFiltersProps) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+  const dictionary = getDictionary(language);
   const resultLabel =
     resultCount === 1
       ? t("filters.resultCountry", { count: String(resultCount) })
@@ -78,7 +81,7 @@ export default function CountryFilters({
                 : "border border-zinc-800 text-zinc-500 hover:text-zinc-300"
             }`}
           >
-            {r}
+            {translateCountryRegion(dictionary, r)}
           </button>
         ))}
       </div>

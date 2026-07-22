@@ -126,7 +126,10 @@ export function GovernanceValidationFlow({ steps }: GovernanceValidationFlowProp
               <p className="mt-1 text-sm text-zinc-400">{step.description}</p>
               {step.ruleCategories.length > 0 && (
                 <p className="mt-2 text-xs text-zinc-600">
-                  {gc.relatedTopics} {step.ruleCategories.join(", ")}
+                  {gc.relatedTopics}{" "}
+                  {step.ruleCategories
+                    .map((category) => gc.categories[category as keyof typeof gc.categories]?.label ?? category)
+                    .join(", ")}
                 </p>
               )}
             </div>

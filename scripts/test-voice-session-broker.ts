@@ -9,6 +9,7 @@ import {
   handleVoiceSessionBrokerRequest,
   OPENAI_REALTIME_CLIENT_SECRETS_URL,
   parseAllowedOrigins,
+  REALTIME_OUTPUT_VOICE,
   resolveRequestOrigin,
 } from "@/lib/voice-operator/session-broker/pages-voice-session-broker";
 
@@ -63,12 +64,24 @@ function upstreamSuccess() {
   };
 }
 
-function upstreamError(status: number, message = "invalid_request_error") {
+function upstreamError(status: number, message = "invalid_request_error", code?: string) {
   return async () =>
-    new Response(JSON.stringify({ error: { message } }), {
-      status,
-      headers: { "Content-Type": "application/json" },
-    });
+    new Response(
+      JSON.stringify({
+        error: {
+          message,
+          type: "invalid_request_error",
+          ...(code ? { code } : {}),
+        },
+      }),
+      {
+        status,
+        headers: {
+          "Content-Type": "application/json",
+          "x-request-id": "req_test_upstream",
+        },
+      },
+    );
 }
 
 test("parseAllowedOrigins trims and drops empty entries", () => {
@@ -179,17 +192,52 @@ test("successful POST returns ephemeral credential metadata only", async () => {
   assert.match(res.headers.get("Cache-Control") ?? "", /no-store/);
 });
 
-test("upstream OpenAI error returns safe generic 502", async () => {
+test("upstream OpenAI 401 returns classified invalid_api_key in dev diagnostics", async () => {
   const res = await handleVoiceSessionBrokerRequest(
     postRequest({ language: "en", origin: "http://localhost:3000" }),
     env(),
-    { fetchFn: upstreamError(401, `Incorrect API key provided: ${API_KEY}`) as typeof fetch },
+    {
+      fetchFn: upstreamError(401, `Incorrect API key provided: ${API_KEY}`, "invalid_api_key") as typeof fetch,
+      exposeUpstreamDiagnostics: true,
+    },
+  );
+  assert.equal(res.status, 502);
+  const body = (await res.json()) as {
+    error: string;
+    upstream?: { status: number; code?: string; requestId?: string; message?: string };
+  };
+  assert.equal(body.error, "invalid_api_key");
+  assert.equal(body.upstream?.status, 401);
+  assert.equal(body.upstream?.code, "invalid_api_key");
+  assert.equal(body.upstream?.requestId, "req_test_upstream");
+  assert.ok(!JSON.stringify(body).includes(API_KEY));
+});
+
+test("upstream OpenAI 401 returns generic broker_upstream_error without dev diagnostics", async () => {
+  const res = await handleVoiceSessionBrokerRequest(
+    postRequest({ language: "en", origin: "http://localhost:3000" }),
+    env(),
+    { fetchFn: upstreamError(401, `Incorrect API key provided: ${API_KEY}`, "invalid_api_key") as typeof fetch },
   );
   assert.equal(res.status, 502);
   const text = await res.text();
   assert.equal(JSON.parse(text).error, "broker_upstream_error");
   assert.ok(!text.includes(API_KEY));
-  assert.ok(!text.includes("sk-"));
+});
+
+test("upstream OpenAI 429 insufficient_quota is classified", async () => {
+  const res = await handleVoiceSessionBrokerRequest(
+    postRequest({ language: "en", origin: "http://localhost:3000" }),
+    env(),
+    {
+      fetchFn: upstreamError(429, "You exceeded your current quota.", "insufficient_quota") as typeof fetch,
+      exposeUpstreamDiagnostics: true,
+    },
+  );
+  assert.equal(res.status, 502);
+  const body = (await res.json()) as { error: string; upstream?: { code?: string } };
+  assert.equal(body.error, "insufficient_quota");
+  assert.equal(body.upstream?.code, "insufficient_quota");
 });
 
 test("secret-leak regression: success and error bodies never include server API key", async () => {
@@ -228,16 +276,17 @@ test("createOpenAiClientSecret uses official client_secrets endpoint shape", asy
   assert.equal(result.ok, true);
   const parsed = JSON.parse(seenBody) as {
     expires_after: { anchor: string; seconds: number };
-    session: { type: string; model: string };
+    session: { type: string; model: string; audio: { output: { voice: string } } };
   };
   assert.equal(parsed.expires_after.anchor, "created_at");
   assert.equal(parsed.session.type, "realtime");
   assert.equal(parsed.session.model, "gpt-realtime");
+  assert.equal(parsed.session.audio.output.voice, REALTIME_OUTPUT_VOICE);
   assert.match(seenBody, /Men CBAI Ovoz Operatoriman/);
   assert.match(seenBody, /Do NOT repeat this full introduction/i);
 });
 
-test("invalid upstream credential shape returns 502 without fallback secret", async () => {
+test("invalid upstream credential shape returns classified 502 without fallback secret", async () => {
   const res = await handleVoiceSessionBrokerRequest(
     postRequest({ language: "uz", origin: "http://localhost:3000" }),
     env(),
@@ -247,10 +296,36 @@ test("invalid upstream credential shape returns 502 without fallback secret", as
           status: 200,
           headers: { "Content-Type": "application/json" },
         })) as typeof fetch,
+      exposeUpstreamDiagnostics: true,
     },
   );
   assert.equal(res.status, 502);
   const body = await res.json();
-  assert.equal(body.error, "broker_upstream_error");
+  assert.equal(body.error, "invalid_upstream_credential_shape");
   assert.equal(body.clientSecret, undefined);
+});
+
+test("nested client_secret response shape maps to ephemeral credential", async () => {
+  const res = await handleVoiceSessionBrokerRequest(
+    postRequest({ language: "uz", origin: "http://localhost:3000" }),
+    env(),
+    {
+      fetchFn: (async () =>
+        new Response(
+          JSON.stringify({
+            client_secret: {
+              value: "ek_test_nested_credential",
+              expires_at: 1_700_000_000,
+            },
+            session: { id: "sess_nested", model: "gpt-realtime" },
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        )) as typeof fetch,
+      exposeUpstreamDiagnostics: true,
+    },
+  );
+  assert.equal(res.status, 200);
+  const body = (await res.json()) as { clientSecret: string; sessionId: string };
+  assert.equal(body.clientSecret, "ek_test_nested_credential");
+  assert.equal(body.sessionId, "sess_nested");
 });

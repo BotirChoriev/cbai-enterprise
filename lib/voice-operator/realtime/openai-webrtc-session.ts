@@ -4,7 +4,7 @@
 
 import { mapGetUserMediaError } from "@/lib/voice-operator/microphone-access";
 import { buildVoiceOperatorInstructions } from "@/lib/voice-operator/instructions";
-import { parseRealtimeServerEvent } from "@/lib/voice-operator/realtime/realtime-events";
+import { parseRealtimeServerEvent, type RealtimeToolCallEvent } from "@/lib/voice-operator/realtime/realtime-events";
 import type { RealtimeConnectionState } from "@/lib/voice-operator/realtime/realtime-provider";
 import type { EphemeralRealtimeCredential, VoicePermissionIssue } from "@/lib/voice-operator/types";
 import {
@@ -40,6 +40,8 @@ export type WebRtcSessionDeps = {
   readonly createAudioElement: () => HTMLAudioElement;
 };
 
+export type RealtimeToolCallListener = (event: RealtimeToolCallEvent) => void;
+
 export type WebRtcSessionHandle = {
   readonly disconnect: () => void;
   readonly interrupt: () => void;
@@ -47,6 +49,8 @@ export type WebRtcSessionHandle = {
   readonly getState: () => RealtimeConnectionState;
   readonly onStateChange: (listener: RealtimeStateListener) => () => void;
   readonly onTranscript: (listener: RealtimeTranscriptListener) => () => void;
+  readonly onToolCall: (listener: RealtimeToolCallListener) => () => void;
+  readonly sendToolResults: (messages: readonly Record<string, unknown>[]) => void;
   readonly getLocalStream: () => MediaStream | null;
   readonly getRemoteStream: () => MediaStream | null;
 };
@@ -104,6 +108,19 @@ function createTranscriptEmitter() {
       listeners.forEach((listener) => listener(event));
     },
     subscribe(listener: RealtimeTranscriptListener) {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+  };
+}
+
+function createToolCallEmitter() {
+  const listeners = new Set<RealtimeToolCallListener>();
+  return {
+    emit(event: RealtimeToolCallEvent) {
+      listeners.forEach((listener) => listener(event));
+    },
+    subscribe(listener: RealtimeToolCallListener) {
       listeners.add(listener);
       return () => listeners.delete(listener);
     },
@@ -203,6 +220,14 @@ export async function connectOpenAiWebRtcSession(options: {
 
   const stateEmitter = createStateEmitter(session);
   const transcriptEmitter = createTranscriptEmitter();
+  const toolCallEmitter = createToolCallEmitter();
+
+  const sendToolResults = (messages: readonly Record<string, unknown>[]) => {
+    if (session.disconnected || session.dataChannel?.readyState !== "open") return;
+    for (const message of messages) {
+      session.dataChannel.send(JSON.stringify(message));
+    }
+  };
 
   const disconnect = () => {
     if (session.disconnected && session.state === "idle") return;
@@ -239,6 +264,9 @@ export async function connectOpenAiWebRtcSession(options: {
         });
       }
     }
+    if (parsed.toolCall) {
+      toolCallEmitter.emit(parsed.toolCall);
+    }
   };
 
   const handle: WebRtcSessionHandle = {
@@ -259,6 +287,8 @@ export async function connectOpenAiWebRtcSession(options: {
     getState: stateEmitter.get,
     onStateChange: stateEmitter.subscribe,
     onTranscript: transcriptEmitter.subscribe,
+    onToolCall: toolCallEmitter.subscribe,
+    sendToolResults,
     getLocalStream: () => session.localStream,
     getRemoteStream: () => session.remoteStream,
   };

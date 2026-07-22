@@ -1,6 +1,10 @@
 /**
  * CBAI Intelligence Engine — Evidence Layer foundation (BUILD-023).
  *
+ * @deprecated QUARANTINED (Stage 1) — duplicate of platform Evidence at /knowledge.
+ * Canonical: lib/evidence-explorer.ts + components/evidence. Do not delete in Stage 1.
+ * @see lib/canonical-contracts/evidence.ts
+ *
  * Framework-only evidence collection, source registry, and shape validation.
  * No data fetching, API calls, LLM integration, or mock business data.
  *

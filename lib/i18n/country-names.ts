@@ -26,6 +26,12 @@ export const COUNTRY_LOCALIZED_NAMES: Record<string, { uz: string; ru: string; t
  * the superset a multilingual matcher should check against, never just the English one. */
 export function allNameFormsForCountry(countryId: string, englishName: string): readonly string[] {
   const localized = COUNTRY_LOCALIZED_NAMES[countryId];
-  if (!localized) return [englishName];
-  return [englishName, localized.uz, localized.ru, localized.tr];
+  const shortForms =
+    countryId === "usa"
+      ? ["AQSh", "AQSH", "USA", "US", "United States", "America"]
+      : countryId === "uae"
+        ? ["BAA", "UAE"]
+        : [];
+  if (!localized) return [englishName, ...shortForms];
+  return [englishName, localized.uz, localized.ru, localized.tr, ...shortForms];
 }

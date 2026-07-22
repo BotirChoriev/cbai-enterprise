@@ -3,7 +3,6 @@
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import type { UserDensityMode } from "@/lib/intelligence-os/adaptive-density";
-import { densityModeExplanation } from "@/lib/intelligence-os/adaptive-density";
 import { cbaiMineralSurface, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 const MODES: readonly UserDensityMode[] = ["focused", "standard", "expert"];
@@ -46,10 +45,9 @@ export default function AdaptiveDensityControl() {
           </button>
         ))}
       </div>
-      <p className="text-xs text-zinc-500">
+      <p className="text-xs text-[var(--cbai-text-muted)]">
         {t("universalWorkspace.densityExplanation")}: {t(`universalWorkspace.${MODE_EXPLAIN[current]}`)}
       </p>
-      <p className="text-[10px] text-zinc-600">{densityModeExplanation(current)}</p>
     </section>
   );
 }

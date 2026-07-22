@@ -26,8 +26,11 @@ export default function EvidenceOperatingStatus({ summary }: EvidenceOperatingSt
       value: String(summary.registryEntityCount),
     },
     {
-      label: "Graph edges",
-      value: `${summary.verifiedGraphEdges} verified / ${summary.graphEdges}`,
+      label: t("evidenceExplorer.graphEdges"),
+      value: t("evidenceExplorer.graphEdgesVerified", {
+        verified: String(summary.verifiedGraphEdges),
+        total: String(summary.graphEdges),
+      }),
     },
   ];
 

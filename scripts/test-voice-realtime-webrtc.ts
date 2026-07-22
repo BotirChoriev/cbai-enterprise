@@ -92,9 +92,21 @@ test("broker rejects sk- credential in JSON body", () => {
 });
 
 test("mapBrokerCodeToIssue maps authentication and backend codes", () => {
+  assert.equal(mapBrokerCodeToIssue("INVALID_API_KEY"), "invalid_api_key");
+  assert.equal(mapBrokerCodeToIssue("QUOTA_OR_ACCOUNT_BLOCKED"), "quota_or_account_blocked");
   assert.equal(mapBrokerCodeToIssue("AUTHENTICATION_FAILED"), "authentication_failed");
   assert.equal(mapBrokerCodeToIssue("BACKEND_REQUIRED"), "required");
   assert.equal(mapBrokerCodeToIssue("ERROR"), "unreachable");
+});
+
+test("broker classifies upstream invalid_api_key 502 without generic ERROR fallback", () => {
+  const result = classifyBrokerHttpResponse({
+    status: 502,
+    contentType: "application/json",
+    bodyText: JSON.stringify({ error: "invalid_api_key" }),
+  });
+  assert.equal(result.ok, false);
+  if (!result.ok) assert.equal(result.code, "INVALID_API_KEY");
 });
 
 test("realtime events map speech and response lifecycle states", () => {

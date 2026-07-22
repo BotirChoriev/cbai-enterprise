@@ -1,3 +1,5 @@
+"use client";
+
 import type { University } from "@/lib/universities";
 import { getUniversityLinkedEntities } from "@/lib/universities.adapter";
 import {
@@ -5,6 +7,9 @@ import {
   resolveUniversityListEvidenceLabel,
   universityEvidenceStatusClass,
 } from "@/lib/universities.intelligence";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import { translateEntityListEvidenceLabel } from "@/lib/i18n/entity-ui-translation";
+import { getDictionary } from "@/lib/i18n/translate";
 
 type UniversityCardProps = {
   university: University;
@@ -17,11 +22,16 @@ export default function UniversityCard({
   isSelected,
   onSelect,
 }: UniversityCardProps) {
+  const { language, t } = useTranslation();
+  const dictionary = getDictionary(language);
   const profile = buildUniversityIntelligenceProfile(
     university,
     getUniversityLinkedEntities(university),
   );
-  const evidenceLabel = resolveUniversityListEvidenceLabel(profile);
+  const evidenceLabel = translateEntityListEvidenceLabel(
+    dictionary,
+    resolveUniversityListEvidenceLabel(profile),
+  );
   const evidenceClass = universityEvidenceStatusClass(
     profile.referenceConnected ? "connected" : "insufficient",
   );
@@ -50,7 +60,7 @@ export default function UniversityCard({
         </div>
         {isSelected ? (
           <span className="rounded-full bg-teal-500/10 px-2 py-0.5 text-[10px] font-medium text-teal-400">
-            Selected
+            {t("entities.selected")}
           </span>
         ) : null}
       </div>

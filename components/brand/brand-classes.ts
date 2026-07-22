@@ -26,22 +26,23 @@ export const cbaiGapMd = "gap-3";
 
 /* ── Typography scale ──────────────────────────────────────────────────── */
 
-export const cbaiTextBody = "text-sm text-zinc-300";
-export const cbaiTextMuted = "text-xs text-zinc-500";
-export const cbaiTextCaption = "text-xs text-zinc-400";
+export const cbaiTextBody = "text-sm text-[var(--cbai-text-secondary)]";
+export const cbaiTextMuted = "text-xs text-[var(--cbai-text-muted)]";
+export const cbaiTextCaption = "text-xs text-[var(--cbai-text-muted)]";
 
 /* ── Surfaces ──────────────────────────────────────────────────────────── */
 
 export const cbaiGlassCard =
   "rounded-xl border border-teal-500/10 bg-[var(--card)]/80 shadow-[0_0_48px_-16px_rgba(13,148,136,0.14)] backdrop-blur-md";
 
-export const cbaiSectionTitle = "text-base font-semibold tracking-tight text-zinc-100";
+export const cbaiSectionTitle = "text-base font-semibold tracking-tight text-[var(--cbai-text-primary)]";
 
 export const cbaiSectionEyebrow =
-  "text-[10px] font-medium uppercase tracking-[0.2em] text-teal-400/90";
+  "text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--cbai-accent-primary)]";
 
-export const cbaiPageHeader =
-  "rounded-xl border border-teal-500/10 bg-[var(--surface)]/80 px-6 py-5 backdrop-blur-sm";
+export const cbaiPageHeader = "cbai-page-header";
+
+export const cbaiPageWorkspace = "cbai-page-workspace";
 
 /** Mineral surface — structured operating panel without excessive glass. */
 export const cbaiMineralSurface =
@@ -87,6 +88,17 @@ export const cbaiBtnSecondary =
 export const cbaiBtnSecondarySm =
   `inline-flex min-h-8 items-center justify-center rounded-lg border border-zinc-700 bg-[var(--surface)]/80 px-3 text-xs font-medium text-teal-400 ${cbaiTransition} hover:border-teal-500/30 hover:bg-zinc-900/60 disabled:cursor-not-allowed disabled:opacity-40 ${cbaiFocusRing}`;
 
+export const cbaiBtnGhost =
+  `inline-flex min-h-10 items-center justify-center rounded-lg px-4 text-sm font-medium text-zinc-400 ${cbaiTransition} hover:text-zinc-200 ${cbaiFocusRing}`;
+
+/* ── Surface hierarchy (Level 0 canvas / Level 1 glass / Level 2 solid) ─ */
+
+export const cbaiSurfaceCanvas = "bg-[var(--cbai-shell-bg)]";
+export const cbaiSurfaceGlass =
+  "rounded-xl border border-teal-500/12 bg-[var(--cbai-glass-surface)] backdrop-blur-md";
+export const cbaiSurfaceSolid =
+  "rounded-xl border border-zinc-800/80 bg-[var(--cbai-solid-surface)]";
+
 /* ── Chips & inline actions ────────────────────────────────────────────── */
 
 export const cbaiChip =
@@ -109,12 +121,15 @@ export const cbaiLinkAction =
 export const cbaiNavActive = "bg-teal-500/10 text-teal-400";
 export const cbaiNavInactive = `text-zinc-400 ${cbaiTransition} hover:bg-zinc-900/80 hover:text-zinc-50`;
 
-export const cbaiNavEyebrow =
-  "text-[10px] font-medium uppercase tracking-[0.18em] text-zinc-600";
+export const cbaiNavEyebrow = "cbai-nav-eyebrow px-2";
 
-export const cbaiNavRow = `flex items-center gap-2.5 rounded-lg px-2 py-2 text-xs ${cbaiTransition} ${cbaiFocusRing}`;
-export const cbaiNavRowActive = "bg-teal-500/10 text-teal-300";
-export const cbaiNavRowIdle = "text-zinc-500 hover:bg-zinc-900/60 hover:text-zinc-200";
+export const cbaiNavRow = "cbai-nav-row focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-400";
+export const cbaiNavRowActive = "cbai-nav-row-active";
+export const cbaiNavRowIdle = "cbai-nav-row-idle";
+
+export const cbaiSpatialNavRow = cbaiNavRow;
+export const cbaiSpatialNavRowActive = cbaiNavRowActive;
+export const cbaiSpatialNavRowIdle = cbaiNavRowIdle;
 
 /* ── Search & shell ────────────────────────────────────────────────────── */
 

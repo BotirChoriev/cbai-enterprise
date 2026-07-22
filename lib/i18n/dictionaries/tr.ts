@@ -3,6 +3,11 @@ import {
   VOICE_CONTROL_TR,
 } from "@/lib/i18n/platform-copy-voice-control";
 import { VOICE_OPERATOR_TR } from "@/lib/i18n/platform-copy-voice-operator";
+import { PLATFORM_ACTION_TR, PLATFORM_GUIDANCE_TR } from "@/lib/i18n/platform-copy-platform-actions";
+import { AUTH_COLLAB_TR } from "@/lib/i18n/platform-copy-auth-collab";
+import { VOICE_COMMAND_TR } from "@/lib/i18n/platform-copy-voice-command";
+import { FORWARD_DEPLOYED_TR, FORWARD_DEPLOYED_ENGINE_ACTION_TR } from "@/lib/i18n/platform-copy-forward-deployed-tr";
+import { SPATIAL_WORLD_TR } from "@/lib/i18n/platform-copy-spatial-world";
 import { COMPASS_COPY_TR, ENTITIES_TR, MY_WORK_TR, PRODUCT_STATUS_TR, SYSTEM_TR } from "@/lib/i18n/platform-copy-tr";
 import {
   DASHBOARD_TR,
@@ -20,6 +25,7 @@ import {
   ACCOUNT_PAGE_TR,
   ASSISTANT_VOICE_TR,
   ENTITY_UI_TR,
+  INDICATOR_EXPLORER_TR,
   GOVERNANCE_PAGE_TR,
   GRAPH_EXTENDED_TR,
   GRAPH_PLATFORM_TR,
@@ -28,6 +34,8 @@ import {
   PROJECT_UI_TR,
   REPORTS_CENTER_TR,
   RESEARCH_CATALOG_TR,
+  RESEARCH_NETWORK_LEGEND_TR,
+  RESEARCH_REVIEW_TIMELINE_TR,
   RESEARCH_HOME_TR,
   RESEARCH_WORKSPACE_TR,
   TRUST_DATA_SOURCES_TR,
@@ -113,6 +121,8 @@ import {
   MISSION_OPERATING_TR,
 } from "@/lib/i18n/platform-copy-build026-tr";
 import { SOURCE_INGESTION_TR } from "@/lib/i18n/platform-copy-build0285-tr";
+import { OPERATIONAL_OBJECT_TR } from "@/lib/i18n/platform-copy-operational-objects";
+import { INVESTOR_WORKSPACE_TR, WORKSPACE_SHARED_TR } from "@/lib/i18n/platform-copy-investor";
 
 const tr: TranslationDictionary = {
   roles: {
@@ -243,6 +253,20 @@ const tr: TranslationDictionary = {
     startWithSearch: "Aramayla başlayın",
     startWithSearchBody: "Bir profil bulun, mevcut bilgileri inceleyin ve raporları açın.",
     openSearch: "Aramayı Aç",
+    openNavigation: "Gezinmeyi aç",
+    operations: "Operasyonlar",
+    oversight: "Denetim",
+    advanced: "Gelişmiş",
+    system: "Sistem",
+    about: "CBAI Hakkında",
+    collaboration: "İşbirliği",
+    workspace: "Çalışma alanı",
+    scientificDocuments: "Bilimsel belgeler",
+    files: "Dosyalar",
+    teams: "Ekipler",
+    messages: "Mesajlar",
+    notifications: "Bildirimler",
+    publications: "Yayınlar",
   },
   home: {
     heroTitle: "Kanıtlar birbirine bağlı.",
@@ -382,6 +406,16 @@ const tr: TranslationDictionary = {
   universities: {
     title: "Üniversiteler",
     openUniversity: "Üniversiteyi aç",
+    searchPlaceholder: "Ülke, üniversite adı veya kurum türüne göre arayın…",
+    filterCountry: "Ülke",
+    filterType: "Tür",
+    filterAll: "Tümü",
+    resultCount: "{count} üniversite",
+    types: {
+      Public: "Devlet",
+      Private: "Özel",
+      Research: "Araştırma",
+    },
   },
   reports: {
     title: "Raporlar",
@@ -548,12 +582,24 @@ const tr: TranslationDictionary = {
   assistantVoice: ASSISTANT_VOICE_TR,
   voiceControl: VOICE_CONTROL_TR,
   voiceOperator: VOICE_OPERATOR_TR,
+  authCollab: AUTH_COLLAB_TR,
+  voiceCommand: VOICE_COMMAND_TR,
+  platformAction: PLATFORM_ACTION_TR,
+  platformGuidance: PLATFORM_GUIDANCE_TR,
+  forwardDeployed: FORWARD_DEPLOYED_TR,
+  forwardDeployedEngineAction: FORWARD_DEPLOYED_ENGINE_ACTION_TR,
+  spatialWorld: SPATIAL_WORLD_TR,
   myWorkExt: MY_WORK_EXT_TR,
   researchCatalog: RESEARCH_CATALOG_TR,
+  researchNetworkLegend: RESEARCH_NETWORK_LEGEND_TR,
+  researchReviewTimeline: RESEARCH_REVIEW_TIMELINE_TR,
   graphExtended: GRAPH_EXTENDED_TR,
   entityUi: ENTITY_UI_TR,
+  indicatorExplorer: INDICATOR_EXPLORER_TR,
   projectUi: PROJECT_UI_TR,
   governancePage: GOVERNANCE_PAGE_TR,
+  workspaceShared: WORKSPACE_SHARED_TR,
+  investorWorkspace: INVESTOR_WORKSPACE_TR,
   entityIntelligence: { ...ENTITY_INTELLIGENCE_TR, ...ENTITY_INTELLIGENCE_BUILD009_TR },
   sourceCoverage: SOURCE_COVERAGE_TR,
   entityRelationships: ENTITY_RELATIONSHIPS_TR,
@@ -611,6 +657,7 @@ const tr: TranslationDictionary = {
   missionOperating: MISSION_OPERATING_TR,
   genesisOs: GENESIS_OS_TR,
   researchCanvas: RESEARCH_CANVAS_TR,
+  operationalObject: OPERATIONAL_OBJECT_TR,
 };
 
 export default tr;

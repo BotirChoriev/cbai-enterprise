@@ -1,6 +1,10 @@
 /**
  * BUILD-030B — Collaboration persistence (device-local).
  * Multi-account collaboration requires shared backend — not claimed here.
+ *
+ * @deprecated QUARANTINED growth path (Stage 1) — zero component imports.
+ * Provisional canonical owner: lib/organization-os. Do not delete in Stage 1.
+ * @see lib/canonical-contracts/quarantine.ts
  */
 
 import { resolveStorageKey } from "@/lib/storage/namespaced-key";

@@ -3,9 +3,14 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { derivePrimaryEvidenceStates } from "@/lib/intelligence-os/evidence-primary-states";
-import { deriveFirstMinuteAction, translateFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
+import {
+  deriveFirstMinuteAction,
+  translateFirstMinuteAction,
+  type FirstMinuteAction,
+} from "@/lib/intelligence-os/first-minute";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import {
   cbaiLinkAction,
@@ -24,12 +29,25 @@ const STATE_LABEL: Record<string, string> = {
   needs_review: "evidenceNeedsReview",
 };
 
+/** Matches deriveFirstMinuteAction(null) on the server — no localStorage on SSR. */
+const PRE_HYDRATION_FIRST_MINUTE: FirstMinuteAction = {
+  label: "Start a mission",
+  labelKey: "startMission",
+  href: "/?create=1",
+  reason: "Name the problem first",
+  exposesArchitecture: false,
+};
+
 export default function EvidencePrimaryStatesPanel() {
   const { t } = useTranslation();
+  const hydrated = useHydrated();
   const { mission } = useMissionContext();
   const disclosure = useProgressiveDisclosure();
   const states = useMemo(() => derivePrimaryEvidenceStates(mission), [mission]);
-  const next = useMemo(() => deriveFirstMinuteAction(mission), [mission]);
+  const next = useMemo(
+    () => (hydrated ? deriveFirstMinuteAction(mission) : PRE_HYDRATION_FIRST_MINUTE),
+    [hydrated, mission],
+  );
   const total = states.reduce((sum, row) => sum + row.count, 0);
 
   if (!mission) {

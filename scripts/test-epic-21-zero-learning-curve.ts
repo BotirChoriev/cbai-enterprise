@@ -10,6 +10,7 @@ import { resolveProgressiveDisclosure, shouldShowGlobalMissionBar, shouldShowOpe
 import { deriveSearchActivationStages } from "@/lib/intelligence-os/search-activation";
 import { executeGatewaySearch } from "@/lib/search-gateway";
 import { deriveFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
+import { resolveStorageKey } from "@/lib/storage/namespaced-key";
 import { listSimplicityMetrics } from "@/lib/intelligence-os/simplicity-metrics";
 import { derivePrimaryEvidenceStates } from "@/lib/intelligence-os/evidence-primary-states";
 import { deriveCapabilityAssessmentOffer } from "@/lib/intelligence-os/capability-assessment";
@@ -66,7 +67,7 @@ test("5. Simplicity metrics architecture only — no fabricated values", () => {
   assert.equal(metrics.length, 6);
   for (const metric of metrics) {
     assert.equal(metric.value, null);
-    assert.match(metric.limitation, /no analytics pipeline/i);
+    assert.equal(metric.limitationKey, "simplicityMetricsNote");
   }
 });
 
@@ -99,6 +100,76 @@ test("9. Primary surfaces simplified — reports, graph, evidence", () => {
   assert.match(graph, /GraphPrimaryViews/);
   const evidence = readSource("components/evidence/EvidenceExplorer.tsx");
   assert.match(evidence, /EvidencePrimaryStatesPanel/);
+});
+
+test("9b. EvidencePrimaryStatesPanel — pre-hydration href matches SSR default", () => {
+  const panel = readSource("components/evidence/EvidencePrimaryStatesPanel.tsx");
+  const ssrAction = deriveFirstMinuteAction(null);
+  assert.equal(ssrAction.href, "/?create=1");
+  assert.match(panel, /PRE_HYDRATION_FIRST_MINUTE/);
+  assert.match(panel, /href: "\/\?create=1"/);
+  assert.match(panel, /labelKey: "startMission"/);
+});
+
+test("9c. EvidencePrimaryStatesPanel — server and initial client share deterministic href", () => {
+  const panel = readSource("components/evidence/EvidencePrimaryStatesPanel.tsx");
+  assert.match(panel, /useHydrated\(\)/);
+  assert.match(panel, /hydrated \? deriveFirstMinuteAction\(mission\) : PRE_HYDRATION_FIRST_MINUTE/);
+  const hydratedHook = readSource("lib/hooks/use-hydrated.ts");
+  assert.match(hydratedHook, /getServerSnapshot\(\): boolean/);
+  assert.match(hydratedHook, /return false/);
+  assert.match(hydratedHook, /getSnapshot\(\): boolean/);
+  assert.match(hydratedHook, /return true/);
+});
+
+test("9d. EvidencePrimaryStatesPanel — stored-project href only after hydration path", () => {
+  const ssrHref = deriveFirstMinuteAction(null).href;
+  assert.equal(ssrHref, "/?create=1");
+
+  const storage = new Map<string, string>();
+  const priorWindow = globalThis.window;
+  Object.defineProperty(globalThis, "window", {
+    configurable: true,
+    value: {
+      localStorage: {
+        getItem: (key: string) => storage.get(key) ?? null,
+        setItem: (key: string, value: string) => {
+          storage.set(key, value);
+        },
+        removeItem: (key: string) => {
+          storage.delete(key);
+        },
+      },
+    },
+  });
+
+  try {
+    storage.set(
+      resolveStorageKey("cbai-projects"),
+      JSON.stringify([
+        {
+          id: "project-hydration-regression",
+          title: "Hydration Regression Project",
+          type: "research_project",
+          description: "Stored locally to prove post-hydration navigation differs from SSR.",
+          tags: [],
+          visibility: "private",
+          status: "active",
+          createdAt: "2026-07-21T00:00:00.000Z",
+          updatedAt: "2026-07-21T00:00:00.000Z",
+        },
+      ]),
+    );
+    const browserAction = deriveFirstMinuteAction(null);
+    assert.match(browserAction.href, /^\/my-work\?project=/);
+    assert.notEqual(browserAction.href, ssrHref);
+  } finally {
+    if (priorWindow === undefined) {
+      Reflect.deleteProperty(globalThis, "window");
+    } else {
+      Object.defineProperty(globalThis, "window", { configurable: true, value: priorWindow });
+    }
+  }
 });
 
 test("10. Progressive disclosure gates experience chrome", () => {
@@ -148,9 +219,10 @@ test("15. EPIC-22 — screen simplicity audit architecture", () => {
   assert.match(audit.note, /Heuristic/i);
 });
 
-test("16. EPIC-23 — mission continuity wired in page shell", () => {
-  const shell = readSource("components/shared/OperatingPageShell.tsx");
-  assert.match(shell, /MissionOperatingContextBar/);
+test("16. EPIC-23 — mission continuity wired in layout ribbon", () => {
+  const layout = readSource("app/(dashboard)/layout.tsx");
+  assert.match(layout, /LivingContextRibbon/);
+  assert.doesNotMatch(readSource("components/shared/OperatingPageShell.tsx"), /MissionOperatingContextBar/);
   const reasoning = readSource("components/reasoning/ReasoningExplorer.tsx");
   assert.doesNotMatch(reasoning, /href="\/reasoning"/);
 });
@@ -235,8 +307,7 @@ test("26. Platform convergence — mission home and contextual loading", () => {
   const graph = readSource("components/graph/GraphPageClient.tsx");
   assert.match(graph, /recordEntityView/);
   assert.match(graph, /setCountry/);
-  const myWork = readSource("components/my-work/MyWorkPageClient.tsx");
-  assert.match(myWork, /missionContextVariant="compact"/);
+  assert.match(layout, /LivingContextRibbon/);
   for (const dict of [en, uz, ru, tr]) {
     assert.ok(dict.common.loadingResearch);
   }

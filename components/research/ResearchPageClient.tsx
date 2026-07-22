@@ -11,7 +11,7 @@ export default function ResearchPageClient() {
     <OperatingPageShell
       title={t("navigation.research")}
       showOperator={false}
-      missionContextVariant="compact"
+      showMissionContext={false}
     >
       <ResearchHome />
     </OperatingPageShell>

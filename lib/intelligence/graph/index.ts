@@ -1,6 +1,10 @@
 /**
  * CBAI Intelligence Engine — Graph Context Layer (BUILD-026).
  *
+ * @deprecated QUARANTINED (Stage 1) — duplicate of canonical graph stack.
+ * Canonical: lib/graph + lib/living-object-network + components/graph → /graph.
+ * Do not delete in Stage 1. @see lib/canonical-contracts/graph.ts
+ *
  * Framework-only graph context assembly. No traversal, scoring,
  * graph mutation, external services, or UI bindings.
  *

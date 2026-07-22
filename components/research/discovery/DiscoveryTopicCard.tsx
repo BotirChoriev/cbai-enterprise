@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import type { CrossTopicDiscovery } from "@/lib/research/discovery/discovery-types";
 import {
@@ -7,6 +9,7 @@ import type { ResearchTopic } from "@/lib/research/research-topics";
 import { getResearchTopicPath } from "@/lib/research/research-topics";
 import DiscoveryPath from "@/components/research/discovery/DiscoveryPath";
 import { cbaiGlassCard } from "@/components/brand/brand-classes";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type DiscoveryTopicCardProps = {
   sourceTopic: ResearchTopic;
@@ -23,6 +26,7 @@ export default function DiscoveryTopicCard({
   compact = false,
   onSelectTopic,
 }: DiscoveryTopicCardProps) {
+  const { t } = useTranslation();
   return (
     <article className={`${cbaiGlassCard} flex flex-col gap-3 p-3`}>
       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -45,7 +49,7 @@ export default function DiscoveryTopicCard({
       {discovery.sharedMethods.length > 0 ? (
         <div>
           <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
-            Shared methods
+            {t("researchCatalog.sharedMethods")}
           </p>
           <p className="mt-1 text-xs text-zinc-400">{discovery.sharedMethods.join(" · ")}</p>
         </div>
@@ -54,7 +58,7 @@ export default function DiscoveryTopicCard({
       {discovery.sharedEvidenceTypes.length > 0 ? (
         <div>
           <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
-            Shared evidence types
+            {t("researchCatalog.sharedEvidenceTypes")}
           </p>
           <p className="mt-1 text-xs text-zinc-400">
             {discovery.sharedEvidenceTypes.join(" · ")}
@@ -83,7 +87,7 @@ export default function DiscoveryTopicCard({
           href={getResearchTopicPath(relatedTopic.topicId)}
           className="text-xs font-medium text-teal-400 transition-colors hover:text-teal-300"
         >
-          Open topic →
+          {t("research.openTopic")} →
         </Link>
       </div>
     </article>

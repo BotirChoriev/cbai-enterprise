@@ -1,16 +1,17 @@
+"use client";
+
+import { useMemo } from "react";
 import type { GovernanceRuleCategoryRow } from "@/lib/governance-control-center";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import { getDictionary } from "@/lib/i18n/translate";
 
 type GovernancePillarsProps = {
   categories: readonly GovernanceRuleCategoryRow[];
 };
 
-// Governance's own atmosphere (OS Bible Part IX.9.4 / XVI: each room shares the kernel, not the
-// mood). Research is a colorful, organic lattice; Governance is symmetrical and load-bearing —
-// real rule categories rendered as pillars, height driven by each category's real rule count,
-// never an invented number. Navy + gold rather than the open emerald field elsewhere: the two
-// colors the Design Bible reserves for depth/infrastructure and "exceptional, load-bearing" —
-// exactly what a rule registry is.
 export default function GovernancePillars({ categories }: GovernancePillarsProps) {
+  const { language } = useTranslation();
+  const gc = getDictionary(language).governanceCenter;
   const maxCount = Math.max(...categories.map((c) => c.ruleCount), 1);
   const width = 460;
   const height = 244;
@@ -18,9 +19,17 @@ export default function GovernancePillars({ categories }: GovernancePillarsProps
   const baseline = height - 34;
   const gap = 14;
   const pillarWidth = (width - gap * (categories.length - 1)) / categories.length;
+  const totalRules = categories.reduce((sum, c) => sum + c.ruleCount, 0);
+  const ariaLabel = useMemo(
+    () =>
+      gc.pillarsAria
+        .replace("{categories}", String(categories.length))
+        .replace("{rules}", String(totalRules)),
+    [gc.pillarsAria, categories.length, totalRules],
+  );
 
   return (
-    <div className="relative mx-auto flex w-full max-w-[560px] items-center justify-center lg:mx-0">
+    <div className="relative mx-auto flex w-full max-w-[560px] flex-col items-center justify-center gap-2 lg:mx-0">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute h-[320px] w-[420px] rounded-full bg-[radial-gradient(ellipse,rgba(198,149,47,0.14),transparent_70%)]"
@@ -30,7 +39,7 @@ export default function GovernancePillars({ categories }: GovernancePillarsProps
         viewBox={`0 0 ${width} ${height}`}
         fill="none"
         role="img"
-        aria-label={`Governance rule registry: ${categories.length} categories, ${categories.reduce((sum, c) => sum + c.ruleCount, 0)} real rules, height proportional to each category's real rule count`}
+        aria-label={ariaLabel}
       >
         <line x1="0" y1={baseline} x2={width} y2={baseline} stroke="#c6952f" strokeWidth="1" opacity="0.35" />
         {categories.map((cat, index) => {
@@ -71,6 +80,9 @@ export default function GovernancePillars({ categories }: GovernancePillarsProps
           </linearGradient>
         </defs>
       </svg>
+      <p className="relative max-w-md text-center text-[11px] leading-relaxed text-[var(--cbai-text-muted)]">
+        {gc.pillarsCaption}
+      </p>
     </div>
   );
 }

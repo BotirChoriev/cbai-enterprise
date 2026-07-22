@@ -1,6 +1,10 @@
 /**
  * CBAI Intelligence Engine — type foundation (BUILD-021).
  *
+ * @deprecated QUARANTINED (Stage 1) — orphan module. Do not add new app/components imports.
+ * Canonical owners: lib/platform-actions, lib/evidence-explorer, lib/graph, lib/intelligence-os.
+ * Physical delete/move is Stage 2+ only. See lib/canonical-contracts/quarantine.ts.
+ *
  * Framework-agnostic interfaces defining the epistemic layer of CBAI:
  * evidence, confidence, trust, context, traces, requests, results, and
  * the engine contract.

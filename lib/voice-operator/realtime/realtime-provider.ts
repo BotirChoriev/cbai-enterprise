@@ -7,6 +7,7 @@ import {
   connectOpenAiWebRtcSession,
   RealtimeMicrophoneError,
   type RealtimeStateListener,
+  type RealtimeToolCallListener,
   type RealtimeTranscriptListener,
   type WebRtcSessionHandle,
 } from "@/lib/voice-operator/realtime/openai-webrtc-session";
@@ -37,6 +38,8 @@ export type RealtimeVoiceProvider = {
   getState: () => RealtimeConnectionState;
   onStateChange: (listener: RealtimeStateListener) => () => void;
   onTranscript: (listener: RealtimeTranscriptListener) => () => void;
+  onToolCall: (listener: RealtimeToolCallListener) => () => void;
+  sendToolResults: (messages: readonly Record<string, unknown>[]) => void;
 };
 
 type StateListener = (state: RealtimeConnectionState) => void;
@@ -74,6 +77,8 @@ export function createUnavailableRealtimeProvider(): RealtimeVoiceProvider {
     getState: holder.get,
     onStateChange: holder.subscribe,
     onTranscript: noop,
+    onToolCall: noop,
+    sendToolResults() {},
   };
 }
 
@@ -114,6 +119,8 @@ export function createMockRealtimeProvider(options?: {
       transcriptListeners.add(listener);
       return () => transcriptListeners.delete(listener);
     },
+    onToolCall: () => () => {},
+    sendToolResults() {},
   };
 }
 
@@ -130,6 +137,7 @@ export function createOpenAiWebRtcRealtimeProvider(): RealtimeVoiceProvider {
   let connectEpoch = 0;
   const holder = createStateHolder("idle");
   const transcriptListeners = new Set<RealtimeTranscriptListener>();
+  const toolCallListeners = new Set<RealtimeToolCallListener>();
   let sessionUnsubs: Array<() => void> = [];
 
   const clearSessionBindings = () => {
@@ -143,6 +151,9 @@ export function createOpenAiWebRtcRealtimeProvider(): RealtimeVoiceProvider {
       session.onStateChange((state) => holder.set(state)),
       session.onTranscript((event) => {
         transcriptListeners.forEach((listener) => listener(event));
+      }),
+      session.onToolCall((event) => {
+        toolCallListeners.forEach((listener) => listener(event));
       }),
     );
   };
@@ -225,6 +236,13 @@ export function createOpenAiWebRtcRealtimeProvider(): RealtimeVoiceProvider {
     onTranscript(listener) {
       transcriptListeners.add(listener);
       return () => transcriptListeners.delete(listener);
+    },
+    onToolCall(listener) {
+      toolCallListeners.add(listener);
+      return () => toolCallListeners.delete(listener);
+    },
+    sendToolResults(messages) {
+      activeSession?.sendToolResults(messages);
     },
   };
 }

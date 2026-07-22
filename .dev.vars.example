@@ -1,0 +1,6 @@
+# Cloudflare Pages Functions local secrets — copy to .dev.vars (never commit).
+# Used by: npm run dev:voice
+
+OPENAI_API_KEY=
+# Include both localhost and 127.0.0.1 — Safari may use either origin.
+VOICE_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,http://localhost:8788,http://127.0.0.1:8788

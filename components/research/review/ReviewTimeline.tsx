@@ -1,37 +1,37 @@
+"use client";
+
 import type { ResearchReview } from "@/lib/research/review/review-model";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import StatusBadge from "@/components/shared/StatusBadge";
-
-const TIMELINE_DATE_FORMAT = new Intl.DateTimeFormat("en-US", {
-  dateStyle: "medium",
-  timeStyle: "short",
-  timeZone: "UTC",
-});
-
-function formatTimelineDate(value: string | undefined): string | null {
-  return value ? TIMELINE_DATE_FORMAT.format(new Date(value)) : null;
-}
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type ReviewTimelineProps = {
   review: ResearchReview;
 };
 
-// ResearchReview currently only records a creation timestamp. Submitted, assigned, decision, and
-// archived events live on separate ReviewAssignment/ReviewDecision/ReviewHistory records this
-// single-prop component does not receive — one trailing sentence explains all four rather than
-// repeating the same reason four times.
 export default function ReviewTimeline({ review }: ReviewTimelineProps) {
+  const { t, language } = useTranslation();
+  const timelineDateFormat = new Intl.DateTimeFormat(language, {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "UTC",
+  });
+
+  function formatTimelineDate(value: string | undefined): string | null {
+    return value ? timelineDateFormat.format(new Date(value)) : null;
+  }
+
   const milestones = [
-    { label: "Created", value: formatTimelineDate(review.createdAt) },
-    { label: "Submitted", value: null },
-    { label: "Assigned", value: null },
-    { label: "Decision", value: null },
-    { label: "Archived", value: null },
+    { label: t("researchReviewTimeline.created"), value: formatTimelineDate(review.createdAt) },
+    { label: t("researchReviewTimeline.submitted"), value: null },
+    { label: t("researchReviewTimeline.assigned"), value: null },
+    { label: t("researchReviewTimeline.decision"), value: null },
+    { label: t("researchReviewTimeline.archived"), value: null },
   ];
 
   return (
-    <section aria-label="Review timeline" className={`${cbaiGlassCard} space-y-3 p-4`}>
-      <p className={cbaiSectionEyebrow}>Timeline</p>
+    <section aria-label={t("researchReviewTimeline.ariaLabel")} className={`${cbaiGlassCard} space-y-3 p-4`}>
+      <p className={cbaiSectionEyebrow}>{t("researchReviewTimeline.heading")}</p>
       <ol className="space-y-2">
         {milestones.map((milestone) => (
           <li
@@ -47,10 +47,7 @@ export default function ReviewTimeline({ review }: ReviewTimelineProps) {
           </li>
         ))}
       </ol>
-      <p className="text-xs text-zinc-600">
-        Submitted, assigned, decision, and archived events connect once assignment and history
-        tracking are wired to this workspace.
-      </p>
+      <p className="text-xs text-zinc-600">{t("researchReviewTimeline.futureEventsNote")}</p>
     </section>
   );
 }

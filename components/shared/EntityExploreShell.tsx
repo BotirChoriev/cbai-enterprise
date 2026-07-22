@@ -2,10 +2,10 @@
 
 import type { ReactNode } from "react";
 import EntityPageHeader from "@/components/shared/EntityPageHeader";
-import MissionOperatingContextBar from "@/components/mission/MissionOperatingContextBar";
 import ContextualOperatorBanner from "@/components/assistant/ContextualOperatorBanner";
+import EngineRouteEntryStrip from "@/components/forward-deployed/EngineRouteEntryStrip";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
-import { cbaiEntitySidebarStack, cbaiPageStack } from "@/components/brand/brand-classes";
+import { cbaiEntitySidebarStack, cbaiPageStack, cbaiPageWorkspace } from "@/components/brand/brand-classes";
 
 type EntityExploreShellProps = {
   title: string;
@@ -33,11 +33,11 @@ export default function EntityExploreShell({
   const disclosure = useProgressiveDisclosure();
 
   return (
-    <div className={cbaiPageStack}>
+    <div className={`${cbaiPageWorkspace} ${cbaiPageStack}`}>
       <EntityPageHeader title={title} description={description} />
-      <MissionOperatingContextBar variant="compact" />
       {notFoundNotice}
       {disclosure.level === "expert" ? <ContextualOperatorBanner /> : null}
+      <EngineRouteEntryStrip />
       {beforeGrid}
       <div className="grid gap-6 xl:grid-cols-12 xl:items-start">
         <div className={ENTITY_SIDEBAR}>

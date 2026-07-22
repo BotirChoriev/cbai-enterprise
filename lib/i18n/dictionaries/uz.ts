@@ -3,6 +3,11 @@ import {
   VOICE_CONTROL_UZ,
 } from "@/lib/i18n/platform-copy-voice-control";
 import { VOICE_OPERATOR_UZ } from "@/lib/i18n/platform-copy-voice-operator";
+import { PLATFORM_ACTION_UZ, PLATFORM_GUIDANCE_UZ } from "@/lib/i18n/platform-copy-platform-actions";
+import { AUTH_COLLAB_UZ } from "@/lib/i18n/platform-copy-auth-collab";
+import { VOICE_COMMAND_UZ } from "@/lib/i18n/platform-copy-voice-command";
+import { FORWARD_DEPLOYED_UZ, FORWARD_DEPLOYED_ENGINE_ACTION_UZ } from "@/lib/i18n/platform-copy-forward-deployed-uz";
+import { SPATIAL_WORLD_UZ } from "@/lib/i18n/platform-copy-spatial-world";
 import { COMPASS_COPY_UZ, ENTITIES_UZ, MY_WORK_UZ, PRODUCT_STATUS_UZ, SYSTEM_UZ } from "@/lib/i18n/platform-copy-uz";
 import {
   DASHBOARD_UZ,
@@ -20,6 +25,7 @@ import {
   ACCOUNT_PAGE_UZ,
   ASSISTANT_VOICE_UZ,
   ENTITY_UI_UZ,
+  INDICATOR_EXPLORER_UZ,
   GOVERNANCE_PAGE_UZ,
   GRAPH_EXTENDED_UZ,
   GRAPH_PLATFORM_UZ,
@@ -28,6 +34,8 @@ import {
   PROJECT_UI_UZ,
   REPORTS_CENTER_UZ,
   RESEARCH_CATALOG_UZ,
+  RESEARCH_NETWORK_LEGEND_UZ,
+  RESEARCH_REVIEW_TIMELINE_UZ,
   RESEARCH_HOME_UZ,
   RESEARCH_WORKSPACE_UZ,
   TRUST_DATA_SOURCES_UZ,
@@ -113,6 +121,8 @@ import {
   MISSION_OPERATING_UZ,
 } from "@/lib/i18n/platform-copy-build026-uz";
 import { SOURCE_INGESTION_UZ } from "@/lib/i18n/platform-copy-build0285-uz";
+import { OPERATIONAL_OBJECT_UZ } from "@/lib/i18n/platform-copy-operational-objects";
+import { INVESTOR_WORKSPACE_UZ, WORKSPACE_SHARED_UZ } from "@/lib/i18n/platform-copy-investor";
 
 const uz: TranslationDictionary = {
   roles: {
@@ -243,6 +253,20 @@ const uz: TranslationDictionary = {
     startWithSearch: "Qidiruvdan boshlang",
     startWithSearchBody: "Profilni toping, mavjud ma'lumotni ko‘rib chiqing va hisobotlarni oching.",
     openSearch: "Qidiruvni ochish",
+    openNavigation: "Navigatsiyani ochish",
+    operations: "Operatsiyalar",
+    oversight: "Nazorat",
+    advanced: "Kengaytirilgan",
+    system: "Tizim",
+    about: "CBAI haqida",
+    collaboration: "Hamkorlik",
+    workspace: "Ish maydoni",
+    scientificDocuments: "Ilmiy hujjatlar",
+    files: "Fayllar",
+    teams: "Jamoalar",
+    messages: "Xabarlar",
+    notifications: "Bildirishnomalar",
+    publications: "Nashrlar",
   },
   home: {
     heroTitle: "Dalillar bog‘langan.",
@@ -382,6 +406,16 @@ const uz: TranslationDictionary = {
   universities: {
     title: "Universitetlar",
     openUniversity: "Universitetni ochish",
+    searchPlaceholder: "Mamlakat, universitet nomi yoki muassasa turi bo‘yicha qidiring…",
+    filterCountry: "Mamlakat",
+    filterType: "Tur",
+    filterAll: "Hammasi",
+    resultCount: "{count} ta universitet",
+    types: {
+      Public: "Davlat",
+      Private: "Xususiy",
+      Research: "Tadqiqot",
+    },
   },
   reports: {
     title: "Hisobotlar",
@@ -548,12 +582,24 @@ const uz: TranslationDictionary = {
   assistantVoice: ASSISTANT_VOICE_UZ,
   voiceControl: VOICE_CONTROL_UZ,
   voiceOperator: VOICE_OPERATOR_UZ,
+  authCollab: AUTH_COLLAB_UZ,
+  voiceCommand: VOICE_COMMAND_UZ,
+  platformAction: PLATFORM_ACTION_UZ,
+  platformGuidance: PLATFORM_GUIDANCE_UZ,
+  forwardDeployed: FORWARD_DEPLOYED_UZ,
+  forwardDeployedEngineAction: FORWARD_DEPLOYED_ENGINE_ACTION_UZ,
+  spatialWorld: SPATIAL_WORLD_UZ,
   myWorkExt: MY_WORK_EXT_UZ,
   researchCatalog: RESEARCH_CATALOG_UZ,
+  researchNetworkLegend: RESEARCH_NETWORK_LEGEND_UZ,
+  researchReviewTimeline: RESEARCH_REVIEW_TIMELINE_UZ,
   graphExtended: GRAPH_EXTENDED_UZ,
   entityUi: ENTITY_UI_UZ,
+  indicatorExplorer: INDICATOR_EXPLORER_UZ,
   projectUi: PROJECT_UI_UZ,
   governancePage: GOVERNANCE_PAGE_UZ,
+  workspaceShared: WORKSPACE_SHARED_UZ,
+  investorWorkspace: INVESTOR_WORKSPACE_UZ,
   entityIntelligence: { ...ENTITY_INTELLIGENCE_UZ, ...ENTITY_INTELLIGENCE_BUILD009_UZ },
   sourceCoverage: SOURCE_COVERAGE_UZ,
   entityRelationships: ENTITY_RELATIONSHIPS_UZ,
@@ -611,6 +657,7 @@ const uz: TranslationDictionary = {
   missionOperating: MISSION_OPERATING_UZ,
   genesisOs: GENESIS_OS_UZ,
   researchCanvas: RESEARCH_CANVAS_UZ,
+  operationalObject: OPERATIONAL_OBJECT_UZ,
 };
 
 export default uz;

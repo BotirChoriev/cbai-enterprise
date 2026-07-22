@@ -199,13 +199,13 @@ test("mic toggle UI: active unslashed teal mic stops capture; inactive slashed m
   assert.match(dock, /copy\.liveListeningScope/);
   assert.doesNotMatch(dock, /animate-pulse/);
   assert.doesNotMatch(dock, /border-red-500/);
-  assert.match(dock, /border-teal-500/);
-  assert.match(dock, /border-zinc-700/);
+  assert.match(dock, /cbai-voice-dock-btn-live/);
+  assert.match(readSource("app/globals.css"), /\.cbai-voice-dock-btn-live[\s\S]*--cbai-accent-primary/);
 
-  const micIconTernary = dock.match(/\{vo\.micLive \?\s*\([\s\S]*?\)\s*:\s*\([\s\S]*?\)\s*\}/);
+  const micIconTernary = dock.match(/\{vo\.micLive \|\| micDisabled \?\s*\([\s\S]*?\)\s*:\s*\([\s\S]*?\)\s*\}/);
   assert.ok(micIconTernary, "mic icon ternary");
   const [, activeIcon, inactiveIcon] =
-    micIconTernary![0].match(/vo\.micLive \?\s*\(([\s\S]*?)\)\s*:\s*\(([\s\S]*?)\)\s*\}/) ?? [];
+    micIconTernary![0].match(/vo\.micLive \|\| micDisabled \?\s*\(([\s\S]*?)\)\s*:\s*\(([\s\S]*?)\)\s*\}/) ?? [];
   assert.ok(activeIcon && inactiveIcon, "mic icon branches");
   assert.doesNotMatch(activeIcon, /M4\.5 4\.5l15 15/, "active listening shows unslashed microphone");
   assert.match(inactiveIcon, /M4\.5 4\.5l15 15/, "inactive ready shows slashed microphone");
@@ -218,21 +218,20 @@ test("late broker connect cannot apply after capture cancelled", () => {
   assert.match(provider, /provider\.disconnect\(\)/);
 });
 
-test("route change stops live capture", () => {
+test("route change preserves live voice session (auth collaboration P0)", () => {
   const provider = readSource("components/voice-operator/VoiceOperatorProvider.tsx");
   assert.match(provider, /usePathname\(\)/);
-  assert.match(provider, /\[pathname, releaseLiveAudioResources\]/);
+  assert.match(provider, /Internal client-side navigation must NOT tear down/);
+  assert.doesNotMatch(provider, /\[pathname, releaseLiveAudioResources\]/);
 });
 
 test("identity intro phrases for UZ/EN/RU/TR", () => {
-  assert.equal(
-    getVoiceOperatorIntroPhrase("uz"),
-    "Men CBAI Ovoz Operatoriman. Sizga tadqiqot, dalillar va platformadagi ishlaringiz bo'yicha yordam beraman.",
-  );
+  assert.equal(getVoiceOperatorIntroPhrase("uz"), VOICE_OPERATOR_INTRO_PHRASES.uz);
   assert.equal(getVoiceOperatorIntroPhrase("en"), VOICE_OPERATOR_INTRO_PHRASES.en);
   assert.equal(getVoiceOperatorIntroPhrase("ru"), VOICE_OPERATOR_INTRO_PHRASES.ru);
   assert.equal(getVoiceOperatorIntroPhrase("tr"), VOICE_OPERATOR_INTRO_PHRASES.tr);
   const uz = buildVoiceOperatorInstructions("uz");
   assert.match(uz, /Men sun'iy intellektman/);
   assert.match(uz, /Never claim to be human/i);
+  assert.match(uz, /Botir Choriev/);
 });

@@ -109,3 +109,40 @@ test("ResearchHero uses dictionary researchHome strings", () => {
   assert.ok(source.includes("researchHome.title"));
   assert.ok(!source.includes("RESEARCH_HOME.title"));
 });
+
+test("UZ operational object copy has linked work and report draft labels", () => {
+  const uz = getDictionary("uz");
+  assert.equal(uz.operationalObject.createLinkedWork, "Bog‘langan ish yaratish");
+  assert.equal(uz.operationalObject.typeReportDraft, "Hisobot qoralamasi");
+  assert.ok(uz.filters.overview.length > 0);
+  assert.notEqual(uz.filters.overview, "filters.overview");
+  assert.ok(uz.operationalObject.linkedWorkDefaultNextAction.includes("tasdiqlang"));
+});
+
+test("Country and graph linked-work entry use composer — no hardcoded English", () => {
+  const countryPanel = readSource("components/countries/CountryIntelligencePanel.tsx");
+  const graphPanel = readSource("components/graph/GraphEntityPanel.tsx");
+  assert.ok(countryPanel.includes("CreateLinkedWorkButton"));
+  assert.ok(graphPanel.includes("CreateLinkedWorkButton"));
+  assert.ok(countryPanel.includes("operationalObject.createLinkedWork") || countryPanel.includes("CreateLinkedWorkButton"));
+  assert.doesNotMatch(countryPanel, /Open topic/);
+  assert.doesNotMatch(graphPanel, /Create linked work"/);
+});
+
+test("Research topic and discovery cards use localized openTopic key", () => {
+  for (const file of [
+    "components/research/discovery/DiscoveryTopicCard.tsx",
+    "components/research/network/ResearchNetworkFocusPanel.tsx",
+    "components/research/workspace/WorkspaceTopicNavigator.tsx",
+  ]) {
+    const source = readSource(file);
+    assert.ok(source.includes("research.openTopic"), `${file} must use research.openTopic`);
+    assert.doesNotMatch(source, />Open topic/);
+  }
+});
+
+test("CreateProjectForm routes through operational composer when provider available", () => {
+  const source = readSource("components/project/CreateProjectForm.tsx");
+  assert.ok(source.includes("openComposer"));
+  assert.ok(source.includes("operationalObjects"));
+});

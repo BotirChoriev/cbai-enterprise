@@ -188,12 +188,12 @@ test("16. Intelligence Cabinet is discoverable — the Sidebar/mobile nav disclo
   assert.match(read("components/layout/MobileNavDrawer.tsx"), /navigation\.intelligenceCabinet/);
 });
 
-test("17. Homepage identity: Intelligence Canvas replaces marketing homepage — Operator on first screen", () => {
+test("17. Homepage identity: Spatial World Intelligence replaces marketing homepage — Operator on first screen", () => {
   const home = read("components/platform/PlatformHome.tsx");
-  assert.match(home, /IntelligenceCanvas/);
-  const canvas = read("components/canvas/IntelligenceCanvas.tsx");
-  assert.match(canvas, /SystemAwakeningSequence/);
-  assert.match(canvas, /MissionOperatorPresence/);
+  assert.match(home, /SpatialWorldIntelligenceHome/);
+  const spatial = read("components/spatial-world/SpatialWorldIntelligenceHome.tsx");
+  assert.match(spatial, /OperatorOrb/);
+  assert.match(spatial, /vo\.openDock/);
 });
 
 test("21. Intelligence Canvas: Operator and operating objects share one shell — no marketing divider", () => {

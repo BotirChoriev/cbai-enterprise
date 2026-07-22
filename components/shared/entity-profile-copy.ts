@@ -1,6 +1,10 @@
 import type { EntityEvidenceGapProfile } from "@/lib/evidence-gap";
 import { getNonAvailableGaps } from "@/lib/evidence-gap";
 import type { ProductStatus } from "@/lib/product-status";
+import {
+  INSUFFICIENT_EVIDENCE_LABEL,
+  REGISTRY_SOURCE_LABEL,
+} from "@/lib/i18n/entity-ui-translation";
 
 export type EntityDecisionReviewSummary = {
   entityName: string;
@@ -22,9 +26,9 @@ type CoverageWithIndicators = {
   }[];
 };
 
-const REGISTRY_SOURCE_LABEL = "Available — CBAI Local Registry";
-const INSUFFICIENT_EVIDENCE_LABEL = "Insufficient Evidence";
+export { REGISTRY_SOURCE_LABEL, INSUFFICIENT_EVIDENCE_LABEL };
 
+/** @deprecated Use translateOfficialInformationLabel() with the active dictionary. */
 export function plainAvailableInformation(sourceLabel: string): string {
   if (sourceLabel === REGISTRY_SOURCE_LABEL) {
     return "Official information available.";

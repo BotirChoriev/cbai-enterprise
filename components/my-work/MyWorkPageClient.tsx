@@ -8,7 +8,7 @@ export default function MyWorkPageClient() {
   const { t } = useTranslation();
 
   return (
-    <OperatingPageShell title={t("myWork.title")} missionContextVariant="compact">
+    <OperatingPageShell title={t("myWork.title")}>
       <MyWork />
     </OperatingPageShell>
   );

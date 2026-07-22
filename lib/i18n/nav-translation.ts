@@ -32,14 +32,27 @@ const NAV_LABEL_KEYS: Record<string, string> = {
   "/graph": "navigation.knowledgeGraph",
   "/ai-control": "navigation.governance",
   "/governance": "navigation.governance",
+  "/about": "navigation.about",
   "/research/workspace": "navigation.researchWorkspace",
+  "/workspace": "navigation.workspace",
+  "/scientific-documents": "navigation.scientificDocuments",
+  "/files": "navigation.files",
+  "/teams": "navigation.teams",
+  "/messages": "navigation.messages",
+  "/notifications": "navigation.notifications",
+  "/publications": "navigation.publications",
 };
 
 const NAV_SECTION_TITLE_KEYS: Record<string, string> = {
   Explore: "navigation.explore",
+  Intelligence: "navigation.intelligence",
+  Operations: "navigation.operations",
+  Oversight: "navigation.oversight",
+  Collaboration: "navigation.collaboration",
+  Advanced: "navigation.advanced",
+  System: "navigation.system",
   Ecosystems: "navigation.intelligenceLenses",
   "Intelligence Lenses": "navigation.intelligenceLenses",
-  Intelligence: "navigation.intelligence",
 };
 
 /** Real label for a nav item's real href — falls back to the item's own English label only for a

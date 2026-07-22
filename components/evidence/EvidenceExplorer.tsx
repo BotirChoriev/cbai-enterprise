@@ -11,6 +11,7 @@ import EvidenceTrust from "@/components/evidence/EvidenceTrust";
 import EvidenceMethodology from "@/components/evidence/EvidenceMethodology";
 import EvidenceIndicatorMap from "@/components/evidence/EvidenceIndicatorMap";
 import EvidenceTrustSurfacePanel from "@/components/evidence/EvidenceTrustSurfacePanel";
+import EngineRouteEntryStrip from "@/components/forward-deployed/EngineRouteEntryStrip";
 import EvidencePrimaryStatesPanel from "@/components/evidence/EvidencePrimaryStatesPanel";
 import KnowledgeBrainPanel from "@/components/knowledge/KnowledgeBrainPanel";
 import KnowledgeSourceSearchPanel from "@/components/knowledge/KnowledgeSourceSearchPanel";
@@ -28,8 +29,9 @@ export default function EvidenceExplorer() {
     <OperatingPageShell
       title={t("evidence.title")}
       showOperator={false}
-      missionContextVariant="compact"
+      showMissionContext={false}
     >
+      <EngineRouteEntryStrip />
       <EvidencePrimaryStatesPanel />
       <KnowledgeBrainPanel compact />
       <KnowledgeSourceSearchPanel />

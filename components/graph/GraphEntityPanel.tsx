@@ -10,6 +10,7 @@ import { loadProjects } from "@/lib/project/project-store";
 import { cbaiGraphPanel, cbaiTextCaption } from "@/components/brand/brand-classes";
 import Link from "next/link";
 import { getDictionary } from "@/lib/i18n/translate";
+import CreateLinkedWorkButton from "@/components/operational-objects/CreateLinkedWorkButton";
 
 type GraphEntityPanelProps = {
   selectedNode: GraphNode | null;
@@ -204,6 +205,18 @@ function EntityDetails({
           {t("graphUi.openModule", { type: typeLabel })}
         </Link>
       ) : null}
+
+      <CreateLinkedWorkButton
+        variant="graph"
+        compact
+        graph={{
+          nodeId: node.id,
+          entityType: node.type,
+          entityId: node.entityId,
+          entityName: node.label,
+          routePath: "/graph",
+        }}
+      />
     </div>
   );
 }

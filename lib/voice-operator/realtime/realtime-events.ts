@@ -9,9 +9,16 @@ export type RealtimeTranscriptEvent = {
   readonly final: boolean;
 };
 
+export type RealtimeToolCallEvent = {
+  readonly callId: string;
+  readonly name: string;
+  readonly argumentsJson: string;
+};
+
 export type RealtimeEventParseResult = {
   readonly state?: RealtimeConnectionState;
   readonly transcript?: RealtimeTranscriptEvent;
+  readonly toolCall?: RealtimeToolCallEvent;
 };
 
 function readString(value: unknown): string | null {
@@ -57,6 +64,24 @@ export function parseRealtimeServerEvent(raw: string): RealtimeEventParseResult 
       if (!transcript) return null;
       return { transcript: { role: "assistant", text: transcript, final: true } };
     }
+    case "response.function_call_arguments.done": {
+      const callId = readString(event.call_id);
+      const name = readString(event.name);
+      const args = typeof event.arguments === "string" ? event.arguments : "";
+      if (!callId || !name) return null;
+      return { toolCall: { callId, name, argumentsJson: args } };
+    }
+    case "response.output_item.done": {
+      const item = event.item;
+      if (!item || typeof item !== "object") return null;
+      const record = item as Record<string, unknown>;
+      if (readString(record.type) !== "function_call") return null;
+      const callId = readString(record.call_id);
+      const name = readString(record.name);
+      const args = typeof record.arguments === "string" ? record.arguments : "";
+      if (!callId || !name) return null;
+      return { toolCall: { callId, name, argumentsJson: args } };
+    }
     case "error":
       return { state: "connection_failed" };
     default:
@@ -94,9 +119,29 @@ export function mapRealtimeStateToDockState(state: RealtimeConnectionState): Voi
   }
 }
 
+export function mapPlatformDockState(state: VoiceDockState): string {
+  switch (state) {
+    case "executing_action":
+      return "stateExecutingAction";
+    case "awaiting_confirmation":
+      return "stateAwaitingConfirmation";
+    default:
+      return "stateReady";
+  }
+}
+
 export function mapBrokerCodeToIssue(
-  code: "BACKEND_REQUIRED" | "ORIGIN_BLOCKED" | "RATE_LIMITED" | "AUTHENTICATION_FAILED" | "ERROR",
+  code:
+    | "BACKEND_REQUIRED"
+    | "ORIGIN_BLOCKED"
+    | "RATE_LIMITED"
+    | "AUTHENTICATION_FAILED"
+    | "INVALID_API_KEY"
+    | "QUOTA_OR_ACCOUNT_BLOCKED"
+    | "ERROR",
 ): VoiceBrokerIssue {
+  if (code === "INVALID_API_KEY") return "invalid_api_key";
+  if (code === "QUOTA_OR_ACCOUNT_BLOCKED") return "quota_or_account_blocked";
   if (code === "AUTHENTICATION_FAILED") return "authentication_failed";
   if (code === "BACKEND_REQUIRED") return "required";
   return "unreachable";

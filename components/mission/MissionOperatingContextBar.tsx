@@ -22,6 +22,7 @@ import {
 } from "@/lib/intelligence-os/first-minute";
 import { loadCompanionThought, recordCompanionThought } from "@/lib/intelligence-os/living-memory";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
+import { useHydrated } from "@/lib/hooks/use-hydrated";
 
 type MissionOperatingContextBarProps = {
   /** Compact strip only — full boundary on mission-heavy routes */
@@ -43,16 +44,45 @@ const PRIMARY_ROUTES_WITH_CONTEXT = new Set([
   "/trust",
   "/ai-control",
   "/governance",
+  "/investor",
   "/settings",
   "/account",
 ]);
+
+function resolveResumeFocus(
+  priorThought: NonNullable<ReturnType<typeof loadCompanionThought>>,
+  currentLanguage: string,
+  translate: (key: string, params?: Record<string, string>) => string,
+  livePurpose: string,
+): { text: string; localeNote: string | null } {
+  if (priorThought.focusKind === "system" && priorThought.purposeKey) {
+    return {
+      text: translate(`zeroLearningCurve.${priorThought.purposeKey}`),
+      localeNote: null,
+    };
+  }
+  const text = priorThought.lastFocus;
+  const localeNote =
+    priorThought.focusLocale &&
+    priorThought.focusLocale !== currentLanguage &&
+    priorThought.focusKind === "user"
+      ? translate("zeroLearningCurve.resumeSavedInLocale", {
+          locale: priorThought.focusLocale.toUpperCase(),
+        })
+      : null;
+  if (priorThought.focusKind === "system" && text === livePurpose) {
+    return { text: livePurpose, localeNote: null };
+  }
+  return { text, localeNote };
+}
 
 export default function MissionOperatingContextBar({
   variant = "compact",
 }: MissionOperatingContextBarProps) {
   const pathname = usePathname();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const disclosure = useProgressiveDisclosure();
+  const hydrated = useHydrated();
   const { mission, humanImpact } = useMissionContext();
 
   const basePath = pathname.split("?")[0];
@@ -70,17 +100,31 @@ export default function MissionOperatingContextBar({
   const purpose = purposeKey ? t(`zeroLearningCurve.${purposeKey}`) : "";
   const storyBeat = storyKey ? t(`zeroLearningCurve.${storyKey}`) : "";
 
-  const priorThought = useMemo(() => (showBar ? loadCompanionThought() : null), [showBar]);
+  const priorThought = useMemo(
+    () => (showBar && hydrated ? loadCompanionThought() : null),
+    [showBar, hydrated],
+  );
 
   useEffect(() => {
     if (!showBar) return;
-    const focus =
+    const userFocus =
       mission?.problem?.trim() ||
-      (mission?.whyExists?.trim() ? mission.whyExists : "") ||
-      purpose;
-    if (!focus.trim()) return;
-    recordCompanionThought(mission?.id ?? null, pathname, focus.trim());
-  }, [showBar, mission?.id, mission?.problem, mission?.whyExists, pathname, purpose]);
+      (mission?.whyExists?.trim() ? mission.whyExists : "");
+    if (userFocus) {
+      recordCompanionThought(mission?.id ?? null, pathname, userFocus, {
+        focusKind: "user",
+        focusLocale: language,
+      });
+      return;
+    }
+    if (purposeKey && purpose.trim()) {
+      recordCompanionThought(mission?.id ?? null, pathname, purpose, {
+        focusKind: "system",
+        focusLocale: language,
+        purposeKey,
+      });
+    }
+  }, [showBar, mission?.id, mission?.problem, mission?.whyExists, pathname, purpose, purposeKey, language]);
 
   if (!showBar || !companion) return null;
 
@@ -92,14 +136,20 @@ export default function MissionOperatingContextBar({
     reason: "companion",
     exposesArchitecture: false,
   });
-  const showResume =
-    disclosure.showCompanionDetail &&
+
+  const resume =
     priorThought &&
     priorThought.lastRoute !== basePath &&
     priorThought.missionId === (mission?.id ?? null) &&
-    priorThought.lastFocus.trim().length > 0 &&
-    priorThought.lastFocus !== purpose &&
-    priorThought.lastFocus !== mission?.problem?.trim();
+    priorThought.lastFocus.trim().length > 0
+      ? resolveResumeFocus(priorThought, language, t, purpose)
+      : null;
+
+  const showResume =
+    disclosure.showCompanionDetail &&
+    resume &&
+    resume.text !== purpose &&
+    resume.text !== mission?.problem?.trim();
 
   const showBoundary =
     variant === "full" && disclosure.showInlineHumanDecisionBoundary;
@@ -122,9 +172,12 @@ export default function MissionOperatingContextBar({
           <p className={cbaiSectionEyebrow}>{t("zeroLearningCurve.companionEyebrow")}</p>
           <p className={cbaiTextBody}>{purpose}</p>
           {disclosure.showCompanionStoryBeat ? <p className={cbaiTextMuted}>{storyBeat}</p> : null}
-          {showResume ? (
+          {showResume && resume ? (
             <p className={cbaiTextMuted}>
-              {t("zeroLearningCurve.resumeThought")}: {priorThought.lastFocus}
+              {t("zeroLearningCurve.resumeThought")}: {resume.text}
+              {resume.localeNote ? (
+                <span className="block text-[11px] text-zinc-500">{resume.localeNote}</span>
+              ) : null}
             </p>
           ) : null}
           {humanImpact && !humanImpact.isComplete ? (

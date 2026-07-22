@@ -12,6 +12,8 @@ export const VOICE_OPERATOR_EN = {
   stateSearchingSources: "Searching sources",
   stateResponding: "Responding",
   stateActionConfirmation: "Confirmation required",
+  stateExecutingAction: "Executing action",
+  stateAwaitingConfirmation: "Awaiting confirmation",
   stateDisconnected: "Disconnected",
   stateBackendRequired: "Backend required",
   stateError: "Error",
@@ -46,9 +48,30 @@ export const VOICE_OPERATOR_EN = {
   permissionContinueText: "Continue with text",
   permissionClose: "Close",
   backendRequiredNotice: "Live voice conversation requires a secure backend connection.",
+  localCapabilityNotice: "Local live voice is not configured.",
+  localCapabilityUserNotice:
+    "Live voice is not available in this environment. You can still type messages below.",
+  localVoiceSetupHint: "Run npm run dev:voice and set OPENAI_API_KEY in .dev.vars for secure local Realtime.",
+  developerDiagnosticsHeading: "Developer diagnostics",
+  diagnosticsBrokerUrl: "Broker URL",
+  diagnosticsAllowedOrigin: "Allowed origin",
+  diagnosticsClassification: "Credential classification",
+  diagnosticsConnectionState: "Connection state",
+  diagnosticsDoctorCommand: "Preflight command",
+  diagnosticsNotConfigured: "Not configured",
+  diagnosticsClassificationUnknown: "Unknown or not yet probed",
+  diagnosticsClassificationInvalidKey: "Invalid or placeholder API key (EXTERNAL_BLOCKED)",
+  diagnosticsClassificationQuota: "Quota or billing blocked",
+  diagnosticsClassificationAuth: "Authentication or access denied",
+  diagnosticsClassificationUnreachable: "Broker unreachable",
+  diagnosticsClassificationNotConfigured: "Broker not configured",
   brokerUnavailableNotice: "The secure voice backend is unreachable. Text chat remains available.",
   brokerAuthenticationFailedNotice:
     "Voice backend authentication failed. Sign in to the preview environment and try again.",
+  brokerInvalidApiKeyNotice:
+    "Live voice is unavailable because the backend API key is invalid or not configured. Text chat remains available.",
+  brokerQuotaBlockedNotice:
+    "Live voice is unavailable because the backend account quota or billing blocked Realtime access. Text chat remains available.",
   browserFallbackNotice: "Browser transcription is unreliable for Uzbek. Edit text before sending.",
   externalSearchActive: "External search active",
   revokeExternalSearch: "Revoke search consent",
@@ -67,6 +90,7 @@ export const VOICE_OPERATOR_EN = {
   consentPrompt: "Sanitized query will be sent to connected providers. Continue?",
   consentYes: "Yes, continue",
   consentNo: "Cancel",
+  guidanceCardTitle: "Operator guidance",
 } as const;
 
 export const VOICE_OPERATOR_UZ = {
@@ -81,6 +105,8 @@ export const VOICE_OPERATOR_UZ = {
   stateSearchingSources: "Manbalarni izlayapman",
   stateResponding: "Javob bermoqda",
   stateActionConfirmation: "Amal uchun tasdiq kerak",
+  stateExecutingAction: "Amal bajarilmoqda",
+  stateAwaitingConfirmation: "Tasdiqlashingizni kutmoqda",
   stateDisconnected: "Aloqa uzildi",
   stateBackendRequired: "Backend talab qilinadi",
   stateError: "Xato",
@@ -115,9 +141,32 @@ export const VOICE_OPERATOR_UZ = {
   permissionContinueText: "Matn bilan davom etish",
   permissionClose: "Yopish",
   backendRequiredNotice: "Jonli ovozli suhbat uchun xavfsiz backend ulanishi kerak.",
+  localCapabilityNotice:
+    "Mahalliy jonli ovoz sozlanmagan.",
+  localCapabilityUserNotice:
+    "Jonli ovoz bu muhitda mavjud emas. Quyida matn orqali davom etishingiz mumkin.",
+  localVoiceSetupHint:
+    "npm run dev:voice ni ishga tushiring va .dev.vars faylida OPENAI_API_KEY ni belgilang.",
+  developerDiagnosticsHeading: "Dasturchi diagnostikasi",
+  diagnosticsBrokerUrl: "Broker URL",
+  diagnosticsAllowedOrigin: "Ruxsat etilgan origin",
+  diagnosticsClassification: "Credential tasnifi",
+  diagnosticsConnectionState: "Ulanish holati",
+  diagnosticsDoctorCommand: "Preflight buyrug'i",
+  diagnosticsNotConfigured: "Sozlanmagan",
+  diagnosticsClassificationUnknown: "Noma'lum yoki hali tekshirilmagan",
+  diagnosticsClassificationInvalidKey: "Noto'g'ri yoki placeholder API kaliti (EXTERNAL_BLOCKED)",
+  diagnosticsClassificationQuota: "Kvota yoki to'lov bloklangan",
+  diagnosticsClassificationAuth: "Autentifikatsiya yoki kirish rad etildi",
+  diagnosticsClassificationUnreachable: "Brokerga ulanib bo'lmadi",
+  diagnosticsClassificationNotConfigured: "Broker sozlanmagan",
   brokerUnavailableNotice: "Xavfsiz ovoz backendiga ulanib bo'lmadi. Matnli suhbat ishlayveradi.",
   brokerAuthenticationFailedNotice:
     "Ovoz backend autentifikatsiyasi muvaffaqiyatsiz. Preview muhitiga kiring va qayta urinib ko'ring.",
+  brokerInvalidApiKeyNotice:
+    "Jonli ovoz mavjud emas — backend API kaliti noto'g'ri yoki sozlanmagan. Matnli suhbat ishlayveradi.",
+  brokerQuotaBlockedNotice:
+    "Jonli ovoz mavjud emas — backend hisob kvotasi yoki to'lov Realtime ga ruxsat bermadi. Matnli suhbat ishlayveradi.",
   browserFallbackNotice: "Brauzer transkripti o'zbekcha uchun ishonchsiz. Yuborishdan oldin matnni tahrirlang.",
   externalSearchActive: "Tashqi qidiruv faol",
   revokeExternalSearch: "Qidiruv roziligini bekor qilish",
@@ -136,6 +185,7 @@ export const VOICE_OPERATOR_UZ = {
   consentPrompt: "Sanitizatsiya qilingan so'rov ulangan provayderlarga yuboriladi. Davom etilsinmi?",
   consentYes: "Ha, davom etish",
   consentNo: "Bekor qilish",
+  guidanceCardTitle: "Operator yo'riqnomasi",
 } as const;
 
 export const VOICE_OPERATOR_RU = {
@@ -150,6 +200,8 @@ export const VOICE_OPERATOR_RU = {
   stateSearchingSources: "Поиск источников",
   stateResponding: "Отвечаю",
   stateActionConfirmation: "Требуется подтверждение",
+  stateExecutingAction: "Выполняется действие",
+  stateAwaitingConfirmation: "Ожидается подтверждение",
   stateDisconnected: "Отключено",
   stateBackendRequired: "Требуется backend",
   stateError: "Ошибка",
@@ -184,9 +236,31 @@ export const VOICE_OPERATOR_RU = {
   permissionContinueText: "Продолжить текстом",
   permissionClose: "Закрыть",
   backendRequiredNotice: "Для живого голосового разговора нужно безопасное backend-подключение.",
+  localCapabilityNotice: "Локальный живой голос не настроен.",
+  localCapabilityUserNotice:
+    "Живой голос недоступен в этой среде. Вы можете продолжить, вводя сообщения ниже.",
+  localVoiceSetupHint:
+    "Запустите npm run dev:voice и укажите OPENAI_API_KEY в .dev.vars.",
+  developerDiagnosticsHeading: "Диагностика для разработчика",
+  diagnosticsBrokerUrl: "URL брокера",
+  diagnosticsAllowedOrigin: "Разрешённый origin",
+  diagnosticsClassification: "Классификация credential",
+  diagnosticsConnectionState: "Состояние подключения",
+  diagnosticsDoctorCommand: "Команда preflight",
+  diagnosticsNotConfigured: "Не настроено",
+  diagnosticsClassificationUnknown: "Неизвестно или ещё не проверено",
+  diagnosticsClassificationInvalidKey: "Недействительный или placeholder API-ключ (EXTERNAL_BLOCKED)",
+  diagnosticsClassificationQuota: "Квота или биллинг заблокированы",
+  diagnosticsClassificationAuth: "Ошибка аутентификации или доступа",
+  diagnosticsClassificationUnreachable: "Брокер недоступен",
+  diagnosticsClassificationNotConfigured: "Брокер не настроен",
   brokerUnavailableNotice: "Безопасный голосовой backend недоступен. Текстовый чат работает.",
   brokerAuthenticationFailedNotice:
     "Не удалось пройти аутентификацию голосового backend. Войдите в preview-среду и повторите попытку.",
+  brokerInvalidApiKeyNotice:
+    "Живой голос недоступен: API-ключ backend недействителен или не настроен. Текстовый чат доступен.",
+  brokerQuotaBlockedNotice:
+    "Живой голос недоступен: квота или биллинг backend блокирует Realtime. Текстовый чат доступен.",
   browserFallbackNotice: "Транскрипция браузера ненадёжна. Отредактируйте текст перед отправкой.",
   externalSearchActive: "Внешний поиск активен",
   revokeExternalSearch: "Отозвать согласие на поиск",
@@ -205,6 +279,7 @@ export const VOICE_OPERATOR_RU = {
   consentPrompt: "Очищенный запрос будет отправлен подключённым провайдерам. Продолжить?",
   consentYes: "Да, продолжить",
   consentNo: "Отмена",
+  guidanceCardTitle: "Подсказка оператора",
 } as const;
 
 export const VOICE_OPERATOR_TR = {
@@ -219,6 +294,8 @@ export const VOICE_OPERATOR_TR = {
   stateSearchingSources: "Kaynaklar aranıyor",
   stateResponding: "Yanıt veriyorum",
   stateActionConfirmation: "Onay gerekli",
+  stateExecutingAction: "Eylem yürütülüyor",
+  stateAwaitingConfirmation: "Onay bekleniyor",
   stateDisconnected: "Bağlantı kesildi",
   stateBackendRequired: "Backend gerekli",
   stateError: "Hata",
@@ -253,9 +330,31 @@ export const VOICE_OPERATOR_TR = {
   permissionContinueText: "Metinle devam et",
   permissionClose: "Kapat",
   backendRequiredNotice: "Canlı sesli konuşma için güvenli backend bağlantısı gerekir.",
+  localCapabilityNotice: "Yerel canlı ses yapılandırılmadı.",
+  localCapabilityUserNotice:
+    "Canlı ses bu ortamda kullanılamıyor. Aşağıdan yazarak devam edebilirsiniz.",
+  localVoiceSetupHint:
+    "npm run dev:voice çalıştırın ve .dev.vars içinde OPENAI_API_KEY ayarlayın.",
+  developerDiagnosticsHeading: "Geliştirici tanılaması",
+  diagnosticsBrokerUrl: "Broker URL",
+  diagnosticsAllowedOrigin: "İzin verilen origin",
+  diagnosticsClassification: "Credential sınıflandırması",
+  diagnosticsConnectionState: "Bağlantı durumu",
+  diagnosticsDoctorCommand: "Preflight komutu",
+  diagnosticsNotConfigured: "Yapılandırılmadı",
+  diagnosticsClassificationUnknown: "Bilinmiyor veya henüz kontrol edilmedi",
+  diagnosticsClassificationInvalidKey: "Geçersiz veya placeholder API anahtarı (EXTERNAL_BLOCKED)",
+  diagnosticsClassificationQuota: "Kota veya faturalandırma engellendi",
+  diagnosticsClassificationAuth: "Kimlik doğrulama veya erişim reddedildi",
+  diagnosticsClassificationUnreachable: "Broker'a ulaşılamıyor",
+  diagnosticsClassificationNotConfigured: "Broker yapılandırılmadı",
   brokerUnavailableNotice: "Güvenli ses backend'ine ulaşılamıyor. Metin sohbeti kullanılabilir.",
   brokerAuthenticationFailedNotice:
     "Ses backend kimlik doğrulaması başarısız. Preview ortamına giriş yapın ve tekrar deneyin.",
+  brokerInvalidApiKeyNotice:
+    "Canlı ses kullanılamıyor — backend API anahtarı geçersiz veya yapılandırılmamış. Metin sohbeti kullanılabilir.",
+  brokerQuotaBlockedNotice:
+    "Canlı ses kullanılamıyor — backend hesap kotası veya faturalandırma Realtime'ı engelliyor. Metin sohbeti kullanılabilir.",
   browserFallbackNotice: "Tarayıcı transkripti güvenilir değil. Göndermeden önce metni düzenleyin.",
   externalSearchActive: "Harici arama aktif",
   revokeExternalSearch: "Arama onayını iptal et",
@@ -274,6 +373,7 @@ export const VOICE_OPERATOR_TR = {
   consentPrompt: "Temizlenmiş sorgu bağlı sağlayıcılara gönderilecek. Devam edilsin mi?",
   consentYes: "Evet, devam",
   consentNo: "İptal",
+  guidanceCardTitle: "Operatör rehberi",
 } as const;
 
 export type VoiceOperatorCopy = { readonly [K in keyof typeof VOICE_OPERATOR_EN]: string };
@@ -297,6 +397,8 @@ export function dockStateLabel(copy: VoiceOperatorCopy, state: string): string {
     searching_sources: "stateSearchingSources",
     responding: "stateResponding",
     action_confirmation: "stateActionConfirmation",
+    executing_action: "stateExecutingAction",
+    awaiting_confirmation: "stateAwaitingConfirmation",
     disconnected: "stateDisconnected",
     backend_required: "stateBackendRequired",
     error: "stateError",

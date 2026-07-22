@@ -1,3 +1,5 @@
+"use client";
+
 import type { Country } from "@/lib/countries";
 import {
   buildCountryIntelligenceProfile,
@@ -5,6 +7,9 @@ import {
   countryEvidenceStatusClass,
 } from "@/lib/countries.intelligence";
 import { getCountryRelationships } from "@/lib/countries.adapter";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import { translateEntityListEvidenceLabel } from "@/lib/i18n/entity-ui-translation";
+import { getDictionary } from "@/lib/i18n/translate";
 
 type CountryCardProps = {
   country: Country;
@@ -17,11 +22,16 @@ export default function CountryCard({
   isSelected,
   onSelect,
 }: CountryCardProps) {
+  const { language, t } = useTranslation();
+  const dictionary = getDictionary(language);
   const profile = buildCountryIntelligenceProfile(
     country,
     getCountryRelationships(country),
   );
-  const evidenceLabel = resolveCountryListEvidenceLabel(profile);
+  const evidenceLabel = translateEntityListEvidenceLabel(
+    dictionary,
+    resolveCountryListEvidenceLabel(profile),
+  );
   const evidenceClass = countryEvidenceStatusClass(
     profile.referenceConnected ? "connected" : "insufficient",
   );
@@ -48,15 +58,17 @@ export default function CountryCard({
             </p>
           </div>
         </div>
-        {isSelected && (
+        {isSelected ? (
           <span className="rounded-full bg-teal-500/10 px-2 py-0.5 text-[10px] font-medium text-teal-400">
-            Selected
+            {t("entities.selected")}
           </span>
-        )}
+        ) : null}
       </div>
 
       <div className="mt-4 space-y-2">
-        <p className="text-xs text-zinc-500">Capital: {country.capital}</p>
+        <p className="text-xs text-zinc-500">
+          {t("entityUi.capitalLabel")}: {country.capital}
+        </p>
         <span
           className={`inline-flex rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${evidenceClass}`}
         >

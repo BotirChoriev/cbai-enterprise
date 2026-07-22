@@ -3,10 +3,20 @@
  * Creates ephemeral OpenAI Realtime client secrets; never exposes long-lived API keys.
  */
 
+import { buildPlatformRealtimeTools } from "@/lib/platform-actions/realtime-tool-schemas";
 import { buildVoiceOperatorInstructions } from "@/lib/voice-operator/instructions";
+import {
+  buildUpstreamErrorResponseBody,
+  classifyUpstreamFailure,
+  parseOpenAiErrorBody,
+  redactUpstreamMessage,
+  type UpstreamDiagnostics,
+} from "@/lib/voice-operator/session-broker/upstream-diagnostics";
+import { VOICE_VAD_CONFIG } from "@/lib/voice-operator/vad-config";
 
 export const OPENAI_REALTIME_CLIENT_SECRETS_URL = "https://api.openai.com/v1/realtime/client_secrets";
 export const REALTIME_MODEL = "gpt-realtime";
+export const REALTIME_OUTPUT_VOICE = "marin";
 export const MAX_VOICE_SESSION_BODY_BYTES = 4096;
 
 export type VoiceSessionBrokerEnv = {
@@ -22,10 +32,14 @@ export type VoiceSessionBrokerRequestBody = {
 
 export type OpenAiClientSecretCreateResponse = {
   readonly value?: string;
-  readonly expires_at?: number;
+  readonly expires_at?: number | string;
   readonly session?: {
     readonly id?: string;
     readonly model?: string;
+  };
+  readonly client_secret?: {
+    readonly value?: string;
+    readonly expires_at?: number | string;
   };
 };
 
@@ -38,10 +52,15 @@ export type VoiceSessionBrokerSuccess = {
 
 export type FetchLike = typeof fetch;
 
+export type VoiceSessionBrokerOptions = {
+  readonly fetchFn?: FetchLike;
+  readonly exposeUpstreamDiagnostics?: boolean;
+};
+
 const JSON_HEADERS = { "Content-Type": "application/json" } as const;
 
 function jsonResponse(
-  body: Record<string, string>,
+  body: Record<string, unknown>,
   status: number,
   origin: string | null,
   allowedOrigins: readonly string[],
@@ -80,23 +99,80 @@ function assertNoSecretLeak(text: string, apiKey: string | undefined): void {
   if (apiKey && text.includes(apiKey)) {
     throw new Error("Broker attempted to leak OPENAI_API_KEY");
   }
-  if (/\bsk-[A-Za-z0-9_-]{8,}\b/.test(text)) {
+  if (/\bsk-[A-Za-z0-9_-]{3,}\b/.test(text)) {
     throw new Error("Broker attempted to leak sk-* credential");
+  }
+  if (/\bek_[A-Za-z0-9_-]{8,}\b/.test(text)) {
+    throw new Error("Broker attempted to leak ek_* credential");
   }
 }
 
-function sanitizePublicText(text: string, apiKey: string | undefined): string {
-  assertNoSecretLeak(text, apiKey);
-  return text;
+function sanitizeErrorText(text: string, apiKey: string | undefined): string {
+  const sanitized = redactUpstreamMessage(text, apiKey);
+  assertNoSecretLeak(sanitized, apiKey);
+  return sanitized;
+}
+
+function sanitizeCredentialResponse(text: string, apiKey: string | undefined): string {
+  let sanitized = text;
+  if (apiKey?.trim()) {
+    sanitized = sanitized.split(apiKey.trim()).join("[REDACTED]");
+  }
+  if (apiKey && sanitized.includes(apiKey)) {
+    throw new Error("Broker attempted to leak OPENAI_API_KEY");
+  }
+  if (/\bsk-[A-Za-z0-9_-]{3,}\b/.test(sanitized)) {
+    throw new Error("Broker attempted to leak sk-* credential");
+  }
+  return sanitized;
+}
+
+function normalizeExpiresAt(value: number | string | undefined): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string" && value.trim()) {
+    const asNumber = Number(value);
+    if (Number.isFinite(asNumber)) return asNumber;
+    const parsed = Date.parse(value);
+    if (Number.isFinite(parsed)) return Math.floor(parsed / 1000);
+  }
+  return null;
+}
+
+export function buildRealtimeClientSecretPayload(language: string | undefined): string {
+  return JSON.stringify({
+    expires_after: {
+      anchor: "created_at",
+      seconds: 600,
+    },
+    session: {
+      type: "realtime",
+      model: REALTIME_MODEL,
+      instructions: buildVoiceOperatorInstructions(language ?? "en"),
+      tools: buildPlatformRealtimeTools(),
+      tool_choice: "auto",
+      audio: {
+        output: {
+          voice: REALTIME_OUTPUT_VOICE,
+        },
+        input: {
+          turn_detection: {
+            type: "server_vad",
+            silence_duration_ms: VOICE_VAD_CONFIG.silenceDurationMs,
+            interrupt_response: VOICE_VAD_CONFIG.bargeInEnabled,
+          },
+        },
+      },
+    },
+  });
 }
 
 function mapUpstreamResponse(
   upstream: OpenAiClientSecretCreateResponse,
   sessionHint?: string,
 ): VoiceSessionBrokerSuccess | null {
-  const clientSecret = upstream.value?.trim();
-  const expiresAtEpoch = upstream.expires_at;
-  if (!clientSecret || !clientSecret.startsWith("ek_") || typeof expiresAtEpoch !== "number") {
+  const clientSecret = (upstream.value ?? upstream.client_secret?.value)?.trim();
+  const expiresAtEpoch = normalizeExpiresAt(upstream.expires_at ?? upstream.client_secret?.expires_at);
+  if (!clientSecret || !clientSecret.startsWith("ek_") || expiresAtEpoch === null) {
     return null;
   }
   if (clientSecret.startsWith("sk-")) return null;
@@ -109,46 +185,60 @@ function mapUpstreamResponse(
   };
 }
 
+export type CreateOpenAiClientSecretResult =
+  | { ok: true; data: OpenAiClientSecretCreateResponse }
+  | { ok: false; diagnostics: UpstreamDiagnostics };
 
 export async function createOpenAiClientSecret(
   apiKey: string,
   language: string | undefined,
   fetchFn: FetchLike,
-): Promise<{ ok: true; data: OpenAiClientSecretCreateResponse } | { ok: false; status: number }> {
-  const response = await fetchFn(OPENAI_REALTIME_CLIENT_SECRETS_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      expires_after: {
-        anchor: "created_at",
-        seconds: 600,
+): Promise<CreateOpenAiClientSecretResult> {
+  let response: Response;
+  try {
+    response = await fetchFn(OPENAI_REALTIME_CLIENT_SECRETS_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
       },
-      session: {
-        type: "realtime",
-        model: REALTIME_MODEL,
-        instructions: buildVoiceOperatorInstructions(language ?? "en"),
-        audio: {
-          input: {
-            turn_detection: {
-              type: "server_vad",
-              silence_duration_ms: 900,
-              interrupt_response: true,
-            },
-          },
-        },
-      },
-    }),
-  });
-
-  if (!response.ok) {
-    return { ok: false, status: response.status };
+      body: buildRealtimeClientSecretPayload(language),
+    });
+  } catch {
+    return {
+      ok: false,
+      diagnostics: classifyUpstreamFailure({ status: 0, cause: "network" }),
+    };
   }
 
-  const data = (await response.json()) as OpenAiClientSecretCreateResponse;
-  return { ok: true, data };
+  const requestId = response.headers.get("x-request-id");
+  const rawBody = await response.text();
+
+  if (!response.ok) {
+    return {
+      ok: false,
+      diagnostics: classifyUpstreamFailure({
+        status: response.status,
+        errorBody: parseOpenAiErrorBody(rawBody),
+        requestId,
+        apiKey,
+      }),
+    };
+  }
+
+  try {
+    const data = JSON.parse(rawBody) as OpenAiClientSecretCreateResponse;
+    return { ok: true, data };
+  } catch {
+    return {
+      ok: false,
+      diagnostics: classifyUpstreamFailure({
+        status: response.status,
+        cause: "invalid_shape",
+        requestId,
+      }),
+    };
+  }
 }
 
 async function readJsonBody(request: Request): Promise<
@@ -183,12 +273,28 @@ async function readJsonBody(request: Request): Promise<
   }
 }
 
+function upstreamFailureResponse(
+  diagnostics: UpstreamDiagnostics,
+  origin: string,
+  allowedOrigins: readonly string[],
+  apiKey: string | undefined,
+  exposeDiagnostics: boolean,
+): Response {
+  const body = buildUpstreamErrorResponseBody(diagnostics, exposeDiagnostics);
+  const payload = sanitizeErrorText(JSON.stringify(body), apiKey);
+  const headers = new Headers(JSON_HEADERS);
+  headers.set("Cache-Control", "no-store");
+  applyCors(headers, origin, allowedOrigins);
+  return new Response(payload, { status: 502, headers });
+}
+
 export async function handleVoiceSessionBrokerRequest(
   request: Request,
   env: VoiceSessionBrokerEnv,
-  options?: { fetchFn?: FetchLike },
+  options?: VoiceSessionBrokerOptions,
 ): Promise<Response> {
   const fetchFn = options?.fetchFn ?? fetch;
+  const exposeDiagnostics = options?.exposeUpstreamDiagnostics === true;
   const allowedOrigins = parseAllowedOrigins(env.VOICE_ALLOWED_ORIGINS);
 
   if (allowedOrigins.length === 0) {
@@ -229,23 +335,19 @@ export async function handleVoiceSessionBrokerRequest(
 
   const upstream = await createOpenAiClientSecret(apiKey, parsedBody.body.language, fetchFn);
   if (!upstream.ok) {
-    const payload = sanitizePublicText(JSON.stringify({ error: "broker_upstream_error" }), apiKey);
-    const headers = new Headers(JSON_HEADERS);
-    headers.set("Cache-Control", "no-store");
-    applyCors(headers, origin, allowedOrigins);
-    return new Response(payload, { status: 502, headers });
+    return upstreamFailureResponse(upstream.diagnostics, origin, allowedOrigins, apiKey, exposeDiagnostics);
   }
 
   const mapped = mapUpstreamResponse(upstream.data, parsedBody.body.sessionHint);
   if (!mapped) {
-    const payload = sanitizePublicText(JSON.stringify({ error: "broker_upstream_error" }), apiKey);
-    const headers = new Headers(JSON_HEADERS);
-    headers.set("Cache-Control", "no-store");
-    applyCors(headers, origin, allowedOrigins);
-    return new Response(payload, { status: 502, headers });
+    const diagnostics = classifyUpstreamFailure({
+      status: 200,
+      cause: "invalid_shape",
+    });
+    return upstreamFailureResponse(diagnostics, origin, allowedOrigins, apiKey, exposeDiagnostics);
   }
 
-  const successBody = sanitizePublicText(JSON.stringify(mapped), apiKey);
+  const successBody = sanitizeCredentialResponse(JSON.stringify(mapped), apiKey);
   const headers = new Headers(JSON_HEADERS);
   headers.set("Cache-Control", "no-store");
   applyCors(headers, origin, allowedOrigins);

@@ -54,9 +54,9 @@ test("5. BUILD-011 i18n in all four active languages", () => {
   }
 });
 
-test("6. PlatformHome renders Intelligence Canvas — not marketing homepage stack", () => {
+test("6. PlatformHome renders Spatial World Intelligence — not marketing homepage stack", () => {
   const home = readSource("components/platform/PlatformHome.tsx");
-  assert.match(home, /IntelligenceCanvas/);
+  assert.match(home, /SpatialWorldIntelligenceHome/);
   assert.doesNotMatch(home, /HomeEcosystems/);
   assert.doesNotMatch(home, /RoleWorkContextCards/);
   assert.doesNotMatch(home, /HomeIntelligenceGlobe/);

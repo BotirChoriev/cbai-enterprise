@@ -31,6 +31,13 @@ export function translateGraphEvidenceLabel(
     return gui.evidenceLabels.partnershipVerification;
   if (label === "Registry available") return gp.registryAvailable;
   if (label === "Evidence connected") return gp.evidenceConnected;
+  const indicatorMatch = /^(\d+) indicator connected$/.exec(label);
+  if (indicatorMatch) {
+    const count = Number(indicatorMatch[1]);
+    return count === 1
+      ? dictionary.entityUi.indicatorConnectedOne
+      : dictionary.entityUi.indicatorConnectedMany.replace("{count}", String(count));
+  }
   if (label === "Evidence unavailable") return gp.evidenceUnavailable;
   if (label === "Insufficient Evidence") return gp.insufficientEvidence;
   if (label === "Evidence Source Not Connected") return gp.notConnected;

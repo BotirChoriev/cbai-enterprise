@@ -68,6 +68,20 @@ export const ENTITIES_UZ = {
   selected: "Tanlangan",
   worldMapTitle: "Jahon intellektual xaritasi",
   worldMapShowing: "Jahon intellektual xaritasi — {name} ko‘rsatilmoqda",
+  worldMapHeading: "Qaysi mamlakatlar profilga ega?",
+  worldMapDescription:
+    "Mahalliy reestrdagi har bir mamlakat mintaqa bo‘yicha guruhlangan va haqiqiy dalil holati ko‘rsatilgan. Profilni ochish uchun mamlakatni tanlang.",
+  worldMapSearchLabel: "Mamlakat nomi, kodi yoki mintaqa bo‘yicha qidiring",
+  worldMapSearchPlaceholder: "Mamlakatlarni qidirish…",
+  worldMapLegendAria: "Ma’lumot holati afsonasi",
+  worldMapResultsMatch: "{count} ta mamlakat \"{query}\" bo‘yicha mos keldi",
+  worldMapResultsMatchOne: "1 ta mamlakat \"{query}\" bo‘yicha mos keldi",
+  worldMapNoMatch: "Mahalliy reestrda \"{query}\" mos keladigan mamlakat topilmadi.",
+  share: "Ulashish",
+  linkCopied: "Havola nusxalandi",
+  linkCopyFailed: "Havolani nusxalab bo‘lmadi",
+  entityNotFound:
+    "\"{requestedId}\" mos keladigan {entityLabel} topilmadi — havola eskirgan bo‘lishi mumkin. O‘rniga {fallbackName} ko‘rsatilmoqda; qidiruv yoki ro‘yxatdan to‘g‘risini toping.",
 } as const;
 
 export const MY_WORK_UZ = {

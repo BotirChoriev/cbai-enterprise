@@ -18,6 +18,8 @@ export type SessionBrokerResponse =
         | "ORIGIN_BLOCKED"
         | "RATE_LIMITED"
         | "AUTHENTICATION_FAILED"
+        | "INVALID_API_KEY"
+        | "QUOTA_OR_ACCOUNT_BLOCKED"
         | "ERROR";
       readonly message: string;
     };

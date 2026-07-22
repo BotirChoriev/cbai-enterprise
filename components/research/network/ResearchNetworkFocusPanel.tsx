@@ -8,6 +8,7 @@ import {
   type ResearchConnectionType,
 } from "@/lib/research/network/network-types";
 import { getResearchTopicPath } from "@/lib/research/research-topics";
+import { useTranslation } from "@/lib/i18n/use-translation";
 import {
   cbaiBtnPrimary,
   cbaiBtnSecondary,
@@ -34,6 +35,7 @@ export default function ResearchNetworkFocusPanel({
   onSelectTopic,
   onClearFocus,
 }: ResearchNetworkFocusPanelProps) {
+  const { t } = useTranslation();
   const topicPath = getResearchTopicPath(node.topicId);
   const visibleRelatedTopics = relatedTopics.slice(0, MAX_RELATED_TOPICS);
 
@@ -43,7 +45,7 @@ export default function ResearchNetworkFocusPanel({
       className={`${cbaiGlassCard} flex flex-col gap-4 border-teal-500/20 p-4 shadow-[0_0_32px_-8px_rgba(34,211,238,0.25)] transition-all duration-[250ms] lg:max-h-[720px] lg:overflow-y-auto`}
     >
       <div className="space-y-1">
-        <p className={cbaiSectionEyebrow}>Selected topic</p>
+        <p className={cbaiSectionEyebrow}>{t("researchCatalog.selectedTopicEyebrow")}</p>
         <h3 id="network-focus-heading" className="text-lg font-semibold text-zinc-100">
           {node.topicName}
         </h3>
@@ -55,7 +57,7 @@ export default function ResearchNetworkFocusPanel({
           id="network-focus-methods-heading"
           className="text-[10px] font-medium uppercase tracking-wider text-zinc-600"
         >
-          Methods
+          {t("researchCatalog.methods")}
         </h4>
         {node.sharedMethods.length > 0 ? (
           <ul className="flex flex-wrap gap-1.5">
@@ -128,7 +130,7 @@ export default function ResearchNetworkFocusPanel({
 
       <div className="mt-auto flex flex-col gap-2 border-t border-zinc-800/80 pt-4">
         <Link href={topicPath} className={`${cbaiBtnPrimary} w-full`}>
-          Open topic →
+          {t("research.openTopic")} →
         </Link>
         <button type="button" onClick={onClearFocus} className={`${cbaiBtnSecondary} w-full`}>
           Clear focus

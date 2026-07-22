@@ -37,8 +37,52 @@ export function parseBrokerCredentialJson(bodyText: string): EphemeralRealtimeCr
   }
 }
 
+function parseBrokerErrorJson(bodyText: string): { error?: string } | null {
+  try {
+    const payload = JSON.parse(bodyText) as { error?: unknown };
+    if (payload && typeof payload === "object" && typeof payload.error === "string") {
+      return { error: payload.error };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function classifyUpstreamBrokerError(error: string): SessionBrokerResponse | null {
+  switch (error) {
+    case "invalid_api_key":
+      return {
+        ok: false,
+        code: "INVALID_API_KEY",
+        message: "Voice backend API key is invalid or not configured.",
+      };
+    case "insufficient_quota":
+      return {
+        ok: false,
+        code: "QUOTA_OR_ACCOUNT_BLOCKED",
+        message: "Voice backend account quota or billing blocked Realtime access.",
+      };
+    case "project_or_model_access_denied":
+      return {
+        ok: false,
+        code: "AUTHENTICATION_FAILED",
+        message: "Voice backend project does not have Realtime model access.",
+      };
+    case "rate_limited":
+      return { ok: false, code: "RATE_LIMITED", message: "Rate limit exceeded." };
+    case "backend_required":
+      return { ok: false, code: "BACKEND_REQUIRED", message: "Voice broker backend is not configured." };
+    case "origin_blocked":
+      return { ok: false, code: "ORIGIN_BLOCKED", message: "Origin not allowed." };
+    default:
+      return null;
+  }
+}
+
 export function classifyBrokerHttpResponse(input: BrokerResponseInput): SessionBrokerResponse {
   const { status, contentType, bodyText } = input;
+  const upstreamError = parseBrokerErrorJson(bodyText);
 
   if (isBrokerAuthenticationRedirect(status)) {
     return {
@@ -69,6 +113,10 @@ export function classifyBrokerHttpResponse(input: BrokerResponseInput): SessionB
   }
 
   if (!status || status < 200 || status >= 300) {
+    if (upstreamError?.error) {
+      const classified = classifyUpstreamBrokerError(upstreamError.error);
+      if (classified) return classified;
+    }
     return { ok: false, code: "ERROR", message: `Broker error (${status}).` };
   }
 

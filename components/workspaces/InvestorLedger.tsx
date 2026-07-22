@@ -1,21 +1,27 @@
+"use client";
+
 import type { WorkspaceCoverageItem } from "@/lib/workspaces";
-import { displayStatusLabel } from "@/lib/workspaces";
 import { workspaceMotifFill } from "@/components/workspaces/workspace-motif-colors";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import { getDictionary } from "@/lib/i18n/translate";
+import { translateWorkspaceStatusLabel } from "@/lib/i18n/investor-translation";
 
 type InvestorLedgerProps = {
   domains: readonly WorkspaceCoverageItem[];
 };
 
-// Investor's own atmosphere: a due-diligence ledger, not a wheel — diligence is sequential and
-// comparative across domains, so each real domain gets one row, and each row's real
-// indicator-connection ratio sets the tick length. Indigo instead of Governance's navy+gold or
-// Citizen's clay: the one room whose subject is capital, not people or rules.
 export default function InvestorLedger({ domains }: InvestorLedgerProps) {
+  const { language } = useTranslation();
+  const dictionary = getDictionary(language);
   const width = 300;
   const rowHeight = 20;
   const height = domains.length * rowHeight + 12;
   const labelWidth = 8;
   const maxTick = width - labelWidth - 40;
+  const ariaLabel = dictionary.investorWorkspace.ledgerAria.replace(
+    "{count}",
+    String(domains.length),
+  );
 
   return (
     <div className="relative mx-auto flex w-full max-w-[340px] items-center justify-center lg:mx-0">
@@ -28,12 +34,13 @@ export default function InvestorLedger({ domains }: InvestorLedgerProps) {
         viewBox={`0 0 ${width} ${height}`}
         fill="none"
         role="img"
-        aria-label={`Investor evidence ledger: ${domains.length} real investment domains, tick length is each domain's real indicator-connection ratio`}
+        aria-label={ariaLabel}
       >
         {domains.map((domain, index) => {
           const y = index * rowHeight + 8;
           const ratio = domain.indicatorCount > 0 ? domain.connectedCount / domain.indicatorCount : 0;
           const tickLength = Math.max(6, ratio * maxTick);
+          const status = translateWorkspaceStatusLabel(dictionary, domain.statusLabel);
           return (
             <g key={domain.id}>
               <line
@@ -54,7 +61,7 @@ export default function InvestorLedger({ domains }: InvestorLedgerProps) {
                 strokeWidth="3"
                 strokeLinecap="round"
               >
-                <title>{`${domain.title}: ${displayStatusLabel(domain.statusLabel)}`}</title>
+                <title>{`${domain.title}: ${status}`}</title>
               </line>
               <circle
                 cx={labelWidth + tickLength}

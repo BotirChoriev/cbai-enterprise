@@ -1,6 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import { getDictionary } from "@/lib/i18n/translate";
+import { translateInvestorWorkspace } from "@/lib/i18n/investor-translation";
 import { buildInvestorWorkspace } from "@/lib/workspaces/investor";
 import WorkspaceHero from "@/components/workspaces/WorkspaceHero";
 import WorkspaceCoverageGrid from "@/components/workspaces/WorkspaceCoverageGrid";
@@ -10,13 +13,18 @@ import RoleProjectEntry from "@/components/workspaces/RoleProjectEntry";
 import InvestorLedger from "@/components/workspaces/InvestorLedger";
 
 export default function InvestorWorkspace() {
-  const model = useMemo(() => buildInvestorWorkspace(), []);
+  const { language } = useTranslation();
+  const model = useMemo(() => {
+    const base = buildInvestorWorkspace();
+    return translateInvestorWorkspace(getDictionary(language), base);
+  }, [language]);
+  const copy = getDictionary(language).investorWorkspace;
 
   return (
     <div className="space-y-10">
       <WorkspaceHero
         embedded
-        versionLabel="Investor Workspace"
+        versionLabel={copy.versionLabel}
         title={model.hero.title}
         subtitle={model.hero.subtitle}
         description={model.hero.description}
@@ -24,46 +32,43 @@ export default function InvestorWorkspace() {
         motif={<InvestorLedger domains={model.investmentEvidenceMap} />}
         metrics={[
           {
-            label: "Evidence domains",
+            label: copy.metricEvidenceDomains,
             value: String(model.summary.domainsTracked),
           },
           {
-            label: "Available information",
+            label: copy.metricAvailableInformation,
             value: String(model.summary.domainsWithEvidence),
           },
           {
-            label: "Sources connected",
+            label: copy.metricSourcesConnected,
             value: String(model.summary.connectedSources),
             detail: `/ ${model.summary.totalSources}`,
           },
         ]}
       />
 
-      <RoleProjectEntry
-        projectType="investment_analysis"
-        description="Track a real investment question against the macro, trade, and infrastructure evidence below — no scores or recommendations, just your own evidence, notes, and a report attached to one project."
-      />
+      <RoleProjectEntry projectType="investment_analysis" description={copy.projectEntryDescription} />
 
       <WorkspaceCoverageGrid
         headingId="investor-evidence-map"
-        heading="Investment evidence"
-        description="Macro, trade, procurement, and infrastructure topics."
+        heading={copy.sectionInvestmentEvidenceHeading}
+        description={copy.sectionInvestmentEvidenceDescription}
         items={model.investmentEvidenceMap}
       />
 
       <WorkspaceEntityLinks links={model.entityLinks} />
 
       <WorkspaceSourceCoverage
-        heading="Official sources"
-        description="Official sources for investment review."
+        heading={copy.sectionOfficialSourcesHeading}
+        description={copy.sectionOfficialSourcesDescription}
         sources={model.sources}
         headingId="investor-source-coverage"
       />
 
       <WorkspaceCoverageGrid
         headingId="investor-opportunity-readiness"
-        heading="Opportunity status"
-        description="Status by topic — information only, not recommendations."
+        heading={copy.sectionOpportunityStatusHeading}
+        description={copy.sectionOpportunityStatusDescription}
         items={model.opportunityReadiness}
       />
     </div>

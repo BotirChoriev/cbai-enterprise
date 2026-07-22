@@ -12,33 +12,30 @@ export type SimplicityMetricKind =
 
 export type SimplicityMetric = {
   readonly kind: SimplicityMetricKind;
-  readonly label: string;
+  readonly labelKey: keyof typeof import("@/lib/i18n/platform-copy-build020-en").ZERO_LEARNING_CURVE_EN;
   readonly value: null;
   readonly unit: null;
-  readonly limitation: string;
+  readonly limitationKey: "simplicityMetricsNote";
 };
 
-const METRIC_LABELS: Record<SimplicityMetricKind, string> = {
-  time_to_first_success: "Time To First Success",
-  time_to_resume: "Time To Resume",
-  navigation_confidence: "Navigation Confidence",
-  context_continuity: "Context Continuity",
-  mission_completion_flow: "Mission Completion Flow",
-  decision_confidence: "Decision Confidence",
+const METRIC_LABEL_KEYS: Record<SimplicityMetricKind, SimplicityMetric["labelKey"]> = {
+  time_to_first_success: "simplicityMetricTimeToFirstSuccess",
+  time_to_resume: "simplicityMetricTimeToResume",
+  navigation_confidence: "simplicityMetricNavigationConfidence",
+  context_continuity: "simplicityMetricContextContinuity",
+  mission_completion_flow: "simplicityMetricMissionCompletionFlow",
+  decision_confidence: "simplicityMetricDecisionConfidence",
 };
 
 export function listSimplicityMetrics(): readonly SimplicityMetric[] {
-  return (Object.keys(METRIC_LABELS) as SimplicityMetricKind[]).map((kind) => ({
+  return (Object.keys(METRIC_LABEL_KEYS) as SimplicityMetricKind[]).map((kind) => ({
     kind,
-    label: METRIC_LABELS[kind],
+    labelKey: METRIC_LABEL_KEYS[kind],
     value: null,
     unit: null,
-    limitation: "Metric architecture only — no analytics pipeline connected.",
+    limitationKey: "simplicityMetricsNote",
   }));
 }
-
-export const SIMPLICITY_METRICS_NOTE =
-  "UX metrics are defined for future instrumentation. Values are never fabricated.";
 
 export type PrimaryScreenId =
   | "home"

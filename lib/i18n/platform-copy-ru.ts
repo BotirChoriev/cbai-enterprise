@@ -68,6 +68,20 @@ export const ENTITIES_RU = {
   selected: "Выбрано",
   worldMapTitle: "Карта мировой разведки",
   worldMapShowing: "Карта мировой разведки — показано {name}",
+  worldMapHeading: "У каких стран есть профили?",
+  worldMapDescription:
+    "Каждая страна в локальном реестре, сгруппированная по регионам, с реальным статусом данных. Выберите страну, чтобы открыть профиль.",
+  worldMapSearchLabel: "Поиск по названию, коду или региону",
+  worldMapSearchPlaceholder: "Поиск стран…",
+  worldMapLegendAria: "Легенда статуса данных",
+  worldMapResultsMatch: "{count} стран соответствуют «{query}»",
+  worldMapResultsMatchOne: "1 страна соответствует «{query}»",
+  worldMapNoMatch: "В локальном реестре нет стран, соответствующих «{query}».",
+  share: "Поделиться",
+  linkCopied: "Ссылка скопирована",
+  linkCopyFailed: "Не удалось скопировать ссылку",
+  entityNotFound:
+    "Не найдено {entityLabel}, соответствующего «{requestedId}» — ссылка может быть устаревшей. Вместо этого показано {fallbackName}; используйте поиск или список ниже.",
 } as const;
 
 export const MY_WORK_RU = {

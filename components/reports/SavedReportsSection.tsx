@@ -1,14 +1,11 @@
 "use client";
 
-import { useMissionContext } from "@/components/mission/MissionContextProvider";
-import { deriveFirstMinuteAction, translateFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { loadReports, deleteReport, type SavedReport } from "@/lib/reports/reports-store";
 import { PLATFORM_MODULES } from "@/lib/context";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
-import EmptyState from "@/components/shared/EmptyState";
 import ActivationStatusLine from "@/components/shared/ActivationStatusLine";
 import { useMissionDataRevision } from "@/lib/hooks/use-mission-data-revision";
 
@@ -29,24 +26,12 @@ function reportHref(report: SavedReport): string {
 
 export default function SavedReportsSection() {
   const { t } = useTranslation();
-  const { mission } = useMissionContext();
   useMissionDataRevision();
-  const next = useMemo(() => deriveFirstMinuteAction(mission), [mission]);
   const reports = loadReports();
   const [status, setStatus] = useState<string | null>(null);
 
   if (reports.length === 0) {
-    return (
-      <EmptyState
-        title={t("reports.myReports")}
-        message={t("reports.noReports")}
-        action={
-          <Link href={next.href} className="text-xs text-teal-400 hover:text-teal-300">
-            {translateFirstMinuteAction(t, next)} →
-          </Link>
-        }
-      />
-    );
+    return null;
   }
 
   return (

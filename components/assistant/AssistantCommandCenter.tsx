@@ -39,6 +39,7 @@ import {
   createVoiceTranscriptRecord,
   markVoiceTranscriptConfirmed,
 } from "@/lib/voice/voice-transcript-provenance";
+import { useOperationalObjectsOptional } from "@/components/operational-objects/OperationalObjectProvider";
 import type { VoiceActionProposal, VoiceControlPhase } from "@/lib/voice/voice-control-types";
 
 const SUGGESTED_COMMAND_IDS = ["open-my-work", "continue-research", "open-evidence", "open-trust"];
@@ -90,6 +91,7 @@ export default function AssistantCommandCenter({
   const speechLanguage = speechLanguageOverride ?? defaultSpeechLanguage;
   const sessionRef = useRef<SpeechRecognitionSession | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const operationalObjects = useOperationalObjectsOptional();
 
   const focusedEntity = getPrimaryEntity(context);
 
@@ -192,9 +194,19 @@ export default function AssistantCommandCenter({
     (rawInput: string, fromVoice = false) => {
       const trimmed = rawInput.trim();
       if (!trimmed) return;
+
+      if (operationalObjects) {
+        const handled = operationalObjects.submitCommand(trimmed, voiceResolverContext, executeDeps, fromVoice ? "voice_command" : "typed_command");
+        if (handled) {
+          setInput("");
+          resetVoiceFlow();
+          return;
+        }
+      }
+
       presentProposal(parseInput(trimmed), fromVoice);
     },
-    [parseInput, presentProposal],
+    [executeDeps, operationalObjects, parseInput, presentProposal, resetVoiceFlow, voiceResolverContext],
   );
 
   function handleSubmit(event: React.FormEvent) {
