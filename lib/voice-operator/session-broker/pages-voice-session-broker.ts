@@ -53,13 +53,35 @@ function jsonResponse(
 }
 
 function applyCors(headers: Headers, origin: string | null, allowedOrigins: readonly string[]): void {
-  if (origin && allowedOrigins.includes(origin)) {
+  if (origin && isOriginAllowed(origin, allowedOrigins)) {
     headers.set("Access-Control-Allow-Origin", origin);
     headers.set("Vary", "Origin");
+    headers.set("Access-Control-Allow-Credentials", "true");
   }
   headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
   headers.set("Access-Control-Allow-Headers", "Content-Type");
   headers.set("Access-Control-Max-Age", "86400");
+}
+
+/** Soft in-memory rate limit (abuse mitigation — not end-user auth). SF-1 remains productionBlocker. */
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX = 30;
+const rateBuckets = new Map<string, { count: number; windowStart: number }>();
+
+export function resetVoiceBrokerRateLimitForTests(): void {
+  rateBuckets.clear();
+}
+
+function checkRateLimit(key: string): boolean {
+  const now = Date.now();
+  const bucket = rateBuckets.get(key);
+  if (!bucket || now - bucket.windowStart > RATE_LIMIT_WINDOW_MS) {
+    rateBuckets.set(key, { count: 1, windowStart: now });
+    return true;
+  }
+  if (bucket.count >= RATE_LIMIT_MAX) return false;
+  bucket.count += 1;
+  return true;
 }
 
 export function parseAllowedOrigins(raw: string | undefined): readonly string[] {
@@ -70,10 +92,45 @@ export function parseAllowedOrigins(raw: string | undefined): readonly string[] 
     .filter(Boolean);
 }
 
+/**
+ * Exact origins plus optional wildcard entries like `https://*.cbai-enterprise.pages.dev`
+ * so Preview hash aliases and branch aliases share one allowlist entry.
+ */
+export function isOriginAllowed(origin: string | null, allowedOrigins: readonly string[]): boolean {
+  if (!origin) return false;
+  if (allowedOrigins.includes(origin)) return true;
+
+  let hostname: string;
+  try {
+    hostname = new URL(origin).hostname;
+  } catch {
+    return false;
+  }
+
+  for (const entry of allowedOrigins) {
+    const match = /^(https?):\/\/\*\.([^/]+)$/i.exec(entry);
+    if (!match) continue;
+    const scheme = match[1].toLowerCase();
+    const suffix = match[2].toLowerCase();
+    if (!origin.toLowerCase().startsWith(`${scheme}://`)) continue;
+    const host = hostname.toLowerCase();
+    if (host === suffix || host.endsWith(`.${suffix}`)) return true;
+  }
+  return false;
+}
+
+/**
+ * Resolve request Origin for broker CORS/authz.
+ * SF-1 partial: POST authorization requires the Origin *header*.
+ * Body origin alone must not mint credentials (spoofable by non-browser clients).
+ * Body origin may still be used to detect header/body mismatches when both are present.
+ */
 export function resolveRequestOrigin(request: Request, bodyOrigin?: string): string | null {
-  const headerOrigin = request.headers.get("Origin")?.trim();
-  if (headerOrigin && bodyOrigin && headerOrigin !== bodyOrigin) return null;
-  return headerOrigin ?? bodyOrigin?.trim() ?? null;
+  const headerOrigin = request.headers.get("Origin")?.trim() || null;
+  const trimmedBody = bodyOrigin?.trim() || null;
+  if (headerOrigin && trimmedBody && headerOrigin !== trimmedBody) return null;
+  // Require header for authorization — never fall back to body-only.
+  return headerOrigin;
 }
 
 function assertNoSecretLeak(text: string, apiKey: string | undefined): void {
@@ -199,7 +256,7 @@ export async function handleVoiceSessionBrokerRequest(
 
   if (method === "OPTIONS") {
     const origin = request.headers.get("Origin")?.trim() ?? null;
-    if (!origin || !allowedOrigins.includes(origin)) {
+    if (!origin || !isOriginAllowed(origin, allowedOrigins)) {
       return jsonResponse({ error: "origin_blocked" }, 403, origin, allowedOrigins);
     }
     const headers = new Headers();
@@ -218,8 +275,13 @@ export async function handleVoiceSessionBrokerRequest(
   }
 
   const origin = resolveRequestOrigin(request, parsedBody.body.origin);
-  if (!origin || !allowedOrigins.includes(origin)) {
+  if (!origin || !isOriginAllowed(origin, allowedOrigins)) {
     return jsonResponse({ error: "origin_blocked" }, 403, origin, allowedOrigins);
+  }
+
+  const rateKey = `${origin}|${request.headers.get("CF-Connecting-IP")?.trim() || "unknown"}`;
+  if (!checkRateLimit(rateKey)) {
+    return jsonResponse({ error: "rate_limited" }, 429, origin, allowedOrigins);
   }
 
   const apiKey = env.OPENAI_API_KEY?.trim();

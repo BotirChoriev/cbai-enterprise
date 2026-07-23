@@ -57,6 +57,18 @@ export function classifyBrokerHttpResponse(input: BrokerResponseInput): SessionB
   }
 
   if (status === 403) {
+    if (isBrokerHtmlResponse(contentType, bodyText)) {
+      return {
+        ok: false,
+        code: "AUTHENTICATION_FAILED",
+        message: "Voice broker authentication is required.",
+      };
+    }
+    if (upstreamError?.error === "origin_blocked") {
+      return { ok: false, code: "ORIGIN_BLOCKED", message: "Origin not allowed." };
+    }
+    const classified = upstreamError?.error ? classifyUpstreamBrokerError(upstreamError.error) : null;
+    if (classified) return classified;
     return { ok: false, code: "ORIGIN_BLOCKED", message: "Origin not allowed." };
   }
 

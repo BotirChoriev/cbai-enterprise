@@ -22,9 +22,58 @@ export type SessionBrokerResponse =
       readonly message: string;
     };
 
-export function resolveVoiceBrokerUrl(): string | null {
-  const url = process.env.NEXT_PUBLIC_VOICE_BROKER_URL?.trim();
-  return url || null;
+function stripTrailingSlash(url: string): string {
+  return url.replace(/\/+$/, "");
+}
+
+function isLoopbackHost(hostname: string): boolean {
+  return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]" || hostname === "::1";
+}
+
+function isCloudflarePagesHost(hostname: string): boolean {
+  return hostname === "pages.dev" || hostname.endsWith(".pages.dev");
+}
+
+/**
+ * Resolve the broker base URL (…/api/voice, without /session).
+ *
+ * Preview fix: when the app is served from a Cloudflare Pages host, always call the
+ * **same-origin** Pages Function at `/api/voice` so Access cookies apply and hash vs
+ * branch-alias host mismatches cannot break the mint. Local loopback brokers (doctor)
+ * keep the configured absolute URL (different port).
+ */
+export function resolveVoiceBrokerUrl(
+  envUrl: string | undefined = process.env.NEXT_PUBLIC_VOICE_BROKER_URL,
+  pageOrigin: string | undefined = typeof window !== "undefined" ? window.location.origin : undefined,
+): string | null {
+  const configured = envUrl?.trim() || null;
+  if (!configured) return null;
+
+  if (!pageOrigin) {
+    return stripTrailingSlash(configured);
+  }
+
+  try {
+    const page = new URL(pageOrigin);
+    const broker = new URL(configured, pageOrigin);
+
+    if (isLoopbackHost(broker.hostname)) {
+      return stripTrailingSlash(broker.href);
+    }
+
+    if (broker.origin === page.origin) {
+      return stripTrailingSlash(`${broker.origin}${broker.pathname}`);
+    }
+
+    // Pages Preview / production Pages: colocated Function — never cross-origin mint.
+    if (isCloudflarePagesHost(page.hostname)) {
+      return `${page.origin}/api/voice`;
+    }
+
+    return stripTrailingSlash(broker.href);
+  } catch {
+    return stripTrailingSlash(configured);
+  }
 }
 
 export function evaluateVoiceBrokerStatus(): VoiceBrokerStatus {
@@ -61,6 +110,8 @@ export async function requestRealtimeSessionCredential(
     const response = await fetch(`${brokerUrl.replace(/\/$/, "")}/session`, {
       method: "POST",
       redirect: "manual",
+      // Same-origin Access session cookies must be sent with the mint request.
+      credentials: "include",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({
         language: request.language,
