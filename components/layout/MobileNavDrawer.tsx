@@ -20,11 +20,12 @@ type MobileNavDrawerProps = {
 };
 
 /**
- * Responsive mobile navigation (Phase 1/19) — the desktop Sidebar (components/layout/Sidebar.tsx)
- * is hidden below `md:`; this drawer is the mobile equivalent, reusing the exact same
- * `primaryNavSections`/`secondaryNavSections` data so there is only ever one real navigation
- * source. Real focus handling (Escape closes, backdrop click closes) — no third-party dialog
- * dependency.
+ * Responsive mobile navigation (Phase 1/19; Phase 12 polish note) — the desktop Sidebar
+ * (components/layout/Sidebar.tsx) is hidden below `md:`; this drawer is the mobile equivalent,
+ * reusing the exact same `primaryNavSections`/`secondaryNavSections` data so there is only ever
+ * one real navigation source. New Phase 9–11 routes (/digital-twin, /billing) remain reachable by
+ * direct URL; pages show a mobileNavNote stub. Real focus handling (Escape closes, backdrop click
+ * closes) — no third-party dialog dependency.
  */
 export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps) {
   const pathname = usePathname();

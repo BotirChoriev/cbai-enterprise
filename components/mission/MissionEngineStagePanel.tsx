@@ -184,6 +184,7 @@ export default function MissionEngineStagePanel() {
           <button
             type="button"
             onClick={ensureRuntime}
+            aria-label="Initialize mission engine stage runtime"
             className="rounded-md border border-teal-500/40 bg-teal-500/10 px-3 py-1.5 text-xs text-teal-300"
           >
             Initialize stage runtime
@@ -253,6 +254,7 @@ export default function MissionEngineStagePanel() {
             <button
               type="button"
               onClick={() => recordDecision(true)}
+              aria-label="Record human-approved mission decision"
               className="rounded border border-teal-500/40 px-2 py-1 text-[10px] text-teal-300"
             >
               Record human-approved decision

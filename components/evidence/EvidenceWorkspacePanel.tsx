@@ -120,6 +120,7 @@ export default function EvidenceWorkspacePanel() {
         <button
           type="button"
           onClick={onCreate}
+          aria-label="Save draft evidence as unverified"
           className="rounded-md border border-teal-500/40 bg-teal-500/10 px-3 py-1.5 text-xs text-teal-300"
         >
           Save draft evidence
@@ -170,6 +171,7 @@ export default function EvidenceWorkspacePanel() {
                       key={status}
                       type="button"
                       onClick={() => onTransition(record.id, status)}
+                      aria-label={`Move evidence ${record.title} to ${evidenceStatusDisplayLabel(status)}`}
                       className="rounded border border-zinc-700 px-2 py-1 text-[10px] text-zinc-400 hover:border-zinc-500 hover:text-zinc-200"
                     >
                       → {evidenceStatusDisplayLabel(status)}
