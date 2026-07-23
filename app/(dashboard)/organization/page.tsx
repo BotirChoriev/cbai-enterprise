@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import CloudAccountGate from "@/components/account/CloudAccountGate";
 import OrganizationPageClient from "@/components/organization/OrganizationPageClient";
 
 export const metadata: Metadata = {
@@ -7,5 +9,11 @@ export const metadata: Metadata = {
 };
 
 export default function OrganizationPage() {
-  return <OrganizationPageClient />;
+  return (
+    <CloudAccountGate>
+      <Suspense fallback={<p className="text-sm text-zinc-500">Loading organization…</p>}>
+        <OrganizationPageClient />
+      </Suspense>
+    </CloudAccountGate>
+  );
 }

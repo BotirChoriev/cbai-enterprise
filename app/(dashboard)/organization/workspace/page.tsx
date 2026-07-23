@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import CloudAccountGate from "@/components/account/CloudAccountGate";
 import OrganizationWorkspace from "@/components/enterprise-collaboration/OrganizationWorkspace";
 
 export const metadata: Metadata = {
@@ -8,5 +9,9 @@ export const metadata: Metadata = {
 };
 
 export default function OrganizationWorkspacePage() {
-  return <OrganizationWorkspace />;
+  return (
+    <CloudAccountGate>
+      <OrganizationWorkspace />
+    </CloudAccountGate>
+  );
 }

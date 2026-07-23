@@ -132,6 +132,14 @@ export async function completePasswordReset(newPassword: string): Promise<CloudA
   return { ok: true };
 }
 
+/**
+ * Change password while already signed in — same browser `auth.updateUser` path as reset
+ * completion. Honest when unconfigured; does not invent admin session-revoke APIs.
+ */
+export async function changeSignedInPassword(newPassword: string): Promise<CloudActionResult> {
+  return completePasswordReset(newPassword);
+}
+
 export async function resendEmailConfirmation(email: string): Promise<CloudActionResult> {
   const client = getSupabaseBrowserClient();
   if (!client) return { ok: false, error: NOT_CONFIGURED_ERROR };

@@ -88,9 +88,13 @@ test("8. LOCAL_ACCOUNT_NOTICE honestly discloses this is a device-local, not ser
   assert.match(LOCAL_ACCOUNT_NOTICE.toLowerCase(), /this device only/);
 });
 
-test("9. Cloud storage is honestly unconfigured in this environment — never claims a fake connection", () => {
-  assert.equal(isCloudStorageConfigured(), false);
-  assert.equal(currentStorageMode(), "local");
+test("9. Cloud storage mode is env-aware — never claims a fake connection when unset", () => {
+  if (isCloudStorageConfigured()) {
+    assert.equal(currentStorageMode(), "cloud");
+  } else {
+    assert.equal(isCloudStorageConfigured(), false);
+    assert.equal(currentStorageMode(), "local");
+  }
 });
 
 test("10. SupabaseStorageAdapter is real, typed, and honestly rejects every call when unconfigured", async () => {

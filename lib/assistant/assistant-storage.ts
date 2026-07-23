@@ -112,6 +112,7 @@ export function saveAssistantProfile(profile: AssistantProfile): void {
   const cloudUserId = getSyncedCloudUserId();
   if (!cloudUserId) return;
   void upsertCloudProfile(cloudUserId, {
+    displayName: profile.name,
     assistantName: profile.name,
     avatarMode: profile.avatar,
     preferredLanguage: profile.preferredLanguage,

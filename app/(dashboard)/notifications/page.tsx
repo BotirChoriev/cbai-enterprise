@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import CloudAccountGate from "@/components/account/CloudAccountGate";
 import NotificationCenter from "@/components/enterprise-collaboration/NotificationCenter";
 
 export const metadata: Metadata = {
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function NotificationsPage() {
-  return <NotificationCenter />;
+  return (
+    <CloudAccountGate>
+      <NotificationCenter />
+    </CloudAccountGate>
+  );
 }

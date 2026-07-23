@@ -18,6 +18,7 @@ import {
   requestPasswordReset as apiRequestPasswordReset,
   completePasswordReset as apiCompletePasswordReset,
   resendEmailConfirmation as apiResendEmailConfirmation,
+  changeSignedInPassword as apiChangeSignedInPassword,
   isSupabaseConfigured,
   type CloudUser,
   type CloudAuthResult,
@@ -62,6 +63,7 @@ type AuthValue = {
   requestPasswordReset: (email: string, redirectTo: string) => Promise<CloudActionResult>;
   completePasswordReset: (newPassword: string) => Promise<CloudActionResult>;
   resendEmailConfirmation: (email: string) => Promise<CloudActionResult>;
+  changeSignedInPassword: (newPassword: string) => Promise<CloudActionResult>;
 
   // Combined
   accountMode: AccountMode;
@@ -213,6 +215,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       requestPasswordReset: apiRequestPasswordReset,
       completePasswordReset: apiCompletePasswordReset,
       resendEmailConfirmation: apiResendEmailConfirmation,
+      changeSignedInPassword: apiChangeSignedInPassword,
 
       accountMode: cloudUser ? "cloud" : user ? "device-local" : "signed-out",
     }),

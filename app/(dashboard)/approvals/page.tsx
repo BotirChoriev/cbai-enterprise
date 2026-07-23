@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import CloudAccountGate from "@/components/account/CloudAccountGate";
 import ApprovalCenter from "@/components/enterprise-collaboration/ApprovalCenter";
 
 export const metadata: Metadata = {
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function ApprovalsPage() {
-  return <ApprovalCenter />;
+  return (
+    <CloudAccountGate>
+      <ApprovalCenter />
+    </CloudAccountGate>
+  );
 }

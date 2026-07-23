@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import CloudAccountGate from "@/components/account/CloudAccountGate";
 import MissionDashboard from "@/components/enterprise-collaboration/MissionDashboard";
 
 export const metadata: Metadata = {
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function MissionDashboardPage() {
-  return <MissionDashboard />;
+  return (
+    <CloudAccountGate>
+      <MissionDashboard />
+    </CloudAccountGate>
+  );
 }

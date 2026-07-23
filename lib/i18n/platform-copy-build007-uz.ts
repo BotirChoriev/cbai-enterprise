@@ -16,6 +16,8 @@ export const ACCOUNT_PAGE_UZ = {
     "Qurilmadagi mahalliy hisob — hisob ma'lumotlari faqat shu brauzerda xeshlangan va tuzlangan. Hech narsa serverga yuborilmaydi. Sayt ma'lumotlarini tozalash bu hisobni olib tashlaydi.",
   emailNotConfirmed:
     "Emailingiz hali tasdiqlanmagan. Tasdiqlash havolasi uchun pochta qutingizni tekshiring — tasdiqlaguncha ba'zi bulut funksiyalari cheklangan bo'lishi mumkin.",
+  resendConfirmation: "Tasdiqlash emailini qayta yuborish",
+  resendConfirmationSent: "Tasdiqlash emaili yuborildi — pochta qutingizni tekshiring.",
   continueWorking: "Ishni davom ettirish",
   signOutCloud: "Bulutdan chiqish",
   signOut: "Chiqish",
@@ -51,6 +53,38 @@ export const ACCOUNT_PAGE_UZ = {
   projects: "Loyihalar",
   bookmarks: "Xatcho'plar",
   memberSince: "A'zo bo'lgan sana",
+  securityHeading: "Hisob xavfsizligi",
+  securityBody:
+    "Tizimga kirgan holda bulut parolingizni o'zgartiring. Bu parolni tiklashdagi bilan bir xil brauzer Supabase Auth yangilanishidan foydalanadi.",
+  changePassword: "Parolni yangilash",
+  newPassword: "Yangi parol",
+  confirmNewPassword: "Yangi parolni tasdiqlang",
+  passwordUpdated: "Parol yangilandi.",
+  passwordChangeUnavailable:
+    "Ushbu joylashtirishda parolni o'zgartirish mavjud emas — bulut Auth sozlanmagan, shuning uchun yangilanadigan sessiya yo'q.",
+  sessionHeading: "Faol sessiya",
+  sessionEmail: "{email} sifatida kirdingiz",
+  sessionRestoring: "Oldingi bulut sessiyasi tiklanmoqda…",
+  sessionRestored: "Sessiya ushbu brauzerda tiklandi.",
+  sessionNoMultiDeviceRevoke:
+    "Ushbu brauzer faqat joriy sessiyani ko'rsatadi. Boshqa qurilmalarni bekor qilish server admin API talab qiladi va brauzer mijozida mavjud emas.",
+  profileHeading: "Bulut profili",
+  profileBody:
+    "Ko'rsatiladigan ism, til va avatar tizimga kirganda bulut profilingizga sinxronlanadi — va ushbu qurilmadagi Yordamchi sozlamalarida saqlanadi.",
+  displayName: "Ko'rsatiladigan ism",
+  preferredLanguage: "Afzal til",
+  avatarMode: "Avatar",
+  saveProfile: "Profilni saqlash",
+  profileSaved: "Profil saqlandi.",
+  profileSaveFailed: "Profilni bulutga saqlab bo'lmadi. Mahalliy sozlamalar baribir yangilandi.",
+  cloudGateTitle: "Bulutli hisob kerak",
+  cloudGateHeading: "Umumiy hamkorlik uchun tizimga kiring",
+  cloudGateBody:
+    "Tashkilot ish maydoni, tasdiqlar, faoliyat va bildirishnomalar tasdiqlangan bulutli hisobni talab qiladi. Qurilmadagi mahalliy kirish faqat shu brauzerdagi shaxsiy ish uchun.",
+  cloudGateLocalOnly:
+    "Siz qurilmadagi mahalliy hisob bilan kirdingiz. Umumiy hamkorlik bulutli hisobni talab qiladi — Hisob sahifasida kiring.",
+  cloudGateRestoring: "Tiklangan bulut sessiyasi tekshirilmoqda…",
+  cloudGateCta: "Hisobga o'tish",
 } as const;
 
 export const REPORTS_CENTER_UZ = {

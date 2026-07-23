@@ -1,16 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/platform/context/AuthProvider";
+import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { loadProjects } from "@/lib/project/project-store";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { cbaiBtnPrimary, cbaiBtnSecondary, cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import {
+  ASSISTANT_AVATARS,
+  ASSISTANT_LANGUAGES,
+  type AssistantAvatarId,
+} from "@/lib/assistant/assistant-profile";
+import { upsertCloudProfile } from "@/lib/supabase/cloud-profile";
+import Avatar from "@/components/shared/Avatar";
 
 type LocalMode = "sign-in" | "sign-up";
 type CloudMode = "sign-in" | "sign-up" | "forgot-password";
 type AccountTab = "cloud" | "local";
+
+const MIN_PASSWORD_LENGTH = 8;
+const inputClass =
+  "mt-1 w-full rounded-lg border border-zinc-800 bg-zinc-950/80 px-3 py-2 text-sm text-zinc-200 placeholder:text-zinc-600 outline-none focus:border-teal-500/30";
 
 function AccountModeBadge() {
   const { accountMode } = useAuth();
@@ -32,10 +44,260 @@ function AccountModeBadge() {
   );
 }
 
-function CloudSignedInView() {
-  const { cloudUser, cloudSignOut } = useAuth();
+function CloudActiveSessionSection() {
+  const { cloudUser, cloudSessionRestoring } = useAuth();
   const { t } = useTranslation();
   if (!cloudUser) return null;
+
+  return (
+    <section className="space-y-2 border-t border-zinc-800/80 pt-4" aria-labelledby="cloud-session-heading">
+      <p className={cbaiSectionEyebrow} id="cloud-session-heading">
+        {t("accountPage.sessionHeading")}
+      </p>
+      <p className="text-sm text-zinc-300">{t("accountPage.sessionEmail", { email: cloudUser.email })}</p>
+      <p className="text-xs text-zinc-500">
+        {cloudSessionRestoring ? t("accountPage.sessionRestoring") : t("accountPage.sessionRestored")}
+      </p>
+      <p className="text-xs leading-relaxed text-zinc-600">{t("accountPage.sessionNoMultiDeviceRevoke")}</p>
+    </section>
+  );
+}
+
+function CloudProfileSection() {
+  const { cloudUser } = useAuth();
+  const { profile, updateProfile } = useAssistantProfile();
+  const { t } = useTranslation();
+  const [displayName, setDisplayName] = useState(profile.name);
+  const [preferredLanguage, setPreferredLanguage] = useState(profile.preferredLanguage);
+  const [avatarMode, setAvatarMode] = useState<AssistantAvatarId>(profile.avatar);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    setDisplayName(profile.name);
+    setPreferredLanguage(profile.preferredLanguage);
+    setAvatarMode(profile.avatar);
+  }, [profile.name, profile.preferredLanguage, profile.avatar]);
+
+  if (!cloudUser) return null;
+
+  async function handleSave(event: React.FormEvent) {
+    event.preventDefault();
+    setNotice(null);
+    setError(null);
+    setIsSaving(true);
+
+    updateProfile({
+      name: displayName.trim(),
+      preferredLanguage,
+      avatar: avatarMode,
+    });
+
+    const cloudResult = await upsertCloudProfile(cloudUser!.id, {
+      displayName: displayName.trim(),
+      preferredLanguage,
+      avatarMode,
+      assistantName: displayName.trim(),
+    });
+    setIsSaving(false);
+
+    if (!cloudResult) {
+      setError(t("accountPage.profileSaveFailed"));
+      return;
+    }
+    setNotice(t("accountPage.profileSaved"));
+  }
+
+  return (
+    <section className="space-y-3 border-t border-zinc-800/80 pt-4" aria-labelledby="cloud-profile-heading">
+      <div>
+        <p className={cbaiSectionEyebrow} id="cloud-profile-heading">
+          {t("accountPage.profileHeading")}
+        </p>
+        <p className="mt-1 text-xs leading-relaxed text-zinc-600">{t("accountPage.profileBody")}</p>
+      </div>
+
+      <form onSubmit={handleSave} className="space-y-3">
+        <div>
+          <label htmlFor="cloud-display-name" className="text-xs text-zinc-500">
+            {t("accountPage.displayName")}
+          </label>
+          <input
+            id="cloud-display-name"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            placeholder={t("accountPage.namePlaceholder")}
+            className={inputClass}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="cloud-preferred-language" className="text-xs text-zinc-500">
+            {t("accountPage.preferredLanguage")}
+          </label>
+          <select
+            id="cloud-preferred-language"
+            value={preferredLanguage}
+            onChange={(e) => setPreferredLanguage(e.target.value)}
+            className={inputClass}
+          >
+            {ASSISTANT_LANGUAGES.map((language) => (
+              <option key={language.code} value={language.code} disabled={!language.available}>
+                {language.label}
+                {language.available ? "" : " — n/a"}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="space-y-1.5">
+          <span className="text-xs text-zinc-500">{t("accountPage.avatarMode")}</span>
+          <div className="flex flex-wrap gap-2">
+            {ASSISTANT_AVATARS.map((avatar) => (
+              <button
+                key={avatar}
+                type="button"
+                onClick={() => setAvatarMode(avatar)}
+                aria-pressed={avatarMode === avatar}
+                title={avatar}
+                className={`rounded-full transition-shadow ${
+                  avatarMode === avatar ? "ring-2 ring-teal-400/60 ring-offset-2 ring-offset-slate-950" : ""
+                }`}
+              >
+                <Avatar name={displayName || avatar} avatar={avatar} />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {error ? <p className="text-xs text-amber-400">{error}</p> : null}
+        {notice ? <p className="text-xs text-emerald-400">{notice}</p> : null}
+
+        <button type="submit" disabled={isSaving} className={`${cbaiBtnPrimary} disabled:opacity-50`}>
+          {isSaving ? t("accountPage.pleaseWait") : t("accountPage.saveProfile")}
+        </button>
+      </form>
+    </section>
+  );
+}
+
+function CloudSecuritySection() {
+  const { changeSignedInPassword, isCloudConfigured } = useAuth();
+  const { t } = useTranslation();
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  if (!isCloudConfigured) {
+    return (
+      <section className="space-y-2 border-t border-zinc-800/80 pt-4" aria-labelledby="cloud-security-heading">
+        <p className={cbaiSectionEyebrow} id="cloud-security-heading">
+          {t("accountPage.securityHeading")}
+        </p>
+        <p className="text-xs leading-relaxed text-zinc-600">{t("accountPage.passwordChangeUnavailable")}</p>
+      </section>
+    );
+  }
+
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    setError(null);
+    setNotice(null);
+
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      setError(t("resetPasswordPage.minPasswordLength", { length: String(MIN_PASSWORD_LENGTH) }));
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError(t("validation.passwordsDoNotMatch"));
+      return;
+    }
+
+    setIsSubmitting(true);
+    const result = await changeSignedInPassword(password);
+    setIsSubmitting(false);
+
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+    setPassword("");
+    setConfirmPassword("");
+    setNotice(t("accountPage.passwordUpdated"));
+  }
+
+  return (
+    <section className="space-y-3 border-t border-zinc-800/80 pt-4" aria-labelledby="cloud-security-heading">
+      <div>
+        <p className={cbaiSectionEyebrow} id="cloud-security-heading">
+          {t("accountPage.securityHeading")}
+        </p>
+        <p className="mt-1 text-xs leading-relaxed text-zinc-600">{t("accountPage.securityBody")}</p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <div>
+          <label htmlFor="cloud-change-password" className="text-xs text-zinc-500">
+            {t("accountPage.newPassword")}
+          </label>
+          <input
+            id="cloud-change-password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder={t("accountPage.passwordSignUpPlaceholder")}
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label htmlFor="cloud-change-password-confirm" className="text-xs text-zinc-500">
+            {t("accountPage.confirmNewPassword")}
+          </label>
+          <input
+            id="cloud-change-password-confirm"
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder={t("accountPage.passwordSignInPlaceholder")}
+            className={inputClass}
+          />
+        </div>
+
+        {error ? <p className="text-xs text-amber-400">{error}</p> : null}
+        {notice ? <p className="text-xs text-emerald-400">{notice}</p> : null}
+
+        <button type="submit" disabled={isSubmitting} className={`${cbaiBtnPrimary} disabled:opacity-50`}>
+          {isSubmitting ? t("accountPage.pleaseWait") : t("accountPage.changePassword")}
+        </button>
+      </form>
+    </section>
+  );
+}
+
+function CloudSignedInView() {
+  const { cloudUser, cloudSignOut, resendEmailConfirmation } = useAuth();
+  const { t } = useTranslation();
+  const [resendNotice, setResendNotice] = useState<string | null>(null);
+  const [resendError, setResendError] = useState<string | null>(null);
+  const [isResending, setIsResending] = useState(false);
+
+  if (!cloudUser) return null;
+
+  async function handleResendConfirmation() {
+    setResendNotice(null);
+    setResendError(null);
+    setIsResending(true);
+    const result = await resendEmailConfirmation(cloudUser!.email);
+    setIsResending(false);
+    if (!result.ok) {
+      setResendError(result.error);
+      return;
+    }
+    setResendNotice(t("accountPage.resendConfirmationSent"));
+  }
 
   return (
     <div className={`${cbaiGlassCard} space-y-4 p-6`}>
@@ -48,10 +310,26 @@ function CloudSignedInView() {
       </div>
 
       {!cloudUser.emailConfirmed ? (
-        <p className="rounded-md bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
-          {t("accountPage.emailNotConfirmed")}
-        </p>
+        <div className="space-y-2 rounded-md bg-amber-500/10 px-3 py-2">
+          <p className="text-xs text-amber-300">{t("accountPage.emailNotConfirmed")}</p>
+          <button
+            type="button"
+            onClick={() => {
+              void handleResendConfirmation();
+            }}
+            disabled={isResending}
+            className="text-xs font-medium text-teal-400 hover:text-teal-300 disabled:opacity-50"
+          >
+            {isResending ? t("accountPage.pleaseWait") : t("accountPage.resendConfirmation")}
+          </button>
+          {resendError ? <p className="text-xs text-amber-400">{resendError}</p> : null}
+          {resendNotice ? <p className="text-xs text-emerald-400">{resendNotice}</p> : null}
+        </div>
       ) : null}
+
+      <CloudActiveSessionSection />
+      <CloudProfileSection />
+      <CloudSecuritySection />
 
       <p className="border-t border-zinc-800/80 pt-4 text-xs leading-relaxed text-zinc-600">{t("accountPage.cloudNotice")}</p>
 

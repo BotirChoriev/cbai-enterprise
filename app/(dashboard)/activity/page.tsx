@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import CloudAccountGate from "@/components/account/CloudAccountGate";
 import ActivityCenter from "@/components/enterprise-collaboration/ActivityCenter";
 
 export const metadata: Metadata = {
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function ActivityPage() {
-  return <ActivityCenter />;
+  return (
+    <CloudAccountGate>
+      <ActivityCenter />
+    </CloudAccountGate>
+  );
 }

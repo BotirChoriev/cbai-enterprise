@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import CloudAccountGate from "@/components/account/CloudAccountGate";
 import OrganizationDashboard from "@/components/enterprise-collaboration/OrganizationDashboard";
 
 export const metadata: Metadata = {
@@ -9,8 +10,10 @@ export const metadata: Metadata = {
 
 export default function OrganizationDashboardPage() {
   return (
-    <Suspense fallback={<p className="text-sm text-zinc-500">Loading organization dashboard…</p>}>
-      <OrganizationDashboard />
-    </Suspense>
+    <CloudAccountGate>
+      <Suspense fallback={<p className="text-sm text-zinc-500">Loading organization dashboard…</p>}>
+        <OrganizationDashboard />
+      </Suspense>
+    </CloudAccountGate>
   );
 }

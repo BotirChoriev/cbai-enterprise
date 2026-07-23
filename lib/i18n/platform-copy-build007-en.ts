@@ -16,6 +16,8 @@ export const ACCOUNT_PAGE_EN = {
     "Device-Local account — credentials are hashed and salted in this browser only. Nothing is sent to a server. Clearing site data removes this account.",
   emailNotConfirmed:
     "Your email is not confirmed yet. Check your inbox for a confirmation link — some cloud features may be limited until you confirm.",
+  resendConfirmation: "Resend confirmation email",
+  resendConfirmationSent: "Confirmation email sent — check your inbox.",
   continueWorking: "Continue Working",
   signOutCloud: "Sign Out of Cloud",
   signOut: "Sign Out",
@@ -50,6 +52,36 @@ export const ACCOUNT_PAGE_EN = {
   projects: "Projects",
   bookmarks: "Bookmarks",
   memberSince: "Member since",
+  securityHeading: "Account security",
+  securityBody: "Change your cloud password while signed in. This uses the same browser Supabase Auth update as password reset.",
+  changePassword: "Update password",
+  newPassword: "New password",
+  confirmNewPassword: "Confirm new password",
+  passwordUpdated: "Password updated.",
+  passwordChangeUnavailable:
+    "Password change is not available in this deployment — cloud Auth is not configured, so there is no signed-in session to update.",
+  sessionHeading: "Active session",
+  sessionEmail: "Signed in as {email}",
+  sessionRestoring: "Restoring your previous cloud session…",
+  sessionRestored: "Session restored on this browser.",
+  sessionNoMultiDeviceRevoke:
+    "This browser shows the current session only. Revoking other devices requires a server admin API and is not available in the browser client.",
+  profileHeading: "Cloud profile",
+  profileBody: "Display name, preferred language, and avatar sync to your cloud profile when signed in — and stay in Assistant settings on this device.",
+  displayName: "Display name",
+  preferredLanguage: "Preferred language",
+  avatarMode: "Avatar",
+  saveProfile: "Save profile",
+  profileSaved: "Profile saved.",
+  profileSaveFailed: "Could not save profile to the cloud. Local preferences were still updated.",
+  cloudGateTitle: "Cloud account required",
+  cloudGateHeading: "Sign in to use shared collaboration",
+  cloudGateBody:
+    "Organization workspace, approvals, activity, and notifications need a verified cloud account. Device-local sign-in is for personal work on this browser only.",
+  cloudGateLocalOnly:
+    "You are signed in with a device-local account. Shared collaboration requires a cloud account — sign in on the Account page.",
+  cloudGateRestoring: "Checking for a restored cloud session…",
+  cloudGateCta: "Go to Account",
 } as const;
 
 export const REPORTS_CENTER_EN = {

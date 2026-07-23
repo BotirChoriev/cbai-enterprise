@@ -16,6 +16,8 @@ export const ACCOUNT_PAGE_TR = {
     "Cihaza özel hesap — kimlik bilgileri yalnızca bu tarayıcıda hashlenir ve tuzlanır. Sunucuya hiçbir şey gönderilmez. Site verilerini temizlemek bu hesabı kaldırır.",
   emailNotConfirmed:
     "E-postanız henüz onaylanmadı. Onay bağlantısı için gelen kutunuzu kontrol edin — onaylayana kadar bazı bulut özellikleri sınırlı olabilir.",
+  resendConfirmation: "Onay e-postasını yeniden gönder",
+  resendConfirmationSent: "Onay e-postası gönderildi — gelen kutunuzu kontrol edin.",
   continueWorking: "Çalışmaya Devam Et",
   signOutCloud: "Buluttan Çık",
   signOut: "Çıkış Yap",
@@ -51,6 +53,38 @@ export const ACCOUNT_PAGE_TR = {
   projects: "Projeler",
   bookmarks: "Yer İmleri",
   memberSince: "Üyelik tarihi",
+  securityHeading: "Hesap güvenliği",
+  securityBody:
+    "Oturum açıkken bulut parolanızı değiştirin. Bu, parola sıfırlamadakiyle aynı tarayıcı Supabase Auth güncellemesini kullanır.",
+  changePassword: "Parolayı güncelle",
+  newPassword: "Yeni parola",
+  confirmNewPassword: "Yeni parolayı onayla",
+  passwordUpdated: "Parola güncellendi.",
+  passwordChangeUnavailable:
+    "Bu dağıtımda parola değişikliği kullanılamaz — bulut Auth yapılandırılmadığı için güncellenecek oturum yok.",
+  sessionHeading: "Aktif oturum",
+  sessionEmail: "{email} olarak oturum açık",
+  sessionRestoring: "Önceki bulut oturumu geri yükleniyor…",
+  sessionRestored: "Oturum bu tarayıcıda geri yüklendi.",
+  sessionNoMultiDeviceRevoke:
+    "Bu tarayıcı yalnızca geçerli oturumu gösterir. Diğer cihazları iptal etmek sunucu admin API gerektirir ve tarayıcı istemcisinde yoktur.",
+  profileHeading: "Bulut profili",
+  profileBody:
+    "Görünen ad, dil ve avatar oturum açıkken bulut profilinize senkronize olur — ve bu cihazdaki Asistan ayarlarında kalır.",
+  displayName: "Görünen ad",
+  preferredLanguage: "Tercih edilen dil",
+  avatarMode: "Avatar",
+  saveProfile: "Profili kaydet",
+  profileSaved: "Profil kaydedildi.",
+  profileSaveFailed: "Profil buluta kaydedilemedi. Yerel tercihler yine de güncellendi.",
+  cloudGateTitle: "Bulut hesabı gerekli",
+  cloudGateHeading: "Paylaşılan iş birliği için giriş yapın",
+  cloudGateBody:
+    "Kuruluş çalışma alanı, onaylar, etkinlik ve bildirimler doğrulanmış bir bulut hesabı gerektirir. Cihaza özel giriş yalnızca bu tarayıcıdaki kişisel çalışma içindir.",
+  cloudGateLocalOnly:
+    "Cihaza özel bir hesapla oturum açtınız. Paylaşılan iş birliği bulut hesabı gerektirir — Hesap sayfasından giriş yapın.",
+  cloudGateRestoring: "Geri yüklenen bulut oturumu kontrol ediliyor…",
+  cloudGateCta: "Hesaba git",
 } as const;
 
 export const REPORTS_CENTER_TR = {
