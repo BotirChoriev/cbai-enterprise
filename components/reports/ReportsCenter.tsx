@@ -18,8 +18,8 @@ import ReportReadinessSection from "@/components/reports/ReportReadinessSection"
 import SavedReportsSection from "@/components/reports/SavedReportsSection";
 import ReportsPrimaryActions from "@/components/reports/ReportsPrimaryActions";
 import EnterpriseReportArchitecture from "@/components/enterprise/EnterpriseReportArchitecture";
-import GlobalStatusStrip from "@/components/enterprise/GlobalStatusStrip";
-import { buildGlobalStatus } from "@/lib/enterprise/global-status";
+import OfficialEvidencePanel from "@/components/enterprise/OfficialEvidencePanel";
+import LiveGlobalStatusStrip from "@/components/enterprise/LiveGlobalStatusStrip";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 
 function entityProfilePath(entity: PrimaryEntityRef): string {
@@ -63,7 +63,8 @@ export default function ReportsCenter() {
       }
     >
       <ReportsPrimaryActions />
-      <GlobalStatusStrip status={buildGlobalStatus()} />
+      <LiveGlobalStatusStrip />
+      <OfficialEvidencePanel showReports />
       <EnterpriseReportArchitecture />
       <SavedReportsSection />
       {disclosure.showReportsReadinessDetail ? (

@@ -9,8 +9,8 @@ import ModuleAccountabilityPanel from "@/components/trust/ModuleAccountabilityPa
 import OrganizationInspectorPanel from "@/components/organization/OrganizationInspectorPanel";
 import TrustVerificationStatuses from "@/components/trust/TrustVerificationStatuses";
 import TrustOperatingDashboard from "@/components/enterprise/TrustOperatingDashboard";
-import GlobalStatusStrip from "@/components/enterprise/GlobalStatusStrip";
-import { buildGlobalStatus } from "@/lib/enterprise/global-status";
+import OfficialEvidencePanel from "@/components/enterprise/OfficialEvidencePanel";
+import LiveGlobalStatusStrip from "@/components/enterprise/LiveGlobalStatusStrip";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import { DATA_SOURCE_CATEGORIES } from "@/lib/trust/data-source-categories";
@@ -38,7 +38,8 @@ export default function TrustPageClient() {
 
   return (
     <OperatingPageShell title={t("trust.title")} description={trustPage.pageDescription} showMissionContext={false}>
-      <GlobalStatusStrip status={buildGlobalStatus()} />
+      <LiveGlobalStatusStrip />
+      <OfficialEvidencePanel showReports />
       <TrustOperatingDashboard />
 
       <nav aria-label={trustPage.sectionsNav} className={`${cbaiGlassCard} p-4`}>
