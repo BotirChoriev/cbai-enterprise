@@ -37,7 +37,7 @@ export default function OfficialEvidencePanel({
         const params = new URLSearchParams();
         if (entityId) params.set("entityId", entityId);
         if (refresh) params.set("refresh", "1");
-        const response = await fetch(`/api/evidence/observations?${params.toString()}`, {
+        const response = await fetch(`/api/evidence-observations?${params.toString()}`, {
           method: refresh ? "POST" : "GET",
           credentials: "include",
         });
@@ -65,7 +65,7 @@ export default function OfficialEvidencePanel({
   async function loadReport(kind: "evidence" | "executive") {
     const params = new URLSearchParams({ report: kind });
     if (entityId) params.set("entityId", entityId);
-    const response = await fetch(`/api/evidence/observations?${params.toString()}`, {
+    const response = await fetch(`/api/evidence-observations?${params.toString()}`, {
       credentials: "include",
     });
     const data = (await response.json()) as ObservationsResponse;

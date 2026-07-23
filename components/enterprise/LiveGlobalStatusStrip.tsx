@@ -21,7 +21,7 @@ export default function LiveGlobalStatusStrip({ compact, entityId }: LiveGlobalS
       try {
         const params = new URLSearchParams({ refresh: "1" });
         if (entityId) params.set("entityId", entityId);
-        const response = await fetch(`/api/evidence/observations?${params.toString()}`, {
+        const response = await fetch(`/api/evidence-observations?${params.toString()}`, {
           method: "POST",
           credentials: "include",
         });

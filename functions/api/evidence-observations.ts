@@ -1,19 +1,19 @@
 /**
- * Cloudflare Pages Function — GET/POST /api/evidence/observations
+ * Cloudflare Pages Function — GET/POST /api/evidence-observations
  * Refreshes official connectors and returns verified observations only.
  */
 
-import { refreshOfficialConnectors } from "../../../lib/official-connectors/pipeline";
+import { refreshOfficialConnectors } from "../../lib/official-connectors/pipeline";
 import {
   listObservations,
   listConnectorHealth,
   connectedSourceSlugs,
   observationCount,
-} from "../../../lib/official-connectors/store";
+} from "../../lib/official-connectors/store";
 import {
   generateEvidenceReport,
   generateExecutiveSummary,
-} from "../../../lib/official-connectors/reports";
+} from "../../lib/official-connectors/reports";
 
 export interface Env {
   readonly CENSUS_API_KEY?: string;
@@ -69,7 +69,6 @@ export const onRequest: PagesFunction<Env> = async (context) => {
 
   try {
     let refreshReport = null;
-    // Always refresh before report generation so citations exist in this isolate.
     if (refresh || report) {
       refreshReport = await refreshOfficialConnectors({
         countryId: entityId && !entityId.includes(":") ? entityId : "usa",
