@@ -33,6 +33,11 @@ const NAV_LABEL_KEYS: Record<string, string> = {
   "/ai-control": "navigation.governance",
   "/governance": "navigation.governance",
   "/research/workspace": "navigation.researchWorkspace",
+  "/enterprise": "navigation.enterprise",
+  "/notifications": "navigation.notifications",
+  "/reviews": "navigation.reviews",
+  "/approvals": "navigation.approvals",
+  "/activity": "navigation.activity",
 };
 
 const NAV_SECTION_TITLE_KEYS: Record<string, string> = {
@@ -40,6 +45,7 @@ const NAV_SECTION_TITLE_KEYS: Record<string, string> = {
   Ecosystems: "navigation.intelligenceLenses",
   "Intelligence Lenses": "navigation.intelligenceLenses",
   Intelligence: "navigation.intelligence",
+  Collaboration: "navigation.collaboration",
 };
 
 /** Real label for a nav item's real href — falls back to the item's own English label only for a

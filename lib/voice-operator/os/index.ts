@@ -14,6 +14,7 @@ import { detectCrossModuleIntent } from "@/lib/voice-operator/os/cross-module";
 import { detectMissionCoachIntent } from "@/lib/voice-operator/os/mission-coach";
 import { detectCompareIntent, detectOpenSearchIntent } from "@/lib/voice-operator/os/open-search";
 import { buildProactiveSuggestions, type OsSuggestion } from "@/lib/voice-operator/os/proactive-suggestions";
+import { detectCollaborationAwarenessIntent } from "@/lib/voice-operator/os/collaboration-awareness";
 
 export type OsIntentResult = {
   readonly assistantText: string;
@@ -36,6 +37,9 @@ export function resolveDigitalAssistantOsIntent(
     suggestions,
     contextSummary: os.summary,
   });
+
+  const collab = detectCollaborationAwarenessIntent(raw);
+  if (collab) return withMeta(collab.assistantText, collab.href);
 
   const coach = detectMissionCoachIntent(raw);
   if (coach) return withMeta(coach.assistantText, coach.href);

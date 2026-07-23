@@ -195,6 +195,41 @@ export const secondaryNavSections: NavSection[] = [
       },
     ],
   },
+  {
+    title: "Collaboration",
+    items: [
+      {
+        label: "Enterprise",
+        href: "/enterprise",
+        icon: "dashboard",
+        description: "Enterprise collaboration hub and capability status.",
+      },
+      {
+        label: "Notifications",
+        href: "/notifications",
+        icon: "my-work",
+        description: "In-app notifications and mentions.",
+      },
+      {
+        label: "Reviews",
+        href: "/reviews",
+        icon: "workflows",
+        description: "Assigned collaboration reviews.",
+      },
+      {
+        label: "Approvals",
+        href: "/approvals",
+        icon: "agents",
+        description: "Organization approval requests and decisions.",
+      },
+      {
+        label: "Activity",
+        href: "/activity",
+        icon: "analytics",
+        description: "Membership-scoped audit activity.",
+      },
+    ],
+  },
 ];
 
 /** Flat navigation list for module grids and legacy consumers — primary + secondary combined, so

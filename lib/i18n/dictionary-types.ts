@@ -104,6 +104,12 @@ export type TranslationDictionary = {
     knowledgeGraph: string;
     governance: string;
     researchWorkspace: string;
+    collaboration: string;
+    enterprise: string;
+    notifications: string;
+    reviews: string;
+    approvals: string;
+    activity: string;
     startWithSearch: string;
     startWithSearchBody: string;
     openSearch: string;

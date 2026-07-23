@@ -6,6 +6,8 @@
 import { getCurrentMission } from "@/lib/intelligence-os/mission-engine";
 import { getPrimaryEntity, type PlatformContextSnapshot } from "@/lib/context";
 import { patchVoiceSessionMemory, readVoiceSessionMemory } from "@/lib/voice-operator/session-memory";
+import { buildCollaborationAssistantSnapshot } from "@/lib/enterprise-collaboration/assistant-context";
+import { resolveActorId } from "@/lib/persistence/resolve-actor-id";
 
 export type AssistantOsContext = {
   readonly countryName: string | null;
@@ -15,6 +17,12 @@ export type AssistantOsContext = {
   readonly researchTopicId: string | null;
   readonly pathname: string;
   readonly summary: string;
+  readonly organizationName: string | null;
+  readonly workspaceId: string | null;
+  readonly pendingApprovals: number;
+  readonly unreadNotifications: number;
+  readonly assignedReviews: number;
+  readonly unreadMentions: number;
 };
 
 export function buildAssistantOsContext(
@@ -25,6 +33,7 @@ export function buildAssistantOsContext(
   const primary = platform ? getPrimaryEntity(platform) : null;
   const topicMatch = /^\/research\/([^/]+)/.exec(pathname);
   const researchTopicId = topicMatch?.[1] ?? null;
+  const collab = buildCollaborationAssistantSnapshot(resolveActorId());
 
   const countryName =
     platform?.country?.name ?? (primary?.kind === "country" ? primary.name : null);
@@ -34,6 +43,8 @@ export function buildAssistantOsContext(
     platform?.university?.name ?? (primary?.kind === "university" ? primary.name : null);
 
   const parts: string[] = [];
+  if (collab.organizationName) parts.push(`Organization: ${collab.organizationName}`);
+  if (collab.workspaceId) parts.push(`Workspace: ${collab.workspaceId}`);
   if (countryName) parts.push(`Country: ${countryName}`);
   if (companyName) parts.push(`Company: ${companyName}`);
   if (universityName) parts.push(`University: ${universityName}`);
@@ -44,6 +55,11 @@ export function buildAssistantOsContext(
     parts.push("Module: Evidence");
   }
   if (pathname.startsWith("/trust")) parts.push("Module: Trust");
+  if (pathname.startsWith("/enterprise") || pathname.startsWith("/notifications")) {
+    parts.push("Module: Enterprise collaboration");
+  }
+  if (collab.pendingApprovals > 0) parts.push(`Pending approvals: ${collab.pendingApprovals}`);
+  if (collab.unreadNotifications > 0) parts.push(`Unread notifications: ${collab.unreadNotifications}`);
 
   return {
     countryName,
@@ -53,6 +69,12 @@ export function buildAssistantOsContext(
     researchTopicId,
     pathname,
     summary: parts.length > 0 ? parts.join(" · ") : "No entity selected yet",
+    organizationName: collab.organizationName,
+    workspaceId: collab.workspaceId,
+    pendingApprovals: collab.pendingApprovals,
+    unreadNotifications: collab.unreadNotifications,
+    assignedReviews: collab.assignedReviews,
+    unreadMentions: collab.unreadMentions,
   };
 }
 

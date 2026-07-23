@@ -63,6 +63,12 @@ test("smart investor summary uses architecture honesty", () => {
     researchTopicId: null,
     pathname: "/",
     summary: "No entity selected yet",
+    organizationName: null,
+    workspaceId: null,
+    pendingApprovals: 0,
+    unreadNotifications: 0,
+    assignedReviews: 0,
+    unreadMentions: 0,
   });
   assert.ok(result);
   assert.equal(result!.kind, "investor");

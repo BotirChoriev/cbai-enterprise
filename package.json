@@ -73,7 +73,8 @@
     "test:digital-assistant-os": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-digital-assistant-os.ts",
     "test:official-connectors": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-official-connectors.ts",
     "test:official-connector-foundation": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-official-connector-foundation.ts",
-    "test:foundation-world-bank-wdi": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-foundation-world-bank-wdi.ts"
+    "test:foundation-world-bank-wdi": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-foundation-world-bank-wdi.ts",
+    "test:enterprise-collaboration": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-enterprise-collaboration.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.2",

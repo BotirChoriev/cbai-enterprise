@@ -16,7 +16,11 @@ export type OrganizationAuditEventName =
   | "member_role_changed"
   | "member_removed"
   | "member_left"
-  | "ownership_transferred";
+  | "ownership_transferred"
+  | "approval_requested"
+  | "approval_approved"
+  | "approval_rejected"
+  | "approval_changes_requested";
 
 export type OrganizationAuditRecord = {
   readonly id: string;
