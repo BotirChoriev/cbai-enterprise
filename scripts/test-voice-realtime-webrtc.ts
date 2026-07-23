@@ -422,6 +422,7 @@ test("VoiceOperatorProvider appends realtime transcripts to session memory", () 
 test("broker client uses manual redirect and JSON accept headers", () => {
   const client = readSource("lib/voice-operator/session-broker/client.ts");
   assert.match(client, /redirect:\s*"manual"/);
+  assert.match(client, /credentials:\s*"include"/);
   assert.match(client, /classifyBrokerHttpResponse/);
 });
 

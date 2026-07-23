@@ -3,4 +3,7 @@
 
 OPENAI_API_KEY=
 # Include both localhost and 127.0.0.1 — Safari may use either origin.
+# Preview (Cloudflare Pages runtime): also include the exact Preview origin(s), and optionally
+#   https://*.cbai-enterprise.pages.dev
+# so branch aliases and deployment hash hosts both mint.
 VOICE_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,http://localhost:8788,http://127.0.0.1:8788

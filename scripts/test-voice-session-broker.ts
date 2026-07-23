@@ -152,6 +152,19 @@ test("blocked origin on POST returns 403", async () => {
   assert.equal((await res.json()).error, "origin_blocked");
 });
 
+test("body-only origin without Origin header is blocked (SF-1 partial)", async () => {
+  const res = await handleVoiceSessionBrokerRequest(
+    new Request("https://cbai.example/api/voice/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ language: "uz", origin: "http://localhost:3000" }),
+    }),
+    env(),
+  );
+  assert.equal(res.status, 403);
+  assert.equal((await res.json()).error, "origin_blocked");
+});
+
 test("invalid JSON returns 400", async () => {
   const res = await handleVoiceSessionBrokerRequest(
     postRequest({}, "http://localhost:3000", { rawBody: "{not-json" }),
