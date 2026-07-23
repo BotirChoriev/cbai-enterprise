@@ -30,6 +30,7 @@ import {
   resolveDigitalAssistantOsIntent,
   type OsSuggestion,
 } from "@/lib/voice-operator/os";
+import { resolveDigitalAssistantAction } from "@/lib/digital-assistant-actions";
 
 export type DigitalAssistantResult = {
   readonly assistantText: string;
@@ -99,6 +100,25 @@ export async function runDigitalAssistant(
     return {
       assistantText: missionAction.assistantText,
       href: missionAction.href,
+      handled: true,
+    };
+  }
+
+  // Phase 6 action layer — READ / DRAFT (confirmation required) / navigate.
+  const phase6 = resolveDigitalAssistantAction(trimmed);
+  if (phase6) {
+    if (!deps.sideEffectsOnly) {
+      appendConversationTurn({ role: "assistant", text: phase6.assistantText });
+    }
+    if (phase6.href && phase6.mode !== "draft") {
+      deps.router.push(phase6.href);
+    } else if (phase6.href && phase6.mode === "draft" && phase6.confirmationRequired) {
+      // Drafts navigate to the confirmation surface; never auto-complete.
+      deps.router.push(phase6.href);
+    }
+    return {
+      assistantText: phase6.assistantText,
+      href: phase6.href,
       handled: true,
     };
   }
