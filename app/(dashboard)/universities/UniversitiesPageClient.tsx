@@ -18,6 +18,8 @@ import EntityOptionalExploration from "@/components/shared/EntityOptionalExplora
 import EntityExploreShell from "@/components/shared/EntityExploreShell";
 import { UniversityIntelligencePanel } from "@/components/universities/UniversityIntelligencePanel";
 import EntityNotFoundNotice from "@/components/system/EntityNotFoundNotice";
+import GlobalStatusStrip from "@/components/enterprise/GlobalStatusStrip";
+import { buildGlobalStatus } from "@/lib/enterprise/global-status";
 
 export default function UniversitiesPageClient() {
   const { context, setUniversity, recordEntityView } = usePlatformContext();
@@ -84,6 +86,16 @@ export default function UniversitiesPageClient() {
     <EntityExploreShell
       title={t("universities.title")}
       description={t("entities.universitiesDescription")}
+      statusStrip={
+        <GlobalStatusStrip
+          compact
+          status={buildGlobalStatus({
+            ...journey.profile.coverage.evidenceCoverage,
+            connectedSources: journey.profile.coverage.sources.filter((s) => s.statusLabel === "Connected").length,
+            totalSources: journey.profile.coverage.sources.length,
+          })}
+        />
+      }
       notFoundNotice={
         requestedUniversityNotFound && requestedUniversityId ? (
           <EntityNotFoundNotice

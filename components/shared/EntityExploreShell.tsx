@@ -12,6 +12,7 @@ type EntityExploreShellProps = {
   description: string;
   notFoundNotice?: ReactNode;
   beforeGrid?: ReactNode;
+  statusStrip?: ReactNode;
   filters: ReactNode;
   list: ReactNode;
   detail: ReactNode;
@@ -26,6 +27,7 @@ export default function EntityExploreShell({
   description,
   notFoundNotice,
   beforeGrid,
+  statusStrip,
   filters,
   list,
   detail,
@@ -36,6 +38,7 @@ export default function EntityExploreShell({
     <div className={cbaiPageStack}>
       <EntityPageHeader title={title} description={description} />
       <MissionOperatingContextBar variant="compact" />
+      {statusStrip}
       {notFoundNotice}
       {disclosure.level === "expert" ? <ContextualOperatorBanner /> : null}
       {beforeGrid}

@@ -16,6 +16,8 @@ import EntityExploreShell from "@/components/shared/EntityExploreShell";
 import { CountryIntelligencePanel } from "@/components/countries/CountryIntelligencePanel";
 import WorldIntelligenceMap from "@/components/countries/WorldIntelligenceMap";
 import EntityNotFoundNotice from "@/components/system/EntityNotFoundNotice";
+import GlobalStatusStrip from "@/components/enterprise/GlobalStatusStrip";
+import { buildGlobalStatus } from "@/lib/enterprise/global-status";
 import { cbaiDisclosurePanel, cbaiDisclosureSummary } from "@/components/brand/brand-classes";
 
 export default function CountriesPageClient() {
@@ -68,6 +70,16 @@ export default function CountriesPageClient() {
     <EntityExploreShell
       title={t("countries.title")}
       description={t("entities.countriesDescription")}
+      statusStrip={
+        <GlobalStatusStrip
+          compact
+          status={buildGlobalStatus({
+            ...journey.profile.coverage.evidenceCoverage,
+            connectedSources: journey.profile.coverage.sources.filter((s) => s.statusLabel === "Connected").length,
+            totalSources: journey.profile.coverage.sources.length,
+          })}
+        />
+      }
       notFoundNotice={
         requestedCountryNotFound && requestedCountryId ? (
           <EntityNotFoundNotice

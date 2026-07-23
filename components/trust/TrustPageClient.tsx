@@ -8,6 +8,9 @@ import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import ModuleAccountabilityPanel from "@/components/trust/ModuleAccountabilityPanel";
 import OrganizationInspectorPanel from "@/components/organization/OrganizationInspectorPanel";
 import TrustVerificationStatuses from "@/components/trust/TrustVerificationStatuses";
+import TrustOperatingDashboard from "@/components/enterprise/TrustOperatingDashboard";
+import GlobalStatusStrip from "@/components/enterprise/GlobalStatusStrip";
+import { buildGlobalStatus } from "@/lib/enterprise/global-status";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import { DATA_SOURCE_CATEGORIES } from "@/lib/trust/data-source-categories";
@@ -35,6 +38,9 @@ export default function TrustPageClient() {
 
   return (
     <OperatingPageShell title={t("trust.title")} description={trustPage.pageDescription} showMissionContext={false}>
+      <GlobalStatusStrip status={buildGlobalStatus()} />
+      <TrustOperatingDashboard />
+
       <nav aria-label={trustPage.sectionsNav} className={`${cbaiGlassCard} p-4`}>
         <ul className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
           {SECTIONS.map((section) => (

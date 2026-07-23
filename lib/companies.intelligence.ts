@@ -178,8 +178,9 @@ export function resolveCompanyListEvidenceLabel(
   profile: CompanyIntelligenceProfile,
 ): string {
   const { evidenceCoverage } = profile.coverage;
-  if (evidenceCoverage.connected > 0) {
-    return `${evidenceCoverage.connected} indicator connected`;
+  if (evidenceCoverage.total > 0) {
+    const noun = evidenceCoverage.connected === 1 ? "indicator" : "indicators";
+    return `${evidenceCoverage.connected} / ${evidenceCoverage.total} ${noun} connected`;
   }
   if (profile.referenceConnected) {
     return "Registry available";

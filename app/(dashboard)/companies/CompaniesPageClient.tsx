@@ -18,6 +18,8 @@ import EntityOptionalExploration from "@/components/shared/EntityOptionalExplora
 import EntityExploreShell from "@/components/shared/EntityExploreShell";
 import { CompanyIntelligencePanel } from "@/components/companies/CompanyIntelligencePanel";
 import EntityNotFoundNotice from "@/components/system/EntityNotFoundNotice";
+import GlobalStatusStrip from "@/components/enterprise/GlobalStatusStrip";
+import { buildGlobalStatus } from "@/lib/enterprise/global-status";
 
 export default function CompaniesPageClient() {
   const { context, setCompany, recordEntityView } = usePlatformContext();
@@ -75,6 +77,16 @@ export default function CompaniesPageClient() {
     <EntityExploreShell
       title={t("companies.title")}
       description={t("entities.companiesDescription")}
+      statusStrip={
+        <GlobalStatusStrip
+          compact
+          status={buildGlobalStatus({
+            ...journey.profile.coverage.evidenceCoverage,
+            connectedSources: journey.profile.coverage.sources.filter((s) => s.statusLabel === "Connected").length,
+            totalSources: journey.profile.coverage.sources.length,
+          })}
+        />
+      }
       notFoundNotice={
         requestedCompanyNotFound && requestedCompanyId ? (
           <EntityNotFoundNotice

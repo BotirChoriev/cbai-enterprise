@@ -36,6 +36,8 @@ import { getCountryRelationships } from "@/lib/countries.adapter";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import AddToMissionButton from "@/components/mission/MissionOperatingActions";
 import CreateProjectFromEntityButton from "@/components/project/CreateProjectFromEntityButton";
+import GlobalStatusStrip from "@/components/enterprise/GlobalStatusStrip";
+import { buildGlobalStatus } from "@/lib/enterprise/global-status";
 import { useTranslation } from "@/lib/i18n/use-translation";
 
 type CountryIntelligencePanelProps = {
@@ -87,7 +89,11 @@ export function CountryIntelligencePanel({
           initialModel={evidenceComparison}
         />
       </EntityCompareSection>
-      <CountryIndicatorCoverage indicatorsByDomain={coverage.indicatorsByDomain} />
+      <CountryIndicatorCoverage
+        evidenceCoverage={coverage.evidenceCoverage}
+        indicatorsByDomain={coverage.indicatorsByDomain}
+        sources={coverage.sources}
+      />
     </div>
   );
 
@@ -130,6 +136,15 @@ export function CountryIntelligencePanel({
             href: country.officialWebsite,
           },
         ]}
+      />
+
+      <GlobalStatusStrip
+        compact
+        status={buildGlobalStatus({
+          ...coverage.evidenceCoverage,
+          connectedSources: sourceConnectedCount,
+          totalSources: coverage.sources.length,
+        })}
       />
 
       <IntelligenceContextPanel

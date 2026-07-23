@@ -9,6 +9,9 @@ import {
 } from "@/components/governance-control/GovernanceSections";
 import GovernancePillars from "@/components/governance-control/GovernancePillars";
 import SupremePrinciplesSection from "@/components/governance-control/SupremePrinciplesSection";
+import GovernanceUserMetrics from "@/components/enterprise/GovernanceUserMetrics";
+import GlobalStatusStrip from "@/components/enterprise/GlobalStatusStrip";
+import { buildGlobalStatus } from "@/lib/enterprise/global-status";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { getDictionary } from "@/lib/i18n/translate";
 import { translateGovernanceControlModel } from "@/lib/i18n/governance-translation";
@@ -28,6 +31,10 @@ export default function GovernanceControlCenter({ embedded = false }: Governance
   return (
     <div className="space-y-10">
       {embedded ? <GovernancePillars categories={model.ruleCategories} /> : null}
+
+      <GlobalStatusStrip status={buildGlobalStatus()} />
+
+      <GovernanceUserMetrics />
 
       <SupremePrinciplesSection />
 

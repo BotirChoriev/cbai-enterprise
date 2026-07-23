@@ -29,6 +29,10 @@ import CompanyTrustSection from "@/components/companies/CompanyTrustSection";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import AddToMissionButton from "@/components/mission/MissionOperatingActions";
 import CreateProjectFromEntityButton from "@/components/project/CreateProjectFromEntityButton";
+import GlobalStatusStrip from "@/components/enterprise/GlobalStatusStrip";
+import EntityArchitecturePanel from "@/components/enterprise/EntityArchitecturePanel";
+import { buildGlobalStatus } from "@/lib/enterprise/global-status";
+import { COMPANY_ARCHITECTURE_FIELDS } from "@/lib/enterprise/entity-architecture";
 import { useTranslation } from "@/lib/i18n/use-translation";
 
 type CompanyIntelligencePanelProps = {
@@ -66,7 +70,11 @@ export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligen
           initialModel={evidenceComparison}
         />
       </EntityCompareSection>
-      <CompanyIndicatorCoverage indicatorsByDomain={coverage.indicatorsByDomain} />
+      <CompanyIndicatorCoverage
+        evidenceCoverage={coverage.evidenceCoverage}
+        indicatorsByDomain={coverage.indicatorsByDomain}
+        sources={coverage.sources}
+      />
     </div>
   );
 
@@ -118,6 +126,21 @@ export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligen
         sourceConnectedCount={sourceConnectedCount}
         totalSources={coverage.sources.length}
         availableItems={getConnectedAvailableItems(coverage)}
+      />
+
+      <GlobalStatusStrip
+        compact
+        status={buildGlobalStatus({
+          ...coverage.evidenceCoverage,
+          connectedSources: sourceConnectedCount,
+          totalSources: coverage.sources.length,
+        })}
+      />
+
+      <EntityArchitecturePanel
+        title="Company intelligence fields"
+        description="Enterprise profile architecture. Values appear only when an official source is connected — otherwise status is Missing, Planned, or Awaiting official source."
+        fields={COMPANY_ARCHITECTURE_FIELDS}
       />
 
       <EvidenceGapPanel

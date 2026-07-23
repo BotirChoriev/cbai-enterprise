@@ -28,6 +28,9 @@ import { buildTopicEvidenceReview } from "@/lib/research/evidence/evidence-topic
 import { buildResearchMission } from "@/lib/research-mission/research-mission-builder";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { cbaiHeroGlow } from "@/components/brand/brand-classes";
+import ResearchWorkspaceFacets from "@/components/enterprise/ResearchWorkspaceFacets";
+import GlobalStatusStrip from "@/components/enterprise/GlobalStatusStrip";
+import { buildGlobalStatus } from "@/lib/enterprise/global-status";
 
 type ResearchTopicDetailProps = {
   topic: ResearchTopic;
@@ -47,6 +50,10 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
       className={`mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6 sm:py-10 ${cbaiHeroGlow}`}
     >
       <ResearchTopicHero topic={topic} />
+
+      <GlobalStatusStrip compact status={buildGlobalStatus()} />
+
+      <ResearchWorkspaceFacets topic={topic} />
 
       <div className="flex justify-end gap-2">
         <CreateProjectFromEntityButton entity={{ kind: "research_topic", id: topic.topicId, name: topic.topicName }} />

@@ -13,6 +13,7 @@ type OperatingPageShellProps = {
   showOperator?: boolean;
   showMissionContext?: boolean;
   missionContextVariant?: "compact" | "full";
+  statusStrip?: ReactNode;
   children: ReactNode;
 };
 
@@ -24,6 +25,7 @@ export default function OperatingPageShell({
   showOperator = false,
   showMissionContext = true,
   missionContextVariant,
+  statusStrip,
   children,
 }: OperatingPageShellProps) {
   const showMissionBar = showMissionContext && missionContextVariant;
@@ -32,6 +34,7 @@ export default function OperatingPageShell({
     <div className={cbaiStackLg}>
       <EntityPageHeader title={title} description={description ?? ""} />
       {showMissionBar ? <MissionOperatingContextBar variant={missionContextVariant} /> : null}
+      {statusStrip}
       {action}
       {showOperator ? <ContextualOperatorBanner /> : null}
       {children}

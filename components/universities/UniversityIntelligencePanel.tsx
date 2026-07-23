@@ -28,6 +28,10 @@ import { getUniversityRelationships } from "@/lib/universities.adapter";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import AddToMissionButton from "@/components/mission/MissionOperatingActions";
 import CreateProjectFromEntityButton from "@/components/project/CreateProjectFromEntityButton";
+import GlobalStatusStrip from "@/components/enterprise/GlobalStatusStrip";
+import EntityArchitecturePanel from "@/components/enterprise/EntityArchitecturePanel";
+import { buildGlobalStatus } from "@/lib/enterprise/global-status";
+import { UNIVERSITY_ARCHITECTURE_FIELDS } from "@/lib/enterprise/entity-architecture";
 import { useTranslation } from "@/lib/i18n/use-translation";
 
 type UniversityIntelligencePanelProps = {
@@ -91,6 +95,21 @@ export function UniversityIntelligencePanel({
         availableItems={getConnectedAvailableItems(coverage)}
       />
 
+      <GlobalStatusStrip
+        compact
+        status={buildGlobalStatus({
+          ...coverage.evidenceCoverage,
+          connectedSources: sourceConnectedCount,
+          totalSources: coverage.sources.length,
+        })}
+      />
+
+      <EntityArchitecturePanel
+        title="University research architecture"
+        description="Enterprise research fields prepared for official sources. No rankings, citations, or funding totals are invented."
+        fields={UNIVERSITY_ARCHITECTURE_FIELDS}
+      />
+
       <EvidenceGapPanel
         profile={evidenceGaps}
         showSummary={false}
@@ -124,7 +143,11 @@ export function UniversityIntelligencePanel({
           />
         </EntityCompareSection>
 
-        <UniversityIndicatorCoverage indicatorsByDomain={coverage.indicatorsByDomain} />
+        <UniversityIndicatorCoverage
+          evidenceCoverage={coverage.evidenceCoverage}
+          indicatorsByDomain={coverage.indicatorsByDomain}
+          sources={coverage.sources}
+        />
 
         <UniversitySourceCoverage sources={coverage.sources} />
 

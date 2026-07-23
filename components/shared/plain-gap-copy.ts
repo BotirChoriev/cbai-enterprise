@@ -7,19 +7,19 @@ export function plainMissingReason(
 
   switch (reason) {
     case "Evidence source not connected":
-      return "The official source is not available on this profile yet.";
+      return "Integration status: Not connected. The official source is registered but not linked to this profile.";
     case "Connector planned":
-      return "The official source is planned but not available yet.";
+      return "Integration status: Planned. Awaiting official source connector — no estimated availability date.";
     case "Indicator not mapped":
-      return "No official source is linked to this topic yet.";
+      return "Integration status: Missing. No official source mapping exists for this indicator yet.";
     case "Methodology pending":
-      return "The review method for this topic is not finalized yet.";
+      return "Integration status: Verification pending. Review methodology for this topic is not finalized.";
     case "Official source unavailable":
-      return "The official source is no longer available.";
+      return "Integration status: Blocked. The designated official source is no longer available.";
     case "Verification pending":
-      return "The official source is awaiting review before it can be shown.";
+      return "Integration status: Verification pending. Human review is required before this source can be shown.";
     default:
-      return "Official information for this topic is not available yet.";
+      return "Integration status: Missing. Official information for this topic is not available yet.";
   }
 }
 

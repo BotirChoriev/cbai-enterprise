@@ -7,6 +7,7 @@ import { cbaiGlassCard } from "@/components/brand/brand-classes";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { getDictionary } from "@/lib/i18n/translate";
 import { translateResearchTopicStatus } from "@/lib/i18n/research-topic-status-translation";
+import ResearchWorkspaceFacets from "@/components/enterprise/ResearchWorkspaceFacets";
 
 function statusBadgeClass(topic: ResearchTopic["status"]): string {
   switch (topic) {
@@ -71,6 +72,8 @@ export default function ResearchTopicCard({
           <dd className="mt-1 text-xs leading-relaxed text-zinc-500">{topic.futureWorkspace}</dd>
         </div>
       </dl>
+
+      <ResearchWorkspaceFacets topic={topic} compact />
 
       <Link
         href={topicPath}
