@@ -77,9 +77,29 @@ export async function inviteOrganizationMemberPersisted(input: Omit<InviteMember
   const result = await repo.inviteMember({ ...input, inviterId: actorId });
   if (!result.ok) return { error: result.message, code: result.code };
 
+  const { buildInvitationAcceptUrl, sendOrganizationInvitationEmail, isPreviewOrDevHost } = await import(
+    "@/lib/enterprise-collaboration/email-transport"
+  );
+  const acceptUrl = buildInvitationAcceptUrl(result.value.rawToken);
+  const org = await repo.getOrganization(input.organizationId);
+  const emailResult = await sendOrganizationInvitationEmail({
+    toEmail: input.inviteeEmail,
+    organizationName: org?.name ?? "Organization",
+    inviterDisplayName: input.inviterDisplayName,
+    role: input.role,
+    acceptUrl,
+    expiresAt: result.value.invitation.expiresAt,
+  });
+
   if (repo.isShared) await refreshMirror(actorId);
   notifyChange();
-  return result.value;
+  return {
+    ...result.value,
+    emailStatus: emailResult.status,
+    emailMessage: emailResult.status === "delivered" ? "Invitation email delivered." : emailResult.message,
+    copyLinkAllowed: isPreviewOrDevHost() || emailResult.status !== "delivered",
+    acceptUrl,
+  };
 }
 
 export async function acceptOrganizationInvitationPersisted(input: {

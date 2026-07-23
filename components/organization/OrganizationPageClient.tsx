@@ -192,11 +192,20 @@ export default function OrganizationPageClient() {
         });
         setBusy(false);
         if ("error" in result) {
-          setError(result.error);
+          setError(typeof result.error === "string" ? result.error : "Invite failed.");
           return;
         }
-        const link = `${window.location.origin}/organization?invite=${result.rawToken}`;
-        setFeedback(t("organizationOs.inviteCreated", { link }));
+        if (result.emailStatus === "delivered") {
+          setFeedback(`Invitation created and email delivered to ${inviteEmail}.`);
+        } else {
+          const link = result.acceptUrl ?? `${window.location.origin}/organization?invite=${result.rawToken}`;
+          setFeedback(
+            `Email delivery not configured — invitation record is valid. Preview copy-link: ${link}`,
+          );
+          if (result.copyLinkAllowed && navigator.clipboard?.writeText) {
+            void navigator.clipboard.writeText(link);
+          }
+        }
       } else {
         const { inviteOrganizationMember } = await import(
           "@/lib/organization-os/organization-membership-store"

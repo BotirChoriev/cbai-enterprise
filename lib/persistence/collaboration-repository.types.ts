@@ -19,6 +19,7 @@ export interface CollaborationRepository {
     readonly createdBy: string;
     readonly title: string;
     readonly description?: string | null;
+    readonly ownerOrganizationId?: string | null;
   }): Promise<RepositoryResult<MissionCollaboration>>;
   listParticipants(collaborationId: string): Promise<readonly CollaborationParticipant[]>;
   listSharedObjects(collaborationId: string, actorId: string): Promise<readonly SharedLivingObject[]>;

@@ -53,3 +53,11 @@ export {
   getEnterpriseCapabilityMatrix,
   realtimeCollaborationStatus,
 } from "@/lib/enterprise-collaboration/capability-status";
+
+export {
+  buildInvitationAcceptUrl,
+  sendOrganizationInvitationEmail,
+  isPreviewOrDevHost,
+} from "@/lib/enterprise-collaboration/email-transport";
+
+export { getRealtimeCapability, subscribeCollaborationRealtime } from "@/lib/enterprise-collaboration/realtime";

@@ -5,6 +5,7 @@
 import { DeviceLocalOrganizationRepository } from "@/lib/persistence/device-local-organization-adapter";
 import { DeviceLocalCollaborationRepository } from "@/lib/persistence/device-local-collaboration-adapter";
 import { SupabaseOrganizationRepository } from "@/lib/persistence/supabase-organization-adapter";
+import { SupabaseCollaborationRepository } from "@/lib/persistence/supabase-collaboration-adapter";
 import type { OrganizationRepository } from "@/lib/persistence/organization-repository.types";
 import type { CollaborationRepository } from "@/lib/persistence/collaboration-repository.types";
 import { isOrganizationCollaborationShared } from "@/lib/persistence/persistence-capability";
@@ -22,7 +23,9 @@ export function resolveOrganizationRepository(): OrganizationRepository {
 
 export function resolveCollaborationRepository(): CollaborationRepository {
   if (cachedCollabRepo) return cachedCollabRepo;
-  cachedCollabRepo = new DeviceLocalCollaborationRepository();
+  cachedCollabRepo = isOrganizationCollaborationShared()
+    ? new SupabaseCollaborationRepository()
+    : new DeviceLocalCollaborationRepository();
   return cachedCollabRepo;
 }
 

@@ -22,6 +22,7 @@ const STATUS_LABEL = {
   partially_implemented: "Partially implemented",
   planned: "Planned",
   missing: "Missing",
+  blocked: "Blocked",
 } as const;
 
 export default function EnterpriseHub() {

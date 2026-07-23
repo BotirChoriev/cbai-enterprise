@@ -18,6 +18,7 @@ import { PlatformContextProvider } from "@/components/platform/context/PlatformC
 import { UniversalWorkspaceProvider } from "@/components/platform/context/UniversalWorkspaceProvider";
 import { MissionContextProvider } from "@/components/mission/MissionContextProvider";
 import { AuthProvider } from "@/components/platform/context/AuthProvider";
+import { ActiveOrganizationProvider } from "@/components/enterprise-collaboration/ActiveOrganizationProvider";
 import VoiceOperatorProvider from "@/components/voice-operator/VoiceOperatorProvider";
 import VoiceOperatorDock from "@/components/voice-operator/VoiceOperatorDock";
 import OfflineBanner from "@/components/system/OfflineBanner";
@@ -46,6 +47,7 @@ export default function DashboardLayout({
 
   return (
     <AuthProvider>
+      <ActiveOrganizationProvider>
       <div className="flex h-screen overflow-hidden bg-[var(--background)]">
         <Sidebar />
         <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
@@ -87,6 +89,7 @@ export default function DashboardLayout({
           </Suspense>
         </div>
       </div>
+      </ActiveOrganizationProvider>
     </AuthProvider>
   );
 }

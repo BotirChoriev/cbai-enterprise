@@ -7,7 +7,8 @@ export type EnterpriseCapabilityStatus =
   | "implemented"
   | "partially_implemented"
   | "planned"
-  | "missing";
+  | "missing"
+  | "blocked";
 
 export type CollaborationTargetType =
   | "mission"

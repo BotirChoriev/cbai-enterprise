@@ -74,8 +74,16 @@ export function getEnterpriseCapabilityMatrix(): readonly EnterpriseCapabilityRo
     {
       id: "realtime",
       label: "Realtime team updates",
-      status: "planned",
-      note: "No Supabase Realtime channels for collaboration yet.",
+      status: isOrganizationCollaborationShared() ? "partially_implemented" : "blocked",
+      note: isOrganizationCollaborationShared()
+        ? "Realtime module wired for org/user scopes — requires live RLS proof before claiming Implemented."
+        : "Blocked — shared Supabase backend not configured in this environment.",
+    },
+    {
+      id: "cloud-collab-repo",
+      label: "Supabase collaboration repository",
+      status: "partially_implemented",
+      note: "Factory selects SupabaseCollaborationRepository when shared backend is ready; live apply still required.",
     },
     {
       id: "billing",
@@ -90,8 +98,14 @@ export function realtimeCollaborationStatus(): {
   readonly status: EnterpriseCapabilityStatus;
   readonly message: string;
 } {
+  if (!isOrganizationCollaborationShared()) {
+    return {
+      status: "blocked",
+      message: "Realtime blocked — shared Supabase backend is not configured.",
+    };
+  }
   return {
-    status: "planned",
-    message: "Realtime team updates are planned — this build uses refresh-based local stores.",
+    status: "partially_implemented",
+    message: "Realtime channels are wired but not verified with live multi-user RLS proof.",
   };
 }

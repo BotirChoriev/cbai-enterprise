@@ -6,6 +6,7 @@ import AssistantCommandCenter from "@/components/assistant/AssistantCommandCente
 import AccountMenu from "@/components/assistant/AccountMenu";
 import LanguageSelector from "@/components/i18n/LanguageSelector";
 import ThemeToggle from "@/components/shared/ThemeToggle";
+import OrganizationSwitcher from "@/components/enterprise-collaboration/OrganizationSwitcher";
 import { CBAIMark } from "@/components/brand/CBAILogo";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useContextualHref } from "@/lib/context/use-contextual-href";
@@ -87,6 +88,7 @@ export default function Topbar({ onMenuClick, transparent = false }: TopbarProps
         </Link>
         <ThemeToggle hideOnMobile />
         <LanguageSelector compact />
+        <OrganizationSwitcher />
         <AccountMenu />
       </div>
     </header>

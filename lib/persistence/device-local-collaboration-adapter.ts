@@ -39,8 +39,15 @@ export class DeviceLocalCollaborationRepository implements CollaborationReposito
     createdBy: string;
     title: string;
     description?: string | null;
+    ownerOrganizationId?: string | null;
   }) {
-    const result = createMissionCollaboration(input);
+    const result = createMissionCollaboration({
+      missionId: input.missionId,
+      createdBy: input.createdBy,
+      title: input.title,
+      description: input.description,
+      ownerOrganizationId: input.ownerOrganizationId,
+    });
     if ("error" in result) return err("validation_failed", result.error);
     return ok(result);
   }
