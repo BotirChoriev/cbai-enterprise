@@ -37,7 +37,11 @@ export default function EvidenceWorkspacePanel() {
 
   useEffect(() => {
     if (!hydrated) return;
-    refresh();
+    // Deferred so the effect does not synchronously cascade setState (eslint react-hooks/set-state-in-effect).
+    const id = window.setTimeout(() => {
+      setRecords(loadEvidenceRecords());
+    }, 0);
+    return () => window.clearTimeout(id);
   }, [hydrated]);
 
   function onCreate() {

@@ -40,10 +40,14 @@ export default function MissionEngineStagePanel() {
 
   useEffect(() => {
     if (!hydrated || !mission) {
-      setRuntime(null);
-      return;
+      const id = window.setTimeout(() => setRuntime(null), 0);
+      return () => window.clearTimeout(id);
     }
-    refresh(mission.id);
+    const missionId = mission.id;
+    const id = window.setTimeout(() => {
+      setRuntime(loadMissionEngineRuntime(missionId));
+    }, 0);
+    return () => window.clearTimeout(id);
   }, [hydrated, mission]);
 
   if (!mission) {

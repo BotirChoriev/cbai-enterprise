@@ -54,9 +54,9 @@ test("1. Module registry includes required Digital Twin modules", () => {
 
 test("2. All integrations are Not Connected or Planned — never live fabricated", () => {
   assert.equal(allDigitalTwinIntegrationsHonest(), true);
-  for (const module of DIGITAL_TWIN_MODULES) {
+  for (const twinModule of DIGITAL_TWIN_MODULES) {
     assert.ok(
-      module.integrationStatus === "not_connected" || module.integrationStatus === "planned",
+      twinModule.integrationStatus === "not_connected" || twinModule.integrationStatus === "planned",
     );
   }
   assert.equal(getDigitalTwinModule("anomaly").integrationStatus, "planned");

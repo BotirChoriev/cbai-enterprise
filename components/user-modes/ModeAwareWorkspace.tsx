@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
   USER_MODE_CATALOG,
@@ -25,12 +25,9 @@ type ModeAwareWorkspaceProps = {
  */
 export default function ModeAwareWorkspace({ variant = "full" }: ModeAwareWorkspaceProps) {
   const hydrated = useHydrated();
-  const [modeId, setModeId] = useState<UserModeId>("general");
-
-  useEffect(() => {
-    if (!hydrated) return;
-    setModeId(loadSelectedUserModeId());
-  }, [hydrated]);
+  const [modeId, setModeId] = useState<UserModeId>(() =>
+    typeof window === "undefined" ? "general" : loadSelectedUserModeId(),
+  );
 
   const selected = USER_MODE_CATALOG.find((entry) => entry.id === modeId) ?? USER_MODE_CATALOG[0];
 

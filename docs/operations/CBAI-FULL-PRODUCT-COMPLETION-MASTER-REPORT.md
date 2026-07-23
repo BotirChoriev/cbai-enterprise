@@ -65,9 +65,10 @@ Live RLS: previously **PASS** via `verify:live-enterprise-collaboration` on Prev
 
 ## 11. Preview URLs
 
-- Branch alias: `https://preview-voice-research-integ.cbai-enterprise.pages.dev`  
-- Per-deploy URL: from Cloudflare Pages check on latest push  
-- Key routes: `/organization/workspace`, `/modes`, `/evidence/workspace`, `/reports/builder`, `/digital-twin`, `/billing`
+- Branch alias: `https://preview-voice-research-integ.cbai-enterprise.pages.dev`
+- Last known **successful** CF Pages deploy for collaboration UI: commit `cf83ec2`
+- Tip commits `6a42d5f`…`79ec482`: Cloudflare Pages check reported **Build failed** (logs only in CF dashboard). **Local** `npm run build` / `CI=true npm run build` **pass** (112 routes). Production untouched.
+- Key routes (once Preview build is green again): `/organization/workspace`, `/modes`, `/evidence/workspace`, `/reports/builder`, `/digital-twin`, `/billing`
 
 ## 12. Commit hashes (phases)
 
