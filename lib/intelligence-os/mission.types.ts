@@ -2,7 +2,13 @@
  * Mission Engine — the primary organizing object of the Universal Intelligence OS.
  *
  * Not search. Not profession. A problem the user is trying to solve with evidence.
+ *
+ * Phase 5 stage runtime (define → … → complete), tasks, evidence requirements,
+ * human review checkpoints, and decision records live in `lib/mission-engine/`
+ * and link here by mission id — they do not replace MissionStatus.
  */
+
+export type { MissionEngineStage } from "@/lib/mission-engine/types";
 
 export type MissionStatus = "draft" | "active" | "paused" | "completed";
 
