@@ -22,6 +22,7 @@ import {
   inviteOrganizationMemberPersisted,
 } from "@/lib/persistence/organization-persistence-service";
 import {
+  changeOrganizationMemberRoleCloud,
   fetchApprovalsForUser,
   fetchOrganizationActivityEvents,
   fetchOrganizationComments,
@@ -76,6 +77,7 @@ export default function OrganizationWorkspace() {
   const [feedback, setFeedback] = useState<string | null>(null);
 
   const [commentBody, setCommentBody] = useState("");
+  const [replyToId, setReplyToId] = useState<string | null>(null);
   const [approvalTitle, setApprovalTitle] = useState("Workspace publish approval");
   const [assignee, setAssignee] = useState("");
   const [inviteEmail, setInviteEmail] = useState("");
@@ -90,6 +92,24 @@ export default function OrganizationWorkspace() {
   const canInvite =
     Boolean(orgId && userId) &&
     evaluateOrganizationPermission(userId, orgId!, "invite_members");
+  const canManageMembers =
+    Boolean(orgId && userId) &&
+    evaluateOrganizationPermission(userId, orgId!, "manage_members");
+
+  const roots = useMemo(
+    () => comments.filter((c) => !c.parentId),
+    [comments],
+  );
+  const repliesByParent = useMemo(() => {
+    const map = new Map<string, EnterpriseComment[]>();
+    for (const c of comments) {
+      if (!c.parentId) continue;
+      const list = map.get(c.parentId) ?? [];
+      list.push(c);
+      map.set(c.parentId, list);
+    }
+    return map;
+  }, [comments]);
 
   const loadWorkspace = useCallback(async () => {
     if (!userId || !orgId) {
@@ -173,6 +193,7 @@ export default function OrganizationWorkspace() {
       targetType: "mission",
       targetId: "organization-workspace",
       body: commentBody,
+      parentId: replyToId,
     });
     setBusy(false);
     if ("error" in result) {
@@ -180,7 +201,31 @@ export default function OrganizationWorkspace() {
       return;
     }
     setCommentBody("");
-    setFeedback("Comment posted (RLS-scoped).");
+    setReplyToId(null);
+    setFeedback(replyToId ? "Reply posted (RLS-scoped)." : "Comment posted (RLS-scoped).");
+    await loadWorkspace();
+  }
+
+  async function changeRole(member: OrganizationMembership, workspaceRoleId: WorkspaceMemberRoleId) {
+    if (!orgId || !canManageMembers) return;
+    if (member.role === "owner") {
+      setFeedback("Owner role changes require a dedicated transfer flow.");
+      return;
+    }
+    setBusy(true);
+    const result = await changeOrganizationMemberRoleCloud({
+      organizationId: orgId,
+      memberUserId: member.userId,
+      newRole: storageRoleFromWorkspaceId(workspaceRoleId),
+      expectedVersion: member.version,
+    });
+    setBusy(false);
+    if ("error" in result) {
+      setFeedback(result.error);
+      return;
+    }
+    setFeedback(`Role updated to ${workspaceRoleId}.`);
+    if (sharedBackend && userId) await hydrateOrganizationPersistence(userId);
     await loadWorkspace();
   }
 
@@ -352,12 +397,33 @@ export default function OrganizationWorkspace() {
             ) : (
               <ul className="space-y-2">
                 {members.map((m) => (
-                  <li key={m.id} className="flex items-center justify-between gap-2 text-sm text-zinc-300">
+                  <li key={m.id} className="flex flex-wrap items-center justify-between gap-2 text-sm text-zinc-300">
                     <span>
                       {m.userDisplayName || shortId(m.userId)}{" "}
                       <span className="text-zinc-500">({shortId(m.userId)})</span>
                     </span>
-                    <span className="text-xs text-teal-300/90">{displayLabelForStorageRole(m.role)}</span>
+                    {canManageMembers && m.role !== "owner" ? (
+                      <select
+                        aria-label={`Role for ${m.userDisplayName || m.userId}`}
+                        value={
+                          INVITEABLE_WORKSPACE_ROLES.find((r) => r.storageRole === m.role)?.id ??
+                          "viewer"
+                        }
+                        disabled={busy}
+                        className={`rounded-md border border-zinc-700 bg-zinc-950/60 px-2 py-1 text-xs text-zinc-200 ${cbaiFocusRing}`}
+                        onChange={(e) =>
+                          void changeRole(m, e.target.value as WorkspaceMemberRoleId)
+                        }
+                      >
+                        {INVITEABLE_WORKSPACE_ROLES.map((r) => (
+                          <option key={r.id} value={r.id}>
+                            {r.label}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <span className="text-xs text-teal-300/90">{displayLabelForStorageRole(m.role)}</span>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -418,21 +484,49 @@ export default function OrganizationWorkspace() {
               placeholder="Comment — use mention buttons to insert @userId"
               className={`w-full rounded-lg border border-zinc-700 bg-zinc-950/60 px-3 py-2 text-sm text-zinc-200 ${cbaiFocusRing}`}
             />
+            {replyToId ? (
+              <p className="text-xs text-zinc-500">
+                Replying to {shortId(replyToId)}{" "}
+                <button
+                  type="button"
+                  className="text-teal-400"
+                  onClick={() => setReplyToId(null)}
+                >
+                  Cancel
+                </button>
+              </p>
+            ) : null}
             <button
               type="button"
               disabled={busy || !commentBody.trim()}
               className={`${cbaiBtnPrimary} ${cbaiFocusRing}`}
               onClick={() => void postComment()}
             >
-              Post comment
+              {replyToId ? "Post reply" : "Post comment"}
             </button>
-            {comments.length === 0 ? (
+            {roots.length === 0 ? (
               <p className="text-sm text-zinc-500">No comments in this organization yet.</p>
             ) : (
-              <ul className="max-h-56 space-y-2 overflow-y-auto">
-                {comments.map((c) => (
-                  <li key={c.id} className="text-sm text-zinc-300">
-                    <span className="text-zinc-500">{shortId(c.authorId)}</span> — {c.body}
+              <ul className="max-h-72 space-y-3 overflow-y-auto">
+                {roots.map((c) => (
+                  <li key={c.id} className="space-y-2 text-sm text-zinc-300">
+                    <div>
+                      <span className="text-zinc-500">{shortId(c.authorId)}</span> — {c.body}
+                    </div>
+                    <button
+                      type="button"
+                      className={`${cbaiBtnSecondary} ${cbaiFocusRing} text-xs`}
+                      onClick={() => setReplyToId(c.id)}
+                    >
+                      Reply
+                    </button>
+                    <ul className="ml-4 space-y-2 border-l border-zinc-800 pl-3">
+                      {(repliesByParent.get(c.id) ?? []).map((r) => (
+                        <li key={r.id} className="text-xs text-zinc-400">
+                          <span className="text-zinc-500">{shortId(r.authorId)}</span> — {r.body}
+                        </li>
+                      ))}
+                    </ul>
                   </li>
                 ))}
               </ul>

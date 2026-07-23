@@ -77,6 +77,7 @@ export async function persistEnterpriseComment(input: {
     targetId: String(data.target_id),
     authorId: String(data.author_id),
     body: String(data.body),
+    parentId: data.parent_id ? String(data.parent_id) : null,
     createdAt: String(data.created_at),
     updatedAt: String(data.updated_at),
   };
@@ -131,6 +132,7 @@ export async function fetchOrganizationComments(
     targetId: String(row.target_id),
     authorId: String(row.author_id),
     body: String(row.body),
+    parentId: row.parent_id ? String(row.parent_id) : null,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   }));
@@ -439,4 +441,42 @@ export async function fetchOrganizationActivityEvents(
 
 export function isEnterpriseCloudPersistenceActive(): boolean {
   return sharedReady();
+}
+
+/**
+ * Change a member role via RLS (owner/administrator only). No service role.
+ */
+export async function changeOrganizationMemberRoleCloud(input: {
+  readonly organizationId: string;
+  readonly memberUserId: string;
+  readonly newRole: string;
+  readonly expectedVersion: number;
+}): Promise<{ readonly ok: true } | { readonly error: string }> {
+  const client = db();
+  if (!client) {
+    return { error: "Shared backend not configured — role changes require Preview Supabase." };
+  }
+  const { data, error } = await client
+    .from("organization_memberships")
+    .update({
+      role: input.newRole,
+      version: input.expectedVersion + 1,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("organization_id", input.organizationId)
+    .eq("user_id", input.memberUserId)
+    .eq("version", input.expectedVersion)
+    .select("id,role,version")
+    .maybeSingle();
+  if (error) return { error: error.message };
+  if (!data) return { error: "Role change denied by RLS or version conflict — reload and retry." };
+
+  await client.rpc("append_organization_activity", {
+    p_organization_id: input.organizationId,
+    p_action: "member_role_changed",
+    p_target_type: "membership",
+    p_target_id: input.memberUserId,
+  });
+
+  return { ok: true };
 }

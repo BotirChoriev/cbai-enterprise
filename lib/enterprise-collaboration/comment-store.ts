@@ -46,6 +46,7 @@ export function createEnterpriseComment(input: {
   readonly targetType: CollaborationTargetType;
   readonly targetId: string;
   readonly body: string;
+  readonly parentId?: string | null;
 }): EnterpriseComment | { readonly error: string } {
   const gate = assertUserBelongsToOrganization(input.authorId, input.organizationId);
   if (!gate.ok) return { error: gate.error };
@@ -60,6 +61,7 @@ export function createEnterpriseComment(input: {
     targetId: input.targetId,
     authorId: input.authorId,
     body,
+    parentId: input.parentId ?? null,
     createdAt: now,
     updatedAt: now,
   };

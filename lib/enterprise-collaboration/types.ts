@@ -26,6 +26,7 @@ export type EnterpriseComment = {
   readonly targetId: string;
   readonly authorId: string;
   readonly body: string;
+  readonly parentId: string | null;
   readonly createdAt: string;
   readonly updatedAt: string;
 };

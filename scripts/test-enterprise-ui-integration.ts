@@ -77,6 +77,9 @@ test("organization workspace route and cloud-wired centers exist", () => {
     "fetchOrganizationActivityEvents",
     "INVITEABLE_WORKSPACE_ROLES",
     "CollaborationStatePanel",
+    "changeOrganizationMemberRoleCloud",
+    "parentId",
+    "Reply",
   ]);
   assertSourceContains("components/enterprise-collaboration/ApprovalCenter.tsx", [
     "persistApprovalRequest",
