@@ -7,3 +7,9 @@ OPENAI_API_KEY=
 #   https://*.cbai-enterprise.pages.dev
 # so branch aliases and deployment hash hosts both mint.
 VOICE_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,http://localhost:8788,http://127.0.0.1:8788
+
+# Official USA connectors — runtime secrets for Pages Functions ONLY.
+# Never prefix with NEXT_PUBLIC_ (must not ship to the browser).
+# Configure the same names in Cloudflare Pages → Settings → Environment variables (Preview).
+CENSUS_API_KEY=
+BEA_API_KEY=

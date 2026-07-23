@@ -1,0 +1,13 @@
+# Cloudflare Pages project metadata for Preview Functions + optional KV.
+# Bindings are applied in the Cloudflare dashboard for the Pages project.
+# This file documents the expected Preview binding name; it does not deploy Production.
+
+name = "cbai-enterprise"
+compatibility_date = "2026-07-01"
+pages_build_output_dir = "out"
+
+# Optional — create a KV namespace and bind it in Pages → Settings → Functions:
+# Binding name must be: EVIDENCE_OBSERVATIONS_KV
+# [[kv_namespaces]]
+# binding = "EVIDENCE_OBSERVATIONS_KV"
+# id = "<preview-kv-namespace-id>"

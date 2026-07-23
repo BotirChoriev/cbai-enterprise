@@ -54,31 +54,30 @@ export default function OfficialEvidencePanel({
             setError(data.error ?? "Official evidence request failed");
             return;
           }
-          setObservations(data.observations ?? []);
-          setConnectedSources(data.connectedSources ?? []);
+          setObservations([...(data.observations ?? [])]);
+          setConnectedSources([...(data.connectedSources ?? [])]);
           setMode("api");
           setStatus("ready");
           return;
         }
 
         const fallback = await refreshOfficialConnectorsInBrowser(entityId ?? "usa");
-        setObservations(
-          entityId
-            ? fallback.observations.filter((item) => item.entityId === entityId)
-            : fallback.observations,
-        );
-        setConnectedSources([...fallback.connectedSources]);
+        const fallbackObs = entityId
+          ? fallback.observations.filter((item) => item.entityId === entityId)
+          : fallback.observations;
+        setObservations([...fallbackObs]);
+        // Browser path never claims "connected" — only deployed Pages Function may.
+        setConnectedSources([]);
         setMode(fallback.mode);
         setStatus("ready");
       } catch (err) {
         try {
           const fallback = await refreshOfficialConnectorsInBrowser(entityId ?? "usa");
-          setObservations(
-            entityId
-              ? fallback.observations.filter((item) => item.entityId === entityId)
-              : fallback.observations,
-          );
-          setConnectedSources([...fallback.connectedSources]);
+          const fallbackObs = entityId
+            ? fallback.observations.filter((item) => item.entityId === entityId)
+            : fallback.observations;
+          setObservations([...fallbackObs]);
+          setConnectedSources([]);
           setMode(fallback.mode);
           setStatus("ready");
         } catch (inner) {
@@ -173,6 +172,10 @@ export default function OfficialEvidencePanel({
                   <dd>{item.provenance.retrievedAt}</dd>
                 </div>
                 <div>
+                  <dt className="uppercase tracking-wider text-zinc-600">Last checked</dt>
+                  <dd>{item.provenance.lastCheckedAt}</dd>
+                </div>
+                <div>
                   <dt className="uppercase tracking-wider text-zinc-600">Source URL</dt>
                   <dd className="truncate">
                     <a
@@ -184,6 +187,10 @@ export default function OfficialEvidencePanel({
                       {item.provenance.sourceUrl}
                     </a>
                   </dd>
+                </div>
+                <div>
+                  <dt className="uppercase tracking-wider text-zinc-600">Freshness</dt>
+                  <dd>{item.freshnessStatus}</dd>
                 </div>
                 <div>
                   <dt className="uppercase tracking-wider text-zinc-600">Verification</dt>

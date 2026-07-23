@@ -1,6 +1,5 @@
 /**
- * In-memory verified observation store — publishes only after validation.
- * Duplicate prevention by provenance+indicator+entity+period key.
+ * Verified observation store — versioned; never silently overwrites.
  */
 
 import type {
@@ -10,11 +9,40 @@ import type {
 } from "@/lib/official-connectors/types";
 import { assertPublishable, dedupeKey } from "@/lib/official-connectors/framework/validate";
 import { appendAudit } from "@/lib/official-connectors/framework/audit";
+import {
+  connectedSlugsFromRegistry,
+  markSourceConnected,
+} from "@/lib/official-connectors/connection-status";
+import { sourceHashForObservation } from "@/lib/official-connectors/persistence/source-hash";
 
-const observations = new Map<string, VerifiedObservation>();
+export type ObservationVersionRecord = {
+  readonly version: number;
+  readonly sourceHash: string;
+  readonly writtenAt: string;
+  readonly observation: VerifiedObservation;
+  readonly transformationLog: readonly string[];
+};
+
+const versionsByIdentity = new Map<string, ObservationVersionRecord[]>();
 const health = new Map<string, ConnectorHealthSnapshot>();
+const healthHistory = new Map<string, ConnectorHealthSnapshot[]>();
 
-export function publishObservation(observation: VerifiedObservation): boolean {
+export type PublishOutcome =
+  | { readonly ok: true; readonly version: number; readonly duplicate: false }
+  | { readonly ok: false; readonly duplicate: true; readonly existingVersion: number; readonly message: string }
+  | { readonly ok: false; readonly duplicate: false; readonly message: string };
+
+export function publishObservation(
+  observation: VerifiedObservation,
+  options: { readonly markConnected?: boolean } = {},
+): boolean {
+  return publishObservationVersioned(observation, options).ok;
+}
+
+export function publishObservationVersioned(
+  observation: VerifiedObservation,
+  options: { readonly markConnected?: boolean } = {},
+): PublishOutcome {
   const error = assertPublishable(observation);
   if (error) {
     appendAudit({
@@ -23,36 +51,84 @@ export function publishObservation(observation: VerifiedObservation): boolean {
       detail: error,
       failureClass: "validation_failed",
     });
-    return false;
+    return { ok: false, duplicate: false, message: error };
   }
+
   const key = dedupeKey(observation);
-  observations.set(key, observation);
+  const hash = sourceHashForObservation(observation);
+  const existing = versionsByIdentity.get(key) ?? [];
+  const latest = existing[existing.length - 1];
+
+  if (latest && latest.sourceHash === hash) {
+    appendAudit({
+      connectorId: observation.provenance.connectorId,
+      action: "reject",
+      detail: `duplicate:${key}`,
+      failureClass: "validation_failed",
+    });
+    return {
+      ok: false,
+      duplicate: true,
+      existingVersion: latest.version,
+      message: "Duplicate observation rejected — prior verified version retained",
+    };
+  }
+
+  const version = (latest?.version ?? 0) + 1;
+  const record: ObservationVersionRecord = {
+    version,
+    sourceHash: hash,
+    writtenAt: new Date().toISOString(),
+    observation,
+    transformationLog: [
+      observation.transformationNotes,
+      latest
+        ? `Supersedes version ${latest.version} (hash ${latest.sourceHash}) without deleting it`
+        : "Initial verified version",
+    ],
+  };
+  versionsByIdentity.set(key, [...existing, record]);
   appendAudit({
     connectorId: observation.provenance.connectorId,
     action: "publish",
-    detail: key,
+    detail: `${key}@v${version}`,
   });
-  return true;
+
+  if (options.markConnected) {
+    markSourceConnected(observation.provenance.sourceSlug, observation.provenance.retrievedAt);
+  }
+
+  return { ok: true, version, duplicate: false };
 }
 
 export function listObservations(filter?: {
   entityId?: string;
   sourceSlug?: OfficialSourceSlug;
 }): readonly VerifiedObservation[] {
-  const all = [...observations.values()];
-  return all.filter((item) => {
-    if (filter?.entityId && item.entityId !== filter.entityId) return false;
-    if (filter?.sourceSlug && item.provenance.sourceSlug !== filter.sourceSlug) return false;
-    return true;
-  });
+  const latest: VerifiedObservation[] = [];
+  for (const versions of versionsByIdentity.values()) {
+    const last = versions[versions.length - 1];
+    if (!last) continue;
+    const item = last.observation;
+    if (filter?.entityId && item.entityId !== filter.entityId) continue;
+    if (filter?.sourceSlug && item.provenance.sourceSlug !== filter.sourceSlug) continue;
+    latest.push(item);
+  }
+  return latest;
+}
+
+export function listObservationVersions(identityKey: string): readonly ObservationVersionRecord[] {
+  return [...(versionsByIdentity.get(identityKey) ?? [])];
 }
 
 export function clearObservations(): void {
-  observations.clear();
+  versionsByIdentity.clear();
 }
 
 export function setConnectorHealth(snapshot: ConnectorHealthSnapshot): void {
   health.set(snapshot.connectorId, snapshot);
+  const history = healthHistory.get(snapshot.connectorId) ?? [];
+  healthHistory.set(snapshot.connectorId, [...history, snapshot].slice(-50));
 }
 
 export function getConnectorHealth(connectorId: string): ConnectorHealthSnapshot | null {
@@ -63,21 +139,22 @@ export function listConnectorHealth(): readonly ConnectorHealthSnapshot[] {
   return [...health.values()];
 }
 
+export function listConnectorHealthHistory(connectorId: string): readonly ConnectorHealthSnapshot[] {
+  return [...(healthHistory.get(connectorId) ?? [])];
+}
+
+/**
+ * Connected = registry marked connected (Pages Function path only).
+ * Does not treat in-memory browser retrieval as connected.
+ */
 export function connectedSourceSlugs(): readonly OfficialSourceSlug[] {
-  const slugs = new Set<OfficialSourceSlug>();
-  for (const item of observations.values()) {
-    if (item.verificationState === "verified") {
-      slugs.add(item.provenance.sourceSlug);
-    }
-  }
-  for (const item of health.values()) {
-    if (item.liveCapable && item.status === "healthy" && item.lastSuccessAt) {
-      slugs.add(item.sourceSlug);
-    }
-  }
-  return [...slugs];
+  return connectedSlugsFromRegistry();
 }
 
 export function observationCount(): number {
-  return observations.size;
+  return listObservations().length;
+}
+
+export function exportAllVersions(): readonly ObservationVersionRecord[] {
+  return [...versionsByIdentity.values()].flat();
 }

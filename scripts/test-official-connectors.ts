@@ -82,7 +82,7 @@ test("assertPublishable rejects stale and unverified", () => {
   assert.ok(assertPublishable(sampleObservation({ value: Number.NaN })));
 });
 
-test("duplicate prevention uses provenance key", () => {
+test("duplicate prevention versions without silent overwrite", () => {
   clearObservations();
   const a = sampleObservation();
   const b = sampleObservation({ id: "other-id", value: 2 });
@@ -91,6 +91,17 @@ test("duplicate prevention uses provenance key", () => {
   assert.equal(publishObservation(b), true);
   assert.equal(observationCount(), 1);
   assert.equal(listObservations()[0]?.value, 2);
+  assert.equal(publishObservation(b), false);
+});
+
+test("WDI phase4 mapping gates are complete for approved codes", async () => {
+  const { listApprovedLiveWdiCodes, assertWdiMappingGates } = await import(
+    "../lib/official-connectors/sources/wdi-mapping.ts"
+  );
+  for (const candidate of listApprovedLiveWdiCodes()) {
+    assert.deepEqual(assertWdiMappingGates(candidate), []);
+  }
+  assert.ok(listApprovedLiveWdiCodes().some((c) => c.code === "NE.EXP.GNFS.CD"));
 });
 
 test("freshness marks old retrievals stale", () => {

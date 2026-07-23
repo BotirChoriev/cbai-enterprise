@@ -15,6 +15,7 @@ import {
   listObservations,
   observationCount,
 } from "@/lib/official-connectors/store";
+import { markSourceConnected } from "@/lib/official-connectors/connection-status";
 import type { ConnectorAttemptResult, OfficialSourceSlug } from "@/lib/official-connectors/types";
 import { getInfrastructureSummary } from "@/lib/evidence-infrastructure/registry";
 
@@ -22,6 +23,8 @@ export type RefreshOptions = {
   readonly countryId?: string;
   readonly censusApiKey?: string;
   readonly beaApiKey?: string;
+  /** Only true for deployed Pages Function path. */
+  readonly markConnectedOnSuccess?: boolean;
 };
 
 export type RefreshReport = {
@@ -32,26 +35,44 @@ export type RefreshReport = {
   readonly health: ReturnType<typeof listConnectorHealth>;
 };
 
+function maybeMark(slug: OfficialSourceSlug, result: ConnectorAttemptResult, enabled: boolean) {
+  if (!enabled) return;
+  if (result.ok && result.observations.length > 0) {
+    markSourceConnected(slug, result.checkedAt);
+  }
+}
+
 export async function refreshOfficialConnectors(
   options: RefreshOptions = {},
 ): Promise<RefreshReport> {
   const countryId = options.countryId ?? "usa";
+  const mark = options.markConnectedOnSuccess === true;
   const results: Record<string, ConnectorAttemptResult> = {};
 
   results["world-bank"] = await fetchWorldBankForCountry(countryId);
+  maybeMark("world-bank", results["world-bank"], mark);
 
-  // Optionally refresh a small additional set for multi-country demos — not the full registry.
   const extras = countries.map((c) => c.id).filter((id) => id !== countryId).slice(0, 2);
   for (const id of extras) {
     results[`world-bank:${id}`] = await fetchWorldBankForCountry(id);
+    maybeMark("world-bank", results[`world-bank:${id}`], mark);
   }
 
   results["united-nations"] = await fetchUnitedNationsConnectivity();
   results.oecd = await fetchOecdForCountry(countryId);
+  maybeMark("oecd", results.oecd, mark);
+
   results["us-bls"] = await fetchUsBlsUnemployment();
+  maybeMark("us-bls", results["us-bls"], mark);
+
   results["us-sec"] = await fetchUsSecRegistryMatches();
+  maybeMark("us-sec", results["us-sec"], mark);
+
   results["us-census"] = await fetchUsCensus(options.censusApiKey);
+  maybeMark("us-census", results["us-census"], mark);
+
   results["us-bea"] = await fetchUsBea(options.beaApiKey);
+  maybeMark("us-bea", results["us-bea"], mark);
 
   return {
     checkedAt: new Date().toISOString(),

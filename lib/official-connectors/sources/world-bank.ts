@@ -9,6 +9,7 @@ import { cacheGet, cacheSet } from "@/lib/official-connectors/framework/cache";
 import { appendAudit } from "@/lib/official-connectors/framework/audit";
 import { computeFreshness, isoNow } from "@/lib/official-connectors/framework/validate";
 import { publishObservation, setConnectorHealth } from "@/lib/official-connectors/store";
+import { listApprovedLiveWdiCodes } from "@/lib/official-connectors/sources/wdi-mapping";
 import type {
   ConnectorAttemptResult,
   VerifiedObservation,
@@ -17,33 +18,14 @@ import type {
 export const WORLD_BANK_CONNECTOR_ID = "conn-world-bank-wdi-live";
 export const WORLD_BANK_API_BASE = "https://api.worldbank.org/v2";
 
-/** Stable WDI codes with CBAI mapping. */
-export const WORLD_BANK_LIVE_INDICATORS = [
-  {
-    code: "NY.GDP.MKTP.CD",
-    name: "GDP (current US$)",
-    unit: "current US$",
-    cbaiIndicatorSlug: "national-accounts",
-  },
-  {
-    code: "SP.POP.TOTL",
-    name: "Population, total",
-    unit: "people",
-    cbaiIndicatorSlug: null,
-  },
-  {
-    code: "FP.CPI.TOTL.ZG",
-    name: "Inflation, consumer prices (annual %)",
-    unit: "percent",
-    cbaiIndicatorSlug: "national-accounts",
-  },
-  {
-    code: "SL.UEM.TOTL.ZS",
-    name: "Unemployment, total (% of total labor force)",
-    unit: "percent of labor force",
-    cbaiIndicatorSlug: "labour-market-statistics",
-  },
-] as const;
+/** Approved live WDI codes only (baseline + Phase 4 reviewed). */
+export const WORLD_BANK_LIVE_INDICATORS = listApprovedLiveWdiCodes().map((item) => ({
+  code: item.code,
+  name: item.officialName,
+  unit: item.unit,
+  cbaiIndicatorSlug: item.cbaiIndicatorSlug,
+}));
+
 
 type WbRow = {
   indicator?: { id?: string; value?: string };

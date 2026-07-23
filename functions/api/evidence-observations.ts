@@ -1,6 +1,7 @@
 /**
  * Cloudflare Pages Function — GET/POST /api/evidence-observations
  * Refreshes official connectors and returns verified observations only.
+ * Runtime secrets: CENSUS_API_KEY, BEA_API_KEY (never exposed to client).
  */
 
 import { refreshOfficialConnectors } from "../../lib/official-connectors/pipeline";
@@ -9,16 +10,26 @@ import {
   listConnectorHealth,
   connectedSourceSlugs,
   observationCount,
+  exportAllVersions,
+  listConnectorHealthHistory,
 } from "../../lib/official-connectors/store";
+import { listConnectionStatuses } from "../../lib/official-connectors/connection-status";
 import {
   generateEvidenceReport,
   generateExecutiveSummary,
 } from "../../lib/official-connectors/reports";
+import {
+  buildImmutableSourceRecords,
+  persistVerifiedBundle,
+  persistenceStatus,
+  type EvidenceKvNamespace,
+} from "../../lib/official-connectors/persistence/kv-store";
 
 export interface Env {
   readonly CENSUS_API_KEY?: string;
   readonly BEA_API_KEY?: string;
   readonly VOICE_ALLOWED_ORIGINS?: string;
+  readonly EVIDENCE_OBSERVATIONS_KV?: EvidenceKvNamespace;
 }
 
 type PagesFunction<E = unknown> = (context: {
@@ -74,7 +85,22 @@ export const onRequest: PagesFunction<Env> = async (context) => {
         countryId: entityId && !entityId.includes(":") ? entityId : "usa",
         censusApiKey: env.CENSUS_API_KEY,
         beaApiKey: env.BEA_API_KEY,
+        markConnectedOnSuccess: true,
       });
+
+      const observations = listObservations();
+      const persist = await persistVerifiedBundle(
+        {
+          immutableSourceRecords: buildImmutableSourceRecords(observations),
+          versions: exportAllVersions(),
+          healthHistory: listConnectorHealth().flatMap((h) =>
+            listConnectorHealthHistory(h.connectorId),
+          ),
+          writtenAt: new Date().toISOString(),
+        },
+        env.EVIDENCE_OBSERVATIONS_KV,
+      );
+      refreshReport = { ...refreshReport, persistence: persist };
     }
 
     if (report === "evidence") {
@@ -88,13 +114,16 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       ok: true,
       observationCount: observationCount(),
       connectedSources: connectedSourceSlugs(),
+      connectionStatuses: listConnectionStatuses(),
       health: listConnectorHealth(),
       observations: entityId ? listObservations({ entityId }) : listObservations(),
       refresh: refreshReport,
+      persistence: persistenceStatus(env.EVIDENCE_OBSERVATIONS_KV),
       principles: {
         noInventedValues: true,
         humanDecisionRequired: true,
         noJudgments: true,
+        connectedOnlyAfterPagesFunctionSuccess: true,
       },
     });
   } catch (error) {
