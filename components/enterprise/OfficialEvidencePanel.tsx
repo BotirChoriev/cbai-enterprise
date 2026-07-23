@@ -3,6 +3,11 @@
 import { useCallback, useEffect, useState } from "react";
 import type { VerifiedObservation } from "@/lib/official-connectors/types";
 import type { OfficialGeneratedReport } from "@/lib/official-connectors/reports";
+import {
+  refreshOfficialConnectorsInBrowser,
+  browserEvidenceReport,
+  browserExecutiveSummary,
+} from "@/lib/official-connectors/browser-refresh";
 import { cbaiGlassCard, cbaiSectionEyebrow, cbaiBtnSecondary } from "@/components/brand/brand-classes";
 
 type ObservationsResponse = {
@@ -28,6 +33,7 @@ export default function OfficialEvidencePanel({
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
   const [report, setReport] = useState<OfficialGeneratedReport | null>(null);
+  const [mode, setMode] = useState<string>("api");
 
   const load = useCallback(
     async (refresh: boolean) => {
@@ -41,18 +47,44 @@ export default function OfficialEvidencePanel({
           method: refresh ? "POST" : "GET",
           credentials: "include",
         });
-        const data = (await response.json()) as ObservationsResponse;
-        if (!data.ok) {
-          setStatus("error");
-          setError(data.error ?? "Official evidence request failed");
+        if (response.ok) {
+          const data = (await response.json()) as ObservationsResponse;
+          if (!data.ok) {
+            setStatus("error");
+            setError(data.error ?? "Official evidence request failed");
+            return;
+          }
+          setObservations(data.observations ?? []);
+          setConnectedSources(data.connectedSources ?? []);
+          setMode("api");
+          setStatus("ready");
           return;
         }
-        setObservations(data.observations ?? []);
-        setConnectedSources(data.connectedSources ?? []);
+
+        const fallback = await refreshOfficialConnectorsInBrowser(entityId ?? "usa");
+        setObservations(
+          entityId
+            ? fallback.observations.filter((item) => item.entityId === entityId)
+            : fallback.observations,
+        );
+        setConnectedSources([...fallback.connectedSources]);
+        setMode(fallback.mode);
         setStatus("ready");
       } catch (err) {
-        setStatus("error");
-        setError(err instanceof Error ? err.message : String(err));
+        try {
+          const fallback = await refreshOfficialConnectorsInBrowser(entityId ?? "usa");
+          setObservations(
+            entityId
+              ? fallback.observations.filter((item) => item.entityId === entityId)
+              : fallback.observations,
+          );
+          setConnectedSources([...fallback.connectedSources]);
+          setMode(fallback.mode);
+          setStatus("ready");
+        } catch (inner) {
+          setStatus("error");
+          setError(inner instanceof Error ? inner.message : String(err));
+        }
       }
     },
     [entityId],
@@ -63,13 +95,24 @@ export default function OfficialEvidencePanel({
   }, [load]);
 
   async function loadReport(kind: "evidence" | "executive") {
-    const params = new URLSearchParams({ report: kind });
-    if (entityId) params.set("entityId", entityId);
-    const response = await fetch(`/api/evidence-observations?${params.toString()}`, {
-      credentials: "include",
-    });
-    const data = (await response.json()) as ObservationsResponse;
-    if (data.ok && data.report) setReport(data.report);
+    try {
+      const params = new URLSearchParams({ report: kind });
+      if (entityId) params.set("entityId", entityId);
+      const response = await fetch(`/api/evidence-observations?${params.toString()}`, {
+        credentials: "include",
+      });
+      if (response.ok) {
+        const data = (await response.json()) as ObservationsResponse;
+        if (data.ok && data.report) {
+          setReport(data.report);
+          return;
+        }
+      }
+    } catch {
+      /* fall through to browser */
+    }
+    await refreshOfficialConnectorsInBrowser(entityId ?? "usa");
+    setReport(kind === "evidence" ? browserEvidenceReport(entityId) : browserExecutiveSummary(entityId));
   }
 
   return (
@@ -82,6 +125,9 @@ export default function OfficialEvidencePanel({
           </h3>
           <p className="mt-1 text-sm text-zinc-500">
             Live connector outputs only. Missing values stay Missing / Planned / Awaiting official source.
+            {mode === "browser-keyless"
+              ? " Browser keyless refresh is active while the Pages Function deploys."
+              : null}
           </p>
         </div>
         <button type="button" className={cbaiBtnSecondary} onClick={() => void load(true)}>
@@ -89,9 +135,7 @@ export default function OfficialEvidencePanel({
         </button>
       </div>
 
-      {status === "loading" ? (
-        <p className="text-sm text-zinc-500">Checking official sources…</p>
-      ) : null}
+      {status === "loading" ? <p className="text-sm text-zinc-500">Checking official sources…</p> : null}
       {error ? <p className="text-sm text-amber-300">{error}</p> : null}
 
       <div className={`${cbaiGlassCard} px-4 py-3 text-sm text-zinc-400`}>
@@ -131,7 +175,12 @@ export default function OfficialEvidencePanel({
                 <div>
                   <dt className="uppercase tracking-wider text-zinc-600">Source URL</dt>
                   <dd className="truncate">
-                    <a href={item.provenance.sourceUrl} className="text-teal-400 hover:text-teal-300" target="_blank" rel="noreferrer">
+                    <a
+                      href={item.provenance.sourceUrl}
+                      className="text-teal-400 hover:text-teal-300"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
                       {item.provenance.sourceUrl}
                     </a>
                   </dd>

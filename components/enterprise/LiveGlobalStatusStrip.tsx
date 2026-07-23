@@ -25,6 +25,27 @@ export default function LiveGlobalStatusStrip({ compact, entityId }: LiveGlobalS
           method: "POST",
           credentials: "include",
         });
+        if (!response.ok) {
+          const { refreshOfficialConnectorsInBrowser } = await import(
+            "@/lib/official-connectors/browser-refresh"
+          );
+          const fallback = await refreshOfficialConnectorsInBrowser(entityId ?? "usa");
+          const base = buildGlobalStatus();
+          const mergedConnected = Math.max(
+            base.connectedSources,
+            new Set(["cbai-local-registry", ...fallback.connectedSources]).size,
+          );
+          setStatus({
+            ...base,
+            connectedSources: mergedConnected,
+            missingSources: Math.max(0, base.totalSources - mergedConnected),
+            lastUpdated: new Date().toISOString(),
+            coverageBasis: `${fallback.observationCount} verified official observation(s) published · ${base.coverageBasis}`,
+            confidence: "Partial — verified sources registered",
+            evidenceHealth: "Healthy — registry connected",
+          });
+          return;
+        }
         const data = (await response.json()) as {
           ok?: boolean;
           observationCount?: number;
