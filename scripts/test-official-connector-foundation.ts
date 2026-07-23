@@ -7,12 +7,11 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
-  FOUNDATION_CONNECTOR_CONTRACTS,
-  FOUNDATION_SOURCE_REGISTRY,
   assertNoLiveConnectors,
   buildProvenance,
   classifyHttpFailure,
-  countLiveFoundationSources,
+  FOUNDATION_SOURCE_REGISTRY,
+  FOUNDATION_CONNECTOR_CONTRACTS,
   deriveFreshnessState,
   fetchWithFoundationAdapter,
   FoundationAuditLog,
@@ -27,11 +26,17 @@ import {
   type FetchLike,
 } from "../lib/official-connector-foundation/index.ts";
 
-test("phase1: zero live sources and connectors", () => {
-  assert.equal(countLiveFoundationSources(), 0);
-  assert.ok(FOUNDATION_SOURCE_REGISTRY.every((s) => s.connectionStatus === "planned"));
-  assert.ok(FOUNDATION_CONNECTOR_CONTRACTS.every((c) => c.liveEnabled === false));
+test("phase1 registry keeps non-live sources planned; verified sources may be connected", () => {
   assert.doesNotThrow(() => assertNoLiveConnectors());
+  assert.ok(FOUNDATION_CONNECTOR_CONTRACTS.every((c) => c.liveEnabled === false));
+  const connected = FOUNDATION_SOURCE_REGISTRY.filter((s) => s.connectionStatus === "connected");
+  const planned = FOUNDATION_SOURCE_REGISTRY.filter((s) => s.connectionStatus === "planned");
+  assert.ok(connected.some((s) => s.slug === "world-bank"));
+  assert.ok(connected.some((s) => s.slug === "us-bls"));
+  assert.ok(connected.some((s) => s.slug === "us-sec"));
+  assert.ok(planned.some((s) => s.slug === "us-census"));
+  assert.ok(planned.some((s) => s.slug === "us-bea"));
+  assert.ok(planned.some((s) => s.slug === "oecd"));
 });
 
 test("malformed response is rejected", () => {
@@ -189,8 +194,8 @@ test("missing-source fallback never invents evidence", () => {
   assert.ok(isSafeEmptyCoverage(unknown));
 
   const planned = missingSourceFallback({
-    sourceSlug: "world-bank",
-    indicatorName: "GDP (current US$)",
+    sourceSlug: "us-census",
+    indicatorName: "Total population (ACS 5-year)",
     jurisdiction: "USA",
   });
   assert.equal(planned.status, "Awaiting official source");

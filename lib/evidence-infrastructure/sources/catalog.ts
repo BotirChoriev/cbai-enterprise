@@ -47,8 +47,8 @@ export const OFFICIAL_EVIDENCE_SOURCES: readonly EvidenceSourceRecord[] = [
     ],
     updateFrequency: "Annual and quarterly for WDI; ad hoc for reports",
     license: "World Bank Open Data Terms of Use",
-    connectionStatus: "planned",
-    verificationStatus: "not_started",
+    connectionStatus: "connected",
+    verificationStatus: "verified",
   }),
   defineSource({
     id: "src-imf",
@@ -235,8 +235,8 @@ export const OFFICIAL_EVIDENCE_SOURCES: readonly EvidenceSourceRecord[] = [
     supportedIndicators: ["labour-market-statistics"],
     updateFrequency: "Monthly",
     license: "U.S. Government work",
-    connectionStatus: "planned",
-    verificationStatus: "not_started",
+    connectionStatus: "connected",
+    verificationStatus: "verified",
   }),
   defineSource({
     id: "src-us-sec",
@@ -248,8 +248,8 @@ export const OFFICIAL_EVIDENCE_SOURCES: readonly EvidenceSourceRecord[] = [
     supportedIndicators: ["industry-classification"],
     updateFrequency: "As published",
     license: "SEC public disclosure",
-    connectionStatus: "planned",
-    verificationStatus: "not_started",
+    connectionStatus: "connected",
+    verificationStatus: "verified",
   }),
   defineSource({
     id: "src-cbai-local-registry",

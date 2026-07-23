@@ -10,6 +10,7 @@ export const OFFICIAL_CONNECTOR_FOUNDATION_VERSION = "1.0.0-phase1" as const;
 export type FoundationConnectionStatus =
   | "planned"
   | "ready"
+  | "connected"
   | "live"
   | "deprecated"
   | "disabled";

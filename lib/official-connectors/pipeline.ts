@@ -37,6 +37,8 @@ export type RefreshReport = {
 
 function maybeMark(slug: OfficialSourceSlug, result: ConnectorAttemptResult, enabled: boolean) {
   if (!enabled) return;
+  // Connectivity-only probes (OECD/UN) must not flip connectionStatus to connected.
+  if (slug === "oecd" || slug === "united-nations") return;
   if (result.ok && result.observations.length > 0) {
     markSourceConnected(slug, result.checkedAt);
   }

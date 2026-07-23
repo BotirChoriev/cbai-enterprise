@@ -16,8 +16,8 @@ export const FOUNDATION_SOURCE_REGISTRY: readonly OfficialSourceRecord[] = [
     jurisdictionScope: "Global country-coded statistics",
     updateFrequency: "As published (often annual)",
     license: "World Bank Open Data Terms of Use",
-    connectionStatus: "planned",
-    defaultHealth: "planned",
+    connectionStatus: "connected",
+    defaultHealth: "healthy",
   },
   {
     id: "fsrc-united-nations",
@@ -81,8 +81,8 @@ export const FOUNDATION_SOURCE_REGISTRY: readonly OfficialSourceRecord[] = [
     jurisdictionScope: "United States",
     updateFrequency: "Monthly",
     license: "U.S. Government work",
-    connectionStatus: "planned",
-    defaultHealth: "planned",
+    connectionStatus: "connected",
+    defaultHealth: "healthy",
   },
   {
     id: "fsrc-us-sec",
@@ -94,8 +94,8 @@ export const FOUNDATION_SOURCE_REGISTRY: readonly OfficialSourceRecord[] = [
     jurisdictionScope: "United States",
     updateFrequency: "As published",
     license: "SEC public disclosure",
-    connectionStatus: "planned",
-    defaultHealth: "planned",
+    connectionStatus: "connected",
+    defaultHealth: "healthy",
   },
 ] as const;
 

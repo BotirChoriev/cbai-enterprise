@@ -72,6 +72,8 @@ export function markSourceConnected(slug: OfficialSourceSlug, at = new Date().to
   if (!row || row.status === "disabled") return;
   row.status = "connected";
   row.lastConnectedAt = at;
+  (row as { reason: string }).reason =
+    "Verified observation retrieved by deployed Preview Pages Function and displayed";
 }
 
 export function getConnectionStatus(slug: OfficialSourceSlug): ConnectionRecord {
