@@ -397,3 +397,46 @@ export async function markMentionReadCloud(
     readAt: (data.read_at as string | null) ?? null,
   };
 }
+
+export type OrganizationActivityEvent = {
+  readonly id: string;
+  readonly organizationId: string | null;
+  readonly actorUserId: string | null;
+  readonly action: string;
+  readonly targetType: string | null;
+  readonly targetId: string | null;
+  readonly createdAt: string;
+};
+
+/**
+ * Membership-scoped activity_events via RLS (anon key + user JWT).
+ * Never uses service role.
+ */
+export async function fetchOrganizationActivityEvents(
+  organizationId: string,
+): Promise<OrganizationActivityEvent[] | { readonly error: string }> {
+  const client = db();
+  if (!client) {
+    return { error: "Shared backend not configured — organization activity requires Preview Supabase." };
+  }
+  const { data, error } = await client
+    .from("activity_events")
+    .select("id,organization_id,actor_user_id,action,target_type,target_id,created_at")
+    .eq("organization_id", organizationId)
+    .order("created_at", { ascending: false })
+    .limit(50);
+  if (error) return { error: error.message };
+  return ((data ?? []) as Record<string, unknown>[]).map((row) => ({
+    id: String(row.id),
+    organizationId: row.organization_id ? String(row.organization_id) : null,
+    actorUserId: row.actor_user_id ? String(row.actor_user_id) : null,
+    action: String(row.action ?? row.event_type ?? "event"),
+    targetType: row.target_type ? String(row.target_type) : null,
+    targetId: row.target_id ? String(row.target_id) : null,
+    createdAt: String(row.created_at),
+  }));
+}
+
+export function isEnterpriseCloudPersistenceActive(): boolean {
+  return sharedReady();
+}

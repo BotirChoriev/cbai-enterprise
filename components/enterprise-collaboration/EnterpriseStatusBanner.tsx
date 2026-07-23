@@ -41,6 +41,10 @@ export default function EnterpriseStatusBanner() {
         <Link href="/organization" className="text-teal-400 hover:text-teal-300">
           Manage organizations
         </Link>
+        {" · "}
+        <Link href="/organization/workspace" className="text-teal-400 hover:text-teal-300">
+          Organization Workspace
+        </Link>
       </p>
     </section>
   );

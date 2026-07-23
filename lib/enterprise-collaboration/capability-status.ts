@@ -38,14 +38,18 @@ export function getEnterpriseCapabilityMatrix(): readonly EnterpriseCapabilityRo
     {
       id: "comments",
       label: "Comments",
-      status: "partially_implemented",
-      note: "Organization-scoped comment store + UI centers; cloud persistence planned in migration 0009.",
+      status: shared ? "implemented" : "partially_implemented",
+      note: shared
+        ? "Organization Workspace + centers read/write enterprise_comments via anon JWT + RLS."
+        : "Device-local comment store; connect Preview Supabase for shared comments.",
     },
     {
       id: "mentions",
       label: "Mentions",
-      status: "partially_implemented",
-      note: "@userId mentions within the same organization; no email delivery.",
+      status: shared ? "implemented" : "partially_implemented",
+      note: shared
+        ? "@userId mentions persist to enterprise_mentions under RLS; email delivery not configured."
+        : "@userId mentions in device-local store only.",
     },
     {
       id: "assignments",
@@ -56,34 +60,42 @@ export function getEnterpriseCapabilityMatrix(): readonly EnterpriseCapabilityRo
     {
       id: "notifications",
       label: "Notifications",
-      status: "partially_implemented",
-      note: "In-app notification store + Notification Center; push/email delivery missing.",
+      status: shared ? "implemented" : "partially_implemented",
+      note: shared
+        ? "Notification Center loads user_notifications + mentions via RLS; push/email delivery missing."
+        : "In-app device-local notifications only.",
     },
     {
       id: "approvals",
       label: "Approval workflow",
-      status: "partially_implemented",
-      note: "Request/decide flow with RBAC on approve_internal_review; not wired to every mission object.",
+      status: shared ? "implemented" : "partially_implemented",
+      note: shared
+        ? "Request/decide on enterprise_approvals with RLS role gates (owner/admin/reviewer)."
+        : "Device-local approval store with RBAC gates.",
     },
     {
       id: "audit",
       label: "Audit log",
-      status: "partially_implemented",
-      note: "Organization + collaboration audit stores; Activity Center aggregates membership-scoped events.",
+      status: shared ? "implemented" : "partially_implemented",
+      note: shared
+        ? "Activity Center + Organization Workspace timeline read activity_events (RLS) plus org audit."
+        : "Device-local organization/collaboration audit only.",
     },
     {
       id: "realtime",
       label: "Realtime team updates",
       status: isOrganizationCollaborationShared() ? "partially_implemented" : "blocked",
       note: isOrganizationCollaborationShared()
-        ? "Realtime module wired for org/user scopes — requires live RLS proof before claiming Implemented."
+        ? "Realtime module wired for org/user scopes — refresh-based UI is Implemented; live channel proof remains partial."
         : "Blocked — shared Supabase backend not configured in this environment.",
     },
     {
       id: "cloud-collab-repo",
       label: "Supabase collaboration repository",
-      status: "partially_implemented",
-      note: "Factory selects SupabaseCollaborationRepository when shared backend is ready; live apply still required.",
+      status: shared ? "implemented" : "partially_implemented",
+      note: shared
+        ? "Factory selects Supabase adapters; UI uses cloud-persistence with anon key only (no service role)."
+        : "Device-local adapters until Preview Supabase public env is set.",
     },
     {
       id: "billing",

@@ -7,6 +7,7 @@ import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-clas
 import { getEnterpriseCapabilityMatrix } from "@/lib/enterprise-collaboration";
 
 const HUB = [
+  { href: "/organization/workspace", title: "Organization Workspace", body: "Members, comments, approvals, activity." },
   { href: "/enterprise/personal", title: "Personal Dashboard", body: "Your memberships and queues." },
   { href: "/enterprise/organization", title: "Organization Dashboard", body: "Active org, roles, comments, audit." },
   { href: "/enterprise/workspace", title: "Workspace Dashboard", body: "Product lenses + active org context." },
@@ -14,7 +15,7 @@ const HUB = [
   { href: "/notifications", title: "Notification Center", body: "In-app alerts and @mentions." },
   { href: "/reviews", title: "Review Center", body: "Assigned collaboration reviews." },
   { href: "/approvals", title: "Approval Center", body: "Request and decide approvals." },
-  { href: "/activity", title: "Activity Center", body: "Membership-scoped audit trail." },
+  { href: "/activity", title: "Activity Center", body: "Membership-scoped activity timeline." },
 ];
 
 const STATUS_LABEL = {

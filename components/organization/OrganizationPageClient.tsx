@@ -29,6 +29,14 @@ import ExecutionOsPanel from "@/components/genesis/ExecutionOsPanel";
 import { MISSION_DATA_CHANGED } from "@/lib/intelligence-os/mission-activation-events";
 import type { OrganizationKind } from "@/lib/organization-os/organization.types";
 import { ORGANIZATION_KINDS } from "@/lib/organization-os/organization.types";
+import {
+  INVITEABLE_WORKSPACE_ROLES,
+  displayLabelForStorageRole,
+  storageRoleFromWorkspaceId,
+  type WorkspaceMemberRoleId,
+} from "@/lib/organization-os/workspace-roles";
+import type { OrganizationRole } from "@/lib/organization-os/organization-membership-store";
+import Link from "next/link";
 
 export default function OrganizationPageClient() {
   const { t } = useTranslation();
@@ -40,6 +48,7 @@ export default function OrganizationPageClient() {
   const [kind, setKind] = useState<OrganizationKind>("other");
   const [website, setWebsite] = useState("");
   const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState<WorkspaceMemberRoleId>("reviewer");
   const [feedback, setFeedback] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -188,7 +197,7 @@ export default function OrganizationPageClient() {
           organizationId: selectedOrgId,
           inviterDisplayName: displayName,
           inviteeEmail: inviteEmail,
-          role: "member",
+          role: storageRoleFromWorkspaceId(inviteRole) as OrganizationRole,
         });
         setBusy(false);
         if ("error" in result) {
@@ -215,7 +224,7 @@ export default function OrganizationPageClient() {
           inviterId: userId,
           inviterDisplayName: displayName,
           inviteeEmail: inviteEmail,
-          role: "member",
+          role: storageRoleFromWorkspaceId(inviteRole) as OrganizationRole,
         });
         setBusy(false);
         if ("error" in result) {
@@ -327,10 +336,29 @@ export default function OrganizationPageClient() {
                 disabled={busy}
                 className={`min-h-10 w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 text-sm ${cbaiFocusRing}`}
               />
+              <label htmlFor="invite-role" className="text-xs text-zinc-500">
+                Role
+              </label>
+              <select
+                id="invite-role"
+                value={inviteRole}
+                onChange={(e) => setInviteRole(e.target.value as WorkspaceMemberRoleId)}
+                disabled={busy}
+                className={`min-h-10 w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 text-sm ${cbaiFocusRing}`}
+              >
+                {INVITEABLE_WORKSPACE_ROLES.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.label}
+                  </option>
+                ))}
+              </select>
               <button type="button" onClick={sendInvite} disabled={busy} className={`${cbaiBtnPrimary} min-h-10`}>
                 {t("organizationOs.createInviteLink")}
               </button>
               <p className="text-[10px] text-zinc-600">{t("organizationOs.emailNotSent")}</p>
+              <Link href="/organization/workspace" className="text-xs text-teal-400 hover:text-teal-300">
+                Open Organization Workspace →
+              </Link>
             </section>
           ) : null}
 
@@ -339,7 +367,7 @@ export default function OrganizationPageClient() {
             <ul className="space-y-1 text-xs text-zinc-400">
               {members.map((m) => (
                 <li key={m.id}>
-                  {m.userDisplayName} · {m.role} · v{m.version}
+                  {m.userDisplayName} · {displayLabelForStorageRole(m.role)} · v{m.version}
                 </li>
               ))}
             </ul>

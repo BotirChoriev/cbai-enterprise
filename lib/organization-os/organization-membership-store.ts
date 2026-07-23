@@ -21,8 +21,10 @@ export type OrganizationRole =
   | "administrator"
   | "mission_lead"
   | "researcher"
+  | "analyst"
   | "reviewer"
   | "member"
+  | "viewer"
   | "guest";
 
 export type InvitationStatus =

@@ -75,8 +75,12 @@
     "test:official-connector-foundation": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-official-connector-foundation.ts",
     "test:foundation-world-bank-wdi": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-foundation-world-bank-wdi.ts",
     "test:enterprise-collaboration": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-enterprise-collaboration.ts",
+    "test:enterprise-ui-integration": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-enterprise-ui-integration.ts",
     "test:enterprise-cloud-activation": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-enterprise-cloud-activation.ts",
-    "preflight:enterprise-migration": "node --import ./scripts/register-alias-loader.mjs scripts/preflight-enterprise-migration.ts"
+    "preflight:enterprise-migration": "node --import ./scripts/register-alias-loader.mjs scripts/preflight-enterprise-migration.ts",
+    "apply:enterprise-migrations": "node --import ./scripts/register-alias-loader.mjs scripts/apply-enterprise-migrations.ts",
+    "provision:preview-test-users": "node --import ./scripts/register-alias-loader.mjs scripts/provision-preview-test-users.ts",
+    "verify:live-enterprise-collaboration": "node --import ./scripts/register-alias-loader.mjs scripts/verify-live-enterprise-collaboration.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.2",

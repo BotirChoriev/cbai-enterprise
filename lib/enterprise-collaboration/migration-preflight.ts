@@ -88,19 +88,44 @@ export function runEnterpriseMigrationPreflight(root = process.cwd()): {
 
   const hasUrl = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL?.trim());
   const hasAnon = Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim());
-  const hasDb = Boolean(process.env.SUPABASE_DB_URL?.trim() || process.env.DATABASE_URL?.trim());
-  if (!hasUrl || !hasAnon) {
-    findings.push({
-      id: "env-public",
-      severity: "blocker",
-      message: "NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY not set — cannot verify Preview cloud.",
-    });
-  }
+  const dbUrl = (process.env.SUPABASE_DB_URL || process.env.DATABASE_URL || "").trim();
+  const hasDb = Boolean(dbUrl);
+  const dbLooksPostgres = /^(postgres(?:ql)?:\/\/)/i.test(dbUrl);
+
+  // Apply gate: operator DB URL only. Public anon keys live in Cloudflare Preview and are
+  // required for live app/RLS proof, not for SQL migration apply.
   if (!hasDb) {
     findings.push({
       id: "env-db",
       severity: "blocker",
       message: "SUPABASE_DB_URL / DATABASE_URL not set — migration apply is blocked from this environment.",
+    });
+  } else if (!dbLooksPostgres) {
+    findings.push({
+      id: "env-db-format",
+      severity: "blocker",
+      message: "SUPABASE_DB_URL must be a postgresql:// (or postgres://) URI, not an https Project URL.",
+    });
+  } else {
+    findings.push({
+      id: "env-db",
+      severity: "info",
+      message: "SUPABASE_DB_URL present as postgres URI — apply gate satisfied.",
+    });
+  }
+
+  if (!hasUrl || !hasAnon) {
+    findings.push({
+      id: "env-public",
+      severity: "warn",
+      message:
+        "NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY not set in this shell — live client/RLS proof remains blocked until local or Pages Preview env provides them.",
+    });
+  } else {
+    findings.push({
+      id: "env-public",
+      severity: "info",
+      message: "Public Supabase URL + anon key present for live client verification.",
     });
   }
 

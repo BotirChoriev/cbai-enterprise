@@ -87,8 +87,24 @@ test("B039-RLS suite — direct table boundary tests", async () => {
     assert.ok(error || true, `Anonymous select on ${table} should not leak data`);
   }
 
-  const guestPromote = await clientB.from("organization_memberships").update({ role: "owner" }).eq("organization_id", orgId);
-  assert.ok(guestPromote.error, "Member self-promote must fail at RLS");
+  const guestBefore = await clientB
+    .from("organization_memberships")
+    .select("role")
+    .eq("organization_id", orgId)
+    .eq("user_id", (await clientB.auth.getUser()).data.user!.id)
+    .single();
+  await clientB.from("organization_memberships").update({ role: "owner" }).eq("organization_id", orgId);
+  const guestAfter = await clientB
+    .from("organization_memberships")
+    .select("role")
+    .eq("organization_id", orgId)
+    .eq("user_id", (await clientB.auth.getUser()).data.user!.id)
+    .single();
+  assert.equal(
+    guestAfter.data?.role,
+    guestBefore.data?.role,
+    "Member self-promote must be denied (role unchanged under RLS)",
+  );
 
   await clientA.auth.signOut();
   await clientB.auth.signOut();

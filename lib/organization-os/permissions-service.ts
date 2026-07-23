@@ -52,6 +52,7 @@ const ROLE_PERMISSIONS: Record<OrganizationRole, readonly OrganizationPermission
     "add_evidence",
     "review_evidence",
     "create_report",
+    "approve_internal_review",
     "manage_collaboration",
     "view_audit_history",
   ],
@@ -67,8 +68,10 @@ const ROLE_PERMISSIONS: Record<OrganizationRole, readonly OrganizationPermission
     "manage_collaboration",
   ],
   researcher: ["view_organization", "view_private_mission", "add_evidence", "create_report"],
+  analyst: ["view_organization", "view_private_mission", "add_evidence", "create_report", "review_evidence"],
   reviewer: ["view_organization", "view_private_mission", "review_evidence", "approve_internal_review"],
   member: ["view_organization", "view_private_mission"],
+  viewer: ["view_organization"],
   guest: ["view_organization"],
 };
 

@@ -61,14 +61,18 @@ If absent: invitation remains valid; UI must say “Email delivery not configure
 
 ## E. Apply order (only when preflight `okToApply: true`)
 
+Preview project may be empty. `npm run apply:enterprise-migrations` auto-detects:
+
+- **No `organizations` table** → apply `0001`…`0010` (skips `0003` verification SELECTs)
+- **Orgs present, `storage_objects` missing** → resume `0008` then `0009`/`0010`
+- **`organizations` already present with storage** → apply `0009` then `0010` only
+
 ```bash
 npm run preflight:enterprise-migration
-# then apply to Preview DB only:
-# 1) supabase/migrations/0009_enterprise_collaboration_comments.sql
-# 2) supabase/migrations/0010_activity_events_org_compat.sql
+npm run apply:enterprise-migrations
 ```
 
-Stop if preflight reports blockers.
+Stop if preflight reports blockers. Never point `SUPABASE_DB_URL` at Production.
 
 ---
 
