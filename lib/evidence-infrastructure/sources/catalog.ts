@@ -235,8 +235,8 @@ export const OFFICIAL_EVIDENCE_SOURCES: readonly EvidenceSourceRecord[] = [
     supportedIndicators: ["labour-market-statistics"],
     updateFrequency: "Monthly",
     license: "U.S. Government work",
-    connectionStatus: "connected",
-    verificationStatus: "verified",
+    connectionStatus: "planned",
+    verificationStatus: "not_started",
   }),
   defineSource({
     id: "src-us-sec",
@@ -248,8 +248,8 @@ export const OFFICIAL_EVIDENCE_SOURCES: readonly EvidenceSourceRecord[] = [
     supportedIndicators: ["industry-classification"],
     updateFrequency: "As published",
     license: "SEC public disclosure",
-    connectionStatus: "connected",
-    verificationStatus: "verified",
+    connectionStatus: "planned",
+    verificationStatus: "not_started",
   }),
   defineSource({
     id: "src-cbai-local-registry",
