@@ -63,6 +63,14 @@ export default function ReportsCenter() {
       }
     >
       <ReportsPrimaryActions />
+      <div className="mb-4">
+        <Link
+          href="/reports/builder"
+          className="inline-flex min-h-10 items-center text-sm font-medium text-teal-400 transition-colors hover:text-teal-300"
+        >
+          Open enterprise report builder
+        </Link>
+      </div>
       <LiveGlobalStatusStrip />
       <OfficialEvidencePanel showReports />
       <EnterpriseReportArchitecture />
