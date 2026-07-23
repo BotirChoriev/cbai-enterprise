@@ -6,6 +6,7 @@ import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import AssistantSettingsForm from "@/components/assistant/AssistantSettingsForm";
 import LivingMemoryControl from "@/components/operating/LivingMemoryControl";
 import AdaptiveDensityControl from "@/components/operating/AdaptiveDensityControl";
+import ModeAwareWorkspace from "@/components/user-modes/ModeAwareWorkspace";
 import CapabilityAssessmentOffer from "@/components/settings/CapabilityAssessmentOffer";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import {
@@ -39,6 +40,7 @@ export default function SettingsPageClient() {
   return (
     <OperatingPageShell title={t("navigation.settings")} description={t("settingsPage.description")} showMissionContext={false}>
       <AdaptiveDensityControl />
+      <ModeAwareWorkspace variant="compact" />
       <AssistantSettingsForm />
       <CapabilityAssessmentOffer />
       <LivingMemoryControl />

@@ -6,6 +6,7 @@ import { buildGlobalStatus } from "@/lib/enterprise/global-status";
 import { getCurrentMission } from "@/lib/intelligence-os/mission-engine";
 import { myWorkHrefForMission } from "@/lib/intelligence-os/mission-operating-context";
 import { getMissionNextAction } from "@/lib/intelligence-os/mission-lifecycle";
+import { buildUserModeSuggestionHints } from "@/lib/user-modes/assistant-hints";
 import type { AssistantOsContext } from "@/lib/voice-operator/os/session-context";
 
 export type OsSuggestion = {
@@ -69,6 +70,17 @@ export function buildProactiveSuggestions(os: AssistantOsContext): readonly OsSu
       actionLabel: "Open companies",
       href: "/companies",
       command: "Open Companies",
+    });
+  }
+
+  // Optional Phase 3 stub: mode preference hint (never invents evidence).
+  const modeHint = buildUserModeSuggestionHints()[0];
+  if (modeHint && suggestions.length < 3) {
+    suggestions.push({
+      id: modeHint.id,
+      prompt: modeHint.prompt,
+      actionLabel: modeHint.actionLabel,
+      href: modeHint.href,
     });
   }
 
