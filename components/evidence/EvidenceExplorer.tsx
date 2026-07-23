@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import Link from "next/link";
 import { buildEvidenceExplorerModel } from "@/lib/evidence-explorer";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import EvidenceSourceCoverage from "@/components/evidence/EvidenceSourceCoverage";
@@ -44,6 +45,12 @@ export default function EvidenceExplorer() {
           <EvidenceIndicatorMap indicatorsByDomain={model.indicatorsByDomain} />
           <EvidenceMethodology points={model.methodology} />
           <EvidenceTrust pillars={model.trustPillars} />
+          <p className="text-xs text-zinc-500">
+            Device-local evidence lifecycle workspace (planned drafts, no fabricated live sources):{" "}
+            <Link href="/evidence/workspace" className="text-teal-400 hover:text-teal-300">
+              /evidence/workspace
+            </Link>
+          </p>
         </>
       ) : null}
     </OperatingPageShell>
