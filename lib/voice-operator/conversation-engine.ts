@@ -76,9 +76,12 @@ function uzResponse(key: string, language: string): string {
 export async function processConversationInput(
   userText: string,
   ctx: VoiceToolContext,
+  options?: { readonly skipUserAppend?: boolean },
 ): Promise<ConversationEngineResponse> {
   const session = readVoiceSessionMemory() ?? createVoiceSessionMemory(ctx.language, "browser_fallback");
-  appendConversationTurn({ role: "user", text: userText });
+  if (!options?.skipUserAppend) {
+    appendConversationTurn({ role: "user", text: userText });
+  }
 
   const trimmed = userText.trim();
   if (!trimmed) {

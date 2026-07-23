@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import AssistantCommandCenter from "@/components/assistant/AssistantCommandCenter";
+import DigitalAssistantPanel from "@/components/assistant/DigitalAssistantPanel";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
@@ -18,7 +18,7 @@ type MissionOperatorPresenceProps = {
   mission: Mission | null;
 };
 
-/** Research partner — visible only when uncertainty requires guidance. */
+/** Research partner — live Digital Assistant connected to Voice Operator. */
 export default function MissionOperatorPresence({ mission }: MissionOperatorPresenceProps) {
   const { profile } = useAssistantProfile();
   const { t } = useTranslation();
@@ -39,14 +39,6 @@ export default function MissionOperatorPresence({ mission }: MissionOperatorPres
 
   if (!hydrated) return null;
 
-  if (presence.mode === "silent" || presence.mode === "compact") {
-    return (
-      <section aria-label={t("zeroLearningCurve.commandEyebrow")} className="space-y-2">
-        <AssistantCommandCenter size="prominent" hideOrb />
-      </section>
-    );
-  }
-
   return (
     <section className="space-y-3" aria-label={t("missionCenter.operatorPresence")}>
       {presence.insight ? (
@@ -63,7 +55,7 @@ export default function MissionOperatorPresence({ mission }: MissionOperatorPres
         </p>
       ) : null}
 
-      <AssistantCommandCenter size="prominent" hideOrb />
+      <DigitalAssistantPanel />
 
       {mission && linkedProject && guideStep ? (
         <Link href={`/my-work?project=${linkedProject.id}`} className={`${cbaiBtnPrimary} inline-flex gap-2`}>

@@ -179,7 +179,7 @@ test("18. EPIC-24 — route companion and human memory architecture", () => {
 test("19. EPIC-24 — operator as guidance without greetings", () => {
   const operator = readSource("components/mission/MissionOperatorPresence.tsx");
   assert.doesNotMatch(operator, /assistant\.greeting/);
-  assert.doesNotMatch(operator, /OperatorOrb/);
+  assert.match(operator, /DigitalAssistantPanel/);
   assert.match(operator, /deriveOperatorPresenceMode/);
 });
 

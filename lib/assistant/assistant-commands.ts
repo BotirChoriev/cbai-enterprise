@@ -39,9 +39,10 @@ export const ASSISTANT_COMMANDS: readonly AssistantCommand[] = [
     href: "/?create=1",
     keywords: [
       "start mission", "start a mission", "new mission", "create mission",
-      "missiyani boshlash", "yangi missiya",
-      "начать миссию", "новая миссия",
-      "görev başlat", "yeni görev",
+      "analyze this", "analyse this", "investigate this", "research this topic",
+      "missiyani boshlash", "yangi missiya", "tahlil qil",
+      "начать миссию", "новая миссия", "проанализируй",
+      "görev başlat", "yeni görev", "analiz et",
     ],
   },
   {

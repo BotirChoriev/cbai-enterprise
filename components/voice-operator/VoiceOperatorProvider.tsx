@@ -10,7 +10,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type {
   EvidenceResultsPayload,
   VoiceBrokerIssue,
@@ -25,9 +25,9 @@ import {
 } from "@/lib/voice-operator/session-memory";
 import {
   clearConversationPendingState,
-  processConversationInput,
   resolveOperatorMode,
 } from "@/lib/voice-operator/conversation-engine";
+import { runDigitalAssistant } from "@/lib/voice-operator/digital-assistant";
 import {
   mapSpeechRecognitionError,
   requestMicrophoneAccess,
@@ -48,6 +48,11 @@ import { SpeechRecognitionSession } from "@/lib/voice/speech-recognition-session
 import { resolveActiveSpeechLanguage } from "@/lib/voice/speech-language-preference";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
+import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
+import { resolveOperatorName } from "@/lib/assistant/assistant-profile";
+import { getPrimaryEntity } from "@/lib/context";
+import { getResearchTopicById } from "@/lib/research/research-topics";
+import type { RelationshipFocus } from "@/lib/assistant/assistant-relationship-commands";
 
 type VoiceOperatorContextValue = {
   readonly dockOpen: boolean;
@@ -133,8 +138,10 @@ function startBrowserSpeechSession(
 
 export default function VoiceOperatorProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const { language } = useTranslation();
-  const { profile } = useAssistantProfile();
+  const router = useRouter();
+  const { language, t } = useTranslation();
+  const { profile, updateProfile } = useAssistantProfile();
+  const { context, pinEntityToWorkspace } = usePlatformContext();
   const [dockOpen, setDockOpen] = useState(false);
   const [dockState, setDockState] = useState<VoiceDockState>("closed");
   const [permissionIssue, setPermissionIssue] = useState<VoicePermissionIssue | null>(null);
@@ -156,6 +163,35 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
   const operatorMode = useMemo(() => resolveOperatorMode(language), [language]);
   const brokerConfigured = !operatorMode.backendRequired;
   const micLive = isLiveMicDockState(dockState);
+
+  const focusedEntity = getPrimaryEntity(context);
+  const relationshipFocus = useMemo<RelationshipFocus | null>(() => {
+    const topicMatch = /^\/research\/([^/]+)$/.exec(pathname);
+    if (topicMatch && getResearchTopicById(topicMatch[1])) {
+      return { kind: "research_topic", id: topicMatch[1] };
+    }
+    return focusedEntity ? { kind: focusedEntity.kind, id: focusedEntity.id } : null;
+  }, [pathname, focusedEntity]);
+
+  const voiceResolverContext = useMemo(
+    () => ({
+      relationshipFocus,
+      operatorName: resolveOperatorName(profile),
+      focusedEntityName: focusedEntity?.name,
+    }),
+    [relationshipFocus, profile, focusedEntity?.name],
+  );
+
+  const executeDeps = useMemo(
+    () => ({
+      router,
+      focusedEntity,
+      pinEntityToWorkspace,
+      updateProfile,
+      t,
+    }),
+    [router, focusedEntity, pinEntityToWorkspace, updateProfile, t],
+  );
 
   const toolContext = useMemo(
     () => ({
@@ -205,9 +241,17 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
   }, []);
 
   const applyResponse = useCallback(
-    async (userText: string) => {
+    async (userText: string, options?: { userTurnAlreadyRecorded?: boolean; sideEffectsOnly?: boolean }) => {
       setDockState("thinking");
-      const response = await processConversationInput(userText, toolContext);
+      const response = await runDigitalAssistant(userText, {
+        language,
+        router,
+        voiceResolverContext,
+        executeDeps,
+        toolContext,
+        userTurnAlreadyRecorded: options?.userTurnAlreadyRecorded,
+        sideEffectsOnly: options?.sideEffectsOnly,
+      });
       setDockState(response.awaitingConsent ? "action_confirmation" : "responding");
       setAwaitingConsent(Boolean(response.awaitingConsent));
       if (response.evidenceResults) {
@@ -216,9 +260,10 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
       if (response.openEvidencePanel) {
         setEvidenceOpen(true);
       }
+      bumpTranscript();
       setTimeout(() => setDockState(sessionActive ? "ready" : "closed"), 800);
     },
-    [toolContext, sessionActive],
+    [language, router, voiceResolverContext, executeDeps, toolContext, sessionActive, bumpTranscript],
   );
 
   const syncBrokerIssue = useCallback(() => {
@@ -292,6 +337,14 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
             if (!event.final || !event.text.trim()) return;
             appendConversationTurn({ role: event.role, text: event.text.trim() });
             bumpTranscript();
+            // Digital Assistant side-effects (navigate / mission) for user speech;
+            // Realtime model still speaks — avoid duplicate assistant transcript lines.
+            if (event.role === "user") {
+              void applyResponse(event.text.trim(), {
+                userTurnAlreadyRecorded: true,
+                sideEffectsOnly: true,
+              });
+            }
           }),
         );
 
@@ -330,7 +383,7 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
         realtimeStartingRef.current = false;
       }
     },
-    [language, bumpTranscript, clearRealtimeBindings, stopLiveAudioCapture],
+    [language, bumpTranscript, clearRealtimeBindings, stopLiveAudioCapture, applyResponse],
   );
 
   const openDock = useCallback(() => {
@@ -372,10 +425,10 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
     setTextInput("");
     setSessionActive(true);
     setTranscriptVisible(true);
-    appendConversationTurn({ role: "user", text });
-    bumpTranscript();
+    setDockOpen(true);
+    // User turn is recorded inside runDigitalAssistant.
     await applyResponse(text);
-  }, [textInput, applyResponse, bumpTranscript]);
+  }, [textInput, applyResponse]);
 
   const startListening = useCallback(async () => {
     if (muted || micLive || realtimeStartingRef.current) return;

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { createMission } from "@/lib/intelligence-os/mission-store";
 import { createProject } from "@/lib/project/project-store";
 import { linkMissionToProject } from "@/lib/intelligence-os/mission-store";
+import { consumePendingMissionProblem } from "@/lib/voice-operator/mission-intent";
 import { cbaiBtnPrimary, cbaiBtnSecondary, cbaiMineralSurface, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type MissionCreationFlowProps = {
@@ -27,6 +28,11 @@ export default function MissionCreationFlow({ onComplete, onCancel }: MissionCre
   const [capabilitiesNeeded, setCapabilitiesNeeded] = useState("");
   const [environmentalImpact, setEnvironmentalImpact] = useState("");
   const [successCriteria, setSuccessCriteria] = useState("");
+
+  useEffect(() => {
+    const seeded = consumePendingMissionProblem();
+    if (seeded) setProblem(seeded);
+  }, []);
 
   function finish() {
     const project = createProject({
