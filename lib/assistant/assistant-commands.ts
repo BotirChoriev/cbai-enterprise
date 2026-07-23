@@ -100,10 +100,29 @@ export const ASSISTANT_COMMANDS: readonly AssistantCommand[] = [
     phrase: "Open Research",
     href: "/research",
     keywords: [
-      "open research",
+      "open research", "open research module",
       "tadqiqotni och", "tadqiqot",
       "открой исследования", "исследования",
       "araştırmayı aç", "araştırma",
+    ],
+  },
+  {
+    id: "open-countries",
+    phrase: "Open Countries",
+    href: "/countries",
+    keywords: [
+      "open countries", "open country module",
+      "davlatlarni och",
+      "открой страны",
+      "ülkeleri aç",
+    ],
+  },
+  {
+    id: "open-evidence-module",
+    phrase: "Open Evidence",
+    href: "/knowledge",
+    keywords: [
+      "open evidence module", "open the evidence",
     ],
   },
   {
@@ -333,6 +352,83 @@ export const ASSISTANT_COMMANDS: readonly AssistantCommand[] = [
       "loyihalarimni och", "mening loyihalarim",
       "открой мои проекты", "мои проекты",
       "projelerimi aç", "projelerim",
+    ],
+  },
+  {
+    id: "open-governance",
+    phrase: "Open Governance",
+    href: "/governance",
+    keywords: [
+      "open governance", "governance", "governance center",
+      "boshqaruvni och", "boshqaruv",
+      "открой управление", "управление",
+      "yönetişimi aç", "yönetişim",
+    ],
+  },
+  {
+    id: "open-mission-engine",
+    phrase: "Open Mission Engine",
+    href: "/?create=1",
+    keywords: [
+      "open mission engine", "mission engine", "open the mission engine",
+      "missiya dvigatelini och",
+      "открой движок миссий",
+      "görev motorunu aç",
+    ],
+  },
+  {
+    id: "show-official-sources",
+    phrase: "Show official sources",
+    href: "/trust",
+    keywords: [
+      "show official sources", "official sources", "connected sources",
+      "rasmiy manbalar",
+      "официальные источники",
+      "resmi kaynaklar",
+    ],
+  },
+  {
+    id: "show-constitutional-evidence",
+    phrase: "Show constitutional evidence",
+    href: "/trust#constitution",
+    keywords: [
+      "show constitutional evidence", "constitutional evidence", "constitution evidence",
+      "konstitutsiya dalillari",
+      "конституционные доказательства",
+      "anayasal kanıt",
+    ],
+  },
+  {
+    id: "find-corruption-indicators",
+    phrase: "Find corruption indicators",
+    href: "/knowledge?q=corruption",
+    keywords: [
+      "find corruption indicators", "corruption indicators", "show corruption indicators",
+      "korrupsiya ko'rsatkichlari",
+      "показатели коррупции",
+      "yolsuzluk göstergeleri",
+    ],
+  },
+  {
+    id: "generate-investor-report",
+    phrase: "Generate investor report",
+    href: "/reports",
+    keywords: [
+      "generate investor report", "investor report", "investor summary", "investor brief",
+      "investor hisoboti",
+      "инвесторский отчёт",
+      "yatırımcı raporu",
+    ],
+  },
+  {
+    id: "generate-executive-summary",
+    phrase: "Generate executive summary",
+    href: "/reports",
+    keywords: [
+      "generate executive summary", "executive summary", "executive report",
+      "ijro xulosasi",
+      "исполнительное резюме",
+      "yönetici özeti",
     ],
   },
 ] as const;

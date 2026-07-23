@@ -1,11 +1,12 @@
 /**
- * CBAI Digital Assistant — single session brain for Voice Operator text + voice side-effects.
- * Uses deterministic platform routing (same stack as Command Center) plus evidence conversation engine.
+ * CBAI Digital Assistant — platform OS brain for Voice Operator text + voice side-effects.
+ * Uses Mission → OS intents → platform routing → evidence conversation engine.
  * Does not create a second voice backend.
  */
 
 import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import type { EvidenceResultsPayload } from "@/lib/voice-operator/types";
+import type { PlatformContextSnapshot } from "@/lib/context";
 import {
   appendConversationTurn,
   createVoiceSessionMemory,
@@ -25,6 +26,10 @@ import {
   detectMissionAssistantIntent,
   writePendingMissionProblem,
 } from "@/lib/voice-operator/mission-intent";
+import {
+  resolveDigitalAssistantOsIntent,
+  type OsSuggestion,
+} from "@/lib/voice-operator/os";
 
 export type DigitalAssistantResult = {
   readonly assistantText: string;
@@ -33,6 +38,8 @@ export type DigitalAssistantResult = {
   readonly openEvidencePanel?: boolean;
   readonly awaitingConsent?: boolean;
   readonly handled: boolean;
+  readonly suggestions?: readonly OsSuggestion[];
+  readonly contextSummary?: string;
 };
 
 export type DigitalAssistantDeps = {
@@ -41,6 +48,8 @@ export type DigitalAssistantDeps = {
   readonly voiceResolverContext: VoiceResolverContext;
   readonly executeDeps: ExecuteVoiceActionDeps;
   readonly toolContext: VoiceToolContext;
+  readonly platformContext?: PlatformContextSnapshot | null;
+  readonly pathname?: string;
   /** When true, user turn was already written to session memory (Realtime transcript). */
   readonly userTurnAlreadyRecorded?: boolean;
   /** When true, only navigate/mission side-effects — skip assistant transcript append (Realtime speaks). */
@@ -54,7 +63,7 @@ function ensureSession(language: string): void {
 }
 
 /**
- * Route one user utterance through Mission → platform actions → evidence engine.
+ * Route one user utterance through Mission → OS intents → platform actions → evidence engine.
  */
 export async function runDigitalAssistant(
   userText: string,
@@ -94,6 +103,25 @@ export async function runDigitalAssistant(
     };
   }
 
+  const osIntent = resolveDigitalAssistantOsIntent(
+    trimmed,
+    deps.platformContext ?? null,
+    deps.pathname ?? "/",
+  );
+  if (osIntent) {
+    if (!deps.sideEffectsOnly) {
+      appendConversationTurn({ role: "assistant", text: osIntent.assistantText });
+    }
+    deps.router.push(osIntent.href);
+    return {
+      assistantText: osIntent.assistantText,
+      href: osIntent.href,
+      handled: true,
+      suggestions: osIntent.suggestions,
+      contextSummary: osIntent.contextSummary,
+    };
+  }
+
   const proposal = resolveVoiceAction(trimmed, deps.voiceResolverContext);
   if (proposal.status === "known") {
     const message =
@@ -121,7 +149,6 @@ export async function runDigitalAssistant(
     return { assistantText, handled: true };
   }
 
-  // Evidence / clarify path — conversation engine appends the user turn again unless skipped.
   const response = await processConversationInput(trimmed, deps.toolContext, {
     skipUserAppend: true,
   });

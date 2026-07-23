@@ -249,6 +249,8 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
         voiceResolverContext,
         executeDeps,
         toolContext,
+        platformContext: context,
+        pathname,
         userTurnAlreadyRecorded: options?.userTurnAlreadyRecorded,
         sideEffectsOnly: options?.sideEffectsOnly,
       });
@@ -263,7 +265,7 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
       bumpTranscript();
       setTimeout(() => setDockState(sessionActive ? "ready" : "closed"), 800);
     },
-    [language, router, voiceResolverContext, executeDeps, toolContext, sessionActive, bumpTranscript],
+    [language, router, voiceResolverContext, executeDeps, toolContext, context, pathname, sessionActive, bumpTranscript],
   );
 
   const syncBrokerIssue = useCallback(() => {

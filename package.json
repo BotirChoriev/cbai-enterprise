@@ -69,7 +69,8 @@
     "test:epic-21-zero-learning-curve": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-epic-21-zero-learning-curve.ts",
     "test:voice-broker-preview-origin": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-voice-broker-preview-origin.ts",
     "test:digital-assistant": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-digital-assistant.ts",
-    "test:enterprise-completeness": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-enterprise-completeness.ts"
+    "test:enterprise-completeness": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-enterprise-completeness.ts",
+    "test:digital-assistant-os": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-digital-assistant-os.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.2",

@@ -5,12 +5,15 @@ import { useMemo } from "react";
 import OperatorOrb, { type OperatorOrbState } from "@/components/shared/OperatorOrb";
 import { useVoiceOperator } from "@/components/voice-operator/VoiceOperatorProvider";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
+import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
+import { usePathname } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { resolveOperatorName } from "@/lib/assistant/assistant-profile";
 import { getCurrentMission } from "@/lib/intelligence-os/mission-engine";
 import { myWorkHrefForMission } from "@/lib/intelligence-os/mission-operating-context";
 import { readVoiceSessionMemory } from "@/lib/voice-operator/session-memory";
+import { peekOsContext } from "@/lib/voice-operator/os";
 import { cbaiBtnPrimary, cbaiBtnSecondary } from "@/components/brand/brand-classes";
 import type { VoiceDockState } from "@/lib/voice-operator/types";
 
@@ -50,12 +53,13 @@ function statusLabel(
 }
 
 /**
- * Live CBAI Digital Assistant — connected to Voice Operator (same Realtime session).
- * Replaces decorative / placeholder operator rails.
+ * Live CBAI Digital Assistant — platform OS surface on Voice Operator (same Realtime session).
  */
 export default function DigitalAssistantPanel() {
   const hydrated = useHydrated();
   const { t } = useTranslation();
+  const pathname = usePathname();
+  const { context } = usePlatformContext();
   const { profile } = useAssistantProfile();
   const vo = useVoiceOperator();
   const operatorName = resolveOperatorName(profile);
@@ -66,6 +70,11 @@ export default function DigitalAssistantPanel() {
     void vo.transcriptRevision;
     return (readVoiceSessionMemory()?.turns ?? []).slice(-4);
   }, [hydrated, vo.transcriptRevision]);
+
+  const { context: osContext, suggestions } = useMemo(
+    () => peekOsContext(hydrated ? context : null, pathname),
+    [hydrated, context, pathname, vo.transcriptRevision],
+  );
 
   if (!hydrated) return null;
 
@@ -81,17 +90,51 @@ export default function DigitalAssistantPanel() {
         <OperatorOrb state={orbState} size={56} />
         <div className="min-w-0 flex-1">
           <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-teal-200/80">
-            {t("zeroLearningCurve.commandEyebrow")}
+            Platform OS
           </p>
           <h2 className="text-sm font-semibold text-zinc-50">{operatorName}</h2>
           <p className="mt-1 text-xs leading-relaxed text-zinc-400" role="status">
             {status}
           </p>
           <p className="mt-1 text-[11px] text-zinc-500">
-            Research · Evidence · Countries · Companies · Universities · Reports · Trust · Missions
+            Navigate · Compare · Evidence · Reports · Missions · Trust
           </p>
         </div>
       </div>
+
+      <p className="rounded-lg border border-zinc-800/80 bg-zinc-950/50 px-3 py-2 text-[11px] text-zinc-400">
+        <span className="font-medium text-zinc-300">Context · </span>
+        {osContext.summary}
+      </p>
+
+      {suggestions.length > 0 ? (
+        <ul className="space-y-2">
+          {suggestions.map((suggestion) => (
+            <li
+              key={suggestion.id}
+              className="rounded-lg border border-teal-500/15 bg-teal-500/5 px-3 py-2"
+            >
+              <p className="text-[11px] leading-relaxed text-zinc-400">{suggestion.prompt}</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <Link href={suggestion.href} className="text-[11px] font-medium text-teal-300 hover:text-teal-200">
+                  {suggestion.actionLabel} →
+                </Link>
+                {suggestion.command ? (
+                  <button
+                    type="button"
+                    className="text-[11px] text-zinc-500 hover:text-zinc-300"
+                    onClick={() => {
+                      vo.setTextInput(suggestion.command ?? "");
+                    }}
+                  >
+                    Use command
+                  </button>
+                ) : null}
+              </div>
+            </li>
+          ))}
+        </ul>
+      ) : null}
 
       {recentTurns.length > 0 ? (
         <ul className="max-h-28 space-y-1.5 overflow-y-auto rounded-lg border border-zinc-800/80 bg-zinc-950/60 px-2.5 py-2 text-[11px]">
@@ -105,7 +148,9 @@ export default function DigitalAssistantPanel() {
           ))}
         </ul>
       ) : (
-        <p className="text-xs text-zinc-500">{t("assistant.operatorReadySignedOut")}</p>
+        <p className="text-xs text-zinc-500">
+          Try: Open Countries · Compare USA and Japan · Show official sources · Continue my last mission
+        </p>
       )}
 
       <form
@@ -122,7 +167,7 @@ export default function DigitalAssistantPanel() {
           id="digital-assistant-input"
           value={vo.textInput}
           onChange={(event) => vo.setTextInput(event.target.value)}
-          placeholder={t("assistant.commandPlaceholder")}
+          placeholder="Command the platform…"
           className="min-w-0 flex-1 rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500"
         />
         <button type="submit" className={cbaiBtnPrimary}>
