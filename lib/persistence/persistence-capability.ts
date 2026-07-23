@@ -21,15 +21,10 @@ export type PersistenceStatus = {
   readonly limitation: string;
 };
 
-function readEnv(name: string): string | undefined {
-  if (typeof process === "undefined" || !process.env) return undefined;
-  const value = process.env[name];
-  return value && value.trim() ? value.trim() : undefined;
-}
-
 export function detectPersistenceCapability(): PersistenceCapability {
-  const url = readEnv("NEXT_PUBLIC_SUPABASE_URL");
-  const key = readEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+  // Static NEXT_PUBLIC_* reads so Next can inline them into the client bundle.
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
   if (!url && !key) return "shared_backend_not_configured";
   if (!url || !key) return "shared_backend_misconfigured";
   if (!isSupabaseConfigured()) return "shared_backend_misconfigured";
