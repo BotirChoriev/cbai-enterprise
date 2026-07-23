@@ -20,20 +20,29 @@ export function missingSourceFallback(params: {
     };
   }
 
-  if (source.connectionStatus === "planned" || source.connectionStatus !== "live") {
+  if (source.connectionStatus === "planned" || source.connectionStatus === "ready") {
     return {
       status: "Awaiting official source",
-      reason: `${source.sourceName} is registered but not live. Indicator "${params.indicatorName}" is not fabricated.`,
+      reason: `${source.sourceName} is registered but not connected. Indicator "${params.indicatorName}" is not fabricated.`,
       expectedSource: source.sourceName,
-      nextStep: `Connect ${source.sourceName} in a later phase; until then leave coverage as awaiting official source.`,
+      nextStep: `Connect ${source.sourceName} via verified retrieval; until then leave coverage as awaiting official source.`,
+    };
+  }
+
+  if (source.connectionStatus === "connected" || source.connectionStatus === "live") {
+    return {
+      status: "Not checked",
+      reason: `Source ${source.sourceName} is connected but indicator "${params.indicatorName}" was not retrieved for this query.`,
+      expectedSource: source.sourceName,
+      nextStep: "Run the connector check for this jurisdiction/indicator without inventing values.",
     };
   }
 
   return {
-    status: "Not checked",
-    reason: `Source ${source.sourceName} is live but indicator "${params.indicatorName}" was not retrieved for this query.`,
+    status: "Planned",
+    reason: `${source.sourceName} connection status is ${source.connectionStatus}.`,
     expectedSource: source.sourceName,
-    nextStep: "Run the connector check for this jurisdiction/indicator without inventing values.",
+    nextStep: "Keep Planned / Missing until verified retrieval succeeds.",
   };
 }
 

@@ -1,16 +1,18 @@
 /**
- * Phase 1 connector contracts — liveEnabled is always false.
+ * Foundation connector contracts.
+ * Only World Bank WDI may become liveEnabled at runtime after verified retrieval.
  */
 
 import type { ConnectorContract } from "@/lib/official-connector-foundation/types";
+import { getWorldBankRuntimeStatus } from "@/lib/official-connector-foundation/runtime-status";
 
-export const FOUNDATION_CONNECTOR_CONTRACTS: readonly ConnectorContract[] = [
+const STATIC_CONTRACTS: readonly ConnectorContract[] = [
   {
     connectorId: "fconn-world-bank-wdi",
     sourceSlug: "world-bank",
-    title: "World Bank WDI Connector (Phase 1 contract)",
-    description: "Contract for future WDI retrieval — not live in Phase 1.",
-    version: "0.1.0-phase1",
+    title: "World Bank WDI Connector",
+    description: "World Development Indicators — first live foundation connector.",
+    version: "1.0.0",
     supportedEntities: ["country"],
     supportedIndicatorCodes: [
       "NY.GDP.MKTP.CD",
@@ -22,14 +24,14 @@ export const FOUNDATION_CONNECTOR_CONTRACTS: readonly ConnectorContract[] = [
     health: {
       state: "planned",
       lastCheckedAt: null,
-      message: "Phase 1 — connector contract only; not live",
+      message: "Awaiting verified WDI retrieval",
     },
   },
   {
     connectorId: "fconn-un-sdg",
     sourceSlug: "united-nations",
-    title: "UN SDG Connector (Phase 1 contract)",
-    description: "Contract for future UN SDG retrieval — not live in Phase 1.",
+    title: "UN SDG Connector (planned)",
+    description: "Contract only — not live.",
     version: "0.1.0-phase1",
     supportedEntities: ["country"],
     supportedIndicatorCodes: [],
@@ -37,14 +39,14 @@ export const FOUNDATION_CONNECTOR_CONTRACTS: readonly ConnectorContract[] = [
     health: {
       state: "planned",
       lastCheckedAt: null,
-      message: "Phase 1 — connector contract only; not live",
+      message: "Planned — not live",
     },
   },
   {
     connectorId: "fconn-oecd-member",
     sourceSlug: "oecd",
-    title: "OECD Member Connector (Phase 1 contract)",
-    description: "Contract for member-country OECD datasets — not live in Phase 1.",
+    title: "OECD Member Connector (planned)",
+    description: "Contract only — not live.",
     version: "0.1.0-phase1",
     supportedEntities: ["country"],
     supportedIndicatorCodes: [],
@@ -52,14 +54,14 @@ export const FOUNDATION_CONNECTOR_CONTRACTS: readonly ConnectorContract[] = [
     health: {
       state: "planned",
       lastCheckedAt: null,
-      message: "Phase 1 — connector contract only; not live",
+      message: "Planned — not live",
     },
   },
   {
     connectorId: "fconn-us-bls",
     sourceSlug: "us-bls",
-    title: "U.S. BLS Connector (Phase 1 contract)",
-    description: "Contract for BLS publicAPI — not live in Phase 1.",
+    title: "U.S. BLS Connector (planned)",
+    description: "Contract only — not live in this build.",
     version: "0.1.0-phase1",
     supportedEntities: ["country"],
     supportedIndicatorCodes: ["LNS14000000"],
@@ -67,14 +69,14 @@ export const FOUNDATION_CONNECTOR_CONTRACTS: readonly ConnectorContract[] = [
     health: {
       state: "planned",
       lastCheckedAt: null,
-      message: "Phase 1 — connector contract only; not live",
+      message: "Planned — not live",
     },
   },
   {
     connectorId: "fconn-us-sec",
     sourceSlug: "us-sec",
-    title: "U.S. SEC Connector (Phase 1 contract)",
-    description: "Contract for SEC public disclosures — not live in Phase 1.",
+    title: "U.S. SEC Connector (planned)",
+    description: "Contract only — not live in this build.",
     version: "0.1.0-phase1",
     supportedEntities: ["company"],
     supportedIndicatorCodes: ["sec-ticker"],
@@ -82,19 +84,45 @@ export const FOUNDATION_CONNECTOR_CONTRACTS: readonly ConnectorContract[] = [
     health: {
       state: "planned",
       lastCheckedAt: null,
-      message: "Phase 1 — connector contract only; not live",
+      message: "Planned — not live",
     },
   },
 ] as const;
 
-export function getFoundationConnectorById(connectorId: string): ConnectorContract | undefined {
-  return FOUNDATION_CONNECTOR_CONTRACTS.find((c) => c.connectorId === connectorId);
+export function getFoundationConnectorContracts(): readonly ConnectorContract[] {
+  const wb = getWorldBankRuntimeStatus();
+  return STATIC_CONTRACTS.map((contract) => {
+    if (contract.connectorId !== "fconn-world-bank-wdi") return contract;
+    return {
+      ...contract,
+      liveEnabled: wb.liveEnabled,
+      health: {
+        state: wb.health,
+        lastCheckedAt: wb.lastCheckedAt,
+        message: wb.message,
+      },
+    };
+  });
 }
 
-export function assertNoLiveConnectors(): void {
-  for (const connector of FOUNDATION_CONNECTOR_CONTRACTS) {
+/** @deprecated Prefer getFoundationConnectorContracts() for runtime-aware status. */
+export const FOUNDATION_CONNECTOR_CONTRACTS = STATIC_CONTRACTS;
+
+export function getFoundationConnectorById(connectorId: string): ConnectorContract | undefined {
+  return getFoundationConnectorContracts().find((c) => c.connectorId === connectorId);
+}
+
+/** Unrelated connectors must remain non-live. World Bank may be live after verified retrieval. */
+export function assertUnrelatedConnectorsRemainPlanned(): void {
+  for (const connector of getFoundationConnectorContracts()) {
+    if (connector.connectorId === "fconn-world-bank-wdi") continue;
     if (connector.liveEnabled !== false) {
-      throw new Error(`Phase 1 violation: ${connector.connectorId} must not be live`);
+      throw new Error(`Unrelated connector must stay planned: ${connector.connectorId}`);
     }
   }
+}
+
+/** @deprecated Use assertUnrelatedConnectorsRemainPlanned */
+export function assertNoLiveConnectors(): void {
+  assertUnrelatedConnectorsRemainPlanned();
 }

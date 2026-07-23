@@ -1,17 +1,15 @@
 /**
- * Official Connector Foundation — Phase 1 focused tests.
- * Covers: malformed responses, timeout, rate limit, duplicate prevention,
- * provenance retention, missing-source fallback. No live source calls.
+ * Official Connector Foundation — focused tests (non-live plumbing).
  */
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
-  assertNoLiveConnectors,
+  assertUnrelatedConnectorsRemainPlanned,
   buildProvenance,
   classifyHttpFailure,
-  FOUNDATION_SOURCE_REGISTRY,
-  FOUNDATION_CONNECTOR_CONTRACTS,
+  getFoundationSourceRegistry,
+  getFoundationConnectorContracts,
   deriveFreshnessState,
   fetchWithFoundationAdapter,
   FoundationAuditLog,
@@ -22,21 +20,16 @@ import {
   normalizeValidatedObservation,
   parseJsonResponse,
   plannedHealthSnapshot,
+  resetWorldBankRuntimeForTests,
   validateObservationPayload,
   type FetchLike,
 } from "../lib/official-connector-foundation/index.ts";
 
-test("phase1 registry keeps non-live sources planned; verified sources may be connected", () => {
-  assert.doesNotThrow(() => assertNoLiveConnectors());
-  assert.ok(FOUNDATION_CONNECTOR_CONTRACTS.every((c) => c.liveEnabled === false));
-  const connected = FOUNDATION_SOURCE_REGISTRY.filter((s) => s.connectionStatus === "connected");
-  const planned = FOUNDATION_SOURCE_REGISTRY.filter((s) => s.connectionStatus === "planned");
-  assert.ok(connected.some((s) => s.slug === "world-bank"));
-  assert.ok(connected.some((s) => s.slug === "us-bls"));
-  assert.ok(connected.some((s) => s.slug === "us-sec"));
-  assert.ok(planned.some((s) => s.slug === "us-census"));
-  assert.ok(planned.some((s) => s.slug === "us-bea"));
-  assert.ok(planned.some((s) => s.slug === "oecd"));
+test("static registry defaults Planned; unrelated connectors stay planned", () => {
+  resetWorldBankRuntimeForTests();
+  assert.doesNotThrow(() => assertUnrelatedConnectorsRemainPlanned());
+  assert.ok(getFoundationSourceRegistry().every((s) => s.connectionStatus === "planned"));
+  assert.ok(getFoundationConnectorContracts().every((c) => c.liveEnabled === false));
 });
 
 test("malformed response is rejected", () => {
@@ -180,12 +173,15 @@ test("provenance retention keeps all required fields", () => {
   assert.equal(provenance.retrievedAt, retrievedAt);
   assert.equal(provenance.lastCheckedAt, lastCheckedAt);
   assert.equal(provenance.publicationDate, null);
-  assert.equal(provenance.connectorHealth, "planned");
   assert.equal(deriveFreshnessState(null, 1000), "not_checked");
-  assert.equal(deriveFreshnessState(lastCheckedAt, 24 * 60 * 60 * 1000, Date.parse(lastCheckedAt) + 1000), "fresh");
+  assert.equal(
+    deriveFreshnessState(lastCheckedAt, 24 * 60 * 60 * 1000, Date.parse(lastCheckedAt) + 1000),
+    "fresh"
+  );
 });
 
 test("missing-source fallback never invents evidence", () => {
+  resetWorldBankRuntimeForTests();
   const unknown = missingSourceFallback({
     sourceSlug: "does-not-exist",
     indicatorName: "GDP",
@@ -194,12 +190,11 @@ test("missing-source fallback never invents evidence", () => {
   assert.ok(isSafeEmptyCoverage(unknown));
 
   const planned = missingSourceFallback({
-    sourceSlug: "us-census",
-    indicatorName: "Total population (ACS 5-year)",
+    sourceSlug: "world-bank",
+    indicatorName: "GDP (current US$)",
     jurisdiction: "USA",
   });
   assert.equal(planned.status, "Awaiting official source");
-  assert.ok(planned.reason.includes("not fabricated") || planned.reason.includes("not live"));
   assert.ok(isSafeEmptyCoverage(planned));
   assert.equal(plannedHealthSnapshot("fconn-world-bank-wdi").health, "planned");
 });

@@ -96,8 +96,8 @@ export type ConnectorContract = {
   readonly version: string;
   readonly supportedEntities: readonly ("country" | "company" | "university")[];
   readonly supportedIndicatorCodes: readonly string[];
-  /** Phase 1: always false — no live connections. */
-  readonly liveEnabled: false;
+  /** True only after verified live retrieval for that connector. */
+  readonly liveEnabled: boolean;
   readonly health: {
     readonly state: ConnectorHealthState;
     readonly lastCheckedAt: string | null;

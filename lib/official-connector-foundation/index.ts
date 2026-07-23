@@ -20,16 +20,44 @@ export type {
 
 export {
   FOUNDATION_SOURCE_REGISTRY,
+  getFoundationSourceRegistry,
   getFoundationSourceBySlug,
   listPlannedFoundationSources,
   countLiveFoundationSources,
+  countConnectedFoundationSources,
 } from "@/lib/official-connector-foundation/source-registry";
 
 export {
   FOUNDATION_CONNECTOR_CONTRACTS,
+  getFoundationConnectorContracts,
   getFoundationConnectorById,
   assertNoLiveConnectors,
+  assertUnrelatedConnectorsRemainPlanned,
 } from "@/lib/official-connector-foundation/connector-contracts";
+
+export {
+  getWorldBankRuntimeStatus,
+  markWorldBankConnected,
+  markWorldBankFailure,
+  resetWorldBankRuntimeForTests,
+  isWorldBankConnected,
+} from "@/lib/official-connector-foundation/runtime-status";
+
+export {
+  fetchWorldBankWdiForCountry,
+  validateWdiPayload,
+  buildWdiEndpoint,
+  isSupportedWdiIndicator,
+  WORLD_BANK_WDI_INDICATORS,
+  WORLD_BANK_WDI_CONNECTOR_ID,
+  WORLD_BANK_WDI_API_BASE,
+  WDI_FRESHNESS_MAX_AGE_MS,
+  foundationWdiStore,
+} from "@/lib/official-connector-foundation/adapters/world-bank-wdi";
+export type {
+  WdiFetchResult,
+  WorldBankWdiIndicatorCode,
+} from "@/lib/official-connector-foundation/adapters/world-bank-wdi";
 
 export {
   fetchWithFoundationAdapter,

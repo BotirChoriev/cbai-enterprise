@@ -1,11 +1,13 @@
 /**
- * Phase 1 official source registry — planned only.
- * No source is marked live.
+ * Phase 1 official source registry.
+ * Static defaults are Planned. World Bank may become Connected at runtime
+ * only after verified WDI retrieval (see runtime-status.ts).
  */
 
 import type { OfficialSourceRecord } from "@/lib/official-connector-foundation/types";
+import { getWorldBankRuntimeStatus } from "@/lib/official-connector-foundation/runtime-status";
 
-export const FOUNDATION_SOURCE_REGISTRY: readonly OfficialSourceRecord[] = [
+const STATIC_REGISTRY: readonly OfficialSourceRecord[] = [
   {
     id: "fsrc-world-bank",
     slug: "world-bank",
@@ -16,8 +18,8 @@ export const FOUNDATION_SOURCE_REGISTRY: readonly OfficialSourceRecord[] = [
     jurisdictionScope: "Global country-coded statistics",
     updateFrequency: "As published (often annual)",
     license: "World Bank Open Data Terms of Use",
-    connectionStatus: "connected",
-    defaultHealth: "healthy",
+    connectionStatus: "planned",
+    defaultHealth: "planned",
   },
   {
     id: "fsrc-united-nations",
@@ -81,8 +83,8 @@ export const FOUNDATION_SOURCE_REGISTRY: readonly OfficialSourceRecord[] = [
     jurisdictionScope: "United States",
     updateFrequency: "Monthly",
     license: "U.S. Government work",
-    connectionStatus: "connected",
-    defaultHealth: "healthy",
+    connectionStatus: "planned",
+    defaultHealth: "planned",
   },
   {
     id: "fsrc-us-sec",
@@ -94,20 +96,40 @@ export const FOUNDATION_SOURCE_REGISTRY: readonly OfficialSourceRecord[] = [
     jurisdictionScope: "United States",
     updateFrequency: "As published",
     license: "SEC public disclosure",
-    connectionStatus: "connected",
-    defaultHealth: "healthy",
+    connectionStatus: "planned",
+    defaultHealth: "planned",
   },
 ] as const;
 
+/** Registry view with World Bank runtime status overlaid — no other slugs mutated. */
+export function getFoundationSourceRegistry(): readonly OfficialSourceRecord[] {
+  const wb = getWorldBankRuntimeStatus();
+  return STATIC_REGISTRY.map((source) => {
+    if (source.slug !== "world-bank") return source;
+    return {
+      ...source,
+      connectionStatus: wb.status,
+      defaultHealth: wb.health,
+    };
+  });
+}
+
+/** @deprecated Prefer getFoundationSourceRegistry() for runtime-aware status. */
+export const FOUNDATION_SOURCE_REGISTRY = STATIC_REGISTRY;
+
 export function getFoundationSourceBySlug(slug: string): OfficialSourceRecord | undefined {
-  return FOUNDATION_SOURCE_REGISTRY.find((source) => source.slug === slug);
+  return getFoundationSourceRegistry().find((source) => source.slug === slug);
 }
 
 export function listPlannedFoundationSources(): readonly OfficialSourceRecord[] {
-  return FOUNDATION_SOURCE_REGISTRY.filter((source) => source.connectionStatus === "planned");
+  return getFoundationSourceRegistry().filter((source) => source.connectionStatus === "planned");
 }
 
-/** Phase 1 invariant: zero live sources. */
 export function countLiveFoundationSources(): number {
-  return FOUNDATION_SOURCE_REGISTRY.filter((source) => source.connectionStatus === "live").length;
+  return getFoundationSourceRegistry().filter((source) => source.connectionStatus === "live").length;
+}
+
+export function countConnectedFoundationSources(): number {
+  return getFoundationSourceRegistry().filter((source) => source.connectionStatus === "connected")
+    .length;
 }

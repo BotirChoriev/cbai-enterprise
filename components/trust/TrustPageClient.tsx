@@ -10,6 +10,7 @@ import OrganizationInspectorPanel from "@/components/organization/OrganizationIn
 import TrustVerificationStatuses from "@/components/trust/TrustVerificationStatuses";
 import TrustOperatingDashboard from "@/components/enterprise/TrustOperatingDashboard";
 import OfficialEvidencePanel from "@/components/enterprise/OfficialEvidencePanel";
+import FoundationWorldBankPanel from "@/components/enterprise/FoundationWorldBankPanel";
 import LiveGlobalStatusStrip from "@/components/enterprise/LiveGlobalStatusStrip";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
@@ -39,6 +40,7 @@ export default function TrustPageClient() {
   return (
     <OperatingPageShell title={t("trust.title")} description={trustPage.pageDescription} showMissionContext={false}>
       <LiveGlobalStatusStrip />
+      <FoundationWorldBankPanel entityId="usa" />
       <OfficialEvidencePanel showReports />
       <TrustOperatingDashboard />
 
