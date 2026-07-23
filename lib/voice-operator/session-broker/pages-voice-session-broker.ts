@@ -45,15 +45,21 @@ function jsonResponse(
   status: number,
   origin: string | null,
   allowedOrigins: readonly string[],
+  requestHost?: string | null,
 ): Response {
   const headers = new Headers(JSON_HEADERS);
   headers.set("Cache-Control", "no-store");
-  applyCors(headers, origin, allowedOrigins);
+  applyCors(headers, origin, allowedOrigins, requestHost);
   return new Response(JSON.stringify(body), { status, headers });
 }
 
-function applyCors(headers: Headers, origin: string | null, allowedOrigins: readonly string[]): void {
-  if (origin && isOriginAllowed(origin, allowedOrigins)) {
+function applyCors(
+  headers: Headers,
+  origin: string | null,
+  allowedOrigins: readonly string[],
+  requestHost?: string | null,
+): void {
+  if (origin && isOriginAllowed(origin, allowedOrigins, requestHost)) {
     headers.set("Access-Control-Allow-Origin", origin);
     headers.set("Vary", "Origin");
     headers.set("Access-Control-Allow-Credentials", "true");
@@ -95,14 +101,23 @@ export function parseAllowedOrigins(raw: string | undefined): readonly string[] 
 /**
  * Exact origins plus optional wildcard entries like `https://*.cbai-enterprise.pages.dev`
  * so Preview hash aliases and branch aliases share one allowlist entry.
+ *
+ * When `requestHost` is also a `*.cbai-enterprise.pages.dev` host (the Pages Function
+ * serving this request), allow any HTTPS Origin under the same project suffix even if
+ * VOICE_ALLOWED_ORIGINS only lists one alias — hash vs branch-alias mismatch otherwise
+ * returns origin_blocked and the UI shows “unreachable”.
  */
-export function isOriginAllowed(origin: string | null, allowedOrigins: readonly string[]): boolean {
+export function isOriginAllowed(
+  origin: string | null,
+  allowedOrigins: readonly string[],
+  requestHost?: string | null,
+): boolean {
   if (!origin) return false;
   if (allowedOrigins.includes(origin)) return true;
 
   let hostname: string;
   try {
-    hostname = new URL(origin).hostname;
+    hostname = new URL(origin).hostname.toLowerCase();
   } catch {
     return false;
   }
@@ -113,9 +128,23 @@ export function isOriginAllowed(origin: string | null, allowedOrigins: readonly 
     const scheme = match[1].toLowerCase();
     const suffix = match[2].toLowerCase();
     if (!origin.toLowerCase().startsWith(`${scheme}://`)) continue;
-    const host = hostname.toLowerCase();
-    if (host === suffix || host.endsWith(`.${suffix}`)) return true;
+    if (hostname === suffix || hostname.endsWith(`.${suffix}`)) return true;
   }
+
+  const host = (requestHost ?? "").toLowerCase();
+  const pagesProjectSuffix = "cbai-enterprise.pages.dev";
+  if (
+    host === pagesProjectSuffix ||
+    host.endsWith(`.${pagesProjectSuffix}`)
+  ) {
+    if (
+      origin.toLowerCase().startsWith("https://") &&
+      (hostname === pagesProjectSuffix || hostname.endsWith(`.${pagesProjectSuffix}`))
+    ) {
+      return true;
+    }
+  }
+
   return false;
 }
 
@@ -247,46 +276,64 @@ export async function handleVoiceSessionBrokerRequest(
 ): Promise<Response> {
   const fetchFn = options?.fetchFn ?? fetch;
   const allowedOrigins = parseAllowedOrigins(env.VOICE_ALLOWED_ORIGINS);
+  let requestHost: string | null = null;
+  try {
+    requestHost = new URL(request.url).hostname;
+  } catch {
+    requestHost = null;
+  }
 
   if (allowedOrigins.length === 0) {
-    return jsonResponse({ error: "backend_required" }, 503, null, allowedOrigins);
+    return jsonResponse({ error: "backend_required" }, 503, null, allowedOrigins, requestHost);
   }
 
   const method = request.method.toUpperCase();
 
   if (method === "OPTIONS") {
     const origin = request.headers.get("Origin")?.trim() ?? null;
-    if (!origin || !isOriginAllowed(origin, allowedOrigins)) {
-      return jsonResponse({ error: "origin_blocked" }, 403, origin, allowedOrigins);
+    if (!origin || !isOriginAllowed(origin, allowedOrigins, requestHost)) {
+      return jsonResponse({ error: "origin_blocked" }, 403, origin, allowedOrigins, requestHost);
     }
     const headers = new Headers();
     headers.set("Cache-Control", "no-store");
-    applyCors(headers, origin, allowedOrigins);
+    applyCors(headers, origin, allowedOrigins, requestHost);
     return new Response(null, { status: 204, headers });
   }
 
   if (method !== "POST") {
-    return jsonResponse({ error: "method_not_allowed" }, 405, request.headers.get("Origin"), allowedOrigins);
+    return jsonResponse(
+      { error: "method_not_allowed" },
+      405,
+      request.headers.get("Origin"),
+      allowedOrigins,
+      requestHost,
+    );
   }
 
   const parsedBody = await readJsonBody(request);
   if (!parsedBody.ok) {
-    return jsonResponse({ error: parsedBody.error }, parsedBody.status, request.headers.get("Origin"), allowedOrigins);
+    return jsonResponse(
+      { error: parsedBody.error },
+      parsedBody.status,
+      request.headers.get("Origin"),
+      allowedOrigins,
+      requestHost,
+    );
   }
 
   const origin = resolveRequestOrigin(request, parsedBody.body.origin);
-  if (!origin || !isOriginAllowed(origin, allowedOrigins)) {
-    return jsonResponse({ error: "origin_blocked" }, 403, origin, allowedOrigins);
+  if (!origin || !isOriginAllowed(origin, allowedOrigins, requestHost)) {
+    return jsonResponse({ error: "origin_blocked" }, 403, origin, allowedOrigins, requestHost);
   }
 
   const rateKey = `${origin}|${request.headers.get("CF-Connecting-IP")?.trim() || "unknown"}`;
   if (!checkRateLimit(rateKey)) {
-    return jsonResponse({ error: "rate_limited" }, 429, origin, allowedOrigins);
+    return jsonResponse({ error: "rate_limited" }, 429, origin, allowedOrigins, requestHost);
   }
 
   const apiKey = env.OPENAI_API_KEY?.trim();
   if (!apiKey) {
-    return jsonResponse({ error: "backend_required" }, 503, origin, allowedOrigins);
+    return jsonResponse({ error: "backend_required" }, 503, origin, allowedOrigins, requestHost);
   }
 
   const upstream = await createOpenAiClientSecret(apiKey, parsedBody.body.language, fetchFn);
@@ -294,7 +341,7 @@ export async function handleVoiceSessionBrokerRequest(
     const payload = sanitizePublicText(JSON.stringify({ error: "broker_upstream_error" }), apiKey);
     const headers = new Headers(JSON_HEADERS);
     headers.set("Cache-Control", "no-store");
-    applyCors(headers, origin, allowedOrigins);
+    applyCors(headers, origin, allowedOrigins, requestHost);
     return new Response(payload, { status: 502, headers });
   }
 
@@ -303,13 +350,13 @@ export async function handleVoiceSessionBrokerRequest(
     const payload = sanitizePublicText(JSON.stringify({ error: "broker_upstream_error" }), apiKey);
     const headers = new Headers(JSON_HEADERS);
     headers.set("Cache-Control", "no-store");
-    applyCors(headers, origin, allowedOrigins);
+    applyCors(headers, origin, allowedOrigins, requestHost);
     return new Response(payload, { status: 502, headers });
   }
 
   const successBody = sanitizePublicText(JSON.stringify(mapped), apiKey);
   const headers = new Headers(JSON_HEADERS);
   headers.set("Cache-Control", "no-store");
-  applyCors(headers, origin, allowedOrigins);
+  applyCors(headers, origin, allowedOrigins, requestHost);
   return new Response(successBody, { status: 200, headers });
 }

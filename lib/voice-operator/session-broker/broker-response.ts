@@ -7,6 +7,8 @@ export type BrokerResponseInput = {
   readonly status: number;
   readonly contentType: string | null;
   readonly bodyText: string;
+  /** Fetch Response.type — opaqueredirect / status 0 usually means Access intercepted the mint. */
+  readonly responseType?: string | null;
 };
 
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
@@ -81,8 +83,17 @@ function classifyUpstreamBrokerError(error: string): SessionBrokerResponse | nul
 }
 
 export function classifyBrokerHttpResponse(input: BrokerResponseInput): SessionBrokerResponse {
-  const { status, contentType, bodyText } = input;
+  const { status, contentType, bodyText, responseType } = input;
   const upstreamError = parseBrokerErrorJson(bodyText);
+
+  // Opaque / zero status: Access or network blocked before JSON (common with redirect: "manual").
+  if (responseType === "opaqueredirect" || status === 0) {
+    return {
+      ok: false,
+      code: "AUTHENTICATION_FAILED",
+      message: "Voice broker authentication is required.",
+    };
+  }
 
   if (isBrokerAuthenticationRedirect(status)) {
     return {

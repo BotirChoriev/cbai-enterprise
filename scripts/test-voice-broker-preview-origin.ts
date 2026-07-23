@@ -42,6 +42,20 @@ test("isOriginAllowed supports exact and *.cbai-enterprise.pages.dev wildcard", 
   assert.equal(isOriginAllowed("https://attacker.pages.dev", allowed), false);
 });
 
+test("isOriginAllowed soft-allows same Pages project host without wildcard env", () => {
+  const allowed = parseAllowedOrigins("https://preview-voice-research-integ.cbai-enterprise.pages.dev");
+  const requestHost = "preview-voice-research-integ.cbai-enterprise.pages.dev";
+  assert.equal(
+    isOriginAllowed("https://d0fec898.cbai-enterprise.pages.dev", allowed, requestHost),
+    true,
+  );
+  assert.equal(isOriginAllowed("https://evil.example", allowed, requestHost), false);
+  assert.equal(
+    isOriginAllowed("https://d0fec898.cbai-enterprise.pages.dev", allowed, "evil.example"),
+    false,
+  );
+});
+
 test("403 HTML Access is authentication_failed not origin_blocked", () => {
   const result = classifyBrokerHttpResponse({
     status: 403,
@@ -50,6 +64,17 @@ test("403 HTML Access is authentication_failed not origin_blocked", () => {
   });
   assert.equal(result.ok, false);
   if (!result.ok) assert.equal(result.code, "AUTHENTICATION_FAILED");
+});
+
+test("opaqueredirect / status 0 classify as authentication_failed", () => {
+  const opaque = classifyBrokerHttpResponse({
+    status: 0,
+    contentType: null,
+    bodyText: "",
+    responseType: "opaqueredirect",
+  });
+  assert.equal(opaque.ok, false);
+  if (!opaque.ok) assert.equal(opaque.code, "AUTHENTICATION_FAILED");
 });
 
 test("403 JSON origin_blocked remains ORIGIN_BLOCKED", () => {

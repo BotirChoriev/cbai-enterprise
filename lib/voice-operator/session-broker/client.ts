@@ -127,6 +127,7 @@ export async function requestRealtimeSessionCredential(
       status: response.status,
       contentType: response.headers.get("Content-Type"),
       bodyText,
+      responseType: response.type,
     });
   } catch {
     return { ok: false, code: "ERROR", message: "Network error reaching voice broker." };
