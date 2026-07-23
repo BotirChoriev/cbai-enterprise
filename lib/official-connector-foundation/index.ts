@@ -108,3 +108,15 @@ export {
   plannedHealthSnapshot,
   evaluateHealthAfterCheck,
 } from "@/lib/official-connector-foundation/health";
+
+export {
+  PLANNED_CONNECTOR_ADAPTERS,
+  listPlannedConnectorAdapters,
+  getPlannedConnectorAdapter,
+  assertPlannedAdaptersAreNotLive,
+  refusePlannedConnectorFetch,
+} from "@/lib/official-connector-foundation/adapters/planned-adapters";
+export type {
+  PlannedConnectorAdapter,
+  ConnectorAuthRequirement,
+} from "@/lib/official-connector-foundation/adapters/planned-adapters";

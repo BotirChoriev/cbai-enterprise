@@ -9,6 +9,7 @@ export const OFFICIAL_CONNECTOR_FOUNDATION_VERSION = "1.0.0-phase1" as const;
 /** Connection lifecycle — Phase 1 keeps every official source non-live. */
 export type FoundationConnectionStatus =
   | "planned"
+  | "missing"
   | "ready"
   | "connected"
   | "live"
