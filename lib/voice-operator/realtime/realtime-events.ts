@@ -95,9 +95,18 @@ export function mapRealtimeStateToDockState(state: RealtimeConnectionState): Voi
 }
 
 export function mapBrokerCodeToIssue(
-  code: "BACKEND_REQUIRED" | "ORIGIN_BLOCKED" | "RATE_LIMITED" | "AUTHENTICATION_FAILED" | "ERROR",
+  code:
+    | "BACKEND_REQUIRED"
+    | "ORIGIN_BLOCKED"
+    | "RATE_LIMITED"
+    | "AUTHENTICATION_FAILED"
+    | "INVALID_API_KEY"
+    | "QUOTA_OR_ACCOUNT_BLOCKED"
+    | "ERROR",
 ): VoiceBrokerIssue {
+  if (code === "INVALID_API_KEY") return "authentication_failed";
   if (code === "AUTHENTICATION_FAILED") return "authentication_failed";
   if (code === "BACKEND_REQUIRED") return "required";
+  // ORIGIN_BLOCKED, RATE_LIMITED, QUOTA_OR_ACCOUNT_BLOCKED, ERROR
   return "unreachable";
 }
