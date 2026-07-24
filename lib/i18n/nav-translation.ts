@@ -20,6 +20,7 @@ const NAV_LABEL_KEYS: Record<string, string> = {
   "/universities": "navigation.universities",
   "/research": "navigation.research",
   "/knowledge": "navigation.evidence",
+  "/evidence": "navigation.evidence",
   "/analytics": "navigation.reports",
   "/reports": "navigation.reports",
   "/trust": "navigation.trust",

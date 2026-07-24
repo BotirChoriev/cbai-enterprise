@@ -1,0 +1,25 @@
+route,purpose,auth_required,voice_nav_action_id,object_storage,team_scope,visibility,a11y_notes,localization,status
+/,Spatial World home — globe mission canvas operator entry,false,navigate.home,none (in-memory selection); cbai-missions,n/a,public,WebGL globe; keyboard fallbacks PARTIAL,EN/UZ/RU/TR spatial copy,PROVEN_LOCAL
+/my-work,Projects missions operational objects genesis panels,soft (guest OK richer when signed-in),navigate.my_work; project.open; mission.resume,cbai-projects; cbai-project-*; cbai-operational-objects; cbai-missions,personal; cloud sync optional,authenticated-preferred,OperatingPageShell min-h-11 CTAs,full shell i18n,PROVEN_LOCAL
+/search,Global search gateway countries companies universities topics,false,navigate.search,none (query-only),n/a,public,command field grouped results PARTIAL,full,PROVEN_LOCAL
+/countries,Country intelligence profiles ?country= detail,false,navigate.countries; entity.open_country,static catalog + coverage builders,n/a,public,EntityExploreShell PARTIAL keyboard,entity + indicator i18n,PROVEN_LOCAL
+/companies,Company profiles ?company= detail,false,navigate.companies; entity.open_company,static catalog,n/a,public,same as countries,full entity copy,PROVEN_LOCAL
+/universities,University profiles ?university= detail,false,navigate.universities; entity.open_university,static catalog,n/a,public,same as countries,full,PROVEN_LOCAL
+/research,Research topic catalog,false,navigate.research; research.open_topic,cbai-research-*,personal,public,OperatingPageShell,full,PROVEN_LOCAL
+/knowledge,Evidence explorer (nav label Evidence; no /evidence page),false,navigate.evidence,cbai-saved-knowledge-sources; gap/comparison keys,n/a,public,long-form trust emphasis PARTIAL,full,PROVEN_LOCAL
+/graph,Knowledge graph living relationships,false,navigate.graph,cbai-living-relationships,n/a,public,zoom/focus PARTIAL,full,PROVEN_LOCAL
+/reports,Report readiness saved reports,false,navigate.reports; report.compose,cbai-saved-reports,personal,public,empty-state intro,full,PROVEN_LOCAL
+/investor,Investor evidence lens non-advisory,false,navigate.investor,none durable,n/a,public,disclaimer copy required,full incl UZ verification,PROVEN_LOCAL
+/government,Public-administration evidence workspace,false,navigate.government,none durable,n/a,public,ecosystem workspace lens,full,PROVEN_LOCAL
+/governance,Platform rules governance control center,false,navigate.governance; engine.governance.start,none primary,n/a,public (preview-labeled),inDevelopmentEyebrow copy,full,PENDING_IMPLEMENTATION (UI not enforcement)
+/trust,Constitution methodology privacy reference,false,navigate.trust,none,n/a,public,long document section nav,full,PROVEN_LOCAL
+/settings,Assistant accessibility voice diagnostics prefs,false,navigate.settings,profile/prefs localStorage,personal,public,Voice DX panel aria-label fixes,full TR locale verified,PROVEN_LOCAL
+/about,Product identity principles,false,navigate.about,none,n/a,public,reference route,full,PROVEN_LOCAL
+/workspace,Personal cabinet hub link index,false (links to gated routes),navigate.workspace,none,personal index,public (honest empty copy),semantic nav aria-label,authCollab.* keys,PARTIAL (hub only no cabinet backend)
+/scientific-documents,Scientific document intake metadata confirm,yes (isSignedIn),navigate.scientific_documents; scientific_intake.compose,cbai-scientific-intake-records (metadata queued_pending),personal,authenticated,forms labeled aria-live status,full contentLocale on records,PARTIAL (no real upload backend SF-5 adjacent)
+/files,Personal files placeholder,false page gate (voice mutation gated),navigate.files,none,personal (intended),authenticated-intended,empty honest shell,authCollab.*,PENDING_IMPLEMENTATION
+/teams,Team draft creation local,yes (isSignedIn),navigate.teams; team.compose; team.invite,cbai-team-drafts,team (local drafts SF-2),authenticated,form controls min-h-11,full,PARTIAL (not bound to org-OS SF-2)
+/messages,Team conversations placeholder,false page gate,navigate.messages,none,team (intended),authenticated-intended,empty shell,full,PENDING_IMPLEMENTATION
+/notifications,Activity notifications placeholder,false page gate,navigate.notifications,none,personal,authenticated-intended,empty shell,full,PENDING_IMPLEMENTATION
+/publications,Publication readiness workflow in-memory,yes (isSignedIn),navigate.publications; publication.prepare; object.share,in-memory UI only (no durable store),team review modeled,authenticated,checklist never auto-publish copy,full,PARTIAL (SF-5 production blocker)
+/account,Sign-in cloud auth device-local account,n/a (auth surface),none (resume target),cbai-auth-users; cbai-auth-session; Supabase when configured,personal / cloud,public (auth entry),labeled forms PARTIAL,full account copy,PARTIAL (dual mode SF-2)

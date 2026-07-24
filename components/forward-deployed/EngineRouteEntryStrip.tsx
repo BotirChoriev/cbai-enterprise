@@ -17,6 +17,7 @@ const ROUTE_ENGINES: RouteEngine[] = [
   { prefix: "/", engineId: "mission", labelKey: "forwardDeployed.engines.mission", defaultStatement: "Structure next mission step" },
   { prefix: "/research", engineId: "research", labelKey: "forwardDeployed.engines.research", defaultStatement: "Start structured research" },
   { prefix: "/knowledge", engineId: "evidence", labelKey: "forwardDeployed.engines.evidence", defaultStatement: "Map evidence for current context" },
+  { prefix: "/evidence", engineId: "evidence", labelKey: "forwardDeployed.engines.evidence", defaultStatement: "Map evidence for current context" },
   { prefix: "/graph", engineId: "evidence", labelKey: "forwardDeployed.engines.evidence", defaultStatement: "Explore linked evidence relationships" },
   { prefix: "/countries", engineId: "country_intelligence", labelKey: "forwardDeployed.engines.country", defaultStatement: "Country intelligence review" },
   { prefix: "/companies", engineId: "organization_intelligence", labelKey: "forwardDeployed.engines.organization", defaultStatement: "Organization evidence profile" },
@@ -30,6 +31,8 @@ const ROUTE_ENGINES: RouteEngine[] = [
 export default function EngineRouteEntryStrip() {
   const pathname = usePathname();
   const { t } = useTranslation();
+  // Spatial home already owns mission entry — avoid a second mission ribbon (DD-CLOS-006).
+  if (pathname === "/") return null;
   // Prefer longest prefix so "/" does not steal every route.
   const match = [...ROUTE_ENGINES]
     .sort((a, b) => b.prefix.length - a.prefix.length)

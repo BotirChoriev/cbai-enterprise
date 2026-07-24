@@ -193,8 +193,9 @@ test("mic toggle UI: active unslashed teal mic stops capture; inactive slashed m
 
   const dock = readSource("components/voice-operator/VoiceOperatorDock.tsx");
   assert.match(dock, /vo\.micLive \? vo\.stopListening\(\) : vo\.startListening\(\)/);
-  assert.match(dock, /vo\.micLive \? copy\.muteMic : copy\.unmuteMic/);
   assert.match(dock, /copy\.stopLiveListening/);
+  assert.match(dock, /copy\.unmuteMic/);
+  assert.match(dock, /vo\.micLive[\s\S]*copy\.stopLiveListening[\s\S]*copy\.unmuteMic/);
   assert.match(dock, /copy\.liveListeningActive/);
   assert.match(dock, /copy\.liveListeningScope/);
   assert.doesNotMatch(dock, /animate-pulse/);
@@ -202,13 +203,33 @@ test("mic toggle UI: active unslashed teal mic stops capture; inactive slashed m
   assert.match(dock, /cbai-voice-dock-btn-live/);
   assert.match(readSource("app/globals.css"), /\.cbai-voice-dock-btn-live[\s\S]*--cbai-accent-primary/);
 
-  const micIconTernary = dock.match(/\{vo\.micLive \|\| micDisabled \?\s*\([\s\S]*?\)\s*:\s*\([\s\S]*?\)\s*\}/);
+  const micIconTernary = dock.match(/\{vo\.micLive \?\s*\([\s\S]*?\)\s*:\s*\([\s\S]*?\)\s*\}/);
   assert.ok(micIconTernary, "mic icon ternary");
   const [, activeIcon, inactiveIcon] =
-    micIconTernary![0].match(/vo\.micLive \|\| micDisabled \?\s*\(([\s\S]*?)\)\s*:\s*\(([\s\S]*?)\)\s*\}/) ?? [];
+    micIconTernary![0].match(/vo\.micLive \?\s*\(([\s\S]*?)\)\s*:\s*\(([\s\S]*?)\)\s*\}/) ?? [];
   assert.ok(activeIcon && inactiveIcon, "mic icon branches");
   assert.doesNotMatch(activeIcon, /M4\.5 4\.5l15 15/, "active listening shows unslashed microphone");
   assert.match(inactiveIcon, /M4\.5 4\.5l15 15/, "inactive ready shows slashed microphone");
+});
+
+test("micLive stays true while Realtime capture is active across orchestration dock states", () => {
+  const provider = readSource("components/voice-operator/VoiceOperatorProvider.tsx");
+  assert.match(provider, /captureActive/);
+  assert.match(provider, /setCaptureActive\(true\)/);
+  assert.match(provider, /setCaptureActive\(false\)/);
+  assert.match(provider, /micLive = captureActive \|\| isLiveMicDockState\(dockState\)/);
+  assert.match(provider, /pagehide/);
+  assert.match(provider, /beforeunload/);
+  // Browser fallback must not claim capture until SpeechRecognition actually starts.
+  assert.match(provider, /const started = startBrowserSpeechSession\(/);
+  assert.match(provider, /if \(!started\) \{\s*setCaptureActive\(false\);/);
+});
+
+test("SpeechRecognition teardown prefers abort for prompt mic release", () => {
+  const session = readSource("lib/voice/speech-recognition-session.ts");
+  assert.match(session, /abort\?: \(\) => void/);
+  assert.match(session, /recognition\.abort\(\)/);
+  assert.match(session, /event\.error === "aborted"/);
 });
 
 test("late broker connect cannot apply after capture cancelled", () => {

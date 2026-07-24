@@ -1,0 +1,26 @@
+{
+  "phase": "after",
+  "base": "http://localhost:3000",
+  "captured": [
+    "desktop-dark-home.png",
+    "desktop-light-home.png",
+    "desktop-dark-my-work.png",
+    "desktop-dark-knowledge.png",
+    "desktop-dark-countries.png",
+    "desktop-dark-research.png",
+    "desktop-dark-graph.png",
+    "desktop-dark-reports.png",
+    "desktop-dark-investor.png",
+    "desktop-dark-government.png",
+    "desktop-dark-governance.png",
+    "desktop-dark-trust.png",
+    "desktop-dark-settings.png",
+    "desktop-dark-about.png",
+    "desktop-dark-composer.png",
+    "locale-uz-knowledge.png",
+    "locale-ru-settings.png",
+    "mobile-home.png",
+    "locale-tr-mobile-knowledge.png"
+  ],
+  "capturedAt": "2026-07-20T23:24:14.160Z"
+}

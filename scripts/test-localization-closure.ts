@@ -7,7 +7,9 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { getDictionary } from "@/lib/i18n/translate";
 import { translateInvestorWorkspace } from "@/lib/i18n/investor-translation";
+import { translateGovernmentWorkspace } from "@/lib/i18n/government-translation";
 import { buildInvestorWorkspace } from "@/lib/workspaces/investor";
+import { buildGovernmentWorkspace } from "@/lib/workspaces/government";
 import {
   normalizeCompanionThought,
   type CompanionThoughtSnapshot,
@@ -66,6 +68,28 @@ test("UZ investor workspace runtime copy has no identified English UI prose", ()
   for (const phrase of INVESTOR_ENGLISH_UI) {
     assert.ok(!bundle.includes(phrase), `Found English phrase in UZ investor bundle: ${phrase}`);
   }
+});
+
+test("UZ government workspace runtime copy has no identified English UI prose", () => {
+  const uz = getDictionary("uz");
+  const model = translateGovernmentWorkspace(uz, buildGovernmentWorkspace());
+  const bundle = [
+    uz.governmentWorkspace.heroTitle,
+    uz.governmentWorkspace.sectionGovernanceHeading,
+    uz.governmentWorkspace.metricDomainsTracked,
+    model.hero.title,
+    ...model.governanceCoverage.map((row) => row.title),
+  ].join("\n");
+  assert.ok(!bundle.includes("Government Intelligence Workspace"));
+  assert.ok(!bundle.includes("Domains tracked"));
+  assert.ok(!bundle.includes("Public governance"));
+  assert.ok(uz.governmentWorkspace.heroTitle.includes("Davlat"));
+});
+
+test("Government workspace component uses translateGovernmentWorkspace", () => {
+  const source = readSource("components/workspaces/GovernmentWorkspace.tsx");
+  assert.match(source, /translateGovernmentWorkspace/);
+  assert.doesNotMatch(source, /versionLabel=\{`Government Workspace`\}/);
 });
 
 test("UZ governance center chrome avoids English section headings", () => {

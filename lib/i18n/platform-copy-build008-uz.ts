@@ -328,7 +328,7 @@ export const GRAPH_UI_UZ = {
 } as const;
 
 export const ABOUT_PAGE_UZ = {
-  title: "Haqida",
+  title: "CBAI haqida",
   pageDescription: "CBAI nima, nima uchun mavjud va qanday tamoyillarga amal qiladi.",
   whoWeAreEyebrow: "Biz kim",
   purposeHeadline: "Ma'lumotga kirish qiyin qism bo'lishdan to'xtadi.",

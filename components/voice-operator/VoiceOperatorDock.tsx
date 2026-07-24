@@ -175,11 +175,17 @@ export default function VoiceOperatorDock() {
                 className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border disabled:cursor-not-allowed disabled:opacity-45 ${
                   vo.micLive ? "cbai-voice-dock-btn-live" : "border-[var(--cbai-border-default)] bg-[var(--cbai-glass-surface)] text-[var(--muted)]"
                 }`}
-                aria-label={micDisabled ? copy.localCapabilityUserNotice : vo.micLive ? copy.muteMic : copy.unmuteMic}
+                aria-label={
+                  micDisabled
+                    ? copy.localCapabilityUserNotice
+                    : vo.micLive
+                      ? copy.stopLiveListening
+                      : copy.unmuteMic
+                }
                 aria-pressed={vo.micLive}
               >
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
-                  {vo.micLive || micDisabled ? (
+                  {vo.micLive ? (
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"

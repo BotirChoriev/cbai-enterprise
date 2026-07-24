@@ -33,7 +33,10 @@ test("interactive globe has WebGL cleanup, keyboard access, and reduced-motion f
   const globe = readSource("components/spatial-world/InteractiveIntelligenceGlobe.tsx");
   assert.match(globe, /renderer\.dispose\(\)/);
   assert.match(globe, /prefers-reduced-motion/);
-  assert.match(globe, /isMobileViewport/);
+  assert.match(globe, /shouldUseEnvironmentFallback/);
+  assert.match(globe, /pointer: coarse/);
+  assert.match(globe, /useMemo\(\(\) => getGlobeCountryPoints/);
+  assert.match(globe, /cbai-globe-webgl-error/);
   assert.match(globe, /tabIndex=\{0\}/);
   assert.match(globe, /ArrowLeft/);
   assert.match(globe, /data-globe-reset/);
@@ -41,17 +44,15 @@ test("interactive globe has WebGL cleanup, keyboard access, and reduced-motion f
   assert.doesNotMatch(globe, /globeArc|connectionArc|drawArc|fakeArc/i);
 });
 
-test("homepage uses calm teal voice entry and digital OperatorOrb — no fake stats or human avatar", () => {
+test("spatial home suppresses duplicate Mission Engine strip", () => {
   const home = readSource("components/spatial-world/SpatialWorldIntelligenceHome.tsx");
-  assert.match(home, /vo\.openDock/);
-  assert.match(home, /OperatorOrb/);
-  assert.match(home, /loadProjects/);
-  assert.match(home, /projectsEmpty/);
-  assert.match(home, /noFakeData/);
-  assert.doesNotMatch(home, /operatorOpenVoice/);
-  assert.doesNotMatch(home, /12,846|98\.7%|lorem ipsum|Jane Doe|John Smith/i);
-  assert.doesNotMatch(home, /<img[^>]+avatar/i);
+  assert.doesNotMatch(home, /EngineRouteEntryStrip/);
+  const strip = readSource("components/forward-deployed/EngineRouteEntryStrip.tsx");
+  assert.match(strip, /pathname === "\/"/);
+  assert.match(strip, /return null/);
+  assert.match(strip, /\/evidence/);
 });
+
 
 test("country selection links to existing country intelligence route", () => {
   const home = readSource("components/spatial-world/SpatialWorldIntelligenceHome.tsx");
@@ -69,7 +70,8 @@ test("ecosystem strip links to real platform routes only", () => {
   const home = readSource("components/spatial-world/SpatialWorldIntelligenceHome.tsx");
   assert.match(home, /href: "\/research"/);
   assert.match(home, /href: "\/investor"/);
-  assert.match(home, /href: "\/governance"/);
+  assert.match(home, /href: "\/government"/);
+  assert.doesNotMatch(home, /id: "governance"/);
 });
 
 test("logo mark is intelligence sphere without crescent path", () => {

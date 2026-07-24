@@ -86,7 +86,7 @@ export const primaryNavSections: NavSection[] = [
       },
       {
         label: "Evidence",
-        href: "/knowledge",
+        href: "/evidence",
         icon: "knowledge",
         description: "Official source status across profiles.",
       },
@@ -138,9 +138,26 @@ export const primaryNavSections: NavSection[] = [
       },
     ],
   },
+  {
+    title: "System",
+    items: [
+      {
+        label: "Settings",
+        href: "/settings",
+        icon: "settings",
+        description: "Assistant, accessibility, voice diagnostics, and account preferences.",
+      },
+      {
+        label: "About",
+        href: "/about",
+        icon: "about",
+        description: "What CBAI is, why it exists, and the principles it holds itself to.",
+      },
+    ],
+  },
 ];
 
-/** Advanced + Collaboration + System — progressive disclosure in sidebar. */
+/** Collaboration + Advanced — progressive disclosure in sidebar. */
 export const secondaryNavSections: NavSection[] = [
   {
     title: "Collaboration",
@@ -209,23 +226,6 @@ export const secondaryNavSections: NavSection[] = [
         href: "/research/workspace",
         icon: "research",
         description: "Structured research workspace for knowledge organization and evidence review.",
-      },
-    ],
-  },
-  {
-    title: "System",
-    items: [
-      {
-        label: "Settings",
-        href: "/settings",
-        icon: "settings",
-        description: "Assistant, accessibility, voice diagnostics, and account preferences.",
-      },
-      {
-        label: "About",
-        href: "/about",
-        icon: "about",
-        description: "What CBAI is, why it exists, and the principles it holds itself to.",
       },
     ],
   },

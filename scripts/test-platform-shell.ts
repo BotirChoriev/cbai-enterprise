@@ -32,6 +32,18 @@ test("navigation uses theme-aware nav tokens with spatial accent on home only", 
   const nav = readSource("components/operating/OperatingNavigator.tsx");
   assert.match(nav, /spatial=\{isHome\}/);
   assert.match(nav, /cbaiNavEyebrow/);
+  assert.match(nav, /primaryNavSections/);
+  assert.doesNotMatch(nav, /operatingNavigationItems/);
+});
+
+test("canonical IA keeps Government and Governance separate with System in primary", () => {
+  const navigation = readSource("lib/navigation.ts");
+  assert.match(navigation, /href: "\/government"/);
+  assert.match(navigation, /href: "\/governance"/);
+  assert.match(navigation, /title: "System"/);
+  const govIndex = navigation.indexOf('href: "/government"');
+  const governanceIndex = navigation.indexOf('href: "/governance"');
+  assert.ok(govIndex > 0 && governanceIndex > 0 && govIndex !== governanceIndex);
 });
 
 test("sidebar and topbar share unified dark shell", () => {

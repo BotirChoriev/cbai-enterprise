@@ -72,6 +72,12 @@ export const VOICE_OPERATOR_EN = {
     "Live voice is unavailable because the backend API key is invalid or not configured. Text chat remains available.",
   brokerQuotaBlockedNotice:
     "Live voice is unavailable because the backend account quota or billing blocked Realtime access. Text chat remains available.",
+  brokerOriginBlockedNotice:
+    "This page origin is not allowed to use the voice backend. Text chat remains available.",
+  brokerRateLimitedNotice:
+    "The voice backend rate-limited this session. Wait briefly, then try again. Text chat remains available.",
+  brokerConnectionFailedNotice:
+    "Live audio connection failed after credentials were issued. Text chat remains available.",
   browserFallbackNotice: "Browser transcription is unreliable for Uzbek. Edit text before sending.",
   externalSearchActive: "External search active",
   revokeExternalSearch: "Revoke search consent",
@@ -167,6 +173,12 @@ export const VOICE_OPERATOR_UZ = {
     "Jonli ovoz mavjud emas — backend API kaliti noto'g'ri yoki sozlanmagan. Matnli suhbat ishlayveradi.",
   brokerQuotaBlockedNotice:
     "Jonli ovoz mavjud emas — backend hisob kvotasi yoki to'lov Realtime ga ruxsat bermadi. Matnli suhbat ishlayveradi.",
+  brokerOriginBlockedNotice:
+    "Bu sahifa originiga ovoz backendidan foydalanishga ruxsat berilmagan. Matnli suhbat ishlayveradi.",
+  brokerRateLimitedNotice:
+    "Ovoz backend bu sessiyani chekladi. Biroz kutib, qayta urinib ko'ring. Matnli suhbat ishlayveradi.",
+  brokerConnectionFailedNotice:
+    "Hisob ma'lumotlaridan keyin jonli audio ulanishi muvaffaqiyatsiz. Matnli suhbat ishlayveradi.",
   browserFallbackNotice: "Brauzer transkripti o'zbekcha uchun ishonchsiz. Yuborishdan oldin matnni tahrirlang.",
   externalSearchActive: "Tashqi qidiruv faol",
   revokeExternalSearch: "Qidiruv roziligini bekor qilish",
@@ -261,6 +273,12 @@ export const VOICE_OPERATOR_RU = {
     "Живой голос недоступен: API-ключ backend недействителен или не настроен. Текстовый чат доступен.",
   brokerQuotaBlockedNotice:
     "Живой голос недоступен: квота или биллинг backend блокирует Realtime. Текстовый чат доступен.",
+  brokerOriginBlockedNotice:
+    "Этому origin страницы не разрешено использовать голосовой backend. Текстовый чат доступен.",
+  brokerRateLimitedNotice:
+    "Голосовой backend ограничил эту сессию. Подождите и повторите попытку. Текстовый чат доступен.",
+  brokerConnectionFailedNotice:
+    "Живое аудио-соединение не установилось после выдачи учётных данных. Текстовый чат доступен.",
   browserFallbackNotice: "Транскрипция браузера ненадёжна. Отредактируйте текст перед отправкой.",
   externalSearchActive: "Внешний поиск активен",
   revokeExternalSearch: "Отозвать согласие на поиск",
@@ -355,6 +373,12 @@ export const VOICE_OPERATOR_TR = {
     "Canlı ses kullanılamıyor — backend API anahtarı geçersiz veya yapılandırılmamış. Metin sohbeti kullanılabilir.",
   brokerQuotaBlockedNotice:
     "Canlı ses kullanılamıyor — backend hesap kotası veya faturalandırma Realtime'ı engelliyor. Metin sohbeti kullanılabilir.",
+  brokerOriginBlockedNotice:
+    "Bu sayfa origin'inin ses backend'ini kullanmasına izin verilmiyor. Metin sohbeti kullanılabilir.",
+  brokerRateLimitedNotice:
+    "Ses backend bu oturumu hız sınırına taktı. Kısa süre bekleyip tekrar deneyin. Metin sohbeti kullanılabilir.",
+  brokerConnectionFailedNotice:
+    "Kimlik bilgileri verildikten sonra canlı ses bağlantısı kurulamadı. Metin sohbeti kullanılabilir.",
   browserFallbackNotice: "Tarayıcı transkripti güvenilir değil. Göndermeden önce metni düzenleyin.",
   externalSearchActive: "Harici arama aktif",
   revokeExternalSearch: "Arama onayını iptal et",

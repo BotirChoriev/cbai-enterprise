@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { primaryNavSections, secondaryNavSections } from "@/lib/navigation";
-import { operatingNavigationItems } from "@/lib/navigation-operating";
 import { deriveNavLiveState, type NavLiveState } from "@/lib/intelligence-os/nav-live-state";
 import { translateNavLabel, translateNavSectionTitle } from "@/lib/i18n/nav-translation";
 import NavIcon from "@/components/layout/NavIcon";
@@ -66,40 +65,13 @@ function NavRow({
   );
 }
 
-/** Operating Navigator — live state on every item, never icon-only. */
+/** Operating Navigator — one canonical IA on every route, including Spatial home. */
 export default function OperatingNavigator() {
   const pathname = usePathname();
   const { t } = useTranslation();
   const hydrated = useHydrated();
   const { moduleHref } = useContextualHref();
   const isHome = pathname === "/";
-
-  if (isHome) {
-    return (
-      <nav aria-label={t("intelligenceSpaces.operatingNavigator")} className="space-y-1">
-        <p className={`${cbaiNavEyebrow} px-2 pb-2`}>
-          {t("intelligenceSpaces.operatingNavigator")}
-        </p>
-        <ul className="space-y-0.5">
-          {operatingNavigationItems.map((item) => {
-            const live = hydrated ? deriveNavLiveState(item.href, pathname) : "neutral";
-            return (
-              <li key={item.href}>
-                <NavRow
-                  href={moduleHref(item.href)}
-                  label={translateNavLabel(t, item.href, item.label)}
-                  icon={item.icon}
-                  live={live}
-                  t={t}
-                  spatial={isHome}
-                />
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
-    );
-  }
 
   return (
     <nav aria-label={t("intelligenceSpaces.operatingNavigator")} className="space-y-4">

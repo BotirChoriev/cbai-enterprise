@@ -68,6 +68,7 @@
     "test:localization-closure": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-localization-closure.ts",
     "test:rendered-uz-leakage": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-rendered-uz-leakage.ts",
     "test:doctor-voice": "node scripts/doctor-voice.mjs",
+    "test:voice-dev-ports": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-voice-dev-ports.ts",
     "test:intelligence-canvas": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-intelligence-canvas.ts",
     "test:spatial-world-intelligence": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-spatial-world-intelligence.ts",
     "test:platform-shell": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-platform-shell.ts",

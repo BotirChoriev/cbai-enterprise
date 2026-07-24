@@ -1082,6 +1082,9 @@ export type TranslationDictionary = {
     brokerAuthenticationFailedNotice: string;
     brokerInvalidApiKeyNotice: string;
     brokerQuotaBlockedNotice: string;
+    brokerOriginBlockedNotice: string;
+    brokerRateLimitedNotice: string;
+    brokerConnectionFailedNotice: string;
     browserFallbackNotice: string;
     externalSearchActive: string;
     revokeExternalSearch: string;
@@ -1529,7 +1532,7 @@ export type TranslationDictionary = {
     statusAvailableInformation: string;
     registeredDomainFallback: string;
   };
-  investorWorkspace: {
+    investorWorkspace: {
     versionLabel: string;
     heroTitle: string;
     heroSubtitle: string;
@@ -1552,6 +1555,22 @@ export type TranslationDictionary = {
     };
     domains: Record<string, { title: string; purpose: string }>;
     sourceCoverage: Record<string, string>;
+  };
+  governmentWorkspace: {
+    versionLabel: string;
+    heroTitle: string;
+    heroSubtitle: string;
+    heroDescription: string;
+    metricDomainsTracked: string;
+    metricDomainsWithEvidence: string;
+    metricSourcesConnected: string;
+    projectEntryDescription: string;
+    sectionGovernanceHeading: string;
+    sectionGovernanceDescription: string;
+    sectionPublicServicesHeading: string;
+    sectionPublicServicesDescription: string;
+    domains: Record<string, { title: string; purpose: string }>;
+    serviceAreas: Record<string, { title: string; purpose: string }>;
   };
   entityIntelligence: {
     fromSearch: string;

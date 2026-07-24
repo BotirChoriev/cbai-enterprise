@@ -29,7 +29,7 @@ test("resolveVoiceBrokerUrl keeps same-origin configured path", () => {
 
 test("resolveVoiceBrokerUrl returns null when unset", () => {
   assert.equal(resolveVoiceBrokerUrl("", "https://preview-voice-research-integ.cbai-enterprise.pages.dev"), null);
-  assert.equal(resolveVoiceBrokerUrl(undefined, "https://example.com"), null);
+  assert.equal(resolveVoiceBrokerUrl(null, "https://example.com"), null);
 });
 
 test("isOriginAllowed supports exact and *.cbai-enterprise.pages.dev wildcard", () => {

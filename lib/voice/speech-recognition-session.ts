@@ -36,6 +36,7 @@ type SpeechRecognitionLike = {
   onend: (() => void) | null;
   start: () => void;
   stop: () => void;
+  abort?: () => void;
 };
 type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
 
@@ -81,6 +82,11 @@ export class SpeechRecognitionSession {
       };
     };
     recognition.onerror = (event) => {
+      // Intentional stop()/abort() must not surface as a permission or error dock state.
+      if (event.error === "aborted") {
+        this.callbacks.onPhaseChange?.("idle");
+        return;
+      }
       this.callbacks.onError?.(event.error);
       this.callbacks.onPhaseChange?.("error");
     };
@@ -100,7 +106,23 @@ export class SpeechRecognitionSession {
   private pendingResult: SpeechRecognitionSessionResult | null = null;
 
   stop(): void {
-    this.recognition?.stop();
+    const recognition = this.recognition;
+    this.recognition = null;
+    if (!recognition) return;
+    try {
+      // Prefer abort() so Safari releases the mic indicator promptly on Stop/Close/End.
+      if (typeof recognition.abort === "function") {
+        recognition.abort();
+      } else {
+        recognition.stop();
+      }
+    } catch {
+      try {
+        recognition.stop();
+      } catch {
+        /* ignore */
+      }
+    }
   }
 
   consumeResult(): SpeechRecognitionSessionResult | null {

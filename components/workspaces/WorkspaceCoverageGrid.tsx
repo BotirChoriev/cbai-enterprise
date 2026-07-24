@@ -54,7 +54,10 @@ export default function WorkspaceCoverageGrid({
               {shared.topicsWithEvidence
                 .replace("{connected}", String(item.connectedCount))
                 .replace("{total}", String(item.indicatorCount))
-                .replace("{topicPlural}", item.indicatorCount === 1 ? "" : "s")}
+                .replace(
+                  "{topicPlural}",
+                  language === "en" && item.indicatorCount !== 1 ? "s" : "",
+                )}
             </p>
           </div>
         ))}

@@ -45,19 +45,27 @@ function isCloudflarePagesHost(hostname: string): boolean {
  * keep the configured absolute URL (different port).
  */
 export function resolveVoiceBrokerUrl(
-  envUrl: string | undefined = process.env.NEXT_PUBLIC_VOICE_BROKER_URL,
-  pageOrigin: string | undefined = typeof window !== "undefined" ? window.location.origin : undefined,
+  envUrl?: string | null,
+  pageOrigin?: string | null,
 ): string | null {
-  const configured = envUrl?.trim() || null;
+  const rawEnv = envUrl === undefined ? process.env.NEXT_PUBLIC_VOICE_BROKER_URL : envUrl;
+  const configured = rawEnv?.trim() || null;
   if (!configured) return null;
 
-  if (!pageOrigin) {
+  const origin =
+    pageOrigin === undefined
+      ? typeof window !== "undefined"
+        ? window.location.origin
+        : undefined
+      : pageOrigin ?? undefined;
+
+  if (!origin) {
     return stripTrailingSlash(configured);
   }
 
   try {
-    const page = new URL(pageOrigin);
-    const broker = new URL(configured, pageOrigin);
+    const page = new URL(origin);
+    const broker = new URL(configured, origin);
 
     if (isLoopbackHost(broker.hostname)) {
       return stripTrailingSlash(broker.href);
@@ -78,8 +86,18 @@ export function resolveVoiceBrokerUrl(
   }
 }
 
+/** Test-only override for broker env URL (undefined = use process.env). */
+let brokerEnvUrlOverride: string | null | undefined = undefined;
+
+export function setVoiceBrokerEnvUrlForTests(url: string | null | undefined): void {
+  brokerEnvUrlOverride = url;
+}
+
 export function evaluateVoiceBrokerStatus(): VoiceBrokerStatus {
-  const brokerUrl = resolveVoiceBrokerUrl();
+  const envUrl =
+    brokerEnvUrlOverride === undefined ? undefined : brokerEnvUrlOverride;
+  // `null` means explicitly unset for tests; `undefined` reads process.env.
+  const brokerUrl = resolveVoiceBrokerUrl(envUrl === undefined ? undefined : envUrl);
   if (!brokerUrl) {
     return {
       kind: "backend_required",

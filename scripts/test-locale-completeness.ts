@@ -76,9 +76,17 @@ test("UZ voice control includes Uzbek recognition warning", () => {
   assert.ok(VOICE_CONTROL_UZ.uzbekRecognitionWarning.includes("O'zbekcha nutq"));
 });
 
+test("UZ about page title uses CBAI haqida", () => {
+  const dict = getDictionary("uz");
+  assert.equal(dict.aboutPage.title, "CBAI haqida");
+  assert.equal(dict.navigation.about, "CBAI haqida");
+});
+
 test("OperatingNavigator home branch uses translateNavLabel", () => {
   const source = readSource("components/operating/OperatingNavigator.tsx");
   assert.ok(source.includes("translateNavLabel(t, item.href, item.label)"));
+  assert.ok(source.includes("primaryNavSections"));
+  assert.ok(!source.includes("operatingNavigationItems"));
 });
 
 test("EN/RU/TR/UZ dictionaries include voiceOperator keys", () => {

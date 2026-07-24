@@ -399,11 +399,44 @@ html.theme-light .cbai-spatial-home-atmosphere.cbai-intelligence-atmosphere {
     linear-gradient(180deg, #0c1830 0%, #07101f 42%, #050b16 100%) !important;
 }
 
+html.theme-light .cbai-spatial-home-chrome {
+  /* Force Spatial OS navy chrome even when the global theme is light (DD-CLOS-003). */
+  --cbai-shell-bg: #050b16;
+  --cbai-sidebar-bg: #07101f;
+  --cbai-topbar-bg: rgba(7, 16, 31, 0.94);
+  --cbai-canvas: #07101f;
+  --cbai-text-primary: #f1f5f9;
+  --cbai-text-secondary: #cbd5e1;
+  --cbai-text-muted: #94a3b8;
+  --cbai-border-default: rgba(20, 184, 166, 0.18);
+  --cbai-border-subtle: rgba(20, 184, 166, 0.12);
+  --cbai-border-active: rgba(45, 212, 191, 0.45);
+  --cbai-surface-hover: rgba(13, 148, 136, 0.1);
+  --cbai-workspace-solid: #0a1528;
+  --cbai-workspace-glass: rgba(10, 21, 40, 0.82);
+  --cbai-glass-surface: rgba(10, 21, 40, 0.78);
+  --cbai-solid-surface: #0a1528;
+  --foreground: #f1f5f9;
+  --muted: #94a3b8;
+  --surface: #0a1528;
+  color: #e2e8f0;
+}
+
 html.theme-light .cbai-spatial-home-chrome .cbai-platform-sidebar,
 html.theme-light .cbai-spatial-home-chrome .cbai-spatial-sidebar {
   background: linear-gradient(180deg, #0c1830 0%, #07101f 52%, #050b16 100%) !important;
   border-color: rgba(20, 184, 166, 0.12) !important;
   color: #e2e8f0 !important;
+}
+
+html.theme-light .cbai-spatial-home-chrome .cbai-platform-sidebar .cbai-nav-row-idle,
+html.theme-light .cbai-spatial-home-chrome .cbai-spatial-sidebar .cbai-nav-row-idle {
+  color: #cbd5e1 !important;
+}
+
+html.theme-light .cbai-spatial-home-chrome .cbai-platform-sidebar .cbai-nav-row-active,
+html.theme-light .cbai-spatial-home-chrome .cbai-spatial-sidebar .cbai-nav-row-active {
+  color: #f8fafc !important;
 }
 
 html.theme-light .cbai-spatial-home-chrome .cbai-platform-sidebar [class*="text-slate-"],
@@ -414,9 +447,14 @@ html.theme-light .cbai-spatial-home-chrome .cbai-spatial-sidebar [class*="text-z
 }
 
 html.theme-light .cbai-spatial-home-chrome .cbai-platform-topbar {
-  background: rgba(7, 16, 31, 0.92) !important;
+  background: rgba(7, 16, 31, 0.94) !important;
   border-color: rgba(20, 184, 166, 0.12) !important;
   color: #e2e8f0 !important;
+}
+
+html.theme-light .cbai-spatial-home-chrome .cbai-platform-topbar a,
+html.theme-light .cbai-spatial-home-chrome .cbai-platform-topbar button {
+  color: inherit;
 }
 
 .cbai-voice-reserved-main {

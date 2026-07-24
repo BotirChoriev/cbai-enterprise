@@ -123,6 +123,7 @@ import {
 import { SOURCE_INGESTION_EN } from "@/lib/i18n/platform-copy-build0285-en";
 import { OPERATIONAL_OBJECT_EN } from "@/lib/i18n/platform-copy-operational-objects";
 import { INVESTOR_WORKSPACE_EN, WORKSPACE_SHARED_EN } from "@/lib/i18n/platform-copy-investor";
+import { GOVERNMENT_WORKSPACE_EN } from "@/lib/i18n/platform-copy-government";
 
 const en: TranslationDictionary = {
   roles: {
@@ -601,6 +602,7 @@ const en: TranslationDictionary = {
   governancePage: GOVERNANCE_PAGE_EN,
   workspaceShared: WORKSPACE_SHARED_EN,
   investorWorkspace: INVESTOR_WORKSPACE_EN,
+  governmentWorkspace: GOVERNMENT_WORKSPACE_EN,
   entityIntelligence: { ...ENTITY_INTELLIGENCE_EN, ...ENTITY_INTELLIGENCE_BUILD009_EN },
   sourceCoverage: SOURCE_COVERAGE_EN,
   entityRelationships: ENTITY_RELATIONSHIPS_EN,

@@ -144,5 +144,7 @@ export function mapBrokerCodeToIssue(
   if (code === "QUOTA_OR_ACCOUNT_BLOCKED") return "quota_or_account_blocked";
   if (code === "AUTHENTICATION_FAILED") return "authentication_failed";
   if (code === "BACKEND_REQUIRED") return "required";
+  if (code === "ORIGIN_BLOCKED") return "origin_blocked";
+  if (code === "RATE_LIMITED") return "rate_limited";
   return "unreachable";
 }

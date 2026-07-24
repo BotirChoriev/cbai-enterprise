@@ -10,6 +10,7 @@ import {
   evaluateVoiceBrokerStatus,
   requestRealtimeSessionCredential,
   setMockSessionBrokerHandler,
+  setVoiceBrokerEnvUrlForTests,
 } from "@/lib/voice-operator/session-broker/client";
 import {
   clearConversationPendingState,
@@ -54,6 +55,7 @@ beforeEach(() => {
   clearConversationPendingState();
   clearVoiceToolAuditForTests();
   setMockSessionBrokerHandler(null);
+  setVoiceBrokerEnvUrlForTests(undefined);
   revokeExternalSearchConsent();
 });
 
@@ -105,7 +107,7 @@ test("7. text fallback input exists in dock", () => {
 test("7b. mic toggle icons: active unslashed teal stops capture, inactive slashed starts capture", () => {
   const dock = readSource("components/voice-operator/VoiceOperatorDock.tsx");
   assert.match(dock, /vo\.micLive \? vo\.stopListening\(\) : vo\.startListening\(\)/);
-  assert.match(dock, /micDisabled \? copy\.localCapabilityUserNotice : vo\.micLive \? copy\.muteMic : copy\.unmuteMic/);
+  assert.match(dock, /micDisabled[\s\S]*localCapabilityUserNotice[\s\S]*micLive[\s\S]*stopLiveListening[\s\S]*unmuteMic/);
   assert.match(dock, /copy\.stopLiveListening/);
   assert.match(dock, /copy\.liveListeningActive/);
   assert.match(dock, /copy\.liveListeningScope/);
@@ -113,10 +115,10 @@ test("7b. mic toggle icons: active unslashed teal stops capture, inactive slashe
   assert.doesNotMatch(dock, /border-red-500/);
   assert.doesNotMatch(dock, /ring-red-500/);
 
-  const micIconTernary = dock.match(/\{vo\.micLive \|\| micDisabled \? \([\s\S]*?\) : \([\s\S]*?\)\}/);
+  const micIconTernary = dock.match(/\{vo\.micLive \? \([\s\S]*?\) : \([\s\S]*?\)\}/);
   assert.ok(micIconTernary, "mic icon ternary");
   const branchMatch = micIconTernary![0].match(
-    /vo\.micLive \|\| micDisabled \? \(([\s\S]*?)\) : \(([\s\S]*?)\)\}/,
+    /vo\.micLive \? \(([\s\S]*?)\) : \(([\s\S]*?)\)\}/,
   );
   assert.ok(branchMatch, "mic icon branches");
   const activeIcon = branchMatch![1];
@@ -496,6 +498,7 @@ test("36. unclear input triggers clarification", async () => {
 });
 
 test("37. browser fallback mode is labeled when broker missing", () => {
+  setVoiceBrokerEnvUrlForTests(null);
   const mode = resolveOperatorMode("uz");
   assert.equal(mode.mode, "browser_fallback");
   assert.equal(mode.backendRequired, true);
@@ -555,6 +558,7 @@ test("49. broker network error can degrade to browser fallback listening", () =>
 });
 
 test("50. resolveOperatorMode exposes realtimeConfigured for broker gating", () => {
+  setVoiceBrokerEnvUrlForTests(null);
   const mode = resolveOperatorMode("en");
   assert.equal(mode.realtimeConfigured, false);
   assert.match(mode.notice, /Local development|Mahalliy|Локальная|Yerel/i);

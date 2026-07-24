@@ -14,7 +14,6 @@ import { myWorkHrefForMission } from "@/lib/intelligence-os/mission-operating-co
 import { buildWorldIntelligenceMap } from "@/lib/world-map";
 import type { GlobeCountryPoint } from "@/lib/spatial-world/globe-geography";
 import SpatialCountryContextPanel from "@/components/spatial-world/SpatialCountryContextPanel";
-import EngineRouteEntryStrip from "@/components/forward-deployed/EngineRouteEntryStrip";
 
 const InteractiveIntelligenceGlobe = dynamic(
   () => import("@/components/spatial-world/InteractiveIntelligenceGlobe"),
@@ -42,8 +41,8 @@ const ECOSYSTEMS = [
     bodyKey: "ecosystemEconomicBody" as const,
   },
   {
-    id: "governance",
-    href: "/governance",
+    id: "government",
+    href: "/government",
     titleKey: "ecosystemGovernanceTitle" as const,
     bodyKey: "ecosystemGovernanceBody" as const,
   },
@@ -115,8 +114,6 @@ export default function SpatialWorldIntelligenceHome() {
           </Link>
         </div>
       ) : null}
-
-      <EngineRouteEntryStrip />
 
       <div className="grid min-h-0 grid-cols-1 gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(240px,300px)] xl:items-stretch">
         <InteractiveIntelligenceGlobe

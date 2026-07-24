@@ -107,16 +107,72 @@ export async function probeHttp(url, init = {}, options = {}) {
   }
 }
 
+/**
+ * True when an already-listening port serves the CBAI local voice session broker.
+ * Healthy signals: GET /session → 404/405, or OPTIONS/POST returning JSON broker errors
+ * (never treat arbitrary HTML/proxy listeners as CBAI).
+ */
+export async function probeHealthyCbaiBroker(
+  port = DEFAULT_BROKER_PORT,
+  host = "127.0.0.1",
+) {
+  const base = `http://${host}:${port}/api/voice`;
+  const sessionUrl = `${base}/session`;
+  const getProbe = await probeHttp(sessionUrl, { method: "GET" });
+  if (getProbe.ok && (getProbe.status === 404 || getProbe.status === 405)) {
+    return { healthy: true, base, sessionUrl, via: "get_session" };
+  }
+  const optionsProbe = await probeHttp(sessionUrl, {
+    method: "OPTIONS",
+    headers: {
+      Origin: `http://localhost:${DEFAULT_APP_PORT}`,
+      "Access-Control-Request-Method": "POST",
+    },
+  });
+  if (optionsProbe.ok && (optionsProbe.status === 204 || optionsProbe.status === 200)) {
+    return { healthy: true, base, sessionUrl, via: "options_session" };
+  }
+  // Listening but not CBAI broker JSON contract
+  if (getProbe.ok || optionsProbe.ok) {
+    return {
+      healthy: false,
+      base,
+      sessionUrl,
+      via: "foreign_listener",
+      getStatus: getProbe.status,
+      optionsStatus: optionsProbe.status,
+    };
+  }
+  return { healthy: false, base, sessionUrl, via: "unreachable" };
+}
+
+export function parseAllowedOriginsList(allowedRaw) {
+  return String(allowedRaw ?? "")
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
+/** Both loopback app origins must be allowlisted for Safari/local Realtime. */
+export function localAppOriginsAllowed(allowedRaw, appPort = DEFAULT_APP_PORT) {
+  const allowed = parseAllowedOriginsList(allowedRaw);
+  const localhost = `http://localhost:${appPort}`;
+  const loopback = `http://127.0.0.1:${appPort}`;
+  return {
+    localhost,
+    loopback,
+    localhostOk: allowed.includes(localhost),
+    loopbackOk: allowed.includes(loopback),
+    allowed,
+  };
+}
+
 export function classifyClientVoiceMode(brokerUrl) {
   return brokerUrl?.trim() ? "realtime_broker_configured" : "browser_fallback_backend_required";
 }
 
 export function originAllowed(appOrigin, allowedRaw) {
-  const allowed = allowedRaw
-    .split(",")
-    .map((entry) => entry.trim())
-    .filter(Boolean);
-  return allowed.includes(appOrigin);
+  return parseAllowedOriginsList(allowedRaw).includes(appOrigin);
 }
 
 /** Maps broker upstream classification to one actionable next step — no secrets. */

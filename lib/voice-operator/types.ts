@@ -32,6 +32,9 @@ export type VoicePermissionIssue =
 export type VoiceBrokerIssue =
   | "required"
   | "unreachable"
+  | "origin_blocked"
+  | "rate_limited"
+  | "connection_failed"
   | "authentication_failed"
   | "invalid_api_key"
   | "quota_or_account_blocked";

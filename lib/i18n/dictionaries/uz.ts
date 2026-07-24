@@ -123,6 +123,7 @@ import {
 import { SOURCE_INGESTION_UZ } from "@/lib/i18n/platform-copy-build0285-uz";
 import { OPERATIONAL_OBJECT_UZ } from "@/lib/i18n/platform-copy-operational-objects";
 import { INVESTOR_WORKSPACE_UZ, WORKSPACE_SHARED_UZ } from "@/lib/i18n/platform-copy-investor";
+import { GOVERNMENT_WORKSPACE_UZ } from "@/lib/i18n/platform-copy-government";
 
 const uz: TranslationDictionary = {
   roles: {
@@ -600,6 +601,7 @@ const uz: TranslationDictionary = {
   governancePage: GOVERNANCE_PAGE_UZ,
   workspaceShared: WORKSPACE_SHARED_UZ,
   investorWorkspace: INVESTOR_WORKSPACE_UZ,
+  governmentWorkspace: GOVERNMENT_WORKSPACE_UZ,
   entityIntelligence: { ...ENTITY_INTELLIGENCE_UZ, ...ENTITY_INTELLIGENCE_BUILD009_UZ },
   sourceCoverage: SOURCE_COVERAGE_UZ,
   entityRelationships: ENTITY_RELATIONSHIPS_UZ,

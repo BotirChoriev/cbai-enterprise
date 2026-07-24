@@ -123,6 +123,7 @@ import {
 import { SOURCE_INGESTION_TR } from "@/lib/i18n/platform-copy-build0285-tr";
 import { OPERATIONAL_OBJECT_TR } from "@/lib/i18n/platform-copy-operational-objects";
 import { INVESTOR_WORKSPACE_TR, WORKSPACE_SHARED_TR } from "@/lib/i18n/platform-copy-investor";
+import { GOVERNMENT_WORKSPACE_TR } from "@/lib/i18n/platform-copy-government";
 
 const tr: TranslationDictionary = {
   roles: {
@@ -600,6 +601,7 @@ const tr: TranslationDictionary = {
   governancePage: GOVERNANCE_PAGE_TR,
   workspaceShared: WORKSPACE_SHARED_TR,
   investorWorkspace: INVESTOR_WORKSPACE_TR,
+  governmentWorkspace: GOVERNMENT_WORKSPACE_TR,
   entityIntelligence: { ...ENTITY_INTELLIGENCE_TR, ...ENTITY_INTELLIGENCE_BUILD009_TR },
   sourceCoverage: SOURCE_COVERAGE_TR,
   entityRelationships: ENTITY_RELATIONSHIPS_TR,

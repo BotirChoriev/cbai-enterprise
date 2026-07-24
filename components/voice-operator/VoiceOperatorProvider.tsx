@@ -137,6 +137,7 @@ function startBrowserSpeechSession(
   sessionRef: React.MutableRefObject<SpeechRecognitionSession | null>,
   onIssue: (issue: VoicePermissionIssue) => void,
   onDockState: (state: VoiceDockState) => void,
+  onCaptureEnded: () => void,
 ): boolean {
   const speechLang = resolveActiveSpeechLanguage(language, profileSpeechLanguage);
   const session = new SpeechRecognitionSession({
@@ -149,11 +150,22 @@ function startBrowserSpeechSession(
           void applyResponse(result.transcript);
         } else {
           onDockState("ready");
+          onCaptureEnded();
         }
       }
-      if (phase === "error") onDockState("error");
+      if (phase === "error") {
+        onDockState("error");
+        onCaptureEnded();
+      }
+      if (phase === "idle") {
+        onCaptureEnded();
+      }
     },
     onError: (code) => {
+      if (code === "aborted") {
+        onCaptureEnded();
+        return;
+      }
       const issue = mapSpeechRecognitionError(code);
       if (issue) {
         onIssue(issue);
@@ -161,10 +173,12 @@ function startBrowserSpeechSession(
       } else {
         onDockState("error");
       }
+      onCaptureEnded();
     },
   });
   sessionRef.current = session;
   if (!session.start(speechLang)) {
+    sessionRef.current = null;
     onIssue("unsupported");
     onDockState("permission_required");
     return false;
@@ -189,6 +203,7 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
   const [evidenceResults, setEvidenceResults] = useState<EvidenceResultsPayload | null>(null);
   const [evidenceOpen, setEvidenceOpen] = useState(false);
   const [sessionActive, setSessionActive] = useState(false);
+  const [captureActive, setCaptureActive] = useState(false);
   const [muted] = useState(false);
   const [awaitingConsent, setAwaitingConsent] = useState(false);
   const [operatorGuidance, setOperatorGuidance] = useState<PlatformGuidance | null>(null);
@@ -215,7 +230,8 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
 
   const operatorMode = useMemo(() => resolveOperatorMode(language), [language]);
   const brokerConfigured = operatorMode.realtimeConfigured;
-  const micLive = isLiveMicDockState(dockState);
+  /** Capture stays live across orchestration dock states (ready / executing_action). */
+  const micLive = captureActive || isLiveMicDockState(dockState);
 
   const toolContext = useMemo(
     () => ({
@@ -247,6 +263,7 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
     clearRealtimeBindings();
     clearPendingNavAnnounce();
     realtimeProviderRef.current?.disconnect();
+    setCaptureActive(false);
   }, [clearPendingNavAnnounce, clearRealtimeBindings]);
 
   const stopLiveAudioCapture = useCallback(() => {
@@ -272,6 +289,18 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
   // Internal client-side navigation must NOT tear down Realtime/mic.
   // Teardown only on Stop, Close, End session, logout, unload, unmount, or fatal failure.
   void pathname;
+
+  useEffect(() => {
+    const onPageHide = () => {
+      releaseLiveAudioResources();
+    };
+    window.addEventListener("pagehide", onPageHide);
+    window.addEventListener("beforeunload", onPageHide);
+    return () => {
+      window.removeEventListener("pagehide", onPageHide);
+      window.removeEventListener("beforeunload", onPageHide);
+    };
+  }, [releaseLiveAudioResources]);
 
   const bumpTranscript = useCallback(() => {
     setTranscriptRevision((value) => value + 1);
@@ -478,15 +507,21 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
         return;
       }
 
-      setDockState("listening");
-      startBrowserSpeechSession(
+      const started = startBrowserSpeechSession(
         language,
         profile.speechLanguage,
         applyResponse,
         sessionRef,
         setPermissionIssue,
         setDockState,
+        () => setCaptureActive(false),
       );
+      if (!started) {
+        setCaptureActive(false);
+        return;
+      }
+      setDockState("listening");
+      setCaptureActive(true);
     },
     [language, profile.speechLanguage, applyResponse],
   );
@@ -518,19 +553,23 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
         if (!brokerRes.ok) {
           if (!gate.isCurrent()) return;
           const issue = mapBrokerCodeToIssue(brokerRes.code);
-          if (
-            brokerRes.code === "BACKEND_REQUIRED" ||
-            brokerRes.code === "ORIGIN_BLOCKED"
-          ) {
+          if (brokerRes.code === "BACKEND_REQUIRED") {
             setBrokerIssue(issue);
             setDockState("backend_required");
+            realtimeStartingRef.current = false;
+            return;
+          }
+          if (brokerRes.code === "ORIGIN_BLOCKED") {
+            setBrokerIssue(issue);
+            setDockState("error");
             realtimeStartingRef.current = false;
             return;
           }
           if (
             brokerRes.code === "INVALID_API_KEY" ||
             brokerRes.code === "QUOTA_OR_ACCOUNT_BLOCKED" ||
-            brokerRes.code === "AUTHENTICATION_FAILED"
+            brokerRes.code === "AUTHENTICATION_FAILED" ||
+            brokerRes.code === "RATE_LIMITED"
           ) {
             setBrokerIssue(issue);
             setDockState("error");
@@ -722,13 +761,14 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
           return;
         }
         if (state === "connection_failed" || state === "error" || state === "backend_required") {
-          setBrokerIssue("unreachable");
+          setBrokerIssue(state === "connection_failed" ? "connection_failed" : "unreachable");
           setDockState("error");
           stopLiveAudioCapture();
           return;
         }
 
         setDockState(mapRealtimeStateToDockState(state));
+        setCaptureActive(true);
         // First-run intro only after intentional activation — never unsolicited autoplay on page load.
         if (needsVoiceFirstRunIntro()) {
           const intro = getVoiceOperatorFirstRunIntro(language);

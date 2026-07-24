@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import type * as THREE from "three";
 import { buildWorldIntelligenceMap } from "@/lib/world-map";
@@ -45,9 +45,13 @@ function prefersReducedMotion(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-function isMobileViewport(): boolean {
+/** Compact / coarse-pointer surfaces use the country list; desktop recovers on resize. */
+function shouldUseEnvironmentFallback(): boolean {
   if (typeof window === "undefined") return false;
-  return window.innerWidth < 768;
+  if (prefersReducedMotion()) return true;
+  const narrow = window.innerWidth < 640;
+  const coarse = window.matchMedia("(pointer: coarse)").matches;
+  return narrow && coarse;
 }
 
 export default function InteractiveIntelligenceGlobe({
@@ -57,27 +61,48 @@ export default function InteractiveIntelligenceGlobe({
 }: InteractiveIntelligenceGlobeProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [fallbackReason, setFallbackReason] = useState<"none" | "environment" | "webgl">(() => {
-    if (typeof window === "undefined") return "none";
-    if (isMobileViewport() || prefersReducedMotion()) return "environment";
-    return "none";
-  });
+  const [fallbackReason, setFallbackReason] = useState<"none" | "environment" | "webgl">("none");
   const useFallback = fallbackReason !== "none";
   const hoveredIdRef = useRef<string | null>(null);
   const cleanupRef = useRef<(() => void) | null>(null);
   const selectedCountryIdRef = useRef(selectedCountryId);
-  const countryPoints = getGlobeCountryPoints();
+  const countryPoints = useMemo(() => getGlobeCountryPoints(), []);
+  const onSelectCountryRef = useRef(onSelectCountry);
+
+  useEffect(() => {
+    onSelectCountryRef.current = onSelectCountry;
+  }, [onSelectCountry]);
 
   useEffect(() => {
     selectedCountryIdRef.current = selectedCountryId;
   }, [selectedCountryId]);
 
+  useEffect(() => {
+    const evaluateEnvironment = () => {
+      setFallbackReason((current) => {
+        if (current === "webgl") return current;
+        return shouldUseEnvironmentFallback() ? "environment" : "none";
+      });
+    };
+    evaluateEnvironment();
+    window.addEventListener("resize", evaluateEnvironment);
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const pointer = window.matchMedia("(pointer: coarse)");
+    motion.addEventListener("change", evaluateEnvironment);
+    pointer.addEventListener("change", evaluateEnvironment);
+    return () => {
+      window.removeEventListener("resize", evaluateEnvironment);
+      motion.removeEventListener("change", evaluateEnvironment);
+      pointer.removeEventListener("change", evaluateEnvironment);
+    };
+  }, []);
+
   const handleFallbackSelect = useCallback(
     (countryId: string) => {
       const point = countryPoints.find((p) => p.country.id === countryId) ?? null;
-      onSelectCountry(point);
+      onSelectCountryRef.current(point);
     },
-    [countryPoints, onSelectCountry],
+    [countryPoints],
   );
 
   useEffect(() => {
@@ -257,7 +282,7 @@ export default function InteractiveIntelligenceGlobe({
           if (!id) return;
           const point = countryPoints.find((p) => p.country.id === id) ?? null;
           activeCountryId = id;
-          onSelectCountry(point);
+          onSelectCountryRef.current(point);
           if (point) {
             const vector = latLngToUnitVector(point.lat, point.lng);
             flyTarget = new THREE.Vector3(vector.x, vector.y, vector.z).normalize();
@@ -275,7 +300,7 @@ export default function InteractiveIntelligenceGlobe({
           applyDefaultCamera();
           idleRotation = !prefersReducedMotion();
           activeCountryId = null;
-          onSelectCountry(null);
+          onSelectCountryRef.current(null);
         };
 
         const onKeyDown = (event: KeyboardEvent) => {
@@ -285,7 +310,7 @@ export default function InteractiveIntelligenceGlobe({
           }
           if (event.key === "Enter" && activeCountryId) {
             const point = countryPoints.find((p) => p.country.id === activeCountryId);
-            if (point) onSelectCountry(point);
+            if (point) onSelectCountryRef.current(point);
             return;
           }
           if (event.key === "+" || event.key === "=") {
@@ -374,8 +399,14 @@ export default function InteractiveIntelligenceGlobe({
           }
           renderer.dispose();
         };
-      } catch {
-        setFallbackReason("webgl");
+      } catch (error) {
+        if (!disposed) {
+          const message = error instanceof Error ? error.message : String(error);
+          if (typeof window !== "undefined") {
+            window.sessionStorage.setItem("cbai-globe-webgl-error", message.slice(0, 500));
+          }
+          setFallbackReason("webgl");
+        }
       }
     })();
 
@@ -384,12 +415,15 @@ export default function InteractiveIntelligenceGlobe({
       cleanupRef.current?.();
       cleanupRef.current = null;
     };
-  }, [countryPoints, onSelectCountry, useFallback]);
+  }, [countryPoints, useFallback]);
 
   if (useFallback) {
     const groups = buildWorldIntelligenceMap();
     return (
-      <div className="cbai-globe-fallback flex h-full min-h-[280px] flex-col gap-3 rounded-xl border border-teal-500/15 bg-[#07101f] p-4">
+      <div
+        className="cbai-globe-fallback flex h-full min-h-[280px] flex-col gap-3 rounded-xl border border-teal-500/15 bg-[#07101f] p-4"
+        data-globe-fallback={fallbackReason}
+      >
         <div>
           <p className="text-sm font-medium text-teal-50">{labels.fallbackTitle}</p>
           <p className="mt-1 text-xs text-slate-300">{labels.fallbackHint}</p>
