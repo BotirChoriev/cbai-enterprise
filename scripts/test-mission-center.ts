@@ -81,7 +81,11 @@ test("8. Language selector uses i18n keys in rendered panel", () => {
 test("9. Sidebar on home shows readable labels — not ghost icon-only rail", () => {
   const sidebar = readSource("components/layout/Sidebar.tsx");
   assert.doesNotMatch(sidebar, /opacity-\[0\.22\]/);
-  assert.match(sidebar, /w-56/);
+  assert.match(sidebar, /cbai-platform-sidebar/);
+  assert.match(sidebar, /OperatingNavigator/);
+  assert.match(sidebar, /CBAILogo/);
+  const css = readSource("app/globals.css");
+  assert.match(css, /\.cbai-platform-sidebar\s*\{[^}]*width:\s*16rem/);
 });
 
 test("11. Product polish — unified design tokens in brand-classes", () => {

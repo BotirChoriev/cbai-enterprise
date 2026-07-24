@@ -118,8 +118,14 @@ export function setMockSessionBrokerHandler(
 
 export async function requestRealtimeSessionCredential(
   request: SessionBrokerRequest,
+  options?: { readonly signal?: AbortSignal },
 ): Promise<SessionBrokerResponse> {
-  if (mockBrokerHandler) return mockBrokerHandler(request);
+  if (mockBrokerHandler) {
+    if (options?.signal?.aborted) {
+      return { ok: false, code: "ERROR", message: "Broker request aborted." };
+    }
+    return mockBrokerHandler(request);
+  }
 
   const brokerUrl = resolveVoiceBrokerUrl();
   if (!brokerUrl) {
@@ -132,6 +138,7 @@ export async function requestRealtimeSessionCredential(
       redirect: "manual",
       // Same-origin Access session cookies must be sent with the mint request.
       credentials: "include",
+      signal: options?.signal,
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({
         language: request.language,
@@ -140,13 +147,20 @@ export async function requestRealtimeSessionCredential(
       }),
     });
 
+    if (options?.signal?.aborted) {
+      return { ok: false, code: "ERROR", message: "Broker request aborted." };
+    }
+
     const bodyText = await response.text();
     return classifyBrokerHttpResponse({
       status: response.status,
       contentType: response.headers.get("Content-Type"),
       bodyText,
     });
-  } catch {
+  } catch (error) {
+    if (options?.signal?.aborted || (error instanceof DOMException && error.name === "AbortError")) {
+      return { ok: false, code: "ERROR", message: "Broker request aborted." };
+    }
     return { ok: false, code: "ERROR", message: "Network error reaching voice broker." };
   }
 }

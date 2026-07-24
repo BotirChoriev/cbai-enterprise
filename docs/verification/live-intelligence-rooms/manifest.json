@@ -1,0 +1,26 @@
+{
+  "base": "http://127.0.0.1:3010",
+  "captured": [
+    "desktop-1920-rooms-list-en-dark.png",
+    "desktop-1920-rooms-create-consent-en-dark.png",
+    "desktop-1920-meeting-idle-en-dark.png",
+    "desktop-1920-meeting-live-translated-en-dark.png",
+    "desktop-1920-meeting-glossary-evidence-en-dark.png",
+    "desktop-1920-meeting-post-session-proposals-en-dark.png",
+    "desktop-1920-laboratory-en-dark.png",
+    "desktop-1920-practice-en-dark.png",
+    "desktop-1920-collaboration-en-dark.png",
+    "desktop-1440-rooms-list-en-dark.png",
+    "desktop-1440-rooms-list-en-light.png",
+    "desktop-1440-rooms-list-uz-dark.png",
+    "desktop-1440-meeting-uz-dark.png",
+    "desktop-1440-rooms-list-ru-dark.png",
+    "desktop-1440-meeting-ru-dark.png",
+    "desktop-1440-rooms-list-tr-dark.png",
+    "desktop-1440-meeting-tr-dark.png",
+    "desktop-1440-country-live-rooms-panel-en-dark.png",
+    "mobile-390-rooms-list-en-dark.png",
+    "mobile-390-meeting-en-dark.png"
+  ],
+  "at": "2026-07-24T17:27:23.294Z"
+}

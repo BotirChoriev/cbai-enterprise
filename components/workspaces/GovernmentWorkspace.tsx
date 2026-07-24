@@ -28,7 +28,12 @@ export default function GovernmentWorkspace() {
         subtitle={model.hero.subtitle}
         description={model.hero.description}
         accentClassName="text-teal-400"
-        motif={<GovernmentGrid domains={model.governanceCoverage} />}
+        motif={
+          <GovernmentGrid
+            domains={model.governanceCoverage}
+            ariaLabel={copy.motifAriaLabel}
+          />
+        }
         metrics={[
           {
             label: copy.metricDomainsTracked,

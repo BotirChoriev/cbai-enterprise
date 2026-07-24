@@ -89,7 +89,8 @@
     "test:intelligence-os-theme": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-intelligence-os-theme.ts",
     "test:architecture-boundaries": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-architecture-boundaries.ts",
     "test:canonical-contracts": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-canonical-contracts.ts",
-    "test:voice-broker-preview-origin": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-voice-broker-preview-origin.ts"
+    "test:voice-broker-preview-origin": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-voice-broker-preview-origin.ts",
+    "test:live-intelligence-rooms": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-live-intelligence-rooms.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.2",

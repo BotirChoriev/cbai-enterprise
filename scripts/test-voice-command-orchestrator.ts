@@ -158,10 +158,13 @@ test("13. Profile identity is not silently persisted", () => {
   assert.match(ctx.roleHint ?? "", /kimyogar/i);
 });
 
-test("14. Voice session survives client-side navigation — no pathname teardown", () => {
+test("14. Voice mic tears down on client-side navigation — transcript memory preserved", () => {
   const provider = readFileSync("components/voice-operator/VoiceOperatorProvider.tsx", "utf8");
-  assert.match(provider, /Internal client-side navigation must NOT tear down/);
-  assert.doesNotMatch(provider, /}, \[pathname, releaseLiveAudioResources\]\)/);
+  assert.match(provider, /Privacy P0: SPA route changes must release the mic/);
+  assert.match(provider, /}, \[pathname, releaseLiveAudioResources\]\)/);
+  const routeBlock = provider.match(/Privacy P0: SPA route changes[\s\S]*?\}, \[pathname, releaseLiveAudioResources\]\);/);
+  assert.ok(routeBlock);
+  assert.doesNotMatch(routeBlock![0], /clearVoiceSessionMemory/);
 });
 
 test("15. Stop/Close remain wired after commands", () => {

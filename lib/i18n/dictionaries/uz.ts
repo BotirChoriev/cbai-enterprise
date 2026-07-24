@@ -124,6 +124,7 @@ import { SOURCE_INGESTION_UZ } from "@/lib/i18n/platform-copy-build0285-uz";
 import { OPERATIONAL_OBJECT_UZ } from "@/lib/i18n/platform-copy-operational-objects";
 import { INVESTOR_WORKSPACE_UZ, WORKSPACE_SHARED_UZ } from "@/lib/i18n/platform-copy-investor";
 import { GOVERNMENT_WORKSPACE_UZ } from "@/lib/i18n/platform-copy-government";
+import { LIVE_ROOMS_UZ } from "@/lib/i18n/platform-copy-live-rooms";
 
 const uz: TranslationDictionary = {
   roles: {
@@ -264,6 +265,7 @@ const uz: TranslationDictionary = {
     workspace: "Ish maydoni",
     scientificDocuments: "Ilmiy hujjatlar",
     files: "Fayllar",
+    liveRooms: "Jonli xonalar",
     teams: "Jamoalar",
     messages: "Xabarlar",
     notifications: "Bildirishnomalar",
@@ -602,6 +604,7 @@ const uz: TranslationDictionary = {
   workspaceShared: WORKSPACE_SHARED_UZ,
   investorWorkspace: INVESTOR_WORKSPACE_UZ,
   governmentWorkspace: GOVERNMENT_WORKSPACE_UZ,
+  liveRooms: LIVE_ROOMS_UZ,
   entityIntelligence: { ...ENTITY_INTELLIGENCE_UZ, ...ENTITY_INTELLIGENCE_BUILD009_UZ },
   sourceCoverage: SOURCE_COVERAGE_UZ,
   entityRelationships: ENTITY_RELATIONSHIPS_UZ,

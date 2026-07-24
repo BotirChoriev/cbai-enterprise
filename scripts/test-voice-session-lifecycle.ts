@@ -18,10 +18,15 @@ import {
 } from "@/lib/voice-operator/realtime/openai-webrtc-session";
 import {
   areAllTracksEnded,
+  captureResourcesAreLive,
   createLiveCaptureGate,
   isLiveMicDockState,
   stopMediaStreamTracks,
+  streamHasLiveTracks,
 } from "@/lib/voice-operator/voice-session-lifecycle";
+import { requestRealtimeSessionCredential, setMockSessionBrokerHandler } from "@/lib/voice-operator/session-broker/client";
+import { createMockRealtimeProvider } from "@/lib/voice-operator/realtime/realtime-provider";
+import { SpeechRecognitionSession } from "@/lib/voice/speech-recognition-session";
 
 function readSource(path: string): string {
   return readFileSync(path, "utf8");
@@ -212,12 +217,109 @@ test("mic toggle UI: active unslashed teal mic stops capture; inactive slashed m
   assert.match(inactiveIcon, /M4\.5 4\.5l15 15/, "inactive ready shows slashed microphone");
 });
 
+test("streamHasLiveTracks and captureResourcesAreLive mirror MediaStreamTrack.readyState", () => {
+  const live = new MockTrack();
+  const ended = new MockTrack();
+  ended.stop();
+  const stream = new MockStream([live]) as unknown as MediaStream;
+  assert.equal(streamHasLiveTracks(stream), true);
+  assert.equal(captureResourcesAreLive({ localStream: stream }), true);
+  stopMediaStreamTracks(stream);
+  assert.equal(streamHasLiveTracks(stream), false);
+  assert.equal(captureResourcesAreLive({ localStream: stream, speechRecognitionActive: true }), true);
+  assert.equal(captureResourcesAreLive({ localStream: new MockStream([ended]) as unknown as MediaStream }), false);
+});
+
+test("mock realtime provider hasLiveCaptureResources clears on disconnect", async () => {
+  const provider = createMockRealtimeProvider();
+  assert.equal(provider.hasLiveCaptureResources(), false);
+  await provider.connect(
+    {
+      clientSecret: "ek_test",
+      expiresAt: new Date(Date.now() + 60_000).toISOString(),
+      sessionId: "sess",
+      model: "gpt-realtime",
+    },
+    "en",
+  );
+  assert.equal(provider.hasLiveCaptureResources(), true);
+  provider.disconnect();
+  assert.equal(provider.hasLiveCaptureResources(), false);
+});
+
+test("broker credential request respects AbortSignal", async () => {
+  let calls = 0;
+  setMockSessionBrokerHandler(() => {
+    calls += 1;
+    return {
+      ok: true,
+      credential: {
+        clientSecret: "ek_test",
+        expiresAt: new Date(Date.now() + 60_000).toISOString(),
+        sessionId: "sess",
+        model: "gpt-realtime",
+      },
+    };
+  });
+  const controller = new AbortController();
+  controller.abort();
+  const res = await requestRealtimeSessionCredential(
+    { language: "en", origin: "http://localhost:3000" },
+    { signal: controller.signal },
+  );
+  assert.equal(res.ok, false);
+  if (!res.ok) assert.match(res.message, /abort/i);
+  assert.equal(calls, 0);
+  setMockSessionBrokerHandler(null);
+});
+
+test("SpeechRecognitionSession.stop aborts recognition", () => {
+  let aborted = false;
+  let stopped = false;
+  const Recognition = function (this: {
+    lang: string;
+    interimResults: boolean;
+    maxAlternatives: number;
+    onstart: null;
+    onresult: null;
+    onerror: null;
+    onend: null;
+    start: () => void;
+    stop: () => void;
+    abort: () => void;
+  }) {
+    this.lang = "";
+    this.interimResults = false;
+    this.maxAlternatives = 1;
+    this.onstart = null;
+    this.onresult = null;
+    this.onerror = null;
+    this.onend = null;
+    this.start = () => {};
+    this.stop = () => {
+      stopped = true;
+    };
+    this.abort = () => {
+      aborted = true;
+    };
+  } as unknown as new () => SpeechRecognition;
+  (globalThis as { window?: unknown }).window = {
+    SpeechRecognition: Recognition,
+  };
+  const session = new SpeechRecognitionSession();
+  assert.equal(session.start("en-US"), true);
+  session.stop();
+  assert.equal(aborted, true);
+  assert.equal(stopped, false);
+  delete (globalThis as { window?: unknown }).window;
+});
+
 test("micLive stays true while Realtime capture is active across orchestration dock states", () => {
   const provider = readSource("components/voice-operator/VoiceOperatorProvider.tsx");
   assert.match(provider, /captureActive/);
   assert.match(provider, /setCaptureActive\(true\)/);
   assert.match(provider, /setCaptureActive\(false\)/);
-  assert.match(provider, /micLive = captureActive \|\| isLiveMicDockState\(dockState\)/);
+  assert.match(provider, /hasLiveCaptureResources/);
   assert.match(provider, /pagehide/);
   assert.match(provider, /beforeunload/);
   // Browser fallback must not claim capture until SpeechRecognition actually starts.
@@ -237,13 +339,43 @@ test("late broker connect cannot apply after capture cancelled", () => {
   assert.match(provider, /createLiveCaptureGate/);
   assert.match(provider, /if \(!gate\.isCurrent\(\)\) return/);
   assert.match(provider, /provider\.disconnect\(\)/);
+  assert.match(provider, /brokerAbortRef/);
+  assert.match(provider, /beginBrokerRequest/);
 });
 
-test("route change preserves live voice session (auth collaboration P0)", () => {
+test("route change tears down live capture but preserves transcript memory", () => {
   const provider = readSource("components/voice-operator/VoiceOperatorProvider.tsx");
   assert.match(provider, /usePathname\(\)/);
-  assert.match(provider, /Internal client-side navigation must NOT tear down/);
-  assert.doesNotMatch(provider, /\[pathname, releaseLiveAudioResources\]/);
+  assert.match(provider, /pathnameForTeardownRef/);
+  assert.match(provider, /Privacy P0: SPA route changes must release the mic/);
+  assert.match(
+    provider,
+    /useEffect\(\(\) => \{[\s\S]*pathnameForTeardownRef\.current === pathname[\s\S]*releaseLiveAudioResources\(\)[\s\S]*\}\s*,\s*\[pathname, releaseLiveAudioResources\]\)/,
+  );
+  // Route teardown must not clear transcript/session memory.
+  const routeEffect = provider.match(
+    /Privacy P0: SPA route changes[\s\S]*?\}, \[pathname, releaseLiveAudioResources\]\);/,
+  );
+  assert.ok(routeEffect);
+  assert.doesNotMatch(routeEffect![0], /clearVoiceSessionMemory/);
+  assert.match(provider, /brokerAbortRef\.current\?\.abort\(\)/);
+  assert.match(provider, /sessionRef\.current\?\.stop\(\)/);
+  assert.match(provider, /realtimeProviderRef\.current\?\.disconnect\(\)/);
+  assert.match(provider, /setCaptureActive\(false\)/);
+});
+
+test("Close Stop End and unmount still release live audio resources", () => {
+  const provider = readSource("components/voice-operator/VoiceOperatorProvider.tsx");
+  const closeDockMatch = provider.match(/const closeDock = useCallback\(\(\) => \{([\s\S]*?)\}, \[releaseLiveAudioResources\]\)/);
+  assert.ok(closeDockMatch);
+  assert.match(closeDockMatch![1], /releaseLiveAudioResources\(\)/);
+  assert.match(provider, /const stopListening = useCallback\(\(\) => \{[\s\S]*stopLiveAudioCapture\(\)/);
+  assert.match(provider, /const endSession = useCallback\(\(\) => \{[\s\S]*stopLiveAudioCapture\(\)/);
+  assert.match(provider, /clearVoiceSessionMemory\(\)/);
+  assert.match(provider, /pagehide/);
+  assert.match(provider, /beforeunload/);
+  // Idempotent release: generation bump + disconnect on every release path.
+  assert.match(provider, /liveCaptureGenerationRef\.current \+= 1/);
 });
 
 test("identity intro phrases for UZ/EN/RU/TR", () => {

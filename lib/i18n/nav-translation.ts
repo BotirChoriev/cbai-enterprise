@@ -39,6 +39,7 @@ const NAV_LABEL_KEYS: Record<string, string> = {
   "/scientific-documents": "navigation.scientificDocuments",
   "/files": "navigation.files",
   "/teams": "navigation.teams",
+  "/rooms": "navigation.liveRooms",
   "/messages": "navigation.messages",
   "/notifications": "navigation.notifications",
   "/publications": "navigation.publications",

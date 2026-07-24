@@ -187,6 +187,12 @@ export const secondaryNavSections: NavSection[] = [
         description: "Team preparation — invitations require authorization.",
       },
       {
+        label: "Live Rooms",
+        href: "/rooms",
+        icon: "agents",
+        description: "Multilingual live intelligence sessions — meetings, labs, practice, collaboration.",
+      },
+      {
         label: "Messages",
         href: "/messages",
         icon: "reasoning",

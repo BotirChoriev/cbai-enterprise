@@ -25,10 +25,11 @@ test("collaboration IA is progressive disclosure only", () => {
   assert.ok(nav.includes('title: "Collaboration"'));
 });
 
-test("voice provider survives pathname without teardown effect", () => {
+test("voice provider tears down live capture on pathname change", () => {
   const provider = readFileSync("components/voice-operator/VoiceOperatorProvider.tsx", "utf8");
-  assert.match(provider, /void pathname/);
-  assert.doesNotMatch(provider, /useEffect\(\(\)\s*=>\s*\{[\s\S]*releaseLiveAudioResources[\s\S]*\}\s*,\s*\[\s*pathname/);
+  assert.match(provider, /Privacy P0: SPA route changes must release the mic/);
+  assert.match(provider, /useEffect\(\(\) => \{[\s\S]*releaseLiveAudioResources[\s\S]*\}\s*,\s*\[pathname, releaseLiveAudioResources\]\)/);
+  assert.doesNotMatch(provider, /void pathname/);
 });
 
 test("voice navigation announces only after route land", () => {

@@ -124,6 +124,7 @@ import { SOURCE_INGESTION_TR } from "@/lib/i18n/platform-copy-build0285-tr";
 import { OPERATIONAL_OBJECT_TR } from "@/lib/i18n/platform-copy-operational-objects";
 import { INVESTOR_WORKSPACE_TR, WORKSPACE_SHARED_TR } from "@/lib/i18n/platform-copy-investor";
 import { GOVERNMENT_WORKSPACE_TR } from "@/lib/i18n/platform-copy-government";
+import { LIVE_ROOMS_TR } from "@/lib/i18n/platform-copy-live-rooms";
 
 const tr: TranslationDictionary = {
   roles: {
@@ -264,6 +265,7 @@ const tr: TranslationDictionary = {
     workspace: "Çalışma alanı",
     scientificDocuments: "Bilimsel belgeler",
     files: "Dosyalar",
+    liveRooms: "Canlı Odalar",
     teams: "Ekipler",
     messages: "Mesajlar",
     notifications: "Bildirimler",
@@ -602,6 +604,7 @@ const tr: TranslationDictionary = {
   workspaceShared: WORKSPACE_SHARED_TR,
   investorWorkspace: INVESTOR_WORKSPACE_TR,
   governmentWorkspace: GOVERNMENT_WORKSPACE_TR,
+  liveRooms: LIVE_ROOMS_TR,
   entityIntelligence: { ...ENTITY_INTELLIGENCE_TR, ...ENTITY_INTELLIGENCE_BUILD009_TR },
   sourceCoverage: SOURCE_COVERAGE_TR,
   entityRelationships: ENTITY_RELATIONSHIPS_TR,

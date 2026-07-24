@@ -124,6 +124,7 @@ import { SOURCE_INGESTION_RU } from "@/lib/i18n/platform-copy-build0285-ru";
 import { OPERATIONAL_OBJECT_RU } from "@/lib/i18n/platform-copy-operational-objects";
 import { INVESTOR_WORKSPACE_RU, WORKSPACE_SHARED_RU } from "@/lib/i18n/platform-copy-investor";
 import { GOVERNMENT_WORKSPACE_RU } from "@/lib/i18n/platform-copy-government";
+import { LIVE_ROOMS_RU } from "@/lib/i18n/platform-copy-live-rooms";
 
 const ru: TranslationDictionary = {
   roles: {
@@ -264,6 +265,7 @@ const ru: TranslationDictionary = {
     workspace: "Рабочее пространство",
     scientificDocuments: "Научные документы",
     files: "Файлы",
+    liveRooms: "Живые комнаты",
     teams: "Команды",
     messages: "Сообщения",
     notifications: "Уведомления",
@@ -602,6 +604,7 @@ const ru: TranslationDictionary = {
   workspaceShared: WORKSPACE_SHARED_RU,
   investorWorkspace: INVESTOR_WORKSPACE_RU,
   governmentWorkspace: GOVERNMENT_WORKSPACE_RU,
+  liveRooms: LIVE_ROOMS_RU,
   entityIntelligence: { ...ENTITY_INTELLIGENCE_RU, ...ENTITY_INTELLIGENCE_BUILD009_RU },
   sourceCoverage: SOURCE_COVERAGE_RU,
   entityRelationships: ENTITY_RELATIONSHIPS_RU,

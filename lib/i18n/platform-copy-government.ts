@@ -15,6 +15,8 @@ export const GOVERNMENT_WORKSPACE_EN = {
   sectionGovernanceDescription: "Topics for public institutions and source status.",
   sectionPublicServicesHeading: "Public services",
   sectionPublicServicesDescription: "Citizen-facing service topics and evidence status.",
+  motifAriaLabel:
+    "Government domain registry: {domainCount} real governance domains, {withEvidence} with connected evidence today",
   domains: {
     governance: {
       title: "Governance",
@@ -108,6 +110,8 @@ export const GOVERNMENT_WORKSPACE_UZ = {
   sectionGovernanceDescription: "Davlat muassasalari uchun mavzular va manba holati.",
   sectionPublicServicesHeading: "Davlat xizmatlari",
   sectionPublicServicesDescription: "Fuqarolarga yo‘naltirilgan xizmat mavzulari va dalil holati.",
+  motifAriaLabel:
+    "Davlat sohalari reyestri: {domainCount} haqiqiy boshqaruv sohasi, bugun {withEvidence} tasi ulangan dalil bilan",
   domains: {
     governance: {
       title: "Boshqaruv",
@@ -201,6 +205,8 @@ export const GOVERNMENT_WORKSPACE_RU = {
   sectionGovernanceDescription: "Темы для госучреждений и статус источников.",
   sectionPublicServicesHeading: "Государственные услуги",
   sectionPublicServicesDescription: "Темы услуг для граждан и статус доказательств.",
+  motifAriaLabel:
+    "Реестр государственных областей: {domainCount} реальных областей управления, {withEvidence} с подключёнными доказательствами сегодня",
   domains: {
     governance: { title: "Управление", purpose: "Институциональные и административные доказательства из официальных публикаций." },
     "budget-transparency": { title: "Бюджетная прозрачность", purpose: "Фискальная открытость с официальных бюджетных порталов." },
@@ -240,6 +246,8 @@ export const GOVERNMENT_WORKSPACE_TR = {
   sectionGovernanceDescription: "Kamu kurumları için konular ve kaynak durumu.",
   sectionPublicServicesHeading: "Kamu hizmetleri",
   sectionPublicServicesDescription: "Vatandaşa dönük hizmet konuları ve kanıt durumu.",
+  motifAriaLabel:
+    "Kamu alanları kaydı: {domainCount} gerçek yönetişim alanı, bugün {withEvidence} bağlı kanıtlı",
   domains: {
     governance: { title: "Yönetişim", purpose: "Resmi yayınlardan kurumsal ve idari kanıt." },
     "budget-transparency": { title: "Bütçe şeffaflığı", purpose: "Resmi bütçe açıklama portallarından mali açıklık." },

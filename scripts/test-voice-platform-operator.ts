@@ -227,10 +227,13 @@ test("22. double mic click guarded", () => {
   assert.match(provider, /micLive \|\| realtimeStartingRef/);
 });
 
-test("23. route change preserves live voice session (auth collaboration P0)", () => {
+test("23. route change tears down live mic and preserves transcript memory", () => {
   const provider = readSource("components/voice-operator/VoiceOperatorProvider.tsx");
-  assert.match(provider, /Internal client-side navigation must NOT tear down/);
-  assert.doesNotMatch(provider, /\[pathname, releaseLiveAudioResources\]/);
+  assert.match(provider, /Privacy P0: SPA route changes must release the mic/);
+  assert.match(provider, /\[pathname, releaseLiveAudioResources\]/);
+  const routeBlock = provider.match(/Privacy P0: SPA route changes[\s\S]*?\}, \[pathname, releaseLiveAudioResources\]\);/);
+  assert.ok(routeBlock);
+  assert.doesNotMatch(routeBlock![0], /clearVoiceSessionMemory/);
 });
 
 test("24. tool event after close uses stale session guard", () => {

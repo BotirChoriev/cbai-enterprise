@@ -28,12 +28,9 @@ Stop for human Safari approval. Do **not** treat Cursor/Playwright Chromium as S
 
 | Check | Status |
 |-------|--------|
-| Preview POST `/api/voice/session` | PASS (HTTP 200, ephemeral `ek_*` present — secret not logged) |
-| Local broker POST session (`doctor:voice`) | PASS (localhost + 127.0.0.1) |
+| Preview POST `/api/voice/session` | PASS (prior gate; ephemeral `ek_*`) |
+| Local broker POST session (`doctor:voice`) | PASS |
 | Chromium WebRTC / lifecycle unit tests | PASS |
-| `captureActive` + SR abort teardown wiring | PASS (code-verified) |
+| SPA route-change mic teardown wiring | PASS (code-verified — this P0) |
 | Stale async gate after teardown | PASS (code-verified) |
-| Government UZ/RU/TR chrome (excl. official names; excl. motif aria-label) | PASS |
-| Live Safari mic indicator after Stop/Close/End/reload/tab close | **PENDING HUMAN — NOT CLAIMED** |
-
-Full write-up: `docs/verification/final-intelligence-os-closure/p0-safari-acceptance-gate.md`
+| Live Safari mic indicator after route change / Stop / Close / End | **PENDING HUMAN — NOT CLAIMED** |

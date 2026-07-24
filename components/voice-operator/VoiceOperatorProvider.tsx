@@ -216,6 +216,8 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
   const realtimeStartingRef = useRef(false);
   const realtimeUnsubsRef = useRef<Array<() => void>>([]);
   const liveCaptureGenerationRef = useRef(0);
+  /** Aborts in-flight broker credential fetches on teardown (route change, Stop, Close, End, unload). */
+  const brokerAbortRef = useRef<AbortController | null>(null);
   const toolHandlerStateRef = useRef(createRealtimeToolHandlerState(0));
   /** Suppress duplicate transcript orchestration when Realtime tool already handled the same utterance. */
   const recentToolStatementRef = useRef<{ text: string; at: number } | null>(null);
@@ -227,11 +229,27 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
     timeoutId: number | null;
   } | null>(null);
   const navAnnounceGenerationRef = useRef(0);
+  /** Skip first pathname effect run so mount does not tear down a not-yet-started session. */
+  const pathnameForTeardownRef = useRef(pathname);
 
   const operatorMode = useMemo(() => resolveOperatorMode(language), [language]);
   const brokerConfigured = operatorMode.realtimeConfigured;
-  /** Capture stays live across orchestration dock states (ready / executing_action). */
+  /**
+   * Invariant: `captureActive` is the React-visible mirror of owned capture resources.
+   * Set true only after SpeechRecognition start succeeds, or after Realtime connect when
+   * `provider.hasLiveCaptureResources()` is true (MediaStreamTrack.readyState === "live",
+   * or mock connect flag). Cleared only via `releaseLiveAudioResources`, which aborts broker
+   * work, stops SpeechRecognition, disconnects WebRTC (tracks/DC/PC/audio element), and
+   * bumps the generation gate so late async results cannot reactivate capture.
+   * `micLive` also treats live dock phases as live so Stop remains available during orchestration.
+   */
   const micLive = captureActive || isLiveMicDockState(dockState);
+  const beginBrokerRequest = useCallback((): AbortSignal => {
+    brokerAbortRef.current?.abort();
+    const controller = new AbortController();
+    brokerAbortRef.current = controller;
+    return controller.signal;
+  }, []);
 
   const toolContext = useMemo(
     () => ({
@@ -256,12 +274,16 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
   }, []);
 
   const releaseLiveAudioResources = useCallback(() => {
+    // Invalidate every in-flight broker/WebRTC/SpeechRecognition continuation first.
     liveCaptureGenerationRef.current += 1;
     realtimeStartingRef.current = false;
+    brokerAbortRef.current?.abort();
+    brokerAbortRef.current = null;
     sessionRef.current?.stop();
     sessionRef.current = null;
     clearRealtimeBindings();
     clearPendingNavAnnounce();
+    // disconnect → cleanupWebRtcSessionResources: abort connect, close DC/PC, stop tracks, dispose audio.
     realtimeProviderRef.current?.disconnect();
     setCaptureActive(false);
   }, [clearPendingNavAnnounce, clearRealtimeBindings]);
@@ -286,9 +308,17 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
     };
   }, [releaseLiveAudioResources]);
 
-  // Internal client-side navigation must NOT tear down Realtime/mic.
-  // Teardown only on Stop, Close, End session, logout, unload, unmount, or fatal failure.
-  void pathname;
+  // Privacy P0: SPA route changes must release the mic immediately (Safari indicator).
+  // Transcript / session memory are preserved — only live capture resources are torn down.
+  useEffect(() => {
+    if (pathnameForTeardownRef.current === pathname) return;
+    pathnameForTeardownRef.current = pathname;
+    releaseLiveAudioResources();
+    setDockState((state) => {
+      if (state === "closed") return state;
+      return "ready";
+    });
+  }, [pathname, releaseLiveAudioResources]);
 
   useEffect(() => {
     const onPageHide = () => {
@@ -542,11 +572,14 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
         const sessionMemory =
           readVoiceSessionMemory() ?? createVoiceSessionMemory(language, "realtime");
 
-        const brokerRes = await requestRealtimeSessionCredential({
-          language,
-          origin: typeof window !== "undefined" ? window.location.origin : "",
-          sessionHint: sessionMemory.sessionId,
-        });
+        const brokerRes = await requestRealtimeSessionCredential(
+          {
+            language,
+            origin: typeof window !== "undefined" ? window.location.origin : "",
+            sessionHint: sessionMemory.sessionId,
+          },
+          { signal: beginBrokerRequest() },
+        );
 
         if (!gate.isCurrent()) return;
 
@@ -577,6 +610,11 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
             return;
           }
           if (brokerRes.code === "ERROR") {
+            // Aborted/cancelled broker work must not start SpeechRecognition fallback.
+            if (/abort/i.test(brokerRes.message) || !gate.isCurrent()) {
+              realtimeStartingRef.current = false;
+              return;
+            }
             setBrokerIssue(issue);
             realtimeStartingRef.current = false;
             await startBrowserFallbackListening(gate);
@@ -768,7 +806,8 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
         }
 
         setDockState(mapRealtimeStateToDockState(state));
-        setCaptureActive(true);
+        // Source of truth: MediaStreamTrack liveness (mock provider mirrors connect/disconnect).
+        setCaptureActive(provider.hasLiveCaptureResources());
         // First-run intro only after intentional activation — never unsolicited autoplay on page load.
         if (needsVoiceFirstRunIntro()) {
           const intro = getVoiceOperatorFirstRunIntro(language);
@@ -796,7 +835,7 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
         realtimeStartingRef.current = false;
       }
     },
-    [language, bumpTranscript, clearRealtimeBindings, stopLiveAudioCapture, startBrowserFallbackListening, pathname, router, operationalObjects, applyResponse, t, isSignedIn, scheduleNavSuccessAnnounce, releaseLiveAudioResources],
+    [language, bumpTranscript, clearRealtimeBindings, stopLiveAudioCapture, startBrowserFallbackListening, pathname, router, operationalObjects, applyResponse, t, isSignedIn, scheduleNavSuccessAnnounce, releaseLiveAudioResources, beginBrokerRequest],
   );
 
   const openDock = useCallback(() => {
@@ -810,18 +849,24 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
     }
 
     if (operatorMode.mode === "realtime") {
-      void requestRealtimeSessionCredential({
-        language,
-        origin: typeof window !== "undefined" ? window.location.origin : "",
-        sessionHint: readVoiceSessionMemory()?.sessionId,
-      }).then((res) => {
+      const signal = beginBrokerRequest();
+      const generation = liveCaptureGenerationRef.current;
+      void requestRealtimeSessionCredential(
+        {
+          language,
+          origin: typeof window !== "undefined" ? window.location.origin : "",
+          sessionHint: readVoiceSessionMemory()?.sessionId,
+        },
+        { signal },
+      ).then((res) => {
+        if (generation !== liveCaptureGenerationRef.current || signal.aborted) return;
         if (!res.ok && res.code === "BACKEND_REQUIRED") {
           setBrokerIssue("required");
           setDockState("backend_required");
         }
       });
     }
-  }, [language, operatorMode.mode, sessionActive, micLive]);
+  }, [language, operatorMode.mode, sessionActive, micLive, beginBrokerRequest]);
 
   const closeDock = useCallback(() => {
     releaseLiveAudioResources();

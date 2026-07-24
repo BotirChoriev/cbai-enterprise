@@ -212,8 +212,8 @@ test("EN/UZ/RU/TR voiceCommand keys include chemist + identity", () => {
 
 test("pathname teardown + Stop/Close still wired", () => {
   const provider = readFileSync("components/voice-operator/VoiceOperatorProvider.tsx", "utf8");
-  assert.match(provider, /Internal client-side navigation must NOT tear down/);
-  assert.doesNotMatch(provider, /\[pathname, releaseLiveAudioResources\]/);
+  assert.match(provider, /Privacy P0: SPA route changes must release the mic/);
+  assert.match(provider, /\[pathname, releaseLiveAudioResources\]/);
   assert.match(provider, /voice\.stop/);
   assert.match(provider, /voice\.close/);
   assert.match(provider, /releaseLiveAudioResources/);

@@ -153,13 +153,16 @@ test("engine/mutation companion navigation still pushes", () => {
   assert.ok(pushes.length >= 1);
 });
 
-test("internal navigation session persistence — no pathname teardown", () => {
+test("internal navigation tears down mic — transcript announce wiring remains", () => {
   const provider = readFileSync("components/voice-operator/VoiceOperatorProvider.tsx", "utf8");
-  assert.match(provider, /Internal client-side navigation must NOT tear down/);
-  assert.doesNotMatch(provider, /\[pathname, releaseLiveAudioResources\]/);
+  assert.match(provider, /Privacy P0: SPA route changes must release the mic/);
+  assert.match(provider, /\[pathname, releaseLiveAudioResources\]/);
   assert.match(provider, /applyPlatformActionResult/);
   assert.match(provider, /scheduleNavSuccessAnnounce/);
   assert.match(provider, /pendingNavAnnounceRef/);
+  const routeBlock = provider.match(/Privacy P0: SPA route changes[\s\S]*?\}, \[pathname, releaseLiveAudioResources\]\);/);
+  assert.ok(routeBlock);
+  assert.doesNotMatch(routeBlock![0], /clearVoiceSessionMemory/);
 });
 
 test("Stop/Close cleanup and duplicate session guards remain", () => {

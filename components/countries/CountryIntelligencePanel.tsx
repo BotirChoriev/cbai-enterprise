@@ -37,6 +37,7 @@ import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import AddToMissionButton from "@/components/mission/MissionOperatingActions";
 import CreateProjectFromEntityButton from "@/components/project/CreateProjectFromEntityButton";
 import CreateLinkedWorkButton from "@/components/operational-objects/CreateLinkedWorkButton";
+import CountryLiveRoomsPanel from "@/components/live-intelligence-rooms/CountryLiveRoomsPanel";
 import { useTranslation } from "@/lib/i18n/use-translation";
 
 type CountryIntelligencePanelProps = {
@@ -124,6 +125,8 @@ export function CountryIntelligencePanel({
           }}
         />
       </div>
+
+      <CountryLiveRoomsPanel countryId={country.id} countryName={country.name} />
 
       <EntityHeader
         name={registryFacts.name}

@@ -12,6 +12,7 @@ import {
   type WebRtcSessionHandle,
 } from "@/lib/voice-operator/realtime/openai-webrtc-session";
 import type { EphemeralRealtimeCredential } from "@/lib/voice-operator/types";
+import { streamHasLiveTracks } from "@/lib/voice-operator/voice-session-lifecycle";
 import { VOICE_VAD_CONFIG } from "@/lib/voice-operator/vad-config";
 import { buildVoiceOperatorInstructions } from "@/lib/voice-operator/instructions";
 
@@ -36,6 +37,8 @@ export type RealtimeVoiceProvider = {
   interrupt: () => void;
   setMuted: (muted: boolean) => void;
   getState: () => RealtimeConnectionState;
+  /** True while local/remote MediaStreamTracks are still `live` (post-disconnect must be false). */
+  hasLiveCaptureResources: () => boolean;
   onStateChange: (listener: RealtimeStateListener) => () => void;
   onTranscript: (listener: RealtimeTranscriptListener) => () => void;
   onToolCall: (listener: RealtimeToolCallListener) => () => void;
@@ -75,6 +78,7 @@ export function createUnavailableRealtimeProvider(): RealtimeVoiceProvider {
     interrupt() {},
     setMuted() {},
     getState: holder.get,
+    hasLiveCaptureResources: () => false,
     onStateChange: holder.subscribe,
     onTranscript: noop,
     onToolCall: noop,
@@ -88,24 +92,29 @@ export function createMockRealtimeProvider(options?: {
 }): RealtimeVoiceProvider {
   const holder = createStateHolder("idle");
   const transcriptListeners = new Set<RealtimeTranscriptListener>();
+  let mockCaptureLive = false;
   return {
     kind: "mock",
     async connect(credential, language) {
       holder.set("connecting");
       if (options?.connectSucceeds === false) {
         holder.set("connection_failed");
+        mockCaptureLive = false;
         return;
       }
       if (!credential.clientSecret || credential.clientSecret.startsWith("sk-")) {
         holder.set("error");
+        mockCaptureLive = false;
         return;
       }
       void buildVoiceOperatorInstructions(language);
       void VOICE_VAD_CONFIG;
+      mockCaptureLive = true;
       holder.set("connected");
       holder.set("listening");
     },
     disconnect() {
+      mockCaptureLive = false;
       holder.set("disconnected");
       holder.set("idle");
     },
@@ -114,6 +123,7 @@ export function createMockRealtimeProvider(options?: {
     },
     setMuted() {},
     getState: holder.get,
+    hasLiveCaptureResources: () => mockCaptureLive,
     onStateChange: holder.subscribe,
     onTranscript(listener) {
       transcriptListeners.add(listener);
@@ -230,6 +240,10 @@ export function createOpenAiWebRtcRealtimeProvider(): RealtimeVoiceProvider {
       activeSession?.setMuted(muted);
     },
     getState: () => activeSession?.getState() ?? holder.get(),
+    hasLiveCaptureResources: () => {
+      const local = activeSession?.getLocalStream?.() ?? null;
+      return streamHasLiveTracks(local);
+    },
     onStateChange(listener) {
       return holder.subscribe(listener);
     },

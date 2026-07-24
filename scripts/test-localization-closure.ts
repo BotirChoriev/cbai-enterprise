@@ -86,10 +86,25 @@ test("UZ government workspace runtime copy has no identified English UI prose", 
   assert.ok(uz.governmentWorkspace.heroTitle.includes("Davlat"));
 });
 
-test("Government workspace component uses translateGovernmentWorkspace", () => {
-  const source = readSource("components/workspaces/GovernmentWorkspace.tsx");
-  assert.match(source, /translateGovernmentWorkspace/);
-  assert.doesNotMatch(source, /versionLabel=\{`Government Workspace`\}/);
+test("UZ government motif aria-label is localized", () => {
+  const uz = getDictionary("uz");
+  assert.ok(uz.governmentWorkspace.motifAriaLabel.includes("{domainCount}"));
+  assert.ok(!uz.governmentWorkspace.motifAriaLabel.includes("Government domain registry"));
+  const grid = readSource("components/workspaces/GovernmentGrid.tsx");
+  assert.match(grid, /ariaLabel/);
+  assert.doesNotMatch(grid, /Government domain registry:/);
+});
+
+test("EN/UZ/RU/TR liveRooms dictionary keys are complete", () => {
+  for (const locale of ["en", "uz", "ru", "tr"] as const) {
+    const copy = getDictionary(locale).liveRooms;
+    assert.ok(copy.homeTitle.length > 3);
+    assert.ok(copy.createCta.length > 2);
+    assert.ok(copy.multipartyNotice.includes("EXTERNAL_BLOCKED") || locale !== "en");
+    assert.ok(copy.consentAcknowledge.length > 10);
+  }
+  assert.ok(getDictionary("uz").liveRooms.homeTitle.includes("Jonli") || getDictionary("uz").liveRooms.homeTitle.includes("intellekt"));
+  assert.doesNotMatch(getDictionary("uz").liveRooms.homeTitle, /^liveRooms\./);
 });
 
 test("UZ governance center chrome avoids English section headings", () => {
