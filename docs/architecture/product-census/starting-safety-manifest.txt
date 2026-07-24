@@ -1,0 +1,68 @@
+CBAI PRODUCT CENSUS — STARTING SAFETY MANIFEST
+Generated: 2026-07-22 (local)
+Mode: AUDIT-ONLY Phase A freeze
+
+BRANCH: preview/spatial-world-intelligence
+HEAD: 2d1558995f355a899100a6ca15c7d924e913c690
+UPSTREAM: NO_UPSTREAM (no tracking branch configured for @{upstream})
+
+GIT STATUS COUNTS (porcelain paths):
+  total_changed_paths: 226
+  modified_tracked (M / space-M): 137
+  untracked_paths_porcelain (??): 89
+  staged: 0
+  untracked_files_expanded (git ls-files --others --exclude-standard): 494
+  Note: porcelain collapses some untracked directories; expanded file count is higher.
+
+STATUS INVENTORY DIGEST (SHA-256 of git status --short output):
+  012948c517b36eb2fee518ec751e707b9a4be566021b6c4d1ec422cde0edcf33
+  Source: git status --short (path inventory only; no file contents hashed)
+  Excluded from hashing: .dev.vars contents, any secret values, node_modules, build artifacts contents
+
+PACKAGE / RUNTIME (names and versions from package.json / config only):
+  package_manager: npm (inferred; no packageManager field)
+  next: 16.2.10
+  react: 19.2.4
+  react-dom: present
+  three: present
+  @supabase/supabase-js: present
+  typescript: present (dev)
+  tailwindcss: present (dev)
+  playwright: present (dev)
+  scripts_count: 82
+
+BUILD / EXPORT:
+  next.config.ts present
+  static export mode: verify via next.config (to be confirmed in inventory)
+  Cloudflare Pages Functions: functions/ or api/ present under project (api/ listed)
+
+STORAGE / INTEGRATIONS (presence only):
+  Supabase: lib/supabase/*, supabase/migrations
+  localStorage/sessionStorage: multiple lib/* stores (see inventory)
+  IndexedDB: to be confirmed in census
+  Upload/object storage: scientific intake + research canvas file inputs (client-side); cloud migration helpers
+
+ENVIRONMENT VARIABLE NAMES ONLY (from .env.example / .dev.vars.example; VALUES NOT READ):
+  NEXT_PUBLIC_SUPABASE_URL
+  NEXT_PUBLIC_SUPABASE_ANON_KEY
+  CBAI_TEST_USER_A_EMAIL
+  CBAI_TEST_USER_A_PASSWORD
+  CBAI_TEST_USER_B_EMAIL
+  CBAI_TEST_USER_B_PASSWORD
+  CBAI_TEST_USER_C_EMAIL
+  CBAI_TEST_USER_C_PASSWORD
+  CBAI_TEST_BASE_URL
+  NEXT_PUBLIC_VOICE_BROKER_URL
+  OPENAI_API_KEY
+  VOICE_ALLOWED_ORIGINS
+
+EXPLICITLY EXCLUDED FROM AUDIT ARTIFACTS:
+  .dev.vars file contents
+  API keys / tokens / credentials values
+  node_modules/
+  .next/ / out/ generated contents hashing
+  personal credentials
+
+PHASE A RULE:
+  No product source code modifications authorized.
+  Only docs/architecture/product-census/* documentation outputs allowed until Phase A exit check.

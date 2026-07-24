@@ -1,0 +1,37 @@
+P0 Preview Deployment Reality Check — probe summary
+Date: 2026-07-22
+Branch: preview/spatial-world-intelligence
+HEAD: 18a8c23b99ace725c43cfa384141ae7799643c28
+Working tree: DIRTY (Preview Completion uncommitted; deployed commit is HEAD tip as last push)
+
+Hosts:
+1) https://d0fec898.cbai-enterprise.pages.dev
+   - HTTP 200 after redirect → Cloudflare Access login HTML
+   - Title: Sign in ・ Cloudflare Access
+   - CLASS: Cloudflare Access redirect
+
+2) https://preview-spatial-world-intelligence.cbai-enterprise.pages.dev
+   - HTTP 200 → Cloudflare Access login HTML
+   - CLASS: stable branch alias (Cloudflare Pages branch subdomain)
+   - CLASS: Cloudflare Access redirect
+
+3) https://spatial-world-intelligence.cbai-enterprise.pages.dev
+   - Also Access-gated (alternate slug)
+
+4) https://cbai-enterprise.pages.dev
+   - HTTP 200 app HTML title: CBAI — Universal Intelligence Operating System
+   - No Access gate
+   - GET /api/voice/session → SPA HTML (not JSON broker)
+
+5) https://checkbalanceai.global (production custom domain)
+   - HTTP 200 app HTML same title as pages.dev production
+   - No Access gate
+   - GET /api/voice/session → 404 empty
+   - POST /api/voice/session → 405 empty
+   - CLASS: production lacks Pages Function voice broker (or not routed)
+
+Broker probes on hash Preview (unauthenticated):
+- GET /api/voice/session → 302 HTML Access (CLASS: Cloudflare Access redirect)
+- OPTIONS → 403/Access HTML (CLASS: Cloudflare Access redirect / CF edge)
+- POST → 302 HTML Access (CLASS: Cloudflare Access redirect)
+→ Cannot distinguish missing build var / missing runtime secret / origin_blocked / invalid OpenAI key until Access session is available.

@@ -3,6 +3,9 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import StatusBadge from "@/components/shared/StatusBadge";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import { translateCountryRegion } from "@/lib/i18n/entity-ui-translation";
+import { getDictionary } from "@/lib/i18n/translate";
 import { PRODUCT_STATUSES, PRODUCT_STATUS_DOT_CLASSES } from "@/lib/product-status";
 import { buildWorldIntelligenceMap, searchWorldMapCountries, type WorldMapCountry } from "@/lib/world-map";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
@@ -13,10 +16,6 @@ const LEGEND_STATUSES = PRODUCT_STATUSES.filter((status) =>
   ),
 );
 
-// A real accent color per status (reusing the same dot-color language StatusBadge already uses,
-// never a new palette) so each tile reads as a distinct node in a network rather than an
-// identical bordered box — the visual "living network" cue the tile grid was missing, without
-// claiming any specific connection or geography that isn't real.
 const STATUS_ACCENT_BORDER: Record<WorldMapCountry["status"], string> = {
   live: "hover:border-emerald-500/50",
   partial: "hover:border-teal-500/40",
@@ -46,22 +45,15 @@ function CountryTile({ entry }: { entry: WorldMapCountry }) {
   );
 }
 
-/**
- * World Intelligence Map (Release 5, Phase 6) — real country catalog only, grouped by real
- * region, each with an honest data status. Presented as an accessible, keyboard-navigable grid of
- * real links (every tile is a real <a>, not a canvas/SVG image), with a text search over the same
- * data as the primary "list-based fallback" — there is no separate degraded mode because nothing
- * here depends on visual map rendering to be usable. No scores, ratings, heatmaps, or alerts.
- */
 export default function WorldIntelligenceMap() {
+  const { t, language } = useTranslation();
+  const dictionary = getDictionary(language);
   const [query, setQuery] = useState("");
   const regionGroups = useMemo(() => buildWorldIntelligenceMap(), []);
   const searchResults = useMemo(() => (query.trim() ? searchWorldMapCountries(query) : null), [query]);
 
   return (
     <section aria-labelledby="world-map-heading" className={`${cbaiGlassCard} relative space-y-5 overflow-hidden p-5 sm:p-6`}>
-      {/* Purely decorative abstract network texture — no geography, no data claim, just the
-          "living intelligence network" visual cue the flat tile grid was missing on its own. */}
       <svg
         aria-hidden="true"
         className="pointer-events-none absolute -right-10 -top-10 h-64 w-64 text-[#005810] opacity-[0.07]"
@@ -86,31 +78,28 @@ export default function WorldIntelligenceMap() {
 
       <div className="relative flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className={cbaiSectionEyebrow}>World Intelligence Map</p>
+          <p className={cbaiSectionEyebrow}>{t("entities.worldMapTitle")}</p>
           <h2 id="world-map-heading" className="mt-1 text-lg font-semibold text-zinc-100">
-            Which countries have profiles?
+            {t("entities.worldMapHeading")}
           </h2>
-          <p className="mt-1 max-w-xl text-sm text-zinc-500">
-            Every country in the local registry, grouped by region, with its real evidence data
-            status. Select a country to open its profile.
-          </p>
+          <p className="mt-1 max-w-xl text-sm text-zinc-500">{t("entities.worldMapDescription")}</p>
         </div>
         <label className="w-full max-w-xs space-y-1 sm:w-56">
           <span className="sr-only" id="world-map-search-label">
-            Search countries by name, code, or region
+            {t("entities.worldMapSearchLabel")}
           </span>
           <input
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search countries…"
+            placeholder={t("entities.worldMapSearchPlaceholder")}
             aria-labelledby="world-map-search-label"
             className="w-full rounded-lg border border-zinc-800 bg-slate-900/80 px-3 py-2 text-sm text-zinc-200 outline-none transition-colors focus:border-teal-500/30 focus:ring-1 focus:ring-teal-500/20"
           />
         </label>
       </div>
 
-      <ul className="flex flex-wrap items-center gap-3" aria-label="Data status legend">
+      <ul className="flex flex-wrap items-center gap-3" aria-label={t("entities.worldMapLegendAria")}>
         {LEGEND_STATUSES.map((status) => (
           <li key={status} className="flex items-center gap-1.5 text-xs text-zinc-500">
             <StatusBadge status={status} />
@@ -121,35 +110,35 @@ export default function WorldIntelligenceMap() {
       {searchResults ? (
         <div className="space-y-2">
           <p className="text-xs text-zinc-500">
-            {searchResults.length} countr{searchResults.length === 1 ? "y" : "ies"} match
-            &quot;{query}&quot;
+            {searchResults.length === 1
+              ? t("entities.worldMapResultsMatchOne", { query })
+              : t("entities.worldMapResultsMatch", { count: String(searchResults.length), query })}
           </p>
           {searchResults.length > 0 ? (
-            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3" role="list" aria-label="Search results">
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3" role="list" aria-label={t("entities.worldMapSearchLabel")}>
               {searchResults.map((entry) => (
                 <CountryTile key={entry.country.id} entry={entry} />
               ))}
             </div>
           ) : (
-            <p className="text-sm text-zinc-500">
-              No country matches &quot;{query}&quot; in the local registry.
-            </p>
+            <p className="text-sm text-zinc-500">{t("entities.worldMapNoMatch", { query })}</p>
           )}
         </div>
       ) : (
         <div className="space-y-5">
-          {regionGroups.map((group) => (
+          {regionGroups.map((group) => {
+            const regionLabel = translateCountryRegion(dictionary, group.region);
+            return (
             <div key={group.region} className="space-y-2">
-              <h3 className="text-xs font-medium uppercase tracking-wider text-zinc-600">
-                {group.region}
-              </h3>
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3" role="list" aria-label={`${group.region} countries`}>
+              <h3 className="text-xs font-medium uppercase tracking-wider text-zinc-600">{regionLabel}</h3>
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3" role="list" aria-label={regionLabel}>
                 {group.countries.map((entry) => (
                   <CountryTile key={entry.country.id} entry={entry} />
                 ))}
               </div>
             </div>
-          ))}
+          );
+          })}
         </div>
       )}
     </section>

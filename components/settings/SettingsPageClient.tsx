@@ -5,13 +5,13 @@ import { useTranslation } from "@/lib/i18n/use-translation";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import AssistantSettingsForm from "@/components/assistant/AssistantSettingsForm";
 import LivingMemoryControl from "@/components/operating/LivingMemoryControl";
+import VoiceDiagnosticsPanel from "@/components/settings/VoiceDiagnosticsPanel";
 import AdaptiveDensityControl from "@/components/operating/AdaptiveDensityControl";
 import CapabilityAssessmentOffer from "@/components/settings/CapabilityAssessmentOffer";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import {
   deriveScreenSimplicityAudit,
   listSimplicityMetrics,
-  SIMPLICITY_METRICS_NOTE,
   type PrimaryScreenId,
 } from "@/lib/intelligence-os/simplicity-metrics";
 import { cbaiMineralSurface, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
@@ -40,6 +40,7 @@ export default function SettingsPageClient() {
     <OperatingPageShell title={t("navigation.settings")} description={t("settingsPage.description")} showMissionContext={false}>
       <AdaptiveDensityControl />
       <AssistantSettingsForm />
+      <VoiceDiagnosticsPanel />
       <CapabilityAssessmentOffer />
       <LivingMemoryControl />
       {disclosure.level === "expert" ? (
@@ -56,10 +57,10 @@ export default function SettingsPageClient() {
             </li>
           ))}
         </ul>
-        <p className="text-[10px] text-zinc-600">{SIMPLICITY_METRICS_NOTE}</p>
+        <p className="text-[10px] text-zinc-600">{t("zeroLearningCurve.simplicityMetricsNote")}</p>
         <ul className="space-y-0.5 text-[10px] text-zinc-600">
           {metrics.map((metric) => (
-            <li key={metric.kind}>{metric.label}</li>
+            <li key={metric.kind}>{t(`zeroLearningCurve.${metric.labelKey}`)}</li>
           ))}
         </ul>
       </section>

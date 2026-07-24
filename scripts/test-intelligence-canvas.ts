@@ -50,9 +50,9 @@ test("5. BUILD-013 i18n in all four active languages", () => {
   }
 });
 
-test("6. PlatformHome renders Intelligence Canvas", () => {
+test("6. PlatformHome renders Spatial World Intelligence homepage", () => {
   const home = readSource("components/platform/PlatformHome.tsx");
-  assert.match(home, /IntelligenceCanvas/);
+  assert.match(home, /SpatialWorldIntelligenceHome/);
 });
 
 test("7. Graph uses plain Knowledge Graph title", () => {

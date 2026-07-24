@@ -6,7 +6,7 @@ export type ResearchDomainLens = {
   atmosphere: string;
   methodsLabel: string;
   evidenceLabel: string;
-  actionLabel: string;
+  actionLabel?: string;
   accent: {
     text: string;
     glow: string;
@@ -19,7 +19,6 @@ const DEFAULT_LENS: ResearchDomainLens = {
     "Research Intelligence — catalog topics, their documented methods, and evidence types. No live publications or datasets are connected yet.",
   methodsLabel: "Research methods",
   evidenceLabel: "Evidence types",
-  actionLabel: "Open topic",
   accent: { text: "text-teal-300", glow: "rgba(45,212,191,0.14)", line: "#2dd4bf" },
 };
 

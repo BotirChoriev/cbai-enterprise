@@ -158,7 +158,10 @@ export default function KnowledgeBrainPanel({
             {t("knowledgeBrain.suggestedNext")}
           </p>
           <Link href={explanation.suggestedAction.href} className={cbaiLinkAction}>
-            {explanation.suggestedAction.label} →
+            {explanation.suggestedAction.labelKey
+              ? t(explanation.suggestedAction.labelKey)
+              : explanation.suggestedAction.label}{" "}
+            →
           </Link>
         </div>
       ) : null}

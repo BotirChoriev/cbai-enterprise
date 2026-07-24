@@ -58,6 +58,15 @@ export const REPORTS_CENTER_UZ = {
   continuingBody: "Profil ko'rib chiqishingiz shu yerda davom etadi — quyida hisobot turini tanlang.",
   backToProfile: "← Profilga qaytish",
   pageDescription: "Bugun nimalarni ochishingiz mumkin — har bir hisobot turi uchun talab qilinadigan rasmiy ma'lumot.",
+  emptyIntro:
+    "Hisobotlar haqiqiy profil ishi — bog‘langan dalillar, yakunlangan mulohaza va inson tasdiqlagan loyiha natijasidan hosil bo‘ladi. Bu yerda hech narsa yasama emas.",
+  emptyStepsHeading: "Hisobotni nima hosil qiladi",
+  emptyStepEvidence: "Mamlakat, kompaniya yoki universitet profilida dalil holatini ko‘rib chiqing",
+  emptyStepWork: "Mening ishimda bog‘langan ishni inson tasdiqlashi bilan yakunlang",
+  emptyStepOpen: "Qoralama yoki saqlangan hisobot paydo bo‘lganda shu yerga qayting",
+  emptyActionSearch: "Profillarni qidirish",
+  emptyActionEvidence: "Dalillarni ochish",
+  emptyActionMyWork: "Mening ishimga o‘tish",
   whatCanIOpen: "Bugun nimani ochishim mumkin?",
   evidenceRequired: "Talab qilinadigan dalillar",
   openRelatedProfile: "Tegishli profilni ochish →",
@@ -226,6 +235,10 @@ export const MY_WORK_EXT_UZ = {
   onboardingConfigureOperator: "Sozlamalarni ochish",
   onboardingOpenTrust: "Ishonch markazini ochish",
   loading: "Yuklanmoqda…",
+  advancedEngineSummary: "Missiya dvigateli (kengaytirilgan)",
+  advancedEngineHint: "Ixtiyoriy tuzilgan dvigatel kirishi — asosiy keyingi qadam emas.",
+  createProjectSummary: "Loyiha yaratish",
+  secondaryExplore: "Shuningdek ko'ring",
 } as const;
 
 export const RESEARCH_CATALOG_UZ = {
@@ -240,6 +253,9 @@ export const RESEARCH_CATALOG_UZ = {
   tryDifferent: "Boshqa soha yoki qidiruv so'zini sinab ko'ring.",
   clearFilters: "Filtrlarni tozalash",
   methods: "Usullar",
+  sharedMethods: "Umumiy usullar",
+  sharedEvidenceTypes: "Umumiy dalil turlari",
+  selectedTopicEyebrow: "Tanlangan mavzu",
   evidenceTypes: "Dalil turlari",
   futureWorkspace: "Kelajakdagi ish maydoni",
   openTopic: "Mavzuni ochish",
@@ -248,6 +264,28 @@ export const RESEARCH_CATALOG_UZ = {
     workspace_not_available: "Ish maydoni mavjud emas",
     evidence_not_connected: "Dalillar ulanmagan",
   },
+} as const;
+
+export const RESEARCH_NETWORK_LEGEND_UZ = {
+  nodeTypesHeading: "Tugun turlari",
+  researchTopicNode: "Tadqiqot mavzusi — katalog tuguni",
+  catalogAvailable: "Katalogda mavjud",
+  connectionTypesHeading: "Bog'lanish turlari",
+  interactionHeading: "O'zaro ta'sir",
+  interactionBody:
+    "Katalog metadatasini ko'rish uchun tugunni bosing. Bog'langan mavzular yorqin qoladi; bog'lanmaganlar xiralashadi. Tadqiqot mavzusi sahifasiga o'tish uchun Mavzuni ochish tugmasidan foydalaning.",
+} as const;
+
+export const RESEARCH_REVIEW_TIMELINE_UZ = {
+  ariaLabel: "Ko'rib chiqish vaqt chizig'i",
+  heading: "Vaqt chizig'i",
+  created: "Yaratilgan",
+  submitted: "Yuborilgan",
+  assigned: "Tayinlangan",
+  decision: "Qaror",
+  archived: "Arxivlangan",
+  futureEventsNote:
+    "Yuborilgan, tayinlangan, qaror va arxiv hodisalari ko'rib chiqish jarayoni yozuvlari ulanganda ko'rsatiladi.",
 } as const;
 
 export const GRAPH_EXTENDED_UZ = {
@@ -328,6 +366,30 @@ export const ENTITY_UI_UZ = {
   searchCountries: "Mamlakatlarni qidirish…",
   dataStatusLegend: "Ma'lumot holati afsonasi",
   searchResults: "Qidiruv natijalari",
+  capitalLabel: "Poytaxt",
+  indicatorConnectedOne: "1 ko'rsatkich ulangan",
+  indicatorConnectedMany: "{count} ko'rsatkich ulangan",
+  officialInformationAvailable: "Rasmiy ma'lumot mavjud.",
+  officialInformationNotAvailableYet: "Rasmiy ma'lumot hali mavjud emas.",
+  foundedLabel: "Tashkil etilgan",
+} as const;
+
+export const INDICATOR_EXPLORER_UZ = {
+  coverageHeading: "Qamrov holati",
+  coverageLead: "Dalil infratuzilmasidan ulanish holati — baholovchi metrikalar emas.",
+  coverageStatus: "Qamrov holati",
+  connectedSources: "Ulangan manbalar",
+  plannedConnectors: "Rejalashtirilgan ulagichlar",
+  humanReviewRequired: "Inson tekshiruvi talab qilinadi",
+  sourcesHeading: "Rasmiy manbalar va ulagichlar",
+  sourcesLead: "Ushbu ko'rsatkich uchun dalil infratuzilmasi manbalari va rejalashtirilgan ulagichlar.",
+  officialSources: "Rasmiy manbalar",
+  noOfficialSources: "Rasmiy manbalar xaritalanmagan.",
+  requiredSource: "Majburiy manba",
+  noConnectors: "Ulagichlar xaritalanmagan.",
+  connectionConnected: "Ulangan",
+  connectionPlanned: "Rejalashtirilgan",
+  connectionNotConnected: "Ulanmagan",
 } as const;
 
 export const PROJECT_UI_UZ = {

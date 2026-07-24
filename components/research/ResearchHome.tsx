@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import EngineRouteEntryStrip from "@/components/forward-deployed/EngineRouteEntryStrip";
 import ResearchHero from "@/components/research/ResearchHero";
 import ResearchNetwork from "@/components/research/network/ResearchNetwork";
 import ResearchEcosystemOverview from "@/components/research/ResearchEcosystemOverview";
@@ -25,6 +26,7 @@ export default function ResearchHome() {
         className={`mx-auto max-w-6xl space-y-14 px-4 py-10 sm:px-6 sm:py-14 ${cbaiHeroGlow}`}
       >
         <ResearchHero query={query} />
+        <EngineRouteEntryStrip />
 
         <section
           aria-labelledby="research-status-heading"

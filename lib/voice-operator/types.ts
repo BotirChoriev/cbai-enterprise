@@ -13,6 +13,8 @@ export type VoiceDockState =
   | "searching_sources"
   | "responding"
   | "action_confirmation"
+  | "executing_action"
+  | "awaiting_confirmation"
   | "disconnected"
   | "backend_required"
   | "error";
@@ -24,8 +26,18 @@ export type VoicePermissionIssue =
   | "device_busy"
   | "insecure_origin"
   | "unsupported"
-  | "backend_unavailable"
+  | "speech_unavailable"
   | "network_disconnected";
+
+export type VoiceBrokerIssue =
+  | "required"
+  | "unreachable"
+  | "origin_blocked"
+  | "rate_limited"
+  | "connection_failed"
+  | "authentication_failed"
+  | "invalid_api_key"
+  | "quota_or_account_blocked";
 
 export type ToolRiskClass = "read_only" | "external_read" | "draft_write" | "consequential";
 

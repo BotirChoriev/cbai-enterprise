@@ -1,5 +1,10 @@
+"use client";
+
 import type { WorkspaceCoverageItem } from "@/lib/workspaces";
-import { displayStatusLabel, workspaceStatusClass } from "@/lib/workspaces";
+import { workspaceStatusClass } from "@/lib/workspaces";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import { getDictionary } from "@/lib/i18n/translate";
+import { translateWorkspaceStatusLabel } from "@/lib/i18n/investor-translation";
 
 type WorkspaceCoverageGridProps = {
   heading: string;
@@ -14,6 +19,10 @@ export default function WorkspaceCoverageGrid({
   items,
   headingId,
 }: WorkspaceCoverageGridProps) {
+  const { language } = useTranslation();
+  const dictionary = getDictionary(language);
+  const shared = dictionary.workspaceShared;
+
   return (
     <section className="space-y-4" aria-labelledby={headingId}>
       <div>
@@ -37,13 +46,18 @@ export default function WorkspaceCoverageGrid({
               <span
                 className={`shrink-0 rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${workspaceStatusClass(item.statusLabel)}`}
               >
-                {displayStatusLabel(item.statusLabel)}
+                {translateWorkspaceStatusLabel(dictionary, item.statusLabel)}
               </span>
             </div>
             <p className="mt-2 text-xs text-zinc-500">{item.description}</p>
             <p className="mt-3 text-xs text-zinc-600">
-              {item.connectedCount} / {item.indicatorCount} topic
-              {item.indicatorCount === 1 ? "" : "s"} with evidence
+              {shared.topicsWithEvidence
+                .replace("{connected}", String(item.connectedCount))
+                .replace("{total}", String(item.indicatorCount))
+                .replace(
+                  "{topicPlural}",
+                  language === "en" && item.indicatorCount !== 1 ? "s" : "",
+                )}
             </p>
           </div>
         ))}

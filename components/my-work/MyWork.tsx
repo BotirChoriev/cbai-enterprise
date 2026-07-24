@@ -4,7 +4,6 @@ import { Suspense, useMemo } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { buildEvidenceExplorerModel } from "@/lib/evidence-explorer";
-import { buildReportsCenterModel } from "@/lib/reports-center";
 import { cbaiGlassCard, cbaiLoadingLine, cbaiMineralPanel, cbaiPageStack, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
@@ -15,6 +14,8 @@ import SavedEvidence from "@/components/my-work/SavedEvidence";
 import Avatar from "@/components/shared/Avatar";
 import MissionHomeSummary from "@/components/my-work/MissionHomeSummary";
 import MissionLinkedEntitiesPanel from "@/components/my-work/MissionLinkedEntitiesPanel";
+import OperationalObjectIndex from "@/components/operational-objects/OperationalObjectIndex";
+import EngineRouteEntryStrip from "@/components/forward-deployed/EngineRouteEntryStrip";
 import CreateProjectForm from "@/components/project/CreateProjectForm";
 import ProjectList from "@/components/project/ProjectList";
 import ProjectHome from "@/components/project/ProjectHome";
@@ -110,7 +111,6 @@ function MyWorkContent() {
     : undefined;
 
   const evidence = buildEvidenceExplorerModel();
-  const reports = buildReportsCenterModel();
   const { profile, isActive } = useAssistantProfile();
   const { context } = usePlatformContext();
   const { user, isSignedIn, cloudUser, accountMode, cloudSessionRestoring } = useAuth();
@@ -148,8 +148,21 @@ function MyWorkContent() {
     );
   }
 
+  const projectCreatePrefill = Boolean(initialPrimaryEntity || initialType);
+  const showProjectCreateExpanded =
+    projectCreatePrefill || disclosure.level === "expert" || disclosure.showMyWorkCapabilityPanels;
+
   return (
     <div className={cbaiPageStack}>
+      <details className={`${cbaiGlassCard} group px-4 py-3`}>
+        <summary className="cursor-pointer list-none text-xs text-zinc-500 marker:content-none [&::-webkit-details-marker]:hidden">
+          <span className="text-teal-400/90">{t("myWorkExt.advancedEngineSummary")}</span>
+          <span className="mt-0.5 block text-[11px] text-zinc-600">{t("myWorkExt.advancedEngineHint")}</span>
+        </summary>
+        <div className="mt-3 border-t border-zinc-800/80 pt-3">
+          <EngineRouteEntryStrip />
+        </div>
+      </details>
       {isActive || isSignedIn ? (
         <div className={`${cbaiGlassCard} border-teal-500/15 px-6 py-5`}>
           <div className="flex flex-wrap items-center gap-3">
@@ -213,7 +226,20 @@ function MyWorkContent() {
       <PersonalCabinetPanel />
       <MissionLinkedEntitiesPanel />
 
-      <CreateProjectForm initialPrimaryEntity={initialPrimaryEntity} initialType={initialType} />
+      <OperationalObjectIndex />
+
+      {showProjectCreateExpanded ? (
+        <CreateProjectForm initialPrimaryEntity={initialPrimaryEntity} initialType={initialType} />
+      ) : (
+        <details className={`${cbaiGlassCard} px-4 py-3`}>
+          <summary className="cursor-pointer list-none text-sm text-teal-400 marker:content-none [&::-webkit-details-marker]:hidden">
+            {t("myWorkExt.createProjectSummary")}
+          </summary>
+          <div className="mt-3 border-t border-zinc-800/80 pt-3">
+            <CreateProjectForm initialPrimaryEntity={initialPrimaryEntity} initialType={initialType} />
+          </div>
+        </details>
+      )}
 
       <ProjectList />
 
@@ -227,46 +253,38 @@ function MyWorkContent() {
         </>
       ) : null}
 
-      {disclosure.showGatewayGoalChips ? (
-        <section aria-labelledby="my-work-continue-heading" className="space-y-3">
-          <p className={cbaiSectionEyebrow} id="my-work-continue-heading">
-            {t("myWorkExt.continueWorking")}
-          </p>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {continueLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`${cbaiGlassCard} flex flex-col px-5 py-4 transition-colors hover:border-teal-500/25`}
-              >
-                <span className="text-sm font-semibold text-teal-400">{link.label}</span>
-                <span className="mt-1 text-xs text-zinc-500">{link.detail}</span>
-              </Link>
-            ))}
-          </div>
-        </section>
-      ) : null}
+      <nav
+        aria-labelledby="my-work-secondary-heading"
+        className={`${cbaiGlassCard} flex flex-wrap items-baseline gap-x-3 gap-y-1 px-5 py-3`}
+      >
+        <p className={`${cbaiSectionEyebrow} mr-1`} id="my-work-secondary-heading">
+          {t("myWorkExt.secondaryExplore")}
+        </p>
+        {continueLinks.map((link, index) => (
+          <span key={link.href} className="inline-flex items-baseline gap-3">
+            {index > 0 ? <span className="text-zinc-700" aria-hidden="true">·</span> : null}
+            <Link
+              href={link.href}
+              className="text-xs text-teal-400/90 hover:text-teal-300"
+              title={link.detail}
+            >
+              {link.label}
+            </Link>
+          </span>
+        ))}
+        <span className="text-zinc-700" aria-hidden="true">
+          ·
+        </span>
+        <Link href={moduleHref("/reports")} className="text-xs text-teal-400/90 hover:text-teal-300">
+          {t("myWorkExt.reportsCenterLink")}
+        </Link>
+      </nav>
 
       <section aria-labelledby="my-work-recent-heading" className={`${cbaiGlassCard} space-y-2 p-5`}>
         <p className={cbaiSectionEyebrow} id="my-work-recent-heading">
           {t("myWorkExt.recentlyViewed")}
         </p>
         <RecentEntities entities={context.recentEntities} />
-      </section>
-
-      <section aria-labelledby="my-work-reports-heading" className="space-y-3">
-        <p className={cbaiSectionEyebrow} id="my-work-reports-heading">
-          {t("myWorkExt.reportsSection")}
-        </p>
-        <Link
-          href={moduleHref("/reports")}
-          className={`${cbaiGlassCard} flex flex-col px-5 py-4 transition-colors hover:border-teal-500/25 sm:max-w-sm`}
-        >
-          <span className="text-sm font-semibold text-teal-400">{t("myWorkExt.reportsCenterLink")}</span>
-          <span className="mt-1 text-xs text-zinc-500">
-            {t("myWorkExt.reportsCenterDetail", { count: String(reports.summary.reportTypes) })}
-          </span>
-        </Link>
       </section>
 
       <div className="grid gap-4 sm:grid-cols-2">

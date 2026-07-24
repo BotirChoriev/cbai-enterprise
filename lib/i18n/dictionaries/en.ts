@@ -3,6 +3,11 @@ import {
   VOICE_CONTROL_EN,
 } from "@/lib/i18n/platform-copy-voice-control";
 import { VOICE_OPERATOR_EN } from "@/lib/i18n/platform-copy-voice-operator";
+import { PLATFORM_ACTION_EN, PLATFORM_GUIDANCE_EN } from "@/lib/i18n/platform-copy-platform-actions";
+import { AUTH_COLLAB_EN } from "@/lib/i18n/platform-copy-auth-collab";
+import { VOICE_COMMAND_EN } from "@/lib/i18n/platform-copy-voice-command";
+import { FORWARD_DEPLOYED_EN, FORWARD_DEPLOYED_ENGINE_ACTION_EN } from "@/lib/i18n/platform-copy-forward-deployed-en";
+import { SPATIAL_WORLD_EN } from "@/lib/i18n/platform-copy-spatial-world";
 import { COMPASS_COPY_EN, ENTITIES_EN, MY_WORK_EN, PRODUCT_STATUS_EN, SYSTEM_EN } from "@/lib/i18n/platform-copy-en";
 import {
   DASHBOARD_EN,
@@ -20,6 +25,7 @@ import {
   ACCOUNT_PAGE_EN,
   ASSISTANT_VOICE_EN,
   ENTITY_UI_EN,
+  INDICATOR_EXPLORER_EN,
   GOVERNANCE_PAGE_EN,
   GRAPH_EXTENDED_EN,
   GRAPH_PLATFORM_EN,
@@ -29,6 +35,8 @@ import {
   REPORTS_CENTER_EN,
   RESEARCH_CATALOG_EN,
   RESEARCH_HOME_EN,
+  RESEARCH_NETWORK_LEGEND_EN,
+  RESEARCH_REVIEW_TIMELINE_EN,
   RESEARCH_WORKSPACE_EN,
   TRUST_DATA_SOURCES_EN,
   VALIDATION_EN,
@@ -113,6 +121,10 @@ import {
   MISSION_OPERATING_EN,
 } from "@/lib/i18n/platform-copy-build026-en";
 import { SOURCE_INGESTION_EN } from "@/lib/i18n/platform-copy-build0285-en";
+import { OPERATIONAL_OBJECT_EN } from "@/lib/i18n/platform-copy-operational-objects";
+import { INVESTOR_WORKSPACE_EN, WORKSPACE_SHARED_EN } from "@/lib/i18n/platform-copy-investor";
+import { GOVERNMENT_WORKSPACE_EN } from "@/lib/i18n/platform-copy-government";
+import { LIVE_ROOMS_EN } from "@/lib/i18n/platform-copy-live-rooms";
 
 const en: TranslationDictionary = {
   roles: {
@@ -243,6 +255,21 @@ const en: TranslationDictionary = {
     startWithSearch: "Start with Search",
     startWithSearchBody: "Find a profile, review available information, and open reports.",
     openSearch: "Open Search",
+    openNavigation: "Open navigation",
+    operations: "Operations",
+    oversight: "Oversight",
+    advanced: "Advanced",
+    system: "System",
+    about: "About",
+    collaboration: "Collaboration",
+    workspace: "Workspace",
+    scientificDocuments: "Scientific Documents",
+    files: "Files",
+    teams: "Teams",
+    liveRooms: "Live Rooms",
+    messages: "Messages",
+    notifications: "Notifications",
+    publications: "Publications",
   },
   home: {
     heroTitle: "Evidence, connected.",
@@ -382,6 +409,16 @@ const en: TranslationDictionary = {
   universities: {
     title: "Universities",
     openUniversity: "Open university",
+    searchPlaceholder: "Search by country, university name, or institution type…",
+    filterCountry: "Country",
+    filterType: "Type",
+    filterAll: "All",
+    resultCount: "{count} universities",
+    types: {
+      Public: "Public",
+      Private: "Private",
+      Research: "Research",
+    },
   },
   reports: {
     title: "Reports",
@@ -549,12 +586,26 @@ const en: TranslationDictionary = {
   assistantVoice: ASSISTANT_VOICE_EN,
   voiceControl: VOICE_CONTROL_EN,
   voiceOperator: VOICE_OPERATOR_EN,
+  authCollab: AUTH_COLLAB_EN,
+  voiceCommand: VOICE_COMMAND_EN,
+  platformAction: PLATFORM_ACTION_EN,
+  platformGuidance: PLATFORM_GUIDANCE_EN,
+  forwardDeployed: FORWARD_DEPLOYED_EN,
+  forwardDeployedEngineAction: FORWARD_DEPLOYED_ENGINE_ACTION_EN,
+  spatialWorld: SPATIAL_WORLD_EN,
   myWorkExt: MY_WORK_EXT_EN,
   researchCatalog: RESEARCH_CATALOG_EN,
+  researchNetworkLegend: RESEARCH_NETWORK_LEGEND_EN,
+  researchReviewTimeline: RESEARCH_REVIEW_TIMELINE_EN,
   graphExtended: GRAPH_EXTENDED_EN,
   entityUi: ENTITY_UI_EN,
+  indicatorExplorer: INDICATOR_EXPLORER_EN,
   projectUi: PROJECT_UI_EN,
   governancePage: GOVERNANCE_PAGE_EN,
+  workspaceShared: WORKSPACE_SHARED_EN,
+  investorWorkspace: INVESTOR_WORKSPACE_EN,
+  governmentWorkspace: GOVERNMENT_WORKSPACE_EN,
+  liveRooms: LIVE_ROOMS_EN,
   entityIntelligence: { ...ENTITY_INTELLIGENCE_EN, ...ENTITY_INTELLIGENCE_BUILD009_EN },
   sourceCoverage: SOURCE_COVERAGE_EN,
   entityRelationships: ENTITY_RELATIONSHIPS_EN,
@@ -612,6 +663,7 @@ const en: TranslationDictionary = {
   missionOperating: MISSION_OPERATING_EN,
   genesisOs: GENESIS_OS_EN,
   researchCanvas: RESEARCH_CANVAS_EN,
+  operationalObject: OPERATIONAL_OBJECT_EN,
 };
 
 export default en;

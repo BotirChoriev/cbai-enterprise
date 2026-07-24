@@ -1,0 +1,5 @@
+{
+  "base": "http://localhost:3000",
+  "consoleErrors": [],
+  "note": "Automated route/UI capture. Full spoken Safari Realtime verification remains manual."
+}

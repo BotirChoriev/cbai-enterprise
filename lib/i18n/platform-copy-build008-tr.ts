@@ -114,6 +114,10 @@ export const GOVERNANCE_CENTER_TR = {
   reviewProcessBody: "Sürümler kullanıcılara ulaşmadan önce doğrulama adımları.",
   stepLabel: "Adım {order}",
   relatedTopics: "İlgili konular:",
+  pillarsAria:
+    "Yönetişim kural kaydı: {categories} kategori, {rules} kural; yükseklik her kategorinin gerçek kural sayısıyla orantılı",
+  pillarsCaption:
+    "Sütun yüksekliği CBAI kural kaydındaki yönetişim kategorisi başına kayıtlı kural sayısını gösterir — operasyonel performans değil.",
   complianceReportModel: "Uyumluluk Raporu Modeli",
   complianceReportBody:
     "Manuel denetimler ve gelecekteki CI çıktısı için yapısal şablon — burada kontrol yürütülmez.",

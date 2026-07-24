@@ -11,7 +11,7 @@ import ActivationStatusLine from "@/components/shared/ActivationStatusLine";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useMissionDataRevision } from "@/lib/hooks/use-mission-data-revision";
 import {
-  cbaiGlassCard,
+  cbaiMineralSurface,
   cbaiProminentAction,
   cbaiSectionEyebrow,
   cbaiTextBody,
@@ -58,7 +58,7 @@ export default function MissionHomeSummary() {
     : t("missionCenter.impactIncomplete");
 
   return (
-    <section className={`${cbaiGlassCard} space-y-4 border-teal-500/15 p-5`} aria-labelledby="mission-home-heading">
+    <section className={`${cbaiMineralSurface} space-y-4 p-5`} aria-labelledby="mission-home-heading">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 space-y-1">
           <p className={cbaiSectionEyebrow} id="mission-home-heading">

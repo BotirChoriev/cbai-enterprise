@@ -36,6 +36,8 @@ import { getCountryRelationships } from "@/lib/countries.adapter";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import AddToMissionButton from "@/components/mission/MissionOperatingActions";
 import CreateProjectFromEntityButton from "@/components/project/CreateProjectFromEntityButton";
+import CreateLinkedWorkButton from "@/components/operational-objects/CreateLinkedWorkButton";
+import CountryLiveRoomsPanel from "@/components/live-intelligence-rooms/CountryLiveRoomsPanel";
 import { useTranslation } from "@/lib/i18n/use-translation";
 
 type CountryIntelligencePanelProps = {
@@ -100,6 +102,15 @@ export function CountryIntelligencePanel({
       ) : null}
 
       <div className="flex flex-wrap justify-end gap-2">
+        <CreateLinkedWorkButton
+          variant="country"
+          compact
+          country={{
+            countryId: country.id,
+            countryName: country.name,
+            routePath: `/countries?country=${encodeURIComponent(country.id)}`,
+          }}
+        />
         <AddToMissionButton
           entity={{ kind: "country", id: country.id, name: country.name, code: country.code }}
           compact
@@ -114,6 +125,8 @@ export function CountryIntelligencePanel({
           }}
         />
       </div>
+
+      <CountryLiveRoomsPanel countryId={country.id} countryName={country.name} />
 
       <EntityHeader
         name={registryFacts.name}

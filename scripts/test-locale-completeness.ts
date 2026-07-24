@@ -76,9 +76,17 @@ test("UZ voice control includes Uzbek recognition warning", () => {
   assert.ok(VOICE_CONTROL_UZ.uzbekRecognitionWarning.includes("O'zbekcha nutq"));
 });
 
+test("UZ about page title uses CBAI haqida", () => {
+  const dict = getDictionary("uz");
+  assert.equal(dict.aboutPage.title, "CBAI haqida");
+  assert.equal(dict.navigation.about, "CBAI haqida");
+});
+
 test("OperatingNavigator home branch uses translateNavLabel", () => {
   const source = readSource("components/operating/OperatingNavigator.tsx");
   assert.ok(source.includes("translateNavLabel(t, item.href, item.label)"));
+  assert.ok(source.includes("primaryNavSections"));
+  assert.ok(!source.includes("operatingNavigationItems"));
 });
 
 test("EN/RU/TR/UZ dictionaries include voiceOperator keys", () => {
@@ -108,4 +116,41 @@ test("ResearchHero uses dictionary researchHome strings", () => {
   const source = readSource("components/research/ResearchHero.tsx");
   assert.ok(source.includes("researchHome.title"));
   assert.ok(!source.includes("RESEARCH_HOME.title"));
+});
+
+test("UZ operational object copy has linked work and report draft labels", () => {
+  const uz = getDictionary("uz");
+  assert.equal(uz.operationalObject.createLinkedWork, "Bog‘langan ish yaratish");
+  assert.equal(uz.operationalObject.typeReportDraft, "Hisobot qoralamasi");
+  assert.ok(uz.filters.overview.length > 0);
+  assert.notEqual(uz.filters.overview, "filters.overview");
+  assert.ok(uz.operationalObject.linkedWorkDefaultNextAction.includes("tasdiqlang"));
+});
+
+test("Country and graph linked-work entry use composer — no hardcoded English", () => {
+  const countryPanel = readSource("components/countries/CountryIntelligencePanel.tsx");
+  const graphPanel = readSource("components/graph/GraphEntityPanel.tsx");
+  assert.ok(countryPanel.includes("CreateLinkedWorkButton"));
+  assert.ok(graphPanel.includes("CreateLinkedWorkButton"));
+  assert.ok(countryPanel.includes("operationalObject.createLinkedWork") || countryPanel.includes("CreateLinkedWorkButton"));
+  assert.doesNotMatch(countryPanel, /Open topic/);
+  assert.doesNotMatch(graphPanel, /Create linked work"/);
+});
+
+test("Research topic and discovery cards use localized openTopic key", () => {
+  for (const file of [
+    "components/research/discovery/DiscoveryTopicCard.tsx",
+    "components/research/network/ResearchNetworkFocusPanel.tsx",
+    "components/research/workspace/WorkspaceTopicNavigator.tsx",
+  ]) {
+    const source = readSource(file);
+    assert.ok(source.includes("research.openTopic"), `${file} must use research.openTopic`);
+    assert.doesNotMatch(source, />Open topic/);
+  }
+});
+
+test("CreateProjectForm routes through operational composer when provider available", () => {
+  const source = readSource("components/project/CreateProjectForm.tsx");
+  assert.ok(source.includes("openComposer"));
+  assert.ok(source.includes("operationalObjects"));
 });

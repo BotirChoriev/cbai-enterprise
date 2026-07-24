@@ -3,6 +3,11 @@ import {
   VOICE_CONTROL_RU,
 } from "@/lib/i18n/platform-copy-voice-control";
 import { VOICE_OPERATOR_RU } from "@/lib/i18n/platform-copy-voice-operator";
+import { PLATFORM_ACTION_RU, PLATFORM_GUIDANCE_RU } from "@/lib/i18n/platform-copy-platform-actions";
+import { AUTH_COLLAB_RU } from "@/lib/i18n/platform-copy-auth-collab";
+import { VOICE_COMMAND_RU } from "@/lib/i18n/platform-copy-voice-command";
+import { FORWARD_DEPLOYED_RU, FORWARD_DEPLOYED_ENGINE_ACTION_RU } from "@/lib/i18n/platform-copy-forward-deployed-ru";
+import { SPATIAL_WORLD_RU } from "@/lib/i18n/platform-copy-spatial-world";
 import { COMPASS_COPY_RU, ENTITIES_RU, MY_WORK_RU, PRODUCT_STATUS_RU, SYSTEM_RU } from "@/lib/i18n/platform-copy-ru";
 import {
   DASHBOARD_RU,
@@ -20,6 +25,7 @@ import {
   ACCOUNT_PAGE_RU,
   ASSISTANT_VOICE_RU,
   ENTITY_UI_RU,
+  INDICATOR_EXPLORER_RU,
   GOVERNANCE_PAGE_RU,
   GRAPH_EXTENDED_RU,
   GRAPH_PLATFORM_RU,
@@ -28,6 +34,8 @@ import {
   PROJECT_UI_RU,
   REPORTS_CENTER_RU,
   RESEARCH_CATALOG_RU,
+  RESEARCH_NETWORK_LEGEND_RU,
+  RESEARCH_REVIEW_TIMELINE_RU,
   RESEARCH_HOME_RU,
   RESEARCH_WORKSPACE_RU,
   TRUST_DATA_SOURCES_RU,
@@ -113,6 +121,10 @@ import {
   MISSION_OPERATING_RU,
 } from "@/lib/i18n/platform-copy-build026-ru";
 import { SOURCE_INGESTION_RU } from "@/lib/i18n/platform-copy-build0285-ru";
+import { OPERATIONAL_OBJECT_RU } from "@/lib/i18n/platform-copy-operational-objects";
+import { INVESTOR_WORKSPACE_RU, WORKSPACE_SHARED_RU } from "@/lib/i18n/platform-copy-investor";
+import { GOVERNMENT_WORKSPACE_RU } from "@/lib/i18n/platform-copy-government";
+import { LIVE_ROOMS_RU } from "@/lib/i18n/platform-copy-live-rooms";
 
 const ru: TranslationDictionary = {
   roles: {
@@ -243,6 +255,21 @@ const ru: TranslationDictionary = {
     startWithSearch: "Начните с поиска",
     startWithSearchBody: "Найдите профиль, изучите доступную информацию и откройте отчёты.",
     openSearch: "Открыть поиск",
+    openNavigation: "Открыть навигацию",
+    operations: "Операции",
+    oversight: "Надзор",
+    advanced: "Расширенное",
+    system: "Система",
+    about: "О CBAI",
+    collaboration: "Сотрудничество",
+    workspace: "Рабочее пространство",
+    scientificDocuments: "Научные документы",
+    files: "Файлы",
+    liveRooms: "Живые комнаты",
+    teams: "Команды",
+    messages: "Сообщения",
+    notifications: "Уведомления",
+    publications: "Публикации",
   },
   home: {
     heroTitle: "Доказательства связаны.",
@@ -382,6 +409,16 @@ const ru: TranslationDictionary = {
   universities: {
     title: "Университеты",
     openUniversity: "Открыть университет",
+    searchPlaceholder: "Поиск по стране, названию университета или типу учреждения…",
+    filterCountry: "Страна",
+    filterType: "Тип",
+    filterAll: "Все",
+    resultCount: "{count} университетов",
+    types: {
+      Public: "Государственный",
+      Private: "Частный",
+      Research: "Исследовательский",
+    },
   },
   reports: {
     title: "Отчёты",
@@ -548,12 +585,26 @@ const ru: TranslationDictionary = {
   assistantVoice: ASSISTANT_VOICE_RU,
   voiceControl: VOICE_CONTROL_RU,
   voiceOperator: VOICE_OPERATOR_RU,
+  authCollab: AUTH_COLLAB_RU,
+  voiceCommand: VOICE_COMMAND_RU,
+  platformAction: PLATFORM_ACTION_RU,
+  platformGuidance: PLATFORM_GUIDANCE_RU,
+  forwardDeployed: FORWARD_DEPLOYED_RU,
+  forwardDeployedEngineAction: FORWARD_DEPLOYED_ENGINE_ACTION_RU,
+  spatialWorld: SPATIAL_WORLD_RU,
   myWorkExt: MY_WORK_EXT_RU,
   researchCatalog: RESEARCH_CATALOG_RU,
+  researchNetworkLegend: RESEARCH_NETWORK_LEGEND_RU,
+  researchReviewTimeline: RESEARCH_REVIEW_TIMELINE_RU,
   graphExtended: GRAPH_EXTENDED_RU,
   entityUi: ENTITY_UI_RU,
+  indicatorExplorer: INDICATOR_EXPLORER_RU,
   projectUi: PROJECT_UI_RU,
   governancePage: GOVERNANCE_PAGE_RU,
+  workspaceShared: WORKSPACE_SHARED_RU,
+  investorWorkspace: INVESTOR_WORKSPACE_RU,
+  governmentWorkspace: GOVERNMENT_WORKSPACE_RU,
+  liveRooms: LIVE_ROOMS_RU,
   entityIntelligence: { ...ENTITY_INTELLIGENCE_RU, ...ENTITY_INTELLIGENCE_BUILD009_RU },
   sourceCoverage: SOURCE_COVERAGE_RU,
   entityRelationships: ENTITY_RELATIONSHIPS_RU,
@@ -611,6 +662,7 @@ const ru: TranslationDictionary = {
   missionOperating: MISSION_OPERATING_RU,
   genesisOs: GENESIS_OS_RU,
   researchCanvas: RESEARCH_CANVAS_RU,
+  operationalObject: OPERATIONAL_OBJECT_RU,
 };
 
 export default ru;

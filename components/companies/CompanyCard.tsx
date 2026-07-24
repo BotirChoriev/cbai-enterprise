@@ -1,3 +1,5 @@
+"use client";
+
 import type { Company } from "@/lib/companies";
 import { getCompanyLinkedEntities } from "@/lib/companies.adapter";
 import {
@@ -5,6 +7,9 @@ import {
   resolveCompanyListEvidenceLabel,
   companyEvidenceStatusClass,
 } from "@/lib/companies.intelligence";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import { translateEntityListEvidenceLabel } from "@/lib/i18n/entity-ui-translation";
+import { getDictionary } from "@/lib/i18n/translate";
 
 type CompanyCardProps = {
   company: Company;
@@ -17,11 +22,16 @@ export default function CompanyCard({
   isSelected,
   onSelect,
 }: CompanyCardProps) {
+  const { language, t } = useTranslation();
+  const dictionary = getDictionary(language);
   const profile = buildCompanyIntelligenceProfile(
     company,
     getCompanyLinkedEntities(company),
   );
-  const evidenceLabel = resolveCompanyListEvidenceLabel(profile);
+  const evidenceLabel = translateEntityListEvidenceLabel(
+    dictionary,
+    resolveCompanyListEvidenceLabel(profile),
+  );
   const evidenceClass = companyEvidenceStatusClass(
     profile.referenceConnected ? "connected" : "insufficient",
   );
@@ -50,13 +60,15 @@ export default function CompanyCard({
         </div>
         {isSelected ? (
           <span className="rounded-full bg-teal-500/10 px-2 py-0.5 text-[10px] font-medium text-teal-400">
-            Selected
+            {t("entities.selected")}
           </span>
         ) : null}
       </div>
 
       <div className="mt-4 space-y-2">
-        <p className="text-xs text-zinc-500">Founded {company.founded}</p>
+        <p className="text-xs text-zinc-500">
+          {t("entityUi.foundedLabel")} {company.founded}
+        </p>
         <span
           className={`inline-flex rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${evidenceClass}`}
         >

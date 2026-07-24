@@ -17,7 +17,7 @@ export const operatingNavigationItems: readonly NavItem[] = [
   },
   {
     label: "Evidence",
-    href: "/knowledge",
+    href: "/evidence",
     icon: "knowledge",
     description: "Official source status and evidence infrastructure.",
   },

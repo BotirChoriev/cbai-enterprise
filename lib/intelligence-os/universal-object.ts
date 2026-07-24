@@ -42,6 +42,7 @@ export type UniversalObjectRef = {
 export type UniversalObjectAction = {
   readonly label: string;
   readonly href: string;
+  readonly labelKey?: "research.openTopic" | "navigation.evidence" | "navigation.reports" | "navigation.graph";
 };
 
 export type UniversalObjectContract = {
@@ -160,7 +161,7 @@ export function resolveUniversalObject(
         evidenceSummary: null,
         unknowns: [],
         trustState: "catalog reference",
-        actions: [{ label: "Open topic", href: `/research/${ref.id}` }],
+        actions: [{ label: "Open topic", labelKey: "research.openTopic", href: `/research/${ref.id}` }],
         limitations: "Topic detail depends on catalog coverage.",
         returnPath: `/research/${ref.id}`,
         layers: { surface: ref.id },

@@ -54,9 +54,9 @@ test("5. BUILD-011 i18n in all four active languages", () => {
   }
 });
 
-test("6. PlatformHome renders Intelligence Canvas — not marketing homepage stack", () => {
+test("6. PlatformHome renders Spatial World Intelligence — not marketing homepage stack", () => {
   const home = readSource("components/platform/PlatformHome.tsx");
-  assert.match(home, /IntelligenceCanvas/);
+  assert.match(home, /SpatialWorldIntelligenceHome/);
   assert.doesNotMatch(home, /HomeEcosystems/);
   assert.doesNotMatch(home, /RoleWorkContextCards/);
   assert.doesNotMatch(home, /HomeIntelligenceGlobe/);
@@ -81,7 +81,11 @@ test("8. Language selector uses i18n keys in rendered panel", () => {
 test("9. Sidebar on home shows readable labels — not ghost icon-only rail", () => {
   const sidebar = readSource("components/layout/Sidebar.tsx");
   assert.doesNotMatch(sidebar, /opacity-\[0\.22\]/);
-  assert.match(sidebar, /w-56/);
+  assert.match(sidebar, /cbai-platform-sidebar/);
+  assert.match(sidebar, /OperatingNavigator/);
+  assert.match(sidebar, /CBAILogo/);
+  const css = readSource("app/globals.css");
+  assert.match(css, /\.cbai-platform-sidebar\s*\{[^}]*width:\s*16rem/);
 });
 
 test("11. Product polish — unified design tokens in brand-classes", () => {

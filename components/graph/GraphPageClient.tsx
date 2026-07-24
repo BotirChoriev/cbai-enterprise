@@ -23,6 +23,7 @@ import { useTranslation } from "@/lib/i18n/use-translation";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { useUniversalWorkspace } from "@/components/platform/context/UniversalWorkspaceProvider";
 import LivingGraphStructuredView from "@/components/graph/LivingGraphStructuredView";
+import EngineRouteEntryStrip from "@/components/forward-deployed/EngineRouteEntryStrip";
 import { buildLivingGraphProjection } from "@/lib/living-graph/living-graph-projection";
 import { getCurrentUserId } from "@/lib/auth/auth-store";
 import { backfillLivingRelationships } from "@/lib/living-object-network/living-relationship-backfill";
@@ -165,9 +166,10 @@ export default function GraphPageClient() {
     <OperatingPageShell
       title={t("navigation.knowledgeGraph")}
       showOperator={false}
-      missionContextVariant="compact"
+      showMissionContext={false}
     >
       <div className="mx-auto max-w-[90rem] space-y-6 pb-16">
+        <EngineRouteEntryStrip />
         <GraphPrimaryViews
           focusMode={focusMode}
           onFocusModeChange={setFocusMode}
@@ -182,8 +184,8 @@ export default function GraphPageClient() {
           />
         ) : null}
 
-        <div className="grid gap-6 xl:grid-cols-12">
-          <div className="space-y-4 xl:col-span-3">
+        <div className="grid min-h-[min(72vh,720px)] gap-4 lg:grid-cols-12 lg:gap-5">
+          <div className="min-w-0 space-y-4 lg:col-span-3">
             <GraphEntityPanel
               selectedNode={selectedNode}
               connectedEdges={connectedEdges}
@@ -197,7 +199,7 @@ export default function GraphPageClient() {
             {disclosure.showGraphLegend ? <GraphLegend /> : null}
           </div>
 
-          <div className="xl:col-span-6">
+          <div className="min-w-0 lg:col-span-6">
             <GraphCanvas
               graph={graph}
               selectedNodeId={selectedNodeId}
@@ -208,7 +210,7 @@ export default function GraphPageClient() {
             />
           </div>
 
-          <div className="xl:col-span-3">
+          <div className="min-w-0 lg:col-span-3">
             <GraphConnectionsPanel
               selectedNode={selectedNode}
               connectedEdges={connectedEdges}

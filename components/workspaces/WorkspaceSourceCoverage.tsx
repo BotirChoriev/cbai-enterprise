@@ -1,5 +1,10 @@
+"use client";
+
 import type { WorkspaceSourceItem } from "@/lib/workspaces";
-import { displayStatusLabel, workspaceStatusClass } from "@/lib/workspaces";
+import { workspaceStatusClass } from "@/lib/workspaces";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import { getDictionary } from "@/lib/i18n/translate";
+import { translateWorkspaceStatusLabel } from "@/lib/i18n/investor-translation";
 
 type WorkspaceSourceCoverageProps = {
   heading?: string;
@@ -9,11 +14,17 @@ type WorkspaceSourceCoverageProps = {
 };
 
 export default function WorkspaceSourceCoverage({
-  heading = "Official sources",
-  description = "Official sources and their connection status.",
+  heading,
+  description,
   sources,
   headingId = "workspace-source-coverage-heading",
 }: WorkspaceSourceCoverageProps) {
+  const { language } = useTranslation();
+  const dictionary = getDictionary(language);
+  const copy = dictionary.investorWorkspace;
+  const resolvedHeading = heading ?? copy.sectionOfficialSourcesHeading;
+  const resolvedDescription = description ?? copy.sectionOfficialSourcesDescription;
+
   return (
     <section className="space-y-4" aria-labelledby={headingId}>
       <div>
@@ -21,9 +32,9 @@ export default function WorkspaceSourceCoverage({
           id={headingId}
           className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
         >
-          {heading}
+          {resolvedHeading}
         </h2>
-        <p className="mt-1 text-sm text-zinc-500">{description}</p>
+        <p className="mt-1 text-sm text-zinc-500">{resolvedDescription}</p>
       </div>
 
       <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
@@ -41,7 +52,7 @@ export default function WorkspaceSourceCoverage({
               <span
                 className={`shrink-0 rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${workspaceStatusClass(source.statusLabel)}`}
               >
-                {displayStatusLabel(source.statusLabel)}
+                {translateWorkspaceStatusLabel(dictionary, source.statusLabel)}
               </span>
             </li>
           ))}

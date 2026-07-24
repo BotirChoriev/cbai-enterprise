@@ -114,6 +114,10 @@ export const GOVERNANCE_CENTER_UZ = {
   reviewProcessBody: "Relizlar foydalanuvchilarga yetishidan oldin validatsiya qilish bosqichlari.",
   stepLabel: "Bosqich {order}",
   relatedTopics: "Tegishli mavzular:",
+  pillarsAria:
+    "Boshqaruv qoidalari reestri: {categories} toifa, {rules} qoida, balandlik har bir toifaning haqiqiy qoida soniga mos",
+  pillarsCaption:
+    "Ustun balandligi CBAI qoidalar reestridagi har bir boshqaruv toifasining ro‘yxatdan o‘tgan qoidalar sonini ko‘rsatadi — operatsion samaradorlik emas.",
   complianceReportModel: "Moslik hisoboti modeli",
   complianceReportBody:
     "Qo'lda audit va kelajakdagi CI natijasi uchun tuzilmaviy shablon — bu yerda tekshiruvlar bajarilmaydi.",
@@ -324,7 +328,7 @@ export const GRAPH_UI_UZ = {
 } as const;
 
 export const ABOUT_PAGE_UZ = {
-  title: "Haqida",
+  title: "CBAI haqida",
   pageDescription: "CBAI nima, nima uchun mavjud va qanday tamoyillarga amal qiladi.",
   whoWeAreEyebrow: "Biz kim",
   purposeHeadline: "Ma'lumotga kirish qiyin qism bo'lishdan to'xtadi.",

@@ -58,6 +58,15 @@ export const REPORTS_CENTER_TR = {
   continuingBody: "Profil incelemeniz burada devam ediyor — aşağıdan bir rapor türü seçin.",
   backToProfile: "← Profile dön",
   pageDescription: "Bugün neleri açabileceğiniz — her rapor türü için gerekli resmi bilgi.",
+  emptyIntro:
+    "Raporlar gerçek profil çalışmasından — bağlı kanıtlar, tamamlanan akıl yürütme ve insan onaylı proje çıktısından oluşur. Burada hiçbir şey uydurulmaz.",
+  emptyStepsHeading: "Raporu ne oluşturur",
+  emptyStepEvidence: "Bir ülke, şirket veya üniversite profilinde kanıt durumunu inceleyin",
+  emptyStepWork: "Çalışmalarım'da bağlantılı işi insan onayıyla tamamlayın",
+  emptyStepOpen: "Taslak veya kayıtlı rapor oluştuğunda buraya dönün",
+  emptyActionSearch: "Profil ara",
+  emptyActionEvidence: "Kanıtı aç",
+  emptyActionMyWork: "Çalışmalarım'a git",
   whatCanIOpen: "Bugün neyi açabilirim?",
   evidenceRequired: "Gerekli kanıtlar",
   openRelatedProfile: "İlgili profili aç →",
@@ -226,6 +235,10 @@ export const MY_WORK_EXT_TR = {
   onboardingConfigureOperator: "Tercihleri ayarla",
   onboardingOpenTrust: "Güven Merkezini Aç",
   loading: "Yükleniyor…",
+  advancedEngineSummary: "Görev motoru (gelişmiş)",
+  advancedEngineHint: "İsteğe bağlı yapılandırılmış motor girişi — birincil sonraki adım değil.",
+  createProjectSummary: "Proje oluştur",
+  secondaryExplore: "Ayrıca keşfet",
 } as const;
 
 export const RESEARCH_CATALOG_TR = {
@@ -240,6 +253,9 @@ export const RESEARCH_CATALOG_TR = {
   tryDifferent: "Farklı bir alan veya arama terimi deneyin.",
   clearFilters: "Filtreleri temizle",
   methods: "Yöntemler",
+  sharedMethods: "Ortak yöntemler",
+  sharedEvidenceTypes: "Ortak kanıt türleri",
+  selectedTopicEyebrow: "Seçilen konu",
   evidenceTypes: "Kanıt türleri",
   futureWorkspace: "Gelecek çalışma alanı",
   openTopic: "Konuyu aç",
@@ -248,6 +264,28 @@ export const RESEARCH_CATALOG_TR = {
     workspace_not_available: "Çalışma alanı mevcut değil",
     evidence_not_connected: "Kanıt bağlı değil",
   },
+} as const;
+
+export const RESEARCH_NETWORK_LEGEND_TR = {
+  nodeTypesHeading: "Düğüm türleri",
+  researchTopicNode: "Araştırma konusu — katalog düğümü",
+  catalogAvailable: "Katalogda mevcut",
+  connectionTypesHeading: "Bağlantı türleri",
+  interactionHeading: "Etkileşim",
+  interactionBody:
+    "Katalog meta verilerini incelemek için bir düğüme tıklayın. Bağlı konular parlak kalır; ilgisiz düğümler soluklaşır. Araştırma konusu sayfasına gitmek için Konuyu aç öğesini kullanın.",
+} as const;
+
+export const RESEARCH_REVIEW_TIMELINE_TR = {
+  ariaLabel: "İnceleme zaman çizelgesi",
+  heading: "Zaman çizelgesi",
+  created: "Oluşturuldu",
+  submitted: "Gönderildi",
+  assigned: "Atandı",
+  decision: "Karar",
+  archived: "Arşivlendi",
+  futureEventsNote:
+    "Gönderim, atama, karar ve arşiv olayları inceleme iş akışı kayıtları bağlandığında görünür.",
 } as const;
 
 export const GRAPH_EXTENDED_TR = {
@@ -328,6 +366,30 @@ export const ENTITY_UI_TR = {
   searchCountries: "Ülkeleri ara…",
   dataStatusLegend: "Veri durumu açıklaması",
   searchResults: "Arama sonuçları",
+  capitalLabel: "Başkent",
+  indicatorConnectedOne: "1 gösterge bağlı",
+  indicatorConnectedMany: "{count} gösterge bağlı",
+  officialInformationAvailable: "Resmi bilgi mevcut.",
+  officialInformationNotAvailableYet: "Resmi bilgi henüz mevcut değil.",
+  foundedLabel: "Kuruluş",
+} as const;
+
+export const INDICATOR_EXPLORER_TR = {
+  coverageHeading: "Kapsam durumu",
+  coverageLead: "Evidence Infrastructure bağlantı durumu — değerlendirme metrikleri değil.",
+  coverageStatus: "Kapsam durumu",
+  connectedSources: "Bağlı kaynaklar",
+  plannedConnectors: "Planlanan bağlayıcılar",
+  humanReviewRequired: "İnsan incelemesi gerekli",
+  sourcesHeading: "Resmi kaynaklar ve bağlayıcılar",
+  sourcesLead: "Bu gösterge için Evidence Infrastructure kaynakları ve planlanan bağlayıcılar.",
+  officialSources: "Resmi kaynaklar",
+  noOfficialSources: "Resmi kaynaklar eşleştirilmedi.",
+  requiredSource: "Gerekli kaynak",
+  noConnectors: "Bağlayıcılar eşleştirilmedi.",
+  connectionConnected: "Bağlı",
+  connectionPlanned: "Planlandı",
+  connectionNotConnected: "Bağlı değil",
 } as const;
 
 export const PROJECT_UI_TR = {

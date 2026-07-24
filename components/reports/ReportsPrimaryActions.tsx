@@ -84,6 +84,7 @@ export default function ReportsPrimaryActions() {
   }, [context, entity, mission, operating, t]);
 
   if (disclosure.level === "beginner") return null;
+  if (!mission?.projectId && !entity) return null;
 
   return (
     <nav className={cbaiMineralPanelMd} aria-label={t("zeroLearningCurve.reportsAlsoAvailable")}>

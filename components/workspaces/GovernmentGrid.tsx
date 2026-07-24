@@ -4,13 +4,14 @@ import { workspaceMotifFill } from "@/components/workspaces/workspace-motif-colo
 
 type GovernmentGridProps = {
   domains: readonly WorkspaceCoverageItem[];
+  ariaLabel: string;
 };
 
 // Government's own atmosphere: a ledger of institutional cells, not a wheel or a ladder — every
 // domain is an equal-weight civic register, filed side by side. Cool slate-teal, and mostly
 // hollow on purpose: this workspace's real domainsWithEvidence count is low, and an honest motif
 // shows that plainly rather than dressing up an empty registry as a full one.
-export default function GovernmentGrid({ domains }: GovernmentGridProps) {
+export default function GovernmentGrid({ domains, ariaLabel }: GovernmentGridProps) {
   const cols = 4;
   const cell = 58;
   const gap = 10;
@@ -33,7 +34,9 @@ export default function GovernmentGrid({ domains }: GovernmentGridProps) {
         viewBox={`0 0 ${width} ${height}`}
         fill="none"
         role="img"
-        aria-label={`Government domain registry: ${domains.length} real governance domains, ${withEvidence} with connected evidence today`}
+        aria-label={ariaLabel
+          .replace("{domainCount}", String(domains.length))
+          .replace("{withEvidence}", String(withEvidence))}
       >
         {domains.map((domain, index) => {
           const col = index % cols;

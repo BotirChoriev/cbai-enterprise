@@ -32,16 +32,7 @@ export type NavSection = {
   items: NavItem[];
 };
 
-/**
- * Navigation simplification (Global Language Foundation + Premium Interface mission, Phase 15).
- * One global navigation source, structured to match the approved information architecture:
- * Home / My Work / Search (flat, no group header) → Explore (Countries/Companies/Universities/
- * Research/Evidence) → Reports / Trust / Settings (flat). `secondaryNavSections` below holds the
- * real, working Ecosystems (Government/Investor/Citizen) and advanced Intelligence
- * (Dashboard/Reasoning/Knowledge Graph/Governance) modules — still real routes, still one click
- * away (Sidebar renders them in a collapsed "More" disclosure), just no longer competing with the
- * 7 primary items for attention. Nothing was deleted or made unreachable.
- */
+/** Primary + Intelligence + Operations — visible in sidebar without disclosure. */
 export const primaryNavSections: NavSection[] = [
   {
     title: "",
@@ -50,7 +41,7 @@ export const primaryNavSections: NavSection[] = [
         label: "Home",
         href: "/",
         icon: "home",
-        description: "Official evidence intelligence for countries, companies, and universities.",
+        description: "Spatial intelligence command surface — globe, mission, and active work.",
       },
       {
         label: "My Work",
@@ -67,7 +58,7 @@ export const primaryNavSections: NavSection[] = [
     ],
   },
   {
-    title: "Explore",
+    title: "Intelligence",
     items: [
       {
         label: "Countries",
@@ -95,14 +86,20 @@ export const primaryNavSections: NavSection[] = [
       },
       {
         label: "Evidence",
-        href: "/knowledge",
+        href: "/evidence",
         icon: "knowledge",
         description: "Official source status across profiles.",
+      },
+      {
+        label: "Knowledge Graph",
+        href: "/graph",
+        icon: "graph",
+        description: "Navigate verified relationships between platform entities.",
       },
     ],
   },
   {
-    title: "",
+    title: "Operations",
     items: [
       {
         label: "Reports",
@@ -111,16 +108,44 @@ export const primaryNavSections: NavSection[] = [
         description: "Report readiness and saved reports from real project work.",
       },
       {
+        label: "Investor",
+        href: "/investor",
+        icon: "investor",
+        description: "Economic evidence lens — non-advisory due diligence workspace.",
+      },
+      {
+        label: "Government",
+        href: "/government",
+        icon: "government",
+        description: "Public-administration evidence workspace — human-controlled research.",
+      },
+    ],
+  },
+  {
+    title: "Oversight",
+    items: [
+      {
+        label: "Governance",
+        href: "/governance",
+        icon: "ai-control",
+        description: "Platform rules, standards, and review process.",
+      },
+      {
         label: "Trust",
         href: "/trust",
         icon: "trust",
         description: "Constitution, methodology, evidence policy, and version history.",
       },
+    ],
+  },
+  {
+    title: "System",
+    items: [
       {
         label: "Settings",
         href: "/settings",
         icon: "settings",
-        description: "Assistant, accessibility, and account preferences.",
+        description: "Assistant, accessibility, voice diagnostics, and account preferences.",
       },
       {
         label: "About",
@@ -132,60 +157,75 @@ export const primaryNavSections: NavSection[] = [
   },
 ];
 
-/**
- * Real, working modules kept out of the primary 7-item list so they don't clutter it — every
- * route here is unchanged and fully functional; this only affects where it's discoverable from.
- */
+/** Collaboration + Advanced — progressive disclosure in sidebar. */
 export const secondaryNavSections: NavSection[] = [
   {
-    title: "Intelligence Lenses",
+    title: "Collaboration",
     items: [
       {
-        label: "Government",
-        href: "/government",
-        icon: "government",
-        description: "Governance evidence lens — one system, not a separate portal.",
+        label: "Workspace",
+        href: "/workspace",
+        icon: "my-work",
+        description: "Personal cabinet — private projects, files, and continuation.",
       },
       {
-        label: "Investor",
-        href: "/investor",
-        icon: "investor",
-        description: "Economic evidence lens — one system, not a separate portal.",
+        label: "Scientific Documents",
+        href: "/scientific-documents",
+        icon: "research",
+        description: "Signed-in scientific document intake — confirmation-gated.",
       },
+      {
+        label: "Files",
+        href: "/files",
+        icon: "dashboard",
+        description: "Personal files — private by default.",
+      },
+      {
+        label: "Teams",
+        href: "/teams",
+        icon: "citizen",
+        description: "Team preparation — invitations require authorization.",
+      },
+      {
+        label: "Live Rooms",
+        href: "/rooms",
+        icon: "agents",
+        description: "Multilingual live intelligence sessions — meetings, labs, practice, collaboration.",
+      },
+      {
+        label: "Messages",
+        href: "/messages",
+        icon: "reasoning",
+        description: "Team conversations — account required.",
+      },
+      {
+        label: "Notifications",
+        href: "/notifications",
+        icon: "analytics",
+        description: "Activity notifications for your work.",
+      },
+      {
+        label: "Publications",
+        href: "/publications",
+        icon: "knowledge",
+        description: "Publication preparation — explicit confirmation and rights.",
+      },
+    ],
+  },
+  {
+    title: "Advanced",
+    items: [
       {
         label: "Citizen",
         href: "/citizen",
         icon: "citizen",
         description: "Public information lens — one system, not a separate portal.",
       },
-    ],
-  },
-  {
-    title: "Intelligence",
-    items: [
-      {
-        label: "Mission Center",
-        href: "/",
-        icon: "home",
-        description: "Current mission and operating state — replaces legacy dashboard.",
-      },
       {
         label: "Reasoning",
         href: "/reasoning",
         icon: "reasoning",
         description: "How official information supports review before decisions.",
-      },
-      {
-        label: "Knowledge Graph",
-        href: "/graph",
-        icon: "graph",
-        description: "Navigate verified relationships between platform entities.",
-      },
-      {
-        label: "Governance",
-        href: "/governance",
-        icon: "ai-control",
-        description: "Platform rules, standards, and review process.",
       },
       {
         label: "Research Workspace",
@@ -197,19 +237,14 @@ export const secondaryNavSections: NavSection[] = [
   },
 ];
 
-/** Flat navigation list for module grids and legacy consumers — primary + secondary combined, so
- * `/core`'s full route grid still shows every real module even though Sidebar only renders
- * `primaryNavSections` prominently. */
 export const mainNav: NavItem[] = [...primaryNavSections, ...secondaryNavSections].flatMap(
   (section) => section.items,
 );
 
-/** Platform modules excluding the home route. */
 export const platformModules: NavItem[] = mainNav.filter(
   (item) => item.href !== "/",
 );
 
-/** Public journey routes — hide internal context chrome. */
 export const PUBLIC_JOURNEY_ROUTES = new Set([
   "/",
   "/search",

@@ -137,6 +137,9 @@ const ROUTE_KEY_MAP: Record<string, string> = {
   "/account": "account",
   "/about": "about",
   "/research": "research",
+  "/investor": "investor",
+  "/governance": "governance",
+  "/ai-control": "governance",
 };
 
 export function deriveMissionStoryBeat(mission: Mission | null): MissionStoryBeat {
@@ -179,6 +182,8 @@ export function routePurposeI18nKey(routeKey: string): string {
     settings: "routeSettingsPurpose",
     account: "routeAccountPurpose",
     about: "routeAboutPurpose",
+    investor: "routeInvestorPurpose",
+    governance: "routeGovernancePurpose",
   };
   return keys[routeKey] ?? "routeHomePurpose";
 }

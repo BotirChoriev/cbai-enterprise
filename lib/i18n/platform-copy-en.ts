@@ -72,6 +72,20 @@ export const ENTITIES_EN = {
   selected: "Selected",
   worldMapTitle: "World Intelligence Map",
   worldMapShowing: "World Intelligence Map — showing {name}",
+  worldMapHeading: "Which countries have profiles?",
+  worldMapDescription:
+    "Every country in the local registry, grouped by region, with its real evidence data status. Select a country to open its profile.",
+  worldMapSearchLabel: "Search countries by name, code, or region",
+  worldMapSearchPlaceholder: "Search countries…",
+  worldMapLegendAria: "Data status legend",
+  worldMapResultsMatch: "{count} countries match \"{query}\"",
+  worldMapResultsMatchOne: "1 country matches \"{query}\"",
+  worldMapNoMatch: "No country matches \"{query}\" in the local registry.",
+  share: "Share",
+  linkCopied: "Link copied",
+  linkCopyFailed: "Could not copy link",
+  entityNotFound:
+    "We couldn't find a {entityLabel} matching \"{requestedId}\" — the link may be out of date. Showing {fallbackName} instead; use search or the list below to find the right one.",
 } as const;
 
 export const MY_WORK_EN = {

@@ -14,6 +14,24 @@ export type FlowStageSnapshot = {
   readonly status: string;
 };
 
+export type CompanionFocusKind = "user" | "system";
+
+export type CompanionThoughtSnapshot = {
+  readonly missionId: string | null;
+  readonly lastRoute: string;
+  readonly lastFocus: string;
+  readonly recordedAt: string;
+  readonly focusKind?: CompanionFocusKind;
+  readonly focusLocale?: string;
+  readonly purposeKey?: string;
+};
+
+export type CompanionThoughtInput = {
+  readonly focusKind: CompanionFocusKind;
+  readonly focusLocale?: string;
+  readonly purposeKey?: string;
+};
+
 function isBrowser(): boolean {
   return typeof window !== "undefined";
 }
@@ -92,18 +110,30 @@ export function resetLivingMemoryClearFlag(): void {
   window.sessionStorage.removeItem(resolveStorageKey(MEMORY_CLEARED_KEY));
 }
 
-export type CompanionThoughtSnapshot = {
-  readonly missionId: string | null;
-  readonly lastRoute: string;
-  readonly lastFocus: string;
-  readonly recordedAt: string;
-};
+export function normalizeCompanionThought(raw: Record<string, unknown>): CompanionThoughtSnapshot {
+  const focusKind =
+    raw.focusKind === "user" || raw.focusKind === "system"
+      ? raw.focusKind
+      : typeof raw.purposeKey === "string"
+        ? "system"
+        : "user";
+  return {
+    missionId: typeof raw.missionId === "string" ? raw.missionId : null,
+    lastRoute: String(raw.lastRoute),
+    lastFocus: String(raw.lastFocus),
+    recordedAt: typeof raw.recordedAt === "string" ? raw.recordedAt : new Date().toISOString(),
+    focusKind,
+    focusLocale: typeof raw.focusLocale === "string" ? raw.focusLocale : undefined,
+    purposeKey: typeof raw.purposeKey === "string" ? raw.purposeKey : undefined,
+  };
+}
 
 /** EPIC-24 — Remember what the user was pursuing, not only clicks. Architecture only. */
 export function recordCompanionThought(
   missionId: string | null,
   pathname: string,
   focus: string,
+  meta?: CompanionThoughtInput,
 ): void {
   if (!isBrowser() || window.sessionStorage.getItem(resolveStorageKey(MEMORY_CLEARED_KEY)) === "1") {
     return;
@@ -113,6 +143,9 @@ export function recordCompanionThought(
     lastRoute: pathname.split("?")[0],
     lastFocus: focus,
     recordedAt: new Date().toISOString(),
+    focusKind: meta?.focusKind,
+    focusLocale: meta?.focusLocale,
+    purposeKey: meta?.purposeKey,
   };
   window.sessionStorage.setItem(resolveStorageKey(COMPANION_THOUGHT_KEY), JSON.stringify(payload));
 }
@@ -129,7 +162,7 @@ export function loadCompanionThought(): CompanionThoughtSnapshot | null {
       typeof (parsed as { lastRoute: string }).lastRoute === "string" &&
       typeof (parsed as { lastFocus: string }).lastFocus === "string"
     ) {
-      return parsed as CompanionThoughtSnapshot;
+      return normalizeCompanionThought(parsed as Record<string, unknown>);
     }
   } catch {
     return null;

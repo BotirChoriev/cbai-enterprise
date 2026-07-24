@@ -1,5 +1,8 @@
+"use client";
+
 import type { ResearchConnectionType } from "@/lib/research/network/network-types";
 import { RESEARCH_CONNECTION_TYPE_LABELS } from "@/lib/research/network/network-types";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type ResearchNetworkLegendProps = {
   compact?: boolean;
@@ -13,6 +16,7 @@ const CONNECTION_COLORS: Record<ResearchConnectionType, string> = {
 };
 
 export default function ResearchNetworkLegend({ compact = false }: ResearchNetworkLegendProps) {
+  const { t } = useTranslation();
   const connectionTypes: ResearchConnectionType[] = [
     "shared_domain",
     "shared_method",
@@ -23,22 +27,24 @@ export default function ResearchNetworkLegend({ compact = false }: ResearchNetwo
   return (
     <div className={`grid gap-4 ${compact ? "sm:grid-cols-2" : "lg:grid-cols-3"}`}>
       <div>
-        <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">Node types</p>
+        <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
+          {t("researchNetworkLegend.nodeTypesHeading")}
+        </p>
         <ul className="mt-2 space-y-1.5 text-xs text-zinc-500">
           <li className="flex items-center gap-2">
             <span className="h-2.5 w-2.5 rounded-full bg-teal-400/90 shadow-[0_0_8px_rgba(34,211,238,0.5)]" />
-            Research topic — catalog node
+            {t("researchNetworkLegend.researchTopicNode")}
           </li>
           <li className="flex items-center gap-2">
             <span className="h-2.5 w-2.5 rounded-full border border-emerald-500/40 bg-emerald-500/20" />
-            Catalog available
+            {t("researchNetworkLegend.catalogAvailable")}
           </li>
         </ul>
       </div>
 
       <div>
         <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
-          Connection types
+          {t("researchNetworkLegend.connectionTypesHeading")}
         </p>
         <ul className="mt-2 space-y-1.5">
           {connectionTypes.map((type) => (
@@ -55,12 +61,9 @@ export default function ResearchNetworkLegend({ compact = false }: ResearchNetwo
 
       <div className="lg:col-span-1">
         <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
-          Interaction
+          {t("researchNetworkLegend.interactionHeading")}
         </p>
-        <p className="mt-2 text-xs text-zinc-500">
-          Click a node to enter focus mode and review catalog metadata. Connected topics stay
-          bright; unrelated nodes fade. Use Open topic to visit the research topic page.
-        </p>
+        <p className="mt-2 text-xs text-zinc-500">{t("researchNetworkLegend.interactionBody")}</p>
       </div>
     </div>
   );

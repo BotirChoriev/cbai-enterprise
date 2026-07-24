@@ -10,6 +10,7 @@ import {
   evaluateVoiceBrokerStatus,
   requestRealtimeSessionCredential,
   setMockSessionBrokerHandler,
+  setVoiceBrokerEnvUrlForTests,
 } from "@/lib/voice-operator/session-broker/client";
 import {
   clearConversationPendingState,
@@ -41,7 +42,7 @@ import {
   createUnavailableRealtimeProvider,
   resolveRealtimeProvider,
 } from "@/lib/voice-operator/realtime/realtime-provider";
-import { buildVoiceOperatorInstructions, VOICE_OPERATOR_DOMAIN_VOCABULARY } from "@/lib/voice-operator/instructions";
+import { buildVoiceOperatorInstructions, getVoiceOperatorIntroPhrase, VOICE_OPERATOR_DOMAIN_VOCABULARY, VOICE_OPERATOR_INTRO_PHRASES } from "@/lib/voice-operator/instructions";
 import { getDictionary } from "@/lib/i18n/translate";
 import { createSmartIdea } from "@/lib/research-canvas/smart-idea-store";
 
@@ -54,6 +55,7 @@ beforeEach(() => {
   clearConversationPendingState();
   clearVoiceToolAuditForTests();
   setMockSessionBrokerHandler(null);
+  setVoiceBrokerEnvUrlForTests(undefined);
   revokeExternalSearchConsent();
 });
 
@@ -68,12 +70,14 @@ test("1. mic in command bar is text-only by default — voice lives in dock", ()
 test("2. VoiceOperatorDock is fixed bottom-center with sidebar offset", () => {
   const dock = readSource("components/voice-operator/VoiceOperatorDock.tsx");
   assert.match(dock, /fixed inset-x-0 bottom-0/);
-  assert.match(dock, /md:pl-64/);
+  assert.match(dock, /md:pl-\[18rem\]/);
 });
 
 test("3. dashboard main reserves bottom padding so dock does not cover content permanently", () => {
   const layout = readSource("app/(dashboard)/layout.tsx");
-  assert.match(layout, /pb-24/);
+  assert.match(layout, /cbai-platform-main/);
+  const css = readSource("app/globals.css");
+  assert.match(css, /--cbai-dock-inset/);
   assert.match(layout, /VoiceOperatorDock/);
 });
 
@@ -100,12 +104,45 @@ test("7. text fallback input exists in dock", () => {
   assert.match(dock, /sendTextMessage/);
 });
 
+test("7b. mic toggle icons: active unslashed teal stops capture, inactive slashed starts capture", () => {
+  const dock = readSource("components/voice-operator/VoiceOperatorDock.tsx");
+  assert.match(dock, /vo\.micLive \? vo\.stopListening\(\) : vo\.startListening\(\)/);
+  assert.match(dock, /micDisabled[\s\S]*localCapabilityUserNotice[\s\S]*micLive[\s\S]*stopLiveListening[\s\S]*unmuteMic/);
+  assert.match(dock, /copy\.stopLiveListening/);
+  assert.match(dock, /copy\.liveListeningActive/);
+  assert.match(dock, /copy\.liveListeningScope/);
+  assert.doesNotMatch(dock, /animate-pulse/);
+  assert.doesNotMatch(dock, /border-red-500/);
+  assert.doesNotMatch(dock, /ring-red-500/);
+
+  const micIconTernary = dock.match(/\{vo\.micLive \? \([\s\S]*?\) : \([\s\S]*?\)\}/);
+  assert.ok(micIconTernary, "mic icon ternary");
+  const branchMatch = micIconTernary![0].match(
+    /vo\.micLive \? \(([\s\S]*?)\) : \(([\s\S]*?)\)\}/,
+  );
+  assert.ok(branchMatch, "mic icon branches");
+  const activeIcon = branchMatch![1];
+  const inactiveIcon = branchMatch![2];
+  assert.doesNotMatch(activeIcon, /M4\.5 4\.5l15 15/);
+  assert.match(inactiveIcon, /M4\.5 4\.5l15 15/);
+  assert.match(dock, /cbai-voice-dock-btn-live/);
+  assert.match(dock, /cbai-voice-dock-input/);
+  assert.match(dock, /var\(--cbai-glass-surface\)/);
+
+  const uz = readSource("lib/i18n/platform-copy-voice-operator.ts");
+  assert.match(uz, /liveListeningActive: "Jonli tinglash faol"/);
+  assert.match(uz, /liveListeningScope: "Mikrofon faqat ushbu suhbat davomida ishlaydi\."/);
+  assert.match(uz, /stopLiveListening: "To'xtatish"/);
+});
+
 // --- Permission ---
 
 test("8. permission card shows retry and does not claim code overrides Safari", () => {
   const card = readSource("components/voice-operator/VoiceOperatorPermissionCard.tsx");
   assert.match(card, /permissionRetry/);
-  assert.match(card, /o‘zgartirib bo‘lmaydi|o'zgartirib bo'lmaydi/);
+  assert.match(card, /permissionDeniedHelp/);
+  const uz = readSource("lib/i18n/platform-copy-voice-operator.ts");
+  assert.match(uz, /o'zgartirib bo'lmaydi/);
 });
 
 test("9. retry permission is wired in provider", () => {
@@ -113,10 +150,28 @@ test("9. retry permission is wired in provider", () => {
   assert.match(provider, /retryPermission/);
 });
 
-test("10. permission denied maps to permission_required dock state", () => {
+test("10. microphone denial comes from getUserMedia mapping not SpeechRecognition alone", () => {
   const provider = readSource("components/voice-operator/VoiceOperatorProvider.tsx");
-  assert.match(provider, /permission_required/);
-  assert.match(provider, /setPermissionIssue\("denied"\)/);
+  assert.match(provider, /requestMicrophoneAccess/);
+  assert.match(provider, /mapSpeechRecognitionError/);
+  const mic = readSource("lib/voice-operator/microphone-access.ts");
+  assert.match(mic, /NotAllowedError/);
+  assert.match(mic, /speech_unavailable/);
+});
+
+test("10b. broker and microphone states are independent", () => {
+  const provider = readSource("components/voice-operator/VoiceOperatorProvider.tsx");
+  assert.match(provider, /brokerIssue/);
+  assert.match(provider, /VoiceOperatorBrokerNotice|brokerIssue/);
+  const dock = readSource("components/voice-operator/VoiceOperatorDock.tsx");
+  assert.match(dock, /VoiceOperatorBrokerNotice/);
+});
+
+test("10c. realtime path uses broker credential not browser SpeechRecognition", () => {
+  const provider = readSource("components/voice-operator/VoiceOperatorProvider.tsx");
+  assert.match(provider, /startRealtimeListening/);
+  assert.match(provider, /requestRealtimeSessionCredential/);
+  assert.doesNotMatch(provider, /operatorMode\.mode === "realtime"[\s\S]*startBrowserSpeechSession/);
 });
 
 // --- Realtime architecture ---
@@ -390,6 +445,51 @@ test("35. domain terminology preserved in instructions", () => {
   assert.ok(VOICE_OPERATOR_DOMAIN_VOCABULARY.includes("Smart Idea"));
   const instructions = buildVoiceOperatorInstructions("uz");
   assert.match(instructions, /Crossref/);
+  assert.match(instructions, /CBAI Ovoz Operatoriman/);
+  assert.match(instructions, /qaror qilmang|never make decisions/i);
+});
+
+test("35b. Uzbek identity intro phrase is canonical and non-generic", () => {
+  const intro = getVoiceOperatorIntroPhrase("uz");
+  assert.equal(intro, VOICE_OPERATOR_INTRO_PHRASES.uz);
+  assert.match(intro, /Men CBAI Ovoz Operatoriman/);
+  assert.match(intro, /Yakuniy qarorni siz qabul qilasiz/);
+  assert.doesNotMatch(intro, /sun'iy intellekt/i);
+  const instructions = buildVoiceOperatorInstructions("uz");
+  assert.match(instructions, /Men CBAI Ovoz Operatoriman/);
+  assert.match(instructions, /Do NOT repeat the full first-run introduction/i);
+  assert.match(instructions, /Never claim to be human/i);
+  assert.match(instructions, /Men sun'iy intellektman/);
+  assert.match(instructions, /Botir Choriev/);
+  assert.match(instructions, /Universal Intelligence Operating System/);
+});
+
+test("35c. English identity instructions use CBAI Voice Operator intro", () => {
+  const intro = getVoiceOperatorIntroPhrase("en");
+  assert.equal(intro, VOICE_OPERATOR_INTRO_PHRASES.en);
+  const instructions = buildVoiceOperatorInstructions("en");
+  assert.match(instructions, /I am the CBAI Voice Operator/);
+  assert.match(instructions, /Never claim to be human/i);
+  assert.match(instructions, /Do NOT repeat the full first-run introduction/i);
+  assert.match(instructions, /Botir Choriev/);
+});
+
+test("35d. Russian identity instructions use CBAI Voice Operator intro", () => {
+  const intro = getVoiceOperatorIntroPhrase("ru");
+  assert.equal(intro, VOICE_OPERATOR_INTRO_PHRASES.ru);
+  const instructions = buildVoiceOperatorInstructions("ru");
+  assert.match(instructions, /голосовой оператор CBAI/i);
+  assert.match(instructions, /Never claim to be human/i);
+  assert.match(instructions, /Botir|Ботира/);
+});
+
+test("35e. Turkish identity instructions use CBAI Voice Operator intro", () => {
+  const intro = getVoiceOperatorIntroPhrase("tr");
+  assert.equal(intro, VOICE_OPERATOR_INTRO_PHRASES.tr);
+  const instructions = buildVoiceOperatorInstructions("tr");
+  assert.match(instructions, /CBAI Ses Operatörüyüm/);
+  assert.match(instructions, /Never claim to be human/i);
+  assert.match(instructions, /Advise only/i);
 });
 
 test("36. unclear input triggers clarification", async () => {
@@ -398,6 +498,7 @@ test("36. unclear input triggers clarification", async () => {
 });
 
 test("37. browser fallback mode is labeled when broker missing", () => {
+  setVoiceBrokerEnvUrlForTests(null);
   const mode = resolveOperatorMode("uz");
   assert.equal(mode.mode, "browser_fallback");
   assert.equal(mode.backendRequired, true);
@@ -431,7 +532,36 @@ test("41. all four dictionaries include voiceOperator keys", () => {
     const dict = getDictionary(lang);
     assert.ok(dict.voiceOperator.dockTitle.length > 0);
     assert.ok(dict.voiceOperator.backendRequiredNotice.length > 0);
+    assert.ok(dict.voiceOperator.localCapabilityNotice.length > 0);
   }
+});
+
+test("47. localhost open dock uses ready state — not blocking backend_required", () => {
+  const provider = readSource("components/voice-operator/VoiceOperatorProvider.tsx");
+  assert.match(provider, /setDockState\("ready"\)/);
+  assert.doesNotMatch(provider, /backend_required \? "backend_required" : "ready"/);
+});
+
+test("48. voice dock shows local capability notice and integrated CTA styling", () => {
+  const dock = readSource("components/voice-operator/VoiceOperatorDock.tsx");
+  assert.match(dock, /localCapabilityNotice/);
+  assert.match(dock, /cbai-spatial-voice-cta/);
+  assert.match(dock, /localVoiceUnavailable/);
+  assert.doesNotMatch(dock, /rounded-full border border-teal-500\/30 bg-slate-950\/95/);
+});
+
+test("49. broker network error can degrade to browser fallback listening", () => {
+  const provider = readSource("components/voice-operator/VoiceOperatorProvider.tsx");
+  assert.match(provider, /brokerRes.code === "ERROR"/);
+  assert.match(provider, /startBrowserFallbackListening\(gate\)/);
+  assert.match(provider, /brokerRes.code === "BACKEND_REQUIRED"/);
+});
+
+test("50. resolveOperatorMode exposes realtimeConfigured for broker gating", () => {
+  setVoiceBrokerEnvUrlForTests(null);
+  const mode = resolveOperatorMode("en");
+  assert.equal(mode.realtimeConfigured, false);
+  assert.match(mode.notice, /Local development|Mahalliy|Локальная|Yerel/i);
 });
 
 test("42. resolveRealtimeProvider without broker returns unavailable", () => {

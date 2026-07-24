@@ -7,18 +7,31 @@ import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import { deriveFirstMinuteAction, translateFirstMinuteAction } from "@/lib/intelligence-os/first-minute";
 import { shouldShowGlobalMissionBar } from "@/lib/intelligence-os/progressive-disclosure";
+import { getDictionary } from "@/lib/i18n/translate";
+import {
+  translateEvidencePulseLimitation,
+  translateEvidencePulseStateLabel,
+} from "@/lib/i18n/investor-translation";
 import { cbaiLinkAction, cbaiLinkMuted, cbaiTextBody } from "@/components/brand/brand-classes";
 
 /** Mission Gravity 2.0 — quieter in focused mode; one line when possible. */
 export default function GlobalMissionContextBar() {
   const pathname = usePathname();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+  const dictionary = getDictionary(language);
   const { mission, evidencePulse } = useMissionContext();
   const disclosure = useProgressiveDisclosure();
   const firstAction = deriveFirstMinuteAction(mission);
   const firstLabel = translateFirstMinuteAction(t, firstAction);
 
   if (!shouldShowGlobalMissionBar(pathname)) return null;
+
+  const pulseLabel = evidencePulse
+    ? translateEvidencePulseStateLabel(dictionary, evidencePulse.state)
+    : null;
+  const pulseDetail = evidencePulse
+    ? translateEvidencePulseLimitation(dictionary, evidencePulse.limitationKey)
+    : null;
 
   if (!disclosure.showGlobalMissionBarDetail) {
     return (
@@ -62,9 +75,9 @@ export default function GlobalMissionContextBar() {
           ) : null}
         </div>
         <div className="flex shrink-0 items-center gap-3 text-xs">
-          {evidencePulse && evidencePulse.count > 0 ? (
-            <span className="text-zinc-600" title={evidencePulse.limitation}>
-              {evidencePulse.label}
+          {evidencePulse && evidencePulse.count >= 0 && pulseLabel ? (
+            <span className="text-zinc-600" title={pulseDetail ?? undefined}>
+              {pulseLabel}
             </span>
           ) : null}
           {pathname !== "/" ? (

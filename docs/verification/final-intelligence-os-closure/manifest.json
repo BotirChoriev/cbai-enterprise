@@ -1,0 +1,18 @@
+{
+  "closure": "final-intelligence-os-closure",
+  "branch": "preview/spatial-world-intelligence",
+  "head": "839b59966cd76becedac1197ad14ff1f696bb692",
+  "dirs": {
+    "before": "docs/verification/final-intelligence-os-closure/before",
+    "after": "docs/verification/final-intelligence-os-closure/after"
+  },
+  "captureScript": "scripts/verify-final-intelligence-os-closure.mjs",
+  "artifacts": [
+    "docs/verification/final-intelligence-os-closure/00-phase0-audit.md",
+    "docs/verification/final-intelligence-os-closure/design-decisions.md",
+    "docs/verification/final-intelligence-os-closure/defect-log.md",
+    "docs/verification/final-intelligence-os-closure/scorecard.md",
+    "docs/verification/final-intelligence-os-closure/safari-checklist.md"
+  ],
+  "note": "before/ captured mid-closure after early P0 fixes; after/ captures post light-chrome, About UZ, globe, IA repairs. Prior historical assets remain under docs/verification/final-intelligence-os/."
+}

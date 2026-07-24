@@ -68,6 +68,20 @@ export const ENTITIES_TR = {
   selected: "Seçildi",
   worldMapTitle: "Dünya İstihbarat Haritası",
   worldMapShowing: "Dünya İstihbarat Haritası — {name} gösteriliyor",
+  worldMapHeading: "Hangi ülkelerin profili var?",
+  worldMapDescription:
+    "Yerel kayıttaki her ülke bölgeye göre gruplandırılmış ve gerçek kanıt durumu gösterilir. Profili açmak için bir ülke seçin.",
+  worldMapSearchLabel: "Ülke adı, kodu veya bölgeye göre ara",
+  worldMapSearchPlaceholder: "Ülkeleri ara…",
+  worldMapLegendAria: "Veri durumu açıklaması",
+  worldMapResultsMatch: "{count} ülke \"{query}\" ile eşleşiyor",
+  worldMapResultsMatchOne: "1 ülke \"{query}\" ile eşleşiyor",
+  worldMapNoMatch: "Yerel kayıtta \"{query}\" ile eşleşen ülke yok.",
+  share: "Paylaş",
+  linkCopied: "Bağlantı kopyalandı",
+  linkCopyFailed: "Bağlantı kopyalanamadı",
+  entityNotFound:
+    "\"{requestedId}\" ile eşleşen {entityLabel} bulunamadı — bağlantı güncel olmayabilir. Bunun yerine {fallbackName} gösteriliyor; arama veya aşağıdaki listeden doğru olanı bulun.",
 } as const;
 
 export const MY_WORK_TR = {

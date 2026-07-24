@@ -1,0 +1,147 @@
+{
+  "census_id": "cbai-product-census-2026-07-22",
+  "branch": "preview/spatial-world-intelligence",
+  "head": "2d1558995f355a899100a6ca15c7d924e913c690",
+  "upstream": "NO_UPSTREAM",
+  "phase": "A-P audit documentation only",
+  "package_manager": "npm",
+  "framework": {
+    "next": "16.2.10",
+    "react": "19.2.4",
+    "output": "export",
+    "evidence": "package.json; next.config.ts"
+  },
+  "runtime_targets": [
+    "static Cloudflare Pages hosting",
+    "Cloudflare Pages Functions for voice broker"
+  ],
+  "cloudflare_functions": [
+    "functions/api/voice/session.ts"
+  ],
+  "supabase": {
+    "client": "lib/supabase/*",
+    "migrations": "supabase/migrations/0001-0007*.sql",
+    "status": "PARTIAL optional"
+  },
+  "indexeddb": "UNVERIFIED \u2014 no indexedDB usage found in grep of ts/tsx",
+  "web_storage_keys_sample": [
+    "cbai-auth-session",
+    "cbai-auth-users",
+    "cbai-living-relationships",
+    "cbai-missions",
+    "cbai-operational-objects",
+    "cbai-organizations",
+    "cbai-projects",
+    "cbai-saved-reports",
+    "cbai-scientific-intake-records"
+  ],
+  "env_var_names_only": [
+    "NEXT_PUBLIC_SUPABASE_URL",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    "NEXT_PUBLIC_VOICE_BROKER_URL",
+    "OPENAI_API_KEY",
+    "VOICE_ALLOWED_ORIGINS",
+    "CBAI_TEST_USER_A_EMAIL",
+    "CBAI_TEST_USER_A_PASSWORD",
+    "CBAI_TEST_USER_B_EMAIL",
+    "CBAI_TEST_USER_B_PASSWORD",
+    "CBAI_TEST_USER_C_EMAIL",
+    "CBAI_TEST_USER_C_PASSWORD",
+    "CBAI_TEST_BASE_URL"
+  ],
+  "excluded_from_audit": [
+    ".dev.vars values",
+    "API key values",
+    "tokens",
+    "node_modules",
+    "generated .next/out contents",
+    "personal credentials"
+  ],
+  "routes": [
+    "/about/page.tsx",
+    "/account/page.tsx",
+    "/agents/page.tsx",
+    "/ai-control/page.tsx",
+    "/analytics/page.tsx",
+    "/citizen/page.tsx",
+    "/companies/page.tsx",
+    "/core/page.tsx",
+    "/countries/page.tsx",
+    "/dashboard/page.tsx",
+    "/files/page.tsx",
+    "/governance/page.tsx",
+    "/government/page.tsx",
+    "/graph/page.tsx",
+    "/investor/page.tsx",
+    "/knowledge/page.tsx",
+    "/messages/page.tsx",
+    "/my-work/page.tsx",
+    "/notifications/page.tsx",
+    "/organization/page.tsx",
+    "/page.tsx",
+    "/publications/page.tsx",
+    "/reasoning/page.tsx",
+    "/reports/page.tsx",
+    "/research/[topicId]/page.tsx",
+    "/research/canvas/page.tsx",
+    "/research/page.tsx",
+    "/research/workspace/page.tsx",
+    "/reset-password/page.tsx",
+    "/scientific-documents/page.tsx",
+    "/search/page.tsx",
+    "/settings/page.tsx",
+    "/teams/page.tsx",
+    "/trust/page.tsx",
+    "/universities/page.tsx",
+    "/workflows/page.tsx",
+    "/workspace/page.tsx"
+  ],
+  "capability_count": 32,
+  "capabilities_by_status": {
+    "PROVEN_AND_INTEGRATED": 19,
+    "PARTIAL": 9,
+    "ORPHANED": 2,
+    "DOCUMENTATION_ONLY / missing": 1,
+    "DOCUMENTATION_ONLY": 1
+  },
+  "disposition_counts": {
+    "KEEP": 17,
+    "MERGE": 5,
+    "REFACTOR": 5,
+    "QUARANTINE": 5,
+    "ARCHIVE": 2,
+    "DELETE_CANDIDATE": 2
+  },
+  "starting_safety": {
+    "branch": "preview/spatial-world-intelligence",
+    "head": "2d1558995f355a899100a6ca15c7d924e913c690",
+    "upstream": "NO_UPSTREAM",
+    "total_changed_paths": 226,
+    "modified_tracked": 137,
+    "untracked_porcelain": 89,
+    "staged": 0,
+    "untracked_files_expanded": 494,
+    "status_digest_sha256": "012948c517b36eb2fee518ec751e707b9a4be566021b6c4d1ec422cde0edcf33"
+  },
+  "notes": [
+    "Documentation under docs/architecture/product-census/ is the only intentional write set for this audit.",
+    "Do not treat build numbers as proof of product completeness.",
+    "lib/intelligence has no app/components imports (ORPHANED) per explore audit."
+  ],
+  "capability_status_counts": {
+    "PROVEN_AND_INTEGRATED": 19,
+    "PARTIAL": 8,
+    "ORPHANED": 2,
+    "copyright publication incomplete": 1,
+    "DOCUMENTATION_ONLY": 2
+  },
+  "ending_safety": {
+    "total_changed_paths_porcelain": 227,
+    "modified_tracked": 137,
+    "untracked_porcelain": 90,
+    "staged": 0,
+    "untracked_files_expanded": 514,
+    "head_unchanged": true,
+    "product_writes_only_census_docs": true
+  }
+}

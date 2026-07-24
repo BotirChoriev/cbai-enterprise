@@ -44,7 +44,11 @@ export function resolveKnowledgeExplanation(
   }
 
   const suggested = contract.actions[0]
-    ? { label: contract.actions[0].label, href: contract.actions[0].href }
+    ? {
+        label: contract.actions[0].label,
+        labelKey: contract.actions[0].labelKey,
+        href: contract.actions[0].href,
+      }
     : null;
 
   return {

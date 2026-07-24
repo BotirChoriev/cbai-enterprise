@@ -8,6 +8,7 @@ import {
   deriveMissionLifecycle,
   getMissionNextAction,
 } from "@/lib/intelligence-os/mission-lifecycle";
+import { translateMissionLifecycleNext } from "@/lib/i18n/mission-lifecycle-translation";
 import {
   loadProjectEntities,
   loadProjectNotes,
@@ -100,9 +101,11 @@ export default function MissionReasoningPanel() {
       {snapshot.next ? (
         <div className="rounded-lg border border-zinc-800 bg-zinc-950/40 px-4 py-3">
           <p className={cbaiSectionEyebrow}>{t("missionOperating.nextHonestAction")}</p>
-          <p className="mt-1 text-sm text-zinc-300">{snapshot.next.nextAction}</p>
+          <p className="mt-1 text-sm text-zinc-300">
+            {translateMissionLifecycleNext(t, snapshot.next.nextActionKey, snapshot.next.nextAction)}
+          </p>
           <Link href={snapshot.next.href} className="mt-2 inline-block text-sm text-teal-400 hover:text-teal-300">
-            {snapshot.next.nextAction} →
+            {translateMissionLifecycleNext(t, snapshot.next.nextActionKey, snapshot.next.nextAction)} →
           </Link>
         </div>
       ) : null}

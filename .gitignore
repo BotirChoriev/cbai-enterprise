@@ -38,6 +38,12 @@ yarn-error.log*
 # vercel
 .vercel
 
+# cloudflare local voice broker secrets (never commit)
+.dev.vars
+
+# cloudflare local build artifacts
+.wrangler/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

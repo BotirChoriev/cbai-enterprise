@@ -1,11 +1,11 @@
 "use client";
 
-import IntelligenceCanvas from "@/components/canvas/IntelligenceCanvas";
+import SpatialWorldIntelligenceHome from "@/components/spatial-world/SpatialWorldIntelligenceHome";
 
 /**
- * Universal Intelligence OS — Intelligence Canvas replaces homepage behavior.
- * Not a landing page. Not a dashboard. A living intelligence environment.
+ * Universal Intelligence OS — Spatial World Intelligence homepage.
+ * Evidence-first global operating surface with interactive country intelligence.
  */
 export default function PlatformHome() {
-  return <IntelligenceCanvas />;
+  return <SpatialWorldIntelligenceHome />;
 }

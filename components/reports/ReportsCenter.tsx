@@ -14,6 +14,8 @@ import {
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
+import EngineRouteEntryStrip from "@/components/forward-deployed/EngineRouteEntryStrip";
+import ReportsEmptyIntro from "@/components/reports/ReportsEmptyIntro";
 import ReportReadinessSection from "@/components/reports/ReportReadinessSection";
 import SavedReportsSection from "@/components/reports/SavedReportsSection";
 import ReportsPrimaryActions from "@/components/reports/ReportsPrimaryActions";
@@ -47,18 +49,20 @@ export default function ReportsCenter() {
     <OperatingPageShell
       title={title}
       showOperator={false}
-      missionContextVariant={disclosure.showInlineHumanDecisionBoundary ? "full" : "compact"}
+      showMissionContext={false}
       action={
         disclosure.level === "expert" && profileHref ? (
           <Link
             href={profileHref}
-            className="inline-flex min-h-10 items-center text-sm font-medium text-teal-400 transition-colors hover:text-teal-300"
+            className="inline-flex min-h-10 items-center text-sm font-medium text-[var(--cbai-accent-primary)] transition-colors hover:text-[var(--cbai-accent-hover)]"
           >
             {t("reportsCenter.backToProfile")}
           </Link>
         ) : undefined
       }
     >
+      <EngineRouteEntryStrip />
+      <ReportsEmptyIntro />
       <ReportsPrimaryActions />
       <SavedReportsSection />
       {disclosure.showReportsReadinessDetail ? (

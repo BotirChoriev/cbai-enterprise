@@ -5,6 +5,7 @@ import { useTranslation } from "@/lib/i18n/use-translation";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { deriveMissionLifecycle } from "@/lib/intelligence-os/mission-lifecycle";
 import type { Mission } from "@/lib/intelligence-os/mission.types";
+import { translateMissionLifecycleNext } from "@/lib/i18n/mission-lifecycle-translation";
 import { cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 
 type TimelineStage = "question" | "evidence" | "analysis" | "validation" | "impact" | "report";
@@ -71,13 +72,15 @@ export default function CanvasMissionTimeline({ mission }: { mission: Mission | 
         {stages.map((stage) => {
           const node = lifecycle.find((n) => n.stage === THREAD_MAP[stage]);
           const status = node?.status ?? "missing";
+          const nextLabel = node
+            ? translateMissionLifecycleNext(t, node.nextActionKey, node.nextAction)
+            : t("intelligenceCanvas.openStage");
           return (
             <li key={stage} className="min-w-[5.5rem] flex-1">
               <Link
                 href={node?.href ?? stageHref(stage, mission)}
                 className="group flex flex-col items-center gap-1 rounded-md px-1 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/40"
-                aria-label={`${t(`intelligenceCanvas.${STAGE_LABEL[stage]}`)} — ${node?.nextAction ?? t("intelligenceCanvas.openStage")}`}
-                title={node?.missing ?? node?.nextAction}
+                aria-label={`${t(`intelligenceCanvas.${STAGE_LABEL[stage]}`)} — ${nextLabel}`}
               >
                 <span className={`h-1.5 w-full max-w-[3rem] rounded-full ${STATUS_COLOR[status] ?? STATUS_COLOR.missing}`} />
                 <span className="text-[9px] font-medium uppercase tracking-wider text-zinc-600 group-hover:text-teal-400/80">

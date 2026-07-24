@@ -55,9 +55,11 @@ function uzResponse(key: string, language: string): string {
     results: "Natijalarni ekranda ko'rsatdim. Metadata asosida mos kelishi mumkin — to'liq ilmiy tasdiq emas.",
     clarify: "Aniqroq ayting: qaysi mavzu yoki faol Smart Idea bo'yicha dalil kerak?",
     backend_required:
-      "Jonli ovozli suhbat uchun xavfsiz backend ulanishi kerak. Matn rejimi va brauzer transkripti mavjud.",
+      "Jonli Realtime ovoz preview muhitidagi xavfsiz broker orqali ishlaydi. Matn rejimi doim mavjud; brauzer transkripti Safari'da cheklangan bo'lishi mumkin.",
     browser_note:
       "Brauzer transkripti noaniq bo'lishi mumkin. Matnni tahrirlang yoki qo'lda kiriting.",
+    local_capability:
+      "Mahalliy ishlab chiqish: matnli chat mavjud. Jonli Realtime ovoz preview brokerini talab qiladi; Safari brauzerida nutq tanish cheklangan bo'lishi mumkin.",
   };
   if (language === "uz") return uz[key] ?? key;
   const en: Record<string, string> = {
@@ -67,8 +69,10 @@ function uzResponse(key: string, language: string): string {
     no_results: "No results in connected sources yet.",
     results: "I showed the results on screen. Metadata match only — not full scientific verification.",
     clarify: "Please clarify which topic or active Smart Idea you mean.",
-    backend_required: "Live voice conversation requires a secure backend connection.",
+    backend_required: "Live Realtime voice runs through the secure preview broker. Text chat is always available; browser speech may be limited in Safari.",
     browser_note: "Browser transcription may be unreliable. Edit text or type manually.",
+    local_capability:
+      "Local development: text chat is available. Live Realtime voice requires the preview broker; browser speech may be limited in Safari.",
   };
   return en[key] ?? key;
 }
@@ -175,16 +179,18 @@ export async function processConversationInput(
 export function resolveOperatorMode(language: string): {
   mode: "realtime" | "browser_fallback";
   backendRequired: boolean;
+  realtimeConfigured: boolean;
   notice: string;
 } {
   const broker = evaluateVoiceBrokerStatus();
   if (broker.kind === "available") {
-    return { mode: "realtime", backendRequired: false, notice: "" };
+    return { mode: "realtime", backendRequired: false, realtimeConfigured: true, notice: "" };
   }
   return {
     mode: "browser_fallback",
     backendRequired: true,
-    notice: uzResponse("backend_required", language),
+    realtimeConfigured: false,
+    notice: uzResponse("local_capability", language),
   };
 }
 

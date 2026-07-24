@@ -1,6 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import { getDictionary } from "@/lib/i18n/translate";
+import { translateGovernmentWorkspace } from "@/lib/i18n/government-translation";
 import { buildGovernmentWorkspace } from "@/lib/workspaces/government";
 import WorkspaceHero from "@/components/workspaces/WorkspaceHero";
 import WorkspaceCoverageGrid from "@/components/workspaces/WorkspaceCoverageGrid";
@@ -9,44 +12,51 @@ import RoleProjectEntry from "@/components/workspaces/RoleProjectEntry";
 import GovernmentGrid from "@/components/workspaces/GovernmentGrid";
 
 export default function GovernmentWorkspace() {
-  const model = useMemo(() => buildGovernmentWorkspace(), []);
+  const { language } = useTranslation();
+  const model = useMemo(() => {
+    const base = buildGovernmentWorkspace();
+    return translateGovernmentWorkspace(getDictionary(language), base);
+  }, [language]);
+  const copy = getDictionary(language).governmentWorkspace;
 
   return (
     <div className="space-y-10">
       <WorkspaceHero
         embedded
-        versionLabel={`Government Workspace`}
+        versionLabel={copy.versionLabel}
         title={model.hero.title}
         subtitle={model.hero.subtitle}
         description={model.hero.description}
         accentClassName="text-teal-400"
-        motif={<GovernmentGrid domains={model.governanceCoverage} />}
+        motif={
+          <GovernmentGrid
+            domains={model.governanceCoverage}
+            ariaLabel={copy.motifAriaLabel}
+          />
+        }
         metrics={[
           {
-            label: "Domains tracked",
+            label: copy.metricDomainsTracked,
             value: String(model.summary.domainsTracked),
           },
           {
-            label: "Domains with evidence",
+            label: copy.metricDomainsWithEvidence,
             value: String(model.summary.domainsWithEvidence),
           },
           {
-            label: "Sources connected",
+            label: copy.metricSourcesConnected,
             value: String(model.summary.connectedSources),
             detail: `/ ${model.summary.totalSources}`,
           },
         ]}
       />
 
-      <RoleProjectEntry
-        projectType="policy_analysis"
-        description="Track a real policy question against the governance, public-services, and budget-transparency coverage below — evidence, notes, and a report all stay attached to one project you can return to."
-      />
+      <RoleProjectEntry projectType="policy_analysis" description={copy.projectEntryDescription} />
 
       <WorkspaceCoverageGrid
         headingId="government-governance-coverage"
-        heading="Public governance"
-        description="Topics for public institutions and source status."
+        heading={copy.sectionGovernanceHeading}
+        description={copy.sectionGovernanceDescription}
         items={model.governanceCoverage}
       />
 
@@ -54,8 +64,8 @@ export default function GovernmentWorkspace() {
 
       <WorkspaceCoverageGrid
         headingId="government-public-services"
-        heading="Public services"
-        description="Citizen-facing service topics and evidence status."
+        heading={copy.sectionPublicServicesHeading}
+        description={copy.sectionPublicServicesDescription}
         items={model.publicServiceAreas}
       />
     </div>

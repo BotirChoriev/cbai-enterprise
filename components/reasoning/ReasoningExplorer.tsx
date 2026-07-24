@@ -19,7 +19,7 @@ export default function ReasoningExplorer() {
     <OperatingPageShell
       title={t("navigation.reasoning")}
       showOperator={false}
-      missionContextVariant={disclosure.showInlineHumanDecisionBoundary ? "full" : "compact"}
+      showMissionContext={false}
     >
       <MissionReasoningPanel />
       {disclosure.showReasoningStats ? (

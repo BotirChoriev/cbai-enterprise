@@ -4,6 +4,8 @@ import Link from "next/link";
 import type { WorkspaceEntityLink } from "@/lib/workspaces";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import { buildContextualHref } from "@/lib/context";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import { getDictionary } from "@/lib/i18n/translate";
 
 type WorkspaceEntityLinksProps = {
   links: readonly WorkspaceEntityLink[];
@@ -11,6 +13,8 @@ type WorkspaceEntityLinksProps = {
 
 export default function WorkspaceEntityLinks({ links }: WorkspaceEntityLinksProps) {
   const { context } = usePlatformContext();
+  const { language } = useTranslation();
+  const shared = getDictionary(language).workspaceShared;
 
   return (
     <section className="space-y-4" aria-labelledby="workspace-entity-links-heading">
@@ -19,13 +23,9 @@ export default function WorkspaceEntityLinks({ links }: WorkspaceEntityLinksProp
           id="workspace-entity-links-heading"
           className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
         >
-          Entity Links
+          {shared.entityLinksHeading}
         </h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          Navigate to entity intelligence routes — registry facts and coverage status only. This
-          workspace&apos;s working order carries over: the entity page opens with comparables and
-          coverage first, not the narrative profile.
-        </p>
+        <p className="mt-1 text-sm text-zinc-500">{shared.entityLinksDescription}</p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
@@ -40,12 +40,14 @@ export default function WorkspaceEntityLinks({ links }: WorkspaceEntityLinksProp
                 href={buildContextualHref(link.route, context)}
                 className="shrink-0 text-xs text-teal-400 underline-offset-2 hover:underline"
               >
-                Open
+                {shared.openLink}
               </Link>
             </div>
             <p className="mt-2 text-sm text-zinc-400">{link.description}</p>
             <p className="mt-3 text-xs text-zinc-600">
-              {link.registryCount} entit{link.registryCount === 1 ? "y" : "ies"} in registry
+              {shared.registryCount
+                .replace("{count}", String(link.registryCount))
+                .replace("{plural}", link.registryCount === 1 ? "" : "ies")}
             </p>
           </div>
         ))}

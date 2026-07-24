@@ -29,7 +29,7 @@ export default function EmptyState({ variant = "section", title, message, action
   if (variant === "dashed") {
     return (
       <div className={cbaiEmptyDashed}>
-        {title ? <p className="text-sm font-medium text-zinc-300">{title}</p> : null}
+        {title ? <p className="text-sm font-medium text-[var(--cbai-text-primary)]">{title}</p> : null}
         <p className={`${cbaiTextMuted} ${title ? "mt-1" : ""}`}>{message}</p>
         {action ? <div className="mt-4 flex justify-center">{action}</div> : null}
       </div>

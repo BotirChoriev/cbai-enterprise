@@ -59,7 +59,7 @@ export default function SearchGatewayClient() {
     <OperatingPageShell
       title={t("navigation.search")}
       showOperator={false}
-      missionContextVariant="compact"
+      showMissionContext={false}
     >
       {activationMessage ? <ActivationStatusLine message={activationMessage} compact /> : null}
       <SearchGateway query={query} response={response} showGoalEntry={disclosure.showGatewayGoalChips} />

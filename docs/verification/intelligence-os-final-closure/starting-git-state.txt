@@ -1,0 +1,9 @@
+BRANCH: preview/spatial-world-intelligence
+HEAD: 2d1558995f355a899100a6ca15c7d924e913c690
+UPSTREAM: NO_UPSTREAM
+PORCELAIN_PATHS: 227
+MODIFIED_TRACKED: 137
+UNTRACKED_PORCELAIN: 90
+STAGED: 0
+CAPTURED: 2026-07-22T04:00:00Z (approx)
+DEV_PORTS_OBSERVED: serve out :3055; various stale terminals; no secrets recorded

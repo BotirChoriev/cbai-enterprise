@@ -58,6 +58,15 @@ export const REPORTS_CENTER_RU = {
   continuingBody: "Обзор профиля продолжается здесь — выберите тип отчёта ниже.",
   backToProfile: "← Вернуться к профилю",
   pageDescription: "Что можно открыть сегодня — официальная информация, необходимая для каждого типа отчёта.",
+  emptyIntro:
+    "Отчёты формируются из реальной работы с профилями — подключённые доказательства, завершённое рассуждение и подтверждённый человеком результат проекта. Здесь ничего не выдумывается.",
+  emptyStepsHeading: "Что создаёт отчёт",
+  emptyStepEvidence: "Проверьте статус доказательств в профиле страны, компании или университета",
+  emptyStepWork: "Завершите связанную работу в Моей работе с подтверждением человека",
+  emptyStepOpen: "Вернитесь сюда, когда появится черновик или сохранённый отчёт",
+  emptyActionSearch: "Искать профили",
+  emptyActionEvidence: "Открыть доказательства",
+  emptyActionMyWork: "Открыть Мою работу",
   whatCanIOpen: "Что я могу открыть сегодня?",
   evidenceRequired: "Требуемые доказательства",
   openRelatedProfile: "Открыть связанный профиль →",
@@ -228,6 +237,10 @@ export const MY_WORK_EXT_RU = {
   onboardingConfigureOperator: "Настроить параметры",
   onboardingOpenTrust: "Открыть центр доверия",
   loading: "Загрузка…",
+  advancedEngineSummary: "Двигатель миссии (расширенно)",
+  advancedEngineHint: "Необязательный структурированный вход — не основной следующий шаг.",
+  createProjectSummary: "Создать проект",
+  secondaryExplore: "Также открыть",
 } as const;
 
 export const RESEARCH_CATALOG_RU = {
@@ -242,6 +255,9 @@ export const RESEARCH_CATALOG_RU = {
   tryDifferent: "Попробуйте другую область или поисковый запрос.",
   clearFilters: "Сбросить фильтры",
   methods: "Методы",
+  sharedMethods: "Общие методы",
+  sharedEvidenceTypes: "Общие типы доказательств",
+  selectedTopicEyebrow: "Выбранная тема",
   evidenceTypes: "Типы доказательств",
   futureWorkspace: "Будущее пространство",
   openTopic: "Открыть тему",
@@ -250,6 +266,28 @@ export const RESEARCH_CATALOG_RU = {
     workspace_not_available: "Пространство недоступно",
     evidence_not_connected: "Доказательства не подключены",
   },
+} as const;
+
+export const RESEARCH_NETWORK_LEGEND_RU = {
+  nodeTypesHeading: "Типы узлов",
+  researchTopicNode: "Тема исследования — узел каталога",
+  catalogAvailable: "Доступно в каталоге",
+  connectionTypesHeading: "Типы связей",
+  interactionHeading: "Взаимодействие",
+  interactionBody:
+    "Нажмите узел, чтобы войти в режим фокуса и просмотреть метаданные каталога. Связанные темы остаются яркими; несвязанные затемняются. Используйте «Открыть тему», чтобы перейти на страницу темы.",
+} as const;
+
+export const RESEARCH_REVIEW_TIMELINE_RU = {
+  ariaLabel: "Хронология рецензирования",
+  heading: "Хронология",
+  created: "Создано",
+  submitted: "Отправлено",
+  assigned: "Назначено",
+  decision: "Решение",
+  archived: "В архиве",
+  futureEventsNote:
+    "События отправки, назначения, решения и архивации появятся после подключения записей рабочего процесса рецензирования.",
 } as const;
 
 export const GRAPH_EXTENDED_RU = {
@@ -330,6 +368,30 @@ export const ENTITY_UI_RU = {
   searchCountries: "Поиск стран…",
   dataStatusLegend: "Легенда статуса данных",
   searchResults: "Результаты поиска",
+  capitalLabel: "Столица",
+  indicatorConnectedOne: "1 показатель подключён",
+  indicatorConnectedMany: "{count} показателей подключено",
+  officialInformationAvailable: "Официальная информация доступна.",
+  officialInformationNotAvailableYet: "Официальная информация пока недоступна.",
+  foundedLabel: "Основана",
+} as const;
+
+export const INDICATOR_EXPLORER_RU = {
+  coverageHeading: "Статус покрытия",
+  coverageLead: "Состояние подключения из Evidence Infrastructure — не оценочные метрики.",
+  coverageStatus: "Статус покрытия",
+  connectedSources: "Подключённые источники",
+  plannedConnectors: "Запланированные коннекторы",
+  humanReviewRequired: "Требуется проверка человеком",
+  sourcesHeading: "Официальные источники и коннекторы",
+  sourcesLead: "Источники Evidence Infrastructure и запланированные коннекторы для этого показателя.",
+  officialSources: "Официальные источники",
+  noOfficialSources: "Официальные источники не сопоставлены.",
+  requiredSource: "Обязательный источник",
+  noConnectors: "Коннекторы не сопоставлены.",
+  connectionConnected: "Подключено",
+  connectionPlanned: "Запланировано",
+  connectionNotConnected: "Не подключено",
 } as const;
 
 export const PROJECT_UI_RU = {

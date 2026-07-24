@@ -52,7 +52,7 @@ export default function PersonalCabinetPanel() {
           {t("genesisOs.personalCabinetTitle")}
         </h2>
         <p className="text-sm text-zinc-400">{t("genesisOs.personalCabinetPurpose")}</p>
-        <p className="text-xs text-amber-400/90">{snapshot.limitation}</p>
+        <p className="text-xs text-amber-400/90">{t("genesisOs.deviceLocalLimitation")}</p>
         <p className="text-xs text-zinc-600">{t("genesisOs.noUniversalScore")}</p>
       </div>
 
@@ -85,12 +85,7 @@ export default function PersonalCabinetPanel() {
         <div className={`${cbaiGlassCard} space-y-3 p-5`}>
           <h3 className="text-sm font-semibold text-zinc-200">{t("genesisOs.myMissions")}</h3>
           {missionTotal === 0 ? (
-            <p className="text-xs text-zinc-500">
-              {t("genesisOs.emptyMissions")}{" "}
-              <Link href={moduleHref("/?create=1")} className="text-teal-400 hover:text-teal-300">
-                {t("genesisOs.createMission")}
-              </Link>
-            </p>
+            <p className="text-xs text-zinc-500">{t("genesisOs.emptyMissions")}</p>
           ) : (
             <dl className="grid grid-cols-2 gap-2 text-xs text-zinc-400">
               <div>
@@ -117,19 +112,19 @@ export default function PersonalCabinetPanel() {
           <h3 className="text-sm font-semibold text-zinc-200">{t("genesisOs.myWork")}</h3>
           <dl className="grid grid-cols-2 gap-2 text-xs text-zinc-400">
             <div>
-              <dt className="text-zinc-600">Projects</dt>
+              <dt className="text-zinc-600">{t("genesisOs.cabinetStatProjects")}</dt>
               <dd>{snapshot.work.projectCount}</dd>
             </div>
             <div>
-              <dt className="text-zinc-600">Open tasks</dt>
+              <dt className="text-zinc-600">{t("genesisOs.cabinetStatOpenTasks")}</dt>
               <dd>{snapshot.work.openTaskCount}</dd>
             </div>
             <div>
-              <dt className="text-zinc-600">Evidence refs</dt>
+              <dt className="text-zinc-600">{t("genesisOs.cabinetStatEvidenceRefs")}</dt>
               <dd>{snapshot.work.evidenceRefCount}</dd>
             </div>
             <div>
-              <dt className="text-zinc-600">Research objects</dt>
+              <dt className="text-zinc-600">{t("genesisOs.cabinetStatResearchObjects")}</dt>
               <dd>{snapshot.work.researchObjectCount}</dd>
             </div>
           </dl>
@@ -138,35 +133,51 @@ export default function PersonalCabinetPanel() {
         <div className={`${cbaiGlassCard} space-y-3 p-5`}>
           <h3 className="text-sm font-semibold text-zinc-200">{t("genesisOs.myResponsibilities")}</h3>
           <ul className="space-y-1 text-xs text-zinc-400">
-            <li>Execution tasks: {snapshot.responsibilities.assignedTasks.length}</li>
-            <li>Overdue: {snapshot.responsibilities.overdueTasks.length}</li>
-            <li>Blocked: {snapshot.responsibilities.blockedTasks.length}</li>
-            <li>Awaiting review: {snapshot.responsibilities.pendingReviewTasks.length}</li>
+            <li>
+              {t("genesisOs.cabinetStatExecutionTasks")}: {snapshot.responsibilities.assignedTasks.length}
+            </li>
+            <li>
+              {t("genesisOs.cabinetStatOverdue")}: {snapshot.responsibilities.overdueTasks.length}
+            </li>
+            <li>
+              {t("genesisOs.cabinetStatBlocked")}: {snapshot.responsibilities.blockedTasks.length}
+            </li>
+            <li>
+              {t("genesisOs.cabinetStatAwaitingReview")}: {snapshot.responsibilities.pendingReviewTasks.length}
+            </li>
           </ul>
         </div>
 
         <div className={`${cbaiGlassCard} space-y-3 p-5`}>
           <h3 className="text-sm font-semibold text-zinc-200">{t("genesisOs.myTeams")}</h3>
           <p className="text-xs text-zinc-400">
-            Teams: {snapshot.teams.length} · Memberships: {snapshot.memberships.length}
+            {t("genesisOs.cabinetTeamsSummary", {
+              teams: String(snapshot.teams.length),
+              memberships: String(snapshot.memberships.length),
+            })}
           </p>
           <Link href={moduleHref("/organization")} className="text-xs text-teal-400 hover:text-teal-300">
-            Organization OS →
+            {t("genesisOs.organizationOsLink")} →
           </Link>
         </div>
 
         <div className={`${cbaiGlassCard} space-y-3 p-5`}>
           <h3 className="text-sm font-semibold text-zinc-200">{t("genesisOs.myCapability")}</h3>
           <p className="text-xs text-zinc-400">
-            Passport readiness: {snapshot.capability.passport.readiness} · Records:{" "}
-            {snapshot.capability.records.length}
+            {t("genesisOs.cabinetPassportSummary", {
+              readiness: snapshot.capability.passport.readiness,
+              records: String(snapshot.capability.records.length),
+            })}
           </p>
         </div>
 
         <div className={`${cbaiGlassCard} space-y-3 p-5`}>
           <h3 className="text-sm font-semibold text-zinc-200">{t("genesisOs.myOpportunities")}</h3>
           <p className="text-xs text-zinc-400">
-            Opportunities: {snapshot.opportunities.length} · Funding needs: {snapshot.fundingNeeds.length}
+            {t("genesisOs.cabinetOpportunitiesSummary", {
+              opportunities: String(snapshot.opportunities.length),
+              funding: String(snapshot.fundingNeeds.length),
+            })}
           </p>
         </div>
       </div>
@@ -196,16 +207,15 @@ export default function PersonalCabinetPanel() {
           </>
         )}
         {snapshot.attention.nextAction ? (
-          <div className="rounded-lg border border-teal-500/20 bg-teal-950/20 px-4 py-3">
-            <p className={cbaiSectionEyebrow}>{t("genesisOs.nextAction")}</p>
-            <p className="text-sm text-zinc-200">{snapshot.attention.nextAction.label}</p>
+          <p className="text-xs text-zinc-500">
+            <span className="text-zinc-600">{t("genesisOs.nextAction")}: </span>
             <Link
               href={moduleHref(snapshot.attention.nextAction.href)}
-              className="mt-2 inline-block text-xs text-teal-400 hover:text-teal-300"
+              className="text-teal-400 hover:text-teal-300"
             >
-              {t("common.continue")} →
+              {snapshot.attention.nextAction.label} →
             </Link>
-          </div>
+          </p>
         ) : null}
       </div>
     </section>

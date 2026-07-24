@@ -131,6 +131,9 @@ const COMPANION_ROUTES = new Set([
   "/research",
   "/my-work",
   "/search",
+  "/investor",
+  "/government",
+  "/governance",
 ]);
 const ENTITY_EXPLORE_ROUTES = new Set(["/countries", "/companies", "/universities"]);
 const WORKFLOW_CONTINUITY_ROUTES = new Set(["/knowledge", "/reasoning", "/graph", "/reports"]);
@@ -157,6 +160,18 @@ export function shouldShowGlobalMissionBar(pathname: string): boolean {
     return false;
   }
   return true;
+}
+
+/** Compact ribbon — only when real mission context exists. */
+export function shouldShowLivingContextRibbon(
+  pathname: string,
+  mission: import("@/lib/intelligence-os/mission.types").Mission | null,
+): boolean {
+  const base = routeBase(pathname);
+  if (base === "/" || base === "/my-work" || isReferenceRoute(pathname) || INTENT_ROUTES.has(base)) {
+    return false;
+  }
+  return Boolean(mission?.projectId || (mission?.problem && mission.problem.trim().length >= 10));
 }
 
 export function shouldShowMentalModelStrip(pathname: string, flags: ProgressiveDisclosureFlags): boolean {

@@ -113,6 +113,10 @@ export const GOVERNANCE_CENTER_EN = {
   reviewProcessBody: "Steps for validating releases before they reach users.",
   stepLabel: "Step {order}",
   relatedTopics: "Related topics:",
+  pillarsAria:
+    "Governance rule registry: {categories} categories, {rules} rules, height proportional to each category's rule count",
+  pillarsCaption:
+    "Bar height shows registered rule count per governance category in the CBAI rule registry — not operational performance.",
   complianceReportModel: "Compliance Report Model",
   complianceReportBody:
     "Structural template for manual audits and future CI output — no checks executed here.",

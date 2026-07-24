@@ -57,6 +57,15 @@ export const REPORTS_CENTER_EN = {
   continuingBody: "Your profile review continues here — choose a report type below.",
   backToProfile: "← Back to profile",
   pageDescription: "What you can open today — official information required for each report type.",
+  emptyIntro:
+    "Reports are generated from real profile work — connected evidence, completed reasoning, and human-confirmed project output. Nothing is fabricated here.",
+  emptyStepsHeading: "What produces a report",
+  emptyStepEvidence: "Review evidence status on a country, company, or university profile",
+  emptyStepWork: "Complete linked work in My Work with human confirmation",
+  emptyStepOpen: "Return here when a draft or saved report exists",
+  emptyActionSearch: "Search profiles",
+  emptyActionEvidence: "Open Evidence",
+  emptyActionMyWork: "Open My Work",
   whatCanIOpen: "What can I open today?",
   evidenceRequired: "Evidence required",
   openRelatedProfile: "Open related profile →",
@@ -218,6 +227,10 @@ export const MY_WORK_EXT_EN = {
   onboardingConfigureOperator: "Set preferences",
   onboardingOpenTrust: "Open Trust Center",
   loading: "Loading…",
+  advancedEngineSummary: "Mission engine (advanced)",
+  advancedEngineHint: "Optional structured engine entry — not the primary next step.",
+  createProjectSummary: "Create a project",
+  secondaryExplore: "Also explore",
 } as const;
 
 export const RESEARCH_CATALOG_EN = {
@@ -232,6 +245,9 @@ export const RESEARCH_CATALOG_EN = {
   tryDifferent: "Try a different domain or search term.",
   clearFilters: "Clear filters",
   methods: "Methods",
+  sharedMethods: "Shared methods",
+  sharedEvidenceTypes: "Shared evidence types",
+  selectedTopicEyebrow: "Selected topic",
   evidenceTypes: "Evidence types",
   futureWorkspace: "Future workspace",
   openTopic: "Open topic",
@@ -240,6 +256,28 @@ export const RESEARCH_CATALOG_EN = {
     workspace_not_available: "Workspace not available",
     evidence_not_connected: "Evidence not connected",
   },
+} as const;
+
+export const RESEARCH_NETWORK_LEGEND_EN = {
+  nodeTypesHeading: "Node types",
+  researchTopicNode: "Research topic — catalog node",
+  catalogAvailable: "Catalog available",
+  connectionTypesHeading: "Connection types",
+  interactionHeading: "Interaction",
+  interactionBody:
+    "Click a node to enter focus mode and review catalog metadata. Connected topics stay bright; unrelated nodes fade. Use Open topic to visit the research topic page.",
+} as const;
+
+export const RESEARCH_REVIEW_TIMELINE_EN = {
+  ariaLabel: "Review timeline",
+  heading: "Timeline",
+  created: "Created",
+  submitted: "Submitted",
+  assigned: "Assigned",
+  decision: "Decision",
+  archived: "Archived",
+  futureEventsNote:
+    "Submitted, assigned, decision, and archived events appear when review workflow records are connected.",
 } as const;
 
 export const GRAPH_EXTENDED_EN = {
@@ -326,6 +364,30 @@ export const ENTITY_UI_EN = {
   searchCountries: "Search countries…",
   dataStatusLegend: "Data status legend",
   searchResults: "Search results",
+  capitalLabel: "Capital",
+  indicatorConnectedOne: "1 indicator connected",
+  indicatorConnectedMany: "{count} indicators connected",
+  officialInformationAvailable: "Official information available.",
+  officialInformationNotAvailableYet: "Official information is not available yet.",
+  foundedLabel: "Founded",
+} as const;
+
+export const INDICATOR_EXPLORER_EN = {
+  coverageHeading: "Coverage Status",
+  coverageLead: "Connection posture from Evidence Infrastructure — not evaluative metrics.",
+  coverageStatus: "Coverage status",
+  connectedSources: "Connected sources",
+  plannedConnectors: "Planned connectors",
+  humanReviewRequired: "Human review required",
+  sourcesHeading: "Official Sources & Connectors",
+  sourcesLead: "Evidence Infrastructure sources and planned connectors for this indicator.",
+  officialSources: "Official sources",
+  noOfficialSources: "No official sources mapped.",
+  requiredSource: "Required source",
+  noConnectors: "No connectors mapped.",
+  connectionConnected: "Connected",
+  connectionPlanned: "Planned",
+  connectionNotConnected: "Not connected",
 } as const;
 
 export const PROJECT_UI_EN = {
