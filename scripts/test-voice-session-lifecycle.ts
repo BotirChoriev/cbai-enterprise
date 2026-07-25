@@ -384,7 +384,8 @@ test("identity intro phrases for UZ/EN/RU/TR", () => {
   assert.equal(getVoiceOperatorIntroPhrase("ru"), VOICE_OPERATOR_INTRO_PHRASES.ru);
   assert.equal(getVoiceOperatorIntroPhrase("tr"), VOICE_OPERATOR_INTRO_PHRASES.tr);
   const uz = buildVoiceOperatorInstructions("uz");
-  assert.match(uz, /Men sun'iy intellektman/);
+  assert.match(uz, /CheckBalanceAI\.Global/);
   assert.match(uz, /Never claim to be human/i);
   assert.match(uz, /Botir Choriev/);
+  assert.doesNotMatch(uz, /Men sun'iy intellektman/);
 });

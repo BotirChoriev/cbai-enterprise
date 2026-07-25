@@ -15,10 +15,10 @@ const NAV_LABEL_KEYS: Record<string, string> = {
   "/": "navigation.home",
   "/my-work": "navigation.myWork",
   "/search": "navigation.search",
-  "/countries": "navigation.countries",
+  "/countries": "navigation.worldIntelligence",
   "/companies": "navigation.companies",
   "/universities": "navigation.universities",
-  "/research": "navigation.research",
+  "/research": "navigation.researchEvidence",
   "/knowledge": "navigation.evidence",
   "/evidence": "navigation.evidence",
   "/analytics": "navigation.reports",
@@ -41,25 +41,36 @@ const NAV_LABEL_KEYS: Record<string, string> = {
   "/teams": "navigation.teams",
   "/rooms": "navigation.liveRooms",
   "/messages": "navigation.messages",
-  "/notifications": "navigation.notifications",
+  "/discover": "navigation.globalActivity",
+  "/notifications": "navigation.globalUpdates",
   "/publications": "navigation.publications",
 };
 
 const NAV_SECTION_TITLE_KEYS: Record<string, string> = {
   Explore: "navigation.explore",
   Intelligence: "navigation.intelligence",
+  Discover: "navigation.discover",
+  Create: "navigation.create",
   Operations: "navigation.operations",
   Oversight: "navigation.oversight",
   Collaboration: "navigation.collaboration",
+  Collaborate: "navigation.collaboration",
   Advanced: "navigation.advanced",
   System: "navigation.system",
+  Trust: "navigation.trust",
   Ecosystems: "navigation.intelligenceLenses",
   "Intelligence Lenses": "navigation.intelligenceLenses",
+  "World Intelligence": "navigation.worldIntelligence",
+  "Research & Evidence": "navigation.researchEvidence",
+  "Specialist Workspaces": "navigation.specialistWorkspaces",
 };
 
 /** Real label for a nav item's real href — falls back to the item's own English label only for a
  * route this lookup doesn't recognize yet, never a blank or fabricated translation. */
 export function translateNavLabel(t: TFunc, href: string, fallbackLabel: string): string {
+  if (href === "/countries" && fallbackLabel === "Countries") return t("navigation.countries");
+  if (href === "/research" && fallbackLabel === "Research") return t("navigation.research");
+  if (href === "/settings" && fallbackLabel === "Privacy") return t("navigation.privacy");
   const key = NAV_LABEL_KEYS[href];
   return key ? t(key) : fallbackLabel;
 }

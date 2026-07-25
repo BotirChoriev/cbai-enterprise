@@ -48,12 +48,17 @@ function fakeRouter() {
 
 test("identity: canonical UZ definition and creator attribution", () => {
   const id = getCbaiIdentity("uz");
-  assert.match(id.definition, /Universal Intelligence Operating System/);
-  assert.match(id.creatorAttribution, /Botir Choriev tashabbusi/);
+  assert.match(id.definition, /Intelligence Operating System/);
+  assert.match(id.definition, /CheckBalanceAI\.Global/);
+  assert.match(id.creatorAttribution, /Botir Choriev/);
+  assert.match(id.creatorAttribution, /CheckBalanceAI\.Global/);
+  assert.doesNotMatch(id.creatorAttribution, /tashabbusi/);
   assert.match(id.positioningComparison, /Google/);
   assert.match(id.positioningComparison, /ChatGPT/);
   assert.match(id.slogan, /fikrdan natijagacha/i);
   assert.doesNotMatch(id.definition, /knows everything|hamma narsani biladi/i);
+  assert.equal(id.founderName, "Botir Choriev");
+  assert.equal(id.publicPlatformName, "CheckBalanceAI.Global");
 });
 
 test("identity: EN/RU/TR parity for core fields", () => {
@@ -73,8 +78,10 @@ test("identity FAQ: CBAI nima / Kim yaratgan / Maqsadi / Vizioni", () => {
   assert.equal(matchIdentityFaqIntent("Vizioni nima?"), "vision");
   assert.equal(matchIdentityFaqIntent("CBAI insonmi?"), "is_human");
   assert.equal(matchIdentityFaqIntent("CBAI men uchun qaror qiladimi?"), "makes_decisions");
-  assert.match(answerCbaiIdentityFaq("what_is", "uz"), /Universal Intelligence Operating System/);
+  assert.match(answerCbaiIdentityFaq("what_is", "uz"), /Intelligence Operating System/);
+  assert.match(answerCbaiIdentityFaq("what_is", "uz"), /CheckBalanceAI\.Global/);
   assert.match(answerCbaiIdentityFaq("creator", "uz"), /Botir Choriev/);
+  assert.match(answerCbaiIdentityFaq("creator", "uz"), /CheckBalanceAI\.Global/);
   assert.match(answerCbaiIdentityFaq("is_human", "uz"), /inson emasman/i);
 });
 

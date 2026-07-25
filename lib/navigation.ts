@@ -32,7 +32,7 @@ export type NavSection = {
   items: NavItem[];
 };
 
-/** Primary + Intelligence + Operations — visible in sidebar without disclosure. */
+/** Seven canonical destinations — everything else is progressive disclosure. */
 export const primaryNavSections: NavSection[] = [
   {
     title: "",
@@ -47,7 +47,7 @@ export const primaryNavSections: NavSection[] = [
         label: "My Work",
         href: "/my-work",
         icon: "my-work",
-        description: "Continue research, evidence reviews, and reports in progress.",
+        description: "Adaptive personal workspace, drafts, and confirmed work.",
       },
       {
         label: "Search",
@@ -58,110 +58,74 @@ export const primaryNavSections: NavSection[] = [
     ],
   },
   {
-    title: "Intelligence",
+    title: "Discover",
     items: [
       {
-        label: "Countries",
+        label: "Global Activity",
+        href: "/discover",
+        icon: "analytics",
+        description: "Opted-in public projects, research, groups, and media.",
+      },
+      {
+        label: "World Intelligence",
         href: "/countries",
         icon: "countries",
-        description: "Country profiles — available information, gaps, and reports.",
-      },
-      {
-        label: "Companies",
-        href: "/companies",
-        icon: "companies",
-        description: "Company profiles with official information and reports.",
-      },
-      {
-        label: "Universities",
-        href: "/universities",
-        icon: "universities",
-        description: "University profiles with official information and reports.",
-      },
-      {
-        label: "Research",
-        href: "/research",
-        icon: "research",
-        description: "Explore scientific topics, labs, experiments, and evidence.",
-      },
-      {
-        label: "Evidence",
-        href: "/evidence",
-        icon: "knowledge",
-        description: "Official source status across profiles.",
-      },
-      {
-        label: "Knowledge Graph",
-        href: "/graph",
-        icon: "graph",
-        description: "Navigate verified relationships between platform entities.",
+        description: "Countries, companies, and universities in one evidence-led entity system.",
       },
     ],
   },
   {
-    title: "Operations",
+    title: "Create",
     items: [
+      {
+        label: "Research & Evidence",
+        href: "/research",
+        icon: "research",
+        description: "Research questions, source material, evidence review, and knowledge relationships.",
+      },
       {
         label: "Reports",
         href: "/reports",
-        icon: "analytics",
+        icon: "knowledge",
         description: "Report readiness and saved reports from real project work.",
-      },
-      {
-        label: "Investor",
-        href: "/investor",
-        icon: "investor",
-        description: "Economic evidence lens — non-advisory due diligence workspace.",
-      },
-      {
-        label: "Government",
-        href: "/government",
-        icon: "government",
-        description: "Public-administration evidence workspace — human-controlled research.",
-      },
-    ],
-  },
-  {
-    title: "Oversight",
-    items: [
-      {
-        label: "Governance",
-        href: "/governance",
-        icon: "ai-control",
-        description: "Platform rules, standards, and review process.",
-      },
-      {
-        label: "Trust",
-        href: "/trust",
-        icon: "trust",
-        description: "Constitution, methodology, evidence policy, and version history.",
-      },
-    ],
-  },
-  {
-    title: "System",
-    items: [
-      {
-        label: "Settings",
-        href: "/settings",
-        icon: "settings",
-        description: "Assistant, accessibility, voice diagnostics, and account preferences.",
-      },
-      {
-        label: "About",
-        href: "/about",
-        icon: "about",
-        description: "What CBAI is, why it exists, and the principles it holds itself to.",
       },
     ],
   },
 ];
 
-/** Collaboration + Advanced — progressive disclosure in sidebar. */
+/** Entity drill-downs, role lenses, collaboration, and system controls. */
 export const secondaryNavSections: NavSection[] = [
   {
-    title: "Collaboration",
+    title: "World Intelligence",
     items: [
+      { label: "Countries", href: "/countries", icon: "countries", description: "Country intelligence cockpits." },
+      { label: "Companies", href: "/companies", icon: "companies", description: "Company profiles and official information." },
+      { label: "Universities", href: "/universities", icon: "universities", description: "University profiles and official information." },
+      {
+        label: "Global Updates",
+        href: "/notifications",
+        icon: "analytics",
+        description: "Country local time, verified source changes, and your watches.",
+      },
+    ],
+  },
+  {
+    title: "Research & Evidence",
+    items: [
+      { label: "Evidence", href: "/evidence", icon: "knowledge", description: "Source status and human evidence review." },
+      { label: "Knowledge Graph", href: "/graph", icon: "graph", description: "Verified relationships between platform entities." },
+      { label: "Research Workspace", href: "/research/workspace", icon: "research", description: "Structured research and evidence review." },
+    ],
+  },
+  {
+    title: "Collaborate",
+    items: [
+      {
+        label: "Live Rooms",
+        href: "/rooms",
+        icon: "agents",
+        description: "Live intelligence rooms — shared sessions with confirmation-gated actions.",
+      },
       {
         label: "Workspace",
         href: "/workspace",
@@ -187,22 +151,10 @@ export const secondaryNavSections: NavSection[] = [
         description: "Team preparation — invitations require authorization.",
       },
       {
-        label: "Live Rooms",
-        href: "/rooms",
-        icon: "agents",
-        description: "Multilingual live intelligence sessions — meetings, labs, practice, collaboration.",
-      },
-      {
         label: "Messages",
         href: "/messages",
         icon: "reasoning",
         description: "Team conversations — account required.",
-      },
-      {
-        label: "Notifications",
-        href: "/notifications",
-        icon: "analytics",
-        description: "Activity notifications for your work.",
       },
       {
         label: "Publications",
@@ -213,8 +165,20 @@ export const secondaryNavSections: NavSection[] = [
     ],
   },
   {
-    title: "Advanced",
+    title: "Specialist Workspaces",
     items: [
+      {
+        label: "Investor",
+        href: "/investor",
+        icon: "investor",
+        description: "Economic evidence lens — non-advisory due diligence workspace.",
+      },
+      {
+        label: "Government",
+        href: "/government",
+        icon: "government",
+        description: "Public-administration evidence workspace — human-controlled research.",
+      },
       {
         label: "Citizen",
         href: "/citizen",
@@ -227,12 +191,15 @@ export const secondaryNavSections: NavSection[] = [
         icon: "reasoning",
         description: "How official information supports review before decisions.",
       },
-      {
-        label: "Research Workspace",
-        href: "/research/workspace",
-        icon: "research",
-        description: "Structured research workspace for knowledge organization and evidence review.",
-      },
+    ],
+  },
+  {
+    title: "Trust",
+    items: [
+      { label: "Governance", href: "/governance", icon: "ai-control", description: "Platform rules, standards, review, and human oversight." },
+      { label: "Trust", href: "/trust", icon: "trust", description: "Constitution, methodology, evidence policy, and version history." },
+      { label: "Privacy", href: "/settings", icon: "settings", description: "Privacy defaults, voice diagnostics, and account preferences." },
+      { label: "About", href: "/about", icon: "about", description: "CheckBalanceAI.Global platform identity and CBAI Intelligence OS." },
     ],
   },
 ];

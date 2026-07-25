@@ -295,8 +295,8 @@ test("createOpenAiClientSecret uses official client_secrets endpoint shape", asy
   assert.equal(parsed.session.type, "realtime");
   assert.equal(parsed.session.model, "gpt-realtime");
   assert.equal(parsed.session.audio.output.voice, REALTIME_OUTPUT_VOICE);
-  assert.match(seenBody, /Men CBAI Ovoz Operatoriman/);
-  assert.match(seenBody, /Do NOT repeat this full introduction/i);
+  assert.match(seenBody, /CheckBalanceAI\.Global/);
+  assert.match(seenBody, /Do NOT repeat this full introduction|Do NOT repeat the full first-run introduction/i);
 });
 
 test("invalid upstream credential shape returns classified 502 without fallback secret", async () => {

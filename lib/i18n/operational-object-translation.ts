@@ -15,6 +15,14 @@ const TYPE_KEYS: Record<OperationalObjectType, keyof TranslationDictionary["oper
   review: "typeReview",
   decision_brief: "typeDecisionBrief",
   meeting_action: "typeMeetingAction",
+  meeting: "typeMeeting",
+  intelligence_room: "typeIntelligenceRoom",
+  source_review: "typeSourceReview",
+  country_watch: "typeCountryWatch",
+  indicator_watch: "typeIndicatorWatch",
+  pdf_review: "typePdfReview",
+  report_draft: "typeReportDraft",
+  decision_review: "typeDecisionReview",
 };
 
 const STATUS_KEYS: Record<OperationalObjectStatus, keyof TranslationDictionary["operationalObject"]> = {

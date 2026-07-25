@@ -5,6 +5,7 @@ import { useTranslation } from "@/lib/i18n/use-translation";
 import { getDictionary } from "@/lib/i18n/translate";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import OperatorOrb from "@/components/shared/OperatorOrb";
+import PlatformIdentitySection from "@/components/about/PlatformIdentitySection";
 import { cbaiGlassCard, cbaiSectionEyebrow, cbaiBtnPrimary, cbaiBtnSecondary } from "@/components/brand/brand-classes";
 
 const ECOSYSTEM_HREFS = ["/research", "/companies", "/government"] as const;
@@ -36,12 +37,16 @@ export default function AboutPageClient() {
         <div className="relative flex flex-col items-start gap-6">
           <OperatorOrb state="idle" size={64} />
           <p className={cbaiSectionEyebrow}>{t("aboutPage.whoWeAreEyebrow")}</p>
-          <h1 id="about-purpose-heading" className="cbai-display max-w-3xl text-3xl text-zinc-50 sm:text-4xl md:text-5xl">
+          {/* The page title <h1> is rendered once by the shared page header; this is the
+              opening section heading, so the document keeps a single top-level heading. */}
+          <h2 id="about-purpose-heading" className="cbai-display max-w-3xl text-3xl text-zinc-50 sm:text-4xl md:text-5xl">
             {t("aboutPage.purposeHeadline")}
-          </h1>
+          </h2>
           <p className="max-w-2xl text-lg leading-relaxed text-zinc-400">{t("aboutPage.purposeBody")}</p>
         </div>
       </section>
+
+      <PlatformIdentitySection />
 
       <section aria-labelledby="about-what-heading" className={`${cbaiGlassCard} space-y-6 p-8 sm:p-12`}>
         <p className={cbaiSectionEyebrow} id="about-what-heading">{t("aboutPage.whatIsEyebrow")}</p>

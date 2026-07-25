@@ -184,7 +184,7 @@ test("16. route context keys present in draft provenance", () => {
 });
 
 test("17. identity introduction uses canonical Uzbek Voice Operator phrase", () => {
-  assert.match(VOICE_OPERATOR_INTRO_PHRASES.uz, /Men CBAI Ovoz Operatoriman/);
+  assert.match(VOICE_OPERATOR_INTRO_PHRASES.uz, /CheckBalanceAI\.Global/);
   assert.match(VOICE_OPERATOR_INTRO_PHRASES.uz, /Yakuniy qarorni siz qabul qilasiz/);
   const instructions = buildVoiceOperatorInstructions("uz");
   assert.match(instructions, /Do NOT repeat the full first-run introduction/i);

@@ -445,49 +445,50 @@ test("35. domain terminology preserved in instructions", () => {
   assert.ok(VOICE_OPERATOR_DOMAIN_VOCABULARY.includes("Smart Idea"));
   const instructions = buildVoiceOperatorInstructions("uz");
   assert.match(instructions, /Crossref/);
-  assert.match(instructions, /CBAI Ovoz Operatoriman/);
-  assert.match(instructions, /qaror qilmang|never make decisions/i);
+  assert.match(instructions, /CheckBalanceAI\.Global/);
+  assert.match(instructions, /qaror qilmang|never make decisions|Advise only/i);
 });
 
 test("35b. Uzbek identity intro phrase is canonical and non-generic", () => {
   const intro = getVoiceOperatorIntroPhrase("uz");
   assert.equal(intro, VOICE_OPERATOR_INTRO_PHRASES.uz);
-  assert.match(intro, /Men CBAI Ovoz Operatoriman/);
+  assert.match(intro, /CheckBalanceAI\.Global/);
   assert.match(intro, /Yakuniy qarorni siz qabul qilasiz/);
-  assert.doesNotMatch(intro, /sun'iy intellekt/i);
+  assert.doesNotMatch(intro, /^Men CBAIman$/);
+  assert.doesNotMatch(intro, /Men sun'iy intellektman/);
   const instructions = buildVoiceOperatorInstructions("uz");
-  assert.match(instructions, /Men CBAI Ovoz Operatoriman/);
+  assert.match(instructions, /CheckBalanceAI\.Global/);
   assert.match(instructions, /Do NOT repeat the full first-run introduction/i);
   assert.match(instructions, /Never claim to be human/i);
-  assert.match(instructions, /Men sun'iy intellektman/);
+  assert.match(instructions, /Do NOT say only/);
   assert.match(instructions, /Botir Choriev/);
-  assert.match(instructions, /Universal Intelligence Operating System/);
+  assert.match(instructions, /Intelligence Operating System/);
 });
 
-test("35c. English identity instructions use CBAI Voice Operator intro", () => {
+test("35c. English identity instructions use CheckBalanceAI.Global Voice Operator intro", () => {
   const intro = getVoiceOperatorIntroPhrase("en");
   assert.equal(intro, VOICE_OPERATOR_INTRO_PHRASES.en);
   const instructions = buildVoiceOperatorInstructions("en");
-  assert.match(instructions, /I am the CBAI Voice Operator/);
+  assert.match(instructions, /CheckBalanceAI\.Global voice operator/i);
   assert.match(instructions, /Never claim to be human/i);
   assert.match(instructions, /Do NOT repeat the full first-run introduction/i);
   assert.match(instructions, /Botir Choriev/);
 });
 
-test("35d. Russian identity instructions use CBAI Voice Operator intro", () => {
+test("35d. Russian identity instructions use CheckBalanceAI.Global Voice Operator intro", () => {
   const intro = getVoiceOperatorIntroPhrase("ru");
   assert.equal(intro, VOICE_OPERATOR_INTRO_PHRASES.ru);
   const instructions = buildVoiceOperatorInstructions("ru");
-  assert.match(instructions, /голосовой оператор CBAI/i);
+  assert.match(instructions, /голосовой оператор CheckBalanceAI\.Global/i);
   assert.match(instructions, /Never claim to be human/i);
   assert.match(instructions, /Botir|Ботира/);
 });
 
-test("35e. Turkish identity instructions use CBAI Voice Operator intro", () => {
+test("35e. Turkish identity instructions use CheckBalanceAI.Global Voice Operator intro", () => {
   const intro = getVoiceOperatorIntroPhrase("tr");
   assert.equal(intro, VOICE_OPERATOR_INTRO_PHRASES.tr);
   const instructions = buildVoiceOperatorInstructions("tr");
-  assert.match(instructions, /CBAI Ses Operatörüyüm/);
+  assert.match(instructions, /CheckBalanceAI\.Global sesli operatörüyüm/i);
   assert.match(instructions, /Never claim to be human/i);
   assert.match(instructions, /Advise only/i);
 });

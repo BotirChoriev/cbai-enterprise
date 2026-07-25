@@ -1,0 +1,12 @@
+adaptive:0
+von:1
+vo:1
+final10:0
+fpc:0
+rooms:0
+shell:1
+oo:0
+locale:0
+locclose:0
+spatial:0
+vsl:1

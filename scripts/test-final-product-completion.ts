@@ -144,7 +144,11 @@ test("operating page shell uses shared max-width workspace", () => {
   assert.match(shell, /cbaiPageWorkspace/);
   const header = readSource("components/shared/EntityPageHeader.tsx");
   assert.match(header, /cbaiPageHeader/);
-  assert.doesNotMatch(header, /cbai-display/);
+  // Updated by the Final 10/10 consolidation pass: this assertion previously required the shared
+  // entity header to avoid the serif display voice, which contradicted launch-gate rule 19
+  // ("every page-title <h1> uses the CBAI serif display voice"). One page-title typeface is the
+  // stricter invariant, so the shared header must now carry it.
+  assert.match(header, /cbai-display/);
 });
 
 test("living context ribbon replaces duplicate global mission bar", () => {
@@ -175,15 +179,41 @@ test("voice diagnostics panel in settings uses preflight without secrets", () =>
   assert.doesNotMatch(panel, /sk-/);
 });
 
-test("navigation IA uses intelligence operations oversight advanced system groups", () => {
+test("navigation IA uses the canonical Discover Create Collaborate Trust groups", () => {
+  // Adaptive workspace IA: primary Today/Discover/Create destinations, with Collaborate and Trust
+  // in progressive disclosure. Entity drill-downs and role lenses remain reachable.
   const nav = readSource("lib/navigation.ts");
-  assert.match(nav, /title: "Intelligence"/);
-  assert.match(nav, /title: "Operations"/);
-  assert.match(nav, /title: "Oversight"/);
-  assert.match(nav, /title: "Advanced"/);
-  assert.match(nav, /title: "System"/);
-  assert.match(nav, /href: "\/graph"/);
-  assert.match(nav, /href: "\/government"/);
+  assert.match(nav, /title: "Discover"/);
+  assert.match(nav, /title: "Create"/);
+  assert.match(nav, /title: "Collaborate"/);
+  assert.match(nav, /title: "Trust"/);
+  assert.match(nav, /title: "World Intelligence"/);
+  assert.match(nav, /title: "Research & Evidence"/);
+  assert.match(nav, /title: "Specialist Workspaces"/);
+  for (const href of [
+    "/",
+    "/my-work",
+    "/search",
+    "/discover",
+    "/countries",
+    "/companies",
+    "/universities",
+    "/research",
+    "/evidence",
+    "/graph",
+    "/reports",
+    "/rooms",
+    "/notifications",
+    "/investor",
+    "/government",
+    "/citizen",
+    "/governance",
+    "/trust",
+    "/settings",
+    "/about",
+  ]) {
+    assert.match(nav, new RegExp(`href: "${href.replace(/\//g, "\\/")}"`), href);
+  }
 });
 
 test("operating page shell does not duplicate mission chrome", () => {

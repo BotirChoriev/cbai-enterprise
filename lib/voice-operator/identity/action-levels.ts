@@ -41,7 +41,7 @@ export function classifyVoiceActionLevel(
   transcript = "",
 ): VoiceActionLevel {
   const lower = transcript.toLowerCase();
-  if (LEVEL_3.has(lower) || /(o'chir|delete|share|ulash|публик|sil|gönder)/i.test(transcript)) {
+  if (LEVEL_3.has(lower) || /(o'chir|delete|share|ulash|публик|publish|nashr|sil|gönder)/i.test(transcript)) {
     return 3;
   }
   if (actionId && LEVEL_2_ACTIONS.has(actionId)) return 2;

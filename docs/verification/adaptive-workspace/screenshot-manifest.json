@@ -1,0 +1,145 @@
+{
+  "base": "http://127.0.0.1:3110",
+  "results": [
+    {
+      "name": "desktop/my-workspace",
+      "route": "/my-work",
+      "overflow": false,
+      "pageErrors": [],
+      "path": "/Users/botirchoriev/Documents/cbai-enterprise/docs/verification/adaptive-workspace/desktop/my-workspace.png"
+    },
+    {
+      "name": "desktop/role-onboarding-student",
+      "route": "/my-work",
+      "overflow": false,
+      "pageErrors": [],
+      "path": "/Users/botirchoriev/Documents/cbai-enterprise/docs/verification/adaptive-workspace/desktop/role-onboarding-student.png"
+    },
+    {
+      "name": "desktop/role-draft-economist",
+      "route": "/my-work",
+      "overflow": false,
+      "pageErrors": [],
+      "path": "/Users/botirchoriev/Documents/cbai-enterprise/docs/verification/adaptive-workspace/desktop/role-draft-economist.png"
+    },
+    {
+      "name": "desktop/researcher-templates",
+      "route": "/my-work",
+      "overflow": false,
+      "pageErrors": [],
+      "path": "/Users/botirchoriev/Documents/cbai-enterprise/docs/verification/adaptive-workspace/desktop/researcher-templates.png"
+    },
+    {
+      "name": "desktop/government-draft",
+      "route": "/my-work",
+      "overflow": false,
+      "pageErrors": [],
+      "path": "/Users/botirchoriev/Documents/cbai-enterprise/docs/verification/adaptive-workspace/desktop/government-draft.png"
+    },
+    {
+      "name": "desktop/general-draft",
+      "route": "/my-work",
+      "overflow": false,
+      "pageErrors": [],
+      "path": "/Users/botirchoriev/Documents/cbai-enterprise/docs/verification/adaptive-workspace/desktop/general-draft.png"
+    },
+    {
+      "name": "desktop/global-activity",
+      "route": "/discover",
+      "overflow": false,
+      "pageErrors": [],
+      "path": "/Users/botirchoriev/Documents/cbai-enterprise/docs/verification/adaptive-workspace/desktop/global-activity.png"
+    },
+    {
+      "name": "desktop/about-platform-identity",
+      "route": "/about",
+      "overflow": false,
+      "pageErrors": [],
+      "path": "/Users/botirchoriev/Documents/cbai-enterprise/docs/verification/adaptive-workspace/desktop/about-platform-identity.png"
+    },
+    {
+      "name": "desktop/rooms-groups",
+      "route": "/rooms",
+      "overflow": false,
+      "pageErrors": [],
+      "path": "/Users/botirchoriev/Documents/cbai-enterprise/docs/verification/adaptive-workspace/desktop/rooms-groups.png"
+    },
+    {
+      "name": "desktop/pdf-scientific",
+      "route": "/scientific-documents",
+      "overflow": false,
+      "pageErrors": [],
+      "path": "/Users/botirchoriev/Documents/cbai-enterprise/docs/verification/adaptive-workspace/desktop/pdf-scientific.png"
+    },
+    {
+      "name": "desktop/privacy-settings",
+      "route": "/settings",
+      "overflow": false,
+      "pageErrors": [],
+      "path": "/Users/botirchoriev/Documents/cbai-enterprise/docs/verification/adaptive-workspace/desktop/privacy-settings.png"
+    },
+    {
+      "name": "desktop/source-evidence",
+      "route": "/evidence",
+      "overflow": false,
+      "pageErrors": [],
+      "path": "/Users/botirchoriev/Documents/cbai-enterprise/docs/verification/adaptive-workspace/desktop/source-evidence.png"
+    },
+    {
+      "name": "voice/voice-operator-open",
+      "route": "/my-work",
+      "overflow": false,
+      "pageErrors": [],
+      "path": "/Users/botirchoriev/Documents/cbai-enterprise/docs/verification/adaptive-workspace/voice/voice-operator-open.png"
+    },
+    {
+      "name": "modes/home-dark",
+      "route": "/",
+      "overflow": false,
+      "pageErrors": [],
+      "path": "/Users/botirchoriev/Documents/cbai-enterprise/docs/verification/adaptive-workspace/modes/home-dark.png"
+    },
+    {
+      "name": "modes/home-light",
+      "route": "/",
+      "overflow": false,
+      "pageErrors": [],
+      "path": "/Users/botirchoriev/Documents/cbai-enterprise/docs/verification/adaptive-workspace/modes/home-light.png"
+    },
+    {
+      "name": "mobile/my-workspace",
+      "route": "/my-work",
+      "overflow": false,
+      "pageErrors": [],
+      "path": "/Users/botirchoriev/Documents/cbai-enterprise/docs/verification/adaptive-workspace/mobile/my-workspace.png"
+    },
+    {
+      "name": "mobile/global-activity",
+      "route": "/discover",
+      "overflow": false,
+      "pageErrors": [],
+      "path": "/Users/botirchoriev/Documents/cbai-enterprise/docs/verification/adaptive-workspace/mobile/global-activity.png"
+    },
+    {
+      "name": "mobile/about-identity",
+      "route": "/about",
+      "overflow": false,
+      "pageErrors": [],
+      "path": "/Users/botirchoriev/Documents/cbai-enterprise/docs/verification/adaptive-workspace/mobile/about-identity.png"
+    },
+    {
+      "name": "mobile/navigation",
+      "route": "/my-work",
+      "overflow": false,
+      "pageErrors": [],
+      "path": "/Users/botirchoriev/Documents/cbai-enterprise/docs/verification/adaptive-workspace/mobile/navigation.png"
+    },
+    {
+      "name": "mobile/economist-draft",
+      "route": "/my-work",
+      "overflow": false,
+      "pageErrors": [],
+      "path": "/Users/botirchoriev/Documents/cbai-enterprise/docs/verification/adaptive-workspace/mobile/economist-draft.png"
+    }
+  ]
+}

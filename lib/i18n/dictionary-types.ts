@@ -122,6 +122,14 @@ export type TranslationDictionary = {
     notifications: string;
     publications: string;
     liveRooms: string;
+    worldIntelligence: string;
+    researchEvidence: string;
+    specialistWorkspaces: string;
+    globalActivity: string;
+    discover: string;
+    create: string;
+    privacy: string;
+    globalUpdates: string;
   };
   home: {
     heroTitle: string;
@@ -579,6 +587,13 @@ export type TranslationDictionary = {
     typeReview: string;
     typeDecisionBrief: string;
     typeMeetingAction: string;
+    typeMeeting: string;
+    typeIntelligenceRoom: string;
+    typeSourceReview: string;
+    typeCountryWatch: string;
+    typeIndicatorWatch: string;
+    typePdfReview: string;
+    typeDecisionReview: string;
     statusDraft: string;
     statusReady: string;
     statusActive: string;

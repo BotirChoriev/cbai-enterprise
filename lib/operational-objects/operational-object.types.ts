@@ -14,7 +14,15 @@ export type OperationalObjectType =
   | "evidence_request"
   | "review"
   | "decision_brief"
-  | "meeting_action";
+  | "meeting_action"
+  | "meeting"
+  | "intelligence_room"
+  | "source_review"
+  | "country_watch"
+  | "indicator_watch"
+  | "pdf_review"
+  | "report_draft"
+  | "decision_review";
 
 export type OperationalObjectStatus =
   | "draft"
@@ -69,6 +77,11 @@ export type OperationalObject = {
   readonly evidenceRequirements: readonly string[];
   readonly nextAction: string;
   readonly humanDecision: string;
+  readonly owner?: string | null;
+  readonly knownInformation?: readonly string[];
+  readonly missingInformation?: readonly string[];
+  readonly assumptions?: readonly string[];
+  readonly humanApprovalRequired?: boolean;
   readonly projectId?: string;
   readonly missionId?: string;
   readonly parentId?: string;
@@ -99,6 +112,11 @@ export type OperationalObjectDraft = {
   evidenceRequirements: readonly string[];
   nextAction: string;
   humanDecision: string;
+  owner?: string | null;
+  knownInformation?: readonly string[];
+  missingInformation?: readonly string[];
+  assumptions?: readonly string[];
+  humanApprovalRequired?: boolean;
   projectId?: string;
   missionId?: string;
   parentId?: string;
@@ -127,7 +145,15 @@ export function isOperationalObjectType(value: unknown): value is OperationalObj
     value === "evidence_request" ||
     value === "review" ||
     value === "decision_brief" ||
-    value === "meeting_action"
+    value === "meeting_action" ||
+    value === "meeting" ||
+    value === "intelligence_room" ||
+    value === "source_review" ||
+    value === "country_watch" ||
+    value === "indicator_watch" ||
+    value === "pdf_review" ||
+    value === "report_draft" ||
+    value === "decision_review"
   );
 }
 
