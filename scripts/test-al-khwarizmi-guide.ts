@@ -56,3 +56,9 @@ test("guide roams, settles to read, and respects reduced-motion preferences", ()
   assert.match(guideCss, /@keyframes readingBreath/);
   assert.match(guideCss, /prefers-reduced-motion/);
 });
+
+test("roaming pauses for reliable pointer and keyboard interaction", () => {
+  assert.match(guideCss, /\.roaming:hover/);
+  assert.match(guideCss, /\.roaming:focus-within/);
+  assert.match(guideCss, /animation-play-state: paused/);
+});
