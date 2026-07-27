@@ -28,6 +28,8 @@ type ActivationStep = "choices" | "voice" | "describe" | "refine" | "card";
 type ActivationExperienceProps = {
   /** "hero" for first-time visitors; "compact" adds a resume strip and folds the flow. */
   readonly variant: "hero" | "compact";
+  /** The global shell already exposes language on the homepage. */
+  readonly showLanguageSelector?: boolean;
 };
 
 /**
@@ -39,7 +41,10 @@ type ActivationExperienceProps = {
  * pipeline; nothing is persisted until the user confirms in the canonical
  * composer.
  */
-export default function ActivationExperience({ variant }: ActivationExperienceProps) {
+export default function ActivationExperience({
+  variant,
+  showLanguageSelector = true,
+}: ActivationExperienceProps) {
   const { language } = useTranslation();
   const copy = getActivationCopy(language);
   const vo = useVoiceOperator();
@@ -169,9 +174,11 @@ export default function ActivationExperience({ variant }: ActivationExperiencePr
           </h2>
           <p className="mt-1.5 text-xs leading-relaxed text-slate-400">{copy.purposeLine}</p>
         </div>
-        <div className="shrink-0">
-          <LanguageSelector compact />
-        </div>
+        {showLanguageSelector ? (
+          <div className="shrink-0">
+            <LanguageSelector compact />
+          </div>
+        ) : null}
       </div>
 
       {variant === "compact" && step === "choices" ? (

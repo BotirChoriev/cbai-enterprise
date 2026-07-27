@@ -3,264 +3,327 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useCallback, useMemo, useState } from "react";
-import OperatorOrb from "@/components/shared/OperatorOrb";
 import ActivationExperience from "@/components/activation/ActivationExperience";
+import OperatorOrb from "@/components/shared/OperatorOrb";
+import { useVoiceOperator } from "@/components/voice-operator/VoiceOperatorProvider";
 import { useOperationalObjectsOptional } from "@/components/operational-objects/OperationalObjectProvider";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useTranslation } from "@/lib/i18n/use-translation";
-import { getDictionary } from "@/lib/i18n/translate";
 import { loadProjects } from "@/lib/project/project-store";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { myWorkHrefForMission } from "@/lib/intelligence-os/mission-operating-context";
-import { buildWorldIntelligenceMap } from "@/lib/world-map";
 import type { GlobeCountryPoint } from "@/lib/spatial-world/globe-geography";
-import SpatialCountryContextPanel from "@/components/spatial-world/SpatialCountryContextPanel";
-import { getCommandCenterCopy } from "@/lib/i18n/platform-copy-command-center";
 
 const InteractiveIntelligenceGlobe = dynamic(
   () => import("@/components/spatial-world/InteractiveIntelligenceGlobe"),
   {
     ssr: false,
     loading: () => (
-      <div className="cbai-spatial-globe-stage flex h-[min(52vh,540px)] min-h-[400px] max-h-[540px] items-center justify-center rounded-2xl border border-teal-500/20 bg-[#07101f] text-sm text-slate-400">
+      <div className="flex min-h-[360px] items-center justify-center rounded-2xl border border-white/10 bg-[#07101f] text-sm text-slate-400">
         …
       </div>
     ),
   },
 );
 
-const ECOSYSTEMS = [
-  {
-    id: "research",
-    href: "/research",
-    titleKey: "ecosystemResearchTitle" as const,
-    bodyKey: "ecosystemResearchBody" as const,
+const HOME_COPY = {
+  en: {
+    eyebrow: "Collaborative Intelligence Operating System",
+    title: "Open a problem. Work it through with AI. You decide.",
+    subtitle:
+      "CBAI gathers evidence, exposes contradictions, tracks unknowns, and compares scenarios. It never replaces human judgment.",
+    operator: "Voice Operator",
+    operatorBody: "Navigate, investigate, compare, and review the decision flow naturally.",
+    operatorReady: "Ready to work with you",
+    operatorAction: "Open Voice Operator",
+    boundary: "AI investigates and structures. Humans evaluate and decide.",
+    workflow: "One problem. One shared thinking process.",
+    stages: ["Problem", "Evidence", "Contradictions", "Scenarios", "Human decision", "Monitoring"],
+    stageNotes: [
+      "Define what must change",
+      "Verify sources and claims",
+      "Surface conflicts and gaps",
+      "Compare consequences",
+      "Record human judgment",
+      "Watch what changes",
+    ],
+    work: "Continue your work",
+    empty: "No active problem yet.",
+    openProblems: "Open Problem Space",
+    openWork: "Open My Work",
+    evidence: "Evidence workspace",
+    evidenceBody: "Review sources, unknowns, provenance, and counter-evidence.",
+    openEvidence: "Open Evidence",
+    explore: "Explore intelligence sources",
+    exploreBody: "Countries, research, organizations, and the world map support a problem; they are not the starting point.",
+    mapTitle: "World intelligence map",
+    mapHint: "Select a country only when geographic context is relevant to your problem.",
+    mapReset: "Reset view",
+    mapFallbackTitle: "Map unavailable",
+    mapFallbackHint: "Open Countries to continue.",
+    mapKeyboard: "Arrow keys rotate. +/− zoom. Enter opens a country.",
   },
-  {
-    id: "economic",
-    href: "/investor",
-    titleKey: "ecosystemEconomicTitle" as const,
-    bodyKey: "ecosystemEconomicBody" as const,
+  uz: {
+    eyebrow: "Hamkorlikdagi intellekt operatsion tizimi",
+    title: "Muammoni oching. AI bilan birga ishlang. Qarorni siz bering.",
+    subtitle:
+      "CBAI dalillarni yig‘adi, qarama-qarshiliklarni ko‘rsatadi, noma’lumlarni kuzatadi va ssenariylarni taqqoslaydi. Inson hukmini almashtirmaydi.",
+    operator: "Ovozli operator",
+    operatorBody: "Tabiiy ovoz orqali yo‘naling, tekshiring, taqqoslang va qaror jarayonini ko‘rib chiqing.",
+    operatorReady: "Siz bilan ishlashga tayyor",
+    operatorAction: "Ovozli operatorni ochish",
+    boundary: "AI tekshiradi va tizimlaydi. Inson baholaydi va qaror beradi.",
+    workflow: "Bitta muammo. Bitta umumiy fikrlash jarayoni.",
+    stages: ["Muammo", "Dalillar", "Qarama-qarshiliklar", "Ssenariylar", "Inson qarori", "Monitoring"],
+    stageNotes: [
+      "Nima o‘zgarishi kerakligini aniqlang",
+      "Manba va da’volarni tekshiring",
+      "Ziddiyat va bo‘shliqlarni ko‘ring",
+      "Oqibatlarni taqqoslang",
+      "Inson hukmini qayd eting",
+      "O‘zgarishlarni kuzating",
+    ],
+    work: "Ishni davom ettirish",
+    empty: "Hali faol muammo yo‘q.",
+    openProblems: "Muammo maydonini ochish",
+    openWork: "Mening ishlarim",
+    evidence: "Dalillar maydoni",
+    evidenceBody: "Manbalar, noma’lumlar, kelib chiqish va qarshi dalillarni ko‘rib chiqing.",
+    openEvidence: "Dalillarni ochish",
+    explore: "Intellekt manbalarini ko‘rish",
+    exploreBody: "Mamlakatlar, tadqiqotlar, tashkilotlar va dunyo xaritasi muammoni qo‘llab-quvvatlaydi; ular boshlanish nuqtasi emas.",
+    mapTitle: "Dunyo intellekt xaritasi",
+    mapHint: "Geografik kontekst muammo uchun zarur bo‘lgandagina mamlakatni tanlang.",
+    mapReset: "Ko‘rinishni tiklash",
+    mapFallbackTitle: "Xarita mavjud emas",
+    mapFallbackHint: "Davom etish uchun Mamlakatlarni oching.",
+    mapKeyboard: "Yo‘nalish tugmalari aylantiradi. +/− masshtab. Enter mamlakatni ochadi.",
   },
-  {
-    id: "government",
-    href: "/government",
-    titleKey: "ecosystemGovernanceTitle" as const,
-    bodyKey: "ecosystemGovernanceBody" as const,
+  ru: {
+    eyebrow: "Операционная система совместного интеллекта",
+    title: "Откройте проблему. Работайте вместе с ИИ. Решение принимаете вы.",
+    subtitle:
+      "CBAI собирает доказательства, показывает противоречия, отслеживает неизвестное и сравнивает сценарии. Человеческое суждение не заменяется.",
+    operator: "Голосовой оператор",
+    operatorBody: "Навигация, проверка, сравнение и обзор решения естественным голосом.",
+    operatorReady: "Готов работать вместе с вами",
+    operatorAction: "Открыть голосового оператора",
+    boundary: "ИИ исследует и структурирует. Человек оценивает и решает.",
+    workflow: "Одна проблема. Один совместный процесс мышления.",
+    stages: ["Проблема", "Доказательства", "Противоречия", "Сценарии", "Решение человека", "Мониторинг"],
+    stageNotes: [
+      "Определите требуемое изменение",
+      "Проверьте источники и утверждения",
+      "Выявите конфликты и пробелы",
+      "Сравните последствия",
+      "Зафиксируйте решение человека",
+      "Следите за изменениями",
+    ],
+    work: "Продолжить работу",
+    empty: "Активной проблемы пока нет.",
+    openProblems: "Открыть пространство проблем",
+    openWork: "Открыть мою работу",
+    evidence: "Пространство доказательств",
+    evidenceBody: "Проверяйте источники, неизвестное, происхождение и контрдоказательства.",
+    openEvidence: "Открыть доказательства",
+    explore: "Изучить источники интеллекта",
+    exploreBody: "Страны, исследования, организации и карта мира поддерживают проблему, но не являются точкой старта.",
+    mapTitle: "Карта мирового интеллекта",
+    mapHint: "Выбирайте страну, только если географический контекст важен для проблемы.",
+    mapReset: "Сбросить вид",
+    mapFallbackTitle: "Карта недоступна",
+    mapFallbackHint: "Откройте раздел стран.",
+    mapKeyboard: "Стрелки вращают. +/− масштаб. Enter открывает страну.",
   },
-] as const;
+  tr: {
+    eyebrow: "İşbirlikçi Zekâ İşletim Sistemi",
+    title: "Bir problem açın. Yapay zekâyla birlikte çalışın. Kararı siz verin.",
+    subtitle:
+      "CBAI kanıt toplar, çelişkileri görünür kılar, bilinmeyenleri izler ve senaryoları karşılaştırır. İnsan muhakemesinin yerini almaz.",
+    operator: "Sesli Operatör",
+    operatorBody: "Doğal sesle gezin, araştırın, karşılaştırın ve karar akışını inceleyin.",
+    operatorReady: "Sizinle çalışmaya hazır",
+    operatorAction: "Sesli Operatörü aç",
+    boundary: "Yapay zekâ araştırır ve yapılandırır. İnsan değerlendirir ve karar verir.",
+    workflow: "Tek problem. Tek ortak düşünme süreci.",
+    stages: ["Problem", "Kanıt", "Çelişkiler", "Senaryolar", "İnsan kararı", "İzleme"],
+    stageNotes: [
+      "Neyin değişmesi gerektiğini tanımlayın",
+      "Kaynakları ve iddiaları doğrulayın",
+      "Çatışmaları ve boşlukları görün",
+      "Sonuçları karşılaştırın",
+      "İnsan kararını kaydedin",
+      "Değişiklikleri izleyin",
+    ],
+    work: "Çalışmaya devam et",
+    empty: "Henüz aktif problem yok.",
+    openProblems: "Problem Alanını aç",
+    openWork: "Çalışmalarımı aç",
+    evidence: "Kanıt alanı",
+    evidenceBody: "Kaynakları, bilinmeyenleri, kökeni ve karşı kanıtları inceleyin.",
+    openEvidence: "Kanıtları aç",
+    explore: "Zekâ kaynaklarını keşfet",
+    exploreBody: "Ülkeler, araştırmalar, kuruluşlar ve dünya haritası problemi destekler; başlangıç noktası değildir.",
+    mapTitle: "Dünya zekâ haritası",
+    mapHint: "Yalnızca coğrafi bağlam probleminizle ilgiliyse bir ülke seçin.",
+    mapReset: "Görünümü sıfırla",
+    mapFallbackTitle: "Harita kullanılamıyor",
+    mapFallbackHint: "Devam etmek için Ülkeleri açın.",
+    mapKeyboard: "Ok tuşları döndürür. +/− yakınlaştırır. Enter ülkeyi açar.",
+  },
+} as const;
 
 export default function SpatialWorldIntelligenceHome() {
-  const { language } = useTranslation();
+  const { language, t } = useTranslation();
+  const copy = HOME_COPY[language as keyof typeof HOME_COPY] ?? HOME_COPY.en;
+  const voice = useVoiceOperator();
   const operationalObjects = useOperationalObjectsOptional();
   const hydrated = useHydrated();
   const { mission } = useMissionContext();
   const [selectedCountry, setSelectedCountry] = useState<GlobeCountryPoint | null>(null);
-  const copy = getDictionary(language).spatialWorld;
-  const commandCopy = getCommandCenterCopy(language);
-
   const projects = useMemo(() => (hydrated ? loadProjects().slice(0, 3) : []), [hydrated]);
-
-  // Adaptive activation (DD-AIW-001): first-time visitors get the dominant
-  // three-choice hero; anyone with saved work gets the compact resume strip.
   const hasExistingWork =
     hydrated && (projects.length > 0 || (operationalObjects?.objects.length ?? 0) > 0);
-  const activationVariant: "hero" | "compact" = hasExistingWork ? "compact" : "hero";
-
-  const countryStatusMap = useMemo(() => {
-    const map = new Map<string, ReturnType<typeof buildWorldIntelligenceMap>[number]["countries"][number]["status"]>();
-    for (const group of buildWorldIntelligenceMap()) {
-      for (const entry of group.countries) {
-        map.set(entry.country.id, entry.status);
-      }
-    }
-    return map;
-  }, []);
-
-  const globeLabels = useMemo(
-    () => ({
-      title: copy.globeTitle,
-      hint: copy.globeHint,
-      reset: copy.globeReset,
-      fallbackTitle: copy.globeFallbackTitle,
-      fallbackHint: copy.globeFallbackHint,
-      keyboardHint: copy.globeKeyboardHint,
-    }),
-    [copy],
-  );
 
   const handleSelectCountry = useCallback((point: GlobeCountryPoint | null) => {
     setSelectedCountry(point);
   }, []);
 
-  const handleDeselectCountry = useCallback(() => {
-    setSelectedCountry(null);
-  }, []);
-
   return (
-    <div className="cbai-spatial-world-home flex w-full flex-col gap-4 px-3 pb-6 pt-2 sm:px-5 sm:pb-7 sm:pt-3 lg:px-6 lg:pb-8 lg:pt-4">
-      <header className="flex flex-col gap-3">
-        <div className="max-w-2xl space-y-2">
-          <p className="cbai-section-eyebrow-spatial text-[10px] font-medium uppercase tracking-[0.18em]">{copy.eyebrow}</p>
-          <h1 className="cbai-display text-2xl font-semibold tracking-tight text-slate-50 sm:text-[1.75rem] lg:text-[1.875rem]">{copy.welcomeTitle}</h1>
-          <p className="max-w-xl text-sm leading-relaxed text-slate-300">{copy.welcomeSubtitle}</p>
-        </div>
-      </header>
+    <main className="relative w-full overflow-hidden px-3 pb-10 pt-4 sm:px-5 lg:px-7">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[32rem] bg-[radial-gradient(circle_at_72%_12%,rgba(45,212,191,0.13),transparent_42%),radial-gradient(circle_at_18%_0%,rgba(59,130,246,0.09),transparent_34%)]" />
 
-      {/* Adaptive Intelligence Workspace activation — the single voice/text/example
-          entry point. The Voice Operator dock remains the one global voice surface. */}
-      <ActivationExperience variant={activationVariant} />
+      <div className="relative mx-auto max-w-[1480px] space-y-5">
+        <header className="max-w-4xl pt-2">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-teal-300/80">{copy.eyebrow}</p>
+          <h1 className="mt-3 max-w-4xl text-balance text-3xl font-semibold leading-[1.08] tracking-[-0.035em] text-white sm:text-4xl xl:text-5xl">
+            {copy.title}
+          </h1>
+          <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-300 sm:text-base">{copy.subtitle}</p>
+        </header>
 
-      <section className="rounded-xl border border-teal-500/20 bg-[#0a1528]/80 p-4" aria-labelledby="global-command-heading">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 id="global-command-heading" className="text-sm font-semibold text-slate-50">{commandCopy.command}</h2>
-            <p className="mt-1 max-w-2xl text-xs leading-relaxed text-slate-400">{commandCopy.commandBody}</p>
-          </div>
-          <p className="shrink-0 max-w-[16rem] text-xs leading-relaxed text-slate-400 sm:text-right">
-            {commandCopy.operatorFromHero}
-          </p>
-        </div>
-      </section>
+        <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
+          <ActivationExperience
+            variant={hasExistingWork ? "compact" : "hero"}
+            showLanguageSelector={false}
+          />
 
-      {mission ? (
-        <div className="rounded-lg border border-teal-500/25 bg-teal-950/30 px-4 py-2.5">
-          <Link href={myWorkHrefForMission(mission)} className="text-sm font-medium text-teal-200 hover:text-teal-100">
-            {copy.missionContinue}
-          </Link>
-        </div>
-      ) : null}
-
-      <div className="grid min-h-0 grid-cols-1 gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(240px,300px)] xl:items-stretch">
-        <InteractiveIntelligenceGlobe
-          labels={globeLabels}
-          selectedCountryId={selectedCountry?.country.id ?? null}
-          onSelectCountry={handleSelectCountry}
-        />
-
-        <aside className="cbai-spatial-rail flex flex-col gap-3">
-          <div className="rounded-2xl border border-teal-500/20 bg-[#0a1528]/95 p-4">
-            <div className="flex items-start gap-3">
-              <OperatorOrb state="present" size={64} />
-              <div className="min-w-0">
-                <p className="text-sm font-medium text-slate-50">{copy.operatorTitle}</p>
-                <p className="mt-1 text-xs leading-relaxed text-slate-300">{copy.operatorSubtitle}</p>
-                <p className="mt-2 text-xs text-teal-100/90">{copy.operatorStatusReady}</p>
+          <button
+            type="button"
+            onClick={voice.openDock}
+            className="group relative overflow-hidden rounded-2xl border border-teal-300/30 bg-[linear-gradient(145deg,rgba(13,148,136,0.24),rgba(8,15,30,0.94)_58%)] p-5 text-left shadow-[0_20px_70px_rgba(0,0,0,0.25)] transition hover:border-teal-200/55 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-300"
+          >
+            <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-teal-300/10 blur-3xl transition group-hover:bg-teal-300/20" />
+            <div className="relative flex items-center gap-4">
+              <OperatorOrb state={voice.dockOpen ? "listening" : "present"} size={76} />
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-teal-200/80">{copy.operatorReady}</p>
+                <h2 className="mt-1 text-xl font-semibold text-white">{copy.operator}</h2>
               </div>
             </div>
-            <p className="mt-3 text-[11px] leading-relaxed text-slate-400">{copy.trustLine}</p>
+            <p className="relative mt-5 text-sm leading-6 text-slate-300">{copy.operatorBody}</p>
+            <span className="relative mt-6 inline-flex min-h-11 items-center rounded-full bg-teal-300 px-5 text-sm font-semibold text-slate-950">
+              {copy.operatorAction}
+            </span>
+            <p className="relative mt-5 border-t border-white/10 pt-4 text-xs leading-5 text-slate-400">{copy.boundary}</p>
+          </button>
+        </section>
+
+        <section className="rounded-2xl border border-white/10 bg-slate-950/45 p-4 sm:p-5" aria-labelledby="thinking-flow-title">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+            <h2 id="thinking-flow-title" className="text-lg font-semibold text-white">{copy.workflow}</h2>
+            <p className="text-xs text-slate-400">{copy.boundary}</p>
           </div>
+          <ol className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-6">
+            {copy.stages.map((stage, index) => (
+              <li key={stage} className="relative rounded-xl border border-white/10 bg-white/[0.035] p-3">
+                <span className="text-[10px] font-semibold tabular-nums text-teal-300/70">0{index + 1}</span>
+                <p className="mt-2 text-sm font-semibold text-slate-100">{stage}</p>
+                <p className="mt-1 text-[11px] leading-5 text-slate-400">{copy.stageNotes[index]}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
 
-          {selectedCountry ? (
-            <SpatialCountryContextPanel
-              point={selectedCountry}
-              status={countryStatusMap.get(selectedCountry.country.id) ?? "not_connected"}
-              labels={{
-                selected: copy.globeSelected,
-                dataAvailability: copy.dataAvailability,
-                openCountry: copy.globeOpenCountry,
-                deselectCountry: copy.deselectCountry,
-              }}
-              onDeselect={handleDeselectCountry}
-            />
-          ) : null}
-        </aside>
-      </div>
-
-      <section aria-labelledby="spatial-ecosystems-heading" className="pt-1">
-        <p id="spatial-ecosystems-heading" className="cbai-section-eyebrow-spatial text-[10px] font-medium uppercase tracking-[0.18em]">
-          {copy.ecosystemEyebrow}
-        </p>
-        <div className="mt-2 grid gap-2 sm:grid-cols-3">
-          {ECOSYSTEMS.map((item) => (
-            <Link
-              key={item.id}
-              href={item.href}
-              className="rounded-xl border border-teal-500/15 bg-[#0a1528]/75 px-3.5 py-3 transition-colors hover:border-teal-400/30 hover:bg-[#0d1a30]/90"
-            >
-              <p className="text-sm font-medium text-slate-50">{copy[item.titleKey]}</p>
-              <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-slate-400">{copy[item.bodyKey]}</p>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <div className="grid gap-3 lg:grid-cols-2">
-        <section aria-labelledby="spatial-projects-heading" className="rounded-xl border border-teal-500/15 bg-[#0a1528]/60 p-3.5">
-          <p id="spatial-projects-heading" className="cbai-section-eyebrow-spatial text-[10px] font-medium uppercase tracking-[0.18em]">
-            {copy.projectsEyebrow}
-          </p>
-          <h2 className="mt-1 text-sm font-medium text-slate-50">{copy.projectsTitle}</h2>
-          {projects.length > 0 ? (
-            <ul className="mt-2 space-y-1.5">
-              {projects.map((project) => (
-                <li key={project.id}>
-                  <Link href={`/my-work?project=${project.id}`} className="text-sm text-teal-200 hover:text-teal-100">
-                    {project.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="mt-2 text-sm text-slate-400">{copy.projectsEmpty}</p>
-          )}
-          <Link href="/my-work" className="mt-3 inline-flex text-xs font-medium text-teal-300 hover:text-teal-200">
-            {copy.projectsOpen}
+        {mission ? (
+          <Link
+            href={myWorkHrefForMission(mission)}
+            className="block rounded-xl border border-teal-300/25 bg-teal-950/30 px-4 py-3 text-sm font-medium text-teal-100 hover:border-teal-300/45"
+          >
+            {copy.work} →
           </Link>
-        </section>
+        ) : null}
 
-        <section aria-labelledby="spatial-evidence-heading" className="rounded-xl border border-teal-500/15 bg-[#0a1528]/60 p-3.5">
-          <p id="spatial-evidence-heading" className="cbai-section-eyebrow-spatial text-[10px] font-medium uppercase tracking-[0.18em]">
-            {copy.evidenceEyebrow}
-          </p>
-          <h2 className="mt-1 text-sm font-medium text-slate-50">{copy.evidenceTitle}</h2>
-          <p className="mt-1.5 text-sm text-slate-400">{copy.evidenceBody}</p>
-          <div className="mt-3 flex flex-wrap gap-3">
-            <Link href="/knowledge" className="text-xs font-medium text-teal-300 hover:text-teal-200">
-              {copy.evidenceOpen}
-            </Link>
-            <Link href="/graph" className="text-xs font-medium text-teal-300 hover:text-teal-200">
-              {copy.knowledgeOpen}
-            </Link>
-          </div>
-          <p className="mt-3 text-[11px] text-slate-500">{copy.noFakeData}</p>
-        </section>
-      </div>
+        <section className="grid gap-3 md:grid-cols-2">
+          <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{copy.work}</p>
+            {projects.length ? (
+              <ul className="mt-4 space-y-2">
+                {projects.map((project) => (
+                  <li key={project.id}>
+                    <Link href={`/my-work?project=${project.id}`} className="text-sm font-medium text-teal-200 hover:text-teal-100">
+                      {project.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-3 text-sm text-slate-400">{copy.empty}</p>
+            )}
+            <div className="mt-5 flex flex-wrap gap-4 text-sm font-medium">
+              <Link href="/problems" className="text-teal-200 hover:text-teal-100">{copy.openProblems}</Link>
+              <Link href="/my-work" className="text-slate-300 hover:text-white">{copy.openWork}</Link>
+            </div>
+          </article>
 
-      <section className="grid gap-3 lg:grid-cols-3" aria-label={commandCopy.updates}>
-        {[
-          {
-            title: commandCopy.updates,
-            body: commandCopy.updatesUnavailable,
-            next: commandCopy.updatesNext,
-            href: "/notifications",
-            action: commandCopy.openNotifications,
-          },
-          {
-            title: commandCopy.freshness,
-            body: commandCopy.freshnessUnavailable,
-            next: commandCopy.freshnessNext,
-            href: "/evidence",
-            action: commandCopy.openEvidence,
-          },
-          {
-            title: commandCopy.alerts,
-            body: commandCopy.alertsEmpty,
-            next: commandCopy.alertsNext,
-            href: "/evidence",
-            action: commandCopy.openEvidence,
-          },
-        ].map((item) => (
-          <article key={item.title} className="rounded-xl border border-teal-500/15 bg-[#0a1528]/60 p-4">
-            <h2 className="text-sm font-medium text-slate-50">{item.title}</h2>
-            <p className="mt-2 text-sm text-slate-400">{item.body}</p>
-            <p className="mt-2 text-xs text-slate-500">{item.next}</p>
-            <Link href={item.href} className="mt-3 inline-flex min-h-11 items-center text-xs font-medium text-teal-300 hover:text-teal-200">
-              {item.action}
+          <article className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{copy.evidence}</p>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-slate-300">{copy.evidenceBody}</p>
+            <Link href="/evidence" className="mt-5 inline-flex text-sm font-medium text-teal-200 hover:text-teal-100">
+              {copy.openEvidence} →
             </Link>
           </article>
-        ))}
-      </section>
-    </div>
+        </section>
+
+        <details className="group rounded-2xl border border-white/10 bg-[#07101f]/65">
+          <summary className="cursor-pointer list-none p-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-300">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <h2 className="text-base font-semibold text-white">{copy.explore}</h2>
+                <p className="mt-1 max-w-3xl text-xs leading-5 text-slate-400">{copy.exploreBody}</p>
+              </div>
+              <span className="text-xl text-teal-300 transition-transform group-open:rotate-45">+</span>
+            </div>
+          </summary>
+          <div className="border-t border-white/10 p-3 sm:p-5">
+            <InteractiveIntelligenceGlobe
+              labels={{
+                title: copy.mapTitle,
+                hint: copy.mapHint,
+                reset: copy.mapReset,
+                fallbackTitle: copy.mapFallbackTitle,
+                fallbackHint: copy.mapFallbackHint,
+                keyboardHint: copy.mapKeyboard,
+              }}
+              selectedCountryId={selectedCountry?.country.id ?? null}
+              onSelectCountry={handleSelectCountry}
+            />
+            <div className="mt-4 flex flex-wrap gap-2">
+              {[
+                ["/countries", t("navigation.countries")],
+                ["/research", t("navigation.research")],
+                ["/companies", t("navigation.companies")],
+                ["/universities", t("navigation.universities")],
+                ["/graph", t("navigation.knowledgeGraph")],
+              ].map(([href, label]) => (
+                <Link key={href} href={href} className="rounded-full border border-white/10 px-4 py-2 text-xs text-slate-300 hover:border-teal-300/35 hover:text-white">
+                  {label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </details>
+      </div>
+    </main>
   );
 }
