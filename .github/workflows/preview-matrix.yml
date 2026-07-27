@@ -41,8 +41,10 @@ jobs:
                 cases++;
                 const page = await context.newPage();
                 const errors = [];
+                const failedRequests = [];
                 page.on("pageerror", e => errors.push("pageerror: "+e.message));
                 page.on("console", m => { if (m.type()==="error") errors.push("console: "+m.text()); });
+                page.on("requestfailed", r => failedRequests.push({url:r.url(),error:r.failure()?.errorText ?? "unknown"}));
                 let status = 0, title = "", visible = false, overflow = null, navigationError = null;
                 try {
                   const response = await page.goto(base+route,{waitUntil:"networkidle",timeout:45000});
@@ -58,17 +60,18 @@ jobs:
                   title:title.trim().length>0,
                   bodyVisible:visible,
                   noHorizontalOverflow:overflow!==null&&overflow.scrollWidth<=overflow.clientWidth,
+                  noFailedRequests:failedRequests.length===0,
                   noConsoleOrPageErrors:errors.length===0
                 };
                 const pass = Object.values(assertions).every(Boolean);
                 console.log((pass?"PASS ":"FAIL ")+name+" "+route+" "+JSON.stringify(assertions));
-                if (!pass) { failed++; failures.push({viewport:name,route,assertions,status,title,overflow,errors,navigationError}); }
+                if (!pass) { failed++; failures.push({viewport:name,route,assertions,status,title,overflow,failedRequests,errors,navigationError}); }
                 await page.close();
               }
               await context.close();
             }
           } finally { await browser.close(); }
-          const summary = {release:"f6e164ee0ceb4faf3e1eb46aa9bb460ebcac9273",target:base,viewports:viewports.length,routes:routes.length,cases,assertions:cases*6,passedCases:cases-failed,failedCases:failed,failures};
+          const summary = {release:"f6e164ee0ceb4faf3e1eb46aa9bb460ebcac9273",target:base,viewports:viewports.length,routes:routes.length,cases,assertions:cases*7,passedCases:cases-failed,failedCases:failed,failures};
           console.log("FINAL_MATRIX_SUMMARY "+JSON.stringify(summary));
           if (failed) process.exit(1);
           NODE
