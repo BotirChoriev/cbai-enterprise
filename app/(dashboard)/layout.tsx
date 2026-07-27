@@ -27,6 +27,7 @@ import CommandClarifyCard from "@/components/operational-objects/CommandClarifyC
 import OfflineBanner from "@/components/system/OfflineBanner";
 import RouteChromeFallback from "@/components/system/RouteChromeFallback";
 import RouteExperienceHero from "@/components/experience/RouteExperienceHero";
+import AlKhwarizmiGuide from "@/components/al-khwarizmi-guide/AlKhwarizmiGuide";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import {
   shouldShowAmbientTrustStrip,
@@ -103,6 +104,7 @@ export default function DashboardLayout({
                   </MissionContextProvider>
                 </PlatformContextProvider>
               </Suspense>
+              <AlKhwarizmiGuide />
               <VoiceOperatorDock />
             </VoiceOperatorProvider>
           </OperationalObjectProvider>
