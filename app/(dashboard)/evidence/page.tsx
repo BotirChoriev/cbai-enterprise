@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import EvidenceExplorer from "@/components/evidence/EvidenceExplorer";
+import DecisionJourneyHero from "@/components/experience/DecisionJourneyHero";
 
 export const metadata: Metadata = {
   title: "Evidence and Scientific Deliberation",
@@ -8,5 +9,10 @@ export const metadata: Metadata = {
 
 /** Canonical Evidence route — same surface as legacy `/knowledge`. */
 export default function EvidencePage() {
-  return <EvidenceExplorer />;
+  return (
+    <div className="mx-auto max-w-[100rem] space-y-6">
+      <DecisionJourneyHero variant="evidence" />
+      <EvidenceExplorer />
+    </div>
+  );
 }

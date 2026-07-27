@@ -9,6 +9,7 @@ import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import { cbaiStatCell } from "@/components/brand/brand-classes";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
+import DecisionJourneyHero from "@/components/experience/DecisionJourneyHero";
 
 export default function ReasoningExplorer() {
   const { t } = useTranslation();
@@ -21,6 +22,7 @@ export default function ReasoningExplorer() {
       showOperator={false}
       showMissionContext={false}
     >
+      <DecisionJourneyHero variant="scenarios" />
       <MissionReasoningPanel />
       {disclosure.showReasoningStats ? (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

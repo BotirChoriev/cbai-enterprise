@@ -81,6 +81,12 @@ const NAV_ALIASES = {
     "открой доказательства", "доказательства", "покажи доказательства",
     "kanıtları aç", "kanıtlar", "kanıtları göster",
   ],
+  reasoning: [
+    "open scenarios", "compare scenarios", "scenario engine", "open reasoning", "reasoning",
+    "ssenariylarni och", "ssenariylarni taqqosla", "fikrlash jarayonini och",
+    "открой сценарии", "сравни сценарии",
+    "senaryoları aç", "senaryoları karşılaştır",
+  ],
   graph: [
     "open knowledge graph", "knowledge graph", "open graph",
     "bilim grafigini och", "bilim grafigi", "aloqalar xaritasi",
@@ -92,6 +98,12 @@ const NAV_ALIASES = {
     "hisobotlarni och", "hisobotlar",
     "открой отчёты", "отчёты",
     "raporları aç", "raporlar",
+  ],
+  organization: [
+    "open organization", "organization workspace", "organization", "open collaboration",
+    "tashkilotni och", "tashkilot maydoni", "hamkorlikni och",
+    "открой организацию", "пространство организации",
+    "organizasyonu aç", "işbirliğini aç",
   ],
   investor: [
     "open investor", "investor workspace", "investor",
@@ -238,8 +250,10 @@ export const PLATFORM_ACTION_REGISTRY: Record<PlatformActionId, PlatformActionDe
   "navigate.universities": navDef("navigate.universities", NAV_ALIASES.universities, "platformAction.successUniversities", "nav_universities"),
   "navigate.research": navDef("navigate.research", NAV_ALIASES.research, "platformAction.successResearch", "nav_research"),
   "navigate.evidence": navDef("navigate.evidence", NAV_ALIASES.evidence, "platformAction.successEvidence", "nav_evidence"),
+  "navigate.reasoning": navDef("navigate.reasoning", NAV_ALIASES.reasoning, "platformAction.successResearch", "nav_reasoning"),
   "navigate.graph": navDef("navigate.graph", NAV_ALIASES.graph, "platformAction.successGraph", "nav_graph"),
   "navigate.reports": navDef("navigate.reports", NAV_ALIASES.reports, "platformAction.successReports", "nav_reports"),
+  "navigate.organization": navDef("navigate.organization", NAV_ALIASES.organization, "platformAction.successWorkspace", "nav_organization"),
   "navigate.investor": navDef("navigate.investor", NAV_ALIASES.investor, "platformAction.successInvestor", "nav_investor"),
   "navigate.government": navDef("navigate.government", NAV_ALIASES.government, "platformAction.successGovernment", "nav_government"),
   "navigate.governance": navDef("navigate.governance", NAV_ALIASES.governance, "platformAction.successGovernance", "nav_governance"),
@@ -567,10 +581,14 @@ export function hrefForAction(actionId: PlatformActionId, params: { entityId?: s
       return params.topicId ? `/research/${params.topicId}` : params.query ? `/research?q=${encodeURIComponent(params.query)}` : "/research";
     case "navigate.evidence":
       return "/knowledge";
+    case "navigate.reasoning":
+      return "/reasoning";
     case "navigate.graph":
       return "/graph";
     case "navigate.reports":
       return "/reports";
+    case "navigate.organization":
+      return "/organization";
     case "navigate.investor":
       return "/investor";
     case "navigate.government":

@@ -8,6 +8,7 @@ import type { Problem } from "@/lib/problems/problem.types";
 import ProblemInvestigationPanel from "@/components/problems/ProblemInvestigationPanel";
 import ProblemDecisionWorkspace from "@/components/problems/ProblemDecisionWorkspace";
 import ProblemCloudStatus from "@/components/problems/ProblemCloudStatus";
+import DecisionJourneyHero from "@/components/experience/DecisionJourneyHero";
 
 const COPY = {
   en: {
@@ -58,13 +59,16 @@ export default function ProblemWorkspace() {
 
   if (!problem || !brief) {
     return (
-      <section className="mx-auto max-w-5xl rounded-2xl border border-[var(--cbai-border-default)] bg-[var(--cbai-glass-surface)] p-6">
-        <h1 className="cbai-display text-2xl font-semibold text-[var(--cbai-text-primary)]">{copy.title}</h1>
-        <p className="mt-3 text-sm text-[var(--cbai-text-secondary)]">{copy.empty}</p>
-        <Link href="/" className="mt-5 inline-flex rounded-lg bg-teal-500 px-4 py-2 text-sm font-semibold text-slate-950">
-          {copy.back}
-        </Link>
-      </section>
+      <div className="mx-auto max-w-[100rem] space-y-5">
+        <DecisionJourneyHero variant="problem" />
+        <section className="rounded-2xl border border-[var(--cbai-border-default)] bg-[var(--cbai-glass-surface)] p-6">
+          <h2 className="cbai-display text-2xl font-semibold text-[var(--cbai-text-primary)]">{copy.title}</h2>
+          <p className="mt-3 text-sm text-[var(--cbai-text-secondary)]">{copy.empty}</p>
+          <Link href="/" className="mt-5 inline-flex rounded-lg bg-teal-500 px-4 py-2 text-sm font-semibold text-slate-950">
+            {copy.back}
+          </Link>
+        </section>
+      </div>
     );
   }
 
@@ -78,7 +82,8 @@ export default function ProblemWorkspace() {
   ] as const;
 
   return (
-    <div className="mx-auto max-w-6xl space-y-5" data-cbai-problem-workspace={problem.id}>
+    <div className="mx-auto max-w-[100rem] space-y-5" data-cbai-problem-workspace={problem.id}>
+      <DecisionJourneyHero variant="problem" />
       <header className="rounded-2xl border border-teal-500/25 bg-[var(--cbai-glass-surface)] p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>

@@ -5,6 +5,7 @@ import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import EngineRouteEntryStrip from "@/components/forward-deployed/EngineRouteEntryStrip";
 import { cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import GovernanceControlCenter from "@/components/governance-control/GovernanceControlCenter";
+import DecisionJourneyHero from "@/components/experience/DecisionJourneyHero";
 
 export default function GovernancePageClient() {
   const { t } = useTranslation();
@@ -15,6 +16,7 @@ export default function GovernancePageClient() {
       description={t("governancePage.description")}
       showOperator
     >
+      <DecisionJourneyHero variant="governance" />
       <EngineRouteEntryStrip />
       <p className={cbaiSectionEyebrow}>{t("previewPages.inDevelopmentEyebrow")}</p>
       <p className="text-sm text-zinc-500">{t("governancePage.previewNotice")}</p>

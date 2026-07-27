@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import OrganizationPageClient from "@/components/organization/OrganizationPageClient";
+import DecisionJourneyHero from "@/components/experience/DecisionJourneyHero";
 
 export const metadata: Metadata = {
   title: "Organization",
@@ -7,5 +8,10 @@ export const metadata: Metadata = {
 };
 
 export default function OrganizationPage() {
-  return <OrganizationPageClient />;
+  return (
+    <div className="mx-auto max-w-[100rem] space-y-6">
+      <DecisionJourneyHero variant="collaboration" />
+      <OrganizationPageClient />
+    </div>
+  );
 }

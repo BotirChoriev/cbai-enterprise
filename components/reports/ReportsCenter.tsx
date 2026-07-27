@@ -20,6 +20,7 @@ import ReportReadinessSection from "@/components/reports/ReportReadinessSection"
 import SavedReportsSection from "@/components/reports/SavedReportsSection";
 import ReportsPrimaryActions from "@/components/reports/ReportsPrimaryActions";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
+import DecisionJourneyHero from "@/components/experience/DecisionJourneyHero";
 
 function entityProfilePath(entity: PrimaryEntityRef): string {
   switch (entity.kind) {
@@ -61,6 +62,7 @@ export default function ReportsCenter() {
         ) : undefined
       }
     >
+      <DecisionJourneyHero variant="reports" />
       <EngineRouteEntryStrip />
       <ReportsEmptyIntro />
       <ReportsPrimaryActions />

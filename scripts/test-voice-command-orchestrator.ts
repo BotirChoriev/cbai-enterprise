@@ -84,6 +84,16 @@ test("6. Evidence Graph Reports Settings Trust navigation", () => {
   assert.equal(resolveVoiceCommandFromText("maxfiylik siyosatini och", "uz").action?.actionId, "navigate.trust");
 });
 
+test("6a. Scenario and collaboration navigation use the canonical voice registry", () => {
+  const scenarios = resolveVoiceCommandFromText("ssenariylarni taqqosla", "uz");
+  assert.equal(scenarios.action?.actionId, "navigate.reasoning");
+  assert.equal(scenarios.action?.target.href, "/reasoning");
+
+  const collaboration = resolveVoiceCommandFromText("hamkorlikni och", "uz");
+  assert.equal(collaboration.action?.actionId, "navigate.organization");
+  assert.equal(collaboration.action?.target.href, "/organization");
+});
+
 test("7. Partial transcripts never execute", () => {
   const parsed = parseVoiceCommandInput({
     text: "Men kimyo",
