@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import { useTranslation } from "@/lib/i18n/use-translation";
@@ -44,6 +44,7 @@ export default function OrganizationPageClient() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [cloudEmail, setCloudEmail] = useState<string | null>(null);
+  const attemptedInviteTokenRef = useRef<string | null>(null);
 
   const userId = resolveActorId() ?? "device-local";
   const localUser = getCurrentUser();
@@ -70,7 +71,14 @@ export default function OrganizationPageClient() {
   }, [bump]);
 
   useEffect(() => {
-    if (!inviteToken || !isOrganizationCollaborationShared()) return;
+    if (
+      !inviteToken ||
+      !isOrganizationCollaborationShared() ||
+      attemptedInviteTokenRef.current === inviteToken
+    ) {
+      return;
+    }
+    attemptedInviteTokenRef.current = inviteToken;
     void (async () => {
       const session = await getCloudSession();
       if (!session) {
