@@ -1,4 +1,4 @@
-name: Preview Playwright Matrix
+name: Final Production Playwright Matrix
 on:
   workflow_dispatch:
   push:
@@ -11,16 +11,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: f41c8ea487e41b78ee8d3a5830697e06acf06424
+          ref: f6e164ee0ceb4faf3e1eb46aa9bb460ebcac9273
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - name: Run immutable Preview matrix
+      - name: Run immutable Production matrix
         env:
-          PREVIEW_URL: https://a562cfac.cbai-enterprise.pages.dev
+          PREVIEW_URL: https://checkbalanceai.global
         run: |
           node --input-type=module <<'NODE'
           import { chromium } from "playwright";
@@ -68,7 +68,7 @@ jobs:
               await context.close();
             }
           } finally { await browser.close(); }
-          const summary = {release:"f41c8ea487e41b78ee8d3a5830697e06acf06424",target:base,viewports:viewports.length,routes:routes.length,cases,assertions:cases*6,passedCases:cases-failed,failedCases:failed,failures};
+          const summary = {release:"f6e164ee0ceb4faf3e1eb46aa9bb460ebcac9273",target:base,viewports:viewports.length,routes:routes.length,cases,assertions:cases*6,passedCases:cases-failed,failedCases:failed,failures};
           console.log("FINAL_MATRIX_SUMMARY "+JSON.stringify(summary));
           if (failed) process.exit(1);
           NODE
