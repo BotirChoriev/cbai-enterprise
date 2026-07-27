@@ -13,7 +13,7 @@ export type DecisionJourneyVariant =
   | "collaboration"
   | "governance";
 
-type HeroCopy = {
+export type HeroCopy = {
   eyebrow: string;
   title: string;
   description: string;
@@ -21,6 +21,11 @@ type HeroCopy = {
   primaryHref: string;
   core: string;
   nodes: readonly [string, string][];
+};
+
+export type DecisionJourneyHeroContent = {
+  readonly en: HeroCopy;
+  readonly uz: HeroCopy;
 };
 
 const COPY: Record<"en" | "uz", Record<DecisionJourneyVariant, HeroCopy>> = {
@@ -161,18 +166,31 @@ const HERO_IMAGE: Record<DecisionJourneyVariant, string> = {
   governance: "/experience/governance-monitoring-v1.webp",
 };
 
-export default function DecisionJourneyHero({ variant }: { variant: DecisionJourneyVariant }) {
+export default function DecisionJourneyHero({
+  variant,
+  content,
+  image,
+  experienceId,
+}: {
+  variant: DecisionJourneyVariant;
+  content?: DecisionJourneyHeroContent;
+  image?: string;
+  experienceId?: string;
+}) {
   const { language } = useTranslation();
   const { openDock } = useVoiceOperator();
   const locale = language === "uz" ? "uz" : "en";
-  const copy = COPY[locale][variant];
+  const copy = content?.[locale] ?? COPY[locale][variant];
   const journey = JOURNEY[locale];
 
   return (
-    <section className={`${styles.hero} ${styles[variant]}`} data-cbai-experience={variant}>
+    <section
+      className={`${styles.hero} ${styles[variant]}`}
+      data-cbai-experience={experienceId ?? variant}
+    >
       <div
         className={styles.cinematicMedia}
-        style={{ backgroundImage: `url("${HERO_IMAGE[variant]}")` }}
+        style={{ backgroundImage: `url("${image ?? HERO_IMAGE[variant]}")` }}
         aria-hidden="true"
       />
       <div className={styles.content}>

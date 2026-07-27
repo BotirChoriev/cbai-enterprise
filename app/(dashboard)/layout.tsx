@@ -26,6 +26,7 @@ import OperationalObjectComposer from "@/components/operational-objects/Operatio
 import CommandClarifyCard from "@/components/operational-objects/CommandClarifyCard";
 import OfflineBanner from "@/components/system/OfflineBanner";
 import RouteChromeFallback from "@/components/system/RouteChromeFallback";
+import RouteExperienceHero from "@/components/experience/RouteExperienceHero";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import {
   shouldShowAmbientTrustStrip,
@@ -83,7 +84,10 @@ export default function DashboardLayout({
                                 <div
                                   className={`grid min-h-0 flex-1 grid-cols-1 ${showOperatingColumn ? "lg:grid-cols-[minmax(0,1fr)_15rem] xl:grid-cols-[minmax(0,1fr)_17rem]" : ""}`}
                                 >
-                                  <div className="cbai-space-enter min-w-0 px-4 py-4 lg:px-5 lg:py-5">{children}</div>
+                                  <div className="cbai-space-enter min-w-0 space-y-5 px-4 py-4 lg:px-5 lg:py-5">
+                                    <RouteExperienceHero />
+                                    {children}
+                                  </div>
                                   {showOperatingColumn ? <OperatingContextColumn className="hidden lg:flex" /> : null}
                                 </div>
                                 {showContinuity ? <ContinuityTimelineStrip /> : null}
