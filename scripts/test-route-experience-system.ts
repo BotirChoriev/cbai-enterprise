@@ -46,6 +46,8 @@ test("existing cinematic routes and graph work surface are not duplicated", () =
 test("every route visual preserves voice control and human decision framing", () => {
   assert.match(hero, /useVoiceOperator/);
   assert.match(hero, /onClick=\{openDock\}/);
+  assert.match(hero, /Open Voice Operator/);
+  assert.match(hero, /Ovoz operatorini ochish/);
   assert.match(routeHero, /human confirmation/i);
   assert.match(routeHero, /inson tasdig/i);
 });

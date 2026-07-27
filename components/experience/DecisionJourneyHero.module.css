@@ -90,7 +90,7 @@
   z-index: 2;
   display: grid;
   min-height: inherit;
-  grid-template-columns: minmax(0, 0.82fr) minmax(23rem, 1.18fr);
+  grid-template-columns: minmax(0, 0.95fr) minmax(23rem, 1.05fr);
   gap: 1.5rem;
   padding: clamp(1.5rem, 3vw, 3rem);
 }

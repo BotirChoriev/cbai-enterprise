@@ -12,7 +12,7 @@ test("decision journey hero communicates the complete collaborative intelligence
     assert.match(HERO, new RegExp(stage, "i"));
   }
   assert.match(HERO, /openDock/);
-  assert.match(HERO, /Control with Voice Operator/);
+  assert.match(HERO, /Open Voice Operator/);
 });
 
 test("canonical decision surfaces use one shared experience layer", () => {

@@ -205,7 +205,7 @@ export default function DecisionJourneyHero({
             </Link>
             <button type="button" className={styles.secondary} onClick={openDock}>
               <span aria-hidden="true">◉</span>
-              {locale === "uz" ? "Ovoz operatori bilan boshqarish" : "Control with Voice Operator"}
+              {locale === "uz" ? "Ovoz operatorini ochish" : "Open Voice Operator"}
             </button>
           </div>
         </div>
