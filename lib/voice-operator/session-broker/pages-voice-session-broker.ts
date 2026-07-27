@@ -357,6 +357,16 @@ function upstreamFailureResponse(
   apiKey: string | undefined,
   exposeDiagnostics: boolean,
 ): Response {
+  console.error(
+    JSON.stringify({
+      event: "voice_broker_upstream_failure",
+      classification: diagnostics.classification,
+      upstreamStatus: diagnostics.upstreamStatus,
+      openAiType: diagnostics.openAiType ?? null,
+      openAiCode: diagnostics.openAiCode ?? null,
+      requestId: diagnostics.requestId ?? null,
+    }),
+  );
   const body = buildUpstreamErrorResponseBody(diagnostics, exposeDiagnostics);
   const payload = sanitizeErrorText(JSON.stringify(body), apiKey);
   const headers = new Headers(JSON_HEADERS);
