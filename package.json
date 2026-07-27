@@ -109,7 +109,8 @@
     "test:scientific-deliberation-network": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-scientific-deliberation-network.ts",
     "test:world-and-me-intelligence-map": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-world-and-me-intelligence-map.ts",
     "test:live-collaboration-rooms": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-live-collaboration-rooms.ts",
-    "test:decision-journey-experience": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-decision-journey-experience.ts"
+    "test:decision-journey-experience": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-decision-journey-experience.ts",
+    "test:intelligent-work-surface": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-intelligent-work-surface.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.2",

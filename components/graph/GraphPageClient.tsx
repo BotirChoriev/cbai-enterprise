@@ -33,6 +33,7 @@ import { getCurrentUserId } from "@/lib/auth/auth-store";
 import { backfillLivingRelationships } from "@/lib/living-object-network/living-relationship-backfill";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
 import { cbaiBtnPrimary, cbaiFocusRing } from "@/components/brand/brand-classes";
+import IntelligentWorkSurface from "@/components/intelligent-work-surface/IntelligentWorkSurface";
 
 export default function GraphPageClient() {
   const { t, language } = useTranslation();
@@ -166,7 +167,9 @@ export default function GraphPageClient() {
   }, [cycleSelection]);
 
   return (
-    <IntelligencePageFrame
+    <>
+      <IntelligentWorkSurface />
+      <IntelligencePageFrame
       title={copy.title}
       purpose={copy.oneSentence}
       nextStep={copy.primaryQuestion}
@@ -254,6 +257,7 @@ export default function GraphPageClient() {
           </details>
         </EntityOptionalExploration>
       </div>
-    </IntelligencePageFrame>
+      </IntelligencePageFrame>
+    </>
   );
 }
