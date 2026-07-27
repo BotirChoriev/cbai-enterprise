@@ -176,14 +176,19 @@ export async function processConversationInput(
   return { assistantText: uzResponse("clarify", ctx.language), dockState: "ready" };
 }
 
-export function resolveOperatorMode(language: string): {
+export function resolveOperatorMode(language: string, pageOrigin?: string | null): {
   mode: "realtime" | "browser_fallback";
   backendRequired: boolean;
   realtimeConfigured: boolean;
   notice: string;
 } {
-  const pageOrigin = typeof window !== "undefined" ? window.location.origin : null;
-  const broker = evaluateVoiceBrokerStatus(pageOrigin);
+  const resolvedOrigin =
+    pageOrigin === undefined
+      ? typeof window !== "undefined"
+        ? window.location.origin
+        : null
+      : pageOrigin;
+  const broker = evaluateVoiceBrokerStatus(resolvedOrigin);
   if (broker.kind === "available") {
     return { mode: "realtime", backendRequired: false, realtimeConfigured: true, notice: "" };
   }

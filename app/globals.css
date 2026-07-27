@@ -1016,9 +1016,23 @@ html[data-cbai-voice-dock="open"] .cbai-platform-main {
   }
 
   .cbai-voice-dock-open {
-    inset-inline: max(0.75rem, env(safe-area-inset-left)) max(0.75rem, env(safe-area-inset-right));
+    inset: auto max(0.5rem, env(safe-area-inset-right)) max(0.5rem, env(safe-area-inset-bottom))
+      max(0.5rem, env(safe-area-inset-left));
     width: auto;
-    max-height: min(70vh, 28rem);
+    max-height: min(52dvh, 22rem);
+  }
+
+  .cbai-voice-dock-panel {
+    border-radius: 0.875rem;
+    padding: 0.625rem;
+  }
+
+  .cbai-voice-dock-notice {
+    padding: 0.45rem 0.55rem;
+  }
+
+  .cbai-voice-dock-panel [data-voice-action="text-input"] {
+    min-height: 2.75rem;
   }
 
   .cbai-voice-dock-closed .cbai-spatial-voice-cta {

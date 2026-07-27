@@ -196,7 +196,7 @@ export default function SpatialWorldIntelligenceHome() {
       <div className="relative mx-auto max-w-[1480px] space-y-5">
         <header className="max-w-4xl pt-2">
           <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-teal-300/80">{copy.eyebrow}</p>
-          <h1 className="mt-3 max-w-4xl text-balance text-3xl font-semibold leading-[1.08] tracking-[-0.035em] text-white sm:text-4xl xl:text-5xl">
+          <h1 className="mt-3 max-w-4xl text-balance text-[2rem] font-semibold leading-[1.08] tracking-[-0.035em] text-white sm:text-4xl xl:text-5xl">
             {copy.title}
           </h1>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-300 sm:text-base">{copy.subtitle}</p>

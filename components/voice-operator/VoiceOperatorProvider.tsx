@@ -8,6 +8,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -126,6 +127,18 @@ type VoiceOperatorContextValue = {
 };
 
 const VoiceOperatorContext = createContext<VoiceOperatorContextValue | null>(null);
+
+function subscribePageOrigin(): () => void {
+  return () => undefined;
+}
+
+function readPageOrigin(): string {
+  return window.location.origin;
+}
+
+function readServerPageOrigin(): null {
+  return null;
+}
 
 export function useVoiceOperator(): VoiceOperatorContextValue {
   const ctx = useContext(VoiceOperatorContext);
@@ -257,7 +270,15 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
   const sessionActiveRef = useRef(false);
   const captureActiveRef = useRef(false);
 
-  const operatorMode = useMemo(() => resolveOperatorMode(language), [language]);
+  const pageOrigin = useSyncExternalStore(
+    subscribePageOrigin,
+    readPageOrigin,
+    readServerPageOrigin,
+  );
+  const operatorMode = useMemo(
+    () => resolveOperatorMode(language, pageOrigin),
+    [language, pageOrigin],
+  );
   const brokerConfigured = operatorMode.realtimeConfigured;
 
   /** Drive layout reservation (desktop right inset) from a single document data attribute. */

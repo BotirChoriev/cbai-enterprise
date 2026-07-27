@@ -194,7 +194,7 @@ export default function ActivationExperience({
         {step === "choices" ? choices : null}
 
         {step === "voice" ? (
-          <div className="space-y-3" data-activation-voice-intro="1">
+          <div className="hidden space-y-3 sm:block" data-activation-voice-intro="1">
             <p className="rounded-xl border border-teal-500/20 bg-[#0d1a30]/80 px-4 py-3 text-sm leading-relaxed text-slate-100">
               {copy.operatorIntro}
             </p>
