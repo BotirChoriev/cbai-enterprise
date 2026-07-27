@@ -32,14 +32,9 @@ export interface CloudStorageAdapter {
   removeItem(key: string): Promise<void>;
 }
 
-function readEnv(name: string): string | undefined {
-  if (typeof process === "undefined" || !process.env) return undefined;
-  return process.env[name];
-}
-
 /** Real env-var check — never assumes configuration that isn't there. */
 export function isCloudStorageConfigured(): boolean {
-  return Boolean(readEnv("NEXT_PUBLIC_SUPABASE_URL")) && Boolean(readEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"));
+  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) && Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 }
 
 /** The one honest switch point for a simple local/cloud read: "local" (browser storage) until
