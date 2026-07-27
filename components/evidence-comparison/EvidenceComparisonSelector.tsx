@@ -1,6 +1,7 @@
 "use client";
 
 import type { ComparisonCandidate } from "@/lib/evidence-comparison";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type EvidenceComparisonSelectorProps = {
   leftLegacyId: string;
@@ -16,20 +17,20 @@ export default function EvidenceComparisonSelector({
   onSelect,
   disabled = false,
 }: EvidenceComparisonSelectorProps) {
+  const { t } = useTranslation();
+
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-5 py-4">
-      <label htmlFor="comparison-target-select" className="block text-sm font-medium text-zinc-300">
-        Compare with
+    <div className="rounded-xl border border-[var(--cbai-border-default)] bg-[var(--cbai-surface-muted)] px-5 py-4">
+      <label htmlFor="comparison-target-select" className="block text-sm font-medium text-[var(--cbai-text-secondary)]">
+        {t("evidenceComparisonUi.compareWith")}
       </label>
-      <p className="mt-1 text-xs text-zinc-500">
-        Select another profile of the same type to compare.
-      </p>
+      <p className="mt-1 text-xs text-[var(--cbai-text-muted)]">{t("evidenceComparisonUi.compareHint")}</p>
       <select
         id="comparison-target-select"
         value={selectedLegacyId ?? ""}
         onChange={(e) => onSelect(e.target.value)}
         disabled={disabled || candidates.length === 0}
-        className="mt-3 w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-200 outline-none focus:border-teal-500/40 focus:ring-1 focus:ring-teal-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+        className="mt-3 w-full rounded-lg border border-[var(--cbai-border-default)] bg-[var(--cbai-solid-surface)] px-3 py-2 text-sm text-[var(--cbai-text-primary)] outline-none focus:border-[var(--cbai-border-active)] focus:ring-1 focus:ring-[var(--cbai-focus-ring)] disabled:cursor-not-allowed disabled:opacity-50"
       >
         {candidates.map((candidate) => (
           <option key={candidate.entityId} value={candidate.legacyId}>

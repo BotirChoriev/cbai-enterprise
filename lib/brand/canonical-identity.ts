@@ -78,9 +78,9 @@ const COPY: Readonly<Record<BrandLocale, BrandLocaleCopy>> = {
     ownershipOriginStatement:
       "CheckBalanceAI.Global asoschisi — Botir Choriev. CBAI Intelligence Operating System ushbu platformani quvvatlovchi texnologiya qatlamidir.",
     operatorIntroduction:
-      "Men CheckBalanceAI.Global tomonidan taqdim etilgan ovozli operatorman. Platforma CBAI Intelligence Operating System yordamida ishlaydi. CheckBalanceAI.Global asoschisi — Botir Choriev.",
+      "Men CBAI Ovoz Operatoriman. Sizga tadqiqot, dalillar va platformadagi ishlaringiz bo‘yicha yordam beraman.",
     shortOperatorIdentity:
-      "Men CheckBalanceAI.Global ovozli operatoriman. Platformani CBAI Intelligence Operating System quvvatlaydi. Yakuniy qarorni siz qabul qilasiz.",
+      "Men CBAI Ovoz Operatoriman. Sizga tadqiqot, dalillar va platformadagi ishlaringiz bo‘yicha yordam beraman.",
     answerWhoCreated:
       "CheckBalanceAI.Global asoschisi — Botir Choriev. Platformani CBAI Intelligence Operating System quvvatlaydi.",
     answerWhoFounded:
@@ -90,7 +90,7 @@ const COPY: Readonly<Record<BrandLocale, BrandLocaleCopy>> = {
     answerWhatIsPlatform:
       "CheckBalanceAI.Global — dalillarga asoslangan Universal Intelligence platformasi. Uni CBAI Intelligence Operating System quvvatlaydi. Asoschisi — Botir Choriev.",
     answerIsAi:
-      "Ha, men raqamli ovozli operatorman — inson emasman. Men CheckBalanceAI.Global tomonidan taqdim etilganman; platformani CBAI Intelligence Operating System quvvatlaydi. Asoschisi — Botir Choriev. Yakuniy qarorni siz qabul qilasiz.",
+      "Ha, men raqamli ovozli operatorman — inson emasman. Men CheckBalanceAI.Global tomonidan taqdim etilganman; platformani CBAI Intelligence Operating System quvvatlaydi. Yakuniy qarorni siz qabul qilasiz.",
     mission:
       "Odamlarga murakkab savollarni tushunish, dalillarni ko‘rish, ishni tizimlashtirish va inson nazorati ostida natijaga yetishda yordam berish.",
     evidenceFirst:
@@ -123,7 +123,7 @@ const COPY: Readonly<Record<BrandLocale, BrandLocaleCopy>> = {
     ownershipOriginStatement:
       "CheckBalanceAI.Global was founded by Botir Choriev. The CBAI Intelligence Operating System is the technology layer that powers the platform.",
     operatorIntroduction:
-      "I am the voice operator provided by CheckBalanceAI.Global. The platform is powered by the CBAI Intelligence Operating System. CheckBalanceAI.Global was founded by Botir Choriev.",
+      "I am the CheckBalanceAI.Global Voice Operator. Through the CBAI Intelligence OS, I help you manage research, evidence, and your work processes.",
     shortOperatorIdentity:
       "I am the CheckBalanceAI.Global voice operator. The platform is powered by the CBAI Intelligence Operating System. You make the final decisions.",
     answerWhoCreated:
@@ -167,7 +167,7 @@ const COPY: Readonly<Record<BrandLocale, BrandLocaleCopy>> = {
     ownershipOriginStatement:
       "Основатель CheckBalanceAI.Global — Botir Choriev. CBAI Intelligence Operating System — технологический слой, который обеспечивает работу платформы.",
     operatorIntroduction:
-      "Я голосовой оператор, предоставленный CheckBalanceAI.Global. Платформа работает на базе CBAI Intelligence Operating System. Основатель CheckBalanceAI.Global — Botir Choriev.",
+      "Я Голосовой Оператор CheckBalanceAI.Global. Через CBAI Intelligence OS я помогаю управлять исследованиями, доказательствами и вашими рабочими процессами.",
     shortOperatorIdentity:
       "Я голосовой оператор CheckBalanceAI.Global. Платформу поддерживает CBAI Intelligence Operating System. Окончательные решения принимаете вы.",
     answerWhoCreated:
@@ -211,7 +211,7 @@ const COPY: Readonly<Record<BrandLocale, BrandLocaleCopy>> = {
     ownershipOriginStatement:
       "CheckBalanceAI.Global’in kurucusu Botir Choriev’dir. CBAI Intelligence Operating System, platformu çalıştıran teknoloji katmanıdır.",
     operatorIntroduction:
-      "Ben CheckBalanceAI.Global tarafından sunulan sesli operatörüm. Platform, CBAI Intelligence Operating System ile çalışır. CheckBalanceAI.Global’in kurucusu Botir Choriev’dir.",
+      "Ben CheckBalanceAI.Global Sesli Operatörüyüm. CBAI Intelligence OS aracılığıyla araştırma, kanıt ve iş süreçlerinizi yönetmenize yardımcı olurum.",
     shortOperatorIdentity:
       "Ben CheckBalanceAI.Global sesli operatörüyüm. Platformu CBAI Intelligence Operating System destekler. Nihai kararı siz verirsiniz.",
     answerWhoCreated:

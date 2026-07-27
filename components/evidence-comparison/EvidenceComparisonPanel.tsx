@@ -9,6 +9,7 @@ import EvidenceComparisonMatrix from "@/components/evidence-comparison/EvidenceC
 import EvidenceComparisonGaps from "@/components/evidence-comparison/EvidenceComparisonGaps";
 import EvidenceComparisonLimitations from "@/components/evidence-comparison/EvidenceComparisonLimitations";
 import { sanitizeUserMessage } from "@/components/shared/user-facing-copy";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type EvidenceComparisonPanelProps = {
   entityType: ComparisonEntityType;
@@ -21,6 +22,7 @@ export default function EvidenceComparisonPanel({
   leftLegacyId,
   initialModel,
 }: EvidenceComparisonPanelProps) {
+  const { t } = useTranslation();
   const defaultTarget = defaultComparisonTarget(initialModel.context)?.legacyId ?? null;
   const [selectedLegacyId, setSelectedLegacyId] = useState<string | null>(defaultTarget);
 
@@ -33,13 +35,11 @@ export default function EvidenceComparisonPanel({
   const userUnsupportedMessage = sanitizeUserMessage(unsupportedMessage);
 
   return (
-    <section className="space-y-6" aria-label="Evidence comparison">
+    <section className="space-y-6" aria-label={t("evidenceComparisonUi.ariaLabel")}>
       {!context.comparisonAvailable ? (
         <EvidenceComparisonLimitations
           comparison={null}
-          limitations={[
-            "Comparison requires at least two profiles of the same type.",
-          ]}
+          limitations={[t("evidenceComparisonUi.requiresTwo")]}
           unsupportedMessage={sanitizeUserMessage(context.unavailableReason)}
         />
       ) : (
@@ -69,7 +69,7 @@ export default function EvidenceComparisonPanel({
               comparison={null}
               limitations={[]}
               unsupportedMessage={
-                userUnsupportedMessage ?? "Comparison is not available for these profiles."
+                userUnsupportedMessage ?? t("evidenceComparisonUi.notAvailable")
               }
             />
           )}

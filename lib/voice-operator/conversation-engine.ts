@@ -47,7 +47,7 @@ export function isAffirmativeReply(text: string): boolean {
 function uzResponse(key: string, language: string): string {
   const uz: Record<string, string> = {
     greet:
-      "Salom. Men CBAI ovoz operatoriman. Faol kontekstingiz bo'yicha dalillarni izlash, mavjud manbalarni ko'rsatish va keyingi qadamni tushuntirishda yordam bera olaman.",
+      "Salom. Men CBAI Ovoz Operatoriman. Sizga tadqiqot, dalillar va platformadagi ishlaringiz bo‘yicha yordam beraman.",
     ask_consent:
       "Sanitizatsiya qilingan so'rov bilan ochiq ilmiy provayderlarga qidiruv yuboriladi. Shaxsiy artefaktlar yuborilmaydi. Davom etaymi?",
     searching: "Qidiruv boshlandi. Ulangan provayderlardan natijalar yig'ilmoqda…",
@@ -182,7 +182,8 @@ export function resolveOperatorMode(language: string): {
   realtimeConfigured: boolean;
   notice: string;
 } {
-  const broker = evaluateVoiceBrokerStatus();
+  const pageOrigin = typeof window !== "undefined" ? window.location.origin : null;
+  const broker = evaluateVoiceBrokerStatus(pageOrigin);
   if (broker.kind === "available") {
     return { mode: "realtime", backendRequired: false, realtimeConfigured: true, notice: "" };
   }

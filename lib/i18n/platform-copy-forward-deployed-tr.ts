@@ -2,6 +2,10 @@
 
 export const FORWARD_DEPLOYED_TR = {
   workspaceTitle: "Operasyonel çalışma alanı",
+  closeWorkspace: "Kapat",
+  closeWorkspaceAria: "Operasyonel çalışma alanını kapat",
+  backToPage: "Geri",
+  backToEvidence: "Kanıtlara dön",
   objective: "Amaç",
   context: "Bağlam",
   understanding: "CBAI'nin anladığı",

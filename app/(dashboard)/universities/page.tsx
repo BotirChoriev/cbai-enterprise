@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import UniversitiesPageClient from "./UniversitiesPageClient";
 
 export const metadata: Metadata = {
-  title: "Universities",
-  description: "University profiles with official information and reports.",
+  title: "University Intelligence",
+  description:
+    "Connect universities, laboratories, and researchers through traceable evidence — humans approve every commitment.",
 };
 
 export default function UniversitiesPage() {

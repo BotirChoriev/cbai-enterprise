@@ -31,10 +31,16 @@ export type SearchMatchReason = {
   snippet: string;
 };
 
+export type SearchConfidence = "exact" | "alias" | "prefix" | "fuzzy" | "weak";
+
 export type SearchResult = {
   entity: Entity;
   relevanceScore: number;
   matchReasons: SearchMatchReason[];
+  /** How strongly the query matches a verified registry record. */
+  confidence: SearchConfidence;
+  /** Fraction of query tokens that contributed a name/tag hit (0–1). */
+  tokenCoverage: number;
 };
 
 export type SearchInsight = {
@@ -132,12 +138,54 @@ export function buildPlatformEntityHref(
   return query ? `${getEntityHref(entity)}?${query}` : getEntityHref(entity);
 }
 
+function normalizeSearchText(value: string): string {
+  return value
+    .normalize("NFKC")
+    .toLocaleLowerCase("en-US")
+    .replace(/[’‘ʻʼ`´]/g, "'")
+    .replace(/['']/g, "")
+    .replace(/[^\p{L}\p{N}\s]+/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function tokenize(query: string): string[] {
-  return query
-    .toLowerCase()
-    .trim()
+  return normalizeSearchText(query)
     .split(/\s+/)
     .filter((t) => t.length > 0);
+}
+
+/** Bounded Levenshtein for typo tolerance (short tokens only). */
+function editDistance(a: string, b: string): number {
+  if (a === b) return 0;
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+  if (Math.abs(a.length - b.length) > 2) return 99;
+  const prev = new Array(b.length + 1);
+  const cur = new Array(b.length + 1);
+  for (let j = 0; j <= b.length; j++) prev[j] = j;
+  for (let i = 1; i <= a.length; i++) {
+    cur[0] = i;
+    for (let j = 1; j <= b.length; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      cur[j] = Math.min(cur[j - 1] + 1, prev[j] + 1, prev[j - 1] + cost);
+    }
+    for (let j = 0; j <= b.length; j++) prev[j] = cur[j];
+  }
+  return prev[b.length];
+}
+
+function fuzzyTokenScore(token: string, candidate: string): number {
+  if (!token || !candidate) return 0;
+  if (candidate === token) return 100;
+  if (candidate.startsWith(token)) return 80;
+  if (candidate.includes(token)) return 60;
+  if (token.length >= 5 && candidate.length >= 5) {
+    const dist = editDistance(token, candidate);
+    if (dist === 1) return 55;
+    if (dist === 2 && token.length >= 7) return 40;
+  }
+  return 0;
 }
 
 function searchableText(entity: Entity): string {
@@ -150,7 +198,7 @@ function searchableText(entity: Entity): string {
     ...entity.tags.map((t) => t.label),
     ...Object.values(entity.metadata).map(String),
   ];
-  return parts.join(" ").toLowerCase();
+  return normalizeSearchText(parts.join(" "));
 }
 
 function scoreEntity(entity: Entity, tokens: string[]): SearchResult | null {
@@ -158,37 +206,75 @@ function scoreEntity(entity: Entity, tokens: string[]): SearchResult | null {
     return null;
   }
 
-  const nameLower = entity.name.toLowerCase();
+  const nameLower = normalizeSearchText(entity.name);
+  const nameTokens = nameLower.split(/\s+/).filter(Boolean);
   const text = searchableText(entity);
   let score = 0;
+  let coveredTokens = 0;
+  let bestTier: SearchConfidence = "weak";
   const reasons: SearchMatchReason[] = [];
 
+  const promote = (tier: SearchConfidence) => {
+    const order: SearchConfidence[] = ["weak", "fuzzy", "prefix", "alias", "exact"];
+    if (order.indexOf(tier) > order.indexOf(bestTier)) bestTier = tier;
+  };
+
   for (const token of tokens) {
+    let tokenHit = false;
+
     if (nameLower === token) {
       score += 100;
+      tokenHit = true;
+      promote("exact");
       reasons.push({ field: "Name", snippet: `Exact match: ${entity.name}` });
-    } else if (nameLower.startsWith(token)) {
+    } else if (nameLower.startsWith(token) && token.length >= 3) {
       score += 80;
+      tokenHit = true;
+      promote("prefix");
       reasons.push({ field: "Name", snippet: `Starts with "${token}"` });
-    } else if (nameLower.includes(token)) {
+    } else if (nameLower.includes(token) && token.length >= 3) {
       score += 60;
+      tokenHit = true;
+      promote(token.length >= 6 ? "alias" : "prefix");
       reasons.push({ field: "Name", snippet: `Contains "${token}"` });
+    } else {
+      let bestFuzzy = 0;
+      let fuzzyHit = "";
+      for (const nameToken of nameTokens) {
+        const fuzzy = fuzzyTokenScore(token, nameToken);
+        if (fuzzy > bestFuzzy) {
+          bestFuzzy = fuzzy;
+          fuzzyHit = nameToken;
+        }
+      }
+      if (bestFuzzy >= 40) {
+        score += bestFuzzy;
+        tokenHit = true;
+        promote(bestFuzzy >= 55 ? "fuzzy" : "weak");
+        reasons.push({
+          field: "Name",
+          snippet: bestFuzzy >= 55 ? `Close match: ${fuzzyHit}` : `Similar token: ${fuzzyHit}`,
+        });
+      }
     }
 
     const matchingTag = entity.tags.find((t) =>
-      t.label.toLowerCase().includes(token),
+      normalizeSearchText(t.label).includes(token),
     );
     if (matchingTag) {
       score += 40;
+      tokenHit = true;
+      promote("alias");
       reasons.push({ field: "Tag", snippet: matchingTag.label });
     }
 
-    if (entity.category.toLowerCase().includes(token)) {
+    if (normalizeSearchText(entity.category).includes(token)) {
       score += 25;
+      tokenHit = true;
       reasons.push({ field: "Category", snippet: entity.category });
     }
 
-    if (entity.overview.toLowerCase().includes(token)) {
+    if (normalizeSearchText(entity.overview).includes(token)) {
       score += 20;
       reasons.push({ field: "Overview", snippet: truncate(entity.overview, 80) });
     }
@@ -197,7 +283,7 @@ function scoreEntity(entity: Entity, tokens: string[]): SearchResult | null {
       entity.aiSummary &&
       !entity.aiSummary.toLowerCase().includes(INSUFFICIENT_EVIDENCE);
 
-    if (summarySearchable && entity.aiSummary.toLowerCase().includes(token)) {
+    if (summarySearchable && normalizeSearchText(entity.aiSummary).includes(token)) {
       score += 15;
       reasons.push({
         field: "Summary",
@@ -205,13 +291,24 @@ function scoreEntity(entity: Entity, tokens: string[]): SearchResult | null {
       });
     }
 
-    if (text.includes(token) && score === 0) {
+    if (text.includes(token) && !tokenHit) {
       score += 10;
       reasons.push({ field: "Registry", snippet: `Matched "${token}" in profile` });
     }
+
+    if (tokenHit) coveredTokens += 1;
   }
 
   if (score === 0) return null;
+
+  const tokenCoverage = coveredTokens / tokens.length;
+  // Multi-token queries need majority coverage — otherwise "toshkent … unversetiti"
+  // must not promote an unrelated Tashkent university as a verified hit.
+  if (tokens.length >= 3 && tokenCoverage < 0.5) {
+    bestTier = "weak";
+  } else if (tokens.length >= 2 && tokenCoverage < 0.4) {
+    bestTier = "weak";
+  }
 
   const uniqueReasons = reasons.filter(
     (r, i, arr) =>
@@ -222,7 +319,14 @@ function scoreEntity(entity: Entity, tokens: string[]): SearchResult | null {
     entity,
     relevanceScore: Math.round(score),
     matchReasons: uniqueReasons.slice(0, 3),
+    confidence: bestTier,
+    tokenCoverage,
   };
+}
+
+/** Strong enough to present as a verified registry match (never invent records). */
+export function isConfidentSearchResult(result: SearchResult): boolean {
+  return result.confidence !== "weak" && result.tokenCoverage >= 0.5;
 }
 
 function truncate(text: string, max: number): string {
@@ -236,8 +340,8 @@ function passesFilters(entity: Entity, filters: SearchFilters): boolean {
   return true;
 }
 
-/** Core search — local registries only, no score boosting or empty-query browsing. */
-export function searchEntities(
+/** Score every local registry entity (includes weak closest matches). */
+export function rankEntities(
   query: string,
   filters: SearchFilters = DEFAULT_SEARCH_FILTERS,
 ): SearchResult[] {
@@ -253,6 +357,28 @@ export function searchEntities(
     .map((entity) => scoreEntity(entity, tokens))
     .filter((r): r is SearchResult => r !== null)
     .sort((a, b) => b.relevanceScore - a.relevanceScore);
+}
+
+/**
+ * Core search — local registries only.
+ * Returns confident matches. Use `closestRegistryMatches` when empty for honest UX.
+ */
+export function searchEntities(
+  query: string,
+  filters: SearchFilters = DEFAULT_SEARCH_FILTERS,
+): SearchResult[] {
+  return rankEntities(query, filters).filter(isConfidentSearchResult);
+}
+
+/** Closest registry rows when the query is not in the current catalog (never fabricated). */
+export function closestRegistryMatches(
+  query: string,
+  filters: SearchFilters = DEFAULT_SEARCH_FILTERS,
+  limit = 3,
+): SearchResult[] {
+  return rankEntities(query, filters)
+    .filter((r) => !isConfidentSearchResult(r))
+    .slice(0, limit);
 }
 
 /** Honest insight summary for downstream modules (no fabricated patterns). */
@@ -274,13 +400,18 @@ export function generateSearchInsight(
   }
 
   if (results.length === 0) {
+    const closest = closestRegistryMatches(query, filters, 3);
     return {
-      summary: `No verified local entity matched "${query}".`,
-      topMatches: [],
-      patterns: [],
+      summary: `Not in the current registry for "${query}".`,
+      topMatches: closest.map(
+        (r) => `${r.entity.name} (${getEntityTypeLabel(r.entity.type)}) — closest, not a verified hit`,
+      ),
+      patterns: closest.length
+        ? ["Closest local registry rows shown for orientation only — not invented records"]
+        : [],
       suggestedActions: [
+        "Create a research request or connect an official source",
         "Try a country, company, or university name from local catalogs",
-        "Check topic areas for planned evidence modules",
       ],
     };
   }

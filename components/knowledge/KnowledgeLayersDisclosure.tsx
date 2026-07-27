@@ -47,7 +47,11 @@ export default function KnowledgeLayersDisclosure({ layers, className = "" }: Kn
                   : t(`livingIntelligence.${labelKey}`)}
               </summary>
               <p className="mt-1.5 text-xs leading-relaxed text-zinc-500">
-                {value?.trim() ? value : t("livingIntelligence.layerEmpty")}
+                {field === "evidence" && layers.evidenceKey
+                  ? t(layers.evidenceKey)
+                  : value?.trim()
+                    ? value
+                    : t("livingIntelligence.layerEmpty")}
               </p>
             </details>
           );

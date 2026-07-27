@@ -25,9 +25,7 @@ export default function HumanDecisionBoundary({ variant = "full" }: HumanDecisio
         <p className="text-[10px] uppercase tracking-wider text-[var(--gold-soft)]">
           {t("missionCenter.humanDecisionBoundary")}
         </p>
-        <p className={`mt-1 ${cbaiTextCaption}`}>
-          {t("missionCenter.humanJudgment")} — suggested routes never replace your conclusions.
-        </p>
+        <p className={`mt-1 ${cbaiTextCaption}`}>{t("missionCenter.boundaryCompactNote")}</p>
       </section>
     );
   }
@@ -41,19 +39,19 @@ export default function HumanDecisionBoundary({ variant = "full" }: HumanDecisio
       <dl className="grid gap-2 sm:grid-cols-2">
         <div className={`${cbaiStatCell} border-emerald-500/15 bg-emerald-500/5`}>
           <dt className="text-[10px] uppercase tracking-wider text-emerald-400/90">{t("missionCenter.systemKnows")}</dt>
-          <dd className={`mt-1 ${cbaiTextCaption}`}>Local projects, evidence refs, and catalog entities you linked.</dd>
+          <dd className={`mt-1 ${cbaiTextCaption}`}>{t("missionCenter.boundaryKnowsBody")}</dd>
         </div>
         <div className={`${cbaiStatCell} border-teal-500/15 bg-teal-500/5`}>
           <dt className="text-[10px] uppercase tracking-wider text-teal-400/90">{t("missionCenter.systemInfers")}</dt>
-          <dd className={`mt-1 ${cbaiTextCaption}`}>Suggested routes from demonstrated capability — never conclusions.</dd>
+          <dd className={`mt-1 ${cbaiTextCaption}`}>{t("missionCenter.boundaryInfersBody")}</dd>
         </div>
         <div className={cbaiStatCell}>
           <dt className="text-[10px] uppercase tracking-wider text-zinc-500">{t("missionCenter.systemUnknown")}</dt>
-          <dd className={`mt-1 ${cbaiTextMuted}`}>Live APIs, external researchers, and unlinked evidence gaps.</dd>
+          <dd className={`mt-1 ${cbaiTextMuted}`}>{t("missionCenter.boundaryUnknownBody")}</dd>
         </div>
         <div className={`${cbaiStatCell} border-[var(--gold)]/20 bg-[var(--gold)]/5`}>
           <dt className="text-[10px] uppercase tracking-wider text-[var(--gold-soft)]">{t("missionCenter.humanJudgment")}</dt>
-          <dd className={`mt-1 ${cbaiTextCaption}`}>All scientific claims, reports, and decisions remain yours.</dd>
+          <dd className={`mt-1 ${cbaiTextCaption}`}>{t("missionCenter.boundaryJudgmentBody")}</dd>
         </div>
       </dl>
     </section>

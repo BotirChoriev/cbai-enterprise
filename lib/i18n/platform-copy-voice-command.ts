@@ -14,8 +14,8 @@ export const VOICE_COMMAND_EN = {
   optionChemistryEvidence: "Chemistry-related evidence",
   optionChemistryDraft: "New chemistry work card",
   chemistUnderstood:
-    "Understood. I am opening the chemistry research workspace. Do you want to start new research or review existing evidence?",
-  chemistFollowUp: "The chemistry research workspace is open. Which problem, hypothesis, or evidence are you working on?",
+    "Understood. I am opening My Work so we can prepare a chemist workspace draft. I will ask only the minimum useful questions — nothing is saved until you confirm.",
+  chemistFollowUp: "Which field, thesis title, or research objective should we capture first?",
   identityAnswered: "Here is the CBAI answer.",
   announcedHome: "Opening home.",
   announcedMyWork: "Opening My Work.",
@@ -54,6 +54,15 @@ export const VOICE_COMMAND_EN = {
   announcedTeamInvite: "Invite draft opened — confirm before sending.",
   announcedShare: "Share review opened — confirm before sharing.",
   announcedPublication: "Publication readiness opened — confirm before publishing.",
+  scientificIntakeStorageRequired:
+    "I can prepare a scientific workspace draft with the document name, field, and plan. Secure document storage is not connected yet, so the file itself is not uploaded. Upload continues after storage is configured.",
+  navigationDidNotComplete:
+    "Navigation did not finish. I am staying on this page. You can retry or choose another available section.",
+  actionReceiptUnderstood: "Understood",
+  actionReceiptAction: "Action",
+  actionReceiptResult: "Result",
+  actionReceiptLocation: "Current location",
+  actionReceiptNext: "Next step",
   unsupportedCommand: "I did not recognize that command. Try a workspace name or a short goal.",
 } as const;
 
@@ -71,8 +80,8 @@ export const VOICE_COMMAND_UZ = {
   optionChemistryEvidence: "Kimyoga oid dalillar",
   optionChemistryDraft: "Kimyo bo'yicha yangi ish kartasi",
   chemistUnderstood:
-    "Tushundim. Kimyo bo'yicha tadqiqot maydonini ochaman. Siz yangi tadqiqot boshlamoqchimisiz yoki mavjud dalillarni ko'rmoqchimisiz?",
-  chemistFollowUp: "Kimyo tadqiqot maydoni ochildi. Muammo, gipoteza yoki izlayotgan dalilingizni ayting.",
+    "Tushundim. Kimyogar ish maydoni qoralamasini tayyorlash uchun Mening ishlarimni ochaman. Faqat kerakli savollarni so‘rayman — tasdiqlamaguncha hech narsa saqlanmaydi.",
+  chemistFollowUp: "Avval qaysi soha, dissertatsiya nomi yoki tadqiqot maqsadini yozaylik?",
   identityAnswered: "CBAI haqidagi javob.",
   announcedHome: "Bosh sahifani ochaman.",
   announcedMyWork: "Mening ishlarimni ochaman.",
@@ -111,6 +120,15 @@ export const VOICE_COMMAND_UZ = {
   announcedTeamInvite: "Taklif qoralamasi ochildi — yuborishdan oldin tasdiqlang.",
   announcedShare: "Ulashish ko'rib chiqish ochildi — ulashishdan oldin tasdiqlang.",
   announcedPublication: "Nashr tayyorligi ochildi — nashrdan oldin tasdiqlang.",
+  scientificIntakeStorageRequired:
+    "PhD hujjatini qabul qilish uchun xavfsiz hujjat ombori hali ulanmagan. Hozir siz uchun ilmiy ish maydoni qoralamasini tayyorlab, hujjat nomi, sohasi va rejasini saqlashim mumkin. Hujjatni yuklash ombor ulangandan keyin davom etadi.",
+  navigationDidNotComplete:
+    "Navigatsiya yakunlanmadi. Shu sahifada qolaman. Qayta urinib ko‘ring yoki boshqa mavjud bo‘limni tanlang.",
+  actionReceiptUnderstood: "Tushunildi",
+  actionReceiptAction: "Amal",
+  actionReceiptResult: "Natija",
+  actionReceiptLocation: "Joriy joy",
+  actionReceiptNext: "Keyingi qadam",
   unsupportedCommand: "Bu buyruqni tanimadim. Bo'lim nomi yoki qisqa maqsad ayting.",
 } as const;
 
@@ -128,8 +146,8 @@ export const VOICE_COMMAND_RU = {
   optionChemistryEvidence: "Доказательства по химии",
   optionChemistryDraft: "Новая рабочая карточка по химии",
   chemistUnderstood:
-    "Понял. Открываю пространство исследований по химии. Хотите начать новое исследование или посмотреть имеющиеся доказательства?",
-  chemistFollowUp: "Пространство исследований по химии открыто. Назовите проблему, гипотезу или нужные доказательства.",
+    "Понял. Открываю «Моя работа», чтобы подготовить черновик рабочего пространства химика. Задам только необходимые вопросы — ничего не сохранится до подтверждения.",
+  chemistFollowUp: "Какую область, название диссертации или цель исследования зафиксируем сначала?",
   identityAnswered: "Ответ о CBAI.",
   announcedHome: "Открываю главную.",
   announcedMyWork: "Открываю «Моя работа».",
@@ -168,6 +186,15 @@ export const VOICE_COMMAND_RU = {
   announcedTeamInvite: "Черновик приглашения открыт — подтвердите перед отправкой.",
   announcedShare: "Проверка общего доступа открыта — подтвердите перед шарингом.",
   announcedPublication: "Готовность публикации открыта — подтвердите перед публикацией.",
+  scientificIntakeStorageRequired:
+    "Для приёма PhD-документа безопасное хранилище ещё не подключено. Сейчас могу подготовить черновик научного пространства с названием, областью и планом. Загрузка файла продолжится после подключения хранилища.",
+  navigationDidNotComplete:
+    "Переход не завершился. Остаюсь на этой странице. Повторите попытку или выберите другой доступный раздел.",
+  actionReceiptUnderstood: "Понято",
+  actionReceiptAction: "Действие",
+  actionReceiptResult: "Результат",
+  actionReceiptLocation: "Текущее место",
+  actionReceiptNext: "Следующий шаг",
   unsupportedCommand: "Не распознал команду. Назовите раздел или краткую цель.",
 } as const;
 
@@ -185,8 +212,8 @@ export const VOICE_COMMAND_TR = {
   optionChemistryEvidence: "Kimya ile ilgili kanıtlar",
   optionChemistryDraft: "Yeni kimya iş kartı",
   chemistUnderstood:
-    "Anladım. Kimya araştırma alanını açıyorum. Yeni bir araştırma mı başlamak istiyorsunuz, yoksa mevcut kanıtlara mı bakmak istiyorsunuz?",
-  chemistFollowUp: "Kimya araştırma alanı açıldı. Sorunu, hipotezi veya aradığınız kanıtı söyleyin.",
+    "Anladım. Kimyager çalışma alanı taslağını hazırlamak için Çalışmalarımı açıyorum. Yalnızca gerekli soruları soracağım — onaylamadan hiçbir şey kaydedilmez.",
+  chemistFollowUp: "Önce hangi alanı, tez başlığını veya araştırma hedefini kaydedelim?",
   identityAnswered: "CBAI yanıtı.",
   announcedHome: "Ana sayfayı açıyorum.",
   announcedMyWork: "Çalışmalarımı açıyorum.",
@@ -225,6 +252,15 @@ export const VOICE_COMMAND_TR = {
   announcedTeamInvite: "Davet taslağı açıldı — göndermeden önce onaylayın.",
   announcedShare: "Paylaşım incelemesi açıldı — paylaşmadan önce onaylayın.",
   announcedPublication: "Yayın hazırlığı açıldı — yayınlamadan önce onaylayın.",
+  scientificIntakeStorageRequired:
+    "PhD belgesini almak için güvenli belge deposu henüz bağlı değil. Şimdi sizin için bilimsel çalışma alanı taslağını hazırlayıp belge adı, alan ve planı saklayabilirim. Yükleme, depo bağlandıktan sonra devam eder.",
+  navigationDidNotComplete:
+    "Gezinme tamamlanmadı. Bu sayfada kalıyorum. Yeniden deneyin veya başka bir kullanılabilir bölüm seçin.",
+  actionReceiptUnderstood: "Anlaşıldı",
+  actionReceiptAction: "Eylem",
+  actionReceiptResult: "Sonuç",
+  actionReceiptLocation: "Geçerli konum",
+  actionReceiptNext: "Sonraki adım",
   unsupportedCommand: "Komutu tanımadım. Bir alan adı veya kısa bir hedef söyleyin.",
 } as const;
 

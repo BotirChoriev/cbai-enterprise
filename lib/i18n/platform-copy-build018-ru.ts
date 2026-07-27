@@ -62,4 +62,12 @@ export const UNIVERSAL_WORKSPACE_RU = {
   objectTypeQuestion: "Вопрос",
   objectTypeRelationship: "Связь",
   objectTypeCapabilitySignal: "Сигнал компетенции",
+  seeEntityEvidence: "Смотрите панель доказательств объекта",
+  seeEntityModule: "Смотрите модуль объекта",
+  trustRegistryBacked: "На основе реестра",
+  entityCatalogLimitation: "Аналитика объекта зависит от подключённых источников каталога.",
+  openEntity: "Открыть объект",
+  knowledgeUniverse: "Вселенная знаний",
+  stateRegistry: "Запись реестра",
+  maySupportMission: "Может поддержать активную миссию",
 } as const;

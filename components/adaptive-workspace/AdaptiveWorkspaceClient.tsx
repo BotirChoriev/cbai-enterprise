@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { getAdaptiveWorkspaceCopy } from "@/lib/i18n/platform-copy-adaptive-workspace";
 import { getBrandLocaleCopy, CANONICAL_BRAND_FACTS } from "@/lib/brand/canonical-identity";
@@ -25,6 +26,75 @@ import {
   cbaiTextMuted,
 } from "@/components/brand/brand-classes";
 
+function chemistSeedStatement(locale: string): string {
+  if (locale === "uz") return "Men kimyogarman";
+  if (locale === "ru") return "Я химик";
+  if (locale === "tr") return "Ben kimyagerim";
+  return "I am a chemist";
+}
+
+function templateTitle(
+  id: string,
+  copy: ReturnType<typeof getAdaptiveWorkspaceCopy>,
+): string {
+  switch (id) {
+    case "student":
+      return copy.templateStudent;
+    case "researcher_scientist":
+      return copy.templateResearcher;
+    case "chemist_scientist":
+      return copy.templateChemist;
+    case "academic_educator":
+      return copy.templateAcademic;
+    case "economist":
+      return copy.templateEconomist;
+    case "government":
+      return copy.templateGovernment;
+    case "investor_analyst":
+      return copy.templateInvestor;
+    case "organization":
+      return copy.templateOrganization;
+    default:
+      return copy.templateGeneral;
+  }
+}
+
+function templateDescription(
+  id: string,
+  copy: ReturnType<typeof getAdaptiveWorkspaceCopy>,
+): string {
+  switch (id) {
+    case "student":
+      return copy.templateStudentDesc;
+    case "researcher_scientist":
+      return copy.templateResearcherDesc;
+    case "chemist_scientist":
+      return copy.templateChemistDesc;
+    case "academic_educator":
+      return copy.templateAcademicDesc;
+    case "economist":
+      return copy.templateEconomistDesc;
+    case "government":
+      return copy.templateGovernmentDesc;
+    case "investor_analyst":
+      return copy.templateInvestorDesc;
+    case "organization":
+      return copy.templateOrganizationDesc;
+    default:
+      return copy.templateGeneralDesc;
+  }
+}
+
+function buildChemistSeed(locale: string, copy: ReturnType<typeof getAdaptiveWorkspaceCopy>) {
+  const seed = chemistSeedStatement(locale);
+  const interpretation = interpretRoleStatement({ text: seed, locale });
+  return {
+    statement: seed,
+    draft: buildWorkspaceCreationDraft({ interpretation, locale }),
+    statusMessage: copy.draftStatus,
+  };
+}
+
 /**
  * Adaptive My Workspace — role discovery, interpretation confirmation, and
  * draft-to-Operational-Object creation. Nothing is saved until Confirm.
@@ -34,9 +104,19 @@ export default function AdaptiveWorkspaceClient({ embedded = false }: { embedded
   const copy = getAdaptiveWorkspaceCopy(language);
   const brand = getBrandLocaleCopy(language);
   const objects = useOperationalObjects();
-  const [statement, setStatement] = useState("");
-  const [draft, setDraft] = useState<WorkspaceCreationDraft | null>(null);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const discoverChemist =
+    searchParams.get("discover") === "1" && searchParams.get("role") === "chemist";
+  const seeded = useMemo(
+    () => (discoverChemist ? buildChemistSeed(language, copy) : null),
+    // Seed once from URL + locale; copy draftStatus string is locale-stable enough for init.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional URL seed
+    [discoverChemist, language],
+  );
+
+  const [statement, setStatement] = useState(() => seeded?.statement ?? "");
+  const [draft, setDraft] = useState<WorkspaceCreationDraft | null>(() => seeded?.draft ?? null);
+  const [statusMessage, setStatusMessage] = useState<string | null>(() => seeded?.statusMessage ?? null);
 
   const templates = useMemo(() => listWorkspaceTemplates(), []);
 
@@ -90,6 +170,11 @@ export default function AdaptiveWorkspaceClient({ embedded = false }: { embedded
           {copy.roleDiscoveryHeading}
         </h2>
         <p className={`mt-2 ${cbaiTextBody}`}>{brand.roleDiscoveryPrompt}</p>
+        {draft?.interpretation.suggestedTemplateId === "chemist_scientist" ? (
+          <p className={`mt-2 ${cbaiTextMuted}`} data-chemist-discovery="1">
+            {copy.chemistDiscoveryHint}
+          </p>
+        ) : null}
         <label className="mt-4 block text-sm text-[var(--cbai-text-secondary)]" htmlFor="role-statement">
           {copy.editFields}
         </label>
@@ -101,8 +186,8 @@ export default function AdaptiveWorkspaceClient({ embedded = false }: { embedded
           className="mt-2 w-full rounded-lg border border-[var(--cbai-border-default)] bg-[var(--cbai-canvas)] px-3 py-2 text-sm text-[var(--cbai-text-primary)]"
           placeholder={
             language === "uz"
-              ? "Men iqtisodchiman. O‘zbekiston inflyatsiyasi bo‘yicha tahlil qilmoqchiman."
-              : "I am an economist. I want to analyse Uzbekistan inflation."
+              ? "Men kimyogarman. Organik kimyo, dissertatsiya mavzusi va maqsadni ayting."
+              : "I am a chemist. Add field, thesis title, and research objective."
           }
         />
         <div className="mt-3 flex flex-wrap gap-2">
@@ -129,7 +214,8 @@ export default function AdaptiveWorkspaceClient({ embedded = false }: { embedded
             <div>
               <dt className={cbaiTextMuted}>{copy.inferredLabel}</dt>
               <dd className="text-[var(--cbai-text-primary)]">
-                {draft.interpretation.understoodRole} → {getWorkspaceTemplate(draft.interpretation.suggestedTemplateId).id}
+                {draft.interpretation.understoodRole} →{" "}
+                {getWorkspaceTemplate(draft.interpretation.suggestedTemplateId).id}
               </dd>
             </div>
             <div>
@@ -190,38 +276,8 @@ export default function AdaptiveWorkspaceClient({ embedded = false }: { embedded
         </h2>
         <ul className="mt-3 grid gap-3 sm:grid-cols-2">
           {templates.map((template) => {
-            const title =
-              template.id === "student"
-                ? copy.templateStudent
-                : template.id === "researcher_scientist"
-                  ? copy.templateResearcher
-                  : template.id === "academic_educator"
-                    ? copy.templateAcademic
-                    : template.id === "economist"
-                      ? copy.templateEconomist
-                      : template.id === "government"
-                        ? copy.templateGovernment
-                        : template.id === "investor_analyst"
-                          ? copy.templateInvestor
-                          : template.id === "organization"
-                            ? copy.templateOrganization
-                            : copy.templateGeneral;
-            const description =
-              template.id === "student"
-                ? copy.templateStudentDesc
-                : template.id === "researcher_scientist"
-                  ? copy.templateResearcherDesc
-                  : template.id === "academic_educator"
-                    ? copy.templateAcademicDesc
-                    : template.id === "economist"
-                      ? copy.templateEconomistDesc
-                      : template.id === "government"
-                        ? copy.templateGovernmentDesc
-                        : template.id === "investor_analyst"
-                          ? copy.templateInvestorDesc
-                          : template.id === "organization"
-                            ? copy.templateOrganizationDesc
-                            : copy.templateGeneralDesc;
+            const title = templateTitle(template.id, copy);
+            const description = templateDescription(template.id, copy);
             return (
               <li key={template.id} className={`${cbaiSurfaceSolid} ${cbaiPanelPadding}`}>
                 <p className="text-sm font-medium text-[var(--cbai-text-primary)]">{title}</p>

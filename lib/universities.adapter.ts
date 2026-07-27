@@ -84,7 +84,7 @@ export function toUniversityEntity(university: University): Entity {
       investmentScore: 0,
       riskScore: 0,
     },
-    tags: [],
+    tags: (university.aliases ?? []).map((label) => ({ id: label, label })),
     timeline: [],
     aiSummary: INSUFFICIENT_EVIDENCE_LABEL,
     metadata: {

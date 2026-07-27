@@ -8,6 +8,10 @@ import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-clas
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { getDictionary } from "@/lib/i18n/translate";
 import { translateResearchTopicStatus } from "@/lib/i18n/research-topic-status-translation";
+import { localizeResearchDomainLabel } from "@/lib/i18n/entity-domain-labels";
+import { localizeResearchTopic } from "@/lib/i18n/research-catalog-locale";
+import CreateLinkedWorkButton from "@/components/operational-objects/CreateLinkedWorkButton";
+import EvidenceConnectAction from "@/components/evidence/EvidenceConnectAction";
 
 function statusBadgeClass(status: ResearchTopic["status"]): string {
   switch (status) {
@@ -27,6 +31,7 @@ type ResearchTopicHeroProps = {
 export default function ResearchTopicHero({ topic }: ResearchTopicHeroProps) {
   const { t, language } = useTranslation();
   const statusLabel = translateResearchTopicStatus(getDictionary(language), topic.status);
+  const localized = localizeResearchTopic(topic, language);
 
   return (
     <header className="space-y-5">
@@ -40,8 +45,8 @@ export default function ResearchTopicHero({ topic }: ResearchTopicHeroProps) {
       <div className={`${cbaiGlassCard} space-y-4 p-6`}>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className={cbaiSectionEyebrow}>{topic.domain}</p>
-            <h1 className="cbai-display mt-2 text-3xl text-zinc-50 sm:text-4xl">{topic.topicName}</h1>
+            <p className={cbaiSectionEyebrow}>{localizeResearchDomainLabel(topic.domain, language)}</p>
+            <h1 className="cbai-display mt-2 text-3xl text-zinc-50 sm:text-4xl">{localized.topicName}</h1>
           </div>
           <span
             className={`shrink-0 rounded-md border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${statusBadgeClass(topic.status)}`}
@@ -49,7 +54,31 @@ export default function ResearchTopicHero({ topic }: ResearchTopicHeroProps) {
             {statusLabel}
           </span>
         </div>
-        <p className="max-w-3xl text-base leading-relaxed text-zinc-400">{topic.description}</p>
+        <p className="max-w-3xl text-base leading-relaxed text-zinc-400">{localized.description}</p>
+        {localized.sourceLanguage ? (
+          <p className="text-[11px] text-zinc-600">
+            {t("researchTopicDepth.catalogMetadataNotice")} ·{" "}
+            {t("researchTopicDepth.sourceLanguageLabel", { language: localized.sourceLanguage })}
+          </p>
+        ) : null}
+        <div className="flex flex-wrap gap-2">
+          <CreateLinkedWorkButton
+            variant="research"
+            compact
+            research={{
+              topicId: topic.topicId,
+              topicName: localized.topicName,
+              routePath: `/research/${encodeURIComponent(topic.topicId)}`,
+            }}
+          />
+          <EvidenceConnectAction
+            category={t("operationalObject.linkedEvidenceOfficialSources")}
+            relatedEntityName={localized.topicName}
+            relatedEntityKind="research"
+            relatedEntityId={topic.topicId}
+            compact
+          />
+        </div>
       </div>
 
       <EntityHeader entity={toResearchTopicEntity(topic)} showName={false} />

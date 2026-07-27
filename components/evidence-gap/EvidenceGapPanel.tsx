@@ -1,3 +1,5 @@
+"use client";
+
 import type { EntityEvidenceGapProfile } from "@/lib/evidence-gap";
 import { getNonAvailableGaps } from "@/lib/evidence-gap";
 import EvidenceGapSummary from "@/components/evidence-gap/EvidenceGapSummary";
@@ -5,6 +7,7 @@ import EvidenceGapCard from "@/components/evidence-gap/EvidenceGapCard";
 import EvidenceGapSources from "@/components/evidence-gap/EvidenceGapSources";
 import EvidenceGapMethodology from "@/components/evidence-gap/EvidenceGapMethodology";
 import EntityProfileSection from "@/components/shared/EntityProfileSection";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 // Real profiles can carry dozens of missing-indicator records — showing every one at once turns a
 // single section into a wall of near-identical cards (verified via a real, full-length country
@@ -27,28 +30,32 @@ export default function EvidenceGapPanel({
   showSummary = true,
   showSources = true,
   showMethodology = true,
-  heading = "Missing information",
+  heading,
   sectionId = "missing-evidence",
-  nextStep = { label: "Reports →", href: "#reports" },
+  nextStep,
 }: EvidenceGapPanelProps) {
+  const { t } = useTranslation();
+  const resolvedHeading = heading ?? t("entityIntelligence.missingInformation");
+  const resolvedNextStep = nextStep ?? {
+    label: t("entityIntelligence.openReportsCenter"),
+    href: "#reports",
+  };
   const nonAvailable = getNonAvailableGaps(profile);
   const compact = !showSummary && !showSources && !showMethodology;
 
   return (
-    <EntityProfileSection id={sectionId} title={heading} nextStep={nextStep}>
+    <EntityProfileSection id={sectionId} title={resolvedHeading} nextStep={resolvedNextStep}>
       {!compact ? (
-        <p className="text-sm text-zinc-500">What is missing and why.</p>
+        <p className="text-sm text-zinc-500">{t("entityIntelligence.missingWhyShort")}</p>
       ) : (
-        <p className="text-sm text-zinc-500">
-          What is missing, why, and which source applies.
-        </p>
+        <p className="text-sm text-zinc-500">{t("entityIntelligence.missingWhyLong")}</p>
       )}
 
-      {showSummary && <EvidenceGapSummary profile={profile} />}
+      {showSummary ? <EvidenceGapSummary profile={profile} /> : null}
 
       {nonAvailable.length === 0 ? (
         <p className="rounded-lg bg-zinc-900/50 px-4 py-4 text-sm text-zinc-400">
-          No missing information is recorded for this profile.
+          {t("entityIntelligence.noMissingRecorded")}
         </p>
       ) : (
         <>
@@ -62,7 +69,9 @@ export default function EvidenceGapPanel({
           {nonAvailable.length > VISIBLE_GAP_COUNT ? (
             <details className="rounded-lg border border-zinc-800/60 bg-zinc-950/50">
               <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium text-zinc-500 marker:content-none [&::-webkit-details-marker]:hidden">
-                Show all {nonAvailable.length} missing items
+                {t("entityIntelligence.showAllMissing", {
+                  count: String(nonAvailable.length),
+                })}
               </summary>
               <ul className="space-y-2 border-t border-zinc-800 px-4 py-4">
                 {nonAvailable.slice(VISIBLE_GAP_COUNT).map((gap) => (
@@ -76,8 +85,8 @@ export default function EvidenceGapPanel({
         </>
       )}
 
-      {showSources && <EvidenceGapSources profile={profile} />}
-      {showMethodology && <EvidenceGapMethodology profile={profile} />}
+      {showSources ? <EvidenceGapSources profile={profile} /> : null}
+      {showMethodology ? <EvidenceGapMethodology profile={profile} /> : null}
     </EntityProfileSection>
   );
 }

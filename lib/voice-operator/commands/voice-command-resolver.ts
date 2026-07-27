@@ -14,6 +14,7 @@ import { parseVoiceCommandInput } from "@/lib/voice-operator/commands/voice-comm
 import { rejectArbitraryModelUrl, riskForAction } from "@/lib/voice-operator/commands/voice-command-policy";
 import { answerCbaiIdentityFaq, classifyVoiceActionLevel, matchIdentityFaqIntent } from "@/lib/voice-operator/identity";
 import { matchScientificIntakeIntent } from "@/lib/scientific-intake/scientific-intake";
+import { deriveDocumentUploadReadiness } from "@/lib/platform-capabilities/capability-registry";
 import type {
   VoiceCommandAction,
   VoiceCommandClarifyOption,
@@ -37,6 +38,9 @@ function announcementFor(
   }
   if (domainId === "chemistry" && (actionId === "navigate.research" || actionId === "research.open_topic")) {
     return "voiceCommand.announcedChemistry";
+  }
+  if (actionId === "scientific_intake.compose") {
+    return "voiceCommand.announcedScientificIntake";
   }
   if (!actionId) return "voiceCommand.couldNotUnderstand";
   return getVoiceCommandEntry(actionId)?.announcementKey ?? "voiceCommand.completedGeneric";
@@ -98,6 +102,10 @@ export function resolveVoiceCommand(
       originalText: input.text,
     });
     const href = platformResult.ok ? platformResult.navigation?.href : undefined;
+    const uploadReady = deriveDocumentUploadReadiness() === "available";
+    const announcementKey = uploadReady
+      ? "voiceCommand.announcedScientificIntake"
+      : "voiceCommand.scientificIntakeStorageRequired";
     return {
       ok: platformResult.ok,
       intent: {
@@ -114,11 +122,11 @@ export function resolveVoiceCommand(
             actionId: "scientific_intake.compose",
             risk: "needs_confirmation",
             target: { href },
-            announcementKey: "voiceCommand.announcedScientificIntake",
+            announcementKey,
           }
         : null,
       platformResult,
-      messageKey: "voiceCommand.announcedScientificIntake",
+      messageKey: announcementKey,
       actionLevel: 2,
     };
   }
@@ -194,6 +202,12 @@ export function resolveVoiceCommand(
     conversationalRole && domain?.domain.id === "chemistry"
       ? [
           {
+            id: "chemistry_workspace_draft",
+            labelKey: "voiceCommand.optionChemistryDraft",
+            actionId: "operational_object.compose",
+            params: { title: "Chemistry workspace", domain: "research", draftType: "research_question" },
+          },
+          {
             id: "chemistry_research",
             labelKey: "voiceCommand.optionChemistryTopic",
             actionId: "navigate.research",
@@ -203,12 +217,6 @@ export function resolveVoiceCommand(
             id: "chemistry_evidence",
             labelKey: "voiceCommand.optionChemistryEvidence",
             actionId: "navigate.evidence",
-          },
-          {
-            id: "chemistry_draft",
-            labelKey: "voiceCommand.optionChemistryDraft",
-            actionId: "operational_object.compose",
-            params: { title: "Chemistry work", domain: "research" },
           },
         ]
       : undefined;

@@ -33,7 +33,13 @@ export type KnowledgeSourceRecord = {
 export type KnowledgeSuggestedAction = {
   readonly label: string;
   readonly href: string;
-  readonly labelKey?: "research.openTopic" | "navigation.evidence" | "navigation.reports" | "navigation.graph";
+  readonly labelKey?:
+    | "research.openTopic"
+    | "navigation.evidence"
+    | "navigation.reports"
+    | "navigation.graph"
+    | "universalWorkspace.openEntity"
+    | "universalWorkspace.knowledgeUniverse";
 };
 
 /** Progressive explanation model — primary buckets plus secondary disclosure fields. */

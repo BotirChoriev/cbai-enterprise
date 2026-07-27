@@ -6,6 +6,7 @@ import type { PlatformActionResult, PlatformGuidance } from "@/lib/platform-acti
 import { invokeEngineStart } from "@/lib/forward-deployed-engines/engine-bridge";
 import type { OntologyLocale } from "@/lib/ontology/types";
 import { validateNavigationHref } from "@/lib/platform-actions/action-registry";
+import { emitPlatformActionResult } from "@/lib/platform-actions/action-result-events";
 
 export type ApplyPlatformActionDeps = {
   readonly router: AppRouterInstance;
@@ -17,6 +18,7 @@ export type ApplyPlatformActionDeps = {
   ) => void;
   readonly setGuidance?: (guidance: PlatformGuidance | null) => void;
   readonly setTranscriptVisible?: (visible: boolean) => void;
+  readonly readProblemSummary?: (problemId?: string) => string | null;
   readonly t: (path: string, vars?: Record<string, string>) => string;
 };
 
@@ -53,6 +55,15 @@ export function applyPlatformActionResult(
     };
   }
 
+  if (result.problemRead) {
+    const summary = deps.readProblemSummary?.(result.problemRead.problemId) ?? null;
+    return {
+      handled: true,
+      message: summary ?? deps.t("platformAction.failureMutation"),
+      awaitingConfirmation: false,
+    };
+  }
+
   const navHref = result.navigation?.href;
 
   if (result.engineStart) {
@@ -80,6 +91,12 @@ export function applyPlatformActionResult(
     const navigatedHref = pushIfAllowed(deps.router, navHref);
     deps.openComposer(result.mutation.draft, result.mutation.inferredFields, "voice_command");
     deps.setGuidance?.(result.guidance ?? null);
+    emitPlatformActionResult({
+      kind: "confirmation_required",
+      actionId: result.actionId,
+      message: "draft_opened",
+      href: navigatedHref,
+    });
     return {
       handled: true,
       message: result.messageKey ? deps.t(result.messageKey, result.messageVars) : null,
@@ -91,11 +108,33 @@ export function applyPlatformActionResult(
   if (navHref) {
     const navigatedHref = pushIfAllowed(deps.router, navHref);
     deps.setGuidance?.(result.guidance ?? null);
+    if (navigatedHref) {
+      emitPlatformActionResult({
+        kind: "route_opened",
+        actionId: result.actionId,
+        message: navigatedHref,
+        href: navigatedHref,
+      });
+    }
     return {
       handled: Boolean(navigatedHref),
-      message: result.messageKey ? deps.t(result.messageKey, result.messageVars) : null,
+      message: result.spokenMessage ?? (result.messageKey ? deps.t(result.messageKey, result.messageVars) : null),
       awaitingConfirmation: false,
       navigatedHref,
+    };
+  }
+
+  if (result.spokenMessage) {
+    deps.setGuidance?.(result.guidance ?? null);
+    emitPlatformActionResult({
+      kind: "route_opened",
+      actionId: result.actionId,
+      message: result.spokenMessage,
+    });
+    return {
+      handled: true,
+      message: result.spokenMessage,
+      awaitingConfirmation: false,
     };
   }
 

@@ -10,6 +10,7 @@ import { resolveResearchCanvasCommand } from "@/lib/research-canvas/research-can
 import { resolveFlagshipOperatorCommand } from "@/lib/product/flagship-operator-commands";
 import { resolveLanguageCommand } from "@/lib/i18n/language-command";
 import { isConservativelyBlockedInput } from "@/lib/voice/voice-blocklist";
+import { resolveDomainIntelligenceCommand } from "@/lib/domain-intelligence/voice-bridge";
 import type { VoiceActionKind, VoiceActionProposal } from "@/lib/voice/voice-control-types";
 
 export type VoiceResolverContext = {
@@ -74,6 +75,49 @@ export function resolveVoiceAction(rawInput: string, context: VoiceResolverConte
   if (isConservativelyBlockedInput(trimmed)) return blockedProposal(trimmed);
 
   const normalized = trimmed.toLowerCase();
+
+  // Explicit Research Canvas commands must win over the broader domain-intelligence
+  // matcher, which also recognizes the Uzbek word "tadqiqot".
+  const canvasMatch = resolveResearchCanvasCommand(trimmed);
+  if (canvasMatch) {
+    const requiresExternalConsent =
+      normalized.includes("search") ||
+      normalized.includes("qidir") ||
+      normalized.includes("izla");
+    return knownProposal({
+      input: trimmed,
+      kind: canvasMatch.href ? "navigate" : "message",
+      actionLabel: "voiceControl.actionResearchCanvas",
+      actionDescription: "voiceControl.actionResearchCanvasDescription",
+      href: canvasMatch.href,
+      message: canvasMatch.message,
+      actionVars: canvasMatch.href ? { destination: canvasMatch.href } : undefined,
+      requiresExternalConsent,
+    });
+  }
+
+  // Domain / Country Intelligence — read-only navigate or message; never mutates.
+  const domainMatch = resolveDomainIntelligenceCommand(trimmed);
+  if (domainMatch) {
+    if (domainMatch.type === "navigate") {
+      return knownProposal({
+        input: trimmed,
+        kind: "navigate",
+        actionLabel: "voiceControl.actionNavigate",
+        actionDescription: "voiceControl.actionNavigateDescription",
+        href: domainMatch.href,
+        message: domainMatch.message,
+        actionVars: { destination: domainMatch.href },
+      });
+    }
+    return knownProposal({
+      input: trimmed,
+      kind: "message",
+      actionLabel: "voiceControl.actionNavigate",
+      actionDescription: "voiceControl.actionNavigateDescription",
+      message: domainMatch.message,
+    });
+  }
 
   if (SAVE_WORKSPACE_PHRASES.some((phrase) => normalized.includes(phrase))) {
     return knownProposal({
@@ -157,24 +201,6 @@ export function resolveVoiceAction(rawInput: string, context: VoiceResolverConte
       href: flagshipMatch.href,
       message: flagshipMatch.message,
       actionVars: flagshipMatch.href ? { destination: flagshipMatch.href } : undefined,
-    });
-  }
-
-  const canvasMatch = resolveResearchCanvasCommand(trimmed);
-  if (canvasMatch) {
-    const requiresExternalConsent =
-      trimmed.toLowerCase().includes("search") ||
-      trimmed.toLowerCase().includes("qidir") ||
-      trimmed.toLowerCase().includes("izla");
-    return knownProposal({
-      input: trimmed,
-      kind: canvasMatch.href ? "navigate" : "message",
-      actionLabel: "voiceControl.actionResearchCanvas",
-      actionDescription: "voiceControl.actionResearchCanvasDescription",
-      href: canvasMatch.href,
-      message: canvasMatch.message,
-      actionVars: canvasMatch.href ? { destination: canvasMatch.href } : undefined,
-      requiresExternalConsent,
     });
   }
 

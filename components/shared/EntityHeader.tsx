@@ -1,6 +1,10 @@
-import type { Entity } from "@/lib/entity/entity.types";
+"use client";
+
+import type { Entity, EntityType } from "@/lib/entity/entity.types";
 import { getEntityTypeLabel } from "@/lib/entity/entity.helpers";
 import EntityOverviewSection, { type EntityOverviewFacts } from "@/components/shared/EntityOverviewSection";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import { localizeResearchDomainLabel } from "@/lib/i18n/entity-domain-labels";
 
 type EntityHeaderFromEntityProps = {
   entity: Entity;
@@ -24,35 +28,59 @@ type EntityHeaderExplicitProps = {
 
 type EntityHeaderProps = EntityHeaderFromEntityProps | EntityHeaderExplicitProps;
 
+type TFunc = (path: string, vars?: Record<string, string>) => string;
+
+function localizeEntityType(type: EntityType, t: TFunc): string {
+  const map: Partial<Record<EntityType, string>> = {
+    country: "entityUi.entityTypeCountry",
+    company: "entityUi.entityTypeCompany",
+    university: "entityUi.entityTypeUniversity",
+    research_topic: "entityUi.entityTypeResearchTopic",
+  };
+  const key = map[type];
+  return key ? t(key) : getEntityTypeLabel(type);
+}
+
+function localizeMetricLabel(label: string, unit: string | undefined, value: string | number, t: TFunc): {
+  label: string;
+  value: string;
+} {
+  const isRelatedCompanies =
+    label === "Related Companies (subject-matter match)" || label === "related-companies";
+  const displayLabel = isRelatedCompanies ? t("entityUi.relatedCompaniesMetric") : label;
+  const displayUnit =
+    unit === "records" || unit === "yozuv" ? t("entityUi.recordsUnit") : unit;
+  return {
+    label: displayLabel,
+    value: displayUnit ? `${value} ${displayUnit}` : String(value),
+  };
+}
+
 /**
- * Universal Entity Header (Platform Core mission, completed in the Platform Core Completion
- * mission) — one header component for any entity type, built on the already-real
- * EntityOverviewSection rather than a second renderer.
- *
- * Two modes, both rendering through the exact same EntityOverviewSection:
- * - `entity` mode derives everything from a universal Entity object (used by Research topics,
- *   which never had a structured overview card before).
- * - explicit-prop mode accepts the same bespoke fields EntityOverviewSection always took
- *   (Country/Company/University keep their richer per-kind facts — Government, Founded, Official
- *   website — losslessly; this mode exists so those three pages could migrate their import site
- *   onto EntityHeader without losing any detail or changing any rendered output).
+ * Universal Entity Header — one header component for any entity type.
+ * Platform-controlled type/metric labels are localized at render time.
  */
 export default function EntityHeader(props: EntityHeaderProps) {
+  const { t, language } = useTranslation();
+
   if (props.entity) {
     const { entity, facts, showName } = props;
     const derivedFacts =
       facts ??
-      entity.metrics.map((metric) => ({
-        label: metric.label,
-        value: metric.unit ? `${metric.value} ${metric.unit}` : String(metric.value),
-      }));
+      entity.metrics.map((metric) =>
+        localizeMetricLabel(metric.label, metric.unit, metric.value, t),
+      );
+    const subtitle =
+      entity.type === "research_topic" && typeof entity.subtitle === "string"
+        ? localizeResearchDomainLabel(entity.subtitle, language)
+        : entity.subtitle;
 
     return (
       <EntityOverviewSection
         name={entity.name}
-        entityType={getEntityTypeLabel(entity.type)}
+        entityType={localizeEntityType(entity.type, t)}
         country={entity.country ?? null}
-        subtitle={entity.subtitle}
+        subtitle={subtitle}
         availableInformation={entity.aiSummary}
         facts={derivedFacts}
         showName={showName}

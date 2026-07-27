@@ -9,6 +9,7 @@ import {
 } from "@/lib/companies.intelligence";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { translateEntityListEvidenceLabel } from "@/lib/i18n/entity-ui-translation";
+import { localizeIndustryLabel } from "@/lib/i18n/entity-domain-labels";
 import { getDictionary } from "@/lib/i18n/translate";
 
 type CompanyCardProps = {
@@ -54,7 +55,7 @@ export default function CompanyCard({
           <div>
             <p className="text-sm font-semibold text-zinc-50">{company.name}</p>
             <p className="text-[10px] text-zinc-500">
-              {company.industry} · {company.country}
+              {localizeIndustryLabel(company.industry, language)} · {company.country}
             </p>
           </div>
         </div>

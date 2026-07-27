@@ -227,6 +227,18 @@ export type OrganizationAuditEventRow = {
   created_at: string;
 };
 
+export type ProblemSnapshotRow = {
+  id: string;
+  owner_id: string;
+  local_id: string;
+  schema_version: number;
+  status: string;
+  payload: Record<string, unknown>;
+  version: number;
+  created_at: string;
+  updated_at: string;
+};
+
 type Insertable<Row, DefaultedKeys extends keyof Row> = Omit<Row, DefaultedKeys> &
   Partial<Pick<Row, DefaultedKeys>>;
 
@@ -300,6 +312,11 @@ export type Database = {
         ActivityEventRow,
         Insertable<ActivityEventRow, "id" | "created_at">,
         Partial<Omit<ActivityEventRow, "id" | "owner_id">>
+      >;
+      problem_snapshots: TableDef<
+        ProblemSnapshotRow,
+        Insertable<ProblemSnapshotRow, "id" | "created_at" | "updated_at" | "version">,
+        Partial<Omit<ProblemSnapshotRow, "id" | "owner_id" | "local_id" | "created_at">>
       >;
       organizations: TableDef<
         OrganizationRow,

@@ -32,7 +32,11 @@ export type NavSection = {
   items: NavItem[];
 };
 
-/** Seven canonical destinations — everything else is progressive disclosure. */
+/**
+ * Canonical Intelligence OS IA (final-product-finish DD-FPF-001):
+ * CORE → INTELLIGENCE → OPERATIONS → OVERSIGHT → SYSTEM.
+ * Advanced collaboration and specialist extras stay in progressive disclosure.
+ */
 export const primaryNavSections: NavSection[] = [
   {
     title: "",
@@ -47,78 +51,65 @@ export const primaryNavSections: NavSection[] = [
         label: "My Work",
         href: "/my-work",
         icon: "my-work",
-        description: "Adaptive personal workspace, drafts, and confirmed work.",
+        description: "Missions, projects, operational objects, drafts, and next steps.",
+      },
+      {
+        label: "Problem Space",
+        href: "/problems",
+        icon: "core",
+        description: "Evidence, unknowns, contradictions, scenarios, human decisions, and monitoring.",
       },
       {
         label: "Search",
         href: "/search",
         icon: "search",
-        description: "Search countries, companies, and universities.",
+        description: "Direct retrieval across known countries, companies, universities, and work.",
       },
     ],
   },
   {
-    title: "Discover",
+    title: "Intelligence",
     items: [
       {
-        label: "Global Activity",
-        href: "/discover",
-        icon: "analytics",
-        description: "Opted-in public projects, research, groups, and media.",
-      },
-      {
-        label: "World Intelligence",
+        label: "Countries",
         href: "/countries",
         icon: "countries",
-        description: "Countries, companies, and universities in one evidence-led entity system.",
+        description: "Country intelligence cockpits with evidence availability.",
       },
-    ],
-  },
-  {
-    title: "Create",
-    items: [
       {
-        label: "Research & Evidence",
+        label: "Companies",
+        href: "/companies",
+        icon: "companies",
+        description: "Company profiles and official information.",
+      },
+      {
+        label: "Universities",
+        href: "/universities",
+        icon: "universities",
+        description: "University profiles and official information.",
+      },
+      {
+        label: "Research",
         href: "/research",
         icon: "research",
-        description: "Research questions, source material, evidence review, and knowledge relationships.",
+        description: "Expert research catalog, topics, and evidence framing.",
       },
       {
-        label: "Reports",
-        href: "/reports",
+        label: "Evidence",
+        href: "/evidence",
         icon: "knowledge",
-        description: "Report readiness and saved reports from real project work.",
+        description: "Source status, provenance, and human evidence review.",
       },
-    ],
-  },
-];
-
-/** Entity drill-downs, role lenses, collaboration, and system controls. */
-export const secondaryNavSections: NavSection[] = [
-  {
-    title: "World Intelligence",
-    items: [
-      { label: "Countries", href: "/countries", icon: "countries", description: "Country intelligence cockpits." },
-      { label: "Companies", href: "/companies", icon: "companies", description: "Company profiles and official information." },
-      { label: "Universities", href: "/universities", icon: "universities", description: "University profiles and official information." },
       {
-        label: "Global Updates",
-        href: "/notifications",
-        icon: "analytics",
-        description: "Country local time, verified source changes, and your watches.",
+        label: "Knowledge Graph",
+        href: "/graph",
+        icon: "graph",
+        description: "Verified relationships between platform entities.",
       },
     ],
   },
   {
-    title: "Research & Evidence",
-    items: [
-      { label: "Evidence", href: "/evidence", icon: "knowledge", description: "Source status and human evidence review." },
-      { label: "Knowledge Graph", href: "/graph", icon: "graph", description: "Verified relationships between platform entities." },
-      { label: "Research Workspace", href: "/research/workspace", icon: "research", description: "Structured research and evidence review." },
-    ],
-  },
-  {
-    title: "Collaborate",
+    title: "Operations",
     items: [
       {
         label: "Live Rooms",
@@ -126,6 +117,104 @@ export const secondaryNavSections: NavSection[] = [
         icon: "agents",
         description: "Live intelligence rooms — shared sessions with confirmation-gated actions.",
       },
+      {
+        label: "Reports",
+        href: "/reports",
+        icon: "analytics",
+        description: "Report readiness from real project work — never fabricated cards.",
+      },
+      {
+        label: "Investor",
+        href: "/investor",
+        icon: "investor",
+        description: "Economic evidence lens — non-advisory due diligence workspace.",
+      },
+      {
+        label: "Government",
+        href: "/government",
+        icon: "government",
+        description: "Public-administration evidence workspace — human-controlled research.",
+      },
+    ],
+  },
+  {
+    title: "Oversight",
+    items: [
+      {
+        label: "Governance",
+        href: "/governance",
+        icon: "ai-control",
+        description: "Platform rules, standards, review, and human oversight.",
+      },
+      {
+        label: "Trust",
+        href: "/trust",
+        icon: "trust",
+        description: "Constitution, methodology, evidence policy, and version history.",
+      },
+    ],
+  },
+  {
+    title: "System",
+    items: [
+      {
+        label: "Settings",
+        href: "/settings",
+        icon: "settings",
+        description: "Preferences, privacy defaults, and voice diagnostics.",
+      },
+      {
+        label: "About",
+        href: "/about",
+        icon: "about",
+        description: "CheckBalanceAI.Global platform identity and CBAI Intelligence OS.",
+      },
+    ],
+  },
+];
+
+/** Progressive disclosure — advanced collaboration and specialist extras. */
+export const secondaryNavSections: NavSection[] = [
+  {
+    title: "Advanced",
+    items: [
+      {
+        label: "Global Activity",
+        href: "/discover",
+        icon: "analytics",
+        description: "Guided exploration of opted-in public projects, research, groups, and media.",
+      },
+      {
+        label: "Global Updates",
+        href: "/notifications",
+        icon: "analytics",
+        description: "Country local time, verified source changes, and your watches.",
+      },
+      {
+        label: "Research Workspace",
+        href: "/research/workspace",
+        icon: "research",
+        description: "Structured research and evidence review.",
+      },
+      {
+        label: "Citizen",
+        href: "/citizen",
+        icon: "citizen",
+        description: "Public information lens — one system, not a separate portal.",
+      },
+      {
+        label: "Reasoning",
+        href: "/reasoning",
+        icon: "reasoning",
+        description: "How official information supports review before decisions.",
+      },
+    ],
+  },
+  {
+    // Institutional collaboration stays in progressive disclosure (DD-FPF-001);
+    // account/authorization gated features are never promoted to primary nav.
+    title: "Collaboration",
+    items: [
       {
         label: "Workspace",
         href: "/workspace",
@@ -162,44 +251,6 @@ export const secondaryNavSections: NavSection[] = [
         icon: "knowledge",
         description: "Publication preparation — explicit confirmation and rights.",
       },
-    ],
-  },
-  {
-    title: "Specialist Workspaces",
-    items: [
-      {
-        label: "Investor",
-        href: "/investor",
-        icon: "investor",
-        description: "Economic evidence lens — non-advisory due diligence workspace.",
-      },
-      {
-        label: "Government",
-        href: "/government",
-        icon: "government",
-        description: "Public-administration evidence workspace — human-controlled research.",
-      },
-      {
-        label: "Citizen",
-        href: "/citizen",
-        icon: "citizen",
-        description: "Public information lens — one system, not a separate portal.",
-      },
-      {
-        label: "Reasoning",
-        href: "/reasoning",
-        icon: "reasoning",
-        description: "How official information supports review before decisions.",
-      },
-    ],
-  },
-  {
-    title: "Trust",
-    items: [
-      { label: "Governance", href: "/governance", icon: "ai-control", description: "Platform rules, standards, review, and human oversight." },
-      { label: "Trust", href: "/trust", icon: "trust", description: "Constitution, methodology, evidence policy, and version history." },
-      { label: "Privacy", href: "/settings", icon: "settings", description: "Privacy defaults, voice diagnostics, and account preferences." },
-      { label: "About", href: "/about", icon: "about", description: "CheckBalanceAI.Global platform identity and CBAI Intelligence OS." },
     ],
   },
 ];

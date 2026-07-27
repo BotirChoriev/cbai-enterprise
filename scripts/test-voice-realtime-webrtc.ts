@@ -138,6 +138,21 @@ test("realtime events extract user and assistant transcripts", () => {
   assert.deepEqual(assistant, {
     transcript: { role: "assistant", text: "Yordam bera olaman.", final: true },
   });
+
+  // GA renamed assistant transcript events; the parser must handle the GA names too,
+  // otherwise a successfully connected session never renders assistant transcripts.
+  const gaDone = parseRealtimeServerEvent(
+    '{"type":"response.output_audio_transcript.done","transcript":"Yordam bera olaman."}',
+  );
+  assert.deepEqual(gaDone, {
+    transcript: { role: "assistant", text: "Yordam bera olaman.", final: true },
+  });
+  const gaDelta = parseRealtimeServerEvent(
+    '{"type":"response.output_audio_transcript.delta","delta":"Yor"}',
+  );
+  assert.deepEqual(gaDelta, {
+    transcript: { role: "assistant", text: "Yor", final: false },
+  });
 });
 
 test("realtime dock state mapping covers connection lifecycle", () => {
@@ -265,6 +280,7 @@ test("WebRTC session connects, emits listening, and cleans up tracks", async () 
             this.removed = true;
           },
           setAttribute() {},
+          play: async () => undefined,
         };
         audioElements.push(el);
         return el as unknown as HTMLAudioElement;
@@ -337,6 +353,7 @@ test("WebRTC session prevents duplicate connect while prior session active", asy
   }
 
   class MockDataChannel {
+    readyState = "open";
     addEventListener() {}
     close() {}
     send() {}
@@ -370,6 +387,7 @@ test("WebRTC session prevents duplicate connect while prior session active", asy
         pause() {},
         remove() {},
         setAttribute() {},
+        play: async () => undefined,
       }) as unknown as HTMLAudioElement,
   };
 
@@ -410,6 +428,10 @@ test("VoiceOperatorProvider realtime path does not start SpeechRecognitionSessio
   assert.match(provider, /resolveRealtimeProvider/);
   assert.match(provider, /startBrowserFallbackListening/);
   assert.doesNotMatch(provider, /operatorMode\.mode === "realtime"[\s\S]*startBrowserSpeechSession/);
+  assert.doesNotMatch(
+    provider,
+    /brokerRes\.code === "ERROR"[\s\S]{0,400}startBrowserFallbackListening\(gate\)/,
+  );
 });
 
 test("VoiceOperatorProvider appends realtime transcripts to session memory", () => {
@@ -430,6 +452,215 @@ test("openai WebRTC provider creates oai-events data channel", () => {
   const source = readSource("lib/voice-operator/realtime/openai-webrtc-session.ts");
   assert.match(source, /createDataChannel\("oai-events"\)/);
   assert.match(source, /OPENAI_REALTIME_CALLS_URL/);
+  assert.match(source, /waitForDataChannelOpen/);
+  assert.match(source, /stateEmitter\.set\("listening"\)/);
+});
+
+test("Listening is impossible before the OpenAI data channel is open", async () => {
+  const states: string[] = [];
+  class MockTrack {
+    kind = "audio";
+    readyState = "live";
+    enabled = true;
+    stop() {}
+  }
+  class MockStream {
+    getAudioTracks() {
+      return [new MockTrack()];
+    }
+    getTracks() {
+      return this.getAudioTracks();
+    }
+  }
+  class DeferredDataChannel {
+    readyState = "connecting";
+    private listeners = new Map<string, Set<() => void>>();
+    addEventListener(type: string, listener: () => void) {
+      const set = this.listeners.get(type) ?? new Set();
+      set.add(listener);
+      this.listeners.set(type, set);
+    }
+    removeEventListener(type: string, listener: () => void) {
+      this.listeners.get(type)?.delete(listener);
+    }
+    open() {
+      this.readyState = "open";
+      this.listeners.get("open")?.forEach((listener) => listener());
+    }
+    close() {}
+    send() {}
+  }
+  const channel = new DeferredDataChannel();
+  class MockPeerConnection {
+    connectionState = "connected";
+    ontrack: ((event: { streams: MockStream[] }) => void) | null = null;
+    onconnectionstatechange: (() => void) | null = null;
+    async createOffer() {
+      return { sdp: "v=0 offer" };
+    }
+    async setLocalDescription() {}
+    async setRemoteDescription() {}
+    addTrack() {}
+    createDataChannel() {
+      return channel;
+    }
+    close() {}
+  }
+
+  const connectPromise = connectOpenAiWebRtcSession({
+    credential: {
+      clientSecret: "ek_test_session",
+      expiresAt: new Date(Date.now() + 60_000).toISOString(),
+      sessionId: "sess-mock",
+      model: "gpt-realtime",
+    },
+    language: "en",
+    deps: {
+      RTCPeerConnection: MockPeerConnection as unknown as typeof RTCPeerConnection,
+      fetch: async () =>
+        new Response("v=0 answer", {
+          status: 201,
+          headers: { "Content-Type": "application/sdp" },
+        }),
+      getUserMedia: async () => new MockStream() as unknown as MediaStream,
+      createAudioElement: () =>
+        ({
+          autoplay: true,
+          pause() {},
+          remove() {},
+          setAttribute() {},
+          play: async () => undefined,
+        }) as unknown as HTMLAudioElement,
+    },
+  });
+
+  // Yield so SDP completes and the session waits on the data channel.
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  assert.equal(channel.readyState, "connecting");
+  // Open the data channel; Listening must appear only after this.
+  channel.open();
+  const session = await connectPromise;
+  session.onStateChange((state) => states.push(state));
+  assert.equal(session.getState(), "listening");
+  assert.ok(!states.includes("listening") || session.getState() === "listening");
+  session.disconnect();
+});
+
+test("WebRTC SDP failure after getUserMedia stops all tracks", async () => {
+  const stopped: string[] = [];
+  class MockTrack {
+    kind = "audio";
+    readyState = "live";
+    stop() {
+      this.readyState = "ended";
+      stopped.push("audio");
+    }
+  }
+  class MockStream {
+    getAudioTracks() {
+      return [new MockTrack()];
+    }
+    getTracks() {
+      return this.getAudioTracks();
+    }
+  }
+  class MockDataChannel {
+    readyState = "connecting";
+    addEventListener() {}
+    removeEventListener() {}
+    close() {}
+    send() {}
+  }
+  class MockPeerConnection {
+    close() {}
+    async createOffer() {
+      return { sdp: "v=0 offer" };
+    }
+    async setLocalDescription() {}
+    async setRemoteDescription() {}
+    addTrack() {}
+    createDataChannel() {
+      return new MockDataChannel();
+    }
+  }
+
+  const session = await connectOpenAiWebRtcSession({
+    credential: {
+      clientSecret: "ek_test_session",
+      expiresAt: new Date(Date.now() + 60_000).toISOString(),
+      sessionId: "sess-mock",
+      model: "gpt-realtime",
+    },
+    language: "en",
+    deps: {
+      RTCPeerConnection: MockPeerConnection as unknown as typeof RTCPeerConnection,
+      fetch: async () => new Response("unauthorized", { status: 401 }),
+      getUserMedia: async () => new MockStream() as unknown as MediaStream,
+      createAudioElement: () =>
+        ({
+          pause() {},
+          remove() {},
+          setAttribute() {},
+          play: async () => undefined,
+        }) as unknown as HTMLAudioElement,
+    },
+  });
+
+  assert.equal(session.getState(), "authentication_failed");
+  assert.ok(stopped.length >= 1);
+  assert.equal(session.getLocalStream(), null);
+});
+
+test("OpenAI 401 maps to authentication_failed and 429 to connection_failed classification", () => {
+  assert.equal(
+    classifyRealtimeCallsResponse({
+      status: 401,
+      contentType: "application/json",
+      bodyText: "{}",
+    }),
+    "authentication_failed",
+  );
+  assert.equal(
+    classifyRealtimeCallsResponse({
+      status: 429,
+      contentType: "application/json",
+      bodyText: "{}",
+    }),
+    "connection_failed",
+  );
+});
+
+test("broker 403 JSON origin_blocked and HTML Access map correctly", () => {
+  const blocked = classifyBrokerHttpResponse({
+    status: 403,
+    contentType: "application/json",
+    bodyText: JSON.stringify({ error: "origin_blocked" }),
+  });
+  assert.equal(blocked.ok, false);
+  if (!blocked.ok) assert.equal(blocked.code, "ORIGIN_BLOCKED");
+
+  const access = classifyBrokerHttpResponse({
+    status: 403,
+    contentType: "text/html",
+    bodyText: "<html>Cloudflare Access</html>",
+  });
+  assert.equal(access.ok, false);
+  if (!access.ok) assert.equal(access.code, "AUTHENTICATION_FAILED");
+});
+
+test("malformed broker JSON maps to MALFORMED_RESPONSE", () => {
+  const missingModel = classifyBrokerHttpResponse({
+    status: 200,
+    contentType: "application/json",
+    bodyText: JSON.stringify({
+      clientSecret: "ek_test",
+      expiresAt: new Date().toISOString(),
+      sessionId: "sess",
+    }),
+  });
+  assert.equal(missingModel.ok, false);
+  if (!missingModel.ok) assert.equal(missingModel.code, "MALFORMED_RESPONSE");
+  assert.equal(mapBrokerCodeToIssue("MALFORMED_RESPONSE"), "malformed_response");
 });
 
 test("createOpenAiWebRtcRealtimeProvider returns unavailable without window", () => {

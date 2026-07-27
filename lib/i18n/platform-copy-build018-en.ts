@@ -62,6 +62,14 @@ export const UNIVERSAL_WORKSPACE_EN = {
   objectTypeQuestion: "Question",
   objectTypeRelationship: "Relationship",
   objectTypeCapabilitySignal: "Capability signal",
+  seeEntityEvidence: "See entity evidence panel",
+  seeEntityModule: "See entity module",
+  trustRegistryBacked: "Registry-backed",
+  entityCatalogLimitation: "Entity intelligence depends on connected catalog sources.",
+  openEntity: "Open entity",
+  knowledgeUniverse: "Knowledge Universe",
+  stateRegistry: "Registry record",
+  maySupportMission: "May support the active mission",
 } as const;
 
 export type UniversalObjectTypeI18nKey = keyof Pick<

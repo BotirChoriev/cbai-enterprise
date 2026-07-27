@@ -24,14 +24,17 @@ async function signIn(
   anonKey: string,
   email: string,
   password: string,
-): Promise<SupabaseClient> {
+): Promise<{ client: SupabaseClient; userId: string }> {
   const client = createClient(url, anonKey, { auth: { persistSession: false } });
   const { data, error } = await client.auth.signInWithPassword({ email, password });
   if (error || !data.session) throw new Error(`Sign-in failed for ${email}`);
-  return createClient(url, anonKey, {
-    global: { headers: { Authorization: `Bearer ${data.session.access_token}` } },
-    auth: { persistSession: false },
-  });
+  return {
+    userId: data.user.id,
+    client: createClient(url, anonKey, {
+      global: { headers: { Authorization: `Bearer ${data.session.access_token}` } },
+      auth: { persistSession: false },
+    }),
+  };
 }
 
 test("B039-RLS suite — direct table boundary tests", async () => {
@@ -42,8 +45,10 @@ test("B039-RLS suite — direct table boundary tests", async () => {
   }
   const env = readSharedBackendTestEnv()!;
 
-  const clientA = await signIn(env.url, env.anonKey, env.userAEmail, env.userAPassword);
-  const clientB = await signIn(env.url, env.anonKey, env.userBEmail, env.userBPassword);
+  const a = await signIn(env.url, env.anonKey, env.userAEmail, env.userAPassword);
+  const b = await signIn(env.url, env.anonKey, env.userBEmail, env.userBPassword);
+  const clientA = a.client;
+  const clientB = b.client;
 
   const anon = createClient(env.url, env.anonKey, { auth: { persistSession: false } });
 
@@ -66,7 +71,7 @@ test("B039-RLS suite — direct table boundary tests", async () => {
     token_hash: tokenHash,
     status: "pending",
     expires_at: new Date(Date.now() + 86400000).toISOString(),
-    created_by: (await clientA.auth.getUser()).data.user!.id,
+    created_by: a.userId,
   });
 
   await clientB.rpc("accept_organization_invitation_by_token", { p_raw_token: rawToken });
@@ -76,19 +81,46 @@ test("B039-RLS suite — direct table boundary tests", async () => {
   const anonRead = await anon.from("organizations").select("id").eq("id", orgId).maybeSingle();
   assert.equal(anonRead.data, null, "Anonymous must not read private organization");
 
+  for (const rpc of [
+    anon.rpc("create_organization_with_owner", { p_name: "forbidden-anon-org", p_organization_type: "other" }),
+    anon.rpc("accept_organization_invitation_by_token", { p_raw_token: "forbidden-anon-token" }),
+    anon.rpc("append_organization_activity", {
+      p_organization_id: orgId,
+      p_action: "forbidden_anonymous_event",
+      p_target_type: null,
+      p_target_id: null,
+      p_correlation_id: null,
+    }),
+  ]) {
+    const result = await rpc;
+    assert.ok(result.error, "Anonymous RPC execution must be denied");
+  }
+
   if (env.userCEmail && env.userCPassword) {
     const clientC = await signIn(env.url, env.anonKey, env.userCEmail, env.userCPassword);
-    const strangerRead = await clientC.from("organizations").select("id").eq("id", orgId).maybeSingle();
+    const strangerRead = await clientC.client.from("organizations").select("id").eq("id", orgId).maybeSingle();
     assert.equal(strangerRead.data, null, "Unrelated user must not read organization by UUID");
   }
 
   for (const table of TABLES) {
-    const { error } = await anon.from(table).select("id").limit(1);
-    assert.ok(error || true, `Anonymous select on ${table} should not leak data`);
+    const { data, error } = await anon.from(table).select("id").limit(1);
+    assert.ok(error || !data?.length, `Anonymous select on ${table} must not leak data`);
   }
 
-  const guestPromote = await clientB.from("organization_memberships").update({ role: "owner" }).eq("organization_id", orgId);
-  assert.ok(guestPromote.error, "Member self-promote must fail at RLS");
+  const guestPromote = await clientB
+    .from("organization_memberships")
+    .update({ role: "owner" })
+    .eq("organization_id", orgId)
+    .select("role");
+  assert.ok(guestPromote.error || guestPromote.data?.length === 0, "Member self-promote must affect no row");
+  const roleAfterAttempt = await clientB
+    .from("organization_memberships")
+    .select("role")
+    .eq("organization_id", orgId)
+    .eq("user_id", b.userId)
+    .single();
+  assert.equal(roleAfterAttempt.error, null, roleAfterAttempt.error?.message);
+  assert.equal(roleAfterAttempt.data?.role, "member", "Member role must remain unchanged");
 
   await clientA.auth.signOut();
   await clientB.auth.signOut();

@@ -36,12 +36,12 @@ test("navigation uses theme-aware nav tokens with spatial accent on home only", 
   assert.doesNotMatch(nav, /operatingNavigationItems/);
 });
 
-test("canonical IA keeps Government and Governance separate with Trust disclosure", () => {
+test("canonical IA keeps Government and Governance separate with Oversight and Advanced disclosure", () => {
   const navigation = readSource("lib/navigation.ts");
   assert.match(navigation, /href: "\/government"/);
   assert.match(navigation, /href: "\/governance"/);
-  assert.match(navigation, /title: "Trust"/);
-  assert.match(navigation, /title: "Collaborate"/);
+  assert.match(navigation, /title: "Oversight"/);
+  assert.match(navigation, /title: "Advanced"/);
   assert.match(navigation, /href: "\/rooms"/);
   const govIndex = navigation.indexOf('href: "/government"');
   const governanceIndex = navigation.indexOf('href: "/governance"');
@@ -73,6 +73,19 @@ test("knowledge graph gives canvas majority width at lg breakpoint", () => {
   const graph = readSource("components/graph/GraphPageClient.tsx");
   assert.match(graph, /lg:col-span-6/);
   assert.match(graph, /min-h-\[min\(72vh/);
+});
+
+test("voice dock is overlay-only — never reserves a right layout column", () => {
+  const css = readSource("app/globals.css");
+  assert.match(css, /\.cbai-voice-dock-open/);
+  assert.match(css, /safe-area-inset-right/);
+  assert.match(css, /safe-area-inset-bottom/);
+  assert.doesNotMatch(css, /padding-right:\s*var\(--cbai-voice-dock-width/);
+  const dock = readSource("components/voice-operator/VoiceOperatorDock.tsx");
+  assert.doesNotMatch(dock, /md:pl-\[18rem\]/);
+  assert.match(dock, /data-voice-entry="launcher"/);
+  assert.match(dock, /data-voice-dock="open"/);
+  assert.match(dock, /data-voice-action="mic"/);
 });
 
 test("voice dock reserves main scroll space globally", () => {

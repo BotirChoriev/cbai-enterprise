@@ -179,17 +179,17 @@ test("voice diagnostics panel in settings uses preflight without secrets", () =>
   assert.doesNotMatch(panel, /sk-/);
 });
 
-test("navigation IA uses the canonical Discover Create Collaborate Trust groups", () => {
-  // Adaptive workspace IA: primary Today/Discover/Create destinations, with Collaborate and Trust
-  // in progressive disclosure. Entity drill-downs and role lenses remain reachable.
+test("navigation IA uses canonical CORE Intelligence Operations Oversight System groups", () => {
+  // Final-product IA: primary CORE/Intelligence/Operations/Oversight/System with Advanced disclosure.
   const nav = readSource("lib/navigation.ts");
-  assert.match(nav, /title: "Discover"/);
-  assert.match(nav, /title: "Create"/);
-  assert.match(nav, /title: "Collaborate"/);
-  assert.match(nav, /title: "Trust"/);
-  assert.match(nav, /title: "World Intelligence"/);
-  assert.match(nav, /title: "Research & Evidence"/);
-  assert.match(nav, /title: "Specialist Workspaces"/);
+  assert.match(nav, /title: "Intelligence"/);
+  assert.match(nav, /title: "Operations"/);
+  assert.match(nav, /title: "Oversight"/);
+  assert.match(nav, /title: "System"/);
+  assert.match(nav, /title: "Advanced"/);
+  assert.doesNotMatch(nav, /title: "Discover"/);
+  assert.doesNotMatch(nav, /title: "Create"/);
+  assert.doesNotMatch(nav, /title: "Collaborate"/);
   for (const href of [
     "/",
     "/my-work",
@@ -241,9 +241,13 @@ test("voice dock anchors bottom-right and main reserves scroll space", () => {
   const dock = readSource("components/voice-operator/VoiceOperatorDock.tsx");
   const layout = readSource("app/(dashboard)/layout.tsx");
   const css = readSource("app/globals.css");
-  assert.match(dock, /justify-end/);
+  assert.match(dock, /cbai-voice-dock-closed/);
+  assert.match(dock, /cbai-voice-dock-open/);
   assert.match(layout, /cbai-voice-reserved-main/);
   assert.match(css, /cbai-voice-reserved-main/);
+  assert.match(css, /safe-area-inset-right/);
+  assert.match(css, /safe-area-inset-bottom/);
+  assert.doesNotMatch(css, /padding-right:\s*var\(--cbai-voice-dock-width/);
 });
 
 test("spatial home keeps dark sidebar in light theme", () => {

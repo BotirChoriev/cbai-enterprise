@@ -9,6 +9,8 @@ import {
   hrefForAction,
   isAllowedNavigationHref,
 } from "@/lib/platform-actions/registry";
+import { applyRouteFilterParams } from "@/lib/platform-actions/route-filter";
+import { buildRouteSummary } from "@/lib/platform-actions/route-summary";
 import { engineIdFromAction } from "@/lib/forward-deployed-engines/engine-bridge";
 import type {
   PlatformActionContext,
@@ -17,6 +19,7 @@ import type {
   PlatformActionResult,
   PlatformActionId,
 } from "@/lib/platform-actions/types";
+import { buildStarterWorkCard, starterCardToOperationalDraft } from "@/lib/activation/starter-work-card";
 
 const ENGINE_START_ACTIONS = new Set<PlatformActionId>([
   "engine.research.start",
@@ -40,6 +43,7 @@ const ENGINE_CONFIRM_ACTIONS = new Set<PlatformActionId>([
 
 const MUTATION_ACTIONS = new Set<PlatformActionId>([
   "operational_object.compose",
+  "problem.compose",
   "operational_object.confirm_create",
   "project.compose",
   "mission.compose",
@@ -94,6 +98,16 @@ function buildDraftFromIntent(
   params: PlatformActionParams,
   context: PlatformActionContext,
 ): OperationalObjectDraft {
+  if (actionId === "problem.compose") {
+    const card = buildStarterWorkCard({
+      text: params.userStatement ?? context.originalText,
+      locale: context.locale,
+      source: "voice_command",
+      route: context.pathname,
+      problem: params.userStatement ?? context.originalText,
+    });
+    return starterCardToOperationalDraft(card);
+  }
   const domainResolution = resolvePlatformDomain(context.originalText);
   const type =
     params.draftType ??
@@ -167,6 +181,83 @@ export function resolvePlatformActionFromIntent(
       ok: true,
       actionId: intent.actionId,
       localControl: intent.actionId as "voice.stop" | "voice.close" | "transcript.show" | "transcript.hide" | "navigate.back",
+      messageKey: def.successMessageKey,
+    };
+  }
+
+  if (intent.actionId === "problem.read_summary") {
+    return {
+      ok: true,
+      actionId: intent.actionId,
+      problemRead: { problemId: intent.params.query },
+      messageKey: def.successMessageKey,
+    };
+  }
+
+  if (intent.actionId === "route.summarize") {
+    const summary = buildRouteSummary({
+      pathname: context.pathname,
+      locale: context.locale,
+      entityName: intent.params.entityName ?? null,
+      entityKind: intent.params.draftType ?? null,
+      filterLabel: intent.params.filterKey
+        ? `${intent.params.filterKey}=${intent.params.filterValue ?? ""}`
+        : null,
+      notes: intent.params.summarySpoken ? [intent.params.summarySpoken] : undefined,
+    });
+    return {
+      ok: true,
+      actionId: intent.actionId,
+      spokenMessage: summary.spoken,
+      messageKey: def.successMessageKey,
+      guidance: {
+        sectionKey: "platformAction.successSummarize",
+        purposeKey: "platformAction.successSummarize",
+        nextActions: summary.canCreateWork
+          ? [{ id: "create_from_summary", labelKey: "operationalObject.summarizeCreateWork" }]
+          : [],
+      },
+    };
+  }
+
+  if (intent.actionId === "route.apply_filter") {
+    const key = intent.params.filterKey ?? "q";
+    const value = intent.params.filterValue ?? intent.params.query ?? "";
+    const patch = applyRouteFilterParams(context.pathname, "", { [key]: value || null });
+    if (!isAllowedNavigationHref(patch.href) && !(patch.href.split("?")[0] && isAllowedNavigationHref(patch.href.split("?")[0]!))) {
+      // Allow filter patches on current allowlisted path
+      const base = (context.pathname.split("?")[0] || "/");
+      if (!isAllowedNavigationHref(base)) {
+        return { ok: false, code: "route_unavailable", messageKey: def.failureMessageKey };
+      }
+      const patched = applyRouteFilterParams(base, "", { [key]: value || null });
+      return {
+        ok: true,
+        actionId: intent.actionId,
+        navigation: { href: patched.href },
+        spokenMessage: `Filter applied: ${patched.announcedFilter}`,
+        messageKey: def.successMessageKey,
+      };
+    }
+    return {
+      ok: true,
+      actionId: intent.actionId,
+      navigation: { href: patch.href },
+      spokenMessage: `Filter applied: ${patch.announcedFilter}`,
+      messageKey: def.successMessageKey,
+    };
+  }
+
+  if (intent.actionId === "work.open_object") {
+    const objectId = intent.params.objectId ?? intent.params.query;
+    if (!objectId) {
+      return { ok: false, code: "entity_not_found", messageKey: "operationalObject.objectNotFound" };
+    }
+    const href = `/my-work?object=${encodeURIComponent(objectId)}`;
+    return {
+      ok: true,
+      actionId: intent.actionId,
+      navigation: { href },
       messageKey: def.successMessageKey,
     };
   }

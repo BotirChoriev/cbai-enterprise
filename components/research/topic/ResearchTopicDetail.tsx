@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { ResearchTopic } from "@/lib/research/research-topics";
 import ResearchTopicHero from "@/components/research/topic/ResearchTopicHero";
+import ResearchPipelineBoard from "@/components/research/topic/ResearchPipelineBoard";
 import ResearchFutureWorkspace from "@/components/research/topic/ResearchFutureWorkspace";
 import ResearchLandscape from "@/components/research/landscape/ResearchLandscape";
 import ResearchGapExplorer from "@/components/research/gaps/ResearchGapExplorer";
@@ -47,6 +48,8 @@ export default function ResearchTopicDetail({ topic }: ResearchTopicDetailProps)
       className={`mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6 sm:py-10 ${cbaiHeroGlow}`}
     >
       <ResearchTopicHero topic={topic} />
+
+      <ResearchPipelineBoard topicId={topic.topicId} topicName={topic.topicName} />
 
       <div className="flex justify-end gap-2">
         <CreateProjectFromEntityButton entity={{ kind: "research_topic", id: topic.topicId, name: topic.topicName }} />

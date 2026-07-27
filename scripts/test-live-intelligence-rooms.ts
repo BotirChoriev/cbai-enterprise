@@ -46,7 +46,7 @@ test("create + list + get room roundtrip", () => {
     hostHearLocale: "en",
     createdLocale: "uz",
   });
-  assert.equal(room.schemaVersion, 1);
+  assert.equal(room.schemaVersion, 2);
   assert.ok(room.roomId);
   assert.equal(getLiveRoom(room.roomId)?.title, "Council review");
   assert.equal(listLiveRooms().length, 1);
@@ -64,7 +64,7 @@ test("migration preserves unknown fields and is idempotent", () => {
   assert.equal((once as { futureField?: { nested: boolean } }).futureField?.nested, true);
   const twice = migrateLiveIntelligenceRoom(once);
   assert.equal(twice?.roomId, once?.roomId);
-  assert.equal(twice?.schemaVersion, 1);
+  assert.equal(twice?.schemaVersion, 2);
   const collection = migrateLiveRoomCollection([raw, once]);
   assert.equal(collection.length, 2);
 });

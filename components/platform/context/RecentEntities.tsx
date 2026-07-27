@@ -1,9 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import { buildContextualHref, snapshotWithEntityFocus, type ContextEntityRef } from "@/lib/context";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
-import { RECENT_ENTITIES_ARCHITECTURE_NOTE } from "@/lib/context";
 import { getResearchTopicPath } from "@/lib/research/research-topics";
 import { evidenceItemHref } from "@/lib/research/evidence/evidence-bookmark";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type RecentEntitiesProps = {
   entities: readonly ContextEntityRef[];
@@ -39,11 +41,12 @@ function entityHref(entity: ContextEntityRef, context: Parameters<typeof snapsho
 
 export default function RecentEntities({ entities }: RecentEntitiesProps) {
   const { context } = usePlatformContext();
+  const { t } = useTranslation();
 
   return (
     <div>
       <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
-        Recent
+        {t("myWork.recentHeading")}
       </p>
       {entities.length > 0 ? (
         <ul className="mt-2 flex flex-wrap gap-2">
@@ -59,7 +62,7 @@ export default function RecentEntities({ entities }: RecentEntitiesProps) {
           ))}
         </ul>
       ) : (
-        <p className="mt-2 text-[11px] text-zinc-600">{RECENT_ENTITIES_ARCHITECTURE_NOTE}</p>
+        <p className="mt-2 text-[11px] text-zinc-600">{t("myWork.recentEmpty")}</p>
       )}
     </div>
   );

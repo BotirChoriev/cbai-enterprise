@@ -8,6 +8,12 @@ import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-clas
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { getDictionary } from "@/lib/i18n/translate";
 import { translateResearchTopicStatus } from "@/lib/i18n/research-topic-status-translation";
+import { localizeResearchDomainLabel } from "@/lib/i18n/entity-domain-labels";
+import {
+  localizeResearchEvidenceTypeLabel,
+  localizeResearchMethodLabel,
+  localizeResearchTopic,
+} from "@/lib/i18n/research-catalog-locale";
 
 type TopicQuickOverviewProps = {
   topic: ResearchTopic;
@@ -28,6 +34,7 @@ export default function TopicQuickOverview({ topic }: TopicQuickOverviewProps) {
   const { t, language } = useTranslation();
   const statusLabel = translateResearchTopicStatus(getDictionary(language), topic.status);
   const relatedTopics = getCrossTopicDiscoveriesForTopic(topic, 3);
+  const localized = localizeResearchTopic(topic, language);
 
   return (
     <section aria-labelledby="topic-quick-overview-heading" className="space-y-4">
@@ -43,15 +50,21 @@ export default function TopicQuickOverview({ topic }: TopicQuickOverviewProps) {
           <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
             {t("researchTopic.topicLabel")}
           </p>
-          <p className="mt-1 text-sm font-medium text-zinc-100">{topic.topicName}</p>
-          <p className="mt-1 text-xs text-zinc-500">{topic.description}</p>
+          <p className="mt-1 text-sm font-medium text-zinc-100">{localized.topicName}</p>
+          <p className="mt-1 text-xs text-zinc-500">{localized.description}</p>
+          {localized.sourceLanguage ? (
+            <p className="mt-1 text-[10px] text-zinc-600">
+              {t("researchTopicDepth.catalogMetadataNotice")} ·{" "}
+              {t("researchTopicDepth.sourceLanguageLabel", { language: localized.sourceLanguage })}
+            </p>
+          ) : null}
         </div>
 
         <div>
           <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
             {t("researchTopic.domainLabel")}
           </p>
-          <p className="mt-1 text-sm text-zinc-300">{topic.domain}</p>
+          <p className="mt-1 text-sm text-zinc-300">{localizeResearchDomainLabel(topic.domain, language)}</p>
         </div>
 
         <div>
@@ -69,14 +82,18 @@ export default function TopicQuickOverview({ topic }: TopicQuickOverviewProps) {
           <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
             {t("researchTopic.methods")}
           </p>
-          <p className="mt-1 text-xs text-zinc-400">{topic.relatedMethods.join(" · ")}</p>
+          <p className="mt-1 text-xs text-zinc-400">
+            {topic.relatedMethods.map((m) => localizeResearchMethodLabel(m, language)).join(" · ")}
+          </p>
         </div>
 
         <div>
           <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-600">
             {t("researchTopic.evidenceTypes")}
           </p>
-          <p className="mt-1 text-xs text-zinc-400">{topic.relatedEvidenceTypes.join(" · ")}</p>
+          <p className="mt-1 text-xs text-zinc-400">
+            {topic.relatedEvidenceTypes.map((e) => localizeResearchEvidenceTypeLabel(e, language)).join(" · ")}
+          </p>
         </div>
 
         <div className="sm:col-span-2">
@@ -88,13 +105,14 @@ export default function TopicQuickOverview({ topic }: TopicQuickOverviewProps) {
               {relatedTopics.map((discovery) => {
                 const related = getResearchTopicById(discovery.relatedTopicId);
                 if (!related) return null;
+                const relatedLocalized = localizeResearchTopic(related, language);
                 return (
                   <li key={discovery.discoveryId}>
                     <Link
                       href={getResearchTopicPath(related.topicId)}
                       className="rounded-md border border-zinc-800 bg-zinc-900/50 px-2 py-1 text-xs text-teal-400 transition-colors hover:border-teal-500/30 hover:text-teal-300"
                     >
-                      {related.topicName}
+                      {relatedLocalized.topicName}
                     </Link>
                   </li>
                 );

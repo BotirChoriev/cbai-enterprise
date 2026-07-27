@@ -6,6 +6,7 @@ import { useId, useState } from "react";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import { useAuth } from "@/components/platform/context/AuthProvider";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import LocalPdfIntake from "@/components/scientific-intake/LocalPdfIntake";
 import {
   confirmScientificIntake,
   createScientificIntakeDraft,
@@ -14,10 +15,19 @@ import {
   type ScientificDocumentPrivacy,
   type ScientificDocumentType,
 } from "@/lib/scientific-intake/scientific-intake";
+import { deriveDocumentUploadReadiness } from "@/lib/platform-capabilities/capability-registry";
+import { createDocumentIntakeDraft } from "@/lib/document-intake/document-intake";
+import { useOperationalObjectsOptional } from "@/components/operational-objects/OperationalObjectProvider";
+import {
+  buildIntakeOperationalDraft,
+  INTAKE_OBJECT_PROPOSALS,
+} from "@/lib/scientific-intake/intake-to-operational-draft";
+import type { OperationalObjectType } from "@/lib/operational-objects/operational-object.types";
 
 export default function ScientificDocumentIntakeClient() {
   const { t, language } = useTranslation();
   const { isSignedIn } = useAuth();
+  const operationalObjects = useOperationalObjectsOptional();
   const params = useSearchParams();
   const prepare = params.get("prepare") === "1";
   const formId = useId();
@@ -34,7 +44,42 @@ export default function ScientificDocumentIntakeClient() {
   const [fileName, setFileName] = useState<string | null>(null);
   const [fileSize, setFileSize] = useState<number | null>(null);
   const [fileMime, setFileMime] = useState<string | null>(null);
+  const [userQuestion, setUserQuestion] = useState("");
   const records = typeof window !== "undefined" ? readScientificIntakeRecords() : [];
+  const uploadReadiness = deriveDocumentUploadReadiness();
+  const storageConfigured = uploadReadiness === "available";
+  const intakeHonesty = createDocumentIntakeDraft({
+    originalFilename: fileName ?? "thesis.pdf",
+    fileSizeBytes: fileSize ?? 0,
+    contentLocale,
+    privacy: privacy === "public-draft" ? "public" : privacy === "team" ? "team" : "private",
+  });
+
+  function openIntakeWork(proposedType: OperationalObjectType) {
+    if (!operationalObjects) return;
+    const { draft, inferredFields } = buildIntakeOperationalDraft({
+      locale: language,
+      title,
+      purpose: purpose || userQuestion,
+      domainLabel: domain,
+      documentType,
+      proposedType,
+      userQuestion: userQuestion || undefined,
+      attachment: fileName
+        ? {
+            fileName,
+            mimeType: fileMime,
+            fileSizeBytes: fileSize,
+            source: "user_upload",
+            createdAt: new Date().toISOString(),
+            userDescription: purpose || userQuestion || title,
+            contentLocale,
+          }
+        : null,
+    });
+    operationalObjects.openComposer(draft, inferredFields, "manual");
+    setStatusMessage(t("operationalObject.intakeNextAction"));
+  }
 
   if (!isSignedIn) {
     return (
@@ -59,6 +104,19 @@ export default function ScientificDocumentIntakeClient() {
           {statusMessage}
         </p>
       ) : null}
+      {!storageConfigured ? (
+        <p
+          role="status"
+          data-storage-required="1"
+          className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/5 px-3 py-3 text-sm text-[var(--cbai-text-primary)]"
+        >
+          {t("voiceCommand.scientificIntakeStorageRequired")}
+        </p>
+      ) : null}
+      <LocalPdfIntake />
+      <p className="mb-4 text-xs text-[var(--cbai-text-secondary)]" data-intake-status={intakeHonesty.metadata.processingStatus}>
+        {intakeHonesty.metadata.extractionWarnings[0] ?? null}
+      </p>
       <form
         className="grid max-w-xl gap-3"
         onSubmit={(event) => {
@@ -158,6 +216,17 @@ export default function ScientificDocumentIntakeClient() {
             </label>
           ))}
         </fieldset>
+        <label className="grid gap-1 text-sm" htmlFor={`${formId}-question`}>
+          {t("operationalObject.intakeProposeResearchQuestion")}
+          <textarea
+            id={`${formId}-question`}
+            className="min-h-20 rounded-md border border-[var(--cbai-border-default)] bg-[var(--cbai-surface-raised)] px-3 py-2"
+            value={userQuestion}
+            onChange={(e) => setUserQuestion(e.target.value)}
+            placeholder="What would be required to make this vehicle operate?"
+            data-cbai-intake-question=""
+          />
+        </label>
         <label className="grid gap-1 text-sm" htmlFor={`${formId}-purpose`}>
           {t("authCollab.intakeFieldPurpose")}
           <textarea
@@ -222,6 +291,27 @@ export default function ScientificDocumentIntakeClient() {
           </button>
         </div>
       </form>
+      {operationalObjects ? (
+        <section className="mt-8 space-y-3" data-cbai-intake-interpretation="" aria-labelledby={`${formId}-interpret`}>
+          <h2 id={`${formId}-interpret`} className="text-base font-medium">
+            {t("operationalObject.intakeCreateWork")}
+          </h2>
+          <p className="text-sm text-[var(--cbai-text-secondary)]">{t("operationalObject.intakeInterpretationRationale")}</p>
+          <p className="text-xs text-[var(--cbai-text-muted)]">{t("operationalObject.intakeAssumptionNoAutoValidation")}</p>
+          <div className="flex flex-wrap gap-2">
+            {INTAKE_OBJECT_PROPOSALS.map((proposal) => (
+              <button
+                key={`${proposal.type}-${proposal.labelKey}`}
+                type="button"
+                className="min-h-11 rounded-lg border border-[var(--cbai-border-default)] px-3 text-xs focus-visible:outline focus-visible:outline-2"
+                onClick={() => openIntakeWork(proposal.type)}
+              >
+                {t(proposal.labelKey)}
+              </button>
+            ))}
+          </div>
+        </section>
+      ) : null}
       <section className="mt-8" aria-labelledby={`${formId}-records`}>
         <h2 id={`${formId}-records`} className="text-base font-medium">
           {t("authCollab.linkScientific")}

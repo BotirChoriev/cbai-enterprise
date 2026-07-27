@@ -10,10 +10,40 @@ const NAV_ALIASES = {
     "ana sayfayı aç", "ana sayfa", "ana sayfaya dön",
   ],
   myWork: [
-    "my work", "open my work", "my projects", "open projects",
-    "mening ishlarim", "mening ishlarimni ko'rsat", "mening ishlarimni och", "loyihalarim", "loyihalarimni och",
-    "моя работа", "мои проекты", "открой мою работу",
-    "çalışmalarım", "projelerim", "projelerimi aç",
+    "my work",
+    "open my work",
+    "open my workspace",
+    "open my personal cabinet",
+    "show my projects",
+    "my projects",
+    "open projects",
+    "shaxsiy kabinetimni och",
+    "kabinetimni och",
+    "shaxsiy kabinet",
+    "mening kabinetim",
+    "mening ishlarim",
+    "mening ishlarimni ko'rsat",
+    "mening ishlarimni och",
+    "ish maydonimni och",
+    "loyihalarim",
+    "loyihalarimni och",
+    "loyihalarimni ko'rsat",
+    "моя работа",
+    "мои проекты",
+    "открой мою работу",
+    "открой мой кабинет",
+    "личный кабинет",
+    "çalışmalarım",
+    "projelerim",
+    "projelerimi aç",
+    "kişisel kabinimi aç",
+    "kabinimi aç",
+  ],
+  problems: [
+    "open problems", "open problem space", "show problems", "problem space",
+    "muammolarni och", "muammo maydonini och", "muammolarim", "muammoni och",
+    "открой проблемы", "пространство проблем",
+    "problemleri aç", "problem alanını aç",
   ],
   search: [
     "open search", "search intelligence", "search",
@@ -127,6 +157,18 @@ const NAV_ALIASES = {
     "open notifications", "notifications", "bildirishnomalar",
     "уведомления", "bildirimler",
   ],
+  discover: [
+    "global activity", "open global activity", "discover", "open discover",
+    "global faoliyat", "global faoliyatni och", "kashf etish",
+    "глобальная активность", "открыть активность",
+    "küresel etkinlik", "keşfet",
+  ],
+  rooms: [
+    "live rooms", "open live rooms", "meeting hall", "open meeting hall",
+    "yig'ilish zali", "yigilish zali", "yig'ilish zalini och", "jonli xonalar",
+    "зал встреч", "живые комнаты",
+    "toplantı salonu", "canlı odalar",
+  ],
   publications: [
     "open publications", "publications", "nashrlar", "nashrlarimni och", "mening nashrlarimni och",
     "публикации", "yayınlar",
@@ -189,6 +231,7 @@ function mutationDef(
 export const PLATFORM_ACTION_REGISTRY: Record<PlatformActionId, PlatformActionDefinition> = {
   "navigate.home": navDef("navigate.home", NAV_ALIASES.home, "platformAction.successHome", "nav_home"),
   "navigate.my_work": navDef("navigate.my_work", NAV_ALIASES.myWork, "platformAction.successMyWork", "nav_my_work"),
+  "navigate.problems": navDef("navigate.problems", NAV_ALIASES.problems, "platformAction.successMyWork", "nav_problems"),
   "navigate.search": navDef("navigate.search", NAV_ALIASES.search, "platformAction.successSearch", "nav_search"),
   "navigate.countries": navDef("navigate.countries", NAV_ALIASES.countries, "platformAction.successCountries", "nav_countries"),
   "navigate.companies": navDef("navigate.companies", NAV_ALIASES.companies, "platformAction.successCompanies", "nav_companies"),
@@ -220,6 +263,18 @@ export const PLATFORM_ACTION_REGISTRY: Record<PlatformActionId, PlatformActionDe
     "platformAction.successNotifications",
     "nav_notifications",
   ),
+  "navigate.discover": navDef(
+    "navigate.discover",
+    NAV_ALIASES.discover,
+    "platformAction.successDiscover",
+    "nav_discover",
+  ),
+  "navigate.rooms": navDef(
+    "navigate.rooms",
+    NAV_ALIASES.rooms,
+    "platformAction.successRooms",
+    "nav_rooms",
+  ),
   "navigate.publications": navDef(
     "navigate.publications",
     NAV_ALIASES.publications,
@@ -236,7 +291,47 @@ export const PLATFORM_ACTION_REGISTRY: Record<PlatformActionId, PlatformActionDe
   "transcript.hide": navDef("transcript.hide", NAV_ALIASES.transcriptHide, "platformAction.successTranscriptHide", "transcript_hide"),
   "voice.stop": navDef("voice.stop", NAV_ALIASES.voiceStop, "platformAction.successVoiceStop", "voice_stop"),
   "voice.close": navDef("voice.close", NAV_ALIASES.voiceClose, "platformAction.successVoiceClose", "voice_close"),
+  "route.apply_filter": navDef(
+    "route.apply_filter",
+    ["filter", "apply filter", "filtr", "фильтр", "filtre"],
+    "platformAction.successFilter",
+    "route_filter",
+  ),
+  "route.summarize": navDef(
+    "route.summarize",
+    ["summarize", "summarise", "what is missing", "xulosa", "резюме", "özet"],
+    "platformAction.successSummarize",
+    "route_summarize",
+  ),
+  "work.open_object": navDef(
+    "work.open_object",
+    ["open my work item", "continue my work", "ishni och"],
+    "platformAction.successMyWork",
+    "work_open_object",
+  ),
   "operational_object.compose": mutationDef("operational_object.compose", [], "platformAction.successDraftOpen", "oo_compose"),
+  "problem.compose": mutationDef(
+    "problem.compose",
+    [
+      "open a problem", "create problem", "start a problem", "new problem",
+      "muammo och", "yangi muammo och", "muammo yarat", "muammoni boshlaylik",
+      "создай проблему", "открой новую проблему",
+      "problem oluştur", "yeni problem aç",
+    ],
+    "platformAction.successDraftOpen",
+    "problem_compose",
+  ),
+  "problem.read_summary": navDef(
+    "problem.read_summary",
+    [
+      "read problem brief", "read problem summary", "summarize this problem", "summarize the current problem", "explain this problem",
+      "muammoni o'qib ber", "muammo briefini o'qi", "bu muammoni tushuntir", "muammoni xulosa qil",
+      "прочитай проблему", "объясни эту проблему",
+      "problemi oku", "bu problemi açıkla",
+    ],
+    "platformAction.successMyWork",
+    "problem_read_summary",
+  ),
   "operational_object.confirm_create": mutationDef("operational_object.confirm_create", [], "platformAction.successDraftConfirm", "oo_confirm"),
   "project.compose": mutationDef("project.compose", ["create project", "new project", "yangi loyiha"], "platformAction.successProjectDraft", "project_compose"),
   "mission.compose": mutationDef("mission.compose", ["start mission", "new mission", "yangi missiya"], "platformAction.successMissionDraft", "mission_compose"),
@@ -399,11 +494,14 @@ export function getPlatformActionDefinition(actionId: string): PlatformActionDef
 export const ALLOWED_NAVIGATION_HREFS = new Set([
   "/",
   "/my-work",
+  "/problems",
   "/search",
+  "/discover",
   "/countries",
   "/companies",
   "/universities",
   "/research",
+  "/evidence",
   "/knowledge",
   "/graph",
   "/reports",
@@ -424,6 +522,7 @@ export const ALLOWED_NAVIGATION_HREFS = new Set([
   "/notifications",
   "/publications",
   "/organization",
+  "/rooms",
 ]);
 
 export function isAllowedNavigationHref(href: string): boolean {
@@ -445,7 +544,17 @@ export function hrefForAction(actionId: PlatformActionId, params: { entityId?: s
     case "navigate.my_work":
     case "mission.resume":
     case "project.open":
+      if (params.query === "chemist_discover" || params.query === "role_discover") {
+        return "/my-work?discover=1&role=chemist";
+      }
+      if (params.query === "review" || params.query === "waiting" || params.query === "draft" || params.query === "active" || params.query === "completed") {
+        return `/my-work?opFilter=${encodeURIComponent(params.query)}`;
+      }
       return "/my-work";
+    case "navigate.problems":
+      return params.query
+        ? `/problems?problemId=${encodeURIComponent(params.query)}`
+        : "/problems";
     case "navigate.search":
       return params.query ? `/search?q=${encodeURIComponent(params.query)}` : "/search";
     case "navigate.countries":
@@ -489,6 +598,10 @@ export function hrefForAction(actionId: PlatformActionId, params: { entityId?: s
       return "/messages";
     case "navigate.notifications":
       return "/notifications";
+    case "navigate.discover":
+      return "/discover";
+    case "navigate.rooms":
+      return "/rooms";
     case "navigate.publications":
     case "publication.prepare":
     case "object.share":
@@ -501,6 +614,13 @@ export function hrefForAction(actionId: PlatformActionId, params: { entityId?: s
       return params.entityId ? `/universities?university=${params.entityId}` : null;
     case "research.open_topic":
       return params.topicId ? `/research/${params.topicId}` : null;
+    case "work.open_object":
+      return params.query ? `/my-work?object=${encodeURIComponent(params.query)}` : "/my-work";
+    case "route.apply_filter":
+      return null;
+    case "route.summarize":
+    case "problem.read_summary":
+      return null;
     default:
       return null;
   }

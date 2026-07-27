@@ -23,6 +23,12 @@ function noticeKey(issue: VoiceBrokerIssue): string {
       return "voiceOperator.brokerRateLimitedNotice";
     case "connection_failed":
       return "voiceOperator.brokerConnectionFailedNotice";
+    case "malformed_response":
+      return "voiceOperator.brokerMalformedNotice";
+    case "remote_audio_blocked":
+      return "voiceOperator.brokerRemoteAudioBlockedNotice";
+    case "unknown":
+      return "voiceOperator.brokerUnknownNotice";
     case "required":
     default:
       return "voiceOperator.backendRequiredNotice";

@@ -47,7 +47,8 @@ export function runVoicePreflight(options?: {
   readonly audioPlaybackAvailable?: boolean;
   readonly connectionState?: string;
 }): VoicePreflightResult {
-  const broker = evaluateVoiceBrokerStatus();
+  const pageOrigin = typeof window !== "undefined" ? window.location.origin : null;
+  const broker = evaluateVoiceBrokerStatus(pageOrigin);
   const brokerConfigured = broker.kind === "available";
   const brokerUrl = brokerConfigured ? broker.brokerUrl : null;
 

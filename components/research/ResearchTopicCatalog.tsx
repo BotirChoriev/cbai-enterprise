@@ -121,9 +121,9 @@ export default function ResearchTopicCatalog({ initialQuery = "" }: ResearchTopi
             <li key={topic.topicId}>
               <ResearchTopicCard
                 topic={topic}
-                methodsLabel={lens.methodsLabel ?? t("researchCatalog.methods")}
-                evidenceLabel={lens.evidenceLabel ?? t("researchCatalog.evidenceTypes")}
-                actionLabel={lens.actionLabel ?? t("researchCatalog.openTopic")}
+                methodsLabel={t("researchCatalog.methods")}
+                evidenceLabel={t("researchCatalog.evidenceTypes")}
+                actionLabel={t("researchCatalog.openTopic")}
                 futureWorkspaceLabel={t("researchCatalog.futureWorkspace")}
               />
             </li>

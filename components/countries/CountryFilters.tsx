@@ -2,91 +2,188 @@
 
 import type { CountryRegion } from "@/lib/countries";
 import { regions } from "@/lib/countries";
-import { cbaiGlassCard } from "@/components/brand/brand-classes";
+import { COUNTRY_INTELLIGENCE_DOMAINS } from "@/lib/country-intelligence/types";
+import { DOMAIN_DEFINITIONS } from "@/lib/country-intelligence/domains";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { translateCountryRegion } from "@/lib/i18n/entity-ui-translation";
 import { getDictionary } from "@/lib/i18n/translate";
+import {
+  getCountryIntelligenceCopy,
+  type CountryIntelligenceCopy,
+} from "@/lib/i18n/platform-copy-country-intelligence";
+import { cbaiFocusRing, cbaiMineralPanel } from "@/components/brand/brand-classes";
+
+export type CoverageFilter = "all" | "identity_only" | "structured_empty" | "connected";
+export type FreshnessFilter = "all" | "unknown" | "current" | "stale";
 
 type CountryFiltersProps = {
   search: string;
   region: CountryRegion | "All";
+  coverage: CoverageFilter;
+  freshness: FreshnessFilter;
+  domain: "all" | (typeof COUNTRY_INTELLIGENCE_DOMAINS)[number];
+  comparisonOnly: boolean;
   onSearchChange: (value: string) => void;
   onRegionChange: (value: CountryRegion | "All") => void;
+  onCoverageChange: (value: CoverageFilter) => void;
+  onFreshnessChange: (value: FreshnessFilter) => void;
+  onDomainChange: (value: CountryFiltersProps["domain"]) => void;
+  onComparisonOnlyChange: (value: boolean) => void;
   resultCount: number;
+  mobileOpen?: boolean;
+  onMobileOpenChange?: (open: boolean) => void;
 };
+
+function domainLabel(copy: CountryIntelligenceCopy, id: string): string {
+  const def = DOMAIN_DEFINITIONS.find((d) => d.id === id);
+  if (!def) return id;
+  return (copy as Record<string, string>)[def.labelKey] ?? id;
+}
 
 export default function CountryFilters({
   search,
   region,
+  coverage,
+  freshness,
+  domain,
+  comparisonOnly,
   onSearchChange,
   onRegionChange,
+  onCoverageChange,
+  onFreshnessChange,
+  onDomainChange,
+  onComparisonOnlyChange,
   resultCount,
+  mobileOpen = true,
+  onMobileOpenChange,
 }: CountryFiltersProps) {
   const { t, language } = useTranslation();
   const dictionary = getDictionary(language);
+  const cis = getCountryIntelligenceCopy(language);
   const resultLabel =
     resultCount === 1
       ? t("filters.resultCountry", { count: String(resultCount) })
       : t("filters.resultCountries", { count: String(resultCount) });
 
-  return (
-    <div className={`${cbaiGlassCard} flex flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between`}>
-      <div className="relative max-w-md flex-1">
-        <svg
-          className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={1.5}
-          aria-hidden="true"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-          />
-        </svg>
+  const rail = (
+    <div className={`${cbaiMineralPanel} flex flex-col gap-3`} data-cbai-country-filters="">
+      <div className="relative">
+        <label htmlFor="cis-country-search" className="sr-only">
+          {cis.searchCountries}
+        </label>
         <input
+          id="cis-country-search"
           type="search"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder={t("filters.searchCountries")}
-          aria-label={t("filters.searchCountries")}
-          className="w-full rounded-lg border border-zinc-800 bg-zinc-900/60 py-2 pl-10 pr-4 text-sm text-zinc-300 placeholder:text-zinc-600 outline-none transition-colors focus:border-teal-500/40 focus:ring-1 focus:ring-teal-500/20"
+          placeholder={cis.searchCountries}
+          className={`${cbaiFocusRing} w-full rounded-lg border border-[var(--cbai-border)] bg-[var(--cbai-surface)] px-3 py-2.5 text-sm text-[var(--cbai-text-primary)]`}
         />
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          onClick={() => onRegionChange("All")}
-          aria-pressed={region === "All"}
-          className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-            region === "All"
-              ? "bg-teal-500/10 text-teal-400 ring-1 ring-teal-500/30"
-              : "border border-zinc-800 text-zinc-500 hover:text-zinc-300"
-          }`}
-        >
-          {t("filters.allRegions")}
-        </button>
-        {regions.map((r) => (
+      <fieldset>
+        <legend className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--cbai-text-muted)]">
+          {cis.region}
+        </legend>
+        <div className="flex flex-wrap gap-1">
           <button
-            key={r}
             type="button"
-            onClick={() => onRegionChange(r)}
-            aria-pressed={region === r}
-            className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-              region === r
-                ? "bg-teal-500/10 text-teal-400 ring-1 ring-teal-500/30"
-                : "border border-zinc-800 text-zinc-500 hover:text-zinc-300"
+            className={`${cbaiFocusRing} min-h-11 rounded-md border px-2.5 text-xs ${
+              region === "All" ? "border-teal-500/40 text-teal-700 dark:text-teal-300" : "border-[var(--cbai-border)]"
             }`}
+            aria-pressed={region === "All"}
+            onClick={() => onRegionChange("All")}
           >
-            {translateCountryRegion(dictionary, r)}
+            {cis.filterAll}
           </button>
-        ))}
+          {regions.map((r) => (
+            <button
+              key={r}
+              type="button"
+              className={`${cbaiFocusRing} min-h-11 rounded-md border px-2.5 text-xs ${
+                region === r ? "border-teal-500/40 text-teal-700 dark:text-teal-300" : "border-[var(--cbai-border)]"
+              }`}
+              aria-pressed={region === r}
+              onClick={() => onRegionChange(r)}
+            >
+              {translateCountryRegion(dictionary, r)}
+            </button>
+          ))}
+        </div>
+      </fieldset>
+
+      <div className="grid gap-2 sm:grid-cols-2">
+        <label className="block text-xs text-[var(--cbai-text-secondary)]">
+          {cis.dataCoverage}
+          <select
+            className={`${cbaiFocusRing} mt-1 w-full min-h-11 rounded-md border border-[var(--cbai-border)] bg-[var(--cbai-surface)] px-2 text-sm`}
+            value={coverage}
+            onChange={(e) => onCoverageChange(e.target.value as CoverageFilter)}
+          >
+            <option value="all">{cis.filterAll}</option>
+            <option value="structured_empty">structured_empty</option>
+            <option value="connected">connected</option>
+            <option value="identity_only">identity_only</option>
+          </select>
+        </label>
+        <label className="block text-xs text-[var(--cbai-text-secondary)]">
+          {cis.freshness}
+          <select
+            className={`${cbaiFocusRing} mt-1 w-full min-h-11 rounded-md border border-[var(--cbai-border)] bg-[var(--cbai-surface)] px-2 text-sm`}
+            value={freshness}
+            onChange={(e) => onFreshnessChange(e.target.value as FreshnessFilter)}
+          >
+            <option value="all">{cis.filterAll}</option>
+            <option value="unknown">unknown</option>
+            <option value="current">current</option>
+            <option value="stale">stale</option>
+          </select>
+        </label>
       </div>
 
-      <span className="font-mono text-xs text-zinc-600">{resultLabel}</span>
+      <label className="block text-xs text-[var(--cbai-text-secondary)]">
+        {cis.indicatorDomain}
+        <select
+          className={`${cbaiFocusRing} mt-1 w-full min-h-11 rounded-md border border-[var(--cbai-border)] bg-[var(--cbai-surface)] px-2 text-sm`}
+          value={domain}
+          onChange={(e) => onDomainChange(e.target.value as CountryFiltersProps["domain"])}
+        >
+          <option value="all">{cis.filterAll}</option>
+          {COUNTRY_INTELLIGENCE_DOMAINS.map((id) => (
+            <option key={id} value={id}>
+              {domainLabel(cis, id)}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className="flex min-h-11 items-center gap-2 text-sm text-[var(--cbai-text-secondary)]">
+        <input
+          type="checkbox"
+          checked={comparisonOnly}
+          onChange={(e) => onComparisonOnlyChange(e.target.checked)}
+          className={cbaiFocusRing}
+        />
+        {cis.comparisonEligible}
+      </label>
+
+      <p className="text-xs text-[var(--cbai-text-muted)]">{resultLabel}</p>
+    </div>
+  );
+
+  return (
+    <div>
+      <div className="mb-2 flex md:hidden">
+        <button
+          type="button"
+          className={`${cbaiFocusRing} min-h-11 rounded-lg border border-[var(--cbai-border)] px-3 text-sm`}
+          aria-expanded={mobileOpen}
+          onClick={() => onMobileOpenChange?.(!mobileOpen)}
+        >
+          {mobileOpen ? cis.filtersClose : cis.filtersOpen}
+        </button>
+      </div>
+      <div className={mobileOpen ? "block" : "hidden md:block"}>{rail}</div>
     </div>
   );
 }

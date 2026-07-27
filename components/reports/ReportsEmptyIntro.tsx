@@ -35,7 +35,7 @@ export default function ReportsEmptyIntro() {
           {t("reportsCenter.emptyActionSearch")} →
         </Link>
         <Link
-          href="/knowledge"
+          href="/evidence"
           className="text-sm font-medium text-[var(--cbai-accent-primary)] hover:text-[var(--cbai-accent-hover)]"
         >
           {t("reportsCenter.emptyActionEvidence")} →

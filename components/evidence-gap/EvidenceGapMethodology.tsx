@@ -1,12 +1,16 @@
+"use client";
+
 import type { EntityEvidenceGapProfile } from "@/lib/evidence-gap";
 import { getNonAvailableGaps } from "@/lib/evidence-gap";
 import { Card, CardContent, CardHeader } from "@/components/ui/Card";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type EvidenceGapMethodologyProps = {
   profile: EntityEvidenceGapProfile;
 };
 
 export default function EvidenceGapMethodology({ profile }: EvidenceGapMethodologyProps) {
+  const { t } = useTranslation();
   const gaps = getNonAvailableGaps(profile).slice(0, 4);
 
   if (gaps.length === 0) return null;
@@ -18,10 +22,10 @@ export default function EvidenceGapMethodology({ profile }: EvidenceGapMethodolo
           id="evidence-gap-methodology-heading"
           className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
         >
-          Methodology References
+          {t("entityIntelligence.gapMethodologyHeading")}
         </h4>
         <p className="mt-1 text-sm text-zinc-500">
-          Required evidence and methodology for indicators with gaps — explain before evaluate.
+          {t("entityIntelligence.gapMethodologyDescription")}
         </p>
       </div>
 
@@ -32,13 +36,13 @@ export default function EvidenceGapMethodology({ profile }: EvidenceGapMethodolo
             <CardContent className="space-y-2">
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-                  Methodology
+                  {t("entityIntelligence.gapMethodologyLabel")}
                 </p>
                 <p className="mt-1 text-sm text-zinc-400">{gap.requiredMethodology}</p>
               </div>
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-                  Required evidence
+                  {t("entityIntelligence.gapRequiredEvidenceLabel")}
                 </p>
                 <p className="mt-1 text-xs text-zinc-500">{gap.requiredEvidence}</p>
               </div>

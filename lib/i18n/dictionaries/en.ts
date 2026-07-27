@@ -1,3 +1,8 @@
+import {
+  EVIDENCE_COMPARISON_UI_EN,
+  TIMELINE_UI_EN,
+} from "@/lib/i18n/platform-copy-timeline-comparison";
+import { DOMAIN_INTELLIGENCE_EN } from "@/lib/i18n/platform-copy-domain-intelligence";
 import type { TranslationDictionary } from "@/lib/i18n/dictionary-types";
 import {
   VOICE_CONTROL_EN,
@@ -228,6 +233,7 @@ const en: TranslationDictionary = {
   navigation: {
     home: "Home",
     myWork: "My Work",
+    problemSpace: "Problem Space",
     search: "Search",
     explore: "Explore",
     reports: "Reports",
@@ -256,6 +262,7 @@ const en: TranslationDictionary = {
     startWithSearchBody: "Find a profile, review available information, and open reports.",
     openSearch: "Open Search",
     openNavigation: "Open navigation",
+    core: "Core",
     operations: "Operations",
     oversight: "Oversight",
     advanced: "Advanced",
@@ -672,6 +679,9 @@ const en: TranslationDictionary = {
   genesisOs: GENESIS_OS_EN,
   researchCanvas: RESEARCH_CANVAS_EN,
   operationalObject: OPERATIONAL_OBJECT_EN,
+  timelineUi: TIMELINE_UI_EN,
+  evidenceComparisonUi: EVIDENCE_COMPARISON_UI_EN,
+  domainIntelligence: DOMAIN_INTELLIGENCE_EN,
 };
 
 export default en;

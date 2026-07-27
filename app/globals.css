@@ -67,14 +67,27 @@
   --cbai-shadow-elevated: 0 24px 64px rgba(0, 0, 0, 0.28);
   --cbai-topbar-bg: rgba(7, 16, 31, 0.96);
   --cbai-sidebar-bg: var(--cbai-shell-bg);
-  --cbai-nav-text: #94a3b8;
-  --cbai-nav-text-hover: #e2e8f0;
-  --cbai-nav-text-active: #f1f5f9;
-  --cbai-nav-bg-active: rgba(13, 148, 136, 0.14);
-  --cbai-nav-border-active: rgba(45, 212, 191, 0.28);
+  --cbai-nav-text: #cbd5e1;
+  --cbai-nav-text-hover: #f8fafc;
+  --cbai-nav-text-active: #f8fafc;
+  --cbai-nav-bg-active: rgba(13, 148, 136, 0.16);
+  --cbai-nav-border-active: rgba(45, 212, 191, 0.35);
   --cbai-surface-glass: var(--cbai-glass-surface);
   --cbai-surface-elevated: var(--cbai-solid-surface);
   --cbai-surface-inspector: color-mix(in srgb, var(--cbai-solid-surface) 92%, var(--cbai-accent-subtle));
+  /* Canonical semantic roles. Keep legacy aliases above for backward compatibility. */
+  --cbai-sidebar: var(--cbai-sidebar-bg);
+  --cbai-topbar: var(--cbai-topbar-bg);
+  --cbai-solid-surface-role: var(--cbai-solid-surface);
+  --cbai-glass-surface-role: var(--cbai-glass-surface);
+  --cbai-inspector-surface: var(--cbai-surface-inspector);
+  --cbai-elevated-panel: var(--cbai-surface-elevated);
+  --cbai-focus: var(--cbai-focus-ring);
+  --cbai-status-partial: var(--warning);
+  --cbai-status-missing: var(--muted);
+  --cbai-status-critical: #dc5a5a;
+  --cbai-status-source: var(--intelligence);
+  --cbai-status-live: var(--accent);
   --cbai-border-subtle: color-mix(in srgb, var(--border) 55%, transparent);
   --cbai-text-link: var(--cbai-accent-primary);
   --cbai-text-emphasis: var(--foreground);
@@ -112,15 +125,16 @@ html.theme-light {
   --cbai-solid-surface: rgba(255, 255, 255, 0.96);
   --cbai-surface-muted: rgba(238, 244, 242, 0.92);
   --cbai-surface-hover: rgba(13, 148, 136, 0.08);
-  --cbai-text-secondary: #475569;
+  --cbai-text-secondary: #334155;
   --cbai-text-inverse: #f8fafc;
+  --cbai-text-muted: #475569;
   --cbai-accent-hover: #0f766e;
   --cbai-border-active: rgba(13, 148, 136, 0.32);
   --cbai-shadow-soft: 0 1px 2px rgba(15, 23, 42, 0.05), 0 8px 24px -12px rgba(15, 23, 42, 0.1);
   --cbai-shadow-elevated: 0 16px 40px rgba(15, 23, 42, 0.08);
   --cbai-topbar-bg: rgba(248, 246, 241, 0.96);
-  --cbai-nav-text: #475569;
-  --cbai-nav-text-hover: #1e293b;
+  --cbai-nav-text: #334155;
+  --cbai-nav-text-hover: #0f172a;
   --cbai-nav-text-active: #0f172a;
   --cbai-nav-bg-active: rgba(13, 148, 136, 0.12);
   --cbai-nav-border-active: rgba(13, 148, 136, 0.28);
@@ -461,14 +475,10 @@ html.theme-light .cbai-spatial-home-chrome .cbai-platform-topbar button {
   padding-bottom: max(5.5rem, calc(env(safe-area-inset-bottom) + 4.5rem));
 }
 
-.cbai-voice-dock-closed {
-  pointer-events: none;
-}
-
+/* Pointer-events helpers for closed launcher (positioning lives with open dock rules below). */
 .cbai-voice-dock-closed .cbai-spatial-voice-cta,
 .cbai-voice-dock-closed button {
-  pointer-events: auto;
-  max-width: min(14rem, calc(100vw - 2rem));
+  max-width: min(16rem, calc(100vw - 2rem));
 }
 
 .cbai-intelligence-globe canvas {
@@ -917,14 +927,98 @@ html.theme-light [class*="backdrop-blur"] {
   z-index: 1;
 }
 
+/* Adaptive density (data-cbai-density: open | focused | dense) — presentation-only rhythm.
+   User preference always wins over space default (lib/intelligence-os/adaptive-density.ts);
+   density never gates capability, it only tunes section and card spacing. */
+.cbai-intelligence-atmosphere[data-cbai-density="open"] {
+  --cbai-section-gap: 1.75rem;
+  --cbai-card-gap: 1.125rem;
+}
+
+.cbai-intelligence-atmosphere[data-cbai-density="focused"] {
+  --cbai-section-gap: 1.5rem;
+  --cbai-card-gap: 1rem;
+}
+
+.cbai-intelligence-atmosphere[data-cbai-density="dense"] {
+  --cbai-section-gap: 1.25rem;
+  --cbai-card-gap: 0.75rem;
+}
+
 .cbai-platform-main {
   padding-bottom: var(--cbai-dock-inset, 5.5rem);
   scroll-padding-bottom: var(--cbai-dock-inset, 5.5rem);
 }
 
+/**
+ * P0 recovery: Voice dock is a pure overlay.
+ * Never reserve a right layout column (that created the phantom blank column and
+ * compressed page content). Only bump bottom safe-space while open.
+ */
+html[data-cbai-voice-dock="open"] .cbai-platform-main {
+  --cbai-dock-inset: min(38vh, 20rem);
+}
+
+/* Closed launcher — always inside the usable main viewport, bottom-right. */
+.cbai-voice-dock-closed {
+  position: fixed;
+  inset: auto max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) auto;
+  z-index: 40;
+  display: flex;
+  pointer-events: none;
+}
+
+.cbai-voice-dock-closed .cbai-spatial-voice-cta,
+.cbai-voice-dock-closed button {
+  pointer-events: auto;
+}
+
+/* Open dock — bottom-right anchored panel; never a full-height grid column. */
+.cbai-voice-dock-open {
+  position: fixed;
+  inset: auto max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) auto;
+  z-index: 50;
+  display: flex;
+  width: min(var(--cbai-voice-dock-width, 24rem), calc(100vw - 2rem));
+  max-height: min(70vh, 32rem);
+  pointer-events: none;
+}
+
+.cbai-voice-dock-shell {
+  pointer-events: auto;
+  width: 100%;
+  max-width: min(var(--cbai-voice-dock-width, 24rem), calc(100vw - 2rem));
+  max-height: inherit;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --cbai-voice-dock-width: 24rem; /* 384px — within 360–420px */
+  }
+
+  .cbai-voice-dock-open {
+    width: var(--cbai-voice-dock-width);
+    max-height: min(75vh, 36rem);
+  }
+}
+
 @media (max-width: 767px) {
   :root {
     --cbai-dock-inset: 7rem;
+    --cbai-voice-dock-width: calc(100vw - 1.5rem);
+  }
+
+  html[data-cbai-voice-dock="open"] .cbai-platform-main {
+    --cbai-dock-inset: min(52vh, 24rem);
+  }
+
+  .cbai-voice-dock-open {
+    inset-inline: max(0.75rem, env(safe-area-inset-left)) max(0.75rem, env(safe-area-inset-right));
+    width: auto;
+    max-height: min(70vh, 28rem);
   }
 
   .cbai-voice-dock-closed .cbai-spatial-voice-cta {
@@ -1015,10 +1109,10 @@ html:not(.theme-light) .cbai-page-workspace .text-black {
 
 .cbai-nav-eyebrow {
   font-size: 0.625rem;
-  font-weight: 500;
-  letter-spacing: 0.18em;
+  font-weight: 600;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--cbai-text-muted);
+  color: color-mix(in srgb, var(--cbai-text-secondary) 88%, var(--cbai-accent-primary));
 }
 
 .cbai-nav-row {
@@ -1026,15 +1120,19 @@ html:not(.theme-light) .cbai-page-workspace .text-black {
   display: flex;
   align-items: center;
   gap: 0.625rem;
+  min-height: 2.25rem;
   border-radius: 0.5rem;
   border: 1px solid transparent;
-  padding: 0.5rem 0.625rem;
-  font-size: 0.75rem;
+  padding: 0.5rem 0.625rem 0.5rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
   transition: color 150ms ease-out, background-color 150ms ease-out, border-color 150ms ease-out;
 }
 
 .cbai-nav-row-idle {
   color: var(--cbai-nav-text);
+  background: transparent;
+  border-color: transparent;
 }
 
 .cbai-nav-row-idle:hover {
@@ -1045,7 +1143,7 @@ html:not(.theme-light) .cbai-page-workspace .text-black {
 .cbai-nav-row-active {
   color: var(--cbai-nav-text-active);
   background: var(--cbai-nav-bg-active);
-  border-color: var(--cbai-nav-border-active);
+  border-color: transparent;
 }
 
 .cbai-nav-row-active::before {
@@ -1056,7 +1154,7 @@ html:not(.theme-light) .cbai-page-workspace .text-black {
   bottom: 0.375rem;
   width: 3px;
   border-radius: 0 2px 2px 0;
-  background: linear-gradient(180deg, rgba(94, 234, 212, 0.95), rgba(20, 184, 166, 0.75));
+  background: var(--cbai-accent-primary);
 }
 
 .cbai-voice-dock-btn {
@@ -1247,12 +1345,34 @@ html.theme-light .cbai-op-close {
 }
 
 .cbai-op-composer__header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem 1.25rem;
   border-bottom: 1px solid rgba(45, 212, 191, 0.12);
+  background: color-mix(in srgb, var(--cbai-surface, #0b1220) 92%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.cbai-op-composer__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.cbai-op-back {
+  min-height: 2.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: transparent;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  color: inherit;
 }
 
 .cbai-op-composer__eyebrow {

@@ -7,6 +7,7 @@ import {
   WORKSPACE_ROLES,
   ASSISTANT_AVATARS,
 } from "@/lib/assistant/assistant-profile";
+import { canonicalizeUiLocale } from "@/lib/i18n/canonicalize-locale";
 import { resolveStorageKey } from "@/lib/storage/namespaced-key";
 import { getSyncedCloudUserId } from "@/lib/supabase/cloud-session-sync";
 import { upsertCloudProfile } from "@/lib/supabase/cloud-profile";
@@ -51,14 +52,16 @@ function sanitizeProfile(raw: unknown): AssistantProfile {
       typeof candidate.voiceInputEnabled === "boolean"
         ? candidate.voiceInputEnabled
         : fallback.voiceInputEnabled,
-    preferredLanguage:
+    preferredLanguage: canonicalizeUiLocale(
       typeof candidate.preferredLanguage === "string"
         ? candidate.preferredLanguage
         : fallback.preferredLanguage,
-    translationLanguage:
+    ),
+    translationLanguage: canonicalizeUiLocale(
       typeof candidate.translationLanguage === "string"
         ? candidate.translationLanguage
         : fallback.translationLanguage,
+    ),
     speechLanguage:
       typeof candidate.speechLanguage === "string"
         ? candidate.speechLanguage

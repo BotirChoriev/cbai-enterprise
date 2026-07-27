@@ -2,6 +2,7 @@
 
 import { cbaiGlassCard } from "@/components/brand/brand-classes";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { localizeIndustryLabel } from "@/lib/i18n/entity-domain-labels";
 
 type CompanyFiltersProps = {
   search: string;
@@ -26,7 +27,7 @@ export default function CompanyFilters({
   onCountryChange,
   resultCount,
 }: CompanyFiltersProps) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const resultLabel =
     resultCount === 1
       ? t("filters.resultCompany", { count: String(resultCount) })
@@ -72,7 +73,7 @@ export default function CompanyFilters({
           {industries.map((item) => (
             <FilterPill
               key={item}
-              label={item}
+              label={localizeIndustryLabel(item, language)}
               active={industry === item}
               onClick={() => onIndustryChange(item)}
             />

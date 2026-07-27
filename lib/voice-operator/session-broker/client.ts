@@ -20,6 +20,7 @@ export type SessionBrokerResponse =
         | "AUTHENTICATION_FAILED"
         | "INVALID_API_KEY"
         | "QUOTA_OR_ACCOUNT_BLOCKED"
+        | "MALFORMED_RESPONSE"
         | "ERROR";
       readonly message: string;
     };
@@ -36,13 +37,28 @@ function isCloudflarePagesHost(hostname: string): boolean {
   return hostname === "pages.dev" || hostname.endsWith(".pages.dev");
 }
 
+function resolvePageOrigin(pageOrigin?: string | null): string | undefined {
+  if (pageOrigin === undefined) {
+    return typeof window !== "undefined" ? window.location.origin : undefined;
+  }
+  return pageOrigin ?? undefined;
+}
+
+/** Same-origin Pages Function path used on deployed HTTPS hosts. */
+export function sameOriginVoiceBrokerUrl(origin: string): string {
+  return `${stripTrailingSlash(origin)}/api/voice`;
+}
+
 /**
  * Resolve the broker base URL (…/api/voice, without /session).
  *
- * Preview fix: when the app is served from a Cloudflare Pages host, always call the
- * **same-origin** Pages Function at `/api/voice` so Access cookies apply and hash vs
- * branch-alias host mismatches cannot break the mint. Local loopback brokers (doctor)
- * keep the configured absolute URL (different port).
+ * Precedence:
+ * 1. Valid explicit NEXT_PUBLIC_VOICE_BROKER_URL (or test override)
+ * 2. On deployed HTTPS (non-loopback) page origins → `${origin}/api/voice`
+ * 3. Localhost/loopback → only when explicitly configured
+ * 4. Otherwise null → honest text-only fallback
+ *
+ * Secrets never enter the browser through this module.
  */
 export function resolveVoiceBrokerUrl(
   envUrl?: string | null,
@@ -50,40 +66,63 @@ export function resolveVoiceBrokerUrl(
 ): string | null {
   const rawEnv = envUrl === undefined ? process.env.NEXT_PUBLIC_VOICE_BROKER_URL : envUrl;
   const configured = rawEnv?.trim() || null;
-  if (!configured) return null;
+  const origin = resolvePageOrigin(pageOrigin);
 
-  const origin =
-    pageOrigin === undefined
-      ? typeof window !== "undefined"
-        ? window.location.origin
-        : undefined
-      : pageOrigin ?? undefined;
+  if (configured) {
+    if (!origin) {
+      return stripTrailingSlash(configured);
+    }
 
-  if (!origin) {
-    return stripTrailingSlash(configured);
-  }
+    try {
+      const page = new URL(origin);
+      const broker = new URL(configured, origin);
 
-  try {
-    const page = new URL(origin);
-    const broker = new URL(configured, origin);
+      if (isLoopbackHost(broker.hostname)) {
+        // A loopback broker (e.g. the `npm run dev:voice` default baked in from
+        // .env.local) can only ever serve a loopback page. On any deployed,
+        // non-loopback host — especially HTTPS, where fetching http://127.0.0.1
+        // is blocked as mixed content and throws — honoring it guarantees a dead
+        // voice pipeline. Ignore the stray loopback URL and use the colocated
+        // same-origin Pages Function instead.
+        if (isLoopbackHost(page.hostname)) {
+          return stripTrailingSlash(broker.href);
+        }
+        return sameOriginVoiceBrokerUrl(page.origin);
+      }
 
-    if (isLoopbackHost(broker.hostname)) {
+      if (broker.origin === page.origin) {
+        return stripTrailingSlash(`${broker.origin}${broker.pathname}`);
+      }
+
+      // Pages Preview / production Pages: colocated Function — never cross-origin mint.
+      if (isCloudflarePagesHost(page.hostname)) {
+        return sameOriginVoiceBrokerUrl(page.origin);
+      }
+
+      // Other HTTPS deploys: prefer same-origin function unless override is intentional absolute.
+      if (page.protocol === "https:" && !isLoopbackHost(page.hostname)) {
+        return sameOriginVoiceBrokerUrl(page.origin);
+      }
+
       return stripTrailingSlash(broker.href);
+    } catch {
+      return stripTrailingSlash(configured);
     }
-
-    if (broker.origin === page.origin) {
-      return stripTrailingSlash(`${broker.origin}${broker.pathname}`);
-    }
-
-    // Pages Preview / production Pages: colocated Function — never cross-origin mint.
-    if (isCloudflarePagesHost(page.hostname)) {
-      return `${page.origin}/api/voice`;
-    }
-
-    return stripTrailingSlash(broker.href);
-  } catch {
-    return stripTrailingSlash(configured);
   }
+
+  // No build-time URL: still enable same-origin broker on deployed HTTPS hosts.
+  if (origin) {
+    try {
+      const page = new URL(origin);
+      if (page.protocol === "https:" && !isLoopbackHost(page.hostname)) {
+        return sameOriginVoiceBrokerUrl(page.origin);
+      }
+    } catch {
+      return null;
+    }
+  }
+
+  return null;
 }
 
 /** Test-only override for broker env URL (undefined = use process.env). */
@@ -93,15 +132,28 @@ export function setVoiceBrokerEnvUrlForTests(url: string | null | undefined): vo
   brokerEnvUrlOverride = url;
 }
 
-export function evaluateVoiceBrokerStatus(): VoiceBrokerStatus {
-  const envUrl =
-    brokerEnvUrlOverride === undefined ? undefined : brokerEnvUrlOverride;
-  // `null` means explicitly unset for tests; `undefined` reads process.env.
-  const brokerUrl = resolveVoiceBrokerUrl(envUrl === undefined ? undefined : envUrl);
+function activeBrokerEnvUrl(): string | null | undefined {
+  return brokerEnvUrlOverride === undefined ? undefined : brokerEnvUrlOverride;
+}
+
+/**
+ * Evaluate whether a Realtime broker base URL is available.
+ * On the client, defaults to `window.location.origin` so deployed HTTPS Pages
+ * resolve same-origin `/api/voice` even when `NEXT_PUBLIC_VOICE_BROKER_URL`
+ * was not baked into the static export.
+ */
+export function evaluateVoiceBrokerStatus(pageOrigin?: string | null): VoiceBrokerStatus {
+  const origin =
+    pageOrigin === undefined
+      ? typeof window !== "undefined"
+        ? window.location.origin
+        : null
+      : pageOrigin;
+  const brokerUrl = resolveVoiceBrokerUrl(activeBrokerEnvUrl(), origin);
   if (!brokerUrl) {
     return {
       kind: "backend_required",
-      reason: "NEXT_PUBLIC_VOICE_BROKER_URL is not configured.",
+      reason: "Voice broker is not configured for this environment.",
     };
   }
   return { kind: "available", brokerUrl };
@@ -127,7 +179,7 @@ export async function requestRealtimeSessionCredential(
     return mockBrokerHandler(request);
   }
 
-  const brokerUrl = resolveVoiceBrokerUrl();
+  const brokerUrl = resolveVoiceBrokerUrl(activeBrokerEnvUrl(), request.origin);
   if (!brokerUrl) {
     return { ok: false, code: "BACKEND_REQUIRED", message: "Voice broker URL is not configured." };
   }

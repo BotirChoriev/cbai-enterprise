@@ -38,6 +38,10 @@ import AddToMissionButton from "@/components/mission/MissionOperatingActions";
 import CreateProjectFromEntityButton from "@/components/project/CreateProjectFromEntityButton";
 import CreateLinkedWorkButton from "@/components/operational-objects/CreateLinkedWorkButton";
 import CountryLiveRoomsPanel from "@/components/live-intelligence-rooms/CountryLiveRoomsPanel";
+import CountryIntelligenceWorkspaceView from "@/components/domain-intelligence/CountryIntelligenceWorkspaceView";
+import AcademicIntelligenceWorkspaceView from "@/components/domain-intelligence/AcademicIntelligenceWorkspaceView";
+import { buildCountryIntelligenceWorkspace } from "@/lib/domain-intelligence/country-workspace";
+import { buildAcademicIntelligenceWorkspace } from "@/lib/domain-intelligence/academic-workspace";
 import { useTranslation } from "@/lib/i18n/use-translation";
 
 type CountryIntelligencePanelProps = {
@@ -68,6 +72,8 @@ export function CountryIntelligencePanel({
   // economic analyst opens comparables and indicator coverage before anything else. Everyone
   // else (no workspace, or the Citizen lens) gets the original evidence-first order untouched.
   const lens = context.workspace === "government" || context.workspace === "investor" ? context.workspace : null;
+  const domainWorkspace = buildCountryIntelligenceWorkspace(country.id);
+  const academicWorkspace = buildAcademicIntelligenceWorkspace({ countryId: country.id });
 
   const institutionalRecord = (
     <div className="space-y-4">
@@ -127,6 +133,14 @@ export function CountryIntelligencePanel({
       </div>
 
       <CountryLiveRoomsPanel countryId={country.id} countryName={country.name} />
+
+      {domainWorkspace ? <CountryIntelligenceWorkspaceView workspace={domainWorkspace} /> : null}
+
+      <AcademicIntelligenceWorkspaceView
+        workspace={academicWorkspace}
+        countryId={country.id}
+        countryName={country.name}
+      />
 
       <EntityHeader
         name={registryFacts.name}

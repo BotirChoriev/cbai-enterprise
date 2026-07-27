@@ -17,6 +17,7 @@ const LEVEL_3 = new Set<string>([
 
 const LEVEL_2_ACTIONS = new Set<PlatformActionId>([
   "operational_object.compose",
+  "problem.compose",
   "operational_object.confirm_create",
   "project.compose",
   "mission.compose",

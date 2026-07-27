@@ -5,7 +5,7 @@
 import { resolveEntityRef } from "@/lib/context/context-builder";
 import type { ContextEntityRef, EntityKind } from "@/lib/context/context-types";
 import { deriveEvidenceRuntime } from "@/lib/evidence-runtime/evidence-runtime";
-import { deriveEvidencePulse } from "@/lib/intelligence-os/evidence-pulse";
+import { deriveEvidencePulse, type EvidencePulseLabelPart } from "@/lib/intelligence-os/evidence-pulse";
 import { deriveLegacyTrail } from "@/lib/intelligence-os/legacy-trail";
 import { deriveReportReadiness } from "@/lib/intelligence-os/report-readiness";
 import { getCurrentMission } from "@/lib/intelligence-os/mission-engine";
@@ -42,7 +42,13 @@ export type UniversalObjectRef = {
 export type UniversalObjectAction = {
   readonly label: string;
   readonly href: string;
-  readonly labelKey?: "research.openTopic" | "navigation.evidence" | "navigation.reports" | "navigation.graph";
+  readonly labelKey?:
+    | "research.openTopic"
+    | "navigation.evidence"
+    | "navigation.reports"
+    | "navigation.graph"
+    | "universalWorkspace.openEntity"
+    | "universalWorkspace.knowledgeUniverse";
 };
 
 export type UniversalObjectContract = {
@@ -52,6 +58,18 @@ export type UniversalObjectContract = {
   readonly state: string;
   readonly missionRelation: string | null;
   readonly evidenceSummary: string | null;
+  /** Structured i18n parts for evidenceSummary (experienceEngineering.*) when it is platform copy. */
+  readonly evidenceSummaryParts?: readonly EvidencePulseLabelPart[];
+  /** Full dot-path i18n key overriding evidenceSummary when it is deterministic platform copy. */
+  readonly evidenceSummaryKey?: "universalWorkspace.seeEntityEvidence";
+  /** Full dot-path i18n key overriding trustState when it is deterministic platform copy. */
+  readonly trustStateKey?: "universalWorkspace.trustRegistryBacked";
+  /** Full dot-path i18n key overriding limitations when it is deterministic platform copy. */
+  readonly limitationsKey?: "universalWorkspace.entityCatalogLimitation";
+  /** Full dot-path i18n key overriding state when it is an internal code, never user content. */
+  readonly stateKey?: "universalWorkspace.stateRegistry";
+  /** Full dot-path i18n key overriding missionRelation when it is deterministic platform copy. */
+  readonly missionRelationKey?: "universalWorkspace.maySupportMission";
   readonly unknowns: readonly string[];
   readonly trustState: string | null;
   readonly actions: readonly UniversalObjectAction[];
@@ -94,6 +112,7 @@ export function resolveUniversalObject(
         state: m.status,
         missionRelation: "active-center",
         evidenceSummary: pulse.label,
+        evidenceSummaryParts: pulse.labelParts,
         unknowns: m.evidenceMissing ? [m.evidenceMissing] : [],
         trustState: pulse.limitation,
         actions: [{ label: "Mission Space", href: "/" }],
@@ -254,7 +273,7 @@ export function resolveUniversalObject(
         evidenceSummary: "See Knowledge Universe connections",
         unknowns: ["Relationship strength not scored"],
         trustState: "catalog-backed",
-        actions: [{ label: "Knowledge Universe", href: "/graph" }],
+        actions: [{ label: "Knowledge Universe", href: "/graph", labelKey: "universalWorkspace.knowledgeUniverse" }],
         limitations: "Relationships are catalog-derived — not live external feeds.",
         returnPath: "/graph",
         layers: { surface: ref.id, evidence: "Graph edge inspection" },
@@ -301,20 +320,26 @@ function buildEntityContract(
     identity: entity.name,
     purpose: entity.countryName ?? entity.code ?? null,
     state: "registry",
+    stateKey: "universalWorkspace.stateRegistry",
     missionRelation: mission ? "may-support-mission" : null,
+    missionRelationKey: mission ? "universalWorkspace.maySupportMission" : undefined,
     evidenceSummary: "See entity evidence panel",
+    evidenceSummaryKey: "universalWorkspace.seeEntityEvidence",
     unknowns: [],
     trustState: "registry-backed",
+    trustStateKey: "universalWorkspace.trustRegistryBacked",
     actions: [
-      { label: "Open entity", href },
-      { label: "Knowledge Universe", href: "/graph" },
+      { label: "Open entity", href, labelKey: "universalWorkspace.openEntity" },
+      { label: "Knowledge Universe", href: "/graph", labelKey: "universalWorkspace.knowledgeUniverse" },
     ],
     limitations: "Entity intelligence depends on connected catalog sources.",
+    limitationsKey: "universalWorkspace.entityCatalogLimitation",
     returnPath: href,
     layers: {
       surface: entity.name,
       summary: entity.countryName ?? null,
       evidence: "See entity module",
+      evidenceKey: "universalWorkspace.seeEntityModule",
     },
     requiresHumanJudgment: false,
   };

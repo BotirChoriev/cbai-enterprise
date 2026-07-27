@@ -102,6 +102,9 @@ export const MY_WORK_UZ = {
   continueLinksHeading: "Davom etish",
   onboardingHeading: "Boshlash",
   pageDescription: "Missiya uyi — progress, keyingi qadam va so‘nggi ish bir joyda.",
+  recentHeading: "So‘nggi",
+  recentEmpty:
+    "Ochgan profillaringiz shu yerda ko‘rinadi. Boshlash uchun mamlakat, kompaniya yoki universitetni qidiring.",
 } as const;
 
 export const SYSTEM_UZ = {

@@ -1,5 +1,10 @@
 import type { TranslationDictionary } from "@/lib/i18n/dictionary-types";
 import {
+  EVIDENCE_COMPARISON_UI_TR,
+  TIMELINE_UI_TR,
+} from "@/lib/i18n/platform-copy-timeline-comparison";
+import { DOMAIN_INTELLIGENCE_TR } from "@/lib/i18n/platform-copy-domain-intelligence";
+import {
   VOICE_CONTROL_TR,
 } from "@/lib/i18n/platform-copy-voice-control";
 import { VOICE_OPERATOR_TR } from "@/lib/i18n/platform-copy-voice-operator";
@@ -228,6 +233,7 @@ const tr: TranslationDictionary = {
   navigation: {
     home: "Ana Sayfa",
     myWork: "Çalışmalarım",
+    problemSpace: "Problem Alanı",
     search: "Ara",
     explore: "Keşfet",
     reports: "Raporlar",
@@ -256,6 +262,7 @@ const tr: TranslationDictionary = {
     startWithSearchBody: "Bir profil bulun, mevcut bilgileri inceleyin ve raporları açın.",
     openSearch: "Aramayı Aç",
     openNavigation: "Gezinmeyi aç",
+    core: "Temel",
     operations: "Operasyonlar",
     oversight: "Denetim",
     advanced: "Gelişmiş",
@@ -671,6 +678,9 @@ const tr: TranslationDictionary = {
   genesisOs: GENESIS_OS_TR,
   researchCanvas: RESEARCH_CANVAS_TR,
   operationalObject: OPERATIONAL_OBJECT_TR,
+  timelineUi: TIMELINE_UI_TR,
+  evidenceComparisonUi: EVIDENCE_COMPARISON_UI_TR,
+  domainIntelligence: DOMAIN_INTELLIGENCE_TR,
 };
 
 export default tr;

@@ -1,5 +1,10 @@
 import type { TranslationDictionary } from "@/lib/i18n/dictionary-types";
 import {
+  EVIDENCE_COMPARISON_UI_RU,
+  TIMELINE_UI_RU,
+} from "@/lib/i18n/platform-copy-timeline-comparison";
+import { DOMAIN_INTELLIGENCE_RU } from "@/lib/i18n/platform-copy-domain-intelligence";
+import {
   VOICE_CONTROL_RU,
 } from "@/lib/i18n/platform-copy-voice-control";
 import { VOICE_OPERATOR_RU } from "@/lib/i18n/platform-copy-voice-operator";
@@ -228,6 +233,7 @@ const ru: TranslationDictionary = {
   navigation: {
     home: "Главная",
     myWork: "Моя работа",
+    problemSpace: "Пространство проблемы",
     search: "Поиск",
     explore: "Обзор",
     reports: "Отчёты",
@@ -256,6 +262,7 @@ const ru: TranslationDictionary = {
     startWithSearchBody: "Найдите профиль, изучите доступную информацию и откройте отчёты.",
     openSearch: "Открыть поиск",
     openNavigation: "Открыть навигацию",
+    core: "Основное",
     operations: "Операции",
     oversight: "Надзор",
     advanced: "Расширенное",
@@ -671,6 +678,9 @@ const ru: TranslationDictionary = {
   genesisOs: GENESIS_OS_RU,
   researchCanvas: RESEARCH_CANVAS_RU,
   operationalObject: OPERATIONAL_OBJECT_RU,
+  timelineUi: TIMELINE_UI_RU,
+  evidenceComparisonUi: EVIDENCE_COMPARISON_UI_RU,
+  domainIntelligence: DOMAIN_INTELLIGENCE_RU,
 };
 
 export default ru;

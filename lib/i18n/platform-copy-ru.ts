@@ -102,6 +102,9 @@ export const MY_WORK_RU = {
   continueLinksHeading: "Продолжить",
   onboardingHeading: "Начать",
   pageDescription: "Дом миссии — прогресс, следующий шаг и последняя работа в одном месте.",
+  recentHeading: "Недавние",
+  recentEmpty:
+    "Открытые профили появятся здесь. Начните с поиска страны, компании или университета.",
 } as const;
 
 export const SYSTEM_RU = {

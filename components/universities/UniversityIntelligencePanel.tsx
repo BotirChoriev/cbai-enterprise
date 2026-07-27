@@ -28,6 +28,8 @@ import { getUniversityRelationships } from "@/lib/universities.adapter";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import AddToMissionButton from "@/components/mission/MissionOperatingActions";
 import CreateProjectFromEntityButton from "@/components/project/CreateProjectFromEntityButton";
+import CreateLinkedWorkButton from "@/components/operational-objects/CreateLinkedWorkButton";
+import EvidenceConnectAction from "@/components/evidence/EvidenceConnectAction";
 import { useTranslation } from "@/lib/i18n/use-translation";
 
 type UniversityIntelligencePanelProps = {
@@ -51,6 +53,22 @@ export function UniversityIntelligencePanel({
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap justify-end gap-2">
+        <CreateLinkedWorkButton
+          variant="university"
+          compact
+          university={{
+            universityId: university.id,
+            universityName: university.name,
+            routePath: `/universities?university=${encodeURIComponent(university.id)}`,
+          }}
+        />
+        <EvidenceConnectAction
+          category={t("operationalObject.linkedEvidenceOfficialSources")}
+          relatedEntityName={university.name}
+          relatedEntityKind="university"
+          relatedEntityId={university.id}
+          compact
+        />
         <AddToMissionButton
           entity={{ kind: "university", id: university.id, name: university.name, code: university.icon, countryName: university.country }}
           compact

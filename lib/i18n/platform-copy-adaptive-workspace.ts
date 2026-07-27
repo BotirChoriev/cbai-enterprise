@@ -17,10 +17,16 @@ export type AdaptiveWorkspaceCopy = {
   inferredLabel: string;
   missingLabel: string;
   draftStatus: string;
+  firstActionConfirm: string;
+  firstActionEvidence: string;
+  firstActionNext: string;
   templateStudent: string;
   templateStudentDesc: string;
   templateResearcher: string;
   templateResearcherDesc: string;
+  templateChemist: string;
+  templateChemistDesc: string;
+  chemistDiscoveryHint: string;
   templateAcademic: string;
   templateAcademicDesc: string;
   templateEconomist: string;
@@ -51,6 +57,19 @@ export type AdaptiveWorkspaceCopy = {
   fieldCollaborators: string;
   fieldReviewCheckpoints: string;
   fieldPublicationOutput: string;
+  fieldOverview: string;
+  fieldLiteratureSources: string;
+  fieldThesisLibrary: string;
+  fieldExperimentsMethodology: string;
+  fieldMaterialsData: string;
+  fieldEvidenceMap: string;
+  fieldFindings: string;
+  fieldOpenQuestions: string;
+  fieldRisksSafety: string;
+  fieldSupervisorCollaborators: string;
+  fieldTasksMilestones: string;
+  fieldReports: string;
+  fieldProvenanceAudit: string;
   fieldTeachingObjective: string;
   fieldCourseTopic: string;
   fieldCurriculum: string;
@@ -101,6 +120,7 @@ export type AdaptiveWorkspaceCopy = {
   discoveryDescription: string;
   discoveryEmpty: string;
   discoveryEmptyDetail: string;
+  discoveryVsSearch: string;
   followAction: string;
   openAction: string;
 };
@@ -122,10 +142,18 @@ const COPY: Record<"en" | "uz" | "ru" | "tr", AdaptiveWorkspaceCopy> = {
     inferredLabel: "Inferred — editable",
     missingLabel: "Still needed",
     draftStatus: "Draft — not created yet",
+    firstActionConfirm: "Confirm and create the workspace",
+    firstActionEvidence: "Attach required evidence sources",
+    firstActionNext: "Set the first next action",
     templateStudent: "Student Workspace",
     templateStudentDesc: "Learning objective, subject, assignment, evidence, plan, and output.",
     templateResearcher: "Researcher / Scientist Workspace",
     templateResearcherDesc: "Question, hypothesis, methodology, evidence, uncertainty, and publication path.",
+    templateChemist: "Chemist / Laboratory Scientist Workspace",
+    templateChemistDesc:
+      "Overview, research question, hypothesis, literature, thesis library, experiments, materials, evidence map, findings, risks, collaborators, tasks, reports, and provenance.",
+    chemistDiscoveryHint:
+      "Tell me your research field, thesis or project title, objective, experimental/theoretical/review type, current stage, available files, preferred language, and privacy. Nothing is saved until you confirm.",
     templateAcademic: "Academic / Educator Workspace",
     templateAcademicDesc: "Teaching objective, course materials, audience, schedule, and assessment.",
     templateEconomist: "Economist Workspace",
@@ -156,6 +184,19 @@ const COPY: Record<"en" | "uz" | "ru" | "tr", AdaptiveWorkspaceCopy> = {
     fieldCollaborators: "Collaborators",
     fieldReviewCheckpoints: "Review checkpoints",
     fieldPublicationOutput: "Publication / report output",
+    fieldOverview: "Overview",
+    fieldLiteratureSources: "Literature and sources",
+    fieldThesisLibrary: "Thesis / document library",
+    fieldExperimentsMethodology: "Experiments or methodology",
+    fieldMaterialsData: "Materials / data",
+    fieldEvidenceMap: "Evidence map",
+    fieldFindings: "Findings",
+    fieldOpenQuestions: "Open questions",
+    fieldRisksSafety: "Risks and safety",
+    fieldSupervisorCollaborators: "Supervisor / collaborators",
+    fieldTasksMilestones: "Tasks and milestones",
+    fieldReports: "Reports",
+    fieldProvenanceAudit: "Provenance and audit history",
     fieldTeachingObjective: "Teaching or academic objective",
     fieldCourseTopic: "Course / topic",
     fieldCurriculum: "Curriculum / materials",
@@ -204,10 +245,12 @@ const COPY: Record<"en" | "uz" | "ru" | "tr", AdaptiveWorkspaceCopy> = {
     fieldOutput: "Output",
     discoveryTitle: "Global Activity",
     discoveryDescription:
-      "Follow opted-in public projects, research, reports, groups, meetings, and media. Private work never appears here.",
+      "Guided exploration of opted-in public projects, research, reports, groups, and media. Use Search for direct retrieval across known objects. Private work never appears here.",
     discoveryEmpty: "No public activity is available yet.",
     discoveryEmptyDetail:
-      "Only content that an owner explicitly marked Public can appear. Popularity, views, and reactions are never fabricated.",
+      "Only content that an owner explicitly marked Public can appear. Popularity, views, and reactions are never fabricated. Prefer Search when you already know what to find.",
+    discoveryVsSearch:
+      "Search retrieves known objects directly. Global Activity explores relationships among opted-in public work.",
     followAction: "Follow",
     openAction: "Open",
   },
@@ -227,10 +270,18 @@ const COPY: Record<"en" | "uz" | "ru" | "tr", AdaptiveWorkspaceCopy> = {
     inferredLabel: "Taxminiy — tahrirlanadi",
     missingLabel: "Hali kerak",
     draftStatus: "Qoralama — hali yaratilmagan",
+    firstActionConfirm: "Ish maydonini tasdiqlang va yarating",
+    firstActionEvidence: "Kerakli dalil manbalarini ulang",
+    firstActionNext: "Birinchi keyingi qadamni belgilang",
     templateStudent: "Talaba ish maydoni",
     templateStudentDesc: "O‘quv maqsadi, fan, topshiriq, dalillar, reja va natija.",
     templateResearcher: "Tadqiqotchi / olim ish maydoni",
     templateResearcherDesc: "Savol, gipoteza, metodologiya, dalillar, noaniqlik va nashr yo‘li.",
+    templateChemist: "Kimyogar / laboratoriya olimi ish maydoni",
+    templateChemistDesc:
+      "Umumiy ko‘rinish, tadqiqot savoli, gipoteza, adabiyot, dissertatsiya kutubxonasi, tajribalar, materiallar, dalillar xaritasi, topilmalar, xavflar, hamkorlar, vazifalar, hisobotlar va kelib chiqish.",
+    chemistDiscoveryHint:
+      "Tadqiqot sohasi, dissertatsiya yoki loyiha nomi, maqsad, eksperimental/nazariy/sharhlov turi, bosqich, mavjud fayllar, til va maxfiylikni ayting. Tasdiqlamaguncha hech narsa saqlanmaydi.",
     templateAcademic: "Akademik / o‘qituvchi ish maydoni",
     templateAcademicDesc: "O‘qitish maqsadi, materiallar, auditoriya, jadval va baholash.",
     templateEconomist: "Iqtisodchi ish maydoni",
@@ -261,6 +312,19 @@ const COPY: Record<"en" | "uz" | "ru" | "tr", AdaptiveWorkspaceCopy> = {
     fieldCollaborators: "Hamkorlar",
     fieldReviewCheckpoints: "Ko‘rib chiqish bosqichlari",
     fieldPublicationOutput: "Nashr / hisobot natijasi",
+    fieldOverview: "Umumiy ko‘rinish",
+    fieldLiteratureSources: "Adabiyot va manbalar",
+    fieldThesisLibrary: "Dissertatsiya / hujjat kutubxonasi",
+    fieldExperimentsMethodology: "Tajribalar yoki metodologiya",
+    fieldMaterialsData: "Materiallar / ma’lumotlar",
+    fieldEvidenceMap: "Dalillar xaritasi",
+    fieldFindings: "Topilmalar",
+    fieldOpenQuestions: "Ochiq savollar",
+    fieldRisksSafety: "Xavflar va xavfsizlik",
+    fieldSupervisorCollaborators: "Rahbar / hamkorlar",
+    fieldTasksMilestones: "Vazifalar va bosqichlar",
+    fieldReports: "Hisobotlar",
+    fieldProvenanceAudit: "Kelib chiqish va audit tarixi",
     fieldTeachingObjective: "O‘qitish yoki akademik maqsad",
     fieldCourseTopic: "Kurs / mavzu",
     fieldCurriculum: "O‘quv dasturi / materiallar",
@@ -309,10 +373,12 @@ const COPY: Record<"en" | "uz" | "ru" | "tr", AdaptiveWorkspaceCopy> = {
     fieldOutput: "Natija",
     discoveryTitle: "Global faoliyat",
     discoveryDescription:
-      "Ommaviy loyihalar, tadqiqotlar, hisobotlar, guruhlar, uchrashuvlar va medialarni kuzating. Shaxsiy ish bu yerda ko‘rinmaydi.",
+      "Opt-in ommaviy loyihalar, tadqiqotlar, hisobotlar, guruhlar va medialarni yo‘naltirilgan tarzda o‘rganing. Ma’lum obyektlarni to‘g‘ridan-to‘g‘ri topish uchun Qidiruvdan foydalaning. Shaxsiy ish bu yerda ko‘rinmaydi.",
     discoveryEmpty: "Hali ommaviy faoliyat yo‘q.",
     discoveryEmptyDetail:
-      "Faqat egasi aniq Ommaviy deb belgilagan mazmun chiqadi. Mashhurlik, ko‘rishlar va reaksiyalar uydirilmaydi.",
+      "Faqat egasi aniq Ommaviy deb belgilagan mazmun chiqadi. Mashhurlik, ko‘rishlar va reaksiyalar uydirilmaydi. Nima kerakligini bilsangiz, Qidiruvni afzal ko‘ring.",
+    discoveryVsSearch:
+      "Qidiruv ma’lum obyektlarni to‘g‘ridan-to‘g‘ri topadi. Global faoliyat opt-in ommaviy ishlar orasidagi bog‘lanishlarni o‘rganadi.",
     followAction: "Kuzatish",
     openAction: "Ochish",
   },
@@ -332,10 +398,18 @@ const COPY: Record<"en" | "uz" | "ru" | "tr", AdaptiveWorkspaceCopy> = {
     inferredLabel: "Выведено — можно изменить",
     missingLabel: "Ещё нужно",
     draftStatus: "Черновик — ещё не создано",
+    firstActionConfirm: "Подтвердите и создайте рабочее пространство",
+    firstActionEvidence: "Подключите необходимые источники доказательств",
+    firstActionNext: "Задайте первое следующее действие",
     templateStudent: "Рабочее пространство студента",
     templateStudentDesc: "Учебная цель, предмет, задание, доказательства, план и результат.",
     templateResearcher: "Рабочее пространство исследователя / учёного",
     templateResearcherDesc: "Вопрос, гипотеза, методология, доказательства, неопределённость и путь к публикации.",
+    templateChemist: "Рабочее пространство химика / лабораторного учёного",
+    templateChemistDesc:
+      "Обзор, исследовательский вопрос, гипотеза, литература, библиотека диссертации, эксперименты, материалы, карта доказательств, результаты, риски, сотрудники, задачи, отчёты и происхождение.",
+    chemistDiscoveryHint:
+      "Укажите область, название диссертации или проекта, цель, тип (эксперимент/теория/обзор), этап, доступные файлы, язык и конфиденциальность. Ничего не сохраняется до подтверждения.",
     templateAcademic: "Рабочее пространство преподавателя / академика",
     templateAcademicDesc: "Учебная цель, материалы, аудитория, расписание и оценка.",
     templateEconomist: "Рабочее пространство экономиста",
@@ -366,6 +440,19 @@ const COPY: Record<"en" | "uz" | "ru" | "tr", AdaptiveWorkspaceCopy> = {
     fieldCollaborators: "Участники",
     fieldReviewCheckpoints: "Контрольные точки проверки",
     fieldPublicationOutput: "Публикация / отчёт",
+    fieldOverview: "Обзор",
+    fieldLiteratureSources: "Литература и источники",
+    fieldThesisLibrary: "Библиотека диссертации / документов",
+    fieldExperimentsMethodology: "Эксперименты или методология",
+    fieldMaterialsData: "Материалы / данные",
+    fieldEvidenceMap: "Карта доказательств",
+    fieldFindings: "Результаты",
+    fieldOpenQuestions: "Открытые вопросы",
+    fieldRisksSafety: "Риски и безопасность",
+    fieldSupervisorCollaborators: "Руководитель / сотрудники",
+    fieldTasksMilestones: "Задачи и этапы",
+    fieldReports: "Отчёты",
+    fieldProvenanceAudit: "Происхождение и аудит",
     fieldTeachingObjective: "Учебная или академическая цель",
     fieldCourseTopic: "Курс / тема",
     fieldCurriculum: "Программа / материалы",
@@ -414,10 +501,12 @@ const COPY: Record<"en" | "uz" | "ru" | "tr", AdaptiveWorkspaceCopy> = {
     fieldOutput: "Результат",
     discoveryTitle: "Глобальная активность",
     discoveryDescription:
-      "Следите за публичными проектами, исследованиями, отчётами, группами, встречами и медиа. Личная работа здесь не появляется.",
+      "Направляемое изучение публичных проектов, исследований, отчётов, групп и медиа с явным согласием. Для прямого поиска известных объектов используйте Поиск. Личная работа здесь не появляется.",
     discoveryEmpty: "Публичной активности пока нет.",
     discoveryEmptyDetail:
-      "Появляется только контент, который владелец явно сделал публичным. Популярность, просмотры и реакции не выдумываются.",
+      "Появляется только контент, который владелец явно сделал публичным. Популярность, просмотры и реакции не выдумываются. Если вы уже знаете, что искать — откройте Поиск.",
+    discoveryVsSearch:
+      "Поиск находит известные объекты напрямую. Глобальная активность исследует связи среди публичной работы с согласием.",
     followAction: "Следить",
     openAction: "Открыть",
   },
@@ -437,10 +526,18 @@ const COPY: Record<"en" | "uz" | "ru" | "tr", AdaptiveWorkspaceCopy> = {
     inferredLabel: "Çıkarım — düzenlenebilir",
     missingLabel: "Hâlâ gerekli",
     draftStatus: "Taslak — henüz oluşturulmadı",
+    firstActionConfirm: "Çalışma alanını onaylayın ve oluşturun",
+    firstActionEvidence: "Gerekli kanıt kaynaklarını ekleyin",
+    firstActionNext: "İlk sonraki adımı belirleyin",
     templateStudent: "Öğrenci çalışma alanı",
     templateStudentDesc: "Öğrenme hedefi, ders, ödev, kanıt, plan ve çıktı.",
     templateResearcher: "Araştırmacı / bilim insanı çalışma alanı",
     templateResearcherDesc: "Soru, hipotez, yöntem, kanıt, belirsizlik ve yayın yolu.",
+    templateChemist: "Kimyager / laboratuvar bilim insanı çalışma alanı",
+    templateChemistDesc:
+      "Genel bakış, araştırma sorusu, hipotez, literatür, tez kütüphanesi, deneyler, malzemeler, kanıt haritası, bulgular, riskler, işbirlikçiler, görevler, raporlar ve köken.",
+    chemistDiscoveryHint:
+      "Araştırma alanı, tez veya proje başlığı, hedef, deneysel/teorik/inceleme türü, aşama, mevcut dosyalar, dil ve gizlilik bilgisini verin. Onaylamadan hiçbir şey kaydedilmez.",
     templateAcademic: "Akademisyen / eğitmen çalışma alanı",
     templateAcademicDesc: "Öğretim hedefi, materyaller, kitle, program ve değerlendirme.",
     templateEconomist: "Ekonomist çalışma alanı",
@@ -471,6 +568,19 @@ const COPY: Record<"en" | "uz" | "ru" | "tr", AdaptiveWorkspaceCopy> = {
     fieldCollaborators: "İşbirlikçiler",
     fieldReviewCheckpoints: "İnceleme kontrol noktaları",
     fieldPublicationOutput: "Yayın / rapor çıktısı",
+    fieldOverview: "Genel bakış",
+    fieldLiteratureSources: "Literatür ve kaynaklar",
+    fieldThesisLibrary: "Tez / belge kütüphanesi",
+    fieldExperimentsMethodology: "Deneyler veya yöntem",
+    fieldMaterialsData: "Malzemeler / veriler",
+    fieldEvidenceMap: "Kanıt haritası",
+    fieldFindings: "Bulgular",
+    fieldOpenQuestions: "Açık sorular",
+    fieldRisksSafety: "Riskler ve güvenlik",
+    fieldSupervisorCollaborators: "Danışman / işbirlikçiler",
+    fieldTasksMilestones: "Görevler ve kilometre taşları",
+    fieldReports: "Raporlar",
+    fieldProvenanceAudit: "Köken ve denetim geçmişi",
     fieldTeachingObjective: "Öğretim veya akademik hedef",
     fieldCourseTopic: "Ders / konu",
     fieldCurriculum: "Müfredat / materyaller",
@@ -519,10 +629,12 @@ const COPY: Record<"en" | "uz" | "ru" | "tr", AdaptiveWorkspaceCopy> = {
     fieldOutput: "Çıktı",
     discoveryTitle: "Küresel etkinlik",
     discoveryDescription:
-      "Herkese açık projeleri, araştırmaları, raporları, grupları, toplantıları ve medyayı izleyin. Özel çalışma burada görünmez.",
+      "Açık onaylı herkese açık projeler, araştırmalar, raporlar, gruplar ve medyayı rehberli keşfedin. Bilinen nesneleri doğrudan bulmak için Aramayı kullanın. Özel çalışma burada görünmez.",
     discoveryEmpty: "Henüz herkese açık etkinlik yok.",
     discoveryEmptyDetail:
-      "Yalnızca sahibinin açıkça Herkese açık yaptığı içerik görünür. Popülerlik, görüntülenme ve tepkiler uydurulmaz.",
+      "Yalnızca sahibinin açıkça Herkese açık yaptığı içerik görünür. Popülerlik, görüntülenme ve tepkiler uydurulmaz. Ne aradığınızı biliyorsanız Aramayı tercih edin.",
+    discoveryVsSearch:
+      "Arama bilinen nesneleri doğrudan getirir. Küresel etkinlik, açık onaylı herkese açık çalışmalar arasındaki ilişkileri keşfeder.",
     followAction: "İzle",
     openAction: "Aç",
   },

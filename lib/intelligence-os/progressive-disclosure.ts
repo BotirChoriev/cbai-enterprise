@@ -29,6 +29,7 @@ export type ProgressiveDisclosureFlags = {
   readonly showCompanionDetail: boolean;
   readonly showCompanionStoryBeat: boolean;
   readonly showInlineHumanDecisionBoundary: boolean;
+  readonly showExpertDetailToggle: boolean;
 };
 
 const LEVEL_MAP: Record<UserDensityMode, DisclosureLevel> = {
@@ -67,6 +68,7 @@ export function resolveProgressiveDisclosure(mode: UserDensityMode): Progressive
       showCompanionDetail: false,
       showCompanionStoryBeat: false,
       showInlineHumanDecisionBoundary: false,
+      showExpertDetailToggle: true,
     };
   }
 
@@ -93,6 +95,7 @@ export function resolveProgressiveDisclosure(mode: UserDensityMode): Progressive
       showCompanionDetail: true,
       showCompanionStoryBeat: false,
       showInlineHumanDecisionBoundary: false,
+      showExpertDetailToggle: true,
     };
   }
 
@@ -118,6 +121,7 @@ export function resolveProgressiveDisclosure(mode: UserDensityMode): Progressive
     showCompanionDetail: true,
     showCompanionStoryBeat: true,
     showInlineHumanDecisionBoundary: true,
+    showExpertDetailToggle: true,
   };
 }
 

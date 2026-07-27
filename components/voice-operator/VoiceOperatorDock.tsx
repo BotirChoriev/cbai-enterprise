@@ -13,8 +13,7 @@ import { useTranslation } from "@/lib/i18n/use-translation";
 import { dockStateLabel } from "@/lib/i18n/platform-copy-voice-operator";
 import { getDictionary } from "@/lib/i18n/translate";
 import { readVoiceSessionMemory } from "@/lib/voice-operator/session-memory";
-
-const DOCK_INSET = "pb-[max(0.75rem,env(safe-area-inset-bottom))] md:pl-[18rem]";
+import { resolveCanonicalVoiceState, shouldShowLiveListeningBanner } from "@/lib/voice-operator/state-machine";
 
 export default function VoiceOperatorDock() {
   const pathname = usePathname();
@@ -49,11 +48,32 @@ export default function VoiceOperatorDock() {
 
   const session = readVoiceSessionMemory();
   void vo.transcriptRevision;
-  const stateLabel = dockStateLabel(voiceCopy, vo.dockState);
   const localVoiceUnavailable = vo.backendRequired && !vo.brokerIssue;
   const showBrokerError = vo.brokerIssue != null && vo.brokerIssue !== "required";
   const micDisabled =
     localVoiceUnavailable || vo.brokerIssue === "required" || vo.dockState === "backend_required";
+  const showDeveloperDiagnostics =
+    process.env.NODE_ENV === "development" || process.env.NEXT_PUBLIC_VOICE_DIAGNOSTICS === "1";
+  /**
+   * Single classification source for the dock. Text chat is answered by the
+   * deterministic local orchestrator, so it stays usable when live voice is not.
+   */
+  const canonicalState = resolveCanonicalVoiceState({
+    dockState: vo.dockState,
+    brokerIssue: vo.brokerIssue,
+    permissionIssue: vo.permissionIssue,
+    textUsable: true,
+    micLive: vo.micLive,
+  });
+  const stateLabel = dockStateLabel(voiceCopy, canonicalState);
+  const showLiveListening = shouldShowLiveListeningBanner({
+    dockState: vo.dockState,
+    brokerIssue: vo.brokerIssue,
+    captureActive: vo.captureActive,
+    micLive: vo.micLive,
+  });
+  // Stop remains available while connecting or listening, but never alongside a broker failure.
+  const showStopControl = vo.micLive && vo.brokerIssue == null;
 
   if (!vo.dockOpen && vo.dockState === "closed") {
     if (isHome) {
@@ -62,13 +82,16 @@ export default function VoiceOperatorDock() {
     return (
       <>
         <div
-          className={`cbai-voice-dock-closed pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center sm:justify-end ${DOCK_INSET}`}
+          className="cbai-voice-dock-closed"
+          data-voice-state={canonicalState}
+          data-voice-launcher="global"
         >
           <button
             type="button"
             onClick={vo.openDock}
-            className="cbai-spatial-voice-cta pointer-events-auto mb-2 mr-2 flex min-h-10 max-w-[calc(100vw-1.5rem)] items-center gap-2 rounded-full px-3.5 py-2 text-xs font-semibold transition sm:mb-3 sm:mr-4 sm:max-w-none sm:rounded-lg sm:px-4 sm:py-2.5 sm:text-sm"
+            className="cbai-spatial-voice-cta flex min-h-11 items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition"
             aria-label={copy.openDock}
+            data-voice-entry="launcher"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
@@ -84,33 +107,20 @@ export default function VoiceOperatorDock() {
   return (
     <>
       <div
-        className={`cbai-voice-dock-open fixed inset-x-0 bottom-0 z-50 flex justify-end ${DOCK_INSET}`}
-        role="region"
+        className="cbai-voice-dock-open"
+        role="dialog"
+        aria-modal="false"
         aria-label={copy.dockTitle}
+        data-voice-state={canonicalState}
+        data-mic-live={vo.micLive ? "true" : "false"}
+        data-voice-dock="open"
       >
-        <div className="mx-2 mr-3 flex w-full max-w-[min(18rem,calc(100vw-1.5rem))] flex-col gap-2 sm:mr-4">
+        <div className="cbai-voice-dock-shell flex flex-col gap-2">
           {vo.operatorGuidance ? (
             <OperatorGuidanceCard guidance={vo.operatorGuidance} onDismiss={vo.dismissGuidance} />
           ) : null}
           <OperatorCommandClarifyCard />
           <OperatorActionStatus />
-
-          {vo.transcriptVisible && session && session.turns.length > 0 ? (
-            <div className="max-h-36 overflow-y-auto rounded-xl border border-[var(--cbai-border-default)] bg-[var(--cbai-glass-surface)] p-3 text-xs shadow-[var(--cbai-shadow-soft)] backdrop-blur-md">
-              <p className="mb-2 font-medium text-[var(--foreground)]">{copy.transcriptTitle}</p>
-              <ul className="space-y-1.5">
-                {session.turns.slice(-8).map((turn) => (
-                  <li
-                    key={turn.id}
-                    className={turn.role === "user" ? "text-[var(--foreground)]" : "cbai-voice-dock-transcript-assistant"}
-                  >
-                    <span className="text-[var(--muted)]">{turn.role === "user" ? copy.youLabel : copy.cbaiLabel}: </span>
-                    {turn.text}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
 
           <div className="cbai-voice-dock-panel">
             <div className="mb-2 flex items-center justify-between gap-2">
@@ -120,22 +130,48 @@ export default function VoiceOperatorDock() {
                   {stateLabel}
                 </p>
               </div>
-              <button type="button" onClick={vo.closeDock} className="min-h-11 text-xs text-[var(--muted)] hover:text-[var(--foreground)]">
+              <button
+                type="button"
+                onClick={vo.closeDock}
+                className="min-h-11 min-w-11 px-2 text-xs text-[var(--muted)] hover:text-[var(--foreground)]"
+                data-voice-action="close"
+              >
                 {copy.closeDock}
               </button>
             </div>
 
+            {vo.transcriptVisible && session && session.turns.length > 0 ? (
+              <div className="mb-2 max-h-36 overflow-y-auto rounded-lg border border-[var(--cbai-border-default)] bg-[var(--cbai-surface-hover)] p-2.5 text-xs">
+                <p className="mb-1.5 font-medium text-[var(--cbai-text-primary)]">{copy.transcriptTitle}</p>
+                <ul className="space-y-1.5">
+                  {session.turns.slice(-8).map((turn) => (
+                    <li
+                      key={turn.id}
+                      className={turn.role === "user" ? "text-[var(--cbai-text-primary)]" : "cbai-voice-dock-transcript-assistant"}
+                    >
+                      <span className="text-[var(--cbai-text-muted)]">{turn.role === "user" ? copy.youLabel : copy.cbaiLabel}: </span>
+                      {turn.text}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+
             {localVoiceUnavailable || vo.brokerIssue === "required" ? (
               <div className="cbai-voice-dock-notice space-y-2">
                 <p>{copy.localCapabilityUserNotice}</p>
-                <VoiceOperatorDeveloperDiagnostics brokerIssue={vo.brokerIssue} connectionState={vo.dockState} />
+                {showDeveloperDiagnostics ? (
+                  <VoiceOperatorDeveloperDiagnostics brokerIssue={vo.brokerIssue} connectionState={vo.dockState} />
+                ) : null}
               </div>
             ) : null}
 
             {showBrokerError && vo.brokerIssue ? (
               <>
                 <VoiceOperatorBrokerNotice issue={vo.brokerIssue} />
-                <VoiceOperatorDeveloperDiagnostics brokerIssue={vo.brokerIssue} connectionState={vo.dockState} />
+                {showDeveloperDiagnostics ? (
+                  <VoiceOperatorDeveloperDiagnostics brokerIssue={vo.brokerIssue} connectionState={vo.dockState} />
+                ) : null}
               </>
             ) : null}
 
@@ -154,7 +190,7 @@ export default function VoiceOperatorDock() {
               </div>
             ) : null}
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <input
                 type="text"
                 value={vo.textInput}
@@ -164,28 +200,35 @@ export default function VoiceOperatorDock() {
                 }}
                 placeholder={copy.textFallback}
                 className="cbai-voice-dock-input outline-none focus:border-[var(--cbai-border-active)]"
+                data-voice-action="text-input"
               />
-              <button type="button" onClick={() => void vo.sendTextMessage()} className="cbai-voice-dock-btn px-3 py-2">
+              <button
+                type="button"
+                onClick={() => void vo.sendTextMessage()}
+                className="cbai-voice-dock-btn min-h-11 px-3 py-2"
+                data-voice-action="send"
+              >
                 {copy.sendMessage}
               </button>
               <button
                 type="button"
                 disabled={micDisabled}
-                onClick={() => void (vo.micLive ? vo.stopListening() : vo.startListening())}
+                onClick={() => void (showStopControl ? vo.stopListening() : vo.startListening())}
                 className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border disabled:cursor-not-allowed disabled:opacity-45 ${
-                  vo.micLive ? "cbai-voice-dock-btn-live" : "border-[var(--cbai-border-default)] bg-[var(--cbai-glass-surface)] text-[var(--muted)]"
+                  showStopControl ? "cbai-voice-dock-btn-live" : "border-[var(--cbai-border-default)] bg-[var(--cbai-glass-surface)] text-[var(--muted)]"
                 }`}
                 aria-label={
                   micDisabled
                     ? copy.localCapabilityUserNotice
-                    : vo.micLive
-                      ? copy.stopLiveListening
+                    : showStopControl
+                      ? copy.muteMic
                       : copy.unmuteMic
                 }
-                aria-pressed={vo.micLive}
+                aria-pressed={showStopControl}
+                data-voice-action="mic"
               >
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
-                  {vo.micLive ? (
+                  {showStopControl ? (
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -203,14 +246,19 @@ export default function VoiceOperatorDock() {
                   )}
                 </svg>
               </button>
-              {vo.micLive ? (
-                <button type="button" onClick={() => void vo.stopListening()} className="cbai-voice-dock-btn shrink-0 px-3 py-2">
+              {showStopControl ? (
+                <button
+                  type="button"
+                  onClick={() => void vo.stopListening()}
+                  className="cbai-voice-dock-btn min-h-11 shrink-0 px-3 py-2"
+                  data-voice-action="stop"
+                >
                   {copy.stopLiveListening}
                 </button>
               ) : null}
             </div>
 
-            {vo.micLive ? (
+            {showLiveListening ? (
               <div className="mt-2 rounded-lg border border-[var(--cbai-border-default)] bg-[var(--cbai-surface-hover)] px-3 py-2">
                 <p className="text-xs font-medium text-[var(--cbai-text-primary)]">{copy.liveListeningActive}</p>
                 <p className="mt-0.5 text-[11px] text-[var(--cbai-text-muted)]">{copy.liveListeningScope}</p>
@@ -218,10 +266,19 @@ export default function VoiceOperatorDock() {
             ) : null}
 
             <div className="mt-2 flex flex-wrap gap-2">
-              <button type="button" onClick={vo.toggleTranscript} className="text-[11px] text-[var(--cbai-text-muted)] hover:text-[var(--cbai-text-primary)]">
-                {vo.transcriptVisible ? copy.hideTranscript : copy.showTranscript}
+              <button type="button" onClick={vo.toggleTranscript} className="min-h-11 text-[11px] text-[var(--cbai-text-muted)] hover:text-[var(--cbai-text-primary)]">
+                {vo.transcriptVisible
+                  ? copy.hideTranscript
+                  : session && session.turns.length > 0
+                    ? `${copy.showTranscript} (${session.turns.length})`
+                    : copy.showTranscript}
               </button>
-              <button type="button" onClick={vo.endSession} className="text-[11px] text-[var(--cbai-text-muted)] hover:text-[var(--cbai-text-primary)]">
+              <button
+                type="button"
+                onClick={vo.endSession}
+                className="min-h-11 text-[11px] text-[var(--cbai-text-muted)] hover:text-[var(--cbai-text-primary)]"
+                data-voice-action="end-session"
+              >
                 {copy.stopConversation}
               </button>
             </div>

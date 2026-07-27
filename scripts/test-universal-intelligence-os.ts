@@ -78,8 +78,27 @@ test("7. UI wired: Capability Passport on My Work, Supreme Constitution on Gover
   assert.match(governance, /SupremePrinciplesSection/);
 });
 
-test("8. Navigation reframed as Intelligence Lenses — not separate portals", () => {
+test("8. Navigation uses approved Intelligence OS IA — not obsolete Intelligence Lenses portals", () => {
+  // DD-FPF-001 / DD-VC-002: CORE → Intelligence → Operations → Oversight → System,
+  // with Collaboration + Advanced progressive disclosure. "Intelligence Lenses" is superseded.
   const nav = readSource("lib/navigation.ts");
-  assert.match(nav, /Intelligence Lenses/);
+  assert.doesNotMatch(nav, /Intelligence Lenses/);
+  assert.match(nav, /title: "Intelligence"/);
+  assert.match(nav, /title: "Operations"/);
+  assert.match(nav, /title: "Oversight"/);
+  assert.match(nav, /title: "System"/);
+  assert.match(nav, /title: "Advanced"/);
+  assert.match(nav, /title: "Collaboration"/);
+  assert.match(nav, /href: "\/evidence"/);
+  assert.match(nav, /href: "\/rooms"/);
+  assert.match(nav, /href: "\/discover"/);
   assert.match(nav, /not a separate portal/);
+  assert.doesNotMatch(nav, /href:\s*"\/doctor"/);
+  assert.doesNotMatch(nav, /href:\s*"\/professor"/);
+  // Collaboration must not be promoted into primaryNavSections.
+  const primaryEnd = nav.indexOf("secondaryNavSections");
+  assert.ok(primaryEnd > 0);
+  const primary = nav.slice(0, primaryEnd);
+  assert.equal(primary.includes('href: "/publications"'), false);
+  assert.equal(primary.includes('title: "Collaboration"'), false);
 });

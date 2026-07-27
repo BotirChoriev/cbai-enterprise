@@ -4,9 +4,9 @@ import ResearchPageClient from "@/components/research/ResearchPageClient";
 import RouteChromeFallback from "@/components/system/RouteChromeFallback";
 
 export const metadata: Metadata = {
-  title: "Research",
+  title: "Global Research Intelligence",
   description:
-    "Explore catalog research topics and metadata connections in the Global Research Network.",
+    "Connect human intent, verified evidence, research alternatives, executable work, and human decisions — the human decides.",
 };
 
 export default function ResearchPage() {

@@ -105,10 +105,30 @@ function checkRateLimit(key: string): boolean {
 
 export function parseAllowedOrigins(raw: string | undefined): readonly string[] {
   if (!raw?.trim()) return [];
-  return raw
-    .split(",")
-    .map((entry) => entry.trim())
-    .filter(Boolean);
+  const out: string[] = [];
+  for (const entry of raw.split(",")) {
+    const trimmed = entry.trim().replace(/\/+$/, "");
+    if (!trimmed) continue;
+
+    // Wildcard origins (https://*.example.com) — do not run through URL() (asterisk is invalid).
+    const wildcard = /^(https?):\/\/(\*\.[^/?#]+)$/i.exec(trimmed);
+    if (wildcard) {
+      out.push(`${wildcard[1].toLowerCase()}://${wildcard[2].toLowerCase()}`);
+      continue;
+    }
+
+    // Exact origins must be scheme + host [+ port] only — reject path/query/hash.
+    try {
+      if (!trimmed.includes("://")) continue;
+      const url = new URL(trimmed);
+      if (url.pathname && url.pathname !== "/") continue;
+      if (url.search || url.hash) continue;
+      out.push(url.origin);
+    } catch {
+      continue;
+    }
+  }
+  return out;
 }
 
 /**

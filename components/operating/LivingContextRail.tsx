@@ -115,7 +115,7 @@ export default function LivingContextRail({ className = "" }: LivingContextRailP
         <section className="space-y-1">
           <p className="text-[10px] uppercase tracking-wider text-zinc-600">{t("livingIntelligence.unfinishedFlow")}</p>
           <Link href={memory.currentFlowStage.href} className="text-xs text-teal-400 hover:text-teal-300">
-            {memory.currentFlowStage.label} →
+            {t(`experienceEngineering.${memory.currentFlowStage.labelKey}`)} →
           </Link>
         </section>
       ) : null}
@@ -151,9 +151,16 @@ export default function LivingContextRail({ className = "" }: LivingContextRailP
                         ? "text-[var(--gold-soft)]"
                         : "text-zinc-400 hover:text-teal-300"
                   }`}
-                  title={stage.detail}
+                  title={
+                    stage.detailKey
+                      ? t(
+                          `experienceEngineering.${stage.detailKey}`,
+                          stage.detailParams ? { ...stage.detailParams } : undefined,
+                        )
+                      : stage.detail
+                  }
                 >
-                  {stage.label}
+                  {t(`experienceEngineering.${stage.labelKey}`)}
                 </Link>
               </li>
             ))}

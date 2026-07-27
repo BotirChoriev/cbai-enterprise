@@ -37,7 +37,10 @@ export type VoiceBrokerIssue =
   | "connection_failed"
   | "authentication_failed"
   | "invalid_api_key"
-  | "quota_or_account_blocked";
+  | "quota_or_account_blocked"
+  | "malformed_response"
+  | "remote_audio_blocked"
+  | "unknown";
 
 export type ToolRiskClass = "read_only" | "external_read" | "draft_write" | "consequential";
 

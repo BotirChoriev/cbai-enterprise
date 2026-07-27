@@ -1,3 +1,5 @@
+"use client";
+
 import type { WorkspaceExplorerContext } from "@/lib/research/workspace/workspace-explorer";
 import ResearchNotebookSummary from "@/components/research/notebook/ResearchNotebookSummary";
 import ResearchNotebookEvidence from "@/components/research/notebook/ResearchNotebookEvidence";
@@ -11,6 +13,7 @@ import WorkspaceEvidenceOverview from "@/components/research/workspace/Workspace
 import WorkspaceTopicNavigator from "@/components/research/workspace/WorkspaceTopicNavigator";
 import CrossTopicDiscovery from "@/components/research/discovery/CrossTopicDiscovery";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import { useTranslation } from "@/lib/i18n/use-translation";
 import {
   NOTEBOOK_CATALOG_ONLY_NOTICE,
   NOTEBOOK_STATUS_LABELS,
@@ -24,19 +27,24 @@ type WorkspaceContentProps = {
 };
 
 export default function WorkspaceContent({ context, onSelectTopic }: WorkspaceContentProps) {
+  const { t, language } = useTranslation();
   const { topic, knowledgeSummary, evidenceStatuses, notebook, timeline, graph } = context;
   const previewStages = timeline.stages.slice(0, 4);
+  const showSourceLanguage = language !== "en";
 
   return (
     <div className="space-y-6">
       <WorkspaceTopicNavigator topic={topic} />
 
       <div>
-        <p className={cbaiSectionEyebrow}>Evidence navigation</p>
-        <p className="text-xs text-zinc-500">
-          Explore one research topic from catalog notebook, timeline, graph, and future knowledge
-          perspectives.
-        </p>
+        <p className={cbaiSectionEyebrow}>{t("researchTopicDepth.evidenceNavigationEyebrow")}</p>
+        <p className="text-xs text-[var(--cbai-text-muted)]">{t("researchTopicDepth.evidenceNavigationBody")}</p>
+        {showSourceLanguage ? (
+          <p className="mt-1 text-[10px] text-[var(--cbai-text-muted)]">
+            {t("researchTopicDepth.catalogMetadataNotice")} ·{" "}
+            {t("researchTopicDepth.sourceLanguageLabel", { language: "English" })}
+          </p>
+        ) : null}
       </div>
 
       <WorkspaceKnowledgeSummary summary={knowledgeSummary} />
@@ -46,20 +54,20 @@ export default function WorkspaceContent({ context, onSelectTopic }: WorkspaceCo
       <section aria-labelledby="workspace-notebook-preview-heading" className="space-y-3">
         <div className="flex flex-wrap items-end justify-between gap-2">
           <div>
-            <h2 id="workspace-notebook-preview-heading" className="text-sm font-semibold text-zinc-100">
-              Notebook preview
+            <h2 id="workspace-notebook-preview-heading" className="text-sm font-semibold text-[var(--cbai-text-primary)]">
+              {t("researchTopicDepth.notebookPreviewTitle")}
             </h2>
-            <p className="mt-1 text-xs text-zinc-600">{NOTEBOOK_CATALOG_ONLY_NOTICE}</p>
+            <p className="mt-1 text-xs text-[var(--cbai-text-muted)]">{NOTEBOOK_CATALOG_ONLY_NOTICE}</p>
           </div>
           <span className="rounded border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[9px] font-medium uppercase tracking-wider text-emerald-300">
-            Catalog available
+            {t("researchTopicDepth.catalogAvailableBadge")}
           </span>
         </div>
         <ResearchNotebookSummary notebook={notebook} />
         <div className={`${cbaiGlassCard} p-3`}>
           <ResearchNotebookEvidence notebook={notebook} />
-          <p className="mt-3 border-t border-zinc-800/80 pt-2 text-[10px] text-zinc-600">
-            {NOTEBOOK_STATUS_LABELS[notebook.status]} · Human review required before decisions.
+          <p className="mt-3 border-t border-[var(--cbai-border-subtle)] pt-2 text-[10px] text-[var(--cbai-text-muted)]">
+            {NOTEBOOK_STATUS_LABELS[notebook.status]} · {t("researchTopicDepth.humanReviewRequired")}
           </p>
         </div>
       </section>
@@ -67,13 +75,13 @@ export default function WorkspaceContent({ context, onSelectTopic }: WorkspaceCo
       <section aria-labelledby="workspace-timeline-preview-heading" className="space-y-3">
         <div className="flex flex-wrap items-end justify-between gap-2">
           <div>
-            <h2 id="workspace-timeline-preview-heading" className="text-sm font-semibold text-zinc-100">
-              Timeline preview
+            <h2 id="workspace-timeline-preview-heading" className="text-sm font-semibold text-[var(--cbai-text-primary)]">
+              {t("researchTopicDepth.timelinePreviewTitle")}
             </h2>
-            <p className="mt-1 text-xs text-zinc-600">{TIMELINE_WORKFLOW_NOTICE}</p>
+            <p className="mt-1 text-xs text-[var(--cbai-text-muted)]">{TIMELINE_WORKFLOW_NOTICE}</p>
           </div>
           <span className="rounded border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[9px] font-medium uppercase tracking-wider text-emerald-300">
-            Catalog available
+            {t("researchTopicDepth.catalogAvailableBadge")}
           </span>
         </div>
         <div className={`${cbaiGlassCard} space-y-0 p-3`}>
@@ -86,8 +94,10 @@ export default function WorkspaceContent({ context, onSelectTopic }: WorkspaceCo
             ))}
           </ol>
           {timeline.stages.length > previewStages.length ? (
-            <p className="border-t border-zinc-800/80 pt-2 text-center text-[10px] text-zinc-600">
-              +{timeline.stages.length - previewStages.length} more stages on topic page
+            <p className="border-t border-[var(--cbai-border-subtle)] pt-2 text-center text-[10px] text-[var(--cbai-text-muted)]">
+              {t("researchTopicDepth.moreStagesOnTopic", {
+                count: String(timeline.stages.length - previewStages.length),
+              })}
             </p>
           ) : null}
         </div>
@@ -96,13 +106,13 @@ export default function WorkspaceContent({ context, onSelectTopic }: WorkspaceCo
       <section aria-labelledby="workspace-graph-preview-heading" className="space-y-3">
         <div className="flex flex-wrap items-end justify-between gap-2">
           <div>
-            <h2 id="workspace-graph-preview-heading" className="text-sm font-semibold text-zinc-100">
-              Graph preview
+            <h2 id="workspace-graph-preview-heading" className="text-sm font-semibold text-[var(--cbai-text-primary)]">
+              {t("researchTopicDepth.graphPreviewTitle")}
             </h2>
-            <p className="mt-1 text-xs text-zinc-600">{RESEARCH_GRAPH_HONEST_NOTICE}</p>
+            <p className="mt-1 text-xs text-[var(--cbai-text-muted)]">{RESEARCH_GRAPH_HONEST_NOTICE}</p>
           </div>
           <span className="rounded border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[9px] font-medium uppercase tracking-wider text-emerald-300">
-            Catalog available
+            {t("researchTopicDepth.catalogAvailableBadge")}
           </span>
         </div>
         <ResearchGraphCanvas graph={graph} compact />
@@ -110,9 +120,9 @@ export default function WorkspaceContent({ context, onSelectTopic }: WorkspaceCo
 
       <section aria-labelledby="workspace-future-knowledge-heading" className="space-y-4">
         <div>
-          <p className={cbaiSectionEyebrow}>Future knowledge</p>
-          <h2 id="workspace-future-knowledge-heading" className="text-sm font-semibold text-zinc-100">
-            Open questions & negative results
+          <p className={cbaiSectionEyebrow}>{t("researchTopicDepth.futureKnowledgeEyebrow")}</p>
+          <h2 id="workspace-future-knowledge-heading" className="text-sm font-semibold text-[var(--cbai-text-primary)]">
+            {t("researchTopicDepth.openQuestionsNegativeTitle")}
           </h2>
         </div>
         <div className="grid gap-4 lg:grid-cols-2">

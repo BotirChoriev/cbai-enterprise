@@ -184,11 +184,13 @@ test("16. route context keys present in draft provenance", () => {
 });
 
 test("17. identity introduction uses canonical Uzbek Voice Operator phrase", () => {
-  assert.match(VOICE_OPERATOR_INTRO_PHRASES.uz, /CheckBalanceAI\.Global/);
-  assert.match(VOICE_OPERATOR_INTRO_PHRASES.uz, /Yakuniy qarorni siz qabul qilasiz/);
+  assert.match(VOICE_OPERATOR_INTRO_PHRASES.uz, /Men CBAI Ovoz Operatoriman/);
+  assert.match(VOICE_OPERATOR_INTRO_PHRASES.uz, /tadqiqot, dalillar va platformadagi ishlaringiz/);
+  assert.doesNotMatch(VOICE_OPERATOR_INTRO_PHRASES.uz, /Botir/);
   const instructions = buildVoiceOperatorInstructions("uz");
   assert.match(instructions, /Do NOT repeat the full first-run introduction/i);
   assert.match(instructions, /Do not open with generic phrases/);
+  assert.match(instructions, /Never volunteer the founder name/i);
   assert.match(instructions, /Botir Choriev/);
 });
 
@@ -224,14 +226,18 @@ test("21. stop/close lifecycle hooks remain in provider", () => {
 test("22. double mic click guarded", () => {
   const provider = readSource("components/voice-operator/VoiceOperatorProvider.tsx");
   assert.match(provider, /realtimeStartingRef\.current/);
-  assert.match(provider, /micLive \|\| realtimeStartingRef/);
+  // Reuse live capture / reject a second peer connection instead of starting twice.
+  assert.match(provider, /hasLiveCaptureResources\(\)/);
+  assert.match(provider, /never open a second mic|never open a duplicate mic/);
+  assert.match(provider, /if \(micLive\) return;/);
 });
 
-test("23. route change tears down live mic and preserves transcript memory", () => {
+test("23. SPA route changes preserve live intentional session; idle routes still release mic", () => {
   const provider = readSource("components/voice-operator/VoiceOperatorProvider.tsx");
   assert.match(provider, /Privacy P0: SPA route changes must release the mic/);
   assert.match(provider, /\[pathname, releaseLiveAudioResources\]/);
-  const routeBlock = provider.match(/Privacy P0: SPA route changes[\s\S]*?\}, \[pathname, releaseLiveAudioResources\]\);/);
+  assert.match(provider, /keepRealtimeSessionAlive/);
+  const routeBlock = provider.match(/Continuous conversation: SPA route changes[\s\S]*?\}, \[pathname, releaseLiveAudioResources\]\);/);
   assert.ok(routeBlock);
   assert.doesNotMatch(routeBlock![0], /clearVoiceSessionMemory/);
 });

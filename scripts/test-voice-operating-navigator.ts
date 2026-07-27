@@ -106,7 +106,9 @@ test("first-run intro is versioned and not repeated after complete", () => {
     completedAt: "2026-01-01T00:00:00.000Z",
   });
   assert.equal(upgraded.introVersion, CBAI_IDENTITY_VERSION);
-  assert.ok(getVoiceOperatorFirstRunIntro("uz").includes("Botir Choriev"));
+  assert.ok(getVoiceOperatorFirstRunIntro("uz").startsWith("Men CBAI Ovoz Operatoriman"));
+  // Founder attribution stays available when directly asked.
+  assert.ok(answerCbaiIdentityFaq("who_founded", "uz").includes("Botir Choriev"));
   assert.notEqual(VOICE_OPERATOR_INTRO_PHRASES.uz, getVoiceOperatorFirstRunIntro("uz"));
 });
 
@@ -122,11 +124,11 @@ test("first-run intro only after intentional activation — no autoplay on mount
   assert.match(provider, /if \(needsVoiceFirstRunIntro\(\)\)/);
 });
 
-test("chemist: Men kimyogarman navigates Research + follow-up clarify", () => {
+test("chemist: Men kimyogarman opens My Work discovery — not blind Research", () => {
   const res = resolveVoiceCommandFromText("Men kimyogarman.", "uz");
   assert.equal(res.ok, true);
-  assert.equal(res.action?.actionId, "navigate.research");
-  assert.match(res.action?.target.href ?? "", /\/research\?.*q=chemistry/);
+  assert.equal(res.action?.actionId, "navigate.my_work");
+  assert.match(res.action?.target.href ?? "", /\/my-work\?discover=1&role=chemist/);
   assert.equal(res.sessionContextPatch?.domainId, "chemistry");
   assert.ok(res.clarifyOptions && res.clarifyOptions.length >= 2);
   assert.equal(res.messageKey, "voiceCommand.chemistUnderstood");
@@ -142,7 +144,7 @@ test("chemist: EN/RU/TR equivalents", () => {
   ] as const) {
     const res = resolveVoiceCommandFromText(text, locale);
     assert.equal(res.ok, true, text);
-    assert.match(res.action?.target.href ?? "", /chemistry/, text);
+    assert.match(res.action?.target.href ?? "", /\/my-work/, text);
     assert.ok(res.clarifyOptions?.length, text);
   }
 });
@@ -164,7 +166,8 @@ test("chemist does not silently create a project", () => {
     },
   );
   assert.equal(composerOpens, 0);
-  assert.ok(pushes.some((h) => h.includes("/research")));
+  assert.ok(pushes.some((h) => h.includes("/my-work")));
+  assert.ok(!pushes.some((h) => h.includes("/research")));
   assert.equal(readVoiceSessionContext().domainId, "chemistry");
 });
 

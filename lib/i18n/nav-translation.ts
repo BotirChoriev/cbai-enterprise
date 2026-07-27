@@ -15,10 +15,10 @@ const NAV_LABEL_KEYS: Record<string, string> = {
   "/": "navigation.home",
   "/my-work": "navigation.myWork",
   "/search": "navigation.search",
-  "/countries": "navigation.worldIntelligence",
+  "/countries": "navigation.countries",
   "/companies": "navigation.companies",
   "/universities": "navigation.universities",
-  "/research": "navigation.researchEvidence",
+  "/research": "navigation.research",
   "/knowledge": "navigation.evidence",
   "/evidence": "navigation.evidence",
   "/analytics": "navigation.reports",
@@ -47,6 +47,7 @@ const NAV_LABEL_KEYS: Record<string, string> = {
 };
 
 const NAV_SECTION_TITLE_KEYS: Record<string, string> = {
+  Core: "navigation.core",
   Explore: "navigation.explore",
   Intelligence: "navigation.intelligence",
   Discover: "navigation.discover",
@@ -68,9 +69,10 @@ const NAV_SECTION_TITLE_KEYS: Record<string, string> = {
 /** Real label for a nav item's real href — falls back to the item's own English label only for a
  * route this lookup doesn't recognize yet, never a blank or fabricated translation. */
 export function translateNavLabel(t: TFunc, href: string, fallbackLabel: string): string {
-  if (href === "/countries" && fallbackLabel === "Countries") return t("navigation.countries");
-  if (href === "/research" && fallbackLabel === "Research") return t("navigation.research");
   if (href === "/settings" && fallbackLabel === "Privacy") return t("navigation.privacy");
+  if (href === "/rooms" && (fallbackLabel === "Rooms" || fallbackLabel === "Live Rooms")) {
+    return t("navigation.liveRooms");
+  }
   const key = NAV_LABEL_KEYS[href];
   return key ? t(key) : fallbackLabel;
 }

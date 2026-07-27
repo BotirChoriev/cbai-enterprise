@@ -6,6 +6,12 @@ import type { UniversitySourceCoverageItem } from "@/lib/universities.coverage";
 import { coverageStatusClass } from "@/lib/countries.coverage";
 import { cbaiGlassCard } from "@/components/brand/brand-classes";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import {
+  EvidenceCoverage,
+  FreshnessBadge,
+  LastVerified,
+  SourceBadge,
+} from "@/components/provenance/SourceProvenance";
 
 type SourceItem = CountrySourceCoverageItem | CompanySourceCoverageItem | UniversitySourceCoverageItem;
 
@@ -48,24 +54,37 @@ export default function EntitySourceCoveragePanel({ variant, sources }: EntitySo
         : "sourceCoverage.universityDescription";
   const headingId = `${variant}-source-coverage-heading`;
 
+  function translateStatusLabel(statusLabel: string): string {
+    if (statusLabel === "Connected") return t("entityUi.connected");
+    if (statusLabel === "Planned") return t("entityUi.planned");
+    if (statusLabel === "Not connected" || statusLabel === "Not Connected") return t("entityUi.notConnected");
+    return statusLabel;
+  }
+
   return (
     <section className="space-y-4" aria-labelledby={headingId}>
       <div>
-        <h3 id={headingId} className="text-sm font-semibold uppercase tracking-wider text-zinc-500">
+        <h3 id={headingId} className="text-sm font-semibold uppercase tracking-wider text-[var(--cbai-text-muted)]">
           {t(headingKey)}
         </h3>
-        <p className="mt-1 text-sm text-zinc-500">{t(descriptionKey)}</p>
+        <p className="mt-1 text-sm text-[var(--cbai-text-muted)]">{t(descriptionKey)}</p>
       </div>
 
       <div className={`${cbaiGlassCard} overflow-hidden`}>
-        <ul className="divide-y divide-zinc-800">
+        <ul className="divide-y divide-[var(--cbai-border-subtle)]">
           {sources.map((source) => (
             <li key={source.id} className="space-y-3 px-5 py-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-zinc-100">{source.name}</p>
+                  <p className="text-sm font-semibold text-[var(--cbai-text-primary)]">{source.name}</p>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <SourceBadge kind="official_source" />
+                    <FreshnessBadge
+                      status={source.statusLabel === "Connected" ? "verification_required" : "unavailable"}
+                    />
+                  </div>
                   {source.supportedIndicatorCount > 0 ? (
-                    <p className="mt-1 text-xs text-zinc-600">
+                    <p className="mt-1 text-xs text-[var(--cbai-text-muted)]">
                       {t("sourceCoverage.supportedIndicators", {
                         count: String(source.supportedIndicatorCount),
                         plural: source.supportedIndicatorCount === 1 ? "" : "s",
@@ -76,11 +95,11 @@ export default function EntitySourceCoveragePanel({ variant, sources }: EntitySo
                 <span
                   className={`shrink-0 self-start rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${coverageStatusClass(source.statusLabel)}`}
                 >
-                  {source.statusLabel}
+                  {translateStatusLabel(source.statusLabel)}
                 </span>
               </div>
 
-              <dl className="grid grid-cols-2 gap-3 border-t border-zinc-800/80 pt-3 sm:grid-cols-3">
+              <dl className="grid grid-cols-2 gap-3 border-t border-[var(--cbai-border-subtle)] pt-3 sm:grid-cols-3">
                 <EvidenceField label={t("sourceCoverage.publisher")} value={source.organization} />
                 <EvidenceField label={t("entityUi.publicationDate")} value={t("entityUi.notAvailable")} />
                 <EvidenceField label={t("sourceCoverage.confidence")} value={t("entityUi.notAssessed")} />
@@ -91,6 +110,12 @@ export default function EntitySourceCoveragePanel({ variant, sources }: EntitySo
                   href={source.officialWebsite}
                 />
               </dl>
+              <div className="flex flex-wrap gap-x-4 gap-y-2 border-t border-[var(--cbai-border-subtle)] pt-3">
+                <LastVerified value={null} />
+                <EvidenceCoverage
+                  state={source.statusLabel === "Connected" ? "partial" : "missing"}
+                />
+              </div>
             </li>
           ))}
         </ul>

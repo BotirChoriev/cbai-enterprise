@@ -1,5 +1,10 @@
 import type { TranslationDictionary } from "@/lib/i18n/dictionary-types";
 import {
+  EVIDENCE_COMPARISON_UI_UZ,
+  TIMELINE_UI_UZ,
+} from "@/lib/i18n/platform-copy-timeline-comparison";
+import { DOMAIN_INTELLIGENCE_UZ } from "@/lib/i18n/platform-copy-domain-intelligence";
+import {
   VOICE_CONTROL_UZ,
 } from "@/lib/i18n/platform-copy-voice-control";
 import { VOICE_OPERATOR_UZ } from "@/lib/i18n/platform-copy-voice-operator";
@@ -228,6 +233,7 @@ const uz: TranslationDictionary = {
   navigation: {
     home: "Bosh sahifa",
     myWork: "Mening ishlarim",
+    problemSpace: "Muammo maydoni",
     search: "Qidiruv",
     explore: "Kashf etish",
     reports: "Hisobotlar",
@@ -256,6 +262,7 @@ const uz: TranslationDictionary = {
     startWithSearchBody: "Profilni toping, mavjud ma'lumotni ko‘rib chiqing va hisobotlarni oching.",
     openSearch: "Qidiruvni ochish",
     openNavigation: "Navigatsiyani ochish",
+    core: "Asosiy",
     operations: "Operatsiyalar",
     oversight: "Nazorat",
     advanced: "Kengaytirilgan",
@@ -671,6 +678,9 @@ const uz: TranslationDictionary = {
   genesisOs: GENESIS_OS_UZ,
   researchCanvas: RESEARCH_CANVAS_UZ,
   operationalObject: OPERATIONAL_OBJECT_UZ,
+  timelineUi: TIMELINE_UI_UZ,
+  evidenceComparisonUi: EVIDENCE_COMPARISON_UI_UZ,
+  domainIntelligence: DOMAIN_INTELLIGENCE_UZ,
 };
 
 export default uz;

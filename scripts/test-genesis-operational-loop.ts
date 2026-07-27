@@ -419,6 +419,16 @@ test("20. No universal score or ranking", () => {
 
 test("21. UI and operator wiring present", () => {
   assert.match(readSource("components/genesis/OperationalLoopPanel.tsx"), /createProgressUpdate/);
-  assert.match(readSource("components/assistant/AssistantCommandCenter.tsx"), /resolveGenesisCommand/);
   assert.match(readSource("components/genesis/ExecutionOsPanel.tsx"), /OperationalLoopPanel/);
+  // Genesis attention commands remain available as a module (tests 16–17). The Assistant
+  // Command Center now routes through the Operational Object / voice pipeline (confirm-before-
+  // create) rather than calling resolveGenesisCommand directly.
+  const commandCenter = readSource("components/assistant/AssistantCommandCenter.tsx");
+  assert.match(commandCenter, /submitCommand/);
+  assert.match(commandCenter, /resolveVoiceAction/);
+  assert.doesNotMatch(commandCenter, /resolveGenesisCommand/);
+  const genesisCommands = readSource("lib/genesis/genesis-operator-commands.ts");
+  assert.match(genesisCommands, /export function resolveGenesisCommand/);
+  const attention = resolveGenesisCommand("what requires attention", OPERATOR);
+  assert.ok(attention);
 });

@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState, useEffect, useCallback, useRef } from "react";
+import { Suspense, useMemo, useState, useEffect, useCallback, useRef } from "react";
+import Link from "next/link";
 import {
   buildKnowledgeGraph,
   computeGraphStats,
@@ -17,20 +18,25 @@ import GraphConnectionsPanel from "@/components/graph/GraphConnectionsPanel";
 import GraphLegend from "@/components/graph/GraphLegend";
 import GraphMissionInstrument from "@/components/graph/GraphMissionInstrument";
 import GraphPrimaryViews from "@/components/graph/GraphPrimaryViews";
-import OperatingPageShell from "@/components/shared/OperatingPageShell";
+import LivingGraphStructuredView from "@/components/graph/LivingGraphStructuredView";
+import WorldAndMeIntelligenceHome from "@/components/graph/WorldAndMeIntelligenceHome";
+import EngineRouteEntryStrip from "@/components/forward-deployed/EngineRouteEntryStrip";
+import IntelligencePageFrame from "@/components/shared/IntelligencePageFrame";
+import EntityOptionalExploration from "@/components/shared/EntityOptionalExploration";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { getWimCopy } from "@/lib/i18n/platform-copy-world-and-me";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { useUniversalWorkspace } from "@/components/platform/context/UniversalWorkspaceProvider";
-import LivingGraphStructuredView from "@/components/graph/LivingGraphStructuredView";
-import EngineRouteEntryStrip from "@/components/forward-deployed/EngineRouteEntryStrip";
 import { buildLivingGraphProjection } from "@/lib/living-graph/living-graph-projection";
 import { getCurrentUserId } from "@/lib/auth/auth-store";
 import { backfillLivingRelationships } from "@/lib/living-object-network/living-relationship-backfill";
 import { usePlatformContext } from "@/components/platform/context/PlatformContextProvider";
+import { cbaiBtnPrimary, cbaiFocusRing } from "@/components/brand/brand-classes";
 
 export default function GraphPageClient() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+  const copy = getWimCopy(language);
   const { mission } = useMissionContext();
   const { setFocusedObject } = useUniversalWorkspace();
   const { recordEntityView, setCountry, setCompany, setUniversity } = usePlatformContext();
@@ -48,13 +54,10 @@ export default function GraphPageClient() {
     [fullGraph, mission, effectiveFocusMode],
   );
 
-  const graph = useMemo(
-    () => {
-      const filtered = filterGraphByMissionFocus(fullGraph, analysis);
-      return { ...fullGraph, nodes: filtered.nodes, edges: filtered.edges };
-    },
-    [fullGraph, analysis],
-  );
+  const graph = useMemo(() => {
+    const filtered = filterGraphByMissionFocus(fullGraph, analysis);
+    return { ...fullGraph, nodes: filtered.nodes, edges: filtered.edges };
+  }, [fullGraph, analysis]);
 
   const stats = useMemo(() => computeGraphStats(graph), [graph]);
 
@@ -163,68 +166,94 @@ export default function GraphPageClient() {
   }, [cycleSelection]);
 
   return (
-    <OperatingPageShell
-      title={t("navigation.knowledgeGraph")}
+    <IntelligencePageFrame
+      title={copy.title}
+      purpose={copy.oneSentence}
+      nextStep={copy.primaryQuestion}
+      evidenceStatus={copy.honestyBanner}
+      knownUnknown={copy.noLiveSource}
+      confirmationBoundary={copy.voiceClearance}
       showOperator={false}
-      showMissionContext={false}
+      primaryAction={
+        <Link
+          href="/graph?view=my_world"
+          className={`${cbaiBtnPrimary} ${cbaiFocusRing} inline-flex min-h-11 items-center px-4`}
+          data-cbai-primary-action=""
+        >
+          {copy.primaryAction}
+        </Link>
+      }
     >
-      <div className="mx-auto max-w-[90rem] space-y-6 pb-16">
-        <EngineRouteEntryStrip />
-        <GraphPrimaryViews
-          focusMode={focusMode}
-          onFocusModeChange={setFocusMode}
-          missionProjectId={mission?.projectId}
-        />
-        {disclosure.showGraphAnalysis ? (
-          <GraphMissionInstrument
-            analysis={analysis}
-            focusMode={focusMode}
-            onFocusModeChange={setFocusMode}
-            hideFocusToggles
-          />
-        ) : null}
+      <div className="mt-4 space-y-6">
+        <Suspense fallback={<p className="text-sm text-[var(--cbai-text-muted)]">{copy.title}…</p>}>
+          <WorldAndMeIntelligenceHome />
+        </Suspense>
 
-        <div className="grid min-h-[min(72vh,720px)] gap-4 lg:grid-cols-12 lg:gap-5">
-          <div className="min-w-0 space-y-4 lg:col-span-3">
-            <GraphEntityPanel
-              selectedNode={selectedNode}
-              connectedEdges={connectedEdges}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              typeFilter={typeFilter}
-              onTypeFilterChange={setTypeFilter}
-              stats={stats}
-              onClearSelection={() => setSelectedNodeId(null)}
-            />
-            {disclosure.showGraphLegend ? <GraphLegend /> : null}
-          </div>
+        <EntityOptionalExploration>
+          <details className="rounded-lg border border-[var(--cbai-border)] p-3">
+            <summary className={`${cbaiFocusRing} cursor-pointer text-sm font-medium`}>
+              {copy.legacyGraph} ({t("navigation.knowledgeGraph")})
+            </summary>
+            <div className="mt-4 space-y-6 pb-16">
+              <EngineRouteEntryStrip />
+              <GraphPrimaryViews
+                focusMode={focusMode}
+                onFocusModeChange={setFocusMode}
+                missionProjectId={mission?.projectId}
+              />
+              {disclosure.showGraphAnalysis ? (
+                <GraphMissionInstrument
+                  analysis={analysis}
+                  focusMode={focusMode}
+                  onFocusModeChange={setFocusMode}
+                  hideFocusToggles
+                />
+              ) : null}
 
-          <div className="min-w-0 lg:col-span-6">
-            <GraphCanvas
-              graph={graph}
-              selectedNodeId={selectedNodeId}
-              onSelectNode={setSelectedNodeId}
-              searchQuery={searchQuery}
-              typeFilter={typeFilter}
-              selection={selection}
-            />
-          </div>
+              <div className="grid min-h-[min(72vh,720px)] gap-4 lg:grid-cols-12 lg:gap-5">
+                <div className="min-w-0 space-y-4 lg:col-span-3">
+                  <GraphEntityPanel
+                    selectedNode={selectedNode}
+                    connectedEdges={connectedEdges}
+                    searchQuery={searchQuery}
+                    onSearchChange={setSearchQuery}
+                    typeFilter={typeFilter}
+                    onTypeFilterChange={setTypeFilter}
+                    stats={stats}
+                    onClearSelection={() => setSelectedNodeId(null)}
+                  />
+                  {disclosure.showGraphLegend ? <GraphLegend /> : null}
+                </div>
 
-          <div className="min-w-0 lg:col-span-3">
-            <GraphConnectionsPanel
-              selectedNode={selectedNode}
-              connectedEdges={connectedEdges}
-              connectedNodes={connectedNodes}
-            />
-          </div>
-        </div>
+                <div className="min-w-0 lg:col-span-6">
+                  <GraphCanvas
+                    graph={graph}
+                    selectedNodeId={selectedNodeId}
+                    onSelectNode={setSelectedNodeId}
+                    searchQuery={searchQuery}
+                    typeFilter={typeFilter}
+                    selection={selection}
+                  />
+                </div>
 
-        <LivingGraphStructuredView
-          projection={livingProjection}
-          selectedNodeId={livingNodeId}
-          onSelectNode={setLivingNodeId}
-        />
+                <div className="min-w-0 lg:col-span-3">
+                  <GraphConnectionsPanel
+                    selectedNode={selectedNode}
+                    connectedEdges={connectedEdges}
+                    connectedNodes={connectedNodes}
+                  />
+                </div>
+              </div>
+
+              <LivingGraphStructuredView
+                projection={livingProjection}
+                selectedNodeId={livingNodeId}
+                onSelectNode={setLivingNodeId}
+              />
+            </div>
+          </details>
+        </EntityOptionalExploration>
       </div>
-    </OperatingPageShell>
+    </IntelligencePageFrame>
   );
 }

@@ -47,7 +47,8 @@ export default function LocalWorkMigrationPrompt() {
           open question{summary.questions === 1 ? "" : "s"}, {summary.evidence} evidence reference
           {summary.evidence === 1 ? "" : "s"}, {summary.entityLinks} related entit
           {summary.entityLinks === 1 ? "y" : "ies"}, {summary.bookmarks} bookmark{summary.bookmarks === 1 ? "" : "s"}, and{" "}
-          {summary.reports} report{summary.reports === 1 ? "" : "s"} to your cloud account.
+          {summary.reports} report{summary.reports === 1 ? "" : "s"}, and {summary.problems} Problem
+          {summary.problems === 1 ? "" : "s"} to your cloud account.
         </p>
         <p className="text-xs text-zinc-500">Your local copy on this device was not deleted.</p>
         <button type="button" onClick={() => setDismissed(true)} className={cbaiBtnSecondary}>
@@ -90,7 +91,8 @@ export default function LocalWorkMigrationPrompt() {
         {counts.projects} project{counts.projects === 1 ? "" : "s"}, {counts.notes} note{counts.notes === 1 ? "" : "s"},{" "}
         {counts.tasks} task{counts.tasks === 1 ? "" : "s"}, {counts.questions} open question{counts.questions === 1 ? "" : "s"},{" "}
         {counts.evidence} evidence reference{counts.evidence === 1 ? "" : "s"}, {counts.bookmarks} bookmark
-        {counts.bookmarks === 1 ? "" : "s"}, and {counts.reports} report{counts.reports === 1 ? "" : "s"} exist on this device
+        {counts.bookmarks === 1 ? "" : "s"}, {counts.reports} report{counts.reports === 1 ? "" : "s"}, and {counts.problems} Problem
+        {counts.problems === 1 ? "" : "s"} exist on this device
         but are not yet in your cloud account ({cloudUser.email}).
       </p>
 

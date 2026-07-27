@@ -1,5 +1,8 @@
+"use client";
+
 import type { EntityEvidenceGapProfile } from "@/lib/evidence-gap";
 import { coverageStatusClass } from "@/lib/countries.coverage";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type EvidenceGapSourcesProps = {
   profile: EntityEvidenceGapProfile;
@@ -30,6 +33,7 @@ function uniqueSources(profile: EntityEvidenceGapProfile) {
 }
 
 export default function EvidenceGapSources({ profile }: EvidenceGapSourcesProps) {
+  const { t } = useTranslation();
   const sources = uniqueSources(profile);
 
   return (
@@ -39,10 +43,10 @@ export default function EvidenceGapSources({ profile }: EvidenceGapSourcesProps)
           id="evidence-gap-sources-heading"
           className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
         >
-          Official Source Coverage
+          {t("entityIntelligence.gapSourcesHeading")}
         </h4>
         <p className="mt-1 text-sm text-zinc-500">
-          Expected official sources and connectors referenced by applicable indicators.
+          {t("entityIntelligence.gapSourcesDescription")}
         </p>
       </div>
 
@@ -56,7 +60,9 @@ export default function EvidenceGapSources({ profile }: EvidenceGapSourcesProps)
             {source.sourceId && (
               <p className="mt-0.5 font-mono text-[10px] text-zinc-600">{source.sourceId}</p>
             )}
-            <p className="mt-2 text-xs text-zinc-500">Connector: {source.connector}</p>
+            <p className="mt-2 text-xs text-zinc-500">
+              {t("entityIntelligence.gapConnectorLabel", { connector: source.connector })}
+            </p>
             {source.blocker && (
               <span
                 className={`mt-2 inline-block rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${coverageStatusClass("Not connected")}`}

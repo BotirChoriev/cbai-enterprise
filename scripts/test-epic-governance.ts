@@ -90,8 +90,14 @@ test("5. Capability Passport safety rules documented and code avoids forbidden p
 });
 
 test("6. No profession-only portal routing in primary navigation", () => {
+  // DD-FPF-001: approved IA groups replace obsolete "Intelligence Lenses" label.
+  // Profession-only portals (/doctor, /professor) must never appear in primary nav.
   const nav = readSource("lib/navigation.ts");
-  assert.ok(nav.includes("Intelligence Lenses"));
+  assert.doesNotMatch(nav, /Intelligence Lenses/);
+  assert.match(nav, /title: "Intelligence"/);
+  assert.match(nav, /title: "Operations"/);
+  assert.match(nav, /title: "Oversight"/);
+  assert.match(nav, /title: "System"/);
   assert.ok(!nav.match(/href:\s*"\/doctor"/));
   assert.ok(!nav.match(/href:\s*"\/professor"/));
 });
@@ -109,14 +115,28 @@ test("7. No global human ranking in capability or discovery modules", () => {
 });
 
 test("8. Human Decision Boundary wired on conclusion surfaces", () => {
+  // DD-003: mission continuity is layout LivingContextRibbon; missionContextVariant on
+  // OperatingPageShell is deprecated. Human Decision Boundary remains on canvas + living rail
+  // + operating column (visible on reports/reasoning routes via the shell column).
   const canvas = readSource("components/canvas/IntelligenceCanvas.tsx");
   const context = readSource("components/operating/LivingContextRail.tsx");
+  const column = readSource("components/operating/OperatingContextColumn.tsx");
+  const layout = readSource("app/(dashboard)/layout.tsx");
+  const shell = readSource("components/shared/OperatingPageShell.tsx");
   const reports = readSource("components/reports/ReportsCenter.tsx");
   const reasoning = readSource("components/reasoning/ReasoningExplorer.tsx");
   assert.match(canvas, /HumanDecisionBoundary/);
   assert.match(context, /HumanDecisionBoundary/);
-  assert.match(reports, /missionContextVariant=/);
-  assert.match(reasoning, /missionContextVariant=/);
+  assert.match(column, /HumanDecisionBoundary/);
+  assert.match(layout, /LivingContextRibbon/);
+  assert.match(shell, /@deprecated/);
+  assert.match(shell, /LivingContextRibbon/);
+  assert.doesNotMatch(shell, /missionContextVariant=\{/);
+  // Conclusion surfaces remain real modules (not removed) under ribbon continuity.
+  assert.ok(reports.length > 0);
+  assert.ok(reasoning.length > 0);
+  assert.doesNotMatch(reports, /automated final decision|auto-approve/i);
+  assert.doesNotMatch(reasoning, /automated final decision|auto-approve/i);
 });
 
 test("9. Legacy Trail derives from real artifacts — wired on Intelligence Canvas", () => {

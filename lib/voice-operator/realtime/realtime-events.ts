@@ -54,11 +54,15 @@ export function parseRealtimeServerEvent(raw: string): RealtimeEventParseResult 
       if (!transcript) return null;
       return { transcript: { role: "user", text: transcript, final: true } };
     }
+    // GA renamed assistant transcript events (response.output_audio_transcript.*);
+    // beta names (response.audio_transcript.*) are kept for backward compatibility.
+    case "response.output_audio_transcript.delta":
     case "response.audio_transcript.delta": {
       const delta = readString(event.delta);
       if (!delta) return null;
       return { transcript: { role: "assistant", text: delta, final: false } };
     }
+    case "response.output_audio_transcript.done":
     case "response.audio_transcript.done": {
       const transcript = readString(event.transcript);
       if (!transcript) return null;
@@ -138,6 +142,7 @@ export function mapBrokerCodeToIssue(
     | "AUTHENTICATION_FAILED"
     | "INVALID_API_KEY"
     | "QUOTA_OR_ACCOUNT_BLOCKED"
+    | "MALFORMED_RESPONSE"
     | "ERROR",
 ): VoiceBrokerIssue {
   if (code === "INVALID_API_KEY") return "invalid_api_key";
@@ -146,5 +151,6 @@ export function mapBrokerCodeToIssue(
   if (code === "BACKEND_REQUIRED") return "required";
   if (code === "ORIGIN_BLOCKED") return "origin_blocked";
   if (code === "RATE_LIMITED") return "rate_limited";
+  if (code === "MALFORMED_RESPONSE") return "malformed_response";
   return "unreachable";
 }

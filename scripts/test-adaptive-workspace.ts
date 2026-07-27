@@ -77,14 +77,16 @@ test("founder and platform FAQ answers never invent unrelated founders", () => {
 
 test("Uzbek operator introduction matches the required semantic baseline", () => {
   const intro = getOperatorIntroduction("uz");
-  assert.match(intro, /Men CheckBalanceAI\.Global tomonidan taqdim etilgan ovozli operatorman/);
-  assert.match(intro, /CBAI Intelligence Operating System/);
-  assert.match(intro, /CheckBalanceAI\.Global asoschisi — Botir Choriev/);
+  // Short UZ intro uses CBAI voice identity; CheckBalanceAI.Global remains in FAQ / platform answers.
+  assert.match(intro, /^Men CBAI Ovoz Operatoriman\./);
+  assert.doesNotMatch(intro, /Botir/);
   assert.doesNotMatch(intro, /^Men CBAIman/);
   assert.doesNotMatch(intro, /Men sun['‘]iy intellektman/);
+  assert.match(answerCbaiIdentityFaq("who_founded", "uz"), /Botir Choriev/);
+  assert.match(answerCbaiIdentityFaq("what_is_platform", "uz"), /CheckBalanceAI\.Global/);
   const shortId = getShortOperatorIdentity("uz");
-  assert.notEqual(shortId, intro);
-  assert.match(getVoiceOperatorFirstRunIntro("uz"), /Botir Choriev/);
+  assert.match(shortId, /^Men CBAI Ovoz Operatoriman/);
+  assert.match(getVoiceOperatorFirstRunIntro("uz"), /^Men CBAI Ovoz Operatoriman/);
 });
 
 test("Voice identity adapter consumes the brand registry", () => {
@@ -116,13 +118,14 @@ test("role detection covers every supported template role", () => {
     { text: "I work in government public administration", templateId: "government" },
     { text: "I am an investor analysing a sector", templateId: "investor_analyst" },
     { text: "I represent an organization building a team", templateId: "organization" },
+    { text: "I am a chemist preparing a thesis", templateId: "chemist_scientist" },
     { text: "I am not sure yet", templateId: "general" },
   ];
   for (const item of cases) {
     const detected = detectRoleIntent(item.text);
     assert.equal(detected.templateId, item.templateId, item.text);
   }
-  assert.equal(listWorkspaceTemplates().length, 8);
+  assert.equal(listWorkspaceTemplates().length, 9);
 });
 
 test("role interpretation requires confirmation and defaults to private", () => {
@@ -242,33 +245,49 @@ test("consequential voice actions require confirmation; navigation may be immedi
   assert.match(instructions, /Safe navigation may proceed immediately/i);
 });
 
-test("primary IA has seven destinations including Global Activity; Live Rooms under Collaborate", () => {
+test("primary IA uses CORE Intelligence Operations Oversight System with Advanced disclosure", () => {
   const hrefs = primaryNavSections.flatMap((section) => section.items).map((item) => item.href);
-  assert.deepEqual(hrefs, ["/", "/my-work", "/search", "/discover", "/countries", "/research", "/reports"]);
+  assert.ok(hrefs.includes("/"));
+  assert.ok(hrefs.includes("/my-work"));
+  assert.ok(hrefs.includes("/search"));
+  assert.ok(hrefs.includes("/countries"));
+  assert.ok(hrefs.includes("/research"));
+  assert.ok(hrefs.includes("/evidence"));
+  assert.ok(hrefs.includes("/graph"));
+  assert.ok(hrefs.includes("/rooms"));
+  assert.ok(hrefs.includes("/reports"));
+  assert.ok(hrefs.includes("/governance"));
+  assert.ok(hrefs.includes("/trust"));
+  assert.ok(hrefs.includes("/settings"));
+  assert.ok(hrefs.includes("/about"));
+  assert.ok(!hrefs.includes("/discover"), "Discover remains Advanced disclosure");
   const secondary = secondaryNavSections.flatMap((section) => section.items).map((item) => item.href);
-  assert.ok(secondary.includes("/rooms"));
-  assert.ok(secondaryNavSections.some((section) => section.title === "Collaborate"));
-  assert.ok(secondaryNavSections.some((section) => section.title === "Trust"));
+  assert.ok(secondary.includes("/discover"));
+  assert.ok(secondary.includes("/notifications"));
+  assert.ok(secondaryNavSections.some((section) => section.title === "Advanced"));
 });
 
-test("EN/UZ/RU/TR navigation keys exist for discover/create/privacy", () => {
+test("EN/UZ/RU/TR navigation keys exist for canonical IA sections", () => {
   for (const locale of ["en", "uz", "ru", "tr"] as const) {
     const nav = getDictionary(locale).navigation;
     assert.ok(nav.globalActivity.length > 0, locale);
-    assert.ok(nav.discover.length > 0, locale);
-    assert.ok(nav.create.length > 0, locale);
+    assert.ok(nav.intelligence.length > 0, locale);
+    assert.ok(nav.operations.length > 0, locale);
+    assert.ok(nav.oversight.length > 0, locale);
+    assert.ok(nav.system.length > 0, locale);
+    assert.ok(nav.advanced.length > 0, locale);
+    assert.ok(nav.core.length > 0, locale);
     assert.ok(nav.privacy.length > 0, locale);
-    assert.ok(nav.collaboration.length > 0, locale);
-    assert.ok(nav.trust.length > 0, locale);
     const t = (path: string) => {
       const [root, key] = path.split(".");
       return (getDictionary(locale) as Record<string, Record<string, string>>)[root!]![key!]!;
     };
     assert.equal(translateNavLabel(t, "/discover", "Global Activity"), nav.globalActivity);
-    assert.equal(translateNavSectionTitle(t, "Discover"), nav.discover);
-    assert.equal(translateNavSectionTitle(t, "Create"), nav.create);
-    assert.equal(translateNavSectionTitle(t, "Collaborate"), nav.collaboration);
-    assert.equal(translateNavSectionTitle(t, "Trust"), nav.trust);
+    assert.equal(translateNavSectionTitle(t, "Intelligence"), nav.intelligence);
+    assert.equal(translateNavSectionTitle(t, "Operations"), nav.operations);
+    assert.equal(translateNavSectionTitle(t, "Oversight"), nav.oversight);
+    assert.equal(translateNavSectionTitle(t, "System"), nav.system);
+    assert.equal(translateNavSectionTitle(t, "Advanced"), nav.advanced);
     assert.equal(translateNavLabel(t, "/settings", "Privacy"), nav.privacy);
   }
 });

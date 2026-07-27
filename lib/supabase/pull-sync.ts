@@ -30,8 +30,10 @@ import type {
   ProjectEntityLinkRow,
   BookmarkRow,
   ReportRow,
+  ProblemSnapshotRow,
 } from "@/lib/supabase/database.types";
 import type { SavedReport } from "@/lib/reports/reports-store";
+import type { Problem } from "@/lib/problems/problem.types";
 
 const PROJECTS_KEY = "cbai-projects";
 const PROJECT_ENTITIES_KEY = "cbai-project-entities";
@@ -41,6 +43,7 @@ const PROJECT_QUESTIONS_KEY = "cbai-project-questions";
 const PROJECT_EVIDENCE_KEY = "cbai-project-evidence-refs";
 const PINNED_STORAGE_KEY = "cbai-platform-pinned-entities";
 const REPORTS_KEY = "cbai-saved-reports";
+const PROBLEMS_KEY = "cbai-problems";
 
 function isBrowser(): boolean {
   return typeof window !== "undefined";
@@ -112,7 +115,7 @@ function projectFromRow(row: ProjectRow): Project {
 export async function pullCloudDataToLocal(ownerId: string): Promise<void> {
   if (!isBrowser()) return;
 
-  const [projectRows, entityLinkRows, noteRows, taskRows, questionRows, evidenceRows, bookmarkRows, reportRows] =
+  const [projectRows, entityLinkRows, noteRows, taskRows, questionRows, evidenceRows, bookmarkRows, reportRows, problemRows] =
     await Promise.all([
       listCloudRows("projects", ownerId),
       listCloudRows("project_entity_links", ownerId),
@@ -122,6 +125,7 @@ export async function pullCloudDataToLocal(ownerId: string): Promise<void> {
       listCloudRows("project_evidence", ownerId),
       listCloudRows("bookmarks", ownerId),
       listCloudRows("reports", ownerId),
+      listCloudRows("problem_snapshots", ownerId),
     ]);
 
   const projectsKey = cloudBucketKey(PROJECTS_KEY, ownerId);
@@ -239,5 +243,19 @@ export async function pullCloudDataToLocal(ownerId: string): Promise<void> {
   writeLocalBucket(
     reportsKey,
     mergeByRecency(readLocalBucket<SavedReport>(reportsKey), incomingReports, (r) => r.id, (r) => r.generatedAt),
+  );
+
+  const problemsKey = cloudBucketKey(PROBLEMS_KEY, ownerId);
+  const incomingProblems = problemRows
+    .map((row: ProblemSnapshotRow) => row.payload as unknown as Problem)
+    .filter((problem) => problem && typeof problem.id === "string");
+  writeLocalBucket(
+    problemsKey,
+    mergeByRecency(
+      readLocalBucket<Problem>(problemsKey),
+      incomingProblems,
+      (problem) => problem.id,
+      (problem) => problem.updatedAt,
+    ),
   );
 }

@@ -2,6 +2,10 @@
 
 export const FORWARD_DEPLOYED_UZ = {
   workspaceTitle: "Operatsion ish maydoni",
+  closeWorkspace: "Yopish",
+  closeWorkspaceAria: "Operatsion ish maydonini yopish",
+  backToPage: "Orqaga",
+  backToEvidence: "Dalillarga qaytish",
   objective: "Maqsad",
   context: "Kontekst",
   understanding: "CBAI nimani tushundi",

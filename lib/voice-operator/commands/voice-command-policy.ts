@@ -8,6 +8,7 @@ import type { VoiceCommandRisk } from "@/lib/voice-operator/commands/voice-comma
 
 const CONFIRMATION_REQUIRED = new Set<PlatformActionId>([
   "operational_object.compose",
+  "problem.compose",
   "operational_object.confirm_create",
   "project.compose",
   "mission.compose",

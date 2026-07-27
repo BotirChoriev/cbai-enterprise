@@ -200,6 +200,46 @@ export function verifyWebRtcSessionTracksEnded(session: Pick<MutableSession, "lo
   return areAllTracksEnded(session.localStream, session.remoteStream);
 }
 
+function waitForDataChannelOpen(
+  dataChannel: RTCDataChannel,
+  signal: AbortSignal | null | undefined,
+  timeoutMs = 15_000,
+): Promise<void> {
+  if (dataChannel.readyState === "open") return Promise.resolve();
+  if (dataChannel.readyState === "closing" || dataChannel.readyState === "closed") {
+    return Promise.reject(new Error("data_channel_closed"));
+  }
+
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const finish = (fn: () => void) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeoutId);
+      dataChannel.removeEventListener("open", onOpen);
+      dataChannel.removeEventListener("error", onError);
+      dataChannel.removeEventListener("close", onClose);
+      signal?.removeEventListener("abort", onAbort);
+      fn();
+    };
+    const onOpen = () => finish(() => resolve());
+    const onError = () => finish(() => reject(new Error("data_channel_error")));
+    const onClose = () => finish(() => reject(new Error("data_channel_closed")));
+    const onAbort = () => finish(() => reject(new DOMException("Aborted", "AbortError")));
+    const timeoutId = setTimeout(() => finish(() => reject(new Error("data_channel_timeout"))), timeoutMs);
+    dataChannel.addEventListener("open", onOpen);
+    dataChannel.addEventListener("error", onError);
+    dataChannel.addEventListener("close", onClose);
+    if (signal) {
+      if (signal.aborted) {
+        onAbort();
+        return;
+      }
+      signal.addEventListener("abort", onAbort, { once: true });
+    }
+  });
+}
+
 export async function connectOpenAiWebRtcSession(options: {
   readonly credential: EphemeralRealtimeCredential;
   readonly language: string;
@@ -387,6 +427,28 @@ export async function connectOpenAiWebRtcSession(options: {
 
     await peer.setRemoteDescription({ type: "answer", sdp: bodyText });
     if (generation !== session.connectGeneration || session.disconnected) return handle;
+
+    // P0: Listening is forbidden until the OpenAI data channel is open.
+    try {
+      await waitForDataChannelOpen(dataChannel, session.abortController?.signal);
+    } catch (error) {
+      if (generation !== session.connectGeneration || session.disconnected) return handle;
+      cleanupWebRtcSessionResources(session);
+      if (error instanceof DOMException && error.name === "AbortError") {
+        stateEmitter.set("idle");
+        return handle;
+      }
+      stateEmitter.set("connection_failed");
+      return handle;
+    }
+    if (generation !== session.connectGeneration || session.disconnected) return handle;
+
+    // Best-effort remote audio readiness after a user gesture (mic start).
+    try {
+      await session.audioEl?.play();
+    } catch {
+      /* Safari may still unlock after the first remote track; do not fail the session solely here. */
+    }
 
     stateEmitter.set("connected");
     stateEmitter.set("listening");

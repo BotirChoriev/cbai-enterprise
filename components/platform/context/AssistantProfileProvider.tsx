@@ -19,7 +19,9 @@ import {
   loadAssistantProfile,
   saveAssistantProfile,
 } from "@/lib/assistant/assistant-storage";
+import { canonicalizeUiLocale } from "@/lib/i18n/canonicalize-locale";
 import { isRtlLanguage } from "@/lib/i18n/languages";
+import { resolveStorageKey } from "@/lib/storage/namespaced-key";
 
 type AssistantProfileValue = {
   profile: AssistantProfile;
@@ -104,15 +106,38 @@ export function AssistantProfileProvider({ children }: { children: ReactNode }) 
   // `dir` is real RTL preparation (Phase 18) — no active language is RTL today, but activating one
   // later needs no new plumbing.
   useEffect(() => {
-    document.documentElement.lang = profile.preferredLanguage || "en";
-    document.documentElement.dir = isRtlLanguage(profile.preferredLanguage) ? "rtl" : "ltr";
+    const lang = canonicalizeUiLocale(profile.preferredLanguage);
+    document.documentElement.lang = lang;
+    document.documentElement.dir = isRtlLanguage(lang) ? "rtl" : "ltr";
   }, [profile.preferredLanguage]);
+
+  // Cross-tab sync: only the active namespaced profile key may refresh this tab.
+  // Ignoring bare legacy key events prevents an older EN bare profile from
+  // racing a newer explicit UZ choice stored under `:local` / `:u:` / `:cloud:`.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onStorage = (event: StorageEvent) => {
+      if (!event.key) return;
+      const activeKey = resolveStorageKey("cbai-assistant-profile");
+      if (event.key !== activeKey) return;
+      cachedSnapshot = null;
+      listeners.forEach((listener) => listener());
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   const updateProfile = useCallback((patch: Partial<AssistantProfile>) => {
     const current = getSnapshot();
     const next: AssistantProfile = {
       ...current,
       ...patch,
+      preferredLanguage: canonicalizeUiLocale(
+        patch.preferredLanguage ?? current.preferredLanguage,
+      ),
+      translationLanguage: canonicalizeUiLocale(
+        patch.translationLanguage ?? current.translationLanguage,
+      ),
       notifications: { ...current.notifications, ...patch.notifications },
       accessibility: { ...current.accessibility, ...patch.accessibility },
     };

@@ -88,10 +88,10 @@ export const ASSISTANT_COMMANDS: readonly AssistantCommand[] = [
     phrase: "Open my work",
     href: "/my-work",
     keywords: [
-      "my work", "open my work",
-      "mening ishlarim", "ishlarimni och",
-      "моя работа", "открой мою работу", "мои проекты",
-      "çalışmalarım", "çalışmalarımı aç",
+      "my work", "open my work", "open my workspace", "open my personal cabinet", "show my projects",
+      "mening ishlarim", "ishlarimni och", "shaxsiy kabinetimni och", "kabinetimni och", "ish maydonimni och", "loyihalarimni ko'rsat",
+      "моя работа", "открой мою работу", "мои проекты", "открой мой кабинет", "личный кабинет",
+      "çalışmalarım", "çalışmalarımı aç", "kişisel kabinimi aç", "kabinimi aç",
     ],
   },
   {

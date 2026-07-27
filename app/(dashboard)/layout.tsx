@@ -54,50 +54,54 @@ export default function DashboardLayout({
       <div className={`cbai-platform-root flex h-screen overflow-hidden bg-[var(--cbai-shell-bg)] ${isHome ? "cbai-spatial-home-chrome" : ""}`}>
         <Sidebar />
         <div className="cbai-platform-shell flex min-w-0 flex-1 flex-col overflow-hidden">
-          <Suspense fallback={<RouteChromeFallback />}>
-            <PlatformContextProvider>
-              <MissionContextProvider>
-                <UniversalWorkspaceProvider>
-                <OperationalObjectProvider>
-                <EngineWorkspaceProvider>
-                <VoiceOperatorProvider>
-                <OfflineBanner />
-                <MobileNavDrawer open={isMobileNavOpen} onClose={() => setIsMobileNavOpen(false)} />
-                <Topbar onMenuClick={() => setIsMobileNavOpen(true)} spatialHome={isHome} />
-                {!isHome ? <LivingContextRibbon /> : null}
-                {showAmbientTrust ? <AmbientTrustStrip /> : null}
-                {showMentalModel ? <MentalModelStrip /> : null}
-                {!isHome && disclosure.showFloatingIntelligence ? <FloatingIntelligencePresence /> : null}
-                <main className={`cbai-platform-main cbai-voice-reserved-main flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden ${isHome ? "cbai-spatial-main-scroll" : ""}`}>
-                  {isHome ? (
-                    <IntelligenceAtmosphereShell className="cbai-living-canvas cbai-spatial-home-atmosphere min-h-0 flex-1 overflow-visible">
-                      <div className="cbai-spatial-main-canvas w-full min-w-0">{children}</div>
-                    </IntelligenceAtmosphereShell>
-                  ) : (
-                    <MobileIntelligenceShell>
-                      <IntelligenceAtmosphereShell className="cbai-operating-main relative flex min-h-0 flex-1 flex-col">
-                        <div
-                          className={`grid min-h-0 flex-1 grid-cols-1 ${showOperatingColumn ? "lg:grid-cols-[minmax(0,1fr)_15rem] xl:grid-cols-[minmax(0,1fr)_17rem]" : ""}`}
-                        >
-                          <div className="cbai-space-enter min-w-0 px-4 py-4 lg:px-5 lg:py-5">{children}</div>
-                          {showOperatingColumn ? <OperatingContextColumn className="hidden lg:flex" /> : null}
-                        </div>
-                        {showContinuity ? <ContinuityTimelineStrip /> : null}
-                        {disclosure.showLivingContextRail ? <LivingContextMobileToggle /> : null}
-                      </IntelligenceAtmosphereShell>
-                    </MobileIntelligenceShell>
-                  )}
-                </main>
-                <VoiceOperatorDock />
-                <OperationalObjectComposer />
-                <CommandClarifyCard />
-                </VoiceOperatorProvider>
-                </EngineWorkspaceProvider>
-                </OperationalObjectProvider>
-                </UniversalWorkspaceProvider>
-              </MissionContextProvider>
-            </PlatformContextProvider>
-          </Suspense>
+          {/*
+            Voice Operator must stay outside the searchParams Suspense boundary so client-side
+            route changes never remount the realtime session / microphone stream.
+          */}
+          <OperationalObjectProvider>
+            <VoiceOperatorProvider>
+              <Suspense fallback={<RouteChromeFallback />}>
+                <PlatformContextProvider>
+                  <MissionContextProvider>
+                    <UniversalWorkspaceProvider>
+                      <EngineWorkspaceProvider>
+                        <OfflineBanner />
+                        <MobileNavDrawer open={isMobileNavOpen} onClose={() => setIsMobileNavOpen(false)} />
+                        <Topbar onMenuClick={() => setIsMobileNavOpen(true)} spatialHome={isHome} />
+                        {!isHome ? <LivingContextRibbon /> : null}
+                        {showAmbientTrust ? <AmbientTrustStrip /> : null}
+                        {showMentalModel ? <MentalModelStrip /> : null}
+                        {!isHome && disclosure.showFloatingIntelligence ? <FloatingIntelligencePresence /> : null}
+                        <main className={`cbai-platform-main cbai-voice-reserved-main flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden ${isHome ? "cbai-spatial-main-scroll" : ""}`}>
+                          {isHome ? (
+                            <IntelligenceAtmosphereShell className="cbai-living-canvas cbai-spatial-home-atmosphere min-h-0 flex-1 overflow-visible">
+                              <div className="cbai-spatial-main-canvas w-full min-w-0">{children}</div>
+                            </IntelligenceAtmosphereShell>
+                          ) : (
+                            <MobileIntelligenceShell>
+                              <IntelligenceAtmosphereShell className="cbai-operating-main relative flex min-h-0 flex-1 flex-col">
+                                <div
+                                  className={`grid min-h-0 flex-1 grid-cols-1 ${showOperatingColumn ? "lg:grid-cols-[minmax(0,1fr)_15rem] xl:grid-cols-[minmax(0,1fr)_17rem]" : ""}`}
+                                >
+                                  <div className="cbai-space-enter min-w-0 px-4 py-4 lg:px-5 lg:py-5">{children}</div>
+                                  {showOperatingColumn ? <OperatingContextColumn className="hidden lg:flex" /> : null}
+                                </div>
+                                {showContinuity ? <ContinuityTimelineStrip /> : null}
+                                {disclosure.showLivingContextRail ? <LivingContextMobileToggle /> : null}
+                              </IntelligenceAtmosphereShell>
+                            </MobileIntelligenceShell>
+                          )}
+                        </main>
+                        <OperationalObjectComposer />
+                        <CommandClarifyCard />
+                      </EngineWorkspaceProvider>
+                    </UniversalWorkspaceProvider>
+                  </MissionContextProvider>
+                </PlatformContextProvider>
+              </Suspense>
+              <VoiceOperatorDock />
+            </VoiceOperatorProvider>
+          </OperationalObjectProvider>
         </div>
       </div>
     </AuthProvider>

@@ -137,6 +137,16 @@ export const RESEARCH_HOME_UZ = {
     "Jonli tajribalar va laboratoriya ma'lumotlari",
     "SI tomonidan yaratilgan tadqiqot xulosalari",
   ],
+  intakeEyebrow: "Tadqiqot qabul qilish",
+  intakeTitle: "Savol, ovoz yoki hujjatdan boshlang",
+  intakeBody:
+    "Yozma savollar, Ovoz Operator tavsiflari va PDF qabul qilish tahrirlanadigan qoralamalarni ochadi. CBAI mukammal OCR yoki o‘ylab topilgan o‘lchovlarni da’vo qilmaydi.",
+  intakeTyped: "Canvasda tadqiqot savoli yoki Smart Idea yozing",
+  intakeVoice: "Muammoni Ovoz Operatoriga ayting — tasdiqlanadigan qoralama ochiladi",
+  intakePdf: "Mahalliy talqin uchun Ilmiy hujjatlar orqali PDF yuklang",
+  intakeHonest: "Chizmalar va formulalar tasdiqlamaguningizcha tahrirlanadigan kuzatuvlar bo‘lib qoladi",
+  intakeOpenDocuments: "Ilmiy hujjatlarni ochish",
+  intakeOpenMyWork: "Mening ishlarimda bog‘langan ish yaratish",
 } as const;
 
 export const GRAPH_PLATFORM_UZ = {
@@ -247,6 +257,8 @@ export const RESEARCH_CATALOG_UZ = {
   catalogDescription:
     "Har bir tadqiqot mavzusi uchun batafsil sahifalar bilan tuzilgan faqat o'qish katalogi. Jonli ma'lumot bazalari, nashrlar yoki tadqiqotchi profillari ulanmagan.",
   filterLabel: "Tadqiqot mavzularini filtrlash",
+  filterByDomain: "Soha bo‘yicha filtrlash",
+  allDomains: "Barcha sohalar",
   filterPlaceholder: "Mavzu, usul, soha yoki dalil turi bo'yicha filtrlash...",
   showingCount: "{total} ta mavzudan {filtered} tasi ko'rsatilmoqda",
   noMatch: "Filtrga mos tadqiqot mavzulari topilmadi.",
@@ -372,6 +384,16 @@ export const ENTITY_UI_UZ = {
   officialInformationAvailable: "Rasmiy ma'lumot mavjud.",
   officialInformationNotAvailableYet: "Rasmiy ma'lumot hali mavjud emas.",
   foundedLabel: "Tashkil etilgan",
+  relatedResearchEmpty:
+    "Joriy katalogda {industry} bilan mavzu bo‘yicha mos keladigan tadqiqot mavzulari yo‘q.",
+  relatedResearchNote:
+    "{name} kompaniyasining {industry} soha tasnifi bo‘yicha mavzu mosligi — homiylik, moliyalashtirish yoki institutsional da’vo emas.",
+  relatedCompaniesMetric: "Bog‘liq kompaniyalar (mavzu mosligi)",
+  recordsUnit: "yozuv",
+  entityTypeCountry: "Mamlakat",
+  entityTypeCompany: "Kompaniya",
+  entityTypeUniversity: "Universitet",
+  entityTypeResearchTopic: "Tadqiqot mavzusi",
 } as const;
 
 export const INDICATOR_EXPLORER_UZ = {

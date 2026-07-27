@@ -29,7 +29,10 @@ import CompanyTrustSection from "@/components/companies/CompanyTrustSection";
 import SaveToWorkspaceButton from "@/components/shared/SaveToWorkspaceButton";
 import AddToMissionButton from "@/components/mission/MissionOperatingActions";
 import CreateProjectFromEntityButton from "@/components/project/CreateProjectFromEntityButton";
+import CreateLinkedWorkButton from "@/components/operational-objects/CreateLinkedWorkButton";
+import EvidenceConnectAction from "@/components/evidence/EvidenceConnectAction";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { localizeIndustryLabel } from "@/lib/i18n/entity-domain-labels";
 
 type CompanyIntelligencePanelProps = {
   journey: CompanyUserJourney;
@@ -37,7 +40,7 @@ type CompanyIntelligencePanelProps = {
 };
 
 export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligencePanelProps) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const [showReport, setShowReport] = useState(false);
   const { context } = usePlatformContext();
   const { profile, evidenceGaps, evidenceComparison } = journey;
@@ -73,6 +76,22 @@ export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligen
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap justify-end gap-2">
+        <CreateLinkedWorkButton
+          variant="company"
+          compact
+          company={{
+            companyId: company.id,
+            companyName: company.name,
+            routePath: `/companies?company=${encodeURIComponent(company.id)}`,
+          }}
+        />
+        <EvidenceConnectAction
+          category={t("operationalObject.linkedEvidenceOfficialSources")}
+          relatedEntityName={company.name}
+          relatedEntityKind="company"
+          relatedEntityId={company.id}
+          compact
+        />
         <AddToMissionButton
           entity={{ kind: "company", id: company.id, name: company.name, code: company.icon, countryName: company.country }}
           compact
@@ -93,7 +112,7 @@ export function CompanyIntelligencePanel({ journey, company }: CompanyIntelligen
         name={registryFacts.name}
         entityType={t("entityIntelligence.entityTypeCompany")}
         country={registryFacts.country}
-        subtitle={`${registryFacts.icon} · ${registryFacts.industry}`}
+        subtitle={`${registryFacts.icon} · ${localizeIndustryLabel(registryFacts.industry, language)}`}
         availableInformation={registryFacts.sourceLabel}
         facts={[
           { label: t("entityIntelligence.factFounded"), value: String(registryFacts.founded) },

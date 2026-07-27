@@ -62,4 +62,12 @@ export const UNIVERSAL_WORKSPACE_UZ = {
   objectTypeQuestion: "Savol",
   objectTypeRelationship: "Munosabat",
   objectTypeCapabilitySignal: "Qobiliyat signali",
+  seeEntityEvidence: "Obyekt dalillar panelini ko'ring",
+  seeEntityModule: "Obyekt modulini ko'ring",
+  trustRegistryBacked: "Reyestrga asoslangan",
+  entityCatalogLimitation: "Obyekt tahlili ulangan katalog manbalariga bog'liq.",
+  openEntity: "Obyektni ochish",
+  knowledgeUniverse: "Bilim olami",
+  stateRegistry: "Reyestr yozuvi",
+  maySupportMission: "Faol missiyani qo'llab-quvvatlashi mumkin",
 } as const;

@@ -22,6 +22,8 @@ export type University = {
   type: UniversityType;
   /** Official website when recorded in local registry; otherwise null. */
   website: string | null;
+  /** Search aliases (Uzbek Latin/Cyrillic, common short names) — never fabricated profiles. */
+  aliases?: readonly string[];
 };
 
 export const universityTypes: UniversityType[] = ["Public", "Private", "Research"];
@@ -86,6 +88,12 @@ export const universities: University[] = [
     founded: 1955,
     type: "Public",
     website: null,
+    aliases: [
+      "toshkent axborot texnologiyalari universiteti",
+      "тату",
+      "tuit",
+      "tashkent information technologies",
+    ],
   },
   {
     id: "nuuz",
@@ -96,6 +104,32 @@ export const universities: University[] = [
     founded: 1918,
     type: "Public",
     website: null,
+    aliases: [
+      "o'zbekiston milliy universiteti",
+      "ozbekiston milliy universiteti",
+      "mirzo ulug'bek nomidagi",
+      "нууз",
+      "nuuz",
+    ],
+  },
+  {
+    id: "tsau",
+    name: "Tashkent State Agrarian University",
+    icon: "TSAU",
+    country: "Uzbekistan",
+    city: "Tashkent",
+    founded: 1930,
+    type: "Public",
+    website: null,
+    aliases: [
+      "toshkent davlat agrar universiteti",
+      "toshkent davlat agrar universitet",
+      "тошкент давлат аграр университети",
+      "ташкентский государственный аграрный университет",
+      "tsau",
+      "agrar universitet",
+      "tashkent agrarian university",
+    ],
   },
   {
     id: "kaist",

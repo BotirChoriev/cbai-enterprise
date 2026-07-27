@@ -84,10 +84,30 @@ export default function UniversalInspector({ className = "" }: { className?: str
       <InspectorRow label={t("universalWorkspace.whatIsThis")} value={contract.purpose ?? contract.identity} />
       <InspectorRow
         label={t("universalWorkspace.whyRelevantNow")}
-        value={contract.state ? `${t("universalWorkspace.currentState")}: ${contract.state}` : null}
+        value={
+          contract.state
+            ? `${t("universalWorkspace.currentState")}: ${contract.stateKey ? t(contract.stateKey) : contract.state}`
+            : null
+        }
       />
-      <InspectorRow label={t("universalWorkspace.missionConnection")} value={contract.missionRelation} />
-      <InspectorRow label={t("universalWorkspace.evidenceSupports")} value={contract.evidenceSummary} />
+      <InspectorRow
+        label={t("universalWorkspace.missionConnection")}
+        value={contract.missionRelationKey ? t(contract.missionRelationKey) : contract.missionRelation}
+      />
+      <InspectorRow
+        label={t("universalWorkspace.evidenceSupports")}
+        value={
+          contract.evidenceSummaryParts && contract.evidenceSummaryParts.length > 0
+            ? contract.evidenceSummaryParts
+                .map((part) =>
+                  t(`experienceEngineering.${part.key}`, part.params ? { ...part.params } : undefined),
+                )
+                .join(" · ")
+            : contract.evidenceSummaryKey
+              ? t(contract.evidenceSummaryKey)
+              : contract.evidenceSummary
+        }
+      />
       <InspectorRow
         label={t("universalWorkspace.contradicts")}
         value={contract.unknowns.length > 0 ? contract.unknowns.join("; ") : t("universalWorkspace.none")}
@@ -96,8 +116,14 @@ export default function UniversalInspector({ className = "" }: { className?: str
         label={t("universalWorkspace.whatIsMissing")}
         value={contract.unknowns.length > 0 ? contract.unknowns.join("; ") : t("universalWorkspace.none")}
       />
-      <InspectorRow label={t("universalWorkspace.trustState")} value={contract.trustState} />
-      <InspectorRow label={t("universalWorkspace.limitations")} value={contract.limitations} />
+      <InspectorRow
+        label={t("universalWorkspace.trustState")}
+        value={contract.trustStateKey ? t(contract.trustStateKey) : contract.trustState}
+      />
+      <InspectorRow
+        label={t("universalWorkspace.limitations")}
+        value={contract.limitationsKey ? t(contract.limitationsKey) : contract.limitations}
+      />
 
       {contract.actions.length > 0 ? (
         <div className="space-y-1">
@@ -108,7 +134,7 @@ export default function UniversalInspector({ className = "" }: { className?: str
             {contract.actions.map((action) => (
               <li key={action.href}>
                 <Link href={action.href} className="text-xs text-teal-400 hover:text-teal-300">
-                  {action.label} →
+                  {action.labelKey ? t(action.labelKey) : action.label} →
                 </Link>
               </li>
             ))}

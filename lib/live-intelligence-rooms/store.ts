@@ -3,8 +3,16 @@
  */
 
 import { resolveStorageKey } from "@/lib/storage/namespaced-key";
-import { migrateLiveRoomCollection, migrateLiveIntelligenceRoom, CONSENT_POLICY_VERSION } from "@/lib/live-intelligence-rooms/migration";
+import {
+  migrateLiveRoomCollection,
+  migrateLiveIntelligenceRoom,
+  CONSENT_POLICY_VERSION,
+  defaultSchedule,
+  defaultAccess,
+  defaultPublicSession,
+} from "@/lib/live-intelligence-rooms/migration";
 import { buildTranscriptTurn } from "@/lib/live-intelligence-rooms/translation-routing";
+import { getLiveRoomTransportLegacyLabel } from "@/lib/live-intelligence-rooms/transport-adapter";
 import type {
   CreateLiveRoomInput,
   LiveGlossaryTerm,
@@ -102,30 +110,135 @@ export function getLiveRoomSnapshot(roomId: string): LiveIntelligenceRoom | null
   return room;
 }
 
+const recentCreateFingerprints = new Set<string>();
+
+function createFingerprint(input: CreateLiveRoomInput): string {
+  return [
+    input.roomType,
+    input.title.trim().toLowerCase(),
+    input.hostDisplayName.trim().toLowerCase(),
+    input.purpose?.trim().toLowerCase() ?? "",
+    input.schedule?.scheduledStart ?? "now",
+  ].join("|");
+}
+
 export function createLiveRoom(input: CreateLiveRoomInput): LiveIntelligenceRoom {
   const now = new Date().toISOString();
   const hostId = newId("host");
+  const hostName = input.hostDisplayName.trim() || "Host";
+  const locale = input.createdLocale ?? input.hostSpeakLocale;
+  const purpose = (input.purpose ?? input.objective ?? "").trim();
+  const isLab = input.roomType === "laboratory" || input.roomType === "live_laboratory";
+
   const host: LiveParticipant = {
     id: hostId,
-    displayName: input.hostDisplayName.trim() || "Host",
+    displayName: hostName,
     kind: "human",
     role: "host",
+    identityProvenance: input.identityProvenance ?? "unverified_guest",
     speakLocale: input.hostSpeakLocale,
     readLocale: input.hostReadLocale,
     hearLocale: input.hostHearLocale,
     hearTranslatedAudio: Boolean(input.hearTranslatedAudio),
     joinedAt: now,
     leftAt: null,
+    emailPrivate: null,
+    phonePrivate: null,
   };
 
+  const participants: LiveParticipant[] = [host];
+  const moderatorIds: string[] = [];
+  for (const name of input.moderatorDisplayNames ?? []) {
+    if (!name.trim()) continue;
+    const id = newId("mod");
+    moderatorIds.push(id);
+    participants.push({
+      id,
+      displayName: name.trim(),
+      kind: "human",
+      role: "moderator",
+      identityProvenance: "invited_guest",
+      speakLocale: input.hostSpeakLocale,
+      readLocale: input.hostReadLocale,
+      hearLocale: input.hostHearLocale,
+      hearTranslatedAudio: false,
+      joinedAt: now,
+      leftAt: null,
+    });
+  }
+  for (const name of input.presenterDisplayNames ?? []) {
+    if (!name.trim()) continue;
+    participants.push({
+      id: newId("pres"),
+      displayName: name.trim(),
+      kind: "human",
+      role: "presenter",
+      identityProvenance: "invited_guest",
+      speakLocale: input.hostSpeakLocale,
+      readLocale: input.hostReadLocale,
+      hearLocale: input.hostHearLocale,
+      hearTranslatedAudio: false,
+      joinedAt: now,
+      leftAt: null,
+    });
+  }
+  const approverIds: string[] = [];
+  if (input.approverDisplayName?.trim()) {
+    const id = newId("appr");
+    approverIds.push(id);
+    participants.push({
+      id,
+      displayName: input.approverDisplayName.trim(),
+      kind: "human",
+      role: "human_approver",
+      identityProvenance: "invited_guest",
+      speakLocale: input.hostSpeakLocale,
+      readLocale: input.hostReadLocale,
+      hearLocale: input.hostHearLocale,
+      hearTranslatedAudio: false,
+      joinedAt: now,
+      leftAt: null,
+    });
+  }
+
+  const fingerprint = createFingerprint(input);
+  if (input.confirmCreate === true && recentCreateFingerprints.has(fingerprint)) {
+    const existing = listLiveRooms().find(
+      (r) =>
+        r.title.trim().toLowerCase() === input.title.trim().toLowerCase() &&
+        r.hostDisplayName.trim().toLowerCase() === hostName.toLowerCase() &&
+        r.roomType === input.roomType,
+    );
+    if (existing) return existing;
+  }
+  if (input.confirmCreate === true) {
+    recentCreateFingerprints.add(fingerprint);
+  }
+
+  const recordingAllowed = Boolean(input.recordingAllowed);
+  const transcriptRetainAllowed = Boolean(input.transcriptRetainAllowed);
+  const schedule = defaultSchedule(input.schedule);
+  const access = defaultAccess({
+    accessMode: input.accessMode,
+    guestPolicy: input.guestPolicy,
+    waitingRoom: input.waitingRoom,
+    participantLimit: input.participantLimit ?? null,
+    inviteLinkToken:
+      input.accessMode === "link" || input.accessMode === "invite" ? newId("lnk") : null,
+  });
+
   const room: LiveIntelligenceRoom = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     roomId: newId("room"),
     roomType: input.roomType,
     title: input.title.trim() || "Untitled room",
     description: input.description?.trim() ?? "",
-    objective: input.objective?.trim() ?? "",
+    objective: purpose || (input.objective?.trim() ?? ""),
+    purpose: purpose || (input.objective?.trim() ?? ""),
+    expectedOutcome: input.expectedOutcome?.trim() ?? "",
+    topicDomain: input.topicDomain?.trim() ?? "",
     lifecycle: "ready",
+    status: "ready",
     connectionState: "ready",
     missionId: input.missionId ?? null,
     projectId: input.projectId ?? null,
@@ -133,7 +246,10 @@ export function createLiveRoom(input: CreateLiveRoomInput): LiveIntelligenceRoom
     relatedEntities: [],
     sourceRoute: input.sourceRoute ?? "/rooms",
     hostParticipantId: hostId,
-    participants: [host],
+    hostDisplayName: hostName,
+    moderatorIds,
+    approverIds,
+    participants,
     activeSpeakerParticipantId: hostId,
     agenda: [],
     glossary: [],
@@ -142,35 +258,58 @@ export function createLiveRoom(input: CreateLiveRoomInput): LiveIntelligenceRoom
     decisions: [],
     actionItems: [],
     evidenceRefs: [],
-    laboratory:
-      input.roomType === "laboratory"
-        ? {
-            hypothesis: null,
-            method: null,
-            variables: [],
-            observations: [],
-            uncertainties: [],
-            contradictions: [],
-            safetyNotes:
-              "CBAI does not perform physical laboratory work. High-risk scientific actions remain advisory and review-gated.",
-          }
-        : null,
+    presentationMaterials: [...(input.materials ?? [])],
+    laboratory: isLab
+      ? {
+          hypothesis: null,
+          method: null,
+          variables: [],
+          observations: [],
+          uncertainties: [],
+          contradictions: [],
+          safetyNotes:
+            "CBAI does not perform physical laboratory work. High-risk scientific actions remain advisory and review-gated.",
+        }
+      : null,
     practice:
       input.roomType === "practice"
         ? { scenario: null, feedbackNotes: [], aiParticipantsLabeled: true }
         : null,
     consent: {
-      recordingAllowed: Boolean(input.recordingAllowed),
+      recordingAllowed,
       translationAudioAllowed: Boolean(input.translationAudioAllowed),
+      transcriptRetainAllowed,
       retentionDays: input.retentionDays ?? 30,
       acknowledgedAt: null,
       policyVersion: CONSENT_POLICY_VERSION,
     },
+    schedule,
+    attendanceMode: input.attendanceMode ?? "online",
+    access,
+    speakingLanguage: String(input.hostSpeakLocale),
+    readingLanguage: String(input.hostReadLocale),
+    listeningLanguage: String(input.hostHearLocale),
+    translationLanguages: [...(input.translationLanguages ?? [])],
+    confidentiality: input.confidentiality ?? "internal",
+    intellectualPropertyStatus: input.intellectualPropertyStatus ?? "not_claimed",
+    recordingState: recordingAllowed ? "consented_local_only" : "off",
+    transcriptState: transcriptRetainAllowed ? "consented_retain" : "off",
+    publicSession: defaultPublicSession(input.publicSession),
+    invitationDrafts: [],
+    auditEvents: [
+      {
+        id: newId("audit"),
+        at: now,
+        actorDisplayName: hostName,
+        action: "room_created",
+        detail: input.confirmCreate ? "wizard_confirmed" : "api_create",
+      },
+    ],
+    humanApprovalState: approverIds.length ? "pending" : "pending",
     multiPartyTransportAvailable: false,
-    multiPartyTransportLabel:
-      "Multi-party live audio is not available in this Preview build — host Voice Operator + simulated listeners only.",
-    createdLocale: input.createdLocale ?? input.hostSpeakLocale,
-    contentLocale: input.createdLocale ?? input.hostSpeakLocale,
+    multiPartyTransportLabel: getLiveRoomTransportLegacyLabel(),
+    createdLocale: String(locale),
+    contentLocale: String(locale),
     createdAt: now,
     updatedAt: now,
     startedAt: null,
@@ -181,6 +320,14 @@ export function createLiveRoom(input: CreateLiveRoomInput): LiveIntelligenceRoom
   rooms.unshift(room);
   writeAll(rooms);
   return room;
+}
+
+/** Wizard-only create — refuses without confirmCreate: true. */
+export function createLiveRoomFromWizard(input: CreateLiveRoomInput): LiveIntelligenceRoom {
+  if (input.confirmCreate !== true) {
+    throw new Error("Room create requires explicit confirmation.");
+  }
+  return createLiveRoom(input);
 }
 
 export function saveLiveRoom(room: LiveIntelligenceRoom): LiveIntelligenceRoom {
@@ -239,6 +386,7 @@ export function addSimulatedParticipant(
     displayName: options.displayName,
     kind: "ai_simulated",
     role: "ai_simulated",
+    identityProvenance: "ai_simulated",
     speakLocale: options.speakLocale,
     readLocale: options.readLocale,
     hearLocale: options.hearLocale,
@@ -479,6 +627,7 @@ export function resetLiveRoomsForTests(): void {
   cachedSnapshot = [];
   cachedSnapshotToken = "";
   roomSnapshotCache.clear();
+  recentCreateFingerprints.clear();
   if (isBrowser()) {
     window.localStorage.removeItem(resolveStorageKey(STORAGE_KEY));
     window.dispatchEvent(new Event("cbai-live-rooms-changed"));

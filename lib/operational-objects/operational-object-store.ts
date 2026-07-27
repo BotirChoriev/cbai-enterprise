@@ -139,7 +139,11 @@ function resolveConfirmedStatus(draft: OperationalObjectDraft): OperationalObjec
   return draft.status === "draft" ? "ready" : draft.status;
 }
 
-export function confirmOperationalObject(draft: OperationalObjectDraft): OperationalObject {
+export function confirmOperationalObject(draft: OperationalObjectDraft): OperationalObject | null {
+  if (missingRequiredFields(draft).length > 0) {
+    return null;
+  }
+
   let projectId = draft.projectId;
   if (draft.type === "project" && !projectId) {
     const project = createProject({
@@ -181,7 +185,7 @@ export function filterOperationalObjects(
       return objects.filter((o) => o.status === "active" || o.status === "ready");
     case "waiting":
       return objects.filter(
-        (o) => o.status === "waiting_for_input" || o.status === "waiting_for_evidence",
+        (o) => o.status === "waiting_for_input" || o.status === "waiting_for_evidence" || o.status === "blocked",
       );
     case "review":
       return objects.filter((o) => o.status === "needs_review");
@@ -190,6 +194,43 @@ export function filterOperationalObjects(
     default:
       return [...objects];
   }
+}
+
+/** Archive after explicit user confirmation in UI — never silent. */
+export function archiveOperationalObject(id: string): OperationalObject | null {
+  const all = readAllImmediate();
+  const existing = all.find((o) => o.id === id);
+  if (!existing) return null;
+  const archived: OperationalObject = {
+    ...existing,
+    status: "archived",
+    updatedAt: new Date().toISOString(),
+    nextAction: existing.nextAction || "Archived",
+  };
+  writeAll(
+    all.map((o) => (o.id === id ? archived : o)),
+    true,
+  );
+  notifyMissionDataChanged("project");
+  return archived;
+}
+
+/** Resume an archived/completed item into needs_review for human continuation. */
+export function reopenOperationalObject(id: string): OperationalObject | null {
+  const all = readAllImmediate();
+  const existing = all.find((o) => o.id === id);
+  if (!existing) return null;
+  const reopened: OperationalObject = {
+    ...existing,
+    status: "needs_review",
+    updatedAt: new Date().toISOString(),
+  };
+  writeAll(
+    all.map((o) => (o.id === id ? reopened : o)),
+    true,
+  );
+  notifyMissionDataChanged("project");
+  return reopened;
 }
 
 export function migrateOperationalObjectsFromLegacy(): { migrated: number } {

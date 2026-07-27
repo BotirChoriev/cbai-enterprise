@@ -185,6 +185,12 @@ export function createOpenAiWebRtcRealtimeProvider(): RealtimeVoiceProvider {
         return;
       }
 
+      // Already live — reuse the existing peer connection / mic track (no duplicate streams).
+      if (activeSession && streamHasLiveTracks(activeSession.getLocalStream?.() ?? null)) {
+        holder.set(activeSession.getState());
+        return;
+      }
+
       if (connectPromise) {
         await connectPromise;
         return;
@@ -261,12 +267,18 @@ export function createOpenAiWebRtcRealtimeProvider(): RealtimeVoiceProvider {
   };
 }
 
+/** Module-scoped WebRTC provider — survives React remounts without opening a second mic stream. */
+let sharedOpenAiWebRtcProvider: RealtimeVoiceProvider | null = null;
+
 export function resolveRealtimeProvider(brokerConfigured: boolean): RealtimeVoiceProvider {
   if (!brokerConfigured) return createUnavailableRealtimeProvider();
   if (typeof process !== "undefined" && process.env.NODE_ENV === "test") {
     return createMockRealtimeProvider({ connectSucceeds: true });
   }
-  return createOpenAiWebRtcRealtimeProvider();
+  if (!sharedOpenAiWebRtcProvider) {
+    sharedOpenAiWebRtcProvider = createOpenAiWebRtcRealtimeProvider();
+  }
+  return sharedOpenAiWebRtcProvider;
 }
 
 export { RealtimeMicrophoneError } from "@/lib/voice-operator/realtime/openai-webrtc-session";

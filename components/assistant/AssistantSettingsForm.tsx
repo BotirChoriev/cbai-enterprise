@@ -12,6 +12,7 @@ import { countries } from "@/lib/countries";
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import Avatar from "@/components/shared/Avatar";
 import ThemeToggle from "@/components/shared/ThemeToggle";
+import { canonicalizeUiLocale } from "@/lib/i18n/canonicalize-locale";
 import { useTranslation } from "@/lib/i18n/use-translation";
 
 const inputClass =
@@ -120,7 +121,9 @@ export default function AssistantSettingsForm() {
             <span className={labelClass}>{t("settingsPage.preferredLanguage")}</span>
             <select
               value={profile.preferredLanguage}
-              onChange={(e) => updateProfile({ preferredLanguage: e.target.value })}
+              onChange={(e) =>
+                updateProfile({ preferredLanguage: canonicalizeUiLocale(e.target.value) })
+              }
               className={inputClass}
             >
               {ASSISTANT_LANGUAGES.map((language) => (
@@ -136,7 +139,9 @@ export default function AssistantSettingsForm() {
             <span className={labelClass}>{t("settingsPage.futureTranslationLanguage")}</span>
             <select
               value={profile.translationLanguage}
-              onChange={(e) => updateProfile({ translationLanguage: e.target.value })}
+              onChange={(e) =>
+                updateProfile({ translationLanguage: canonicalizeUiLocale(e.target.value) })
+              }
               className={inputClass}
             >
               {ASSISTANT_LANGUAGES.map((language) => (

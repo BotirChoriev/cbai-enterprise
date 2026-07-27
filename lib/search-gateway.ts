@@ -5,7 +5,7 @@
 
 import { industries } from "@/lib/companies";
 import type { SearchResult } from "@/lib/global-search";
-import { searchEntities } from "@/lib/global-search";
+import { closestRegistryMatches, searchEntities } from "@/lib/global-search";
 import { EVIDENCE_NOT_CONNECTED_LABEL } from "@/lib/platform-home";
 
 export type SearchResultGroupId =
@@ -59,6 +59,8 @@ export type GatewaySearchResponse = {
   query: string;
   groups: SearchResultGroup[];
   hasResults: boolean;
+  /** Weak closest rows when no confident hit — never fabricated entities. */
+  closestMatches: SearchResult[];
 };
 
 export type SearchableCategory = {
@@ -579,10 +581,12 @@ export function matchSearchTopics(query: string): SearchTopicMatch[] {
 export function executeGatewaySearch(query: string): GatewaySearchResponse {
   const trimmed = query.trim();
   if (!trimmed) {
-    return { query: "", groups: [], hasResults: false };
+    return { query: "", groups: [], hasResults: false, closestMatches: [] };
   }
 
   const entityResults = searchEntities(trimmed);
+  const closestMatches =
+    entityResults.length === 0 ? closestRegistryMatches(trimmed, undefined, 3) : [];
   const topicMatches = matchSearchTopics(trimmed);
 
   const knowledgeTopics = topicMatches.filter(
@@ -656,6 +660,7 @@ export function executeGatewaySearch(query: string): GatewaySearchResponse {
     query: trimmed,
     groups,
     hasResults: groups.length > 0,
+    closestMatches,
   };
 }
 

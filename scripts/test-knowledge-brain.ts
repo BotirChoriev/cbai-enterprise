@@ -56,10 +56,21 @@ test("5. KnowledgeBrainPanel wired to EvidenceExplorer and UniversalInspector", 
   assert.match(inspector, /KnowledgeBrainPanel/);
 });
 
-test("6. AssistantCommandCenter routes through resolveUniversalIntent", () => {
+test("6. AssistantCommandCenter routes through Operational Object + voice command pipeline", () => {
+  // Supersedes resolveUniversalIntent wiring in the command center (still covered by test 3
+  // for the shared resolver itself). Current contract: typed/voice input → submitCommand /
+  // resolveVoiceAction → Draft Work Card or read-only execute — never silent mutation.
   const command = readSource("components/assistant/AssistantCommandCenter.tsx");
-  assert.match(command, /resolveUniversalIntent/);
-  assert.match(command, /intentCategoryTranslationKey/);
+  assert.match(command, /submitCommand/);
+  assert.match(command, /resolveVoiceAction/);
+  assert.match(command, /voiceActionRequiresConfirmation/);
+  assert.match(command, /action_review/);
+  assert.match(command, /useOperationalObjectsOptional/);
+  // Universal intent remains the shared deterministic categorizer (test 3), not a second voice path.
+  assert.equal(typeof resolveUniversalIntent, "function");
+  assert.equal(typeof intentCategoryTranslationKey, "function");
+  const intent = resolveUniversalIntent("Continue research");
+  assert.ok(intent.category === "continue_research" || intent.command !== null || intent.category === "unrecognized");
 });
 
 test("7. Research completion panels use researchTopicCompletion i18n", () => {

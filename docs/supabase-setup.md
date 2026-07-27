@@ -13,13 +13,19 @@ Project Settings → API — you will need both, and only those two.
 
 In the Supabase SQL editor (or via `supabase db push` with the CLI), run, in order:
 
-1. `supabase/migrations/0001_init_schema.sql` — creates every table.
-2. `supabase/migrations/0002_rls_policies.sql` — enables Row Level Security and every
+1. Apply all numbered files in `supabase/migrations/` in ascending order through
+   `0007_genesis_operational_loop.sql`. These are additive schema evolutions; do not skip a number.
+2. `supabase/migrations/0002_rls_policies.sql` enables the original Row Level Security and every
    own-record policy. **Do not skip this file** — without it, every table is readable and
    writable by anyone with the anon key.
-3. `supabase/migrations/0003_rls_verification_queries.sql` — not a migration; run the queries in
-   it manually afterward to confirm RLS is actually enforced (see
+3. `supabase/migrations/0003_rls_verification_queries.sql` contains verification queries; run
+   them manually afterward to confirm RLS is actually enforced (see
    [`rls-policy-guide.md`](./rls-policy-guide.md)).
+4. Before applying `supabase/migrations/0008_problem_os.sql`, follow
+   [`runbooks/problem-os-supabase-rollout.md`](./runbooks/problem-os-supabase-rollout.md). Its
+   preflight, postflight, two-user RLS test, and human approval gates are mandatory.
+5. Apply `supabase/migrations/0009_problem_os_function_hardening.sql` immediately after `0008`.
+   It keeps both Problem trigger functions internal by revoking direct client/RPC execution.
 
 ## 3. Configure environment variables
 

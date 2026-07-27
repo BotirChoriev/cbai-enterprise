@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useAssistantProfile } from "@/components/platform/context/AssistantProfileProvider";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { getAllLanguages, getLanguageDefinition } from "@/lib/i18n/languages";
+import { canonicalizeUiLocale } from "@/lib/i18n/canonicalize-locale";
 import { cbaiGlassCard } from "@/components/brand/brand-classes";
 
 type LanguageSelectorProps = {
@@ -52,7 +53,7 @@ export default function LanguageSelector({ compact = false }: LanguageSelectorPr
   const current = getLanguageDefinition(profile.preferredLanguage);
 
   function selectInterfaceLanguage(code: string) {
-    updateProfile({ preferredLanguage: code });
+    updateProfile({ preferredLanguage: canonicalizeUiLocale(code) });
     detailsRef.current?.removeAttribute("open");
   }
 

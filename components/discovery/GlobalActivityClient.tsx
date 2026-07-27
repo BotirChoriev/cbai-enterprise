@@ -24,7 +24,7 @@ import {
  * No fabricated popularity or demo feed items.
  */
 export default function GlobalActivityClient() {
-  const { language } = useTranslation();
+  const { language, t } = useTranslation();
   const copy = getAdaptiveWorkspaceCopy(language);
   const publicItems = listPublicActivity([]);
   const capability = describeDiscoveryCapability({ publicItemCount: publicItems.length });
@@ -37,6 +37,7 @@ export default function GlobalActivityClient() {
           {copy.discoveryTitle}
         </h1>
         <p className={`max-w-3xl ${cbaiTextBody}`}>{copy.discoveryDescription}</p>
+        <p className={`mt-2 max-w-3xl ${cbaiTextMuted}`}>{copy.discoveryVsSearch}</p>
       </header>
 
       <section
@@ -55,6 +56,9 @@ export default function GlobalActivityClient() {
               {copy.privacyPrivate} → {copy.privacyPublic} only after explicit confirmation.
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
+              <Link href="/search" className={`min-h-11 inline-flex items-center underline underline-offset-4 ${cbaiLinkAction}`}>
+                {t("navigation.search")}
+              </Link>
               <Link href="/my-work" className={`min-h-11 inline-flex items-center underline underline-offset-4 ${cbaiLinkAction}`}>
                 {copy.pageTitle}
               </Link>

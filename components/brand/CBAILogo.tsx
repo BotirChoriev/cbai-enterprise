@@ -119,16 +119,19 @@ export default function CBAILogo({
   return (
     <div className={`flex items-center gap-3 ${className}`} role="img" aria-label={LOGO_ACCESSIBLE_NAME}>
       <CBAIMark size={markSize} id="cbai-full" />
-      <div aria-hidden="true" className="min-w-0 space-y-0.5">
-        <p className={`${wordmarkGradient} bg-clip-text text-lg font-bold leading-none tracking-tight text-transparent sm:text-xl lg:text-[1.35rem]`}>
+      <div aria-hidden="true" className="min-w-0 space-y-0.5" suppressHydrationWarning>
+        <p
+          className={`${wordmarkGradient} bg-clip-text text-lg font-bold leading-none tracking-tight text-transparent sm:text-xl lg:text-[1.35rem]`}
+          suppressHydrationWarning
+        >
           CBAI
         </p>
         {showTagline ? (
           <>
-            <p className={`text-[9px] font-medium uppercase tracking-[0.13em] ${taglinePrimaryColor} sm:text-[10px]`}>
+            <p className={`text-[9px] font-medium uppercase tracking-[0.13em] ${taglinePrimaryColor} sm:text-[10px]`} suppressHydrationWarning>
               {LOGO_SUBTITLE_PRIMARY}
             </p>
-            <p className={`text-[9px] font-medium uppercase tracking-[0.13em] ${taglineSecondaryColor} sm:text-[10px]`}>
+            <p className={`text-[9px] font-medium uppercase tracking-[0.13em] ${taglineSecondaryColor} sm:text-[10px]`} suppressHydrationWarning>
               {LOGO_SUBTITLE_SECONDARY}
             </p>
           </>

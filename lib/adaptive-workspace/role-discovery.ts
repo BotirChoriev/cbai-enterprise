@@ -14,6 +14,7 @@ import {
   type WorkspacePrivacy,
   type WorkspaceTemplateId,
 } from "@/lib/adaptive-workspace/templates";
+import { getAdaptiveWorkspaceCopy } from "@/lib/i18n/platform-copy-adaptive-workspace";
 
 export type RoleInterpretation = {
   readonly understoodRole: WorkspaceRole;
@@ -59,6 +60,7 @@ function extractTopic(text: string): string | null {
   if (/trade|savdo|торговля/i.test(text)) return "trade";
   if (/education|ta['‘`]?lim|образован/i.test(text)) return "education";
   if (/health|sog['‘`]?liq|здоров/i.test(text)) return "health";
+  if (/chemist|kimyo|chemistry|химия/i.test(text)) return "chemistry";
   if (/research|tadqiqot|исследован/i.test(text)) return "research";
   return null;
 }
@@ -132,10 +134,11 @@ export function buildWorkspaceCreationDraft(input: {
       ? ["Official statistics office (when connected)", "Central bank publications (when connected)"]
       : ["Official national statistics (when connected)"];
 
+  const copy = getAdaptiveWorkspaceCopy(input.locale);
   const firstThreeActions = [
-    "Confirm and create the workspace",
-    "Attach required evidence sources",
-    "Set the first next action",
+    copy.firstActionConfirm,
+    copy.firstActionEvidence,
+    copy.firstActionNext,
   ];
 
   const operationalObjectDraft: OperationalObjectDraft = {

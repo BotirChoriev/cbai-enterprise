@@ -106,6 +106,8 @@ export const MY_WORK_EN = {
   continueLinksHeading: "Continue",
   onboardingHeading: "Get started",
   pageDescription: "Mission home — progress, next action, and latest work in one place.",
+  recentHeading: "Recent",
+  recentEmpty: "Profiles you open will appear here. Search a country, company, or university to begin.",
 } as const;
 
 export const SYSTEM_EN = {

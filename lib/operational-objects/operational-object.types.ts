@@ -49,6 +49,16 @@ export type OperationalObjectDomain =
 
 export type OperationalObjectPriority = "low" | "normal" | "high";
 
+/**
+ * Additive structured payload attached by the Adaptive Intelligence Workspace
+ * activation flow (Starter Work Card). Optional so every legacy record keeps
+ * working; the store already preserves extra fields on read/write.
+ */
+export type OperationalObjectActivationPayload = {
+  readonly schema: number;
+  readonly card: Record<string, unknown> | object;
+};
+
 export type OperationalObjectProvenance = {
   readonly source: "typed_command" | "voice_command" | "manual" | "existing_object";
   readonly originalText?: string;
@@ -92,6 +102,7 @@ export type OperationalObject = {
   readonly updatedAt: string;
   readonly dueAt?: string;
   readonly provenance: OperationalObjectProvenance;
+  readonly activation?: OperationalObjectActivationPayload;
 };
 
 /** Unknown fields from future schema versions — preserved on read/write without typing every key. */
@@ -125,6 +136,7 @@ export type OperationalObjectDraft = {
   locale: string;
   dueAt?: string;
   provenance: OperationalObjectProvenance;
+  activation?: OperationalObjectActivationPayload;
 };
 
 export type OperationalObjectFilter =

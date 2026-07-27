@@ -179,13 +179,14 @@ test("15. Project Dashboard consolidation: the duplicate Health panel is gone, i
   assert.match(dashboard, /Research question/);
 });
 
-test("16. Intelligence Cabinet is discoverable — the Sidebar/mobile nav disclosure is no longer just a bare \"More\"", () => {
+test("16. Advanced disclosure is discoverable — not a bare \"More\" label", () => {
   for (const dict of [en, uz, ru, tr]) {
+    assert.ok(dict.navigation.advanced.length > 0);
+    assert.notEqual(dict.navigation.advanced, dict.navigation.more);
     assert.ok(dict.navigation.intelligenceCabinet.length > 0);
-    assert.notEqual(dict.navigation.intelligenceCabinet, dict.navigation.more);
   }
-  assert.match(read("components/operating/OperatingNavigator.tsx"), /navigation\.intelligenceCabinet/);
-  assert.match(read("components/layout/MobileNavDrawer.tsx"), /navigation\.intelligenceCabinet/);
+  assert.match(read("components/operating/OperatingNavigator.tsx"), /navigation\.advanced/);
+  assert.match(read("components/layout/MobileNavDrawer.tsx"), /navigation\.advanced/);
 });
 
 test("17. Homepage identity: Spatial World Intelligence replaces marketing homepage — Operator on first screen", () => {
@@ -193,7 +194,9 @@ test("17. Homepage identity: Spatial World Intelligence replaces marketing homep
   assert.match(home, /SpatialWorldIntelligenceHome/);
   const spatial = read("components/spatial-world/SpatialWorldIntelligenceHome.tsx");
   assert.match(spatial, /OperatorOrb/);
-  assert.match(spatial, /vo\.openDock/);
+  assert.match(spatial, /ActivationExperience/);
+  const activation = read("components/activation/ActivationExperience.tsx");
+  assert.match(activation, /vo\.openDock/);
 });
 
 test("21. Intelligence Canvas: Operator and operating objects share one shell — no marketing divider", () => {

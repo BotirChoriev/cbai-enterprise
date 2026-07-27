@@ -229,6 +229,22 @@ test("19. Hydration stability — engine workspace uses client-only bridge", () 
   assert.match(provider, /useEffect/);
 });
 
+test("19b. Escapable workspace sheet — dialog semantics, X/Back, Escape, focus trap and restore", () => {
+  const provider = readFileSync("components/forward-deployed/EngineWorkspaceProvider.tsx", "utf8");
+  assert.match(provider, /role="dialog"/);
+  assert.match(provider, /aria-modal="true"/);
+  assert.match(provider, /aria-labelledby="engine-workspace-title"/);
+  assert.match(provider, /event\.key === "Escape"/);
+  assert.match(provider, /forwardDeployed\.backToPage/);
+  assert.match(provider, /forwardDeployed\.closeWorkspaceAria/);
+  assert.match(provider, /forwardDeployed\.closeWorkspace/);
+  // Sticky header keeps the exit visible while scrolling.
+  assert.match(provider, /sticky top-0/);
+  // Focus trap + restoration to the opener.
+  assert.match(provider, /event\.key !== "Tab"/);
+  assert.match(provider, /previous\?\.focus\(\)/);
+});
+
 test("20. Source vs UI copy — official source note in evidence requirements component", () => {
   const panel = readFileSync("components/forward-deployed/EvidenceRequirements.tsx", "utf8");
   assert.match(panel, /officialSourceNote/);

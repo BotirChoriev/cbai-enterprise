@@ -26,7 +26,9 @@ export default function ResearchHero({ query = "" }: ResearchHeroProps) {
       <div className="space-y-6">
         <div className="space-y-3">
           <p className={cbaiSectionEyebrow}>{t("zeroLearningCurve.researchHeroEyebrow")}</p>
-          <h1 className="cbai-display text-3xl text-zinc-50 sm:text-4xl">{researchHome.title}</h1>
+          {/* The page title <h1> is rendered once by the shared page header; this hero
+              statement is the section heading below it. */}
+          <h2 className="cbai-display text-3xl text-zinc-50 sm:text-4xl">{researchHome.title}</h2>
           <p className="max-w-2xl text-base leading-relaxed text-zinc-400 sm:text-lg">
             {researchHome.subheadline}
           </p>

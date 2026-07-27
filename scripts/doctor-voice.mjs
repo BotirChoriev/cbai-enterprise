@@ -157,6 +157,27 @@ async function main() {
     fail("Broker port is not listening — run npm run dev:voice.");
   }
 
+  const healthOwned = await probeHealthyCbaiBroker(brokerPort, "127.0.0.1");
+  console.log(
+    `  Port ownership (8788):    ${
+      !brokerListening
+        ? "free"
+        : healthOwned.healthy
+          ? `CBAI broker (${healthOwned.via})`
+          : "foreign or unhealthy listener — identify with: lsof -nP -iTCP:8788 -sTCP:LISTEN"
+    }`,
+  );
+  if (brokerListening && !healthOwned.healthy) {
+    fail(
+      "Port 8788 is occupied by a non-CBAI listener. Stop that PID yourself (never killall), or set VOICE_BROKER_PORT.",
+    );
+  }
+
+  const envLocalBroker = readEnvLocalBrokerUrl();
+  console.log(`  .env.local broker URL:    ${envLocalBroker ?? "(absent)"}`);
+  console.log(`  process.env broker URL:   ${processBroker ?? "(absent)"}`);
+  console.log(`  Configuration class:      ${clientMode}`);
+
   const secureContextEligible =
     APP_ORIGIN.startsWith("https://") || APP_ORIGIN.includes("localhost") || APP_ORIGIN.includes("127.0.0.1");
   console.log(`  Secure context eligible:  ${secureContextEligible ? "yes" : "no"}`);
@@ -172,10 +193,22 @@ async function main() {
     for (const reason of failures) {
       console.error(`  - ${reason}`);
     }
+    console.error(
+      `\n  Next action: ${
+        !keyConfigured
+          ? "copy .dev.vars.example → .dev.vars and set OPENAI_API_KEY (server-only)."
+          : !brokerListening
+            ? "run npm run dev:voice (reuses a healthy broker; will not duplicate)."
+            : !dualOrigins.localhostOk || !dualOrigins.loopbackOk
+              ? "add both http://localhost:3000 and http://127.0.0.1:3000 to VOICE_ALLOWED_ORIGINS."
+              : "open http://localhost:3000 in Safari and use Voice Operator mic."
+      }`,
+    );
     process.exit(1);
   }
 
   console.log("\nVoice doctor: PASS");
+  console.log("  Next action: open http://localhost:3000 — Voice Operator mic should reach Connecting → Listening.");
   if (!keyConfigured) {
     console.log("  Audible Realtime cannot be verified without a real server-side OPENAI_API_KEY.");
   }

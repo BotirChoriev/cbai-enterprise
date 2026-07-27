@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import SimpleEmptyWorkspace from "@/components/workspace/SimpleEmptyWorkspace";
+import GlobalUpdatesClient from "@/components/notifications/GlobalUpdatesClient";
 
-export const metadata: Metadata = { title: "Notifications" };
+export const metadata: Metadata = { title: "Global updates and watches" };
 
 export default function NotificationsPage() {
-  return <SimpleEmptyWorkspace titleKey="authCollab.notificationsTitle" />;
+  return <GlobalUpdatesClient />;
 }

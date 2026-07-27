@@ -133,6 +133,16 @@ export const RESEARCH_HOME_EN = {
     "Live experiments and lab data",
     "AI-generated research summaries",
   ],
+  intakeEyebrow: "Research intake",
+  intakeTitle: "Start from a question, voice, or document",
+  intakeBody:
+    "Typed questions, Voice Operator descriptions, and PDF intake open editable drafts. CBAI never claims perfect OCR or invents measurements.",
+  intakeTyped: "Type a research question or Smart Idea on the canvas",
+  intakeVoice: "Describe the problem to Voice Operator — opens a confirmable draft",
+  intakePdf: "Upload a PDF via Scientific Documents for local interpretation",
+  intakeHonest: "Diagrams and formulas stay editable observations until you confirm",
+  intakeOpenDocuments: "Open scientific documents",
+  intakeOpenMyWork: "Create linked work in My Work",
 } as const;
 
 export const GRAPH_PLATFORM_EN = {
@@ -239,6 +249,8 @@ export const RESEARCH_CATALOG_EN = {
   catalogDescription:
     "Structured read-only catalog with detail pages for each research topic. No live databases, publications, or researcher profiles are connected.",
   filterLabel: "Filter research topics",
+  filterByDomain: "Filter by domain",
+  allDomains: "All domains",
   filterPlaceholder: "Filter by topic, method, domain, or evidence type...",
   showingCount: "Showing {filtered} of {total} research topics",
   noMatch: "No research topics match your filter.",
@@ -370,6 +382,16 @@ export const ENTITY_UI_EN = {
   officialInformationAvailable: "Official information available.",
   officialInformationNotAvailableYet: "Official information is not available yet.",
   foundedLabel: "Founded",
+  relatedResearchEmpty:
+    "No research topics share subject matter with {industry} in the current catalog.",
+  relatedResearchNote:
+    "Topics related by subject matter to {name}’s {industry} industry classification — not a sponsorship, funding, or institutional claim.",
+  relatedCompaniesMetric: "Related companies (subject-matter match)",
+  recordsUnit: "records",
+  entityTypeCountry: "Country",
+  entityTypeCompany: "Company",
+  entityTypeUniversity: "University",
+  entityTypeResearchTopic: "Research topic",
 } as const;
 
 export const INDICATOR_EXPLORER_EN = {

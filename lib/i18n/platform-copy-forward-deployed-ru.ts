@@ -2,6 +2,10 @@
 
 export const FORWARD_DEPLOYED_RU = {
   workspaceTitle: "Операционное рабочее пространство",
+  closeWorkspace: "Закрыть",
+  closeWorkspaceAria: "Закрыть операционное рабочее пространство",
+  backToPage: "Назад",
+  backToEvidence: "К доказательствам",
   objective: "Цель",
   context: "Контекст",
   understanding: "Что понял CBAI",

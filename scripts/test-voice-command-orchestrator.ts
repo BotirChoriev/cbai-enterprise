@@ -32,19 +32,20 @@ function fakeRouter() {
   };
 }
 
-test("1. Uzbek Men kimyogarman → Research + chemistry filter", () => {
+test("1. Uzbek Men kimyogarman → My Work chemist discovery", () => {
   const resolution = resolveVoiceCommandFromText("Men kimyogarman.", "uz", "/");
   assert.equal(resolution.ok, true);
-  assert.equal(resolution.action?.actionId, "navigate.research");
-  assert.ok(resolution.action?.target.href?.startsWith("/research"));
-  assert.match(resolution.action?.target.href ?? "", /q=chemistry/);
+  assert.equal(resolution.action?.actionId, "navigate.my_work");
+  assert.match(resolution.action?.target.href ?? "", /\/my-work\?discover=1&role=chemist/);
   assert.equal(resolution.sessionContextPatch?.domainId, "chemistry");
 });
 
-test("2. Kimyo bo'limiga o't opens same canonical target", () => {
-  const a = resolveVoiceCommandFromText("Men kimyogarman", "uz");
-  const b = resolveVoiceCommandFromText("Kimyo bo'limiga o't", "uz");
-  assert.equal(a.action?.target.href, b.action?.target.href);
+test("2. Kimyo bo'limiga o't opens Research — distinct from role discovery", () => {
+  const role = resolveVoiceCommandFromText("Men kimyogarman", "uz");
+  const section = resolveVoiceCommandFromText("Kimyo bo'limiga o't", "uz");
+  assert.match(role.action?.target.href ?? "", /\/my-work/);
+  assert.match(section.action?.target.href ?? "", /\/research/);
+  assert.notEqual(role.action?.target.href, section.action?.target.href);
 });
 
 test("3. EN/RU/TR chemistry equivalents", () => {
@@ -52,15 +53,16 @@ test("3. EN/RU/TR chemistry equivalents", () => {
     ["I am a chemist", "en"],
     ["Я химик", "ru"],
     ["Ben kimyagerim", "tr"],
-    ["open chemistry research", "en"],
   ] as const) {
     const domain = resolvePlatformDomain(text);
     assert.ok(domain, text);
     assert.equal(domain?.domain.id, "chemistry");
     const res = resolveVoiceCommandFromText(text, locale);
     assert.equal(res.ok, true, text);
-    assert.ok(res.action?.target.href?.includes("/research"), text);
+    assert.ok(res.action?.target.href?.includes("/my-work"), text);
   }
+  const researchOpen = resolveVoiceCommandFromText("open chemistry research", "en");
+  assert.ok(researchOpen.action?.target.href?.includes("/research"));
 });
 
 test("4. Mening ishlarimni och → My Work", () => {
@@ -194,9 +196,14 @@ test("17. EN/UZ/RU/TR dictionary completeness for voiceCommand", () => {
 
 test("18. Mobile voice dock avoids full-bleed overflow classes", () => {
   const dock = readFileSync("components/voice-operator/VoiceOperatorDock.tsx", "utf8");
-  assert.match(dock, /max-w-\[min\(18rem/);
+  const css = readFileSync("app/globals.css", "utf8");
+  assert.match(dock, /cbai-voice-dock-open/);
   assert.match(dock, /OperatorActionStatus/);
   assert.match(dock, /OperatorCommandClarifyCard/);
+  assert.doesNotMatch(dock, /w-screen|100vw/);
+  assert.match(css, /\.cbai-voice-dock-open/);
+  assert.match(css, /max-height:\s*min\(/);
+  assert.match(css, /safe-area-inset-right/);
 });
 
 test("19. Orchestrator uses platform-actions — not a competing architecture", () => {

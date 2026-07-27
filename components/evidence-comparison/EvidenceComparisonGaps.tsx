@@ -1,10 +1,14 @@
+"use client";
+
 import type { EvidenceComparisonRecord } from "@/lib/evidence-comparison";
+import { useTranslation } from "@/lib/i18n/use-translation";
 
 type EvidenceComparisonGapsProps = {
   comparison: EvidenceComparisonRecord;
 };
 
 export default function EvidenceComparisonGaps({ comparison }: EvidenceComparisonGapsProps) {
+  const { t } = useTranslation();
   const leftOnlyGaps = comparison.leftEvidenceGaps.filter(
     (id) => !comparison.rightEvidenceGaps.includes(id),
   );
@@ -20,44 +24,48 @@ export default function EvidenceComparisonGaps({ comparison }: EvidenceCompariso
       <div>
         <h4
           id="comparison-gaps-heading"
-          className="text-sm font-semibold uppercase tracking-wider text-zinc-500"
+          className="text-sm font-semibold uppercase tracking-wider text-[var(--cbai-text-muted)]"
         >
-          Missing information differences
+          {t("evidenceComparisonUi.gapsHeading")}
         </h4>
-        <p className="mt-1 text-sm text-zinc-500">
-          Where missing information differs between profiles — descriptive only.
-        </p>
+        <p className="mt-1 text-sm text-[var(--cbai-text-muted)]">{t("evidenceComparisonUi.gapsDescription")}</p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-5 py-4">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-            Both profiles ({sharedGaps.length})
+        <div className="rounded-xl border border-[var(--cbai-border-default)] bg-[var(--cbai-surface-muted)] px-5 py-4">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--cbai-text-muted)]">
+            {t("evidenceComparisonUi.bothProfiles", { count: String(sharedGaps.length) })}
           </p>
-          <p className="mt-2 text-xs text-zinc-500">
+          <p className="mt-2 text-xs text-[var(--cbai-text-muted)]">
             {sharedGaps.length === 0
-              ? "No shared missing information."
-              : `${sharedGaps.length} topic(s) missing on both profiles.`}
+              ? t("evidenceComparisonUi.noSharedMissing")
+              : t("evidenceComparisonUi.sharedMissingCount", { count: String(sharedGaps.length) })}
           </p>
         </div>
-        <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-5 py-4">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-            {comparison.leftEntityLabel} only ({leftOnlyGaps.length})
+        <div className="rounded-xl border border-[var(--cbai-border-default)] bg-[var(--cbai-surface-muted)] px-5 py-4">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--cbai-text-muted)]">
+            {t("evidenceComparisonUi.profileOnly", {
+              entity: comparison.leftEntityLabel,
+              count: String(leftOnlyGaps.length),
+            })}
           </p>
-          <p className="mt-2 text-xs text-zinc-500">
+          <p className="mt-2 text-xs text-[var(--cbai-text-muted)]">
             {leftOnlyGaps.length === 0
-              ? "Nothing missing on this profile only."
-              : `${leftOnlyGaps.length} topic(s) missing on this profile only.`}
+              ? t("evidenceComparisonUi.nothingMissingOnly")
+              : t("evidenceComparisonUi.missingOnlyCount", { count: String(leftOnlyGaps.length) })}
           </p>
         </div>
-        <div className="rounded-xl border border-zinc-800 bg-zinc-950 px-5 py-4">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-            {comparison.rightEntityLabel} only ({rightOnlyGaps.length})
+        <div className="rounded-xl border border-[var(--cbai-border-default)] bg-[var(--cbai-surface-muted)] px-5 py-4">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--cbai-text-muted)]">
+            {t("evidenceComparisonUi.profileOnly", {
+              entity: comparison.rightEntityLabel,
+              count: String(rightOnlyGaps.length),
+            })}
           </p>
-          <p className="mt-2 text-xs text-zinc-500">
+          <p className="mt-2 text-xs text-[var(--cbai-text-muted)]">
             {rightOnlyGaps.length === 0
-              ? "Nothing missing on this profile only."
-              : `${rightOnlyGaps.length} topic(s) missing on this profile only.`}
+              ? t("evidenceComparisonUi.nothingMissingOnly")
+              : t("evidenceComparisonUi.missingOnlyCount", { count: String(rightOnlyGaps.length) })}
           </p>
         </div>
       </div>

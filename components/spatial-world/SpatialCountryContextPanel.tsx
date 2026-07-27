@@ -4,6 +4,7 @@ import Link from "next/link";
 import StatusBadge from "@/components/shared/StatusBadge";
 import type { GlobeCountryPoint } from "@/lib/spatial-world/globe-geography";
 import type { ProductStatus } from "@/lib/product-status";
+import { FreshnessBadge, LastVerified, SourceBadge } from "@/components/provenance/SourceProvenance";
 
 type SpatialCountryContextPanelProps = {
   point: GlobeCountryPoint;
@@ -47,6 +48,13 @@ export default function SpatialCountryContextPanel({
       <div className="mt-3">
         <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-slate-400">{labels.dataAvailability}</p>
         <StatusBadge status={status} className="mt-1.5" />
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <SourceBadge kind="official_source" />
+          <FreshnessBadge status={status === "live" || status === "partial" ? "verification_required" : "unavailable"} />
+        </div>
+        <div className="mt-2">
+          <LastVerified value={null} />
+        </div>
       </div>
       <Link
         href={point.href}

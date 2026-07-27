@@ -24,6 +24,7 @@ const ENTRY = (
 export const VOICE_COMMAND_REGISTRY: Readonly<Partial<Record<PlatformActionId, VoiceCommandRegistryEntry>>> = {
   "navigate.home": ENTRY("navigate.home", "navigate", "safe_reversible", "voiceCommand.announcedHome"),
   "navigate.my_work": ENTRY("navigate.my_work", "navigate", "safe_reversible", "voiceCommand.announcedMyWork"),
+  "navigate.problems": ENTRY("navigate.problems", "navigate", "safe_reversible", "voiceCommand.announcedMyWork"),
   "navigate.search": ENTRY("navigate.search", "search", "safe_reversible", "voiceCommand.announcedSearch"),
   "navigate.countries": ENTRY("navigate.countries", "navigate", "safe_reversible", "voiceCommand.announcedCountries"),
   "navigate.companies": ENTRY("navigate.companies", "navigate", "safe_reversible", "voiceCommand.announcedCompanies"),
@@ -40,6 +41,7 @@ export const VOICE_COMMAND_REGISTRY: Readonly<Partial<Record<PlatformActionId, V
   "navigate.about": ENTRY("navigate.about", "navigate", "safe_reversible", "voiceCommand.announcedAbout"),
   "navigate.back": ENTRY("navigate.back", "local_control", "safe_reversible", "platformAction.successBack"),
   "navigate.workspace": ENTRY("navigate.workspace", "navigate", "safe_reversible", "voiceCommand.announcedWorkspace"),
+  "navigate.rooms": ENTRY("navigate.rooms", "navigate", "safe_reversible", "voiceCommand.announcedMyWork"),
   "navigate.scientific_documents": ENTRY(
     "navigate.scientific_documents",
     "navigate",
@@ -68,6 +70,8 @@ export const VOICE_COMMAND_REGISTRY: Readonly<Partial<Record<PlatformActionId, V
   "mission.resume": ENTRY("mission.resume", "resume_mission", "safe_reversible", "voiceCommand.announcedMyWork"),
   "project.open": ENTRY("project.open", "open_project", "safe_reversible", "voiceCommand.announcedMyWork"),
   "operational_object.compose": ENTRY("operational_object.compose", "create_draft_work", "needs_confirmation", "voiceCommand.announcedDraft"),
+  "problem.compose": ENTRY("problem.compose", "create_draft_work", "needs_confirmation", "voiceCommand.announcedDraft"),
+  "problem.read_summary": ENTRY("problem.read_summary", "navigate", "safe_reversible", "voiceCommand.announcedMyWork"),
   "operational_object.confirm_create": ENTRY("operational_object.confirm_create", "create_draft_work", "needs_confirmation", "platformAction.confirmationRequired"),
   "project.compose": ENTRY("project.compose", "create_draft_work", "needs_confirmation", "voiceCommand.announcedDraft"),
   "mission.compose": ENTRY("mission.compose", "create_draft_work", "needs_confirmation", "voiceCommand.announcedDraft"),

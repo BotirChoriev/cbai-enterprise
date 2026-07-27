@@ -35,6 +35,7 @@ export type VoiceCommandExecutorDeps = {
   ) => void;
   readonly setGuidance?: (guidance: PlatformGuidance | null) => void;
   readonly setTranscriptVisible?: (visible: boolean) => void;
+  readonly readProblemSummary?: (problemId?: string) => string | null;
   readonly t: (path: string, vars?: Record<string, string>) => string;
   readonly onStatus?: (status: VoiceOperatorActionStatus, detail?: string) => void;
   readonly onClarify?: (options: readonly VoiceCommandClarifyOption[], question: string) => void;
@@ -185,6 +186,7 @@ export function executeVoiceCommand(
     onLocalControl: deps.onLocalControl,
     setGuidance: deps.setGuidance,
     setTranscriptVisible: deps.setTranscriptVisible,
+    readProblemSummary: deps.readProblemSummary,
     t: deps.t,
   });
 
@@ -192,8 +194,8 @@ export function executeVoiceCommand(
 
   const announcement =
     resolution.spokenMessage ??
-    (resolution.messageKey ? deps.t(resolution.messageKey, resolution.messageVars) : null) ??
-    outcome.message;
+    outcome.message ??
+    (resolution.messageKey ? deps.t(resolution.messageKey, resolution.messageVars) : null);
 
   if (outcome.handled && resolution.action?.actionId) {
     patchVoiceSessionContext({

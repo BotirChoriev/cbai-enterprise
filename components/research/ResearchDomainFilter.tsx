@@ -1,5 +1,9 @@
+"use client";
+
 import type { ResearchDomainId } from "@/lib/research/research-topics";
 import { RESEARCH_DOMAINS } from "@/lib/research/research-topics";
+import { useTranslation } from "@/lib/i18n/use-translation";
+import { localizeResearchDomainLabel } from "@/lib/i18n/entity-domain-labels";
 
 type ResearchDomainFilterProps = {
   selectedDomain: ResearchDomainId | "all";
@@ -12,12 +16,13 @@ export default function ResearchDomainFilter({
   onSelectDomain,
   topicCounts,
 }: ResearchDomainFilterProps) {
+  const { t, language } = useTranslation();
   const totalCount = Object.values(topicCounts).reduce((sum, count) => sum + count, 0);
 
   return (
     <div className="space-y-3">
-      <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-teal-400/90">
-        Filter by domain
+      <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-[var(--cbai-accent-primary)]">
+        {t("researchCatalog.filterByDomain")}
       </p>
       <ul className="flex flex-wrap gap-2">
         <li>
@@ -26,12 +31,12 @@ export default function ResearchDomainFilter({
             onClick={() => onSelectDomain("all")}
             className={`min-h-9 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${
               selectedDomain === "all"
-                ? "border-teal-500/40 bg-teal-500/10 text-teal-300"
-                : "border-zinc-800 bg-slate-950/60 text-zinc-400 hover:border-teal-500/20 hover:text-zinc-200"
+                ? "border-[var(--cbai-border-active)] bg-[var(--cbai-accent-subtle)] text-[var(--cbai-accent-primary)]"
+                : "border-[var(--cbai-border-default)] bg-[var(--cbai-surface-muted)] text-[var(--cbai-text-muted)] hover:border-[var(--cbai-border-active)] hover:text-[var(--cbai-text-primary)]"
             }`}
           >
-            All domains
-            <span className="ml-1.5 text-xs text-zinc-500">({totalCount})</span>
+            {t("researchCatalog.allDomains")}
+            <span className="ml-1.5 text-xs text-[var(--cbai-text-muted)]">({totalCount})</span>
           </button>
         </li>
         {RESEARCH_DOMAINS.map((domain) => (
@@ -41,12 +46,14 @@ export default function ResearchDomainFilter({
               onClick={() => onSelectDomain(domain.domainId)}
               className={`min-h-9 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${
                 selectedDomain === domain.domainId
-                  ? "border-teal-500/40 bg-teal-500/10 text-teal-300"
-                  : "border-zinc-800 bg-slate-950/60 text-zinc-400 hover:border-teal-500/20 hover:text-zinc-200"
+                  ? "border-[var(--cbai-border-active)] bg-[var(--cbai-accent-subtle)] text-[var(--cbai-accent-primary)]"
+                  : "border-[var(--cbai-border-default)] bg-[var(--cbai-surface-muted)] text-[var(--cbai-text-muted)] hover:border-[var(--cbai-border-active)] hover:text-[var(--cbai-text-primary)]"
               }`}
             >
-              {domain.domainName}
-              <span className="ml-1.5 text-xs text-zinc-500">({topicCounts[domain.domainId]})</span>
+              {localizeResearchDomainLabel(domain.domainName, language)}
+              <span className="ml-1.5 text-xs text-[var(--cbai-text-muted)]">
+                ({topicCounts[domain.domainId] ?? 0})
+              </span>
             </button>
           </li>
         ))}

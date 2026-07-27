@@ -137,6 +137,16 @@ export const RESEARCH_HOME_RU = {
     "Живые эксперименты и лабораторные данные",
     "Исследовательские сводки, сгенерированные ИИ",
   ],
+  intakeEyebrow: "Приём исследования",
+  intakeTitle: "Начните с вопроса, голоса или документа",
+  intakeBody:
+    "Текстовые вопросы, описания Voice Operator и PDF-приём открывают редактируемые черновики. CBAI не заявляет идеальный OCR и не выдумывает измерения.",
+  intakeTyped: "Введите исследовательский вопрос или Smart Idea на холсте",
+  intakeVoice: "Опишите задачу Voice Operator — откроется подтверждаемый черновик",
+  intakePdf: "Загрузите PDF через Научные документы для локальной интерпретации",
+  intakeHonest: "Схемы и формулы остаются редактируемыми наблюдениями до вашего подтверждения",
+  intakeOpenDocuments: "Открыть научные документы",
+  intakeOpenMyWork: "Создать связанную работу в Моей работе",
 } as const;
 
 export const GRAPH_PLATFORM_RU = {
@@ -249,6 +259,8 @@ export const RESEARCH_CATALOG_RU = {
   catalogDescription:
     "Структурированный каталог только для чтения с детальными страницами для каждой темы. Живые базы данных, публикации или профили исследователей не подключены.",
   filterLabel: "Фильтр исследовательских тем",
+  filterByDomain: "Фильтр по области",
+  allDomains: "Все области",
   filterPlaceholder: "Фильтр по теме, методу, области или типу доказательств...",
   showingCount: "Показано {filtered} из {total} исследовательских тем",
   noMatch: "Ни одна тема не соответствует фильтру.",
@@ -374,6 +386,16 @@ export const ENTITY_UI_RU = {
   officialInformationAvailable: "Официальная информация доступна.",
   officialInformationNotAvailableYet: "Официальная информация пока недоступна.",
   foundedLabel: "Основана",
+  relatedResearchEmpty:
+    "В текущем каталоге нет исследовательских тем, совпадающих по предмету с «{industry}».",
+  relatedResearchNote:
+    "Темы, связанные по предмету с отраслевой классификацией {industry} компании {name} — не спонсорство, финансирование или институциональная связь.",
+  relatedCompaniesMetric: "Связанные компании (совпадение по предмету)",
+  recordsUnit: "записей",
+  entityTypeCountry: "Страна",
+  entityTypeCompany: "Компания",
+  entityTypeUniversity: "Университет",
+  entityTypeResearchTopic: "Исследовательская тема",
 } as const;
 
 export const INDICATOR_EXPLORER_RU = {

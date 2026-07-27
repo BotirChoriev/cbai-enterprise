@@ -32,6 +32,7 @@ export const SYNC_TABLES: readonly SyncTableName[] = [
   "bookmarks",
   "reports",
   "activity_events",
+  "problem_snapshots",
 ];
 
 export type CloudWriteResult = { ok: true } | { ok: false; error: string };

@@ -9,6 +9,7 @@ import {
   type SearchResultEntry,
 } from "@/lib/search-intelligence-entry";
 import { profileSectionHref } from "@/components/shared/entity-profile-path";
+import { getEntityDetailHref } from "@/lib/global-search";
 import type { Entity } from "@/lib/entity/entity.types";
 import TopicResultCard from "@/components/search/gateway/SearchResultCard";
 import AddToMissionButton from "@/components/mission/MissionOperatingActions";
@@ -61,10 +62,39 @@ export default function SearchGatewayResults({ response, query }: SearchGatewayR
     return (
       <EmptyState
         variant="section"
-        message={t("search.noResults", { query: response.query })}
+        message={t("search.notInRegistry", { query: response.query })}
         action={
           <>
             <p className="text-xs text-zinc-500">{t("search.noResultsHint")}</p>
+            {response.closestMatches.length > 0 ? (
+              <div className="mt-3 space-y-2 text-left">
+                <p className="text-xs font-medium text-zinc-400">{t("search.closestMatchesHeading")}</p>
+                <ul className="space-y-1.5">
+                  {response.closestMatches.map((match) => (
+                    <li key={match.entity.id} className="rounded-md border border-zinc-800/80 px-3 py-2 text-sm">
+                      <Link href={getEntityDetailHref(match.entity)} className={cbaiLinkMuted}>
+                        {match.entity.name}
+                      </Link>
+                      <p className="mt-0.5 text-[11px] text-zinc-600">{t("search.closestMatchNote")}</p>
+                      {match.matchReasons[0] ? (
+                        <p className="text-[11px] text-zinc-500">
+                          {t("search.matchReasonLabel")}: {match.matchReasons[0].snippet}
+                        </p>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Link href="/research" className={cbaiProminentAction}>
+                {t("search.createResearchRequest")}
+              </Link>
+              <Link href="/evidence" className={cbaiLinkMuted}>
+                {t("search.connectSourceAction")}
+              </Link>
+            </div>
+            <p className="mt-4 text-[11px] text-zinc-600">{t("search.examplesAreNotResults")}</p>
             <SearchExamples />
           </>
         }

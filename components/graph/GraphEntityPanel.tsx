@@ -199,7 +199,7 @@ function EntityDetails({
 
       {route ? (
         <Link
-          href={`${route}?id=${node.entityId}`}
+          href={`${route}?${node.type}=${encodeURIComponent(node.entityId)}`}
           className="block w-full rounded-lg border border-zinc-700 bg-zinc-900 py-2 text-center text-xs font-medium text-zinc-300 transition-colors hover:border-teal-500/40 hover:text-teal-300"
         >
           {t("graphUi.openModule", { type: typeLabel })}

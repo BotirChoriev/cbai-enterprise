@@ -20,12 +20,16 @@ function readSource(relativePath: string): string {
 }
 
 test("1. Dashboard layout implements spatial operating model", () => {
+  // DD-003: LivingContextRibbon supersedes GlobalMissionContextBar for mission continuity.
   const layout = readSource("app/(dashboard)/layout.tsx");
-  assert.match(layout, /GlobalMissionContextBar/);
+  assert.match(layout, /LivingContextRibbon/);
+  assert.doesNotMatch(layout, /GlobalMissionContextBar/);
   assert.match(layout, /OperatingContextColumn/);
   assert.match(layout, /ContinuityTimelineStrip/);
   assert.match(layout, /cbai-operating-main/);
   assert.match(layout, /cbai-space-enter/);
+  // Ribbon is suppressed on Spatial home (globe owns the first viewport).
+  assert.match(layout, /!isHome\s*\?\s*<LivingContextRibbon/);
 });
 
 test("2. Sidebar uses Operating Navigator with live state", () => {
@@ -51,8 +55,20 @@ test("4. Living context rail supersedes canvas context layer", () => {
 
 test("5. Operating page shell defers mission continuity to layout ribbon", () => {
   const shell = readSource("components/shared/OperatingPageShell.tsx");
+  const ribbon = readSource("components/operating/LivingContextRibbon.tsx");
+  const layout = readSource("app/(dashboard)/layout.tsx");
   assert.doesNotMatch(shell, /MissionOperatingContextBar/);
-  assert.match(readSource("app/(dashboard)/layout.tsx"), /LivingContextRibbon/);
+  assert.match(layout, /LivingContextRibbon/);
+  // Living context presents mission/object context + resume action; system labels via t().
+  assert.match(ribbon, /operatingContext\.missionContext/);
+  assert.match(ribbon, /mission\?\.problem/);
+  assert.match(ribbon, /firstAction\.href/);
+  assert.match(ribbon, /useTranslation/);
+  // User-entered mission problem is rendered as raw text, not retranslated.
+  assert.doesNotMatch(ribbon, /t\(mission\.problem\)/);
+  // No duplicate obsolete mission bars in the ribbon.
+  assert.doesNotMatch(ribbon, /GlobalMissionContextBar/);
+  assert.doesNotMatch(ribbon, /MissionOperatingContextBar/);
 });
 
 test("6. Capability Galaxy wired in My Work", () => {

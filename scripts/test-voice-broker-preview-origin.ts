@@ -16,6 +16,19 @@ test("resolveVoiceBrokerUrl keeps loopback doctor broker absolute", () => {
   assert.equal(url, "http://127.0.0.1:8788/api/voice");
 });
 
+test("resolveVoiceBrokerUrl ignores a stray loopback broker URL on deployed HTTPS", () => {
+  // Regression: .env.local's `NEXT_PUBLIC_VOICE_BROKER_URL=http://127.0.0.1:8788/api/voice`
+  // was baked into a Preview build and forced the browser to fetch an http loopback
+  // from an https page (mixed content → TypeError → "temporarily unavailable").
+  const preview = "https://preview-spatial-world-intell.cbai-enterprise.pages.dev";
+  assert.equal(resolveVoiceBrokerUrl("http://127.0.0.1:8788/api/voice", preview), `${preview}/api/voice`);
+  assert.equal(resolveVoiceBrokerUrl("http://localhost:8788/api/voice", preview), `${preview}/api/voice`);
+  assert.equal(
+    resolveVoiceBrokerUrl("http://127.0.0.1:8788/api/voice", "https://checkbalanceai.global"),
+    "https://checkbalanceai.global/api/voice",
+  );
+});
+
 test("resolveVoiceBrokerUrl forces same-origin /api/voice on Pages Preview hosts", () => {
   const page = "https://d0fec898.cbai-enterprise.pages.dev";
   const configured = "https://preview-voice-research-integ.cbai-enterprise.pages.dev/api/voice";
@@ -27,9 +40,17 @@ test("resolveVoiceBrokerUrl keeps same-origin configured path", () => {
   assert.equal(resolveVoiceBrokerUrl(`${page}/api/voice`, page), `${page}/api/voice`);
 });
 
-test("resolveVoiceBrokerUrl returns null when unset", () => {
-  assert.equal(resolveVoiceBrokerUrl("", "https://preview-voice-research-integ.cbai-enterprise.pages.dev"), null);
-  assert.equal(resolveVoiceBrokerUrl(null, "https://example.com"), null);
+test("resolveVoiceBrokerUrl defaults to same-origin on deployed HTTPS when unset", () => {
+  const preview = "https://preview-spatial-world-intell.cbai-enterprise.pages.dev";
+  assert.equal(resolveVoiceBrokerUrl("", preview), `${preview}/api/voice`);
+  assert.equal(resolveVoiceBrokerUrl(null, preview), `${preview}/api/voice`);
+  assert.equal(resolveVoiceBrokerUrl(null, "https://checkbalanceai.global"), "https://checkbalanceai.global/api/voice");
+});
+
+test("resolveVoiceBrokerUrl stays unset on localhost without explicit config", () => {
+  assert.equal(resolveVoiceBrokerUrl(null, "http://localhost:3000"), null);
+  assert.equal(resolveVoiceBrokerUrl("", "http://127.0.0.1:3000"), null);
+  assert.equal(resolveVoiceBrokerUrl(null, null), null);
 });
 
 test("isOriginAllowed supports exact and *.cbai-enterprise.pages.dev wildcard", () => {

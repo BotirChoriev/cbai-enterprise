@@ -35,11 +35,30 @@ export default function MentalModelStrip() {
     ? t("experienceEngineering.beginMission")
     : model.why;
 
-  const unfinishedText = model.unfinished === "flow-complete"
-    ? t("experienceEngineering.flowComplete")
-    : model.unfinished === "no-mission"
-      ? t("experienceEngineering.noMission")
-      : model.unfinished;
+  const happeningText = model.happeningParts.length > 0
+    ? model.happeningParts
+        .map((part) => t(`experienceEngineering.${part.key}`, part.params ? { ...part.params } : undefined))
+        .join(" · ")
+    : model.happening;
+
+  const unfinishedText = model.unfinishedStage
+    ? `${t(`experienceEngineering.${model.unfinishedStage.labelKey}`)}: ${
+        model.unfinishedStage.detailKey
+          ? t(
+              `experienceEngineering.${model.unfinishedStage.detailKey}`,
+              model.unfinishedStage.detailParams ? { ...model.unfinishedStage.detailParams } : undefined,
+            )
+          : model.unfinishedStage.detailText
+      }`
+    : model.unfinished === "flow-complete"
+      ? t("experienceEngineering.flowComplete")
+      : model.unfinished === "no-mission"
+        ? t("experienceEngineering.noMission")
+        : model.unfinished;
+
+  const nextLabelText = model.nextLabelKey
+    ? t(`experienceEngineering.${model.nextLabelKey}`)
+    : model.nextLabel;
 
   return (
     <section
@@ -58,7 +77,7 @@ export default function MentalModelStrip() {
         </div>
         <div>
           <dt className="text-zinc-600">{t("experienceEngineering.whatIsHappening")}</dt>
-          <dd className="truncate text-zinc-400" title={model.happening}>{model.happening}</dd>
+          <dd className="truncate text-zinc-400" title={happeningText}>{happeningText}</dd>
         </div>
         <div>
           <dt className="text-zinc-600">{t("experienceEngineering.whatUnfinished")}</dt>
@@ -68,7 +87,7 @@ export default function MentalModelStrip() {
           <dt className="text-zinc-600">{t("experienceEngineering.whatNext")}</dt>
           <dd>
             <Link href={model.nextHref} className="text-teal-400/90 hover:text-teal-300">
-              {model.nextLabel} →
+              {nextLabelText} →
             </Link>
           </dd>
         </div>

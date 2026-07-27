@@ -13,11 +13,13 @@ import uz from "@/lib/i18n/dictionaries/uz";
 import ru from "@/lib/i18n/dictionaries/ru";
 import tr from "@/lib/i18n/dictionaries/tr";
 import { DEFAULT_LANGUAGE_CODE } from "@/lib/i18n/languages";
+import { canonicalizeUiLocale } from "@/lib/i18n/canonicalize-locale";
 
 const DICTIONARIES: Record<string, TranslationDictionary> = { en, uz, ru, tr };
 
 export function getDictionary(languageCode: string): TranslationDictionary {
-  return DICTIONARIES[languageCode] ?? DICTIONARIES[DEFAULT_LANGUAGE_CODE];
+  const canonical = canonicalizeUiLocale(languageCode);
+  return DICTIONARIES[canonical] ?? DICTIONARIES[DEFAULT_LANGUAGE_CODE];
 }
 
 function lookup(dictionary: TranslationDictionary, path: string): string | undefined {

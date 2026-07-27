@@ -4,3 +4,6 @@ export * from "@/lib/live-intelligence-rooms/store";
 export * from "@/lib/live-intelligence-rooms/translation-routing";
 export * from "@/lib/live-intelligence-rooms/object-proposals";
 export * from "@/lib/live-intelligence-rooms/transport-adapter";
+export * from "@/lib/live-intelligence-rooms/wizard";
+export * from "@/lib/live-intelligence-rooms/invitations";
+export * from "@/lib/live-intelligence-rooms/devices";

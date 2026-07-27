@@ -37,3 +37,33 @@ test("probeHealthyCbaiBroker reports unreachable when nothing listens", async ()
   assert.equal(result.healthy, false);
   assert.equal(result.via, "unreachable");
 });
+
+test("classifyClientVoiceMode distinguishes configured broker from fallback", async () => {
+  const { classifyClientVoiceMode } = await import("./voice-dev-utils.mjs");
+  assert.equal(classifyClientVoiceMode("http://127.0.0.1:8788/api/voice"), "realtime_broker_configured");
+  assert.equal(classifyClientVoiceMode(""), "browser_fallback_backend_required");
+  assert.equal(classifyClientVoiceMode(null), "browser_fallback_backend_required");
+});
+
+test("dev:voice source reuses healthy broker and never killalls", async () => {
+  const { readFileSync } = await import("node:fs");
+  const { resolve } = await import("node:path");
+  const source = readFileSync(resolve("scripts/dev-voice.mjs"), "utf8");
+  assert.match(source, /Reusing healthy CBAI voice broker/);
+  assert.match(source, /will not kill arbitrary processes/i);
+  assert.doesNotMatch(source, /killall/);
+  assert.doesNotMatch(source, /pkill/);
+});
+
+test("doctor:voice reports port ownership and dual origins without secrets", async () => {
+  const { readFileSync } = await import("node:fs");
+  const { resolve } = await import("node:path");
+  const source = readFileSync(resolve("scripts/doctor-voice.mjs"), "utf8");
+  assert.match(source, /Port ownership/);
+  assert.match(source, /Origin match localhost/);
+  assert.match(source, /Origin match 127\.0\.0\.1/);
+  assert.match(source, /Next action/);
+  // Credential presence may be asserted via boolean/prefix; never log raw secrets.
+  assert.match(source, /credentialOk \? "yes" : "no"/);
+  assert.doesNotMatch(source, /console\.(log|error)\(`[^`]*\$\{postBody/);
+});

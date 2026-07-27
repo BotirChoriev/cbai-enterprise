@@ -6,6 +6,8 @@ type CountryListProps = {
   countries: Country[];
   selectedId: string;
   onSelect: (id: string) => void;
+  comparisonIds?: readonly string[];
+  onToggleComparison?: (id: string) => void;
   onClearFilters?: () => void;
   emptyMessage: string;
   clearFiltersLabel: string;
@@ -15,6 +17,8 @@ export default function CountryList({
   countries,
   selectedId,
   onSelect,
+  comparisonIds = [],
+  onToggleComparison,
   onClearFilters,
   emptyMessage,
   clearFiltersLabel,
@@ -29,7 +33,7 @@ export default function CountryList({
             <button
               type="button"
               onClick={onClearFilters}
-              className="inline-flex min-h-9 items-center rounded-lg border border-zinc-700 bg-zinc-900 px-3.5 text-xs font-medium text-teal-400 transition-colors hover:border-zinc-600 hover:bg-zinc-800"
+              className="inline-flex min-h-11 items-center rounded-lg border border-[var(--cbai-border)] bg-[var(--cbai-surface)] px-3.5 text-xs font-medium text-teal-700 transition-colors hover:border-teal-500/40 dark:text-teal-300"
             >
               {clearFiltersLabel}
             </button>
@@ -40,13 +44,17 @@ export default function CountryList({
   }
 
   return (
-    <div className="space-y-2">
+    <div className="grid gap-3 sm:grid-cols-1 xl:grid-cols-1" data-cbai-country-directory="">
       {countries.map((country) => (
         <CountryCard
           key={country.id}
           country={country}
           isSelected={country.id === selectedId}
           onSelect={() => onSelect(country.id)}
+          comparisonSelected={comparisonIds.includes(country.id)}
+          onToggleComparison={
+            onToggleComparison ? () => onToggleComparison(country.id) : undefined
+          }
         />
       ))}
     </div>

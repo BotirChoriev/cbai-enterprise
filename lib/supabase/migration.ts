@@ -17,6 +17,29 @@ import { loadReports } from "@/lib/reports/reports-store";
 import { upsertCloudRow, type CloudWriteResult } from "@/lib/supabase/cloud-tables";
 import type { ContextEntityRef } from "@/lib/context/context-types";
 import type { EntityKindValue } from "@/lib/supabase/database.types";
+import type { Problem } from "@/lib/problems/problem.types";
+
+function loadAnonymousLocalProblems(): Problem[] {
+  if (typeof window === "undefined") return [];
+  for (const key of ["cbai-problems:local", "cbai-problems"]) {
+    try {
+      const raw = window.localStorage.getItem(key);
+      const parsed: unknown = raw ? JSON.parse(raw) : [];
+      if (Array.isArray(parsed)) {
+        return parsed.filter(
+          (item): item is Problem =>
+            Boolean(item) &&
+            typeof item === "object" &&
+            typeof (item as Record<string, unknown>).id === "string" &&
+            (item as Record<string, unknown>).finalDecisionOwner === "human",
+        );
+      }
+    } catch {
+      // Try the next legacy/local bucket; migration never mutates source data.
+    }
+  }
+  return [];
+}
 
 function isLinkableEntity(entity: ContextEntityRef): entity is ContextEntityRef & { kind: EntityKindValue } {
   return entity.kind !== "evidence";
@@ -31,6 +54,7 @@ export type MigrationSummary = {
   evidence: number;
   bookmarks: number;
   reports: number;
+  problems: number;
   failures: string[];
 };
 
@@ -69,6 +93,7 @@ export function detectLocalWork(): {
   entityLinks: number;
   bookmarks: number;
   reports: number;
+  problems: number;
   isEmpty: boolean;
 } {
   const projects = loadProjects();
@@ -79,6 +104,7 @@ export function detectLocalWork(): {
   const entityLinks = projects.flatMap((p) => loadProjectEntities(p.id));
   const bookmarks = loadPinnedEntities();
   const reports = loadReports();
+  const problems = loadAnonymousLocalProblems();
 
   const counts = {
     projects: projects.length,
@@ -89,6 +115,7 @@ export function detectLocalWork(): {
     entityLinks: entityLinks.length,
     bookmarks: bookmarks.length,
     reports: reports.length,
+    problems: problems.length,
   };
 
   return { ...counts, isEmpty: Object.values(counts).every((n) => n === 0) };
@@ -114,6 +141,7 @@ export async function migrateLocalWorkToCloud(ownerId: string): Promise<Migratio
     evidence: 0,
     bookmarks: 0,
     reports: 0,
+    problems: 0,
     failures: [],
   };
 
@@ -266,6 +294,21 @@ export async function migrateLocalWorkToCloud(ownerId: string): Promise<Migratio
       }),
     );
     if (reportOk) summary.reports += 1;
+  }
+
+  for (const problem of loadAnonymousLocalProblems()) {
+    const problemOk = await track(
+      summary.failures,
+      `Problem "${problem.briefs[0]?.title ?? problem.id}"`,
+      await upsertCloudRow("problem_snapshots", {
+        owner_id: ownerId,
+        local_id: problem.id,
+        schema_version: problem.schemaVersion,
+        status: problem.status,
+        payload: problem as unknown as Record<string, unknown>,
+      }),
+    );
+    if (problemOk) summary.problems += 1;
   }
 
   if (summary.failures.length === 0) {

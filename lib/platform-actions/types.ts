@@ -11,6 +11,7 @@ import type { OperationalObjectDraft, OperationalObjectDomain, OperationalObject
 export type PlatformActionId =
   | "navigate.home"
   | "navigate.my_work"
+  | "navigate.problems"
   | "navigate.search"
   | "navigate.countries"
   | "navigate.companies"
@@ -33,6 +34,8 @@ export type PlatformActionId =
   | "navigate.messages"
   | "navigate.notifications"
   | "navigate.publications"
+  | "navigate.discover"
+  | "navigate.rooms"
   | "entity.open_country"
   | "entity.open_company"
   | "entity.open_university"
@@ -44,6 +47,8 @@ export type PlatformActionId =
   | "voice.stop"
   | "voice.close"
   | "operational_object.compose"
+  | "problem.compose"
+  | "problem.read_summary"
   | "operational_object.confirm_create"
   | "project.compose"
   | "mission.compose"
@@ -67,7 +72,10 @@ export type PlatformActionId =
   | "engine.organization.confirm"
   | "engine.mission.confirm"
   | "engine.governance.confirm"
-  | "engine.meeting.confirm";
+  | "engine.meeting.confirm"
+  | "route.apply_filter"
+  | "route.summarize"
+  | "work.open_object";
 
 export type PlatformActionConfidence = "high" | "medium" | "low";
 
@@ -100,6 +108,10 @@ export type PlatformActionParams = {
   readonly userStatement?: string;
   readonly engineId?: string;
   readonly countryCode?: string;
+  readonly objectId?: string;
+  readonly filterKey?: string;
+  readonly filterValue?: string;
+  readonly summarySpoken?: string;
 };
 
 export type PlatformActionContext = {
@@ -152,8 +164,13 @@ export type PlatformActionResult =
         readonly countryCode?: string;
         readonly domain?: string;
       };
+      readonly problemRead?: {
+        readonly problemId?: string;
+      };
       readonly messageKey?: string;
       readonly messageVars?: Record<string, string>;
+      /** Pre-built spoken/transcript summary — not a dictionary key. */
+      readonly spokenMessage?: string;
     }
   | {
       readonly ok: false;

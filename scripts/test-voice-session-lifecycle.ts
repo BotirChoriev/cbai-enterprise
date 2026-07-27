@@ -109,6 +109,7 @@ test("cleanupWebRtcSessionResources closes peer, data channel, and ends tracks",
 test("WebRTC disconnect is idempotent", async () => {
   class MockDataChannel {
     closed = false;
+    readyState = "open";
     addEventListener() {}
     close() {
       this.closed = true;
@@ -153,6 +154,7 @@ test("WebRTC disconnect is idempotent", async () => {
           pause() {},
           remove() {},
           setAttribute() {},
+          play: async () => undefined,
         }) as unknown as HTMLAudioElement,
     },
   });
@@ -197,21 +199,25 @@ test("mic toggle UI: active unslashed teal mic stops capture; inactive slashed m
   assert.match(provider, /startListening/);
 
   const dock = readSource("components/voice-operator/VoiceOperatorDock.tsx");
-  assert.match(dock, /vo\.micLive \? vo\.stopListening\(\) : vo\.startListening\(\)/);
+  assert.match(dock, /showStopControl \? vo\.stopListening\(\) : vo\.startListening\(\)/);
   assert.match(dock, /copy\.stopLiveListening/);
   assert.match(dock, /copy\.unmuteMic/);
-  assert.match(dock, /vo\.micLive[\s\S]*copy\.stopLiveListening[\s\S]*copy\.unmuteMic/);
+  assert.match(dock, /copy\.muteMic/);
+  // Mic aria uses mute/unmute; dedicated Stop control uses stopLiveListening.
+  assert.match(dock, /showStopControl[\s\S]*muteMic[\s\S]*unmuteMic/);
+  assert.match(dock, /data-voice-action="stop"/);
   assert.match(dock, /copy\.liveListeningActive/);
   assert.match(dock, /copy\.liveListeningScope/);
+  assert.match(dock, /shouldShowLiveListeningBanner/);
   assert.doesNotMatch(dock, /animate-pulse/);
   assert.doesNotMatch(dock, /border-red-500/);
   assert.match(dock, /cbai-voice-dock-btn-live/);
   assert.match(readSource("app/globals.css"), /\.cbai-voice-dock-btn-live[\s\S]*--cbai-accent-primary/);
 
-  const micIconTernary = dock.match(/\{vo\.micLive \?\s*\([\s\S]*?\)\s*:\s*\([\s\S]*?\)\s*\}/);
+  const micIconTernary = dock.match(/\{showStopControl \?\s*\([\s\S]*?\)\s*:\s*\([\s\S]*?\)\s*\}/);
   assert.ok(micIconTernary, "mic icon ternary");
   const [, activeIcon, inactiveIcon] =
-    micIconTernary![0].match(/vo\.micLive \?\s*\(([\s\S]*?)\)\s*:\s*\(([\s\S]*?)\)\s*\}/) ?? [];
+    micIconTernary![0].match(/showStopControl \?\s*\(([\s\S]*?)\)\s*:\s*\(([\s\S]*?)\)\s*\}/) ?? [];
   assert.ok(activeIcon && inactiveIcon, "mic icon branches");
   assert.doesNotMatch(activeIcon, /M4\.5 4\.5l15 15/, "active listening shows unslashed microphone");
   assert.match(inactiveIcon, /M4\.5 4\.5l15 15/, "inactive ready shows slashed microphone");
@@ -354,7 +360,7 @@ test("route change tears down live capture but preserves transcript memory", () 
   );
   // Route teardown must not clear transcript/session memory.
   const routeEffect = provider.match(
-    /Privacy P0: SPA route changes[\s\S]*?\}, \[pathname, releaseLiveAudioResources\]\);/,
+    /Continuous conversation: SPA route changes[\s\S]*?\}, \[pathname, releaseLiveAudioResources\]\);/,
   );
   assert.ok(routeEffect);
   assert.doesNotMatch(routeEffect![0], /clearVoiceSessionMemory/);
@@ -362,6 +368,37 @@ test("route change tears down live capture but preserves transcript memory", () 
   assert.match(provider, /sessionRef\.current\?\.stop\(\)/);
   assert.match(provider, /realtimeProviderRef\.current\?\.disconnect\(\)/);
   assert.match(provider, /setCaptureActive\(false\)/);
+});
+
+test("live intentional Realtime session stays active across SPA navigation", () => {
+  const provider = readSource("components/voice-operator/VoiceOperatorProvider.tsx");
+  assert.match(provider, /const operatorRouter = useMemo/);
+  assert.match(provider, /operatorNavRef/);
+  assert.match(provider, /keepRealtimeSessionAlive/);
+  assert.match(provider, /hasLiveCaptureResources\(\)/);
+  assert.match(provider, /if \(keepRealtimeSessionAlive\) \{/);
+  assert.match(provider, /sessionActiveRef\.current/);
+  assert.match(provider, /captureActiveRef\.current/);
+  // Continuous conversation resumes listening UI after navigation instead of forcing ready.
+  assert.match(provider, /return "listening"/);
+  assert.match(provider, /router: operatorRouter/);
+  assert.match(provider, /operatorRouter\.push\(output\.href\)/);
+  // Duplicate mic / peer connection must be rejected when capture is already live.
+  assert.match(provider, /never open a second mic/);
+  assert.match(provider, /dockStateAfterTurn/);
+});
+
+test("Voice Operator stays outside searchParams Suspense so navigation does not remount the session", () => {
+  const layout = readSource("app/(dashboard)/layout.tsx");
+  assert.match(layout, /VoiceOperatorProvider/);
+  assert.match(layout, /VoiceOperatorDock/);
+  // Provider wraps Suspense — not nested inside it.
+  const voiceBeforeSuspense = layout.search(/<VoiceOperatorProvider>/);
+  const suspenseOpen = layout.search(/<Suspense\b/);
+  const voiceDock = layout.search(/<VoiceOperatorDock\s*\/>/);
+  const suspenseClose = layout.search(/<\/Suspense>/);
+  assert.ok(voiceBeforeSuspense >= 0 && suspenseOpen > voiceBeforeSuspense);
+  assert.ok(suspenseClose > suspenseOpen && voiceDock > suspenseClose);
 });
 
 test("Close Stop End and unmount still release live audio resources", () => {

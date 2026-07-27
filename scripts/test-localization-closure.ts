@@ -100,7 +100,8 @@ test("EN/UZ/RU/TR liveRooms dictionary keys are complete", () => {
     const copy = getDictionary(locale).liveRooms;
     assert.ok(copy.homeTitle.length > 3);
     assert.ok(copy.createCta.length > 2);
-    assert.ok(copy.multipartyNotice.includes("EXTERNAL_BLOCKED") || locale !== "en");
+    assert.doesNotMatch(copy.multipartyNotice, /EXTERNAL_BLOCKED/);
+    assert.match(copy.multipartyNotice, /Preview|Previewda|Preview’da|Preview\./i);
     assert.ok(copy.consentAcknowledge.length > 10);
   }
   assert.ok(getDictionary("uz").liveRooms.homeTitle.includes("Jonli") || getDictionary("uz").liveRooms.homeTitle.includes("intellekt"));

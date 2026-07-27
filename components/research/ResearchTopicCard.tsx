@@ -7,6 +7,12 @@ import { cbaiGlassCard } from "@/components/brand/brand-classes";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { getDictionary } from "@/lib/i18n/translate";
 import { translateResearchTopicStatus } from "@/lib/i18n/research-topic-status-translation";
+import { localizeResearchDomainLabel } from "@/lib/i18n/entity-domain-labels";
+import {
+  localizeResearchEvidenceTypeLabel,
+  localizeResearchMethodLabel,
+  localizeResearchTopic,
+} from "@/lib/i18n/research-catalog-locale";
 
 function statusBadgeClass(topic: ResearchTopic["status"]): string {
   switch (topic) {
@@ -34,19 +40,25 @@ export default function ResearchTopicCard({
   actionLabel,
   futureWorkspaceLabel,
 }: ResearchTopicCardProps) {
-  const { language } = useTranslation();
+  const { language, t } = useTranslation();
   const catalog = getDictionary(language).researchCatalog;
   const topicPath = getResearchTopicPath(topic.topicId);
   const statusLabel = translateResearchTopicStatus(getDictionary(language), topic.status);
+  const localized = localizeResearchTopic(topic, language);
+  const methods = topic.relatedMethods.map((m) => localizeResearchMethodLabel(m, language)).join(" · ");
+  const evidence = topic.relatedEvidenceTypes
+    .map((e) => localizeResearchEvidenceTypeLabel(e, language))
+    .join(" · ");
+  const future = localized.futureWorkspace;
 
   return (
     <article className={`${cbaiGlassCard} flex h-full flex-col p-5`}>
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <p className="text-[10px] font-medium uppercase tracking-wider text-zinc-500">
-            {topic.domain}
+            {localizeResearchDomainLabel(topic.domain, language)}
           </p>
-          <h3 className="mt-1 text-base font-semibold text-zinc-50">{topic.topicName}</h3>
+          <h3 className="mt-1 text-base font-semibold text-zinc-50">{localized.topicName}</h3>
         </div>
         <span
           className={`shrink-0 rounded-md border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${statusBadgeClass(topic.status)}`}
@@ -55,20 +67,26 @@ export default function ResearchTopicCard({
         </span>
       </div>
 
-      <p className="mt-3 flex-1 text-sm leading-relaxed text-zinc-400">{topic.description}</p>
+      <p className="mt-3 flex-1 text-sm leading-relaxed text-zinc-400">{localized.description}</p>
+      {localized.sourceLanguage ? (
+        <p className="mt-1 text-[10px] text-zinc-600">
+          {t("researchTopicDepth.catalogMetadataNotice")} ·{" "}
+          {t("researchTopicDepth.sourceLanguageLabel", { language: localized.sourceLanguage })}
+        </p>
+      ) : null}
 
       <dl className="mt-4 space-y-3 border-t border-teal-500/10 pt-4 text-sm">
         <div>
           <dt className="text-xs text-zinc-600">{methodsLabel ?? catalog.methods}</dt>
-          <dd className="mt-1 text-zinc-400">{topic.relatedMethods.join(" · ")}</dd>
+          <dd className="mt-1 text-zinc-400">{methods}</dd>
         </div>
         <div>
           <dt className="text-xs text-zinc-600">{evidenceLabel ?? catalog.evidenceTypes}</dt>
-          <dd className="mt-1 text-zinc-400">{topic.relatedEvidenceTypes.join(" · ")}</dd>
+          <dd className="mt-1 text-zinc-400">{evidence}</dd>
         </div>
         <div>
           <dt className="text-xs text-zinc-600">{futureWorkspaceLabel ?? catalog.futureWorkspace}</dt>
-          <dd className="mt-1 text-xs leading-relaxed text-zinc-500">{topic.futureWorkspace}</dd>
+          <dd className="mt-1 text-xs leading-relaxed text-zinc-500">{future}</dd>
         </div>
       </dl>
 

@@ -102,6 +102,9 @@ export const MY_WORK_TR = {
   continueLinksHeading: "Devam et",
   onboardingHeading: "Başla",
   pageDescription: "Görev ana sayfası — ilerleme, sonraki adım ve son çalışma tek yerde.",
+  recentHeading: "Son",
+  recentEmpty:
+    "Açtığınız profiller burada görünür. Başlamak için bir ülke, şirket veya üniversite arayın.",
 } as const;
 
 export const SYSTEM_TR = {

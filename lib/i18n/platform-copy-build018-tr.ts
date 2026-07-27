@@ -62,4 +62,12 @@ export const UNIVERSAL_WORKSPACE_TR = {
   objectTypeQuestion: "Soru",
   objectTypeRelationship: "İlişki",
   objectTypeCapabilitySignal: "Yetenek sinyali",
+  seeEntityEvidence: "Varlık kanıt paneline bakın",
+  seeEntityModule: "Varlık modülüne bakın",
+  trustRegistryBacked: "Kayıt defteri destekli",
+  entityCatalogLimitation: "Varlık istihbaratı bağlı katalog kaynaklarına bağlıdır.",
+  openEntity: "Varlığı aç",
+  knowledgeUniverse: "Bilgi Evreni",
+  stateRegistry: "Kayıt defteri kaydı",
+  maySupportMission: "Aktif görevi destekleyebilir",
 } as const;

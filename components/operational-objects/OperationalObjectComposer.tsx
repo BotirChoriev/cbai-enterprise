@@ -112,27 +112,94 @@ export default function OperationalObjectComposer() {
     updateDraft,
     saveDraft,
     confirmDraft,
+    confirmError,
   } = useOperationalObjects();
   const dialogRef = useRef<HTMLDivElement>(null);
   const [advancedOpen, setAdvancedOpen] = useState(false);
 
+  function requestClose() {
+    if (!draft) {
+      closeComposer();
+      return;
+    }
+    const dirty = Boolean(
+      draft.title.trim() ||
+        draft.objective.trim() ||
+        draft.nextAction.trim() ||
+        draft.humanDecision.trim() ||
+        draft.rationale.trim(),
+    );
+    if (dirty && typeof window !== "undefined" && !window.confirm(t("operationalObject.unsavedConfirm"))) {
+      return;
+    }
+    closeComposer();
+  }
+
   useEffect(() => {
     if (!composerOpen) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") closeComposer();
-    };
+    const dialog = dialogRef.current;
+    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const focusable = () =>
+      dialog?.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"])',
+      ) ?? [];
+
+    const nodes = focusable();
+    nodes[0]?.focus();
+
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        requestClose();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const list = focusable();
+      if (!list.length) return;
+      const first = list[0];
+      const last = list[list.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [composerOpen, closeComposer]);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      previous?.focus();
+    };
+  }, [composerOpen, closeComposer]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!composerOpen || !draft) return null;
 
   const missing = missingRequiredFields(draft);
   const isInferred = (field: string) => inferredFields.includes(field);
   const isMissing = (field: string) => missing.includes(field);
+  const canConfirm = missing.length === 0;
+
+  function onConfirm() {
+    if (!canConfirm) return;
+    confirmDraft();
+  }
+
+  const linkedLabel = draft.provenance.relatedEntityKind
+    ? draft.provenance.graphNodeId
+      ? t("operationalObject.linkedFromGraph")
+      : draft.provenance.relatedEntityKind === "company"
+        ? t("operationalObject.linkedFromCompany")
+        : draft.provenance.relatedEntityKind === "university"
+          ? t("operationalObject.linkedFromUniversity")
+          : draft.provenance.relatedEntityKind === "research"
+            ? t("operationalObject.linkedFromResearch")
+            : t("operationalObject.linkedFromCountry")
+    : null;
 
   return (
-    <div className="cbai-op-composer-backdrop" role="presentation" onClick={closeComposer}>
+    <div className="cbai-op-composer-backdrop" role="presentation">
       <div
         ref={dialogRef}
         className="cbai-op-composer"
@@ -152,18 +219,25 @@ export default function OperationalObjectComposer() {
               aria-label={t("operationalObject.composerTitle")}
             />
             <p className="cbai-op-composer__source">{sourceLabel(source, t)}</p>
-            {draft.provenance.relatedEntityName ? (
+            {draft.provenance.relatedEntityName && linkedLabel ? (
               <p className="cbai-op-composer__source">
-                {draft.provenance.graphNodeId
-                  ? t("operationalObject.linkedFromGraph")
-                  : t("operationalObject.linkedFromCountry")}
-                : {draft.provenance.relatedEntityName}
+                {linkedLabel}: {draft.provenance.relatedEntityName}
               </p>
             ) : null}
           </div>
-          <button type="button" className={`cbai-op-close ${cbaiFocusRing}`} onClick={closeComposer}>
-            {t("common.close")}
-          </button>
+          <div className="cbai-op-composer__header-actions">
+            <button type="button" className={`cbai-op-back ${cbaiFocusRing}`} onClick={requestClose}>
+              {t("operationalObject.back")}
+            </button>
+            <button
+              type="button"
+              className={`cbai-op-close ${cbaiFocusRing}`}
+              onClick={requestClose}
+              aria-label={t("operationalObject.closeAria")}
+            >
+              ×
+            </button>
+          </div>
         </header>
 
         <div className="cbai-op-composer__body">
@@ -291,13 +365,30 @@ export default function OperationalObjectComposer() {
         </div>
 
         <footer className="cbai-op-composer__footer">
-          <button type="button" className={cbaiBtnGhost} onClick={closeComposer}>
+          {missing.length > 0 ? (
+            <p className="cbai-op-composer__missing-banner" role="status" data-cbai-confirm-blocked="">
+              {t("operationalObject.missingHint")}: {missing.map((field) => missingFieldLabel(field, t)).join(", ")}
+            </p>
+          ) : null}
+          {confirmError ? (
+            <p className="cbai-op-composer__missing-banner" role="alert">
+              {confirmError}
+            </p>
+          ) : null}
+          <button type="button" className={cbaiBtnGhost} onClick={requestClose}>
             {t("operationalObject.cancel")}
           </button>
           <button type="button" className={cbaiBtnSecondary} onClick={() => saveDraft()}>
             {t("operationalObject.saveDraft")}
           </button>
-          <button type="button" className={cbaiBtnPrimary} onClick={() => confirmDraft()}>
+          <button
+            type="button"
+            className={cbaiBtnPrimary}
+            onClick={onConfirm}
+            disabled={!canConfirm}
+            aria-disabled={!canConfirm}
+            data-cbai-confirm-create=""
+          >
             {t("operationalObject.confirmCreate")}
           </button>
         </footer>

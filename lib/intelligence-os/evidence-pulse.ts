@@ -23,9 +23,31 @@ export type EvidencePulseLimitationKey =
   | "unverified"
   | "deviceLocal";
 
+export type EvidencePulseLabelKey =
+  | "pulseNoProject"
+  | "pulseNoEvidence"
+  | "pulseConflicts"
+  | "pulseOutdated"
+  | "pulseUnverified"
+  | "pulsePartialSources"
+  | "pulsePartialOutdated"
+  | "pulseLinked";
+
+/** Structured label part: translate `experienceEngineering.{key}` with params at render time. */
+export type EvidencePulseLabelPart = {
+  readonly key: EvidencePulseLabelKey;
+  readonly params?: Readonly<Record<string, string>>;
+};
+
 export type EvidencePulseReading = {
   readonly state: EvidencePulseState;
+  /** @deprecated English fallback. Prefer labelParts + i18n in UI; user content stays in label. */
   readonly label: string;
+  /**
+   * Structured i18n parts joined with " · " at render time. Empty when `label` carries
+   * user-entered content (e.g. mission.evidenceMissing), which must never be machine-translated.
+   */
+  readonly labelParts: readonly EvidencePulseLabelPart[];
   readonly count: number;
   /** @deprecated Prefer limitationKey + i18n in UI. Kept for scripts and tooltips. */
   readonly limitation: string;
@@ -45,6 +67,7 @@ export function deriveEvidencePulse(mission: Mission | null): EvidencePulseReadi
     return {
       state: "missing",
       label: "No project linked to this mission",
+      labelParts: [{ key: "pulseNoProject" }],
       count: 0,
       limitation: "Link a project or add evidence to begin.",
       limitationKey: "noProject",
@@ -59,6 +82,7 @@ export function deriveEvidencePulse(mission: Mission | null): EvidencePulseReadi
     return {
       state: "missing",
       label: mission?.evidenceMissing || "No evidence linked yet",
+      labelParts: mission?.evidenceMissing?.trim() ? [] : [{ key: "pulseNoEvidence" }],
       count: 0,
       limitation: "Your references only — nothing is fabricated.",
       limitationKey: "noRefs",
@@ -75,6 +99,9 @@ export function deriveEvidencePulse(mission: Mission | null): EvidencePulseReadi
     return {
       state: "conflicting",
       label: `${conflictCount} potential conflict${conflictCount === 1 ? "" : "s"} among ${refs.length} reference${refs.length === 1 ? "" : "s"}`,
+      labelParts: [
+        { key: "pulseConflicts", params: { count: String(conflictCount), total: String(refs.length) } },
+      ],
       count: refs.length,
       limitation: "Review conflicting sources before you decide.",
       limitationKey: "conflicting",
@@ -88,6 +115,7 @@ export function deriveEvidencePulse(mission: Mission | null): EvidencePulseReadi
     return {
       state: "outdated",
       label: `${outdatedCount} reference${outdatedCount === 1 ? "" : "s"} older than one year`,
+      labelParts: [{ key: "pulseOutdated", params: { count: String(outdatedCount) } }],
       count: refs.length,
       limitation: "Some sources may need refresh.",
       limitationKey: "outdated",
@@ -102,6 +130,7 @@ export function deriveEvidencePulse(mission: Mission | null): EvidencePulseReadi
     return {
       state: "unverified",
       label: `${refs.length} reference${refs.length === 1 ? "" : "s"} without verified source URLs`,
+      labelParts: [{ key: "pulseUnverified", params: { count: String(refs.length) } }],
       count: refs.length,
       limitation: "Add source URLs where you can.",
       limitationKey: "unverified",
@@ -113,11 +142,22 @@ export function deriveEvidencePulse(mission: Mission | null): EvidencePulseReadi
 
   if (withSource < refs.length || outdatedCount > 0) {
     const parts: string[] = [];
-    if (withSource < refs.length) parts.push(`${withSource} of ${refs.length} have source URLs`);
-    if (outdatedCount > 0) parts.push(`${outdatedCount} may be outdated`);
+    const labelParts: EvidencePulseLabelPart[] = [];
+    if (withSource < refs.length) {
+      parts.push(`${withSource} of ${refs.length} have source URLs`);
+      labelParts.push({
+        key: "pulsePartialSources",
+        params: { withSource: String(withSource), total: String(refs.length) },
+      });
+    }
+    if (outdatedCount > 0) {
+      parts.push(`${outdatedCount} may be outdated`);
+      labelParts.push({ key: "pulsePartialOutdated", params: { count: String(outdatedCount) } });
+    }
     return {
       state: "partial",
       label: parts.join(" · "),
+      labelParts,
       count: refs.length,
       limitation: runtime.limitation,
       limitationKey: "deviceLocal",
@@ -130,6 +170,7 @@ export function deriveEvidencePulse(mission: Mission | null): EvidencePulseReadi
   return {
     state: "available",
     label: `${refs.length} evidence reference${refs.length === 1 ? "" : "s"} linked`,
+    labelParts: [{ key: "pulseLinked", params: { count: String(refs.length) } }],
     count: refs.length,
     limitation: runtime.limitation,
     limitationKey: "deviceLocal",

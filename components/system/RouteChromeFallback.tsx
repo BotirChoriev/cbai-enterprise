@@ -2,7 +2,9 @@
 
 import { useSyncExternalStore } from "react";
 import { cbaiLoadingLine, cbaiMineralPanel, cbaiTransition } from "@/components/brand/brand-classes";
+import { canonicalizeUiLocale, type CanonicalUiLocale } from "@/lib/i18n/canonicalize-locale";
 import { getDictionary } from "@/lib/i18n/translate";
+import { resolveStorageKey } from "@/lib/storage/namespaced-key";
 
 type LoadingMessageKey =
   | "loadingMission"
@@ -11,27 +13,48 @@ type LoadingMessageKey =
   | "loadingGraph"
   | "loadingSearch";
 
-type SupportedLanguage = "en" | "ru" | "uz" | "tr";
-
 type RouteChromeFallbackProps = {
   messageKey?: LoadingMessageKey;
 };
 
-function readPreferredLanguage(): SupportedLanguage {
+const PROFILE_BASE_KEY = "cbai-assistant-profile";
+
+/**
+ * Read the same namespaced profile key the live AssistantProfileProvider uses.
+ * Reading the bare legacy key here previously caused EN/RU chrome flashes under UZ
+ * during Suspense route transitions when `:local` held UZ but the bare key held RU/EN.
+ */
+function readPreferredLanguage(): CanonicalUiLocale {
   try {
-    const raw = localStorage.getItem("cbai-assistant-profile");
-    if (!raw) return "en";
+    const key = resolveStorageKey(PROFILE_BASE_KEY);
+    const raw = localStorage.getItem(key);
+    if (!raw) {
+      // Idempotent legacy migration path — only if namespaced bucket is empty.
+      const legacy = localStorage.getItem(PROFILE_BASE_KEY);
+      if (!legacy) return "en";
+      const parsedLegacy = JSON.parse(legacy) as { preferredLanguage?: string };
+      return canonicalizeUiLocale(parsedLegacy?.preferredLanguage);
+    }
     const parsed = JSON.parse(raw) as { preferredLanguage?: string };
-    const lang = parsed?.preferredLanguage;
-    if (lang === "ru" || lang === "uz" || lang === "tr" || lang === "en") return lang;
+    return canonicalizeUiLocale(parsed?.preferredLanguage);
   } catch {
-    /* ignore malformed profile */
+    return "en";
   }
-  return "en";
 }
 
-function subscribe() {
-  return () => {};
+function subscribe(onStoreChange: () => void) {
+  if (typeof window === "undefined") return () => {};
+  const onStorage = (event: StorageEvent) => {
+    if (!event.key) return;
+    try {
+      const activeKey = resolveStorageKey(PROFILE_BASE_KEY);
+      if (event.key === activeKey) onStoreChange();
+    } catch {
+      // ignore storage errors during sync
+    }
+  };
+  window.addEventListener("storage", onStorage);
+  return () => window.removeEventListener("storage", onStorage);
 }
 
 /** Meaningful Suspense fallback — reads saved language without provider tree. */

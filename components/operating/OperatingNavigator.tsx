@@ -104,9 +104,9 @@ export default function OperatingNavigator() {
           </ul>
         </div>
       ))}
-      <details className="cbai-nav-disclosure border-t pt-3">
+      <details className="cbai-nav-disclosure border-t border-[var(--cbai-border-subtle)] pt-3">
         <summary className={`cbai-nav-disclosure-summary ${cbaiNavEyebrow} mb-2 cursor-pointer list-none px-2`}>
-          {t("navigation.intelligenceCabinet")}
+          {t("navigation.advanced")}
         </summary>
         {secondaryNavSections.map((section, index) => (
           <div key={section.title || `secondary-${index}`} className="mb-3">

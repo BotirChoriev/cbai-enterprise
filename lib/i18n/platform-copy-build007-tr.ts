@@ -137,6 +137,16 @@ export const RESEARCH_HOME_TR = {
     "Canlı deneyler ve laboratuvar verileri",
     "Yapay zeka tarafından oluşturulan araştırma özetleri",
   ],
+  intakeEyebrow: "Araştırma alımı",
+  intakeTitle: "Soru, ses veya belgeden başlayın",
+  intakeBody:
+    "Yazılı sorular, Voice Operator açıklamaları ve PDF alımı düzenlenebilir taslaklar açar. CBAI mükemmel OCR iddia etmez ve ölçüm uydurmaz.",
+  intakeTyped: "Tuvalde bir araştırma sorusu veya Smart Idea yazın",
+  intakeVoice: "Sorunu Voice Operator’a anlatın — onaylanabilir taslak açılır",
+  intakePdf: "Yerel yorum için Bilimsel Belgeler üzerinden PDF yükleyin",
+  intakeHonest: "Diyagramlar ve formüller siz onaylayana kadar düzenlenebilir gözlem olarak kalır",
+  intakeOpenDocuments: "Bilimsel belgeleri aç",
+  intakeOpenMyWork: "İşlerim’de bağlı iş oluştur",
 } as const;
 
 export const GRAPH_PLATFORM_TR = {
@@ -247,6 +257,8 @@ export const RESEARCH_CATALOG_TR = {
   catalogDescription:
     "Her araştırma konusu için ayrıntı sayfalarıyla yapılandırılmış salt okunur katalog. Canlı veritabanları, yayınlar veya araştırmacı profilleri bağlı değil.",
   filterLabel: "Araştırma konularını filtrele",
+  filterByDomain: "Alana göre filtrele",
+  allDomains: "Tüm alanlar",
   filterPlaceholder: "Konu, yöntem, alan veya kanıt türüne göre filtrele...",
   showingCount: "{total} konudan {filtered} tanesi gösteriliyor",
   noMatch: "Filtrenize uyan araştırma konusu yok.",
@@ -372,6 +384,16 @@ export const ENTITY_UI_TR = {
   officialInformationAvailable: "Resmi bilgi mevcut.",
   officialInformationNotAvailableYet: "Resmi bilgi henüz mevcut değil.",
   foundedLabel: "Kuruluş",
+  relatedResearchEmpty:
+    "Geçerli katalogda {industry} ile konu bakımından eşleşen araştırma konusu yok.",
+  relatedResearchNote:
+    "{name} şirketinin {industry} sektör sınıflandırmasıyla konu bakımından ilişkili konular — sponsorluk, finansman veya kurumsal iddia değil.",
+  relatedCompaniesMetric: "İlgili şirketler (konu eşleşmesi)",
+  recordsUnit: "kayıt",
+  entityTypeCountry: "Ülke",
+  entityTypeCompany: "Şirket",
+  entityTypeUniversity: "Üniversite",
+  entityTypeResearchTopic: "Araştırma konusu",
 } as const;
 
 export const INDICATOR_EXPLORER_TR = {

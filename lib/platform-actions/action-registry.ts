@@ -24,6 +24,7 @@ const OS_TO_PLATFORM: Record<CanonicalOsAction, readonly PlatformActionId[]> = {
   navigate: [
     "navigate.home",
     "navigate.my_work",
+    "navigate.problems",
     "navigate.search",
     "navigate.countries",
     "navigate.companies",
@@ -50,6 +51,8 @@ const OS_TO_PLATFORM: Record<CanonicalOsAction, readonly PlatformActionId[]> = {
     "navigate.teams",
     "navigate.messages",
     "navigate.notifications",
+    "navigate.discover",
+    "navigate.rooms",
     "navigate.publications",
     "navigate.workspace",
   ],
@@ -58,6 +61,7 @@ const OS_TO_PLATFORM: Record<CanonicalOsAction, readonly PlatformActionId[]> = {
   prepare_upload: ["scientific_intake.compose"],
   create_draft: [
     "operational_object.compose",
+    "problem.compose",
     "project.compose",
     "mission.compose",
     "report.compose",
@@ -67,7 +71,7 @@ const OS_TO_PLATFORM: Record<CanonicalOsAction, readonly PlatformActionId[]> = {
   invite_member: ["team.invite"],
   share_object: ["object.share"],
   prepare_publication: ["publication.prepare"],
-  explain: [],
+  explain: ["problem.read_summary"],
   unsupported: [],
 };
 

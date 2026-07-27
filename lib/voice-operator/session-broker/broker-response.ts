@@ -28,10 +28,18 @@ export function isBrokerHtmlResponse(contentType: string | null, bodyText: strin
 
 export function parseBrokerCredentialJson(bodyText: string): EphemeralRealtimeCredential | null {
   try {
-    const payload = JSON.parse(bodyText) as EphemeralRealtimeCredential;
+    const payload = JSON.parse(bodyText) as Partial<EphemeralRealtimeCredential>;
     if (!payload.clientSecret || !payload.expiresAt) return null;
+    if (typeof payload.clientSecret !== "string" || typeof payload.expiresAt !== "string") return null;
     if (payload.clientSecret.startsWith("sk-")) return null;
-    return payload;
+    if (typeof payload.sessionId !== "string" || !payload.sessionId.trim()) return null;
+    if (typeof payload.model !== "string" || !payload.model.trim()) return null;
+    return {
+      clientSecret: payload.clientSecret,
+      expiresAt: payload.expiresAt,
+      sessionId: payload.sessionId,
+      model: payload.model,
+    };
   } catch {
     return null;
   }
@@ -142,7 +150,25 @@ export function classifyBrokerHttpResponse(input: BrokerResponseInput): SessionB
 
   const credential = parseBrokerCredentialJson(bodyText);
   if (!credential) {
-    return { ok: false, code: "ERROR", message: "Invalid broker response shape." };
+    return {
+      ok: false,
+      code: "MALFORMED_RESPONSE",
+      message: "Invalid broker response shape.",
+    };
+  }
+  if (!credential.clientSecret.startsWith("ek_")) {
+    return {
+      ok: false,
+      code: "MALFORMED_RESPONSE",
+      message: "Broker credential is not an ephemeral client secret.",
+    };
+  }
+  if (!Number.isFinite(Date.parse(credential.expiresAt))) {
+    return {
+      ok: false,
+      code: "MALFORMED_RESPONSE",
+      message: "Broker credential expiration is invalid.",
+    };
   }
 
   return { ok: true, credential };

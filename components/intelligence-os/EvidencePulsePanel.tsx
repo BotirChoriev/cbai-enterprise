@@ -30,6 +30,11 @@ export default function EvidencePulsePanel({ mission }: { mission: Mission | nul
   const { t, language } = useTranslation();
   const pulse = deriveEvidencePulse(mission);
   const limitation = translateEvidencePulseLimitation(getDictionary(language), pulse.limitationKey);
+  const pulseLabel = pulse.labelParts.length > 0
+    ? pulse.labelParts
+        .map((part) => t(`experienceEngineering.${part.key}`, part.params ? { ...part.params } : undefined))
+        .join(" · ")
+    : pulse.label;
 
   return (
     <section className={`${cbaiMineralSurface} flex gap-4 p-5`} aria-labelledby="evidence-pulse-heading">
@@ -42,7 +47,7 @@ export default function EvidencePulsePanel({ mission }: { mission: Mission | nul
       <div className="min-w-0 flex-1 space-y-1">
         <p className={cbaiSectionEyebrow}>{t("evidencePulse.eyebrow")}</p>
         <h2 id="evidence-pulse-heading" className="text-sm font-medium text-zinc-200">
-          {t(`evidencePulse.${STATE_KEYS[pulse.state]}`)} · {pulse.label}
+          {t(`evidencePulse.${STATE_KEYS[pulse.state]}`)} · {pulseLabel}
         </h2>
         <p className="text-xs text-zinc-500">
           {t("evidencePulse.limitation")}: {limitation}

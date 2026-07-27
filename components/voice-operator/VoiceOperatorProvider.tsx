@@ -81,11 +81,14 @@ import {
   savePendingAuthIntent,
 } from "@/lib/voice-operator/auth-action-policy";
 import { useOperationalObjects } from "@/components/operational-objects/OperationalObjectProvider";
+import { getProblem, listProblems } from "@/lib/problems/problem-repository";
+import { buildProblemVoiceSummary } from "@/lib/problems/problem-voice-summary";
 
 type VoiceOperatorContextValue = {
   readonly dockOpen: boolean;
   readonly dockState: VoiceDockState;
   readonly micLive: boolean;
+  readonly captureActive: boolean;
   readonly permissionIssue: VoicePermissionIssue | null;
   readonly brokerIssue: VoiceBrokerIssue | null;
   readonly transcriptVisible: boolean;
@@ -193,6 +196,19 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
   const { profile } = useAssistantProfile();
   const { isSignedIn } = useAuth();
   const operationalObjects = useOperationalObjects();
+  const readCurrentProblemSummary = useCallback(
+    (requestedProblemId?: string): string | null => {
+      const urlProblemId =
+        typeof window !== "undefined"
+          ? new URLSearchParams(window.location.search).get("problemId")
+          : null;
+      const problemId = requestedProblemId || urlProblemId || listProblems()[0]?.id;
+      if (!problemId) return null;
+      const problem = getProblem(problemId);
+      return problem ? buildProblemVoiceSummary(problem, language) : null;
+    },
+    [language],
+  );
   const [dockOpen, setDockOpen] = useState(false);
   const [dockState, setDockState] = useState<VoiceDockState>("closed");
   const [permissionIssue, setPermissionIssue] = useState<VoicePermissionIssue | null>(null);
@@ -231,9 +247,47 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
   const navAnnounceGenerationRef = useRef(0);
   /** Skip first pathname effect run so mount does not tear down a not-yet-started session. */
   const pathnameForTeardownRef = useRef(pathname);
+  /**
+   * When true, the next SPA pathname change was initiated by the Voice Operator.
+   * Continuous conversation keeps the live session for *any* SPA navigation while capture is live;
+   * this flag is retained for diagnostics and for restoring the listening dock state promptly.
+   */
+  const operatorNavRef = useRef(false);
+  /** Ref mirrors read inside the route effect without widening its dependency array. */
+  const sessionActiveRef = useRef(false);
+  const captureActiveRef = useRef(false);
 
   const operatorMode = useMemo(() => resolveOperatorMode(language), [language]);
   const brokerConfigured = operatorMode.realtimeConfigured;
+
+  /** Drive layout reservation (desktop right inset) from a single document data attribute. */
+  useEffect(() => {
+    const root = document.documentElement;
+    root.dataset.cbaiVoiceDock = dockOpen ? "open" : "closed";
+    return () => {
+      root.dataset.cbaiVoiceDock = "closed";
+    };
+  }, [dockOpen]);
+
+  /**
+   * Router wrapper that flags operator-initiated navigation. Continuous conversation keeps the
+   * Realtime session across SPA routes (see route effect); the flag helps restore listening UI.
+   */
+  const operatorRouter = useMemo(() => {
+    const flag =
+      <T extends (...args: never[]) => unknown>(fn: T): T =>
+      ((...args: Parameters<T>) => {
+        operatorNavRef.current = true;
+        return fn(...args);
+      }) as T;
+    return {
+      ...router,
+      push: flag(router.push.bind(router)),
+      replace: flag(router.replace.bind(router)),
+      back: flag(router.back.bind(router)),
+      forward: flag(router.forward.bind(router)),
+    };
+  }, [router]);
   /**
    * Invariant: `captureActive` is the React-visible mirror of owned capture resources.
    * Set true only after SpeechRecognition start succeeds, or after Realtime connect when
@@ -241,9 +295,11 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
    * or mock connect flag). Cleared only via `releaseLiveAudioResources`, which aborts broker
    * work, stops SpeechRecognition, disconnects WebRTC (tracks/DC/PC/audio element), and
    * bumps the generation gate so late async results cannot reactivate capture.
-   * `micLive` also treats live dock phases as live so Stop remains available during orchestration.
+   * `micLive` also treats live dock phases as live so Stop remains available during orchestration,
+   * but never while a broker failure is active (Listening + unavailable must not coexist).
    */
-  const micLive = captureActive || isLiveMicDockState(dockState);
+  const micLive =
+    brokerIssue == null && (captureActive || isLiveMicDockState(dockState));
   const beginBrokerRequest = useCallback((): AbortSignal => {
     brokerAbortRef.current?.abort();
     const controller = new AbortController();
@@ -294,9 +350,11 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
   }, [releaseLiveAudioResources]);
 
   useEffect(() => {
+    // Reuse the module-scoped Realtime provider so remounts do not open a second mic stream.
     realtimeProviderRef.current = resolveRealtimeProvider(brokerConfigured);
     return () => {
       releaseLiveAudioResources();
+      // Do not null the shared provider instance — only clear this React tree's ref.
       realtimeProviderRef.current = null;
     };
   }, [brokerConfigured, releaseLiveAudioResources]);
@@ -308,11 +366,52 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
     };
   }, [releaseLiveAudioResources]);
 
-  // Privacy P0: SPA route changes must release the mic immediately (Safari indicator).
-  // Transcript / session memory are preserved — only live capture resources are torn down.
+  useEffect(() => {
+    sessionActiveRef.current = sessionActive;
+    captureActiveRef.current = captureActive;
+  }, [sessionActive, captureActive]);
+
+  /**
+   * Continuous conversation: SPA route changes must NOT tear down a live intentional session.
+   * Transcript / session memory are always preserved.
+   * Privacy release still happens on Stop / Close / End / pagehide / beforeunload / unmount
+   * (Safari mic indicator clears when the user leaves or explicitly stops).
+   */
   useEffect(() => {
     if (pathnameForTeardownRef.current === pathname) return;
     pathnameForTeardownRef.current = pathname;
+
+    // Transcript memory is preserved, but the visible transcript auto-collapses on every
+    // route change so an old conversation never visually dominates the new page (spec 2C).
+    setTranscriptVisible(false);
+
+    const operatorInitiated = operatorNavRef.current;
+    operatorNavRef.current = false;
+
+    const providerLive = realtimeProviderRef.current?.hasLiveCaptureResources() ?? false;
+    const keepRealtimeSessionAlive =
+      sessionActiveRef.current && (providerLive || captureActiveRef.current);
+
+    if (keepRealtimeSessionAlive) {
+      // After operator navigation (or any SPA nav while live), resume listening UI automatically.
+      setDockState((state) => {
+        if (state === "closed") return state;
+        if (state === "awaiting_confirmation" || state === "action_confirmation" || state === "permission_required") {
+          return state;
+        }
+        if (operatorInitiated || state === "ready" || state === "executing_action" || state === "responding") {
+          return "listening";
+        }
+        return state;
+      });
+      if (providerLive && !captureActiveRef.current) {
+        setCaptureActive(true);
+      }
+      return;
+    }
+
+    // Privacy P0: SPA route changes must release the mic immediately (Safari indicator)
+    // when there is no intentional live session to preserve.
     releaseLiveAudioResources();
     setDockState((state) => {
       if (state === "closed") return state;
@@ -360,7 +459,7 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
         pendingNavAnnounceRef.current = null;
         appendConversationTurn({
           role: "assistant",
-          text: t("platformAction.failureNavigate"),
+          text: t("voiceCommand.navigationDidNotComplete"),
         });
         bumpTranscript();
       }, 4500);
@@ -380,6 +479,17 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
     bumpTranscript();
   }, [bumpTranscript, hrefMatchesPathname, pathname]);
 
+  /** Prefer continuous listening when capture is still live; otherwise ready/closed. */
+  const dockStateAfterTurn = useCallback(
+    (opts?: { awaitingConfirmation?: boolean }): VoiceDockState => {
+      if (opts?.awaitingConfirmation) return "awaiting_confirmation";
+      const providerLive = realtimeProviderRef.current?.hasLiveCaptureResources() ?? false;
+      if (providerLive || captureActiveRef.current) return "listening";
+      return sessionActiveRef.current || sessionActive ? "ready" : "closed";
+    },
+    [sessionActive],
+  );
+
   const applyResponse = useCallback(
     async (userText: string, eventId?: string) => {
       const platformContext = {
@@ -398,7 +508,7 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
         { text: userText, locale: language, pathname, final: true, eventId },
         platformContext,
         {
-          router,
+          router: operatorRouter,
           openComposer: (draft, inferredFields, source) => {
             operationalObjects.openComposer(
               { ...draft, provenance: { ...draft.provenance, source } },
@@ -417,16 +527,17 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
             }
             if (control === "transcript.show") setTranscriptVisible(true);
             if (control === "transcript.hide") setTranscriptVisible(false);
-            if (control === "navigate.back") router.back();
+            if (control === "navigate.back") operatorRouter.back();
           },
           setGuidance: setOperatorGuidance,
           setTranscriptVisible,
+          readProblemSummary: readCurrentProblemSummary,
           t: (path, vars) => t(path, vars),
           isSignedIn,
           onRequireSignIn: (message, href) => {
             appendConversationTurn({ role: "assistant", text: message });
             bumpTranscript();
-            router.push(href);
+            operatorRouter.push(href);
           },
           onStatus: (status, detail) => {
             setActionStatus(status);
@@ -446,7 +557,7 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
       );
 
       if (orchestrated.duplicate) {
-        setDockState(sessionActive ? "ready" : "closed");
+        setDockState(dockStateAfterTurn());
         return;
       }
 
@@ -459,20 +570,14 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
         }
       }
 
-      if (orchestrated.executed || orchestrated.status === "clarifying") {
+      if (orchestrated.executed || orchestrated.status === "clarifying" || orchestrated.status === "could_not_understand" || orchestrated.status === "waiting_confirmation") {
         setAwaitingConsent(orchestrated.awaitingConfirmation);
-        setDockState(
-          orchestrated.awaitingConfirmation
-            ? "awaiting_confirmation"
-            : sessionActive
-              ? "ready"
-              : "closed",
-        );
+        setDockState(dockStateAfterTurn({ awaitingConfirmation: orchestrated.awaitingConfirmation }));
         return;
       }
 
       const voiceExecuteDeps = {
-        router,
+        router: operatorRouter,
         focusedEntity: null,
         pinEntityToWorkspace: () => {},
         updateProfile: () => {},
@@ -487,7 +592,7 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
         "full",
       );
       if (handled) {
-        setDockState(sessionActive ? "ready" : "closed");
+        setDockState(dockStateAfterTurn());
         return;
       }
 
@@ -501,13 +606,13 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
       if (response.openEvidencePanel) {
         setEvidenceOpen(true);
       }
-      setTimeout(() => setDockState(sessionActive ? "ready" : "closed"), 800);
+      setTimeout(() => setDockState(dockStateAfterTurn({ awaitingConfirmation: response.awaitingConsent })), 800);
     },
     [
       toolContext,
       sessionActive,
       operationalObjects,
-      router,
+      operatorRouter,
       profile.name,
       t,
       language,
@@ -517,6 +622,8 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
       releaseLiveAudioResources,
       isSignedIn,
       scheduleNavSuccessAnnounce,
+      dockStateAfterTurn,
+      readCurrentProblemSummary,
     ],
   );
 
@@ -563,10 +670,19 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
 
       setPermissionIssue(null);
       setBrokerIssue(null);
-      setDockState("connecting");
 
       const provider = realtimeProviderRef.current ?? resolveRealtimeProvider(true);
       realtimeProviderRef.current = provider;
+
+      // Reuse the existing live Realtime session — never open a second mic / peer connection.
+      if (provider.hasLiveCaptureResources()) {
+        setCaptureActive(true);
+        setDockState(mapRealtimeStateToDockState(provider.getState()) || "listening");
+        realtimeStartingRef.current = false;
+        return;
+      }
+
+      setDockState("connecting");
 
       try {
         const sessionMemory =
@@ -585,43 +701,20 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
 
         if (!brokerRes.ok) {
           if (!gate.isCurrent()) return;
+          // Aborted/cancelled broker work must not paint an error or restart capture.
+          if (brokerRes.code === "ERROR" && (/abort/i.test(brokerRes.message) || !gate.isCurrent())) {
+            realtimeStartingRef.current = false;
+            return;
+          }
           const issue = mapBrokerCodeToIssue(brokerRes.code);
-          if (brokerRes.code === "BACKEND_REQUIRED") {
-            setBrokerIssue(issue);
-            setDockState("backend_required");
-            realtimeStartingRef.current = false;
-            return;
-          }
-          if (brokerRes.code === "ORIGIN_BLOCKED") {
-            setBrokerIssue(issue);
-            setDockState("error");
-            realtimeStartingRef.current = false;
-            return;
-          }
-          if (
-            brokerRes.code === "INVALID_API_KEY" ||
-            brokerRes.code === "QUOTA_OR_ACCOUNT_BLOCKED" ||
-            brokerRes.code === "AUTHENTICATION_FAILED" ||
-            brokerRes.code === "RATE_LIMITED"
-          ) {
-            setBrokerIssue(issue);
-            setDockState("error");
-            realtimeStartingRef.current = false;
-            return;
-          }
-          if (brokerRes.code === "ERROR") {
-            // Aborted/cancelled broker work must not start SpeechRecognition fallback.
-            if (/abort/i.test(brokerRes.message) || !gate.isCurrent()) {
-              realtimeStartingRef.current = false;
-              return;
-            }
-            setBrokerIssue(issue);
-            realtimeStartingRef.current = false;
-            await startBrowserFallbackListening(gate);
-            return;
-          }
+          // P0: Realtime mode must never leave Listening + broker failure together.
+          // Do not start browser SpeechRecognition after a broker failure — tear down
+          // immediately and keep text chat usable.
+          releaseLiveAudioResources();
+          setCaptureActive(false);
           setBrokerIssue(issue);
-          setDockState("error");
+          setDockState(brokerRes.code === "BACKEND_REQUIRED" ? "backend_required" : "error");
+          realtimeStartingRef.current = false;
           return;
         }
 
@@ -630,7 +723,14 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
         realtimeUnsubsRef.current.push(
           provider.onStateChange((state) => {
             if (!gate.isCurrent()) return;
+            // After the assistant finishes speaking, Realtime returns to listening — keep UI in sync.
             setDockState(mapRealtimeStateToDockState(state));
+            if (
+              (state === "listening" || state === "connected") &&
+              provider.hasLiveCaptureResources()
+            ) {
+              setCaptureActive(true);
+            }
           }),
           provider.onTranscript((event) => {
             if (!gate.isCurrent()) return;
@@ -704,7 +804,7 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
                 );
                 appendConversationTurn({ role: "assistant", text: message });
                 bumpTranscript();
-                router.push("/account?resume=pending");
+                operatorRouter.push("/account?resume=pending");
                 setDockState("awaiting_confirmation");
                 return;
               }
@@ -731,7 +831,7 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
                 },
               );
               const outcome = applyPlatformActionResult(action, {
-                router,
+                router: operatorRouter,
                 pathname,
                 locale: language as import("@/lib/ontology/types").OntologyLocale,
                 openComposer: (draft, inferredFields, source) => {
@@ -750,10 +850,11 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
                   }
                   if (control === "transcript.show") setTranscriptVisible(true);
                   if (control === "transcript.hide") setTranscriptVisible(false);
-                  if (control === "navigate.back") router.back();
+                  if (control === "navigate.back") operatorRouter.back();
                 },
                 setGuidance: setOperatorGuidance,
                 setTranscriptVisible,
+                readProblemSummary: readCurrentProblemSummary,
                 t: (path, vars) => t(path, vars),
               });
               if (outcome.message) {
@@ -777,7 +878,7 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
             const output = toolResult.output;
             if (output.ok === true && typeof output.href === "string" && output.href.startsWith("/")) {
               if (isAllowedNavigationHref(output.href)) {
-                router.push(output.href);
+                operatorRouter.push(output.href);
                 setOperatorGuidance(null);
               }
             }
@@ -793,20 +894,30 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
 
         const state = provider.getState();
         if (state === "authentication_failed") {
+          releaseLiveAudioResources();
+          setCaptureActive(false);
           setBrokerIssue("authentication_failed");
           setDockState("error");
-          stopLiveAudioCapture();
           return;
         }
         if (state === "connection_failed" || state === "error" || state === "backend_required") {
-          setBrokerIssue(state === "connection_failed" ? "connection_failed" : "unreachable");
-          setDockState("error");
-          stopLiveAudioCapture();
+          releaseLiveAudioResources();
+          setCaptureActive(false);
+          setBrokerIssue(
+            state === "connection_failed"
+              ? "connection_failed"
+              : state === "backend_required"
+                ? "required"
+                : "unreachable",
+          );
+          setDockState(state === "backend_required" ? "backend_required" : "error");
           return;
         }
 
+        setBrokerIssue(null);
         setDockState(mapRealtimeStateToDockState(state));
         // Source of truth: MediaStreamTrack liveness (mock provider mirrors connect/disconnect).
+        // Listening UI is gated on captureActive + listening family + no brokerIssue.
         setCaptureActive(provider.hasLiveCaptureResources());
         // First-run intro only after intentional activation — never unsolicited autoplay on page load.
         if (needsVoiceFirstRunIntro()) {
@@ -823,6 +934,8 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
         }
       } catch (error) {
         if (!gate.isCurrent()) return;
+        releaseLiveAudioResources();
+        setCaptureActive(false);
         if (error instanceof RealtimeMicrophoneError) {
           setPermissionIssue(error.issue);
           setDockState("permission_required");
@@ -830,12 +943,11 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
           setBrokerIssue("unreachable");
           setDockState("error");
         }
-        stopLiveAudioCapture();
       } finally {
         realtimeStartingRef.current = false;
       }
     },
-    [language, bumpTranscript, clearRealtimeBindings, stopLiveAudioCapture, startBrowserFallbackListening, pathname, router, operationalObjects, applyResponse, t, isSignedIn, scheduleNavSuccessAnnounce, releaseLiveAudioResources, beginBrokerRequest],
+    [language, bumpTranscript, clearRealtimeBindings, pathname, operatorRouter, operationalObjects, applyResponse, t, isSignedIn, scheduleNavSuccessAnnounce, releaseLiveAudioResources, beginBrokerRequest, readCurrentProblemSummary, stopLiveAudioCapture],
   );
 
   const openDock = useCallback(() => {
@@ -937,7 +1049,20 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
   }, [textInput, applyResponse, bumpTranscript]);
 
   const startListening = useCallback(async () => {
-    if (muted || micLive || realtimeStartingRef.current) return;
+    if (muted || realtimeStartingRef.current) return;
+
+    // Reuse an already-live Realtime session — never open a duplicate mic stream.
+    const provider = realtimeProviderRef.current;
+    if (provider?.hasLiveCaptureResources()) {
+      setSessionActive(true);
+      setTranscriptVisible(true);
+      setCaptureActive(true);
+      setBrokerIssue(null);
+      setDockState(mapRealtimeStateToDockState(provider.getState()) || "listening");
+      return;
+    }
+
+    if (micLive) return;
 
     const gate = createLiveCaptureGate(() => liveCaptureGenerationRef.current);
     setSessionActive(true);
@@ -985,6 +1110,7 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
     dockOpen,
     dockState,
     micLive,
+    captureActive,
     permissionIssue,
     brokerIssue,
     transcriptVisible,

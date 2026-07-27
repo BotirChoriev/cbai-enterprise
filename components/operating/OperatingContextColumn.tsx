@@ -119,7 +119,7 @@ export default function OperatingContextColumn({ className = "" }: OperatingCont
                       : "text-zinc-400 hover:text-teal-300"
                 }`}
               >
-                {stage.label}
+                {t(`experienceEngineering.${stage.labelKey}`)}
               </Link>
             </li>
           ))}

@@ -11,6 +11,7 @@ import type { OperationalObjectDomain, OperationalObjectType } from "@/lib/opera
 export type WorkspaceTemplateId =
   | "student"
   | "researcher_scientist"
+  | "chemist_scientist"
   | "academic_educator"
   | "economist"
   | "government"
@@ -80,6 +81,32 @@ const TEMPLATES: readonly WorkspaceTemplate[] = [
       { id: "collaborators", labelKey: "adaptiveWorkspace.fieldCollaborators", required: false },
       { id: "reviewCheckpoints", labelKey: "adaptiveWorkspace.fieldReviewCheckpoints", required: false },
       { id: "publicationOutput", labelKey: "adaptiveWorkspace.fieldPublicationOutput", required: false },
+    ],
+  },
+  {
+    id: "chemist_scientist",
+    titleKey: "adaptiveWorkspace.templateChemist",
+    descriptionKey: "adaptiveWorkspace.templateChemistDesc",
+    roles: ["researcher", "engineer"],
+    operationalObjectType: "research_question",
+    domain: "research",
+    defaultPrivacy: "private",
+    fields: [
+      { id: "overview", labelKey: "adaptiveWorkspace.fieldOverview", required: true },
+      { id: "researchQuestion", labelKey: "adaptiveWorkspace.fieldResearchQuestion", required: true },
+      { id: "hypothesis", labelKey: "adaptiveWorkspace.fieldHypothesis", required: false },
+      { id: "literatureSources", labelKey: "adaptiveWorkspace.fieldLiteratureSources", required: false },
+      { id: "thesisLibrary", labelKey: "adaptiveWorkspace.fieldThesisLibrary", required: false },
+      { id: "experimentsMethodology", labelKey: "adaptiveWorkspace.fieldExperimentsMethodology", required: false },
+      { id: "materialsData", labelKey: "adaptiveWorkspace.fieldMaterialsData", required: false },
+      { id: "evidenceMap", labelKey: "adaptiveWorkspace.fieldEvidenceMap", required: false },
+      { id: "findings", labelKey: "adaptiveWorkspace.fieldFindings", required: false },
+      { id: "openQuestions", labelKey: "adaptiveWorkspace.fieldOpenQuestions", required: false },
+      { id: "risksSafety", labelKey: "adaptiveWorkspace.fieldRisksSafety", required: false },
+      { id: "supervisorCollaborators", labelKey: "adaptiveWorkspace.fieldSupervisorCollaborators", required: false },
+      { id: "tasksMilestones", labelKey: "adaptiveWorkspace.fieldTasksMilestones", required: false },
+      { id: "reports", labelKey: "adaptiveWorkspace.fieldReports", required: false },
+      { id: "provenanceAudit", labelKey: "adaptiveWorkspace.fieldProvenanceAudit", required: false },
     ],
   },
   {
@@ -224,7 +251,13 @@ export type DetectedRoleIntent = {
   readonly missingFollowUps: readonly string[];
 };
 
-const ROLE_PATTERNS: readonly { role: WorkspaceRole; pattern: RegExp }[] = [
+const ROLE_PATTERNS: readonly { role: WorkspaceRole; pattern: RegExp; templateId?: WorkspaceTemplateId }[] = [
+  {
+    role: "researcher",
+    pattern:
+      /\b(chemist|research\s*chemist|laboratory\s*scientist|phd\s*researcher|kimyogar(?:man)?|kimyager(?:im)?|химик|лабораторн)\b/i,
+    templateId: "chemist_scientist",
+  },
   { role: "student", pattern: /\b(student|o['‘`]?quvchi|talaba|ученик|студент|öğrenci)\b/i },
   { role: "researcher", pattern: /\b(researcher|scientist|tadqiqotchi|olim|исследователь|учёный|araştırmacı|bilim\s*insanı)\b/i },
   { role: "academic", pattern: /\b(academic|professor|educator|teacher|o['‘`]?qituvchi|professor|академик|преподаватель|akademisyen|öğretmen)\b/i },
@@ -250,20 +283,39 @@ export function detectRoleIntent(text: string): DetectedRoleIntent {
   }
   for (const entry of ROLE_PATTERNS) {
     if (entry.pattern.test(trimmed)) {
-      const template = templateForRole(entry.role);
+      const templateId = entry.templateId ?? templateForRole(entry.role).id;
       const missing: string[] = [];
-      if (!/\b(about|bo['‘`]?yicha|по|hakkında|inflat|tadqiqot|research|project|loyih)/i.test(trimmed)) {
-        missing.push("goal");
+      if (templateId === "chemist_scientist") {
+        if (!/\b(field|soha|fan|област|alan|organic|inorganic|physical|analytical)/i.test(trimmed)) {
+          missing.push("field");
+        }
+        if (!/\b(thesis|dissert|loyih|project|title|mavzu|тема)/i.test(trimmed)) {
+          missing.push("project");
+        }
+        if (!/\b(objective|maqsad|цель|hedef|hypothesis|gipoteza)/i.test(trimmed)) {
+          missing.push("objective");
+        }
+        if (!/\b(experimental|theoretical|review|eksperiment|nazariy|обзор)/i.test(trimmed)) {
+          missing.push("researchType");
+        }
+        if (!/\b(stage|bosqich|этап|aşama)/i.test(trimmed)) {
+          missing.push("stage");
+        }
+        missing.push("files", "language", "privacy");
+      } else {
+        if (!/\b(about|bo['‘`]?yicha|по|hakkında|inflat|tadqiqot|research|project|loyih)/i.test(trimmed)) {
+          missing.push("goal");
+        }
+        if (!/\b(subject|field|soha|fan|област|alan|country|davlat|mamlakat|strana|ülke)/i.test(trimmed)) {
+          missing.push("domain");
+        }
+        if (missing.length < 3) missing.push("privacy");
       }
-      if (!/\b(subject|field|soha|fan|област|alan|country|davlat|mamlakat|strana|ülke)/i.test(trimmed)) {
-        missing.push("domain");
-      }
-      if (missing.length < 3) missing.push("privacy");
       return {
         role: entry.role,
-        templateId: template.id,
+        templateId,
         confidence: "explicit",
-        missingFollowUps: missing.slice(0, 3),
+        missingFollowUps: missing.slice(0, 4),
       };
     }
   }

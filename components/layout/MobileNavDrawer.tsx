@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { primaryNavSections, secondaryNavSections } from "@/lib/navigation";
@@ -20,23 +20,41 @@ type MobileNavDrawerProps = {
 };
 
 /**
- * Responsive mobile navigation (Phase 1/19) — the desktop Sidebar (components/layout/Sidebar.tsx)
- * is hidden below `md:`; this drawer is the mobile equivalent, reusing the exact same
- * `primaryNavSections`/`secondaryNavSections` data so there is only ever one real navigation
- * source. Real focus handling (Escape closes, backdrop click closes) — no third-party dialog
- * dependency.
+ * Mobile navigation drawer — same IA source as desktop (`primaryNavSections` /
+ * `secondaryNavSections`). Focus trap + Escape; deliberate sheet, not a squeezed sidebar.
  */
 export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps) {
   const pathname = usePathname();
   const { t } = useTranslation();
+  const dialogRef = useRef<HTMLElement | null>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!open) return;
+    previousFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const dialog = dialogRef.current;
+    const focusable = dialog?.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), summary, [tabindex]:not([tabindex="-1"])',
+    );
+    focusable?.[0]?.focus();
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") onClose();
+      if (event.key !== "Tab" || !focusable?.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     }
     document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      previousFocusRef.current?.focus();
+    };
   }, [open, onClose]);
 
   if (!open) return null;
@@ -45,13 +63,16 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
     <div className="fixed inset-0 z-50 flex md:hidden">
       <button
         type="button"
-        aria-label="Close navigation"
+        aria-label={t("common.close")}
         onClick={onClose}
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-[color-mix(in_srgb,var(--cbai-text-inverse)_55%,transparent)] backdrop-blur-sm"
       />
       <nav
-        aria-label="Mobile navigation"
-        className="relative flex h-full w-72 max-w-[85vw] flex-col overflow-y-auto border-r border-teal-500/10 bg-[#050810] p-4"
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t("intelligenceSpaces.operatingNavigator")}
+        className="relative flex h-full w-72 max-w-[85vw] flex-col overflow-y-auto border-r border-[var(--cbai-border-subtle)] bg-[var(--cbai-sidebar-bg)] p-4"
       >
         <div className="mb-4 flex items-center justify-between">
           <Link href="/" onClick={onClose}>
@@ -60,8 +81,8 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close navigation"
-            className="flex h-11 w-11 items-center justify-center rounded-md text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-400"
+            aria-label={t("common.close")}
+            className="flex h-11 w-11 items-center justify-center rounded-md text-[var(--cbai-nav-text)] hover:bg-[var(--cbai-surface-hover)] hover:text-[var(--cbai-nav-text-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--cbai-focus-ring)]"
           >
             <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className="h-5 w-5">
               <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
@@ -72,20 +93,18 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
         {primaryNavSections.map((section, index) => (
           <div key={section.title || `primary-${index}`} className="mb-4">
             {section.title ? (
-              <p className="mb-1.5 px-2 text-[10px] font-medium uppercase tracking-widest text-zinc-600">
+              <p className="cbai-nav-eyebrow mb-1.5 px-2">
                 {translateNavSectionTitle(t, section.title)}
               </p>
             ) : null}
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               {section.items.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={onClose}
-                  className={`flex min-h-11 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                    isNavItemActive(pathname, item.href)
-                      ? "bg-teal-500/10 text-teal-400"
-                      : "text-zinc-300 hover:bg-zinc-900"
+                  className={`cbai-nav-row ${
+                    isNavItemActive(pathname, item.href) ? "cbai-nav-row-active" : "cbai-nav-row-idle"
                   }`}
                 >
                   <NavIcon name={item.icon} />
@@ -96,25 +115,23 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
           </div>
         ))}
 
-        <details className="mt-2 border-t border-zinc-800/80 pt-3">
-          <summary className="cursor-pointer px-2 pb-2 text-[10px] font-medium uppercase tracking-widest text-zinc-600">
-            {t("navigation.intelligenceCabinet")}
+        <details className="mt-2 border-t border-[var(--cbai-border-subtle)] pt-3">
+          <summary className="cbai-nav-eyebrow cursor-pointer px-2 pb-2">
+            {t("navigation.advanced")}
           </summary>
           {secondaryNavSections.map((section, index) => (
             <div key={section.title || `secondary-${index}`} className="mb-3">
-              <p className="mb-1.5 px-2 text-[10px] font-medium uppercase tracking-widest text-zinc-700">
+              <p className="cbai-nav-eyebrow mb-1.5 px-2">
                 {translateNavSectionTitle(t, section.title)}
               </p>
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 {section.items.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={onClose}
-                    className={`flex min-h-11 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                      isNavItemActive(pathname, item.href)
-                        ? "bg-teal-500/10 text-teal-400"
-                        : "text-zinc-400 hover:bg-zinc-900"
+                    className={`cbai-nav-row ${
+                      isNavItemActive(pathname, item.href) ? "cbai-nav-row-active" : "cbai-nav-row-idle"
                     }`}
                   >
                     <NavIcon name={item.icon} />

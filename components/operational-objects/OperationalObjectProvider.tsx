@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -16,16 +17,20 @@ import type {
   OperationalObjectProvenance,
 } from "@/lib/operational-objects/operational-object.types";
 import {
+  archiveOperationalObject,
   confirmOperationalObject,
   loadOperationalObjects,
+  reopenOperationalObject,
   saveOperationalDraft,
 } from "@/lib/operational-objects/operational-object-store";
-import { interpretCommand, type CommandIntent } from "@/lib/operational-objects/command-interpreter";
-import { routeOperationalObject, myWorkHrefForObject } from "@/lib/operational-objects/operational-object-routing";
+import { interpretCommand, missingRequiredFields, type CommandIntent } from "@/lib/operational-objects/command-interpreter";
+import { myWorkHrefForObject } from "@/lib/operational-objects/operational-object-routing";
 import { resolveVoiceAction, type VoiceResolverContext } from "@/lib/voice/voice-action-resolver";
 import { executeVoiceAction } from "@/lib/voice/execute-voice-action";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { notifyMissionDataChanged } from "@/lib/intelligence-os/mission-activation-events";
+import { createProblemFromConfirmedStarterCard } from "@/lib/problems/problem-repository";
+import type { StarterWorkCard } from "@/lib/activation/starter-work-card";
 
 type OperationalObjectContextValue = {
   readonly objects: readonly OperationalObject[];
@@ -34,6 +39,7 @@ type OperationalObjectContextValue = {
   readonly inferredFields: readonly string[];
   readonly source: OperationalObjectProvenance["source"];
   readonly successMessage: string | null;
+  readonly confirmError: string | null;
   readonly clarifyIntent: CommandIntent | null;
   refresh: () => void;
   openComposer: (
@@ -54,6 +60,8 @@ type OperationalObjectContextValue = {
   ) => boolean;
   dismissClarify: () => void;
   selectClarifyOption: (optionId: string) => void;
+  archiveObject: (id: string) => OperationalObject | null;
+  reopenObject: (id: string) => OperationalObject | null;
 };
 
 const OperationalObjectContext = createContext<OperationalObjectContextValue | null>(null);
@@ -94,6 +102,9 @@ export default function OperationalObjectProvider({
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [clarifyIntent, setClarifyIntent] = useState<CommandIntent | null>(null);
   const [pendingCommand, setPendingCommand] = useState<string>("");
+  const [confirmError, setConfirmError] = useState<string | null>(null);
+  const confirmInFlightRef = useRef(false);
+  const lastConfirmKeyRef = useRef<string | null>(null);
 
   const refresh = useCallback(() => {
     setObjects(loadOperationalObjects());
@@ -122,6 +133,8 @@ export default function OperationalObjectProvider({
       setComposerOpen(true);
       setClarifyIntent(null);
       setSuccessMessage(null);
+      setConfirmError(null);
+      confirmInFlightRef.current = false;
     },
     [],
   );
@@ -130,10 +143,13 @@ export default function OperationalObjectProvider({
     setComposerOpen(false);
     setDraft(null);
     setInferredFields([]);
+    setConfirmError(null);
+    confirmInFlightRef.current = false;
   }, []);
 
   const updateDraft = useCallback((patch: Partial<OperationalObjectDraft>) => {
     setDraft((current) => (current ? { ...current, ...patch } : current));
+    setConfirmError(null);
   }, []);
 
   const saveDraft = useCallback((): OperationalObject | null => {
@@ -148,14 +164,40 @@ export default function OperationalObjectProvider({
 
   const confirmDraft = useCallback((): OperationalObject | null => {
     if (!draft) return null;
-    const confirmed = confirmOperationalObject(draft);
-    refresh();
-    setComposerOpen(false);
-    setDraft(null);
-    setSuccessMessage(t("operationalObject.createdSuccess"));
-    const route = routeOperationalObject(confirmed);
-    router.push(`${route.href}?from=${encodeURIComponent(confirmed.id)}`);
-    return confirmed;
+    if (confirmInFlightRef.current) return null;
+    const missing = missingRequiredFields(draft);
+    if (missing.length > 0) {
+      setConfirmError(t("operationalObject.confirmBlockedMissing"));
+      return null;
+    }
+    const confirmKey = `${draft.id ?? "new"}:${draft.title}:${draft.objective}:${draft.nextAction}:${draft.humanDecision}`;
+    if (lastConfirmKeyRef.current === confirmKey) {
+      return null;
+    }
+    confirmInFlightRef.current = true;
+    try {
+      const confirmed = confirmOperationalObject(draft);
+      if (!confirmed) {
+        setConfirmError(t("operationalObject.confirmBlockedMissing"));
+        return null;
+      }
+      lastConfirmKeyRef.current = confirmKey;
+      refresh();
+      setComposerOpen(false);
+      setDraft(null);
+      setConfirmError(null);
+      setSuccessMessage(t("operationalObject.createdSuccess"));
+      const activationCard = confirmed.activation?.card as StarterWorkCard | undefined;
+      if (activationCard?.createdVia === "activation") {
+        const problem = createProblemFromConfirmedStarterCard(activationCard, confirmed.id);
+        router.push(`/problems?problemId=${encodeURIComponent(problem.id)}`);
+        return confirmed;
+      }
+      router.push(myWorkHrefForObject(confirmed.id));
+      return confirmed;
+    } finally {
+      confirmInFlightRef.current = false;
+    }
   }, [draft, refresh, router, t]);
 
   const submitCommand = useCallback(
@@ -252,6 +294,24 @@ export default function OperationalObjectProvider({
     [language, missionId, openComposer, pathname, pendingCommand, projectId, router],
   );
 
+  const archiveObject = useCallback(
+    (id: string) => {
+      const archived = archiveOperationalObject(id);
+      refresh();
+      return archived;
+    },
+    [refresh],
+  );
+
+  const reopenObject = useCallback(
+    (id: string) => {
+      const reopened = reopenOperationalObject(id);
+      refresh();
+      return reopened;
+    },
+    [refresh],
+  );
+
   const value = useMemo(
     () => ({
       objects,
@@ -260,6 +320,7 @@ export default function OperationalObjectProvider({
       inferredFields,
       source,
       successMessage,
+      confirmError,
       clarifyIntent,
       refresh,
       openComposer,
@@ -270,6 +331,8 @@ export default function OperationalObjectProvider({
       submitCommand,
       dismissClarify,
       selectClarifyOption,
+      archiveObject,
+      reopenObject,
     }),
     [
       objects,
@@ -278,6 +341,7 @@ export default function OperationalObjectProvider({
       inferredFields,
       source,
       successMessage,
+      confirmError,
       clarifyIntent,
       refresh,
       openComposer,
@@ -288,6 +352,8 @@ export default function OperationalObjectProvider({
       submitCommand,
       dismissClarify,
       selectClarifyOption,
+      archiveObject,
+      reopenObject,
     ],
   );
 
