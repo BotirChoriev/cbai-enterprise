@@ -122,14 +122,9 @@ function MyWorkContent() {
   // Local Mode's first paint is unaffected.
   //
   // Hydration-safety (found via real browser testing on /my-work): `cloudSessionRestoring`
-  // initializes from `isSupabaseConfigured()`, which reads NEXT_PUBLIC_SUPABASE_* through a *dynamic*
-  // `process.env[name]` access. Next.js only inlines NEXT_PUBLIC_* vars into the client bundle on
-  // *static* member access, so the server (with .env.local) sees "configured" while the client's
-  // first render sees "not configured". That divergence made the server render this cloud "restoring"
-  // card while the client rendered the local tree — a genuine React hydration mismatch on the most
-  // core "return to your work" route. Gating on useHydrated() guarantees the server and the client's
-  // first render match exactly; the real restoring state (when cloud is configured) still appears in
-  // the very next commit, once the client is hydrated.
+  // initializes from `isSupabaseConfigured()`. Gating on useHydrated() guarantees the server and
+  // the client's first render match exactly; the real restoring state (when cloud is configured)
+  // appears in the next commit, once the client is hydrated.
   if (hydrated && cloudSessionRestoring) {
     return <div className={`${cbaiGlassCard} p-5 text-sm text-zinc-500`}>{t("myWork.restoringSession")}</div>;
   }

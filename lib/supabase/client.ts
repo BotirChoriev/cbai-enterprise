@@ -21,18 +21,16 @@ function isBrowser(): boolean {
   return typeof window !== "undefined";
 }
 
-function readEnv(name: string): string | undefined {
-  if (typeof process === "undefined" || !process.env) return undefined;
-  const value = process.env[name];
+function normalizeEnv(value: string | undefined): string | undefined {
   return value && value.trim() ? value.trim() : undefined;
 }
 
 export function getSupabaseUrl(): string | undefined {
-  return readEnv("NEXT_PUBLIC_SUPABASE_URL");
+  return normalizeEnv(process.env.NEXT_PUBLIC_SUPABASE_URL);
 }
 
 export function getSupabaseAnonKey(): string | undefined {
-  return readEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+  return normalizeEnv(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 }
 
 /** Real env-var check — never assumes configuration that isn't there. */

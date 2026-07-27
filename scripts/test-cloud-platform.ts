@@ -234,6 +234,22 @@ test("20. .env.example documents only public variable names, never a real creden
   assert.equal(/=\s*["']?(https?:\/\/[a-z0-9-]+\.supabase\.co|eyJ)/i.test(content), false);
 });
 
+test("20b. Browser Supabase configuration uses statically analyzable NEXT_PUBLIC references", () => {
+  for (const path of [
+    "lib/supabase/client.ts",
+    "lib/persistence/persistence-capability.ts",
+    "lib/storage/storage-provider.ts",
+  ]) {
+    const content = readFileSync(join(process.cwd(), path), "utf-8");
+    assert.ok(content.includes("process.env.NEXT_PUBLIC_SUPABASE_URL"), `${path} must statically reference the URL`);
+    assert.ok(
+      content.includes("process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY"),
+      `${path} must statically reference the publishable key`,
+    );
+    assert.equal(/process\.env\s*\[[^\]]+\]/.test(content), false, `${path} must not dynamically index process.env`);
+  }
+});
+
 // ---------------------------------------------------------------------------
 // 21. RLS policy presence (static check against the real migration SQL)
 // ---------------------------------------------------------------------------
