@@ -152,6 +152,15 @@ const ACTIVE_STAGE: Record<DecisionJourneyVariant, number> = {
   governance: 4,
 };
 
+const HERO_IMAGE: Record<DecisionJourneyVariant, string> = {
+  problem: "/experience/problem-space-v1.webp",
+  evidence: "/experience/evidence-engine-v1.webp",
+  scenarios: "/experience/scenario-engine-v1.webp",
+  reports: "/experience/governance-monitoring-v1.webp",
+  collaboration: "/experience/collaboration-v1.webp",
+  governance: "/experience/governance-monitoring-v1.webp",
+};
+
 export default function DecisionJourneyHero({ variant }: { variant: DecisionJourneyVariant }) {
   const { language } = useTranslation();
   const { openDock } = useVoiceOperator();
@@ -161,6 +170,11 @@ export default function DecisionJourneyHero({ variant }: { variant: DecisionJour
 
   return (
     <section className={`${styles.hero} ${styles[variant]}`} data-cbai-experience={variant}>
+      <div
+        className={styles.cinematicMedia}
+        style={{ backgroundImage: `url("${HERO_IMAGE[variant]}")` }}
+        aria-hidden="true"
+      />
       <div className={styles.content}>
         <div className={styles.copy}>
           <p className={styles.eyebrow}>{copy.eyebrow}</p>

@@ -4,14 +4,31 @@
   position: relative;
   isolation: isolate;
   container-type: inline-size;
-  min-height: clamp(25rem, 52vh, 36rem);
+  min-height: clamp(31rem, 68vh, 47rem);
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--hero-accent) 32%, transparent);
   border-radius: 1.5rem;
-  background:
-    radial-gradient(circle at 76% 34%, rgba(var(--hero-accent-rgb), 0.2), transparent 27rem),
-    linear-gradient(128deg, rgba(3, 12, 24, 0.98) 0%, rgba(5, 19, 34, 0.94) 52%, rgba(2, 9, 18, 0.98) 100%);
+  background: #020914;
   box-shadow: 0 2.5rem 6rem rgba(0, 0, 0, 0.28);
+}
+
+.cinematicMedia {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  background-position: center;
+  background-size: cover;
+  filter: saturate(0.9) contrast(1.03);
+  transform: scale(1.01);
+}
+
+.cinematicMedia::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(2, 9, 20, 0.98) 0%, rgba(2, 9, 20, 0.9) 31%, rgba(2, 9, 20, 0.34) 59%, rgba(2, 9, 20, 0.1) 100%),
+    linear-gradient(0deg, rgba(2, 9, 20, 0.9) 0%, transparent 38%, rgba(2, 9, 20, 0.15) 100%);
+  content: "";
 }
 
 .hero::before {
@@ -161,6 +178,7 @@
   position: relative;
   min-height: 24rem;
   align-self: center;
+  opacity: 0.9;
 }
 
 .orbit,
@@ -353,6 +371,16 @@
   .content {
     grid-template-columns: 1fr;
     padding-bottom: 7.2rem;
+  }
+
+  .cinematicMedia {
+    background-position: 66% center;
+  }
+
+  .cinematicMedia::after {
+    background:
+      linear-gradient(0deg, rgba(2, 9, 20, 0.98) 0%, rgba(2, 9, 20, 0.82) 52%, rgba(2, 9, 20, 0.3) 100%),
+      linear-gradient(90deg, rgba(2, 9, 20, 0.55), transparent);
   }
 
   .copy {
