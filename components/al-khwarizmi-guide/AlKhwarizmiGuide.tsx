@@ -74,7 +74,14 @@ export default function AlKhwarizmiGuide() {
     if (open || voice.dockOpen) return;
 
     let timeout = window.setTimeout(() => setIdle(true), 14_000);
-    const markActive = () => {
+    const markActive = (event: Event) => {
+      if (
+        event.type === "pointerdown" &&
+        event.target instanceof Element &&
+        event.target.closest("[data-cbai-progress-guide]")
+      ) {
+        return;
+      }
       setIdle(false);
       window.clearTimeout(timeout);
       timeout = window.setTimeout(() => setIdle(true), 14_000);

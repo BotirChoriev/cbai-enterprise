@@ -61,4 +61,5 @@ test("roaming pauses for reliable pointer and keyboard interaction", () => {
   assert.match(guideCss, /\.roaming:hover/);
   assert.match(guideCss, /\.roaming:focus-within/);
   assert.match(guideCss, /animation-play-state: paused/);
+  assert.match(guide, /closest\("\[data-cbai-progress-guide\]"\)/);
 });
