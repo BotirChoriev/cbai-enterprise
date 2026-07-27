@@ -8,6 +8,7 @@ import {
 } from "@/lib/al-khwarizmi-guide/progress";
 
 const guide = readFileSync("components/al-khwarizmi-guide/AlKhwarizmiGuide.tsx", "utf8");
+const guideCss = readFileSync("components/al-khwarizmi-guide/AlKhwarizmiGuide.module.css", "utf8");
 const layout = readFileSync("app/(dashboard)/layout.tsx", "utf8");
 
 test("guide represents the six-stage CBAI sequence", () => {
@@ -43,4 +44,15 @@ test("guide is mounted inside the Voice Operator provider and uses a project ass
   const providerEnd = layout.indexOf("</VoiceOperatorProvider>");
   assert.ok(providerStart >= 0 && guideIndex > providerStart && guideIndex < providerEnd);
   assert.ok(existsSync("public/guides/al-khwarizmi-guide-v1.png"));
+  assert.ok(existsSync("public/guides/al-khwarizmi-reading-v1.png"));
+});
+
+test("guide roams, settles to read, and respects reduced-motion preferences", () => {
+  assert.match(guide, /14_000/);
+  assert.match(guide, /data-guide-motion/);
+  assert.match(guide, /al-khwarizmi-reading-v1\.png/);
+  assert.match(guide, /ALGORITHM/);
+  assert.match(guideCss, /@keyframes platformRoam/);
+  assert.match(guideCss, /@keyframes readingBreath/);
+  assert.match(guideCss, /prefers-reduced-motion/);
 });

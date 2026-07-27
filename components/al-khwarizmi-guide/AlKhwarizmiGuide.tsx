@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useVoiceOperator } from "@/components/voice-operator/VoiceOperatorProvider";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import {
@@ -64,10 +64,32 @@ export default function AlKhwarizmiGuide() {
   const voice = useVoiceOperator();
   const [open, setOpen] = useState(false);
   const [question, setQuestion] = useState("");
+  const [idle, setIdle] = useState(false);
   const locale = language === "uz" ? "uz" : "en";
   const copy = COPY[locale];
   const stageIndex = useMemo(() => guideStageIndexForPath(pathname), [pathname]);
   const nextStage = useMemo(() => nextGuideStage(pathname), [pathname]);
+
+  useEffect(() => {
+    if (open || voice.dockOpen) return;
+
+    let timeout = window.setTimeout(() => setIdle(true), 14_000);
+    const markActive = () => {
+      setIdle(false);
+      window.clearTimeout(timeout);
+      timeout = window.setTimeout(() => setIdle(true), 14_000);
+    };
+
+    window.addEventListener("pointerdown", markActive, { passive: true });
+    window.addEventListener("keydown", markActive);
+    window.addEventListener("scroll", markActive, { passive: true });
+    return () => {
+      window.clearTimeout(timeout);
+      window.removeEventListener("pointerdown", markActive);
+      window.removeEventListener("keydown", markActive);
+      window.removeEventListener("scroll", markActive);
+    };
+  }, [open, pathname, voice.dockOpen]);
 
   const askGuide = () => {
     const value = question.trim();
@@ -80,7 +102,11 @@ export default function AlKhwarizmiGuide() {
   if (voice.dockOpen) return null;
 
   return (
-    <aside className={styles.root} data-cbai-progress-guide="al-khwarizmi">
+    <aside
+      className={`${styles.root} ${!open ? (idle ? styles.idle : styles.roaming) : ""}`}
+      data-cbai-progress-guide="al-khwarizmi"
+      data-guide-motion={open ? "engaged" : idle ? "reading" : "roaming"}
+    >
       {open ? (
         <section className={styles.panel} aria-label={copy.open}>
           <header className={styles.header}>
@@ -134,19 +160,23 @@ export default function AlKhwarizmiGuide() {
       ) : null}
       <button
         type="button"
-        className={styles.launcher}
-        onClick={() => setOpen((value) => !value)}
+        className={`${styles.launcher} ${idle ? styles.launcherIdle : ""}`}
+        onClick={() => {
+          setIdle(false);
+          setOpen((value) => !value);
+        }}
         aria-label={copy.open}
         aria-expanded={open}
       >
         <Image
-          className={styles.avatar}
-          src="/guides/al-khwarizmi-guide-v1.png"
+          className={`${styles.avatar} ${idle ? styles.avatarReading : ""}`}
+          src={idle ? "/guides/al-khwarizmi-reading-v1.png" : "/guides/al-khwarizmi-guide-v1.png"}
           width={168}
           height={168}
           alt=""
           priority
         />
+        {idle ? <span className={styles.algorithmWord}>ALGORITHM</span> : null}
       </button>
     </aside>
   );

@@ -9,6 +9,16 @@
   pointer-events: none;
 }
 
+.roaming {
+  animation: platformRoam 34s ease-in-out infinite;
+}
+
+.idle {
+  right: 50%;
+  transform: translateX(50%);
+  transition: right 900ms ease, transform 900ms ease;
+}
+
 .launcher,
 .panel {
   pointer-events: auto;
@@ -29,6 +39,7 @@
   box-shadow:
     0 1rem 3rem rgba(0, 0, 0, 0.38),
     0 0 2.5rem rgba(45, 212, 191, 0.14);
+  transition: width 600ms ease, height 600ms ease, border-color 200ms ease;
 }
 
 .launcher::after {
@@ -50,6 +61,35 @@
   object-fit: contain;
   object-position: center bottom;
   transition: transform 180ms ease;
+}
+
+.launcherIdle {
+  width: 8rem;
+  height: 7.2rem;
+  overflow: visible;
+  border-color: rgba(251, 191, 36, 0.48);
+  background: radial-gradient(circle at 50% 76%, rgba(251, 191, 36, 0.12), transparent 62%);
+  box-shadow: 0 1.2rem 3rem rgba(0, 0, 0, 0.26);
+}
+
+.avatarReading {
+  position: absolute;
+  bottom: 0.8rem;
+  width: 6.7rem;
+  height: 6.7rem;
+  animation: readingBreath 3.6s ease-in-out infinite;
+}
+
+.algorithmWord {
+  position: absolute;
+  right: 50%;
+  bottom: 0;
+  color: rgba(94, 234, 212, 0.82);
+  font-size: 0.62rem;
+  font-weight: 850;
+  letter-spacing: 0.2em;
+  text-shadow: 0 0 1.1rem rgba(45, 212, 191, 0.6);
+  transform: translateX(50%);
 }
 
 .launcher:hover .avatar {
@@ -213,13 +253,80 @@
     align-self: flex-end;
   }
 
+  .roaming {
+    animation: mobileRoam 22s ease-in-out infinite;
+  }
+
+  .idle {
+    right: 0.75rem;
+    left: auto;
+    transform: none;
+  }
+
+  .launcherIdle {
+    width: 6.4rem;
+    height: 5.8rem;
+  }
+
+  .avatarReading {
+    width: 5.3rem;
+    height: 5.3rem;
+  }
+
   .panel {
     width: 100%;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .avatar {
+  .avatar,
+  .roaming,
+  .avatarReading {
+    animation: none;
     transition: none;
+  }
+}
+
+@keyframes platformRoam {
+  0%,
+  12%,
+  100% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(calc(-100vw + 23rem), 0);
+  }
+  48% {
+    transform: translate(calc(-100vw + 23rem), calc(-100vh + 13rem));
+  }
+  72% {
+    transform: translate(0, calc(-100vh + 13rem));
+  }
+  86% {
+    transform: translate(-18vw, -18vh);
+  }
+}
+
+@keyframes mobileRoam {
+  0%,
+  20%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(calc(-100vw + 6.5rem), -12vh);
+  }
+  75% {
+    transform: translate(-22vw, -32vh);
+  }
+}
+
+@keyframes readingBreath {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-0.4deg);
+  }
+  50% {
+    transform: translateY(-0.18rem) rotate(0.4deg);
   }
 }
