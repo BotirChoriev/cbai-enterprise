@@ -1,0 +1,74 @@
+name: Preview Playwright Matrix
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - ci/preview-playwright-matrix
+jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: f41c8ea487e41b78ee8d3a5830697e06acf06424
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Run immutable Preview matrix
+        env:
+          PREVIEW_URL: https://a562cfac.cbai-enterprise.pages.dev
+        run: |
+          node --input-type=module <<'NODE'
+          import { chromium } from "playwright";
+          const base = process.env.PREVIEW_URL;
+          const routes = ["/","/account","/my-work","/problems","/evidence","/research","/research/microbiology","/countries","/companies","/universities","/graph","/rooms","/reports","/organization","/governance","/trust","/settings","/about","/search","/investor","/government"];
+          const viewports = [
+            ["mobile-320",320,568],["mobile-375",375,812],["mobile-390",390,844],["mobile-414",414,896],
+            ["tablet-768",768,1024],["desktop-1024",1024,768],["desktop-1440",1440,900],["desktop-1920",1920,1080]
+          ];
+          const browser = await chromium.launch({headless:true});
+          let failed = 0;
+          let cases = 0;
+          const failures = [];
+          try {
+            for (const [name,width,height] of viewports) {
+              const context = await browser.newContext({viewport:{width,height}});
+              for (const route of routes) {
+                cases++;
+                const page = await context.newPage();
+                const errors = [];
+                page.on("pageerror", e => errors.push("pageerror: "+e.message));
+                page.on("console", m => { if (m.type()==="error") errors.push("console: "+m.text()); });
+                let status = 0, title = "", visible = false, overflow = null, navigationError = null;
+                try {
+                  const response = await page.goto(base+route,{waitUntil:"networkidle",timeout:45000});
+                  status = response?.status() ?? 0;
+                  await page.waitForTimeout(route==="/" ? 1500 : 300);
+                  title = await page.title();
+                  visible = await page.locator("body").isVisible();
+                  overflow = await page.evaluate(() => ({scrollWidth:document.documentElement.scrollWidth,clientWidth:document.documentElement.clientWidth}));
+                } catch (e) { navigationError = e?.message ?? String(e); }
+                const assertions = {
+                  navigation:navigationError===null,
+                  status:status>=200&&status<400,
+                  title:title.trim().length>0,
+                  bodyVisible:visible,
+                  noHorizontalOverflow:overflow!==null&&overflow.scrollWidth<=overflow.clientWidth,
+                  noConsoleOrPageErrors:errors.length===0
+                };
+                const pass = Object.values(assertions).every(Boolean);
+                console.log((pass?"PASS ":"FAIL ")+name+" "+route+" "+JSON.stringify(assertions));
+                if (!pass) { failed++; failures.push({viewport:name,route,assertions,status,title,overflow,errors,navigationError}); }
+                await page.close();
+              }
+              await context.close();
+            }
+          } finally { await browser.close(); }
+          const summary = {release:"f41c8ea487e41b78ee8d3a5830697e06acf06424",target:base,viewports:viewports.length,routes:routes.length,cases,assertions:cases*6,passedCases:cases-failed,failedCases:failed,failures};
+          console.log("FINAL_MATRIX_SUMMARY "+JSON.stringify(summary));
+          if (failed) process.exit(1);
+          NODE
