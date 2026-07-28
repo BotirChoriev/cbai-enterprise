@@ -56,6 +56,7 @@ const COPY = {
     verifyPlaceholder: "What happened? What worked, failed, or changed?",
     verifyConfirm: "Confirm outcome",
     linkedMaterials: "Confirmed materials",
+    verifiedLearning: "Verified learning",
   },
   uz: {
     eyebrow: "1-blok · Insonlar",
@@ -91,6 +92,7 @@ const COPY = {
     verifyPlaceholder: "Nima bo‘ldi? Nima ishladi, ishlamadi yoki o‘zgardi?",
     verifyConfirm: "Natijani tasdiqlash",
     linkedMaterials: "Tasdiqlangan materiallar",
+    verifiedLearning: "Tasdiqlangan o‘rganish",
   },
 } as const;
 
@@ -369,11 +371,19 @@ export default function PersonalWorkspaceGateway() {
             />
             <button
               type="button"
+              disabled={!learningNote.trim()}
               onClick={() => confirmPersonalOutcome(learningNote)}
-              className="mt-3 inline-flex min-h-11 items-center rounded-full bg-amber-300 px-5 text-sm font-semibold text-slate-950"
+              className="mt-3 inline-flex min-h-11 items-center rounded-full bg-amber-300 px-5 text-sm font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {copy.verifyConfirm}
             </button>
+          </section>
+        ) : null}
+
+        {workspace.currentStage === "learn" && workspace.learningNote ? (
+          <section className="border-t border-emerald-300/15 bg-emerald-950/10 px-5 py-4 sm:px-6" data-verified-learning="">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-300">{copy.verifiedLearning}</p>
+            <p className="mt-2 text-sm leading-6 text-emerald-50">{workspace.learningNote}</p>
           </section>
         ) : null}
 

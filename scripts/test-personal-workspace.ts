@@ -50,6 +50,8 @@ test("Block 1 exposes the cybernetic loop, material intake, and decision queue",
   assert.match(gateway, /type="file"/);
   assert.match(gateway, /confirmPendingFiles/);
   assert.match(gateway, /confirmPersonalOutcome/);
+  assert.match(gateway, /data-verified-learning/);
+  assert.match(gateway, /disabled=\{!learningNote\.trim\(\)\}/);
   assert.match(gateway, /selectedModuleIds\.length === 0/);
 });
 
