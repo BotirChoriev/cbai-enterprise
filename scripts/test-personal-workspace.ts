@@ -38,6 +38,15 @@ test("human confirmation, persistence, voice, and canonical Operational Objects 
   assert.match(gateway, /humanApprovalRequired: true/);
 });
 
+test("Block 1 exposes the cybernetic loop, material intake, and decision queue", () => {
+  assert.match(gateway, /"sense", "structure", "compare", "decide", "act", "verify", "learn"/);
+  assert.match(gateway, /data-human-decision-queue/);
+  assert.match(gateway, /type="file"/);
+  assert.match(gateway, /confirmPendingFiles/);
+  assert.match(gateway, /confirmPersonalOutcome/);
+  assert.match(gateway, /selectedModuleIds\.length === 0/);
+});
+
 test("People block is mounted on the real platform home", () => {
   assert.match(home, /<PersonalWorkspaceGateway \/>/);
 });
