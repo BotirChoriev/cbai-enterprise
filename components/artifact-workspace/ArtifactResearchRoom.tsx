@@ -11,6 +11,10 @@ import {
 } from "@/lib/pdf-ingestion/local-pdf-ingestion";
 import { validateDocumentUploadCandidate } from "@/lib/document-intake/document-intake";
 import {
+  extractPdfLocally,
+  type BrowserPdfExtraction,
+} from "@/lib/pdf-ingestion/browser-pdf-extraction";
+import {
   ARTIFACT_ROOM_STAGES,
   confirmArtifactUnderstanding,
   createArtifactUnderstandingDraft,
@@ -18,6 +22,10 @@ import {
   type ArtifactUnderstandingDraft,
   type ConfirmedArtifactRoom,
 } from "@/lib/artifact-workspace/artifact-workspace";
+import {
+  uploadArtifactToQuarantine,
+  type ArtifactCloudReceipt,
+} from "@/lib/artifact-workspace/cloud-artifact-storage";
 
 const COPY = {
   en: {
@@ -50,10 +58,20 @@ const COPY = {
     activeBody: "The room is active. Start with evidence; compare alternatives before recording a human decision.",
     original: "Original file",
     checksum: "SHA-256 identity",
-    noExtraction: "Content extraction is not connected yet. CBAI will not claim it has read pages, citations, figures, or formulas.",
+    noExtraction: "This module is not yet human-reviewed. CBAI will not treat extracted text, citations, figures, or formulas as verified evidence.",
     evidence: "Open Evidence",
     work: "Create structured work",
     ask: "Ask Al-Khwarizmi / Voice Operator",
+    archive: "Upload to secure quarantine",
+    archiving: "Uploading securely…",
+    quarantined: "Uploaded to private quarantine. Download and processing stay blocked until an external malware scanner returns clean.",
+    archiveError: "Secure upload failed. No readiness claim was made.",
+    extracted: "Local document extraction",
+    pages: "pages",
+    characters: "characters",
+    headings: "Detected section labels",
+    scanned: "This appears to be an image/scanned PDF. OCR is required before textual analysis.",
+    extractionLimit: "Extraction was limited for browser safety; the limitation is preserved in provenance.",
   },
   uz: {
     eyebrow: "ARTEFAKT INTELLEKTI · PHD PILOT",
@@ -85,10 +103,20 @@ const COPY = {
     activeBody: "Xona faol. Avval dalillarni yig‘ing; inson qarorini qayd etishdan oldin variantlarni taqqoslang.",
     original: "Asl fayl",
     checksum: "SHA-256 identifikator",
-    noExtraction: "Kontentni ajratib o‘qish hali ulanmagan. CBAI sahifa, iqtibos, rasm yoki formulalarni o‘qidim deb da’vo qilmaydi.",
+    noExtraction: "Bu modul hali inson tomonidan tekshirilmagan. CBAI ajratilgan matn, iqtibos, rasm yoki formulalarni tasdiqlangan dalil deb olmaydi.",
     evidence: "Dalillarni ochish",
     work: "Tizimli ish yaratish",
     ask: "Al-Xorazmiy / Ovozli operatordan so‘rash",
+    archive: "Xavfsiz karantinga yuklash",
+    archiving: "Xavfsiz yuklanmoqda…",
+    quarantined: "Private karantinga yuklandi. Tashqi malware scanner «clean» javobini bermaguncha o‘qish va processing yopiq qoladi.",
+    archiveError: "Xavfsiz yuklash bajarilmadi. Tizim tayyor deb da’vo qilmadi.",
+    extracted: "Qurilmadagi hujjat extraction’i",
+    pages: "sahifa",
+    characters: "belgi",
+    headings: "Aniqlangan bo‘lim nomlari",
+    scanned: "Bu rasm/skanerlangan PDFga o‘xshaydi. Matnli tahlildan oldin OCR kerak.",
+    extractionLimit: "Brauzer xavfsizligi uchun extraction cheklandi; bu cheklov provenance’da saqlandi.",
   },
 } as const;
 
@@ -107,6 +135,10 @@ export default function ArtifactResearchRoom() {
   const [metadata, setMetadata] = useState<LocalPdfMetadata | null>(null);
   const [draft, setDraft] = useState<ArtifactUnderstandingDraft | null>(null);
   const [room, setRoom] = useState<ConfirmedArtifactRoom | null>(null);
+  const [cloudBusy, setCloudBusy] = useState(false);
+  const [cloudReceipt, setCloudReceipt] = useState<ArtifactCloudReceipt | null>(null);
+  const [cloudError, setCloudError] = useState<string | null>(null);
+  const [extraction, setExtraction] = useState<BrowserPdfExtraction | null>(null);
 
   function openVoice(prompt: string) {
     voice.setTextInput(prompt);
@@ -136,14 +168,32 @@ export default function ArtifactResearchRoom() {
       const nextMetadata = await createLocalPdfMetadata(file, {
         originalLanguage: language,
       });
+      const nextExtraction = await extractPdfLocally(file);
+      const enrichedMetadata: LocalPdfMetadata = {
+        ...nextMetadata,
+        pageCount: nextExtraction.pageCount,
+        extractionStatus: nextExtraction.likelyScannedDocument
+          ? "scanned_document_unsupported"
+          : "metadata_ready",
+        limitations: [
+          "Text was extracted locally in the browser and was not uploaded by this step.",
+          ...(nextExtraction.truncated
+            ? ["Local extraction was truncated at the documented browser safety limit."]
+            : []),
+          ...(nextExtraction.likelyScannedDocument
+            ? ["The PDF contains too little extractable text and requires OCR."]
+            : []),
+        ],
+      };
       const nextDraft = createArtifactUnderstandingDraft({
         title,
         domain,
         purpose,
         researchQuestion: question,
-        material: nextMetadata,
+        material: enrichedMetadata,
       });
-      setMetadata(nextMetadata);
+      setMetadata(enrichedMetadata);
+      setExtraction(nextExtraction);
       setDraft(nextDraft);
     } catch {
       setError(copy.invalid);
@@ -204,6 +254,21 @@ export default function ArtifactResearchRoom() {
             <ul className="mt-2 space-y-2 text-sm">{draft.knownFromHuman.map((item) => <li key={item}>✓ {item}</li>)}</ul>
             <h4 className="mt-6 text-xs font-semibold uppercase tracking-wider text-amber-300">{copy.unknown}</h4>
             <ul className="mt-2 space-y-2 text-sm text-amber-100">{draft.unknowns.map((item) => <li key={item}>? {item}</li>)}</ul>
+            {extraction ? (
+              <div className="mt-6 rounded-xl border border-emerald-300/25 bg-emerald-300/5 p-4" data-cbai-local-pdf-extraction="">
+                <h4 className="font-semibold text-emerald-200">{copy.extracted}</h4>
+                <p className="mt-2 text-sm text-slate-200">
+                  {extraction.pageCount} {copy.pages} · {extraction.characterCount.toLocaleString()} {copy.characters}
+                </p>
+                {extraction.detectedHeadings.length ? (
+                  <p className="mt-2 text-xs text-slate-300">
+                    {copy.headings}: {extraction.detectedHeadings.join(", ")}
+                  </p>
+                ) : null}
+                {extraction.likelyScannedDocument ? <p className="mt-2 text-xs text-amber-200">{copy.scanned}</p> : null}
+                {extraction.truncated ? <p className="mt-2 text-xs text-amber-200">{copy.extractionLimit}</p> : null}
+              </div>
+            ) : null}
           </article>
           <aside className="space-y-4">
             <div className="rounded-2xl border border-white/10 bg-slate-950/35 p-5">
@@ -231,10 +296,35 @@ export default function ArtifactResearchRoom() {
           <div className="flex flex-wrap gap-3">
             <Link href="/evidence" className="inline-flex min-h-12 items-center rounded-xl bg-cyan-300 px-5 font-semibold text-slate-950">{copy.evidence}</Link>
             <button type="button" onClick={() => openVoice(`${room.title}. ${room.researchQuestion}. Help me structure the next evidence-based step. Human approval is required.`)} className="min-h-12 rounded-xl border border-cyan-300/35 px-5 text-cyan-100">{copy.ask}</button>
+            <button
+              type="button"
+              disabled={cloudBusy || Boolean(cloudReceipt)}
+              onClick={async () => {
+                if (!file) return;
+                setCloudBusy(true);
+                setCloudError(null);
+                try {
+                  setCloudReceipt(await uploadArtifactToQuarantine({ file, room, locale: language }));
+                } catch {
+                  setCloudError(copy.archiveError);
+                } finally {
+                  setCloudBusy(false);
+                }
+              }}
+              className="min-h-12 rounded-xl border border-amber-300/40 px-5 text-amber-100 disabled:opacity-60"
+              data-cbai-artifact-cloud-upload=""
+            >
+              {cloudBusy ? copy.archiving : copy.archive}
+            </button>
           </div>
+          {cloudReceipt ? (
+            <p role="status" className="rounded-xl border border-amber-300/30 bg-amber-300/10 px-4 py-3 text-sm text-amber-50" data-cbai-artifact-quarantined="">
+              {copy.quarantined}
+            </p>
+          ) : null}
+          {cloudError ? <p role="alert" className="text-sm text-rose-200">{cloudError}</p> : null}
         </div>
       ) : null}
     </section>
   );
 }
-

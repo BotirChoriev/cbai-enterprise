@@ -18,15 +18,17 @@ test("artifact understanding stays at a mandatory human checkpoint", () => {
       sizeBytes: 2048,
       mimeType: "application/pdf",
       checksumSha256: "abc123",
+      pageCount: null,
       originalLanguage: "en",
       selectedAt: "2026-07-28T00:00:00.000Z",
-      processingStatus: "local_metadata_ready",
-      sourceProvenance: "user_selected_local_file",
+      extractionStatus: "server_extraction_unavailable",
+      persistence: "local_metadata_only",
+      limitations: ["Server extraction unavailable."],
     },
   });
 
   assert.equal(draft.status, "awaiting_human_confirmation");
-  assert.ok(draft.unknowns.some((item) => item.includes("not been extracted")));
+  assert.ok(draft.unknowns.some((item) => item.includes("not yet available")));
   assert.deepEqual(draft.suggestedModules, PHD_ROOM_MODULES);
 
   const room = confirmArtifactUnderstanding(draft);

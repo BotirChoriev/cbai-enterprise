@@ -44,6 +44,9 @@ yarn-error.log*
 # cloudflare local build artifacts
 .wrangler/
 
+# Supabase CLI link/runtime state (may contain project-specific connection metadata)
+/supabase/.temp/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

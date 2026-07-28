@@ -169,6 +169,73 @@ export type ActivityEventRow = {
   created_at: string;
 };
 
+export type StorageObjectRow = {
+  id: string;
+  owner_user_id: string | null;
+  organization_id: string | null;
+  bucket: string;
+  storage_key: string;
+  content_hash: string | null;
+  byte_size: number | null;
+  mime_type: string | null;
+  visibility: "private" | "team" | "public";
+  lifecycle_status: string;
+  scan_status: string;
+  idempotency_key: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type DocumentArtifactRow = {
+  id: string;
+  owner_user_id: string;
+  storage_object_id: string | null;
+  bucket: string;
+  storage_key: string;
+  original_filename: string;
+  safe_filename: string;
+  byte_size: number;
+  mime_type: string;
+  checksum_sha256: string;
+  title: string;
+  domain: string;
+  purpose: string;
+  research_question: string;
+  content_locale: string;
+  privacy: "private" | "team";
+  scan_status: "pending" | "clean" | "infected" | "failed" | "external_blocked";
+  processing_status:
+    | "quarantined"
+    | "scan_pending"
+    | "extracting"
+    | "needs_human_review"
+    | "human_confirmed"
+    | "failed";
+  scanner_provider: string | null;
+  scanner_result_id: string | null;
+  scanned_at: string | null;
+  parser_version: string | null;
+  page_count: number | null;
+  extraction_warnings: string[];
+  human_confirmed_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type DocumentArtifactSectionRow = {
+  id: string;
+  artifact_id: string;
+  owner_user_id: string;
+  section_kind: string;
+  heading: string | null;
+  page_start: number | null;
+  page_end: number | null;
+  extracted_text: string;
+  extraction_confidence: number | null;
+  provenance: Record<string, unknown>;
+  created_at: string;
+};
+
 export type OrganizationRow = {
   id: string;
   name: string;
@@ -312,6 +379,21 @@ export type Database = {
         ActivityEventRow,
         Insertable<ActivityEventRow, "id" | "created_at">,
         Partial<Omit<ActivityEventRow, "id" | "owner_id">>
+      >;
+      storage_objects: TableDef<
+        StorageObjectRow,
+        Insertable<StorageObjectRow, "id" | "created_at" | "updated_at" | "visibility" | "lifecycle_status" | "scan_status">,
+        Partial<Omit<StorageObjectRow, "id" | "owner_user_id" | "created_at">>
+      >;
+      document_artifacts: TableDef<
+        DocumentArtifactRow,
+        Insertable<DocumentArtifactRow, "id" | "storage_object_id" | "bucket" | "title" | "domain" | "purpose" | "research_question" | "content_locale" | "privacy" | "scan_status" | "processing_status" | "scanner_provider" | "scanner_result_id" | "scanned_at" | "parser_version" | "page_count" | "extraction_warnings" | "human_confirmed_at" | "created_at" | "updated_at">,
+        Partial<Omit<DocumentArtifactRow, "id" | "owner_user_id" | "created_at">>
+      >;
+      document_artifact_sections: TableDef<
+        DocumentArtifactSectionRow,
+        Insertable<DocumentArtifactSectionRow, "id" | "heading" | "page_start" | "page_end" | "extraction_confidence" | "provenance" | "created_at">,
+        never
       >;
       problem_snapshots: TableDef<
         ProblemSnapshotRow,

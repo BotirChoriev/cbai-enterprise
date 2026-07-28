@@ -76,10 +76,15 @@ export function createArtifactUnderstandingDraft(input: {
       `Domain: ${domain}`,
       ...(purpose ? [`Purpose: ${purpose}`] : []),
       ...(question ? [`Research question: ${question}`] : []),
+      ...(input.material.pageCount
+        ? [`Locally extracted page count: ${input.material.pageCount}`]
+        : []),
     ],
     unknowns: [
-      "Document content has not been extracted or semantically verified.",
-      "Page count, citations, figures, formulas, and claims are not yet available.",
+      input.material.extractionStatus === "metadata_ready"
+        ? "Text was extracted locally, but its scientific meaning and claims are not yet verified."
+        : "Document text is not yet available for semantic verification.",
+      "Citations, figures, formulas, and scientific claims still require structured review.",
       "Scientific validity and originality require human and source review.",
     ],
     suggestedModules: [...PHD_ROOM_MODULES],
@@ -117,4 +122,3 @@ export function saveArtifactRoom(room: ConfirmedArtifactRoom): void {
   else rooms.unshift(room);
   window.localStorage.setItem(STORE_KEY, JSON.stringify(rooms));
 }
-
