@@ -15,6 +15,10 @@ test("profession engine adapts to painter, cook, scientist, and unknown work", (
   assert.equal(interpretProfession("Men olimman").templateId, "scientist");
   assert.equal(interpretProfession("Men akademikman").templateId, "academic");
   assert.equal(interpretProfession("I am a professor").templateId, "academic");
+  assert.equal(
+    interpretProfession("I am an academic and professor working on a PhD").templateId,
+    "academic",
+  );
   assert.equal(interpretProfession("Men floristman").templateId, "general");
 });
 

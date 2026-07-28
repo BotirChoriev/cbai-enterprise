@@ -121,9 +121,13 @@ export function getProfessionTemplate(id: ProfessionTemplateId): ProfessionTempl
 
 export function interpretProfession(text: string): ProfessionInterpretation {
   const normalized = text.trim().toLocaleLowerCase();
-  const template =
-    TEMPLATES.find((candidate) => candidate.signals.some((signal) => normalized.includes(signal))) ??
-    getProfessionTemplate("general");
+  const explicitAcademic =
+    /(akademik|professor|academic|lecturer|o'qituvchi|oqituvchi)/i.test(normalized);
+  const template = explicitAcademic
+    ? getProfessionTemplate("academic")
+    : TEMPLATES.find((candidate) =>
+        candidate.signals.some((signal) => normalized.includes(signal)),
+      ) ?? getProfessionTemplate("general");
   const isGenericCraft =
     /(usta|craftsman|tradesperson|hunarmand)/i.test(normalized) && template.id === "general";
   const explicit = template.id !== "general";
