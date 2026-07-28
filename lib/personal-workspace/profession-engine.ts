@@ -1,4 +1,4 @@
-export type ProfessionTemplateId = "painter" | "cook" | "scientist" | "general";
+export type ProfessionTemplateId = "painter" | "cook" | "scientist" | "academic" | "general";
 
 export type LocalizedLabel = { readonly en: string; readonly uz: string };
 
@@ -79,6 +79,24 @@ const TEMPLATES: readonly ProfessionTemplate[] = [
     signals: ["olim", "tadqiqotchi", "kimyogar", "scientist", "researcher", "chemist", "phd"],
   },
   {
+    id: "academic",
+    label: { en: "Academic / professor", uz: "Akademik / professor" },
+    workspaceTitle: { en: "Academic daily desk", uz: "Akademikning kundalik stoli" },
+    modules: [
+      { id: "research", label: { en: "Research & PhD", uz: "Tadqiqot va PhD" }, route: "/research" },
+      { id: "publications", label: { en: "Papers & sources", uz: "Maqolalar va manbalar" }, route: "/evidence" },
+      { id: "teaching", label: { en: "Teaching & students", uz: "Darslar va talabalar" }, route: "/my-work" },
+      { id: "collaboration", label: { en: "Academic collaboration", uz: "Ilmiy hamkorlik" }, route: "/rooms" },
+      { id: "reports", label: { en: "Progress & reports", uz: "Progress va hisobotlar" }, route: "/reports" },
+    ],
+    starterTasks: [
+      { id: "focus", label: { en: "Confirm today’s academic focus", uz: "Bugungi akademik yo‘nalishni tasdiqlash" } },
+      { id: "evidence", label: { en: "Review one research or teaching evidence item", uz: "Bitta tadqiqot yoki dars dalilini ko‘rib chiqish" } },
+      { id: "decision", label: { en: "Record the next human decision or review", uz: "Keyingi inson qarori yoki tekshiruvini qayd etish" } },
+    ],
+    signals: ["akademik", "professor", "academic", "lecturer", "o'qituvchi", "oqituvchi"],
+  },
+  {
     id: "general",
     label: { en: "Personal work", uz: "Shaxsiy ish" },
     workspaceTitle: { en: "My daily desk", uz: "Mening kundalik stolim" },
@@ -98,7 +116,7 @@ const TEMPLATES: readonly ProfessionTemplate[] = [
 ];
 
 export function getProfessionTemplate(id: ProfessionTemplateId): ProfessionTemplate {
-  return TEMPLATES.find((template) => template.id === id) ?? TEMPLATES[3]!;
+  return TEMPLATES.find((template) => template.id === id) ?? TEMPLATES[TEMPLATES.length - 1]!;
 }
 
 export function interpretProfession(text: string): ProfessionInterpretation {

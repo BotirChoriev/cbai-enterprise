@@ -13,6 +13,8 @@ test("profession engine adapts to painter, cook, scientist, and unknown work", (
   assert.equal(interpretProfession("Men malyarman").templateId, "painter");
   assert.equal(interpretProfession("Men oshpazman").templateId, "cook");
   assert.equal(interpretProfession("Men olimman").templateId, "scientist");
+  assert.equal(interpretProfession("Men akademikman").templateId, "academic");
+  assert.equal(interpretProfession("I am a professor").templateId, "academic");
   assert.equal(interpretProfession("Men floristman").templateId, "general");
 });
 
@@ -23,7 +25,7 @@ test("generic craft receives a specialty follow-up instead of a guessed template
 });
 
 test("each daily desk has tasks and connected CBAI modules", () => {
-  for (const id of ["painter", "cook", "scientist", "general"] as const) {
+  for (const id of ["painter", "cook", "scientist", "academic", "general"] as const) {
     const template = getProfessionTemplate(id);
     assert.ok(template.starterTasks.length >= 3);
     assert.ok(template.modules.length >= 4);
