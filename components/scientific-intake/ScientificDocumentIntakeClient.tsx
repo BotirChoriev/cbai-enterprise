@@ -6,7 +6,7 @@ import { useId, useState } from "react";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import { useAuth } from "@/components/platform/context/AuthProvider";
 import { useTranslation } from "@/lib/i18n/use-translation";
-import LocalPdfIntake from "@/components/scientific-intake/LocalPdfIntake";
+import ArtifactResearchRoom from "@/components/artifact-workspace/ArtifactResearchRoom";
 import {
   confirmScientificIntake,
   createScientificIntakeDraft,
@@ -113,12 +113,14 @@ export default function ScientificDocumentIntakeClient() {
           {t("voiceCommand.scientificIntakeStorageRequired")}
         </p>
       ) : null}
-      <LocalPdfIntake />
-      <p className="mb-4 text-xs text-[var(--cbai-text-secondary)]" data-intake-status={intakeHonesty.metadata.processingStatus}>
+      <ArtifactResearchRoom />
+      <p className="mb-4 mt-5 text-xs text-[var(--cbai-text-secondary)]" data-intake-status={intakeHonesty.metadata.processingStatus}>
         {intakeHonesty.metadata.extractionWarnings[0] ?? null}
       </p>
+      <details className="mt-6 rounded-xl border border-[var(--cbai-border-default)] bg-[var(--cbai-solid-surface)] p-4">
+        <summary className="cursor-pointer text-sm font-medium">Advanced scientific intake metadata</summary>
       <form
-        className="grid max-w-xl gap-3"
+        className="mt-5 grid max-w-xl gap-3"
         onSubmit={(event) => {
           event.preventDefault();
           try {
@@ -291,6 +293,7 @@ export default function ScientificDocumentIntakeClient() {
           </button>
         </div>
       </form>
+      </details>
       {operationalObjects ? (
         <section className="mt-8 space-y-3" data-cbai-intake-interpretation="" aria-labelledby={`${formId}-interpret`}>
           <h2 id={`${formId}-interpret`} className="text-base font-medium">

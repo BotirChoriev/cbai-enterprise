@@ -113,7 +113,8 @@
     "test:intelligent-work-surface": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-intelligent-work-surface.ts",
     "test:route-experience-system": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-route-experience-system.ts",
     "test:al-khwarizmi-guide": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-al-khwarizmi-guide.ts",
-    "test:personal-workspace": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-personal-workspace.ts"
+    "test:personal-workspace": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-personal-workspace.ts",
+    "test:artifact-research-room": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-artifact-research-room.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.2",
