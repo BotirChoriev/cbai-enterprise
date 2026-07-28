@@ -27,5 +27,7 @@ test("failed metadata writes compensate by removing uploaded bytes", () => {
 test("research room exposes honest quarantine status", () => {
   assert.match(ui, /data-cbai-artifact-cloud-upload/);
   assert.match(ui, /data-cbai-artifact-quarantined/);
+  assert.match(ui, /data-cbai-artifact-cloud-auth-required/);
+  assert.match(ui, /accountMode !== "cloud"/);
   assert.match(ui, /malware scanner/i);
 });

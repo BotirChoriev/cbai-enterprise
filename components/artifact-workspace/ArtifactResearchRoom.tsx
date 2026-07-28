@@ -4,6 +4,7 @@ import { useId, useState } from "react";
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useVoiceOperator } from "@/components/voice-operator/VoiceOperatorProvider";
+import { useAuth } from "@/components/platform/context/AuthProvider";
 import {
   createLocalPdfMetadata,
   validatePdfFile,
@@ -66,6 +67,7 @@ const COPY = {
     archiving: "Uploading securely…",
     quarantined: "Uploaded to private quarantine. Download and processing stay blocked until an external malware scanner returns clean.",
     archiveError: "Secure upload failed. No readiness claim was made.",
+    archiveNeedsCloud: "Cloud sign-in is required for private quarantine upload. Local extraction remains available.",
     extracted: "Local document extraction",
     pages: "pages",
     characters: "characters",
@@ -111,6 +113,7 @@ const COPY = {
     archiving: "Xavfsiz yuklanmoqda…",
     quarantined: "Private karantinga yuklandi. Tashqi malware scanner «clean» javobini bermaguncha o‘qish va processing yopiq qoladi.",
     archiveError: "Xavfsiz yuklash bajarilmadi. Tizim tayyor deb da’vo qilmadi.",
+    archiveNeedsCloud: "Private karantinga yuklash uchun Cloud Account kerak. Lokal extraction ishlashda davom etadi.",
     extracted: "Qurilmadagi hujjat extraction’i",
     pages: "sahifa",
     characters: "belgi",
@@ -124,6 +127,7 @@ export default function ArtifactResearchRoom() {
   const { language } = useTranslation();
   const copy = COPY[language === "uz" ? "uz" : "en"];
   const voice = useVoiceOperator();
+  const auth = useAuth();
   const id = useId();
   const [file, setFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
@@ -298,7 +302,7 @@ export default function ArtifactResearchRoom() {
             <button type="button" onClick={() => openVoice(`${room.title}. ${room.researchQuestion}. Help me structure the next evidence-based step. Human approval is required.`)} className="min-h-12 rounded-xl border border-cyan-300/35 px-5 text-cyan-100">{copy.ask}</button>
             <button
               type="button"
-              disabled={cloudBusy || Boolean(cloudReceipt)}
+              disabled={cloudBusy || Boolean(cloudReceipt) || auth.accountMode !== "cloud"}
               onClick={async () => {
                 if (!file) return;
                 setCloudBusy(true);
@@ -320,6 +324,11 @@ export default function ArtifactResearchRoom() {
           {cloudReceipt ? (
             <p role="status" className="rounded-xl border border-amber-300/30 bg-amber-300/10 px-4 py-3 text-sm text-amber-50" data-cbai-artifact-quarantined="">
               {copy.quarantined}
+            </p>
+          ) : null}
+          {!cloudReceipt && auth.accountMode !== "cloud" ? (
+            <p className="text-xs text-slate-400" data-cbai-artifact-cloud-auth-required="">
+              {copy.archiveNeedsCloud}
             </p>
           ) : null}
           {cloudError ? <p role="alert" className="text-sm text-rose-200">{cloudError}</p> : null}

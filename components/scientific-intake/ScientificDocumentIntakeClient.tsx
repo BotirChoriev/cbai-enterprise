@@ -17,6 +17,7 @@ import {
 } from "@/lib/scientific-intake/scientific-intake";
 import { deriveDocumentUploadReadiness } from "@/lib/platform-capabilities/capability-registry";
 import { createDocumentIntakeDraft } from "@/lib/document-intake/document-intake";
+import { isSupabaseConfigured } from "@/lib/supabase/client";
 import { useOperationalObjectsOptional } from "@/components/operational-objects/OperationalObjectProvider";
 import {
   buildIntakeOperationalDraft,
@@ -48,6 +49,7 @@ export default function ScientificDocumentIntakeClient() {
   const records = typeof window !== "undefined" ? readScientificIntakeRecords() : [];
   const uploadReadiness = deriveDocumentUploadReadiness();
   const storageConfigured = uploadReadiness === "available";
+  const quarantineStorageConfigured = isSupabaseConfigured();
   const intakeHonesty = createDocumentIntakeDraft({
     originalFilename: fileName ?? "thesis.pdf",
     fileSizeBytes: fileSize ?? 0,
@@ -110,7 +112,11 @@ export default function ScientificDocumentIntakeClient() {
           data-storage-required="1"
           className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/5 px-3 py-3 text-sm text-[var(--cbai-text-primary)]"
         >
-          {t("voiceCommand.scientificIntakeStorageRequired")}
+          {quarantineStorageConfigured
+            ? language === "uz"
+              ? "Private karantin storage ulangan. Tashqi malware scanner clean natija bermaguncha server processing yopiq qoladi."
+              : "Private quarantine storage is connected. Server processing remains blocked until an external malware scanner returns clean."
+            : t("voiceCommand.scientificIntakeStorageRequired")}
         </p>
       ) : null}
       <ArtifactResearchRoom />
