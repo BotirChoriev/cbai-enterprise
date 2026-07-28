@@ -13,6 +13,7 @@ import { loadProjects } from "@/lib/project/project-store";
 import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { myWorkHrefForMission } from "@/lib/intelligence-os/mission-operating-context";
 import type { GlobeCountryPoint } from "@/lib/spatial-world/globe-geography";
+import PersonalWorkspaceGateway from "@/components/personal-workspace/PersonalWorkspaceGateway";
 
 const InteractiveIntelligenceGlobe = dynamic(
   () => import("@/components/spatial-world/InteractiveIntelligenceGlobe"),
@@ -201,6 +202,8 @@ export default function SpatialWorldIntelligenceHome() {
           </h1>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-300 sm:text-base">{copy.subtitle}</p>
         </header>
+
+        <PersonalWorkspaceGateway />
 
         <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
           <ActivationExperience
