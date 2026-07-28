@@ -36,6 +36,7 @@ const COPY = {
     today: "Today",
     progress: "Today’s progress",
     solve: "Open a problem",
+    plan: "Open full work plan",
     ask: "Ask CBAI",
     change: "Change profession",
     human: "AI structures the work. You confirm the plan and make the decisions.",
@@ -56,6 +57,7 @@ const COPY = {
     today: "Bugun",
     progress: "Bugungi progress",
     solve: "Muammoni ochish",
+    plan: "To‘liq ish rejasini ochish",
     ask: "CBAI’dan so‘rash",
     change: "Kasbni o‘zgartirish",
     human: "AI ishni tizimlaydi. Reja va yakuniy qarorni siz tasdiqlaysiz.",
@@ -84,6 +86,44 @@ export default function PersonalWorkspaceGateway() {
     voice.openDock();
   }
 
+  function openOperationalPlan(input: {
+    professionStatement: string;
+    goal: string;
+    tasks: readonly { readonly label: string }[];
+  }) {
+    objects?.openComposer(
+      {
+        type: "work_plan",
+        title: localized(template.workspaceTitle, locale),
+        summary: input.goal,
+        objective: input.goal,
+        rationale: `Confirmed personal workspace template: ${template.id}.`,
+        expectedOutcome: input.goal,
+        domain: template.id === "scientist" ? "research" : "general",
+        status: "active",
+        priority: "normal",
+        requiredInputs: template.modules.map((module) => module.id),
+        evidenceRequirements: ["Completion evidence confirmed by the human"],
+        nextAction: input.tasks[0]?.label ?? "",
+        humanDecision: "Human confirmed profession, goal, and workspace before creation.",
+        knownInformation: [`profession:${input.professionStatement}`, `template:${template.id}`],
+        missingInformation: [],
+        assumptions: [],
+        humanApprovalRequired: true,
+        relatedObjectIds: [],
+        locale,
+        provenance: {
+          source: "manual",
+          originalText: input.professionStatement,
+          locale,
+          inferredFields: ["templateId"],
+        },
+      },
+      ["templateId"],
+      "manual",
+    );
+  }
+
   function confirmWorkspace() {
     const tasks = template.starterTasks.map((task) => ({
       id: task.id,
@@ -98,37 +138,6 @@ export default function PersonalWorkspaceGateway() {
       createdAt: new Date().toISOString(),
       tasks,
     });
-    objects?.openComposer(
-      {
-        type: "work_plan",
-        title: localized(template.workspaceTitle, locale),
-        summary: goal.trim(),
-        objective: goal.trim(),
-        rationale: `Confirmed personal workspace template: ${template.id}.`,
-        expectedOutcome: goal.trim(),
-        domain: template.id === "scientist" ? "research" : "general",
-        status: "active",
-        priority: "normal",
-        requiredInputs: template.modules.map((module) => module.id),
-        evidenceRequirements: ["Completion evidence confirmed by the human"],
-        nextAction: tasks[0]?.label ?? "",
-        humanDecision: "Human confirmed profession, goal, and workspace before creation.",
-        knownInformation: [`profession:${statement.trim()}`, `template:${template.id}`],
-        missingInformation: [],
-        assumptions: [],
-        humanApprovalRequired: true,
-        relatedObjectIds: [],
-        locale,
-        provenance: {
-          source: "manual",
-          originalText: statement.trim(),
-          locale,
-          inferredFields: ["templateId"],
-        },
-      },
-      ["templateId"],
-      "manual",
-    );
   }
 
   if (workspace) {
@@ -196,6 +205,13 @@ export default function PersonalWorkspaceGateway() {
           <Link href="/problems" className="inline-flex min-h-11 items-center rounded-full bg-teal-300 px-5 text-sm font-semibold text-slate-950">
             {copy.solve}
           </Link>
+          <button
+            type="button"
+            onClick={() => openOperationalPlan(workspace)}
+            className="inline-flex min-h-11 items-center rounded-full border border-teal-300/30 px-5 text-sm text-teal-100"
+          >
+            {copy.plan}
+          </button>
           <button
             type="button"
             onClick={() =>
