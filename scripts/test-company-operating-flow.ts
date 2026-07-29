@@ -38,3 +38,12 @@ test("organization page uses a purpose-built company intelligence hero", () => {
   assert.match(page, /The authorized human decides/);
   assert.match(page, /Vakolatli inson qaror beradi/);
 });
+
+test("mobile living context and voice controls occupy separate bottom corners", () => {
+  const toggle = source("components/operating/LivingContextMobileToggle.tsx");
+  const styles = source("app/globals.css");
+  assert.match(toggle, /bottom-4 left-4 right-auto/);
+  assert.match(toggle, /max-w-\[calc\(100vw-14rem\)\]/);
+  assert.match(styles, /\.cbai-voice-dock-closed \{/);
+  assert.match(styles, /inset: auto max\(1rem, env\(safe-area-inset-right\)\)/);
+});

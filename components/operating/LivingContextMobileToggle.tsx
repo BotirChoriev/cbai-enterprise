@@ -20,7 +20,7 @@ export default function LivingContextMobileToggle() {
     <>
       <button
         type="button"
-        className="fixed bottom-20 right-4 z-40 rounded-full border border-teal-500/30 bg-[#050810]/95 px-4 py-2 text-xs font-medium text-teal-300 shadow-lg lg:hidden"
+        className="fixed bottom-4 left-4 right-auto z-40 w-auto max-w-[calc(100vw-14rem)] truncate rounded-full border border-teal-500/30 bg-[#050810]/95 px-4 py-2 text-xs font-medium text-teal-300 shadow-lg sm:bottom-20 sm:left-auto sm:right-4 sm:max-w-none lg:hidden"
         aria-expanded={open}
         aria-controls="living-context-drawer"
         onClick={() => setOpen((v) => !v)}
