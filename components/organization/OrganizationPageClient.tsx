@@ -27,9 +27,9 @@ import { isOrganizationCollaborationShared } from "@/lib/persistence/persistence
 import { cbaiBtnPrimary, cbaiFocusRing, cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import ExecutionOsPanel from "@/components/genesis/ExecutionOsPanel";
 import { MISSION_DATA_CHANGED } from "@/lib/intelligence-os/mission-activation-events";
-import type { OrganizationKind } from "@/lib/organization-os/organization.types";
-import { ORGANIZATION_KINDS } from "@/lib/organization-os/organization.types";
 import CompanyOperatingFlow from "@/components/organization/CompanyOperatingFlow";
+import CompanyOnboardingFlow from "@/components/organization/CompanyOnboardingFlow";
+import type { CompanyOnboardingInput } from "@/lib/company-onboarding/company-onboarding";
 
 export default function OrganizationPageClient() {
   const { t } = useTranslation();
@@ -37,9 +37,6 @@ export default function OrganizationPageClient() {
   const orgParam = searchParams.get("org");
   const inviteToken = searchParams.get("invite");
   const [tick, setTick] = useState(0);
-  const [name, setName] = useState("");
-  const [kind, setKind] = useState<OrganizationKind>("other");
-  const [website, setWebsite] = useState("");
   const [inviteEmail, setInviteEmail] = useState("");
   const [feedback, setFeedback] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -141,24 +138,25 @@ export default function OrganizationPageClient() {
         ? t("organizationOs.persistenceMisconfigured")
         : t("organizationOs.persistenceDeviceLocal");
 
-  const createOrg = () => {
+  const createOrg = (input: CompanyOnboardingInput) => {
     void (async () => {
       setError(null);
       if (isOrganizationCollaborationShared() && !getSyncedCloudUserId()) {
         setError(t("organizationOs.signInRequired"));
         return;
       }
-      if (!name.trim()) {
+      if (!input.name.trim()) {
         setError(t("organizationOs.nameRequired"));
         return;
       }
       setBusy(true);
       if (isOrganizationCollaborationShared()) {
         const result = await createOrganizationPersisted({
-          name,
-          kind,
+          name: input.name,
+          kind: input.kind,
           ownerDisplayName: displayName,
-          website: website.trim() || null,
+          missionStatement: input.missionStatement,
+          website: input.website.trim() || null,
         });
         setBusy(false);
         if ("error" in result) {
@@ -172,17 +170,17 @@ export default function OrganizationPageClient() {
           "@/lib/organization-os/organization-membership-store"
         );
         const result = createOrganizationWithOwner({
-          name,
-          kind,
+          name: input.name,
+          kind: input.kind,
           ownerUserId: userId,
           ownerDisplayName: displayName,
-          website: website.trim() || null,
+          missionStatement: input.missionStatement,
+          website: input.website.trim() || null,
         });
         setBusy(false);
         backfillLivingRelationships(userId);
         setFeedback(t("organizationOs.orgCreated", { name: result.organization.name }));
       }
-      setName("");
       bump();
     })();
   };
@@ -254,47 +252,7 @@ export default function OrganizationPageClient() {
         ) : null}
       </section>
 
-      <section className={`${cbaiGlassCard} space-y-4 p-4`} aria-labelledby="create-org-heading">
-        <h2 id="create-org-heading" className="text-sm font-semibold text-zinc-100">
-          {t("organizationOs.createHeading")}
-        </h2>
-        <p className="text-xs text-zinc-500">{t("organizationOs.identityWarning")}</p>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div>
-            <label htmlFor="org-name" className="text-xs text-zinc-500">
-              {t("organizationOs.nameLabel")}
-            </label>
-            <input
-              id="org-name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              disabled={busy}
-              className={`mt-1 min-h-10 w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 text-sm ${cbaiFocusRing}`}
-            />
-          </div>
-          <div>
-            <label htmlFor="org-kind" className="text-xs text-zinc-500">
-              {t("organizationOs.typeLabel")}
-            </label>
-            <select
-              id="org-kind"
-              value={kind}
-              onChange={(e) => setKind(e.target.value as OrganizationKind)}
-              disabled={busy}
-              className={`mt-1 min-h-10 w-full rounded-md border border-zinc-800 bg-zinc-950/60 px-3 text-sm ${cbaiFocusRing}`}
-            >
-              {ORGANIZATION_KINDS.map((k) => (
-                <option key={k} value={k}>
-                  {k}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <button type="button" onClick={createOrg} disabled={busy} className={`${cbaiBtnPrimary} min-h-10`}>
-          {t("organizationOs.createButton")}
-        </button>
-      </section>
+      <CompanyOnboardingFlow busy={busy} onConfirm={createOrg} />
 
       {selectedOrg ? (
         <>
