@@ -294,6 +294,19 @@ export type OrganizationAuditEventRow = {
   created_at: string;
 };
 
+export type OrganizationResponsibilityMapRow = {
+  id: string;
+  organization_id: string;
+  problem_local_id: string;
+  assignments: Record<string, string>;
+  status: "human_confirmed";
+  confirmed_by: string;
+  confirmed_at: string;
+  version: number;
+  created_at: string;
+  updated_at: string;
+};
+
 export type ProblemSnapshotRow = {
   id: string;
   owner_id: string;
@@ -420,6 +433,11 @@ export type Database = {
         Insertable<OrganizationAuditEventRow, "id" | "created_at" | "safe_metadata" | "target_type">,
         Partial<Omit<OrganizationAuditEventRow, "id">>
       >;
+      organization_responsibility_maps: TableDef<
+        OrganizationResponsibilityMapRow,
+        never,
+        never
+      >;
     };
     Views: Record<string, never>;
     Functions: {
@@ -436,6 +454,15 @@ export type Database = {
       accept_organization_invitation_by_token: {
         Args: { p_raw_token: string };
         Returns: unknown;
+      };
+      confirm_organization_responsibility_map: {
+        Args: {
+          p_organization_id: string;
+          p_problem_local_id: string;
+          p_assignments: Record<string, string>;
+          p_expected_version?: number;
+        };
+        Returns: OrganizationResponsibilityMapRow;
       };
     };
   };

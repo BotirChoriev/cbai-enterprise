@@ -7,6 +7,10 @@ const migration = readFileSync(
   join(process.cwd(), "supabase/migrations/0014_organization_responsibility_maps.sql"),
   "utf8",
 );
+const repair = readFileSync(
+  join(process.cwd(), "supabase/migrations/0015_responsibility_map_audit_count_repair.sql"),
+  "utf8",
+);
 
 test("responsibility persistence is additive and problem-scoped", () => {
   assert.match(migration, /create table if not exists public\.organization_responsibility_maps/);
@@ -48,4 +52,12 @@ test("every confirmed map appends an organization audit event", () => {
   assert.match(migration, /assignmentCount/);
   const auditInsert = migration.slice(migration.indexOf("insert into public.organization_audit_events"));
   assert.doesNotMatch(auditInsert, /'assignments'|p_assignments/);
+});
+
+test("forward repair uses a PostgreSQL-supported assignment count", () => {
+  assert.match(repair, /from jsonb_object_keys\(v_result\.assignments\)/);
+  assert.match(repair, /'assignmentCount', v_assignment_count/);
+  assert.doesNotMatch(repair, /jsonb_object_length/);
+  assert.match(repair, /revoke all privileges[\s\S]*from public, anon, authenticated/);
+  assert.match(repair, /grant execute[\s\S]*to authenticated/);
 });

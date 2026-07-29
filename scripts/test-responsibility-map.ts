@@ -60,13 +60,16 @@ test("separated responsibilities can reach human review", () => {
   assert.equal(confirmResponsibilityMapDraft(draft, true), draft);
 });
 
-test("responsibility UI is honest session state and performs no persistence mutation", () => {
+test("responsibility UI persists only after explicit human confirmation", () => {
   const ui = source("components/organization/ResponsibilityMapPanel.tsx");
   assert.match(ui, /session_draft_only|Session draft only/);
   assert.match(ui, /confirmResponsibilityMapDraft/);
   assert.match(ui, /voice\.setTextInput/);
   assert.match(ui, /conflictLabels\[conflict\]/);
-  assert.doesNotMatch(ui, /supabase|repository|persist|updateOrganization|changeMemberRole/i);
+  assert.match(ui, /persistConfirmedResponsibilityMap/);
+  assert.match(ui, /if \(!reviewed\) return/);
+  assert.match(ui, /sharedPersistence && !problemId/);
+  assert.doesNotMatch(ui, /updateOrganization|changeMemberRole/i);
 });
 
 test("organization page renders responsibility map only inside a real selected organization", () => {

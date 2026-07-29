@@ -31,6 +31,7 @@ import CompanyOperatingFlow from "@/components/organization/CompanyOperatingFlow
 import CompanyOnboardingFlow from "@/components/organization/CompanyOnboardingFlow";
 import type { CompanyOnboardingInput } from "@/lib/company-onboarding/company-onboarding";
 import ResponsibilityMapPanel from "@/components/organization/ResponsibilityMapPanel";
+import { listProblems } from "@/lib/problems/problem-repository";
 
 export default function OrganizationPageClient() {
   const { t } = useTranslation();
@@ -122,6 +123,13 @@ export default function OrganizationPageClient() {
     void tick;
     return selectedOrgId ? loadOrganizationAudit(selectedOrgId) : [];
   }, [selectedOrgId, tick]);
+  const problems = useMemo(() => {
+    void tick;
+    return listProblems().map((problem) => ({
+      id: problem.id,
+      title: problem.briefs.find((brief) => brief.version === problem.currentBriefVersion)?.title ?? problem.id,
+    }));
+  }, [tick]);
 
   const canInvite =
     selectedOrgId &&
@@ -311,7 +319,13 @@ export default function OrganizationPageClient() {
             </ul>
           </section>
 
-          <ResponsibilityMapPanel organizationName={selectedOrg.name} members={members} />
+          <ResponsibilityMapPanel
+            organizationId={selectedOrg.id}
+            organizationName={selectedOrg.name}
+            members={members}
+            problems={problems}
+            sharedPersistence={isOrganizationCollaborationShared()}
+          />
 
           <section className={`${cbaiGlassCard} space-y-2 p-4`}>
             <h3 className="text-sm font-semibold text-zinc-100">{t("organizationOs.auditHeading")}</h3>
