@@ -14,6 +14,13 @@ const entrypoint = readFileSync(
   new URL("../services/clamav-scanner/entrypoint.sh", import.meta.url),
   "utf8",
 );
+const appTsconfig = JSON.parse(
+  readFileSync(new URL("../tsconfig.json", import.meta.url), "utf8"),
+);
+const scannerWrangler = readFileSync(
+  new URL("../services/clamav-scanner/wrangler.jsonc", import.meta.url),
+  "utf8",
+);
 
 test("scanner authenticates service calls without ordinary string comparison", () => {
   assert.match(server, /timingSafeEqual/);
@@ -49,4 +56,18 @@ test("container installs signatures, starts clamd, and waits for readiness", () 
   assert.match(entrypoint, /freshclam/);
   assert.match(entrypoint, /clamdscan --ping=1:1/);
   assert.match(entrypoint, /exec node/);
+  assert.ok(
+    entrypoint.indexOf("exec node") > entrypoint.indexOf("freshclam"),
+    "the HTTP server must remain the foreground container process",
+  );
+  assert.match(server, /clamdscan", \["--ping=1:1"\]/);
+});
+
+test("the standalone Cloudflare service stays outside the Next.js typecheck graph", () => {
+  assert.ok(appTsconfig.exclude.includes("services"));
+});
+
+test("ClamAV receives the memory tier required for signature loading", () => {
+  assert.match(scannerWrangler, /"instance_type":\s*"standard-1"/);
+  assert.match(scannerWrangler, /"max_instances":\s*1/);
 });

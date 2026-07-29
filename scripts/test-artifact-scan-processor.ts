@@ -35,6 +35,7 @@ function mockFetch(
   options: { scannerThrows?: boolean; scannerSha?: string; owner?: string } = {},
 ) {
   const patches: Array<Record<string, unknown>> = [];
+  const scanRequests: Array<Record<string, unknown>> = [];
   const fetchFn: typeof fetch = async (input, init) => {
     const url = String(input);
     if (url.endsWith("/auth/v1/user")) {
@@ -54,10 +55,11 @@ function mockFetch(
       ]);
     }
     if (url.includes("/storage/v1/object/sign/")) {
-      return Response.json({ signedURL: "/storage/v1/object/sign/cbai-artifacts/file?token=signed" });
+      return Response.json({ signedURL: "/object/sign/cbai-artifacts/file?token=signed" });
     }
     if (url === "https://scanner.internal/v1/scan-url") {
       if (options.scannerThrows) throw new Error("network_down");
+      scanRequests.push(JSON.parse(String(init?.body)));
       return Response.json({
         status: verdict,
         scanner: "clamav",
@@ -71,11 +73,11 @@ function mockFetch(
     }
     throw new Error(`unexpected_fetch:${url}`);
   };
-  return { fetchFn, patches };
+  return { fetchFn, patches, scanRequests };
 }
 
 test("clean artifact advances to mandatory human review", async () => {
-  const { fetchFn, patches } = mockFetch("clean");
+  const { fetchFn, patches, scanRequests } = mockFetch("clean");
   const response = await handleArtifactScanRequest(request(), env, fetchFn);
   assert.equal(response.status, 200);
   assert.equal(response.headers.get("access-control-allow-origin"), ORIGIN);
@@ -86,6 +88,35 @@ test("clean artifact advances to mandatory human review", async () => {
   assert.equal(patches.at(-1)?.scan_status, "clean");
   assert.equal(patches.at(-1)?.processing_status, "needs_human_review");
   assert.equal(patches.at(-1)?.scanner_provider, "clamav");
+  assert.equal(
+    scanRequests.at(-1)?.url,
+    "https://preview-project.supabase.co/storage/v1/object/sign/cbai-artifacts/file?token=signed",
+  );
+});
+
+test("Cloudflare service binding is preferred over same-account public fetch", async () => {
+  const { fetchFn } = mockFetch("clean");
+  const bindingCalls: string[] = [];
+  const response = await handleArtifactScanRequest(
+    request(),
+    {
+      ...env,
+      ARTIFACT_SCANNER: {
+        async fetch(input, init) {
+          bindingCalls.push(String(input));
+          return Response.json({
+            status: "clean",
+            scanner: "clamav",
+            signature: null,
+            sha256: JSON.parse(String(init?.body)).expectedSha256,
+          });
+        },
+      },
+    },
+    fetchFn,
+  );
+  assert.equal(response.status, 200);
+  assert.deepEqual(bindingCalls, ["https://scanner.internal/v1/scan-url"]);
 });
 
 test("EICAR-style infected verdict remains blocked", async () => {

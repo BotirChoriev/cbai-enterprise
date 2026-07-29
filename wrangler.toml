@@ -1,0 +1,29 @@
+# Cloudflare Pages configuration downloaded from the authoritative project and
+# extended only for the Preview artifact-scanner service binding.
+name = "cbai-enterprise"
+pages_build_output_dir = "out"
+compatibility_date = "2026-07-01"
+
+[vars]
+NEXT_PUBLIC_SUPABASE_ANON_KEY = "sb_publishable_9UK99iAOCw_loK9GfgmKbw_150U9HoV"
+NEXT_PUBLIC_SUPABASE_URL = "https://ollepcztysujqvjjhxil.supabase.co"
+
+[env.preview]
+compatibility_date = "2026-07-01"
+
+[env.preview.vars]
+NEXT_PUBLIC_SUPABASE_ANON_KEY = "sb_publishable_9UK99iAOCw_loK9GfgmKbw_150U9HoV"
+NEXT_PUBLIC_SUPABASE_URL = "https://ollepcztysujqvjjhxil.supabase.co"
+
+[[env.preview.services]]
+binding = "ARTIFACT_SCANNER"
+service = "cbai-clamav-scanner-preview"
+
+[env.production]
+compatibility_date = "2026-07-05"
+
+[env.production.vars]
+NEXT_PUBLIC_SUPABASE_ANON_KEY = "sb_publishable_JmZuHnkQZ6cojNLAYpo5Ww_HIHacRbE"
+NEXT_PUBLIC_SUPABASE_URL = "https://urzllkxthepkejfcokid.supabase.co"
+NEXT_PUBLIC_VOICE_BROKER_URL = "https://checkbalanceai.global/api/voice/session"
+VOICE_ALLOWED_ORIGINS = "https://checkbalanceai.global"

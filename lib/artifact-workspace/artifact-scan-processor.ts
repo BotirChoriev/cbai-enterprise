@@ -3,6 +3,9 @@ const MAX_ARTIFACT_BYTES = 209_715_200;
 export type ArtifactScanProcessorEnv = {
   readonly SUPABASE_URL?: string;
   readonly SUPABASE_SERVICE_ROLE_KEY?: string;
+  readonly ARTIFACT_SCANNER?: {
+    fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
+  };
   readonly ARTIFACT_SCANNER_URL?: string;
   readonly ARTIFACT_SCANNER_TOKEN?: string;
   readonly ARTIFACT_ALLOWED_ORIGINS?: string;
@@ -64,7 +67,7 @@ function configured(env: ArtifactScanProcessorEnv): boolean {
   return Boolean(
     env.SUPABASE_URL?.trim()
       && env.SUPABASE_SERVICE_ROLE_KEY?.trim()
-      && env.ARTIFACT_SCANNER_URL?.trim()
+      && (env.ARTIFACT_SCANNER || env.ARTIFACT_SCANNER_URL?.trim())
       && env.ARTIFACT_SCANNER_TOKEN?.trim()
       && env.ARTIFACT_ALLOWED_ORIGINS?.trim(),
   );
@@ -166,7 +169,11 @@ export async function handleArtifactScanRequest(
   const signed = (await signedUrlResponse.json()) as { signedURL?: string; signedUrl?: string };
   const signedPath = signed.signedURL ?? signed.signedUrl;
   if (!signedPath) return json(502, { error: "signed_url_missing" }, origin);
-  const downloadUrl = new URL(signedPath, env.SUPABASE_URL).toString();
+  const downloadUrl = signedPath.startsWith("http")
+    ? signedPath
+    : signedPath.startsWith("/storage/")
+      ? `${env.SUPABASE_URL}${signedPath}`
+      : `${env.SUPABASE_URL}/storage/v1${signedPath.startsWith("/") ? "" : "/"}${signedPath}`;
 
   await markArtifact(
     env,
@@ -177,7 +184,13 @@ export async function handleArtifactScanRequest(
 
   let scanResponse: Response;
   try {
-    scanResponse = await fetchFn(`${env.ARTIFACT_SCANNER_URL?.replace(/\/$/, "")}/v1/scan-url`, {
+    const scannerTarget = env.ARTIFACT_SCANNER
+      ? "https://scanner.internal/v1/scan-url"
+      : `${env.ARTIFACT_SCANNER_URL?.replace(/\/$/, "")}/v1/scan-url`;
+    const scannerFetch = env.ARTIFACT_SCANNER
+      ? env.ARTIFACT_SCANNER.fetch.bind(env.ARTIFACT_SCANNER)
+      : fetchFn;
+    scanResponse = await scannerFetch(scannerTarget, {
       method: "POST",
       headers: {
         authorization: `Bearer ${env.ARTIFACT_SCANNER_TOKEN}`,

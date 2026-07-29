@@ -85,6 +85,7 @@ async function scan(path) {
 const server = createServer(async (request, response) => {
   if (request.method === "GET" && request.url === "/healthz") {
     try {
+      await execFileAsync("clamdscan", ["--ping=1:1"], { timeout: 5_000 });
       const { stdout } = await execFileAsync("clamdscan", ["--version"], { timeout: 5_000 });
       return send(response, 200, { status: "ok", scanner: stdout.trim() });
     } catch {
