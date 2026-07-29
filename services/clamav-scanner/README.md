@@ -28,3 +28,11 @@ And these Preview variables:
 
 Do not configure Production until Preview clean, EICAR, scanner-unavailable,
 ownership, hash-mismatch, and cleanup gates all pass.
+
+The checked-in `wrangler.jsonc` deploys a single `basic` Cloudflare Container
+instance for Preview. Set the Worker secret without printing it:
+
+```sh
+npx wrangler secret put SCANNER_TOKEN
+npm run deploy:preview
+```

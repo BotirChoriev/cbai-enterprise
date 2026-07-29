@@ -11,6 +11,7 @@ const execFileAsync = promisify(execFile);
 const PORT = Number(process.env.PORT || 8080);
 const SCANNER_TOKEN = process.env.SCANNER_TOKEN || "";
 const ALLOWED_DOWNLOAD_ORIGIN = process.env.ALLOWED_DOWNLOAD_ORIGIN || "";
+const ALLOW_INSECURE_LOCALHOST = process.env.ALLOW_INSECURE_LOCALHOST === "1";
 const MAX_BYTES = Number(process.env.MAX_SCAN_BYTES || 209_715_200);
 
 function send(response, status, body) {
@@ -37,7 +38,11 @@ async function readJson(request) {
 
 async function downloadToFile(url, path, expectedBytes) {
   const parsed = new URL(url);
-  if (parsed.protocol !== "https:" || parsed.origin !== ALLOWED_DOWNLOAD_ORIGIN) {
+  const localTestOrigin =
+    ALLOW_INSECURE_LOCALHOST
+    && parsed.protocol === "http:"
+    && parsed.hostname === "host.docker.internal";
+  if ((!localTestOrigin && parsed.protocol !== "https:") || parsed.origin !== ALLOWED_DOWNLOAD_ORIGIN) {
     throw new Error("download_origin_not_allowed");
   }
   const response = await fetch(parsed, { redirect: "error", signal: AbortSignal.timeout(120_000) });

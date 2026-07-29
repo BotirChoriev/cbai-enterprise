@@ -7,6 +7,13 @@
     "node": ">=22"
   },
   "scripts": {
-    "start": "node server.mjs"
+    "start": "node server.mjs",
+    "deploy:preview": "wrangler deploy"
+  },
+  "dependencies": {
+    "@cloudflare/containers": "^0.3.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.92.0"
   }
 }

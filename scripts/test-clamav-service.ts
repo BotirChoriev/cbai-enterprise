@@ -24,6 +24,8 @@ test("scanner authenticates service calls without ordinary string comparison", (
 test("scanner blocks SSRF and redirects outside the Supabase origin", () => {
   assert.match(server, /parsed\.protocol !== "https:"/);
   assert.match(server, /parsed\.origin !== ALLOWED_DOWNLOAD_ORIGIN/);
+  assert.match(server, /ALLOW_INSECURE_LOCALHOST/);
+  assert.match(server, /parsed\.hostname === "host\.docker\.internal"/);
   assert.match(server, /redirect:\s*"error"/);
 });
 
@@ -42,9 +44,9 @@ test("temporary private artifacts are deleted after every scan", () => {
 });
 
 test("container installs signatures, starts clamd, and waits for readiness", () => {
-  assert.match(dockerfile, /clamav-daemon/);
+  assert.match(dockerfile, /FROM clamav\/clamav:stable/);
   assert.match(dockerfile, /tini/);
   assert.match(entrypoint, /freshclam/);
-  assert.match(entrypoint, /clamdscan --ping/);
+  assert.match(entrypoint, /clamdscan --ping=1:1/);
   assert.match(entrypoint, /exec node/);
 });

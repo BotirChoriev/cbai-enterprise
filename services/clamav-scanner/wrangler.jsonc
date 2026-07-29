@@ -1,0 +1,36 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "cbai-clamav-scanner-preview",
+  "main": "worker.ts",
+  "compatibility_date": "2026-07-28",
+  "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "ALLOWED_DOWNLOAD_ORIGIN": "https://ollepcztysujqvjjhxil.supabase.co"
+  },
+  "containers": [
+    {
+      "max_instances": 1,
+      "class_name": "ClamAvContainer",
+      "image": "./Dockerfile",
+      "instance_type": "basic"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "CLAMAV_CONTAINER",
+        "class_name": "ClamAvContainer"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["ClamAvContainer"]
+    }
+  ],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  }
+}

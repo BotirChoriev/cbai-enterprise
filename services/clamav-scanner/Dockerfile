@@ -1,13 +1,14 @@
-FROM node:22-alpine
+FROM node:22-alpine AS node-runtime
+FROM clamav/clamav:stable
 
-RUN apk add --no-cache clamav clamav-daemon tini \
-  && mkdir -p /app /run/clamav /var/lib/clamav \
+USER root
+COPY --from=node-runtime /usr/local/bin/node /usr/local/bin/node
+RUN mkdir -p /app /run/clamav \
   && chown -R clamav:clamav /run/clamav /var/lib/clamav
 
 WORKDIR /app
 COPY package.json server.mjs entrypoint.sh ./
-RUN chmod 0555 /app/entrypoint.sh \
-  && freshclam --no-warnings || true
+RUN chmod 0555 /app/entrypoint.sh
 
 ENV NODE_ENV=production
 ENV PORT=8080
