@@ -30,6 +30,7 @@ import { MISSION_DATA_CHANGED } from "@/lib/intelligence-os/mission-activation-e
 import CompanyOperatingFlow from "@/components/organization/CompanyOperatingFlow";
 import CompanyOnboardingFlow from "@/components/organization/CompanyOnboardingFlow";
 import type { CompanyOnboardingInput } from "@/lib/company-onboarding/company-onboarding";
+import ResponsibilityMapPanel from "@/components/organization/ResponsibilityMapPanel";
 
 export default function OrganizationPageClient() {
   const { t } = useTranslation();
@@ -309,6 +310,8 @@ export default function OrganizationPageClient() {
               ))}
             </ul>
           </section>
+
+          <ResponsibilityMapPanel organizationName={selectedOrg.name} members={members} />
 
           <section className={`${cbaiGlassCard} space-y-2 p-4`}>
             <h3 className="text-sm font-semibold text-zinc-100">{t("organizationOs.auditHeading")}</h3>

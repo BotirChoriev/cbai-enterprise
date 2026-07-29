@@ -121,7 +121,8 @@
     "test:clamav-service": "node --test scripts/test-clamav-service.ts",
     "test:browser-pdf-extraction": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-browser-pdf-extraction.ts",
     "test:company-operating-flow": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-company-operating-flow.ts",
-    "test:company-onboarding": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-company-onboarding.ts"
+    "test:company-onboarding": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-company-onboarding.ts",
+    "test:responsibility-map": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-responsibility-map.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.2",
