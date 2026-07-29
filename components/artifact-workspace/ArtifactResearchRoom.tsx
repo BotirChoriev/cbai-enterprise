@@ -24,8 +24,10 @@ import {
   type ConfirmedArtifactRoom,
 } from "@/lib/artifact-workspace/artifact-workspace";
 import {
+  requestArtifactMalwareScan,
   uploadArtifactToQuarantine,
   type ArtifactCloudReceipt,
+  type ArtifactScanReceipt,
 } from "@/lib/artifact-workspace/cloud-artifact-storage";
 
 const COPY = {
@@ -66,6 +68,9 @@ const COPY = {
     archive: "Upload to secure quarantine",
     archiving: "Uploading securely…",
     quarantined: "Uploaded to private quarantine. Download and processing stay blocked until an external malware scanner returns clean.",
+    scanClean: "ClamAV verified this PDF as clean. Human review remains required before its content becomes evidence.",
+    scanInfected: "ClamAV blocked this PDF because malware was detected. It will not be processed.",
+    scanUnavailable: "The PDF remains safely quarantined because the ClamAV service could not complete verification.",
     archiveError: "Secure upload failed. No readiness claim was made.",
     archiveNeedsCloud: "Cloud sign-in is required for private quarantine upload. Local extraction remains available.",
     extracted: "Local document extraction",
@@ -112,6 +117,9 @@ const COPY = {
     archive: "Xavfsiz karantinga yuklash",
     archiving: "Xavfsiz yuklanmoqda…",
     quarantined: "Private karantinga yuklandi. Tashqi malware scanner «clean» javobini bermaguncha o‘qish va processing yopiq qoladi.",
+    scanClean: "ClamAV PDFni zararli dasturlardan toza deb tasdiqladi. Kontent dalilga aylanishidan oldin inson tekshiruvi shart.",
+    scanInfected: "ClamAV PDF ichida zararli dastur aniqlagani uchun uni blokladi. Fayl qayta ishlanmaydi.",
+    scanUnavailable: "ClamAV tekshiruvni yakunlay olmagani sababli PDF xavfsiz karantinda qolmoqda.",
     archiveError: "Xavfsiz yuklash bajarilmadi. Tizim tayyor deb da’vo qilmadi.",
     archiveNeedsCloud: "Private karantinga yuklash uchun Cloud Account kerak. Lokal extraction ishlashda davom etadi.",
     extracted: "Qurilmadagi hujjat extraction’i",
@@ -141,6 +149,8 @@ export default function ArtifactResearchRoom() {
   const [room, setRoom] = useState<ConfirmedArtifactRoom | null>(null);
   const [cloudBusy, setCloudBusy] = useState(false);
   const [cloudReceipt, setCloudReceipt] = useState<ArtifactCloudReceipt | null>(null);
+  const [scanReceipt, setScanReceipt] = useState<ArtifactScanReceipt | null>(null);
+  const [scanBlocked, setScanBlocked] = useState(false);
   const [cloudError, setCloudError] = useState<string | null>(null);
   const [extraction, setExtraction] = useState<BrowserPdfExtraction | null>(null);
 
@@ -307,8 +317,15 @@ export default function ArtifactResearchRoom() {
                 if (!file) return;
                 setCloudBusy(true);
                 setCloudError(null);
+                setScanBlocked(false);
                 try {
-                  setCloudReceipt(await uploadArtifactToQuarantine({ file, room, locale: language }));
+                  const uploaded = await uploadArtifactToQuarantine({ file, room, locale: language });
+                  setCloudReceipt(uploaded);
+                  try {
+                    setScanReceipt(await requestArtifactMalwareScan(uploaded.artifactId));
+                  } catch {
+                    setScanBlocked(true);
+                  }
                 } catch {
                   setCloudError(copy.archiveError);
                 } finally {
@@ -322,8 +339,20 @@ export default function ArtifactResearchRoom() {
             </button>
           </div>
           {cloudReceipt ? (
-            <p role="status" className="rounded-xl border border-amber-300/30 bg-amber-300/10 px-4 py-3 text-sm text-amber-50" data-cbai-artifact-quarantined="">
-              {copy.quarantined}
+            <p role="status" className={`rounded-xl border px-4 py-3 text-sm ${
+              scanReceipt?.status === "clean"
+                ? "border-emerald-300/30 bg-emerald-300/10 text-emerald-50"
+                : scanReceipt?.status === "infected"
+                  ? "border-rose-300/30 bg-rose-300/10 text-rose-50"
+                  : "border-amber-300/30 bg-amber-300/10 text-amber-50"
+            }`} data-cbai-artifact-quarantined="">
+              {scanReceipt?.status === "clean"
+                ? copy.scanClean
+                : scanReceipt?.status === "infected"
+                  ? copy.scanInfected
+                  : scanBlocked
+                    ? copy.scanUnavailable
+                    : copy.quarantined}
             </p>
           ) : null}
           {!cloudReceipt && auth.accountMode !== "cloud" ? (

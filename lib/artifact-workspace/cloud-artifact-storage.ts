@@ -12,6 +12,12 @@ export type ArtifactCloudReceipt = {
   readonly processingStatus: "quarantined";
 };
 
+export type ArtifactScanReceipt = {
+  readonly artifactId: string;
+  readonly status: "clean" | "infected";
+  readonly signature?: string;
+};
+
 function newId(): string {
   return crypto.randomUUID();
 }
@@ -98,3 +104,39 @@ export async function uploadArtifactToQuarantine(input: {
   };
 }
 
+export async function requestArtifactMalwareScan(
+  artifactId: string,
+): Promise<ArtifactScanReceipt> {
+  const client = getSupabaseBrowserClient();
+  if (!client) throw new Error("artifact_cloud_unconfigured");
+  const { data, error } = await client.auth.getSession();
+  const accessToken = data.session?.access_token;
+  if (error || !accessToken) throw new Error("artifact_auth_required");
+
+  const response = await fetch("/api/artifacts/scan", {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({ artifactId }),
+  });
+  const payload = (await response.json().catch(() => ({}))) as {
+    artifactId?: string;
+    status?: string;
+    signature?: string;
+    error?: string;
+  };
+  if (
+    !response.ok
+    || payload.artifactId !== artifactId
+    || (payload.status !== "clean" && payload.status !== "infected")
+  ) {
+    throw new Error(`artifact_scan_failed:${payload.error ?? response.status}`);
+  }
+  return {
+    artifactId,
+    status: payload.status,
+    ...(payload.signature ? { signature: payload.signature } : {}),
+  };
+}

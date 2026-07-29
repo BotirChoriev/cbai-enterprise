@@ -2,6 +2,11 @@
 # Used by: npm run dev:voice
 
 OPENAI_API_KEY=
+SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
+ARTIFACT_SCANNER_URL=
+ARTIFACT_SCANNER_TOKEN=
+ARTIFACT_ALLOWED_ORIGINS=http://localhost:8788
 # Include both localhost and 127.0.0.1 — Safari may use either origin.
 # Preview (Cloudflare Pages runtime): also include the exact Preview origin(s), and optionally
 #   https://*.cbai-enterprise.pages.dev

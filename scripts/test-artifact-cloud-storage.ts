@@ -17,6 +17,9 @@ test("cloud artifact upload targets private quarantine and never marks itself cl
   assert.match(source, /processing_status:\s*"quarantined"/);
   assert.doesNotMatch(source, /scan_status:\s*"clean"/);
   assert.doesNotMatch(source, /processing_status:\s*"human_confirmed"/);
+  assert.match(source, /requestArtifactMalwareScan/);
+  assert.match(source, /\/api\/artifacts\/scan/);
+  assert.match(source, /authorization:\s*`Bearer \$\{accessToken\}`/);
 });
 
 test("failed metadata writes compensate by removing uploaded bytes", () => {

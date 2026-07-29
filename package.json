@@ -117,6 +117,8 @@
     "test:artifact-research-room": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-artifact-research-room.ts",
     "test:artifact-storage-migration": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-artifact-storage-migration.ts",
     "test:artifact-cloud-storage": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-artifact-cloud-storage.ts",
+    "test:artifact-scan-processor": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-artifact-scan-processor.ts",
+    "test:clamav-service": "node --test scripts/test-clamav-service.ts",
     "test:browser-pdf-extraction": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-browser-pdf-extraction.ts"
   },
   "dependencies": {
