@@ -29,6 +29,7 @@ import ExecutionOsPanel from "@/components/genesis/ExecutionOsPanel";
 import { MISSION_DATA_CHANGED } from "@/lib/intelligence-os/mission-activation-events";
 import type { OrganizationKind } from "@/lib/organization-os/organization.types";
 import { ORGANIZATION_KINDS } from "@/lib/organization-os/organization.types";
+import CompanyOperatingFlow from "@/components/organization/CompanyOperatingFlow";
 
 export default function OrganizationPageClient() {
   const { t } = useTranslation();
@@ -231,6 +232,13 @@ export default function OrganizationPageClient() {
 
   return (
     <OperatingPageShell title={t("organizationOs.missionRoomEyebrow")} showOperator={false}>
+      <CompanyOperatingFlow
+        organizationName={selectedOrg?.name ?? null}
+        memberCount={members.length}
+        pendingInvitationCount={invitations.filter((invitation) => invitation.status === "pending").length}
+        auditEventCount={audit.length}
+      />
+
       <section className={`${cbaiGlassCard} space-y-3 p-4`}>
         <p className={cbaiSectionEyebrow}>{t("organizationOs.pageEyebrow")}</p>
         <p className="text-xs text-amber-400/90" role="status">
