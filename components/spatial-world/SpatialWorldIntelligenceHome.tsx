@@ -197,7 +197,7 @@ export default function SpatialWorldIntelligenceHome() {
       <div className="relative mx-auto max-w-[1480px] space-y-5">
         <header className="max-w-4xl pt-2">
           <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-teal-300/80">{copy.eyebrow}</p>
-          <h1 className="mt-3 max-w-4xl text-balance text-[2rem] font-semibold leading-[1.08] tracking-[-0.035em] text-white sm:text-4xl xl:text-5xl">
+          <h1 className="cbai-display mt-3 max-w-4xl text-balance text-[2rem] font-semibold leading-[1.08] tracking-[-0.035em] text-white sm:text-4xl xl:text-5xl">
             {copy.title}
           </h1>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-300 sm:text-base">{copy.subtitle}</p>
@@ -205,7 +205,7 @@ export default function SpatialWorldIntelligenceHome() {
 
         <PersonalWorkspaceGateway />
 
-        <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
+        <section className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
           <ActivationExperience
             variant={hasExistingWork ? "compact" : "hero"}
             showLanguageSelector={false}
@@ -214,7 +214,7 @@ export default function SpatialWorldIntelligenceHome() {
           <button
             type="button"
             onClick={voice.openDock}
-            className="group relative overflow-hidden rounded-2xl border border-teal-300/30 bg-[linear-gradient(145deg,rgba(13,148,136,0.24),rgba(8,15,30,0.94)_58%)] p-5 text-left shadow-[0_20px_70px_rgba(0,0,0,0.25)] transition hover:border-teal-200/55 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-300"
+            className="group relative self-start overflow-hidden rounded-2xl border border-teal-300/30 bg-[linear-gradient(145deg,rgba(13,148,136,0.24),rgba(8,15,30,0.94)_58%)] p-5 text-left shadow-[0_20px_70px_rgba(0,0,0,0.25)] transition hover:border-teal-200/55 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-300"
           >
             <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-teal-300/10 blur-3xl transition group-hover:bg-teal-300/20" />
             <div className="relative flex items-center gap-4">

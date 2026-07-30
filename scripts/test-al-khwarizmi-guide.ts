@@ -60,12 +60,13 @@ test("guide is mounted inside the Voice Operator provider and uses a project ass
   assert.ok(existsSync("public/guides/norbert-wiener-reading-v1.png"));
 });
 
-test("guide roams, settles to read, and respects reduced-motion preferences", () => {
+test("guide stays in a safe edge zone, settles to read, and respects reduced-motion preferences", () => {
   assert.match(guide, /14_000/);
   assert.match(guide, /data-guide-motion/);
   assert.match(guide, /al-khwarizmi-reading-v1\.png/);
   assert.match(guide, /ALGORITHM/);
-  assert.match(guideCss, /@keyframes platformRoam/);
+  assert.match(guideCss, /@keyframes guideFloat/);
+  assert.doesNotMatch(guideCss, /calc\(-100v[wh]/);
   assert.match(guideCss, /@keyframes readingBreath/);
   assert.match(guideCss, /prefers-reduced-motion/);
 });

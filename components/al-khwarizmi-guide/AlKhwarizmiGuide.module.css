@@ -10,7 +10,7 @@
 }
 
 .roaming {
-  animation: platformRoam 34s ease-in-out infinite;
+  animation: guideFloat 6s ease-in-out infinite;
 }
 
 .roaming:hover,
@@ -19,9 +19,9 @@
 }
 
 .idle {
-  right: 50%;
-  transform: translateX(50%);
-  transition: right 900ms ease, transform 900ms ease;
+  right: 1rem;
+  transform: none;
+  transition: transform 320ms ease;
 }
 
 .launcher,
@@ -80,8 +80,8 @@
 }
 
 .launcherIdle {
-  width: 8rem;
-  height: 7.2rem;
+  width: 5.25rem;
+  height: 5.25rem;
   overflow: visible;
   border-color: rgba(251, 191, 36, 0.48);
   background: radial-gradient(circle at 50% 76%, rgba(251, 191, 36, 0.12), transparent 62%);
@@ -90,9 +90,9 @@
 
 .avatarReading {
   position: absolute;
-  bottom: 0.8rem;
-  width: 6.7rem;
-  height: 6.7rem;
+  bottom: 0.45rem;
+  width: 4.65rem;
+  height: 4.65rem;
   animation: readingBreath 3.6s ease-in-out infinite;
 }
 
@@ -290,19 +290,20 @@
 @media (max-width: 640px) {
   .root {
     right: 0.75rem;
-    bottom: 5.25rem;
-    left: 0.75rem;
+    bottom: 5.1rem;
+    left: auto;
     flex-direction: column-reverse;
   }
 
   .launcher {
-    width: 4.6rem;
-    height: 4.6rem;
+    width: 3.35rem;
+    height: 3.35rem;
     align-self: flex-end;
+    border-radius: 1rem;
   }
 
   .roaming {
-    animation: mobileRoam 22s ease-in-out infinite;
+    animation: none;
   }
 
   .idle {
@@ -312,17 +313,17 @@
   }
 
   .launcherIdle {
-    width: 6.4rem;
-    height: 5.8rem;
+    width: 3.35rem;
+    height: 3.35rem;
   }
 
   .avatarReading {
-    width: 5.3rem;
-    height: 5.3rem;
+    width: 3rem;
+    height: 3rem;
   }
 
   .panel {
-    width: 100%;
+    width: min(22rem, calc(100vw - 1.5rem));
   }
 }
 
@@ -335,37 +336,13 @@
   }
 }
 
-@keyframes platformRoam {
+@keyframes guideFloat {
   0%,
-  12%,
   100% {
-    transform: translate(0, 0);
-  }
-  25% {
-    transform: translate(calc(-100vw + 23rem), 0);
-  }
-  48% {
-    transform: translate(calc(-100vw + 23rem), calc(-100vh + 13rem));
-  }
-  72% {
-    transform: translate(0, calc(-100vh + 13rem));
-  }
-  86% {
-    transform: translate(-18vw, -18vh);
-  }
-}
-
-@keyframes mobileRoam {
-  0%,
-  20%,
-  100% {
-    transform: translate(0, 0);
+    transform: translateY(0);
   }
   50% {
-    transform: translate(calc(-100vw + 6.5rem), -12vh);
-  }
-  75% {
-    transform: translate(-22vw, -32vh);
+    transform: translateY(-0.45rem);
   }
 }
 
