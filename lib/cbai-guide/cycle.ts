@@ -53,6 +53,7 @@ function isStarted(stage: MissionLifecycleStage | null): boolean {
  */
 export function deriveCbaiGuideCycle(
   lifecycle: readonly MissionLifecycleStage[],
+  confirmedDecisionCount = 0,
 ): CbaiGuideCycle {
   const mission = findStage(lifecycle, "mission");
   const question = findStage(lifecycle, "question");
@@ -67,7 +68,8 @@ export function deriveCbaiGuideCycle(
   // Impact review and report readiness are prerequisites, not a human decision.
   // The current Mission OS has no persisted mission-linked decision record yet,
   // so the guide must stop here instead of inferring consent from adjacent data.
-  const humanDecisionComplete = false;
+  const humanDecisionComplete =
+    compareComplete && isComplete(impact) && confirmedDecisionCount > 0;
   const actComplete = false;
 
   const definitions: readonly Omit<CbaiCycleStage, "status" | "blocker">[] = [
@@ -96,7 +98,9 @@ export function deriveCbaiGuideCycle(
     reasoning?.missing ?? null,
     impact?.missing ??
       (isComplete(impact)
-        ? "No mission-linked human decision record exists."
+        ? confirmedDecisionCount > 0
+          ? null
+          : "No mission-linked human decision record exists."
         : "A human decision has not been confirmed."),
     report?.missing ?? "No confirmed action record exists.",
     "Define a monitoring result before verification can complete.",

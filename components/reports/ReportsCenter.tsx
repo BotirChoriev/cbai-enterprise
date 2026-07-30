@@ -21,6 +21,7 @@ import SavedReportsSection from "@/components/reports/SavedReportsSection";
 import ReportsPrimaryActions from "@/components/reports/ReportsPrimaryActions";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
 import DecisionJourneyHero from "@/components/experience/DecisionJourneyHero";
+import HumanDecisionRecordPanel from "@/components/reports/HumanDecisionRecordPanel";
 
 function entityProfilePath(entity: PrimaryEntityRef): string {
   switch (entity.kind) {
@@ -66,6 +67,7 @@ export default function ReportsCenter() {
       <EngineRouteEntryStrip />
       <ReportsEmptyIntro />
       <ReportsPrimaryActions />
+      <HumanDecisionRecordPanel />
       <SavedReportsSection />
       {disclosure.showReportsReadinessDetail ? (
         <ReportReadinessSection reportTypes={model.reportTypes} />

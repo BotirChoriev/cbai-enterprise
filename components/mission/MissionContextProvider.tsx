@@ -28,6 +28,7 @@ import { useAssistantProfile } from "@/components/platform/context/AssistantProf
 import { resolveOperatorName } from "@/lib/assistant/assistant-profile";
 
 type MissionContextValue = {
+  readonly revision: number;
   readonly mission: Mission | null;
   readonly evidencePulse: EvidencePulseReading | null;
   readonly missionThread: readonly MissionThreadState[];
@@ -57,6 +58,7 @@ export function MissionContextProvider({ children }: { children: ReactNode }) {
   const value = useMemo((): MissionContextValue => {
     if (!hydrated) {
       return {
+        revision: tick,
         mission: null,
         evidencePulse: null,
         missionThread: [],
@@ -70,6 +72,7 @@ export function MissionContextProvider({ children }: { children: ReactNode }) {
     const mission = getCurrentMission();
     const passport = buildCapabilityPassport(operatorName);
     return {
+      revision: tick,
       mission,
       evidencePulse: deriveEvidencePulse(mission),
       missionThread: deriveMissionThread(mission),
@@ -86,6 +89,7 @@ export function useMissionContext(): MissionContextValue {
   const ctx = useContext(MissionContext);
   if (!ctx) {
     return {
+      revision: 0,
       mission: null,
       evidencePulse: null,
       missionThread: [],

@@ -71,3 +71,19 @@ test("impact and report never substitute for an explicit human decision", () => 
   assert.equal(cycle.stages[5].status, "locked");
   assert.equal(cycle.stages[6].status, "locked");
 });
+
+test("a persisted mission-linked decision opens Act but does not fake execution", () => {
+  const cycle = deriveCbaiGuideCycle([
+    stage("mission", "complete"),
+    stage("question", "complete"),
+    stage("evidence", "complete"),
+    stage("reasoning", "complete"),
+    stage("impact", "complete"),
+    stage("report", "complete"),
+  ], 1);
+
+  assert.equal(cycle.completedCount, 4);
+  assert.equal(cycle.stages[3].status, "complete");
+  assert.equal(cycle.stages[4].id, "act");
+  assert.equal(cycle.stages[4].status, "blocked");
+});

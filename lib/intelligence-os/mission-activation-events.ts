@@ -12,7 +12,8 @@ export type MissionDataChangeReason =
   | "impact"
   | "reasoning"
   | "research"
-  | "bookmark";
+  | "bookmark"
+  | "decision";
 
 export function notifyMissionDataChanged(reason: MissionDataChangeReason): void {
   if (typeof window === "undefined") return;

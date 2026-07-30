@@ -9,6 +9,7 @@ import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { deriveMissionLifecycle } from "@/lib/intelligence-os/mission-lifecycle";
 import { deriveCbaiGuideCycle } from "@/lib/cbai-guide/cycle";
+import { loadMissionDecisions } from "@/lib/decision-ledger/persistence";
 import {
   guidePersonaForPath,
   guideStageIndexForPath,
@@ -120,10 +121,11 @@ export default function AlKhwarizmiGuide() {
   const pathname = usePathname();
   const { language } = useTranslation();
   const voice = useVoiceOperator();
-  const { mission } = useMissionContext();
+  const { mission, revision } = useMissionContext();
   const [open, setOpen] = useState(false);
   const [question, setQuestion] = useState("");
   const [idle, setIdle] = useState(false);
+  const [confirmedDecisionCount, setConfirmedDecisionCount] = useState(0);
   const locale = language === "uz" ? "uz" : "en";
   const copy = COPY[locale];
   const persona = useMemo(() => guidePersonaForPath(pathname), [pathname]);
@@ -131,9 +133,21 @@ export default function AlKhwarizmiGuide() {
   const stageIndex = useMemo(() => guideStageIndexForPath(pathname), [pathname]);
   const nextStage = useMemo(() => nextGuideStage(pathname), [pathname]);
   const cycle = useMemo(
-    () => deriveCbaiGuideCycle(deriveMissionLifecycle(mission)),
-    [mission],
+    () => deriveCbaiGuideCycle(deriveMissionLifecycle(mission), confirmedDecisionCount),
+    [mission, confirmedDecisionCount],
   );
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      const decisions = mission ? await loadMissionDecisions(mission.id) : [];
+      if (!cancelled) setConfirmedDecisionCount(decisions.length);
+    };
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, [mission, revision]);
 
   useEffect(() => {
     if (open || voice.dockOpen) return;

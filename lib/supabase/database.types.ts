@@ -307,6 +307,24 @@ export type OrganizationResponsibilityMapRow = {
   updated_at: string;
 };
 
+export type HumanDecisionRecordRow = {
+  id: string;
+  owner_id: string;
+  mission_local_id: string;
+  problem_local_id: string | null;
+  decision_summary: string;
+  options_considered: string[];
+  chosen_option: string;
+  rationale: string;
+  evidence_refs: string[];
+  unknowns_at_decision: string[];
+  status: "human_confirmed";
+  confirmed_by: string;
+  confirmed_at: string;
+  idempotency_key: string;
+  created_at: string;
+};
+
 export type ProblemSnapshotRow = {
   id: string;
   owner_id: string;
@@ -438,6 +456,11 @@ export type Database = {
         never,
         never
       >;
+      human_decision_records: TableDef<
+        HumanDecisionRecordRow,
+        never,
+        never
+      >;
     };
     Views: Record<string, never>;
     Functions: {
@@ -463,6 +486,20 @@ export type Database = {
           p_expected_version?: number;
         };
         Returns: OrganizationResponsibilityMapRow;
+      };
+      confirm_human_decision: {
+        Args: {
+          p_mission_local_id: string;
+          p_problem_local_id: string;
+          p_decision_summary: string;
+          p_options_considered: string[];
+          p_chosen_option: string;
+          p_rationale: string;
+          p_evidence_refs: string[];
+          p_unknowns_at_decision: string[];
+          p_idempotency_key: string;
+        };
+        Returns: HumanDecisionRecordRow;
       };
     };
   };
