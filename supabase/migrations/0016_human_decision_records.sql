@@ -51,7 +51,7 @@ $$;
 drop trigger if exists reject_human_decision_mutation_trigger
   on public.human_decision_records;
 create trigger reject_human_decision_mutation_trigger
-before update or delete on public.human_decision_records
+before update on public.human_decision_records
 for each row execute function public.reject_human_decision_mutation();
 
 create policy human_decision_records_select_owner

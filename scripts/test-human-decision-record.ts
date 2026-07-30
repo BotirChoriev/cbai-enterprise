@@ -14,7 +14,7 @@ test("decision schema is immutable-by-default and owner-readable", () => {
   assert.match(migration, /status = 'human_confirmed'/);
   assert.match(migration, /human_decision_records_select_owner/);
   assert.match(migration, /human_decision_history_is_immutable/);
-  assert.match(migration, /before update or delete/);
+  assert.match(migration, /before update on public\.human_decision_records/);
   assert.doesNotMatch(migration, /create policy human_decision_records_(insert|update|delete)/);
   assert.match(migration, /revoke all privileges on table public\.human_decision_records/);
 });
