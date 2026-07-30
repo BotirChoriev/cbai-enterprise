@@ -5,6 +5,10 @@
    Light Intelligence palette is explicit via html.theme-light only.
    Design Bible Part III.3.1: "CBAI has no red." --error equals --warning (amber). */
 :root {
+  --font-interface: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --font-code: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --font-display: Iowan Old Style, Baskerville, "Times New Roman", Georgia, serif;
   --background: #050810;
   --surface: #0a1628;
   --card: #0c1220;
@@ -181,14 +185,14 @@ html.theme-light {
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-interface);
+  --font-mono: var(--font-code);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-interface);
 }
 
 ::selection {
@@ -207,7 +211,7 @@ body {
    pairing is doing real identity work — most dashboard software uses one sans for everything, so
    the moment a display serif appears is, by itself, a recognizable "this is CBAI" cue. */
 .cbai-display {
-  font-family: var(--font-display), Georgia, serif;
+  font-family: var(--font-display);
   font-variation-settings: "opsz" 72, "SOFT" 60, "WONK" 1;
   font-weight: 480;
   letter-spacing: -0.01em;
@@ -275,7 +279,7 @@ html.theme-light .cbai-glass {
 }
 
 .home-search-input {
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-interface);
 }
 
 /* Light Intelligence palette — explicit html.theme-light overrides for Tailwind utilities
