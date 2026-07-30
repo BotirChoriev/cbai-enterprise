@@ -29,6 +29,17 @@
   pointer-events: auto;
 }
 
+.feedbackPanel {
+  border-color: rgba(251, 191, 36, 0.34);
+  box-shadow:
+    0 1.5rem 4rem rgba(0, 0, 0, 0.46),
+    0 0 2.4rem rgba(251, 191, 36, 0.08);
+}
+
+.feedbackPanel .eyebrow {
+  color: #fbbf24;
+}
+
 .launcher {
   position: relative;
   display: grid;

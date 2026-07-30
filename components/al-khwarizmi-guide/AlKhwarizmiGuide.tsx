@@ -8,6 +8,7 @@ import { useVoiceOperator } from "@/components/voice-operator/VoiceOperatorProvi
 import { useTranslation } from "@/lib/i18n/use-translation";
 import {
   GUIDE_STAGES,
+  guidePersonaForPath,
   guideStageIndexForPath,
   nextGuideStage,
 } from "@/lib/al-khwarizmi-guide/progress";
@@ -58,6 +59,53 @@ const COPY = {
   },
 } as const;
 
+const PERSONA_COPY = {
+  en: {
+    "al-khwarizmi": {
+      role: "Sequence guide",
+      name: "Al-Khwarizmi",
+      open: "Open Al-Khwarizmi sequence guide",
+      intro: "I organize the sequence; you evaluate the evidence and make the decision.",
+      promptPrefix: "Guide me through this CBAI reasoning step:",
+      activeAsset: "/guides/al-khwarizmi-guide-v1.png",
+      idleAsset: "/guides/al-khwarizmi-reading-v1.png",
+      idleWord: "ALGORITHM",
+    },
+    "norbert-wiener": {
+      role: "Feedback guide",
+      name: "Norbert Wiener",
+      open: "Open Norbert Wiener feedback guide",
+      intro: "I structure feedback, verification, and learning; you retain authority over every action.",
+      promptPrefix: "Help me verify this CBAI feedback step:",
+      activeAsset: "/guides/norbert-wiener-guide-v1.png",
+      idleAsset: "/guides/norbert-wiener-reading-v1.png",
+      idleWord: "FEEDBACK",
+    },
+  },
+  uz: {
+    "al-khwarizmi": {
+      role: "Ketma-ketlik yo‘lko‘rsatuvchisi",
+      name: "Al-Xorazmiy",
+      open: "Al-Xorazmiy ketma-ketlik yo‘lko‘rsatuvchisini ochish",
+      intro: "Men ketma-ketlikni tartiblayman; dalilni siz baholaysiz va qarorni siz berasiz.",
+      promptPrefix: "CBAI fikrlash bosqichida menga yo‘l ko‘rsat:",
+      activeAsset: "/guides/al-khwarizmi-guide-v1.png",
+      idleAsset: "/guides/al-khwarizmi-reading-v1.png",
+      idleWord: "ALGORITM",
+    },
+    "norbert-wiener": {
+      role: "Qayta aloqa yo‘lko‘rsatuvchisi",
+      name: "Norbert Wiener",
+      open: "Norbert Wiener qayta aloqa yo‘lko‘rsatuvchisini ochish",
+      intro: "Men qayta aloqa, tekshiruv va o‘rganishni tartiblayman; har bir harakat vakolati sizda qoladi.",
+      promptPrefix: "CBAI qayta aloqa bosqichini tekshirishga yordam ber:",
+      activeAsset: "/guides/norbert-wiener-guide-v1.png",
+      idleAsset: "/guides/norbert-wiener-reading-v1.png",
+      idleWord: "QAYTA ALOQA",
+    },
+  },
+} as const;
+
 export default function AlKhwarizmiGuide() {
   const pathname = usePathname();
   const { language } = useTranslation();
@@ -67,6 +115,8 @@ export default function AlKhwarizmiGuide() {
   const [idle, setIdle] = useState(false);
   const locale = language === "uz" ? "uz" : "en";
   const copy = COPY[locale];
+  const persona = useMemo(() => guidePersonaForPath(pathname), [pathname]);
+  const personaCopy = PERSONA_COPY[locale][persona];
   const stageIndex = useMemo(() => guideStageIndexForPath(pathname), [pathname]);
   const nextStage = useMemo(() => nextGuideStage(pathname), [pathname]);
 
@@ -101,7 +151,7 @@ export default function AlKhwarizmiGuide() {
   const askGuide = () => {
     const value = question.trim();
     if (!value) return;
-    voice.setTextInput(`${copy.promptPrefix} ${value}`);
+    voice.setTextInput(`${personaCopy.promptPrefix} ${value}`);
     voice.openDock();
     setOpen(false);
   };
@@ -111,22 +161,23 @@ export default function AlKhwarizmiGuide() {
   return (
     <aside
       className={`${styles.root} ${!open ? (idle ? styles.idle : styles.roaming) : ""}`}
-      data-cbai-progress-guide="al-khwarizmi"
+      data-cbai-progress-guide={persona}
+      data-guide-persona={persona}
       data-guide-motion={open ? "engaged" : idle ? "reading" : "roaming"}
     >
       {open ? (
-        <section className={styles.panel} aria-label={copy.open}>
+        <section className={`${styles.panel} ${persona === "norbert-wiener" ? styles.feedbackPanel : ""}`} aria-label={personaCopy.open}>
           <header className={styles.header}>
             <div>
-              <p className={styles.eyebrow}>{copy.role}</p>
-              <h2 className={styles.name}>{copy.name}</h2>
+              <p className={styles.eyebrow}>{personaCopy.role}</p>
+              <h2 className={styles.name}>{personaCopy.name}</h2>
             </div>
             <button type="button" className={styles.close} onClick={() => setOpen(false)}>
               {copy.close}
             </button>
           </header>
           <div className={styles.body}>
-            <p className={styles.explanation}>{copy.intro}</p>
+            <p className={styles.explanation}>{personaCopy.intro}</p>
             <div className={styles.progress} aria-label={`${stageIndex + 1}/${GUIDE_STAGES.length}`}>
               {GUIDE_STAGES.map((stage, index) => (
                 <span
@@ -172,18 +223,18 @@ export default function AlKhwarizmiGuide() {
           setIdle(false);
           setOpen((value) => !value);
         }}
-        aria-label={copy.open}
+        aria-label={personaCopy.open}
         aria-expanded={open}
       >
         <Image
           className={`${styles.avatar} ${idle ? styles.avatarReading : ""}`}
-          src={idle ? "/guides/al-khwarizmi-reading-v1.png" : "/guides/al-khwarizmi-guide-v1.png"}
+          src={idle ? personaCopy.idleAsset : personaCopy.activeAsset}
           width={168}
           height={168}
           alt=""
           priority
         />
-        {idle ? <span className={styles.algorithmWord}>ALGORITHM</span> : null}
+        {idle ? <span className={styles.algorithmWord}>{personaCopy.idleWord}</span> : null}
       </button>
     </aside>
   );

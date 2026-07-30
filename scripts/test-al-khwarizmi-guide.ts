@@ -3,6 +3,7 @@ import test from "node:test";
 import { existsSync, readFileSync } from "node:fs";
 import {
   GUIDE_STAGES,
+  guidePersonaForPath,
   guideStageIndexForPath,
   nextGuideStage,
 } from "@/lib/al-khwarizmi-guide/progress";
@@ -30,6 +31,16 @@ test("route context advances the guide and unlocks the next canonical function",
   assert.equal(nextGuideStage("/reasoning").href, "/reports");
 });
 
+test("one contextual guide selects the right specialist without competing assistants", () => {
+  assert.equal(guidePersonaForPath("/problems"), "al-khwarizmi");
+  assert.equal(guidePersonaForPath("/graph"), "al-khwarizmi");
+  assert.equal(guidePersonaForPath("/organization"), "norbert-wiener");
+  assert.equal(guidePersonaForPath("/trust"), "norbert-wiener");
+  assert.match(guide, /data-guide-persona/);
+  assert.match(guide, /every action/i);
+  assert.match(guide, /har bir harakat vakolati sizda qoladi/i);
+});
+
 test("Al-Khwarizmi asks through the canonical Voice Operator", () => {
   assert.match(guide, /useVoiceOperator/);
   assert.match(guide, /voice\.setTextInput/);
@@ -45,6 +56,8 @@ test("guide is mounted inside the Voice Operator provider and uses a project ass
   assert.ok(providerStart >= 0 && guideIndex > providerStart && guideIndex < providerEnd);
   assert.ok(existsSync("public/guides/al-khwarizmi-guide-v1.png"));
   assert.ok(existsSync("public/guides/al-khwarizmi-reading-v1.png"));
+  assert.ok(existsSync("public/guides/norbert-wiener-guide-v1.png"));
+  assert.ok(existsSync("public/guides/norbert-wiener-reading-v1.png"));
 });
 
 test("guide roams, settles to read, and respects reduced-motion preferences", () => {

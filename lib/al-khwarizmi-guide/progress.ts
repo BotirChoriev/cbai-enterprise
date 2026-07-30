@@ -4,6 +4,8 @@ export type GuideStage = {
   readonly routes: readonly string[];
 };
 
+export type GuidePersona = "al-khwarizmi" | "norbert-wiener";
+
 export const GUIDE_STAGES: readonly GuideStage[] = [
   { id: "problem", href: "/problems", routes: ["/", "/problems", "/my-work", "/search"] },
   {
@@ -43,4 +45,16 @@ export function guideStageIndexForPath(pathname: string): number {
 export function nextGuideStage(pathname: string): GuideStage {
   const current = guideStageIndexForPath(pathname);
   return GUIDE_STAGES[Math.min(current + 1, GUIDE_STAGES.length - 1)];
+}
+
+/**
+ * CBAI uses one contextual guide surface, not competing assistants.
+ * Al-Khwarizmi owns the reasoning sequence; Wiener appears only when the
+ * workflow reaches human action, feedback, verification, and learning.
+ */
+export function guidePersonaForPath(pathname: string): GuidePersona {
+  const stage = GUIDE_STAGES[guideStageIndexForPath(pathname)];
+  return stage.id === "decision" || stage.id === "monitoring"
+    ? "norbert-wiener"
+    : "al-khwarizmi";
 }
