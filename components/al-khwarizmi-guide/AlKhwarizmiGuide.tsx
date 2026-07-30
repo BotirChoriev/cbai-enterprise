@@ -5,9 +5,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useVoiceOperator } from "@/components/voice-operator/VoiceOperatorProvider";
+import { useMissionContext } from "@/components/mission/MissionContextProvider";
 import { useTranslation } from "@/lib/i18n/use-translation";
+import { deriveMissionLifecycle } from "@/lib/intelligence-os/mission-lifecycle";
+import { deriveCbaiGuideCycle } from "@/lib/cbai-guide/cycle";
 import {
-  GUIDE_STAGES,
   guidePersonaForPath,
   guideStageIndexForPath,
   nextGuideStage,
@@ -35,6 +37,10 @@ const COPY = {
     ask: "Ask",
     placeholder: "What do you not understand?",
     promptPrefix: "Guide me through this CBAI step:",
+    cycle: ["Sense", "Structure", "Compare", "Human decide", "Act", "Verify", "Learn"],
+    unknowns: "Open items",
+    checkpoint: "Human checkpoint",
+    noBlocker: "Ready for human review.",
   },
   uz: {
     role: "Progress yo‘lko‘rsatuvchi",
@@ -56,6 +62,10 @@ const COPY = {
     ask: "So‘rash",
     placeholder: "Qaysi joyini tushunmadingiz?",
     promptPrefix: "CBAI’ning ushbu bosqichida menga yo‘l ko‘rsat:",
+    cycle: ["Sezish", "Tizimlash", "Taqqoslash", "Inson qarori", "Harakat", "Tekshirish", "O‘rganish"],
+    unknowns: "Ochiq masalalar",
+    checkpoint: "Inson nazorat nuqtasi",
+    noBlocker: "Inson ko‘rib chiqishi uchun tayyor.",
   },
 } as const;
 
@@ -110,6 +120,7 @@ export default function AlKhwarizmiGuide() {
   const pathname = usePathname();
   const { language } = useTranslation();
   const voice = useVoiceOperator();
+  const { mission } = useMissionContext();
   const [open, setOpen] = useState(false);
   const [question, setQuestion] = useState("");
   const [idle, setIdle] = useState(false);
@@ -119,6 +130,10 @@ export default function AlKhwarizmiGuide() {
   const personaCopy = PERSONA_COPY[locale][persona];
   const stageIndex = useMemo(() => guideStageIndexForPath(pathname), [pathname]);
   const nextStage = useMemo(() => nextGuideStage(pathname), [pathname]);
+  const cycle = useMemo(
+    () => deriveCbaiGuideCycle(deriveMissionLifecycle(mission)),
+    [mission],
+  );
 
   useEffect(() => {
     if (open || voice.dockOpen) return;
@@ -178,13 +193,33 @@ export default function AlKhwarizmiGuide() {
           </header>
           <div className={styles.body}>
             <p className={styles.explanation}>{personaCopy.intro}</p>
-            <div className={styles.progress} aria-label={`${stageIndex + 1}/${GUIDE_STAGES.length}`}>
-              {GUIDE_STAGES.map((stage, index) => (
+            <div className={styles.progress} aria-label={`${cycle.completedCount}/${cycle.stages.length}`}>
+              {cycle.stages.map((stage, index) => (
                 <span
                   key={stage.id}
-                  className={`${styles.progressItem} ${index <= stageIndex ? styles.progressItemActive : ""}`}
+                  title={copy.cycle[index]}
+                  className={`${styles.progressItem} ${
+                    stage.status === "complete"
+                      ? styles.progressItemComplete
+                      : index === cycle.activeIndex
+                        ? styles.progressItemActive
+                        : ""
+                  }`}
                 />
               ))}
+            </div>
+            <div className={styles.cycleStatus}>
+              <div>
+                <span>{copy.cycle[cycle.activeIndex]}</span>
+                <strong>{cycle.completedCount}/{cycle.stages.length}</strong>
+              </div>
+              <p>{cycle.nextBlocker ?? copy.noBlocker}</p>
+              <small>
+                {copy.unknowns}: {cycle.unknownCount}
+                {cycle.stages[cycle.activeIndex]?.humanCheckpoint
+                  ? ` · ${copy.checkpoint}`
+                  : ""}
+              </small>
             </div>
             <div className={styles.stage}>
               <strong>{copy.current[stageIndex]}</strong>

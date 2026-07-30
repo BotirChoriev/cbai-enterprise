@@ -99,12 +99,12 @@ export default function DashboardLayout({
                         </main>
                         <OperationalObjectComposer />
                         <CommandClarifyCard />
+                        <AlKhwarizmiGuide />
                       </EngineWorkspaceProvider>
                     </UniversalWorkspaceProvider>
                   </MissionContextProvider>
                 </PlatformContextProvider>
               </Suspense>
-              <AlKhwarizmiGuide />
               <VoiceOperatorDock />
             </VoiceOperatorProvider>
           </OperationalObjectProvider>
