@@ -26,6 +26,7 @@ import {
   cbaiSectionEyebrow,
   cbaiTextMuted,
 } from "@/components/brand/brand-classes";
+import IntelligenceStatusRail from "@/components/shared/IntelligenceStatusRail";
 
 const STEP_META: { id: WizardStepId; labelKey: keyof ReturnType<typeof getLcrCopy> }[] = [
   { id: 1, labelKey: "stepPurpose" },
@@ -144,6 +145,27 @@ export default function LiveRoomsHome() {
             {copy.emailDeliveryUnavailable} · {copy.smsUnavailable}
           </p>
         ) : null}
+        <IntelligenceStatusRail
+          context={
+            rooms.length > 0
+              ? `${rooms.length} ${language === "uz" ? "ta hamkorlik xonasi" : "collaboration rooms"}`
+              : language === "uz"
+                ? "Yangi hamkorlik xonasini oching"
+                : "Open a new collaboration room"
+          }
+          evidence={
+            language === "uz"
+              ? "Materiallar, e’tirozlar va qarorlar bitta xonada"
+              : "Materials, objections, and decisions stay in one room"
+          }
+          unknown={
+            language === "uz"
+              ? "Taklif qilinmagan ishtirokchilar va yetishmagan materiallar ko‘rinadi"
+              : "Missing participants and materials remain visible"
+          }
+          humanBoundary={copy.humanDecides}
+          compact
+        />
       </header>
 
       {wizardOpen ? (

@@ -4,7 +4,7 @@
   position: relative;
   isolation: isolate;
   container-type: inline-size;
-  min-height: clamp(31rem, 68vh, 47rem);
+  min-height: clamp(18rem, 34vh, 24rem);
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--hero-accent) 32%, transparent);
   border-radius: 1.5rem;
@@ -90,9 +90,10 @@
   z-index: 2;
   display: grid;
   min-height: inherit;
-  grid-template-columns: minmax(0, 0.95fr) minmax(23rem, 1.05fr);
+  grid-template-columns: minmax(20rem, 1.25fr) minmax(16rem, 0.75fr);
   gap: 1.5rem;
-  padding: clamp(1.5rem, 3vw, 3rem);
+  padding: clamp(1.25rem, 2.4vw, 2.25rem);
+  padding-bottom: 5.35rem;
 }
 
 .copy {
@@ -115,7 +116,7 @@
   margin-top: 1rem;
   color: #f8fafc;
   font-family: var(--font-display), ui-serif, Georgia, serif;
-  font-size: clamp(2.2rem, 4vw, 4.15rem);
+  font-size: clamp(1.75rem, 2.7vw, 2.7rem);
   font-weight: 540;
   letter-spacing: -0.052em;
   line-height: 1;
@@ -135,7 +136,7 @@
   display: flex;
   flex-wrap: nowrap;
   gap: 0.5rem;
-  margin-top: 1.25rem;
+  margin-top: 1rem;
 }
 
 .primary,
@@ -177,7 +178,7 @@
 
 .visual {
   position: relative;
-  min-height: 24rem;
+  min-height: 13rem;
   align-self: center;
   opacity: 0.9;
 }
@@ -203,8 +204,8 @@
   top: 43%;
   left: 50%;
   display: grid;
-  width: 8.5rem;
-  height: 8.5rem;
+  width: 5.8rem;
+  height: 5.8rem;
   place-items: center;
   border: 1px solid rgba(var(--hero-accent-rgb), 0.72);
   border-radius: 50%;
@@ -225,11 +226,11 @@
 
 .node {
   position: absolute;
-  width: min(13rem, 38%);
+  width: min(11rem, 40%);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 1rem;
   background: rgba(4, 14, 27, 0.76);
-  padding: 0.85rem;
+  padding: 0.58rem;
   color: #dce8f5;
   box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.24);
   backdrop-filter: blur(1.2rem);
@@ -254,7 +255,7 @@
   display: block;
   margin-top: 0.32rem;
   color: #8da1b7;
-  font-size: 0.7rem;
+  font-size: 0.62rem;
   line-height: 1.45;
 }
 
@@ -276,6 +277,78 @@
 .nodeFour {
   bottom: 0;
   left: 2%;
+}
+
+.engineRail {
+  display: grid;
+  width: min(100%, 43rem);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin-top: 1rem;
+}
+
+.engine {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.72rem;
+  background: rgba(3, 11, 21, 0.62);
+  padding: 0.62rem;
+  color: #8295aa;
+  opacity: 0.7;
+  backdrop-filter: blur(1rem);
+}
+
+.engineActive {
+  border-color: rgba(var(--hero-accent-rgb), 0.42);
+  color: #edf8ff;
+  opacity: 1;
+}
+
+.engineSignal {
+  width: 0.45rem;
+  height: 0.45rem;
+  flex: 0 0 auto;
+  margin-top: 0.18rem;
+  border-radius: 50%;
+  background: #53677c;
+}
+
+.engineActive .engineSignal {
+  background: var(--hero-accent);
+  box-shadow: 0 0 0.8rem rgba(var(--hero-accent-rgb), 0.7);
+}
+
+.engine strong,
+.engine small {
+  display: block;
+}
+
+.engine strong {
+  overflow: hidden;
+  font-size: 0.68rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.engine small {
+  margin-top: 0.18rem;
+  color: #7f93a9;
+  font-size: 0.58rem;
+  line-height: 1.25;
+}
+
+.humanGate {
+  border-color: rgba(251, 191, 36, 0.42);
+  color: #fff7dc;
+  opacity: 1;
+}
+
+.humanGate .engineSignal {
+  background: #fbbf24;
+  box-shadow: 0 0 0.8rem rgba(251, 191, 36, 0.62);
 }
 
 .journey {
@@ -352,7 +425,7 @@
   }
 
   .visual {
-    min-height: 21rem;
+    display: none;
   }
 
   .journey {
@@ -397,7 +470,7 @@
   }
 
   .visual {
-    min-height: 21rem;
+    display: none;
   }
 
   .journey {
@@ -416,7 +489,7 @@
 
   .content {
     gap: 0.5rem;
-    padding: 1.2rem 1.1rem 2rem;
+    padding: 1.2rem 1.1rem 8.4rem;
   }
 
   .actions {
@@ -428,22 +501,8 @@
     line-height: 1.04;
   }
 
-  .visual {
-    min-height: 17rem;
-  }
-
-  .node {
-    width: 43%;
-    padding: 0.65rem;
-  }
-
-  .node span {
-    display: none;
-  }
-
-  .core {
-    width: 6.5rem;
-    height: 6.5rem;
+  .engineRail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .journey {
@@ -480,7 +539,8 @@
 
 :global(html.theme-light) .node,
 :global(html.theme-light) .journey,
-:global(html.theme-light) .secondary {
+:global(html.theme-light) .secondary,
+:global(html.theme-light) .engine {
   background: rgba(255, 255, 255, 0.78);
   color: #0f2236;
 }

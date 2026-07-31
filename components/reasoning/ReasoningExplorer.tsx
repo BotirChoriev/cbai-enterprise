@@ -9,10 +9,14 @@ import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import { cbaiStatCell } from "@/components/brand/brand-classes";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
-import DecisionJourneyHero from "@/components/experience/DecisionJourneyHero";
+import IntelligenceStatusRail from "@/components/shared/IntelligenceStatusRail";
+import {
+  cbaiMineralPanel,
+  cbaiSectionEyebrow,
+} from "@/components/brand/brand-classes";
 
 export default function ReasoningExplorer() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const disclosure = useProgressiveDisclosure();
   const model = useMemo(() => buildReasoningExplorerModel(), []);
 
@@ -22,7 +26,35 @@ export default function ReasoningExplorer() {
       showOperator={false}
       showMissionContext={false}
     >
-      <DecisionJourneyHero variant="scenarios" />
+      <section className={`${cbaiMineralPanel} space-y-4`} data-cbai-reasoning-status="">
+        <div>
+          <p className={cbaiSectionEyebrow}>Intelligence OS</p>
+          <p className="mt-1 max-w-3xl text-sm text-[var(--cbai-text-secondary)]">
+            {language === "uz"
+              ? "Variantlarni dalil, qarama-qarshilik va noma’lumlar bilan taqqoslang. Yakuniy tanlovni inson qiladi."
+              : "Compare options through evidence, contradictions, and unknowns. A human makes the final choice."}
+          </p>
+        </div>
+        <IntelligenceStatusRail
+          context={language === "uz" ? "Faol muammo uchun ssenariylar" : "Scenarios for the active problem"}
+          evidence={`${model.summary.connectedIndicators} / ${model.summary.totalIndicators} ${
+            language === "uz" ? "indikator ulangan" : "indicators connected"
+          }`}
+          unknown={
+            model.summary.connectedSources > 0
+              ? `${model.summary.connectedSources} ${language === "uz" ? "manba ulangan" : "sources connected"}`
+              : language === "uz"
+                ? "Tasdiqlangan manba hali ulanmagan"
+                : "No verified source is connected yet"
+          }
+          humanBoundary={
+            language === "uz"
+              ? "CBAI taqqoslaydi; ssenariyni inson tanlaydi"
+              : "CBAI compares; a human selects the scenario"
+          }
+          compact
+        />
+      </section>
       <MissionReasoningPanel />
       {disclosure.showReasoningStats ? (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

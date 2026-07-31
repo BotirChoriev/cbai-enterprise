@@ -1098,6 +1098,52 @@ html[data-cbai-voice-dock="open"] .cbai-platform-main {
   color: var(--cbai-text-primary);
 }
 
+/* Approved CBAI OS work surface:
+   existing route content stays intact, but old page-local cards inherit one spatial language. */
+.cbai-page-workspace > :where(section, article, div) {
+  min-width: 0;
+}
+
+html:not(.theme-light) .cbai-page-workspace :where(
+  .rounded-xl,
+  .rounded-2xl,
+  .rounded-3xl
+)[class*="border"] {
+  border-color: var(--cbai-border-subtle) !important;
+}
+
+html:not(.theme-light) .cbai-page-workspace :where(
+  .bg-white,
+  .bg-zinc-50,
+  .bg-slate-50,
+  .bg-zinc-100,
+  .bg-slate-100
+) {
+  background-color: var(--cbai-solid-surface) !important;
+  color: var(--cbai-text-primary);
+}
+
+html:not(.theme-light) .cbai-page-workspace :where(
+  .text-zinc-800,
+  .text-slate-800,
+  .text-zinc-900,
+  .text-slate-900,
+  .text-black
+) {
+  color: var(--cbai-text-primary) !important;
+}
+
+html:not(.theme-light) .cbai-page-workspace :where(
+  .text-zinc-500,
+  .text-zinc-600,
+  .text-zinc-700,
+  .text-slate-500,
+  .text-slate-600,
+  .text-slate-700
+) {
+  color: var(--cbai-text-secondary) !important;
+}
+
 /* Intelligence OS workspace surfaces — prefer semantic tokens over raw white/black cards */
 .cbai-operating-card {
   border-radius: var(--cbai-radius-card, 0.75rem);

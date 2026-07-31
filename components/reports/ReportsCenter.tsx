@@ -20,8 +20,8 @@ import ReportReadinessSection from "@/components/reports/ReportReadinessSection"
 import SavedReportsSection from "@/components/reports/SavedReportsSection";
 import ReportsPrimaryActions from "@/components/reports/ReportsPrimaryActions";
 import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure";
-import DecisionJourneyHero from "@/components/experience/DecisionJourneyHero";
 import HumanDecisionRecordPanel from "@/components/reports/HumanDecisionRecordPanel";
+import IntelligenceStatusRail from "@/components/shared/IntelligenceStatusRail";
 
 function entityProfilePath(entity: PrimaryEntityRef): string {
   switch (entity.kind) {
@@ -63,7 +63,12 @@ export default function ReportsCenter() {
         ) : undefined
       }
     >
-      <DecisionJourneyHero variant="reports" />
+      <IntelligenceStatusRail
+        context={entity?.name ?? (language === "uz" ? "Faol ish uchun hisobot" : "Report for active work")}
+        evidence={language === "uz" ? "Manbalar va kelib chiqish hisobotga biriktiriladi" : "Sources and provenance attach to the report"}
+        unknown={language === "uz" ? "Yetishmagan tekshiruvlar hisobotda ochiq qoladi" : "Missing checks remain explicit in the report"}
+        humanBoundary={language === "uz" ? "Hisobotni inson ko‘rib chiqadi va tasdiqlaydi" : "A human reviews and approves the report"}
+      />
       <EngineRouteEntryStrip />
       <ReportsEmptyIntro />
       <ReportsPrimaryActions />

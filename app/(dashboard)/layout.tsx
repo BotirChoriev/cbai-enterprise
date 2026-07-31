@@ -85,7 +85,7 @@ export default function DashboardLayout({
                                 <div
                                   className={`grid min-h-0 flex-1 grid-cols-1 ${showOperatingColumn ? "lg:grid-cols-[minmax(0,1fr)_15rem] xl:grid-cols-[minmax(0,1fr)_17rem]" : ""}`}
                                 >
-                                  <div className="cbai-space-enter min-w-0 space-y-5 px-4 py-4 lg:px-5 lg:py-5">
+                                  <div className="cbai-page-workspace cbai-space-enter min-w-0 space-y-5 px-4 py-4 lg:px-5 lg:py-5">
                                     <RouteExperienceHero />
                                     {children}
                                   </div>
@@ -99,7 +99,7 @@ export default function DashboardLayout({
                         </main>
                         <OperationalObjectComposer />
                         <CommandClarifyCard />
-                        <AlKhwarizmiGuide />
+                        {!isHome ? <AlKhwarizmiGuide /> : null}
                       </EngineWorkspaceProvider>
                     </UniversalWorkspaceProvider>
                   </MissionContextProvider>

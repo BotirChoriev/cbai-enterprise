@@ -12,6 +12,7 @@ import { useProgressiveDisclosure } from "@/lib/hooks/use-progressive-disclosure
 import { cbaiGlassCard, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
 import { DATA_SOURCE_CATEGORIES } from "@/lib/trust/data-source-categories";
 import { PLATFORM_VERSION } from "@/lib/platform-home";
+import IntelligenceStatusRail from "@/components/shared/IntelligenceStatusRail";
 
 const SECTIONS = [
   { id: "constitution", key: "constitution" as const },
@@ -35,6 +36,12 @@ export default function TrustPageClient() {
 
   return (
     <OperatingPageShell title={t("trust.title")} description={trustPage.pageDescription} showMissionContext={false}>
+      <IntelligenceStatusRail
+        context={language === "uz" ? "CBAI metodologiyasi va javobgarligi" : "CBAI methodology and accountability"}
+        evidence={language === "uz" ? "Manba, usul va tekshiruv holati ochiq" : "Source, method, and verification status are explicit"}
+        unknown={language === "uz" ? "Ma’lum cheklovlar yashirilmaydi" : "Known limitations are not hidden"}
+        humanBoundary={language === "uz" ? "Ishonch qarorni almashtirmaydi; inson baholaydi" : "Trust does not replace judgment; a human evaluates"}
+      />
       <nav aria-label={trustPage.sectionsNav} className={`${cbaiGlassCard} p-4`}>
         <ul className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
           {SECTIONS.map((section) => (

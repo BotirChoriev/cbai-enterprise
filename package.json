@@ -125,7 +125,8 @@
     "test:company-operating-flow": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-company-operating-flow.ts",
     "test:company-onboarding": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-company-onboarding.ts",
     "test:responsibility-map": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-responsibility-map.ts",
-    "test:responsibility-map-migration": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-responsibility-map-migration.ts"
+    "test:responsibility-map-migration": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-responsibility-map-migration.ts",
+    "test:contextual-assistance": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-contextual-assistance.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.2",

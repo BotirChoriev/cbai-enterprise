@@ -1,11 +1,13 @@
 "use client";
 
-import SpatialWorldIntelligenceHome from "@/components/spatial-world/SpatialWorldIntelligenceHome";
+import LivingProblemHome from "@/components/platform/LivingProblemHome";
 
 /**
- * Universal Intelligence OS — Spatial World Intelligence homepage.
- * Evidence-first global operating surface with interactive country intelligence.
+ * CBAI Living Problem Canvas.
+ * A human opens the situation first; contextual engines are suggested only
+ * when the material and goal require them. No consequential action bypasses
+ * the existing Operational Object human-confirmation composer.
  */
 export default function PlatformHome() {
-  return <SpatialWorldIntelligenceHome />;
+  return <LivingProblemHome />;
 }

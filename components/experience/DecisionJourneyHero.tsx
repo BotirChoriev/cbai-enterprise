@@ -166,6 +166,37 @@ const HERO_IMAGE: Record<DecisionJourneyVariant, string> = {
   governance: "/experience/governance-monitoring-v1.webp",
 };
 
+const ENGINE_STATE: Record<
+  DecisionJourneyVariant,
+  readonly ["algorithm" | "cybernetics" | "ai", ...("algorithm" | "cybernetics" | "ai")[]]
+> = {
+  problem: ["algorithm", "ai"],
+  evidence: ["algorithm", "ai"],
+  scenarios: ["algorithm", "cybernetics", "ai"],
+  reports: ["algorithm", "cybernetics", "ai"],
+  collaboration: ["algorithm", "cybernetics"],
+  governance: ["algorithm", "cybernetics"],
+};
+
+const ENGINE_COPY = {
+  en: {
+    algorithm: ["Algorithm", "Structure and next step"],
+    cybernetics: ["Cybernetics", "Feedback and deviation"],
+    ai: ["AI", "Evidence and scenarios"],
+    human: ["Human review", "Final authority"],
+    active: "Active for this context",
+    available: "Available when needed",
+  },
+  uz: {
+    algorithm: ["Algoritm", "Tuzilma va keyingi qadam"],
+    cybernetics: ["Kibernetika", "Qayta aloqa va og‘ish"],
+    ai: ["AI", "Dalil va ssenariylar"],
+    human: ["Inson nazorati", "Yakuniy vakolat"],
+    active: "Shu holat uchun faol",
+    available: "Kerak bo‘lganda chaqiriladi",
+  },
+} as const;
+
 export default function DecisionJourneyHero({
   variant,
   content,
@@ -182,6 +213,8 @@ export default function DecisionJourneyHero({
   const locale = language === "uz" ? "uz" : "en";
   const copy = content?.[locale] ?? COPY[locale][variant];
   const journey = JOURNEY[locale];
+  const engineCopy = ENGINE_COPY[locale];
+  const activeEngines = ENGINE_STATE[variant];
 
   return (
     <section
@@ -207,6 +240,32 @@ export default function DecisionJourneyHero({
               <span aria-hidden="true">◉</span>
               {locale === "uz" ? "Ovoz operatori" : "Voice Operator"}
             </button>
+          </div>
+
+          <div className={styles.engineRail} aria-label={locale === "uz" ? "Yordamchi kuchlar" : "Supporting intelligence"}>
+            {(["algorithm", "cybernetics", "ai"] as const).map((engine) => {
+              const isActive = activeEngines.includes(engine);
+              return (
+                <div
+                  key={engine}
+                  className={`${styles.engine} ${isActive ? styles.engineActive : ""}`}
+                  title={isActive ? engineCopy.active : engineCopy.available}
+                >
+                  <span className={styles.engineSignal} aria-hidden="true" />
+                  <span>
+                    <strong>{engineCopy[engine][0]}</strong>
+                    <small>{engineCopy[engine][1]}</small>
+                  </span>
+                </div>
+              );
+            })}
+            <div className={`${styles.engine} ${styles.humanGate}`}>
+              <span className={styles.engineSignal} aria-hidden="true" />
+              <span>
+                <strong>{engineCopy.human[0]}</strong>
+                <small>{engineCopy.human[1]}</small>
+              </span>
+            </div>
           </div>
         </div>
 

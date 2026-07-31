@@ -43,7 +43,7 @@ import {
 
 function MyWorkContent() {
   const searchParams = useSearchParams();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const { moduleHref } = useContextualHref();
 
   const continueLinks = useMemo(
@@ -227,11 +227,40 @@ function MyWorkContent() {
       {accountMode === "cloud" ? <CloudProfileImportPrompt /> : null}
       {accountMode === "cloud" ? <LocalWorkMigrationPrompt /> : null}
 
-      <OperationalObjectIndex />
+      <section className="space-y-3" aria-labelledby="my-work-now-heading">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className={cbaiSectionEyebrow}>
+              {language === "uz" ? "HOZIR" : "NOW"}
+            </p>
+            <h2 id="my-work-now-heading" className="mt-1 text-lg font-semibold text-[var(--cbai-text-primary)]">
+              {language === "uz" ? "E’tibor talab qiladigan ish" : "Work that needs attention"}
+            </h2>
+          </div>
+          <p className="max-w-xl text-xs text-[var(--cbai-text-secondary)]">
+            {language === "uz"
+              ? "Avval inson tekshiruvi, keyin davom etayotgan ish va monitoring."
+              : "Human reviews first, followed by active work and monitoring."}
+          </p>
+        </div>
+        <OperationalObjectIndex />
+      </section>
 
-      <MissionHomeSummary />
-      <PersonalCabinetPanel />
-      <MissionLinkedEntitiesPanel />
+      <section className="space-y-3" aria-labelledby="my-work-context-heading">
+        <div>
+          <p className={cbaiSectionEyebrow}>
+            {language === "uz" ? "ISH KONTEKSTI" : "WORK CONTEXT"}
+          </p>
+          <h2 id="my-work-context-heading" className="mt-1 text-lg font-semibold text-[var(--cbai-text-primary)]">
+            {language === "uz" ? "Maqsad, kabinet va bog‘langan obyektlar" : "Mission, cabinet, and linked entities"}
+          </h2>
+        </div>
+        <div className="grid items-start gap-4 xl:grid-cols-2">
+          <MissionHomeSummary />
+          <PersonalCabinetPanel />
+        </div>
+        <MissionLinkedEntitiesPanel />
+      </section>
 
       {showProjectCreateExpanded ? (
         <CreateProjectForm initialPrimaryEntity={initialPrimaryEntity} initialType={initialType} />
@@ -246,7 +275,17 @@ function MyWorkContent() {
         </details>
       )}
 
-      <ProjectList />
+      <section className="space-y-3" aria-labelledby="my-work-projects-heading">
+        <div>
+          <p className={cbaiSectionEyebrow}>
+            {language === "uz" ? "FAOL JARAYON" : "ACTIVE WORK"}
+          </p>
+          <h2 id="my-work-projects-heading" className="mt-1 text-lg font-semibold text-[var(--cbai-text-primary)]">
+            {language === "uz" ? "Davom ettiriladigan loyihalar" : "Projects to continue"}
+          </h2>
+        </div>
+        <ProjectList />
+      </section>
 
       {disclosure.showMyWorkCapabilityPanels ? (
         <>
@@ -285,14 +324,22 @@ function MyWorkContent() {
         </Link>
       </nav>
 
-      <section aria-labelledby="my-work-recent-heading" className={`${cbaiGlassCard} space-y-2 p-5`}>
-        <p className={cbaiSectionEyebrow} id="my-work-recent-heading">
-          {t("myWorkExt.recentlyViewed")}
-        </p>
-        <RecentEntities entities={context.recentEntities} />
-      </section>
-
-      <div className="grid gap-4 sm:grid-cols-2">
+      <section className="space-y-3" aria-labelledby="my-work-reference-heading">
+        <div>
+          <p className={cbaiSectionEyebrow}>
+            {language === "uz" ? "SAQLANGAN KONTEKST" : "SAVED CONTEXT"}
+          </p>
+          <h2 id="my-work-reference-heading" className="mt-1 text-lg font-semibold text-[var(--cbai-text-primary)]">
+            {language === "uz" ? "Yaqinda ko‘rilgan va saqlangan materiallar" : "Recent and saved material"}
+          </h2>
+        </div>
+        <div className="grid gap-4 xl:grid-cols-2">
+          <section aria-labelledby="my-work-recent-heading" className={`${cbaiGlassCard} space-y-2 p-5`}>
+            <p className={cbaiSectionEyebrow} id="my-work-recent-heading">
+              {t("myWorkExt.recentlyViewed")}
+            </p>
+            <RecentEntities entities={context.recentEntities} />
+          </section>
         <section
           aria-labelledby="my-work-evidence-reviews-heading"
           className={`${cbaiGlassCard} space-y-2 p-5`}
@@ -320,7 +367,8 @@ function MyWorkContent() {
         </section>
 
         <SavedEvidence entities={context.pinnedEntities.filter((entity) => entity.kind === "evidence")} />
-      </div>
+        </div>
+      </section>
     </div>
   );
 }

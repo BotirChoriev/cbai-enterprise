@@ -12,13 +12,21 @@ type SearchGatewayProps = {
 
 export default function SearchGateway({ query, response, showGoalEntry = true }: SearchGatewayProps) {
   return (
-    <div className="mx-auto max-w-2xl space-y-4">
+    <div className="mx-auto max-w-7xl space-y-5">
       {!query && showGoalEntry ? <IntelligenceGatewayEntry compact variant="search" /> : null}
       <SearchGatewayHero query={query} />
-      {query ? <UniversalEvidenceSearchGroups response={response} /> : null}
-      <div className="mt-4">
+      {query ? (
+        <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_19rem]">
+          <div>
+            <SearchGatewayResults response={response} query={query} />
+          </div>
+          <aside className="xl:sticky xl:top-4">
+            <UniversalEvidenceSearchGroups response={response} />
+          </aside>
+        </div>
+      ) : (
         <SearchGatewayResults response={response} query={query} />
-      </div>
+      )}
     </div>
   );
 }

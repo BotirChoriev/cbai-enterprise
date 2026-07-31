@@ -3,14 +3,16 @@
  * Extends OperatingPageShell without replacing route-specific bodies.
  */
 
+"use client";
+
 import type { ReactNode } from "react";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
+import IntelligenceStatusRail from "@/components/shared/IntelligenceStatusRail";
+import { useTranslation } from "@/lib/i18n/use-translation";
 import {
   cbaiFocusRing,
   cbaiMineralPanel,
   cbaiSectionEyebrow,
-  cbaiStackMd,
-  cbaiTextMuted,
 } from "@/components/brand/brand-classes";
 
 export type IntelligencePageFrameProps = {
@@ -40,28 +42,20 @@ export default function IntelligencePageFrame({
   headerAction,
   children,
 }: IntelligencePageFrameProps) {
+  const { language } = useTranslation();
+
   return (
     <OperatingPageShell title={title} description={purpose} action={headerAction} showOperator={showOperator}>
-      <div className={`${cbaiMineralPanel} ${cbaiStackMd}`} data-cbai-page-contract="">
+      <div className={`${cbaiMineralPanel} space-y-4`} data-cbai-page-contract="">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0 space-y-1">
             <p className={cbaiSectionEyebrow}>Intelligence OS</p>
-            {contextLabel ? <p className="text-sm text-[var(--cbai-text-primary)]">{contextLabel}</p> : null}
             {nextStep ? (
-              <p className={cbaiTextMuted}>
-                <span className="font-medium text-[var(--cbai-text-secondary)]">Next: </span>
+              <p className="text-xs text-[var(--cbai-text-secondary)]">
+                <span className="font-medium text-[var(--cbai-text-secondary)]">
+                  {language === "uz" ? "Keyingi: " : "Next: "}
+                </span>
                 {nextStep}
-              </p>
-            ) : null}
-            {evidenceStatus ? (
-              <p className={cbaiTextMuted} data-cbai-evidence-status="">
-                {evidenceStatus}
-              </p>
-            ) : null}
-            {knownUnknown ? <p className={cbaiTextMuted}>{knownUnknown}</p> : null}
-            {confirmationBoundary ? (
-              <p className="text-[11px] text-[var(--cbai-text-muted)]" data-cbai-human-boundary="">
-                {confirmationBoundary}
               </p>
             ) : null}
           </div>
@@ -71,6 +65,13 @@ export default function IntelligencePageFrame({
             </div>
           ) : null}
         </div>
+        <IntelligenceStatusRail
+          context={contextLabel}
+          evidence={evidenceStatus}
+          unknown={knownUnknown}
+          humanBoundary={confirmationBoundary}
+          compact
+        />
       </div>
       {children}
     </OperatingPageShell>

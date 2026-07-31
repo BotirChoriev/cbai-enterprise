@@ -73,12 +73,12 @@ export default function ProblemWorkspace() {
   }
 
   const sections = [
-    [copy.evidence, problem.evidencePassportIds.length],
-    [copy.contradictions, problem.unresolvedContradictionCount],
-    [copy.unknowns, problem.criticalUnknownCount],
-    [copy.scenarios, 0],
-    [copy.decision, problem.status === "decided" ? 1 : 0],
-    [copy.monitoring, problem.status === "monitoring" ? 1 : 0],
+    [copy.evidence, problem.evidencePassportIds.length, "evidence"],
+    [copy.contradictions, problem.unresolvedContradictionCount, "contradiction"],
+    [copy.unknowns, problem.criticalUnknownCount, "unknown"],
+    [copy.scenarios, 0, "scenario"],
+    [copy.decision, problem.status === "decided" ? 1 : 0, "human"],
+    [copy.monitoring, problem.status === "monitoring" ? 1 : 0, "monitoring"],
   ] as const;
 
   return (
@@ -124,11 +124,29 @@ export default function ProblemWorkspace() {
         </aside>
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {sections.map(([label, count]) => (
-          <article key={label} className="rounded-xl border border-[var(--cbai-border-default)] bg-[var(--cbai-glass-surface)] p-4">
-            <p className="text-sm font-medium text-[var(--cbai-text-primary)]">{label}</p>
-            <p className="mt-3 text-2xl font-semibold text-teal-300">{count}</p>
+      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6" aria-label={locale === "uz" ? "Muammo holati" : "Problem status"}>
+        {sections.map(([label, count, role]) => (
+          <article
+            key={label}
+            className="rounded-xl border border-[var(--cbai-border-default)] bg-[var(--cbai-glass-surface)] p-4"
+            data-cbai-problem-status={role}
+          >
+            <div className="flex items-center gap-2">
+              <span
+                className={`h-2 w-2 rounded-full ${
+                  role === "human"
+                    ? "bg-amber-400"
+                    : role === "contradiction"
+                      ? "bg-rose-400"
+                      : role === "unknown"
+                        ? "bg-violet-400"
+                        : "bg-teal-400"
+                }`}
+                aria-hidden="true"
+              />
+              <p className="text-xs font-medium text-[var(--cbai-text-secondary)]">{label}</p>
+            </div>
+            <p className={`mt-3 text-2xl font-semibold ${role === "human" ? "text-amber-300" : "text-[var(--cbai-text-primary)]"}`}>{count}</p>
           </article>
         ))}
       </section>

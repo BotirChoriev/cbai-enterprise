@@ -15,6 +15,7 @@ import {
   type PrimaryScreenId,
 } from "@/lib/intelligence-os/simplicity-metrics";
 import { cbaiMineralSurface, cbaiSectionEyebrow } from "@/components/brand/brand-classes";
+import IntelligenceStatusRail from "@/components/shared/IntelligenceStatusRail";
 
 const PRIMARY_SCREENS: readonly PrimaryScreenId[] = [
   "home",
@@ -28,7 +29,7 @@ const PRIMARY_SCREENS: readonly PrimaryScreenId[] = [
 ];
 
 export default function SettingsPageClient() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const disclosure = useProgressiveDisclosure();
   const metrics = useMemo(() => listSimplicityMetrics(), []);
   const audits = useMemo(
@@ -38,6 +39,12 @@ export default function SettingsPageClient() {
 
   return (
     <OperatingPageShell title={t("navigation.settings")} description={t("settingsPage.description")} showMissionContext={false}>
+      <IntelligenceStatusRail
+        context={language === "uz" ? "Shaxsiy operator va interfeys sozlamalari" : "Personal operator and interface settings"}
+        evidence={language === "uz" ? "Diagnostika va imkoniyat holati" : "Diagnostics and capability state"}
+        unknown={language === "uz" ? "Ulanmagan xizmatlar ochiq belgilanadi" : "Disconnected services are clearly marked"}
+        humanBoundary={language === "uz" ? "Xotira, ovoz va moslashuvni faqat inson o‘zgartiradi" : "Only the human changes memory, voice, and adaptation"}
+      />
       <AdaptiveDensityControl />
       <AssistantSettingsForm />
       <VoiceDiagnosticsPanel />
