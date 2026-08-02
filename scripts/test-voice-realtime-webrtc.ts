@@ -19,6 +19,7 @@ import {
 import {
   classifyRealtimeCallsResponse,
   connectOpenAiWebRtcSession,
+  fetchRealtimeSdp,
   OPENAI_REALTIME_CALLS_URL,
   RealtimeMicrophoneError,
 } from "@/lib/voice-operator/realtime/openai-webrtc-session";
@@ -36,6 +37,20 @@ function readSource(path: string): string {
 beforeEach(() => {
   clearVoiceSessionMemory();
   setMockSessionBrokerHandler(null);
+});
+
+test("Realtime SDP request times out instead of staying Connecting forever", async () => {
+  const neverCompletes = ((_url: string | URL | Request, init?: RequestInit) =>
+    new Promise<Response>((_resolve, reject) => {
+      init?.signal?.addEventListener("abort", () => reject(new DOMException("Aborted", "AbortError")), {
+        once: true,
+      });
+    })) as typeof fetch;
+
+  await assert.rejects(
+    () => fetchRealtimeSdp(neverCompletes, { method: "POST" }, null, 5),
+    /realtime_sdp_timeout/,
+  );
 });
 
 test("broker classifies Cloudflare Access redirect as authentication failure", () => {

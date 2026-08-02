@@ -325,6 +325,33 @@ export type HumanDecisionRecordRow = {
   created_at: string;
 };
 
+export type HumanContextSnapshotRow = {
+  id: string;
+  owner_id: string;
+  context_id: string;
+  scope_kind: "person" | "organization" | "workspace" | "session";
+  scope_ref: string;
+  version: number;
+  payload: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+};
+
+export type HumanContextEventRow = {
+  id: string;
+  owner_id: string;
+  context_id: string;
+  event_id: string;
+  event_type: string;
+  context_version: number;
+  actor_kind: "human" | "system" | "integration";
+  correlation_id: string;
+  idempotency_key: string | null;
+  safe_metadata: Record<string, unknown>;
+  occurred_at: string;
+  created_at: string;
+};
+
 export type ProblemSnapshotRow = {
   id: string;
   owner_id: string;
@@ -461,6 +488,8 @@ export type Database = {
         never,
         never
       >;
+      human_context_snapshots: TableDef<HumanContextSnapshotRow, never, never>;
+      human_context_events: TableDef<HumanContextEventRow, never, never>;
     };
     Views: Record<string, never>;
     Functions: {
@@ -500,6 +529,18 @@ export type Database = {
           p_idempotency_key: string;
         };
         Returns: HumanDecisionRecordRow;
+      };
+      save_human_context: {
+        Args: {
+          p_context: Record<string, unknown>;
+          p_expected_version: number;
+          p_event: Record<string, unknown>;
+        };
+        Returns: HumanContextSnapshotRow;
+      };
+      delete_human_context: {
+        Args: { p_context_id: string };
+        Returns: boolean;
       };
     };
   };

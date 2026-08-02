@@ -259,6 +259,74 @@ export const mainNav: NavItem[] = [...primaryNavSections, ...secondaryNavSection
   (section) => section.items,
 );
 
+export const navigationCenterHrefs = ["/", "/my-work", "/search", "/governance"] as const;
+export type NavigationCenterHref = (typeof navigationCenterHrefs)[number];
+
+const workCenterRoutes = [
+  "/my-work",
+  "/problems",
+  "/rooms",
+  "/reports",
+  "/workspace",
+  "/scientific-documents",
+  "/files",
+  "/teams",
+  "/messages",
+  "/publications",
+  "/investor",
+  "/government",
+];
+
+const intelligenceCenterRoutes = [
+  "/search",
+  "/countries",
+  "/companies",
+  "/universities",
+  "/research",
+  "/evidence",
+  "/graph",
+  "/discover",
+  "/notifications",
+  "/reasoning",
+  "/citizen",
+];
+
+const oversightCenterRoutes = ["/governance", "/trust", "/settings", "/about"];
+
+function routeMatches(pathname: string, href: string): boolean {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+export function getNavigationCenterHref(pathname: string): NavigationCenterHref {
+  if (workCenterRoutes.some((href) => routeMatches(pathname, href))) return "/my-work";
+  if (oversightCenterRoutes.some((href) => routeMatches(pathname, href))) return "/governance";
+  if (intelligenceCenterRoutes.some((href) => routeMatches(pathname, href))) return "/search";
+  return "/";
+}
+
+export function isNavigationCenterHref(href: string): href is NavigationCenterHref {
+  return navigationCenterHrefs.some((centerHref) => centerHref === href);
+}
+
+export const navigationCenterItems: NavItem[] = navigationCenterHrefs
+  .map((href) => mainNav.find((item) => item.href === href))
+  .filter((item): item is NavItem => Boolean(item));
+
+/** Every non-center destination remains available behind progressive disclosure. */
+export const navigationAdvancedSections: NavSection[] = [
+  ...primaryNavSections
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((item) => !isNavigationCenterHref(item.href)),
+    }))
+    .filter((section) => section.items.length > 0),
+  ...secondaryNavSections,
+];
+
+export function isContextualNavigationRoute(pathname: string): boolean {
+  return !navigationCenterHrefs.some((href) => pathname === href);
+}
+
 export const platformModules: NavItem[] = mainNav.filter(
   (item) => item.href !== "/",
 );

@@ -12,7 +12,6 @@ import { buildInvestorWorkspace } from "@/lib/workspaces/investor";
 import { buildGovernmentWorkspace } from "@/lib/workspaces/government";
 import {
   normalizeCompanionThought,
-  type CompanionThoughtSnapshot,
 } from "@/lib/intelligence-os/living-memory";
 import { routePurposeI18nKey } from "@/lib/intelligence-os/first-minute";
 

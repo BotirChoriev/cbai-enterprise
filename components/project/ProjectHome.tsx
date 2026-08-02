@@ -147,11 +147,20 @@ export default function ProjectHome({ project: initialProject }: ProjectHomeProp
   const refresh = () => setLocalRevision((n) => n + 1);
 
   const project = useMemo(
-    () => loadProject(initialProject.id) ?? initialProject,
-    [initialProject.id, initialProject, dataRevision],
+    () => {
+      void dataRevision;
+      return loadProject(initialProject.id) ?? initialProject;
+    },
+    [initialProject, dataRevision],
   );
-  const entities = useMemo(() => loadProjectEntities(project.id), [project.id, dataRevision]);
-  const evidence = useMemo(() => loadProjectEvidence(project.id), [project.id, dataRevision]);
+  const entities = useMemo(() => {
+    void dataRevision;
+    return loadProjectEntities(project.id);
+  }, [project.id, dataRevision]);
+  const evidence = useMemo(() => {
+    void dataRevision;
+    return loadProjectEvidence(project.id);
+  }, [project.id, dataRevision]);
 
   const [showReport, setShowReport] = useState(false);
   const [reportNotice, setReportNotice] = useState<string | null>(null);

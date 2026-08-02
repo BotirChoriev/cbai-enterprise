@@ -30,8 +30,14 @@ type ResearchNotesPanelProps = {
 export default function ResearchNotesPanel({ topicId, evidenceItems, relatedEntities }: ResearchNotesPanelProps) {
   const { t } = useTranslation();
   const revision = useMissionDataRevision();
-  const notes = useMemo(() => loadResearchNotes(topicId), [topicId, revision]);
-  const findings = useMemo(() => loadResearchFindings(topicId), [topicId, revision]);
+  const notes = useMemo(() => {
+    void revision;
+    return loadResearchNotes(topicId);
+  }, [topicId, revision]);
+  const findings = useMemo(() => {
+    void revision;
+    return loadResearchFindings(topicId);
+  }, [topicId, revision]);
   const [noteBody, setNoteBody] = useState("");
   const [noteEvidenceId, setNoteEvidenceId] = useState("");
   const [noteEntityId, setNoteEntityId] = useState("");

@@ -4,7 +4,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { createConnection } from "node:net";
 
-export const DEFAULT_APP_PORT = Number(process.env.PORT || 3000);
+export const DEFAULT_APP_PORT = Number(process.env.PORT || 3001);
 export const DEFAULT_BROKER_PORT = Number(process.env.VOICE_BROKER_PORT || 8788);
 export const BROKER_BASE = `http://127.0.0.1:${DEFAULT_BROKER_PORT}/api/voice`;
 export const BROKER_SESSION_URL = `${BROKER_BASE}/session`;
@@ -32,7 +32,7 @@ export function isOpenAiKeyConfigured() {
 
 export function readVoiceAllowedOrigins() {
   if (!devVarsExists()) {
-    return "http://localhost:3000,http://127.0.0.1:3000";
+    return `http://localhost:${DEFAULT_APP_PORT},http://127.0.0.1:${DEFAULT_APP_PORT}`;
   }
   const raw = readFileSync(".dev.vars", "utf8");
   for (const line of raw.split("\n")) {
@@ -41,7 +41,7 @@ export function readVoiceAllowedOrigins() {
       return trimmed.slice("VOICE_ALLOWED_ORIGINS=".length).trim();
     }
   }
-  return "http://localhost:3000,http://127.0.0.1:3000";
+  return `http://localhost:${DEFAULT_APP_PORT},http://127.0.0.1:${DEFAULT_APP_PORT}`;
 }
 
 export function readEnvLocalBrokerUrl() {

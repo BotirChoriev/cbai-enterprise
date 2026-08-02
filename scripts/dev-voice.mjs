@@ -4,7 +4,7 @@
  *
  * Port policy:
  * - If 8788 already hosts a healthy CBAI broker → reuse it (never duplicate).
- * - If 3000 already hosts a healthy Next app → reuse it.
+ * - If the canonical app port already hosts a healthy Next app → reuse it.
  * - If a port is occupied by an unrelated process → exit with a precise stop command.
  * - Never kill arbitrary processes.
  */

@@ -30,6 +30,7 @@ export default function ResearchWorkspaceActivity({ topicId }: WorkspaceActivity
   const revision = useMissionDataRevision();
 
   const activity = useMemo(() => {
+    void revision;
     const notes = loadResearchNotes(topicId).map(
       (note): ActivityEntry => ({
         id: `note-${note.noteId}`,

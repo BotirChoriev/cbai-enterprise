@@ -37,6 +37,8 @@ function isCloudflarePagesHost(hostname: string): boolean {
   return hostname === "pages.dev" || hostname.endsWith(".pages.dev");
 }
 
+const LOCAL_DEVELOPMENT_BROKER_URL = "http://127.0.0.1:8788/api/voice";
+
 function resolvePageOrigin(pageOrigin?: string | null): string | undefined {
   if (pageOrigin === undefined) {
     return typeof window !== "undefined" ? window.location.origin : undefined;
@@ -55,7 +57,7 @@ export function sameOriginVoiceBrokerUrl(origin: string): string {
  * Precedence:
  * 1. Valid explicit NEXT_PUBLIC_VOICE_BROKER_URL (or test override)
  * 2. On deployed HTTPS (non-loopback) page origins → `${origin}/api/voice`
- * 3. Localhost/loopback → only when explicitly configured
+ * 3. Localhost/loopback → the standard local broker
  * 4. Otherwise null → honest text-only fallback
  *
  * Secrets never enter the browser through this module.
@@ -116,6 +118,9 @@ export function resolveVoiceBrokerUrl(
       const page = new URL(origin);
       if (page.protocol === "https:" && !isLoopbackHost(page.hostname)) {
         return sameOriginVoiceBrokerUrl(page.origin);
+      }
+      if (isLoopbackHost(page.hostname)) {
+        return LOCAL_DEVELOPMENT_BROKER_URL;
       }
     } catch {
       return null;

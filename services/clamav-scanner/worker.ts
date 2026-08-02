@@ -17,7 +17,7 @@ export class ClamAvContainer extends Container {
   };
 }
 
-export default {
+const worker = {
   async fetch(request: Request, runtimeEnv: ScannerEnv): Promise<Response> {
     const url = new URL(request.url);
     if (
@@ -32,3 +32,5 @@ export default {
     return scanner.fetch(request);
   },
 };
+
+export default worker;

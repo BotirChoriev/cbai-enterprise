@@ -56,7 +56,7 @@ export const VOICE_OPERATOR_EN = {
   backendRequiredNotice: "Voice service is not configured",
   localCapabilityNotice: "Voice service is not configured",
   localCapabilityUserNotice:
-    "Voice service is not configured. Text chat remains available.",
+    "Secure live voice is not configured. Browser transcription will be used when supported; text chat remains available.",
   localVoiceSetupHint: "Run npm run dev:voice and set OPENAI_API_KEY in .dev.vars for secure local Realtime.",
   developerDiagnosticsHeading: "Developer diagnostics",
   diagnosticsBrokerUrl: "Broker URL",
@@ -167,7 +167,7 @@ export const VOICE_OPERATOR_UZ = {
   backendRequiredNotice: "Ovoz xizmati sozlanmagan",
   localCapabilityNotice: "Ovoz xizmati sozlanmagan",
   localCapabilityUserNotice:
-    "Ovoz xizmati sozlanmagan. Matnli suhbat ishlayveradi.",
+    "Xavfsiz jonli ovoz xizmati sozlanmagan. Brauzer qo'llasa, transkripsiya ishlatiladi; matnli suhbat doim mavjud.",
   localVoiceSetupHint:
     "npm run dev:voice ni ishga tushiring va .dev.vars faylida OPENAI_API_KEY ni belgilang.",
   developerDiagnosticsHeading: "Dasturchi diagnostikasi",
@@ -279,7 +279,7 @@ export const VOICE_OPERATOR_RU = {
   backendRequiredNotice: "Голосовой сервис не настроен",
   localCapabilityNotice: "Голосовой сервис не настроен",
   localCapabilityUserNotice:
-    "Голосовой сервис не настроен. Текстовый чат доступен.",
+    "Безопасный голосовой сервис не настроен. Если браузер поддерживает распознавание, используется браузерная транскрипция; текстовый чат доступен всегда.",
   localVoiceSetupHint:
     "Запустите npm run dev:voice и укажите OPENAI_API_KEY в .dev.vars.",
   developerDiagnosticsHeading: "Диагностика для разработчика",
@@ -391,7 +391,7 @@ export const VOICE_OPERATOR_TR = {
   backendRequiredNotice: "Ses hizmeti yapılandırılmadı",
   localCapabilityNotice: "Ses hizmeti yapılandırılmadı",
   localCapabilityUserNotice:
-    "Ses hizmeti yapılandırılmadı. Metin sohbeti kullanılabilir.",
+    "Güvenli canlı ses hizmeti yapılandırılmadı. Tarayıcı destekliyorsa tarayıcı transkripsiyonu kullanılır; metin sohbeti her zaman kullanılabilir.",
   localVoiceSetupHint:
     "npm run dev:voice çalıştırın ve .dev.vars içinde OPENAI_API_KEY ayarlayın.",
   developerDiagnosticsHeading: "Geliştirici tanılaması",

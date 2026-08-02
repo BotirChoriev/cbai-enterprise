@@ -50,6 +50,7 @@ import {
 import { getVoiceOperatorFirstRunIntro, getVoiceOperatorIntroPhrase } from "@/lib/voice-operator/instructions";
 import {
   clearConversationPendingState,
+  isAffirmativeReply,
   processConversationInput,
   resolveOperatorMode,
 } from "@/lib/voice-operator/conversation-engine";
@@ -84,6 +85,13 @@ import {
 import { useOperationalObjects } from "@/components/operational-objects/OperationalObjectProvider";
 import { getProblem, listProblems } from "@/lib/problems/problem-repository";
 import { buildProblemVoiceSummary } from "@/lib/problems/problem-voice-summary";
+import { appendNarrationToLatestAgentRun, isAgenticBuildRequest } from "@/lib/agentic-workspace/agent-run-store";
+import { extractLiveProcessItems, type LiveProcessItem } from "@/lib/agentic-workspace/live-process-visualization";
+import {
+  readScientistWorkflowContext,
+  resolveScientistWorkflowTurn,
+  writeScientistWorkflowContext,
+} from "@/lib/voice-operator/scientist-workflow";
 
 type VoiceOperatorContextValue = {
   readonly dockOpen: boolean;
@@ -101,6 +109,8 @@ type VoiceOperatorContextValue = {
   readonly modeNotice: string;
   readonly sessionActive: boolean;
   readonly muted: boolean;
+  readonly liveAssistantNarration: string;
+  readonly liveProcessItems: readonly LiveProcessItem[];
   openDock: () => void;
   closeDock: () => void;
   toggleTranscript: () => void;
@@ -227,6 +237,8 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
   const [permissionIssue, setPermissionIssue] = useState<VoicePermissionIssue | null>(null);
   const [brokerIssue, setBrokerIssue] = useState<VoiceBrokerIssue | null>(null);
   const [transcriptVisible, setTranscriptVisible] = useState(false);
+  const [liveAssistantNarration, setLiveAssistantNarration] = useState("");
+  const [liveProcessItems, setLiveProcessItems] = useState<readonly LiveProcessItem[]>([]);
   const [transcriptRevision, setTranscriptRevision] = useState(0);
   const [textInput, setTextInput] = useState("");
   const [evidenceResults, setEvidenceResults] = useState<EvidenceResultsPayload | null>(null);
@@ -329,11 +341,14 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
   }, []);
 
   const toolContext = useMemo(
-    () => ({
-      sessionId: readVoiceSessionMemory()?.sessionId ?? "pending",
-      language,
-      smartIdeaId: null,
-    }),
+    () => {
+      void transcriptRevision;
+      return {
+        sessionId: readVoiceSessionMemory()?.sessionId ?? "pending",
+        language,
+        smartIdeaId: null,
+      };
+    },
     [language, transcriptRevision],
   );
 
@@ -525,6 +540,56 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
       setClarifyOptions(null);
       setClarifyQuestion(null);
 
+      // A human confirmation for a visible discovery draft must resume that
+      // exact draft before generic command parsing. Otherwise words such as
+      // "tasdiqlayman" are incorrectly treated as an unknown navigation command.
+      if (readVoiceSessionMemory()?.pendingDraftId && isAffirmativeReply(userText)) {
+        setDockState("thinking");
+        const response = await processConversationInput(userText, toolContext);
+        if (response.navigateHref) {
+          operatorRouter.push(response.navigateHref);
+          scheduleNavSuccessAnnounce(
+            response.navigateHref,
+            response.navigationAnnouncement ?? t("voiceCommand.completedGeneric"),
+          );
+        }
+        setDockState(dockStateAfterTurn({ awaitingConfirmation: response.awaitingConsent }));
+        return;
+      }
+
+      const scientistTurn = resolveScientistWorkflowTurn(userText, readScientistWorkflowContext());
+      if (scientistTurn.handled) {
+        if (scientistTurn.context) writeScientistWorkflowContext(scientistTurn.context);
+        if (scientistTurn.href) {
+          operatorRouter.push(scientistTurn.href);
+          if (scientistTurn.message) scheduleNavSuccessAnnounce(scientistTurn.href, scientistTurn.message);
+        } else if (scientistTurn.message) {
+          appendConversationTurn({ role: "assistant", text: scientistTurn.message });
+          bumpTranscript();
+        }
+        setDockState(dockStateAfterTurn());
+        return;
+      }
+
+      // Co-creation drafts are device-local working structures, not persisted
+      // account objects. Open the visible Agent Run before the authenticated
+      // mutation resolver can redirect a guest to /account. Saving, sharing,
+      // publishing, and confirming the result keep their existing auth gates.
+      if (isAgenticBuildRequest(userText)) {
+        setDockState("thinking");
+        const response = await processConversationInput(userText, toolContext);
+        setAwaitingConsent(Boolean(response.awaitingConsent));
+        if (response.navigateHref) {
+          operatorRouter.push(response.navigateHref);
+          scheduleNavSuccessAnnounce(
+            response.navigateHref,
+            response.navigationAnnouncement ?? t("voiceCommand.completedGeneric"),
+          );
+        }
+        setDockState(dockStateAfterTurn({ awaitingConfirmation: response.awaitingConsent }));
+        return;
+      }
+
       const orchestrated = executeVoiceCommand(
         { text: userText, locale: language, pathname, final: true, eventId },
         platformContext,
@@ -582,7 +647,7 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
         return;
       }
 
-      if (orchestrated.message) {
+      if (orchestrated.message && orchestrated.status !== "could_not_understand") {
         if (orchestrated.href && orchestrated.executed && !orchestrated.awaitingConfirmation) {
           scheduleNavSuccessAnnounce(orchestrated.href, orchestrated.message);
         } else {
@@ -591,7 +656,7 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
         }
       }
 
-      if (orchestrated.executed || orchestrated.status === "clarifying" || orchestrated.status === "could_not_understand" || orchestrated.status === "waiting_confirmation") {
+      if (orchestrated.executed || orchestrated.status === "clarifying" || orchestrated.status === "waiting_confirmation") {
         setAwaitingConsent(orchestrated.awaitingConfirmation);
         setDockState(dockStateAfterTurn({ awaitingConfirmation: orchestrated.awaitingConfirmation }));
         return;
@@ -605,7 +670,7 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
         t,
       };
 
-      const handled = operationalObjects.submitCommand(
+      const handled = !isAgenticBuildRequest(userText) && operationalObjects.submitCommand(
         userText,
         { relationshipFocus: null, operatorName: profile.name, focusedEntityName: undefined },
         voiceExecuteDeps,
@@ -627,11 +692,17 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
       if (response.openEvidencePanel) {
         setEvidenceOpen(true);
       }
+      if (response.navigateHref) {
+        operatorRouter.push(response.navigateHref);
+        scheduleNavSuccessAnnounce(
+          response.navigateHref,
+          response.navigationAnnouncement ?? t("voiceCommand.completedGeneric"),
+        );
+      }
       setTimeout(() => setDockState(dockStateAfterTurn({ awaitingConfirmation: response.awaitingConsent })), 800);
     },
     [
       toolContext,
-      sessionActive,
       operationalObjects,
       operatorRouter,
       profile.name,
@@ -755,13 +826,23 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
           }),
           provider.onTranscript((event) => {
             if (!gate.isCurrent()) return;
-            if (!event.final || !event.text.trim()) return;
             const trimmed = event.text.trim();
+            if (!trimmed) return;
+            if (event.role === "assistant") {
+              const items = extractLiveProcessItems(trimmed);
+              setLiveAssistantNarration(trimmed);
+              setLiveProcessItems(items);
+              if (!event.final) return;
+              appendNarrationToLatestAgentRun(items.map((item) => item.text));
+            }
+            if (!event.final) return;
             appendConversationTurn({ role: event.role, text: trimmed });
             bumpTranscript();
             // Authoritative local command path — only final user transcripts execute.
             // Skip if a Realtime tool just applied the same statement (avoids double navigation).
             if (event.role === "user") {
+              setLiveAssistantNarration("");
+              setLiveProcessItems([]);
               const recent = recentToolStatementRef.current;
               if (recent && recent.text === trimmed && Date.now() - recent.at < 3500) {
                 return;
@@ -1143,6 +1224,8 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
     modeNotice: operatorMode.notice,
     sessionActive,
     muted,
+    liveAssistantNarration,
+    liveProcessItems,
     operatorGuidance,
     openDock,
     closeDock,

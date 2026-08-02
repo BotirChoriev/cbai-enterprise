@@ -20,27 +20,6 @@ async function shot(page, name) {
   console.log("saved", name);
 }
 
-async function setLocale(page, code) {
-  await page.evaluate((locale) => {
-    try {
-      const key = Object.keys(localStorage).find((k) => k.includes("assistant-profile") || k.includes("cbai-assistant"));
-      // Best-effort: write preferredLanguage into any existing profile blob, else set a marker.
-      const raw = key ? localStorage.getItem(key) : null;
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === "object") {
-          if (parsed.preferredLanguage !== undefined) parsed.preferredLanguage = locale;
-          else if (parsed.profile?.preferredLanguage !== undefined) parsed.profile.preferredLanguage = locale;
-          localStorage.setItem(key, JSON.stringify(parsed));
-        }
-      }
-      localStorage.setItem("cbai-preferred-language", locale);
-    } catch {
-      /* ignore */
-    }
-  }, code);
-}
-
 async function desktopFlow() {
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({

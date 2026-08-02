@@ -50,8 +50,13 @@ export default function VoiceOperatorDock() {
   void vo.transcriptRevision;
   const localVoiceUnavailable = vo.backendRequired && !vo.brokerIssue;
   const showBrokerError = vo.brokerIssue != null && vo.brokerIssue !== "required";
-  const micDisabled =
-    localVoiceUnavailable || vo.brokerIssue === "required" || vo.dockState === "backend_required";
+  // A missing Realtime broker must not disable the browser SpeechRecognition fallback.
+  // startListening() performs the authoritative environment and permission checks.
+  // Missing Realtime configuration is not a reason to disable the control: the
+  // provider can still request microphone permission and start the browser's
+  // SpeechRecognition fallback. Only a concrete broker failure disables retry
+  // through this button; that notice exposes its own recovery action.
+  const micDisabled = showBrokerError;
   const showDeveloperDiagnostics =
     process.env.NODE_ENV === "development" || process.env.NEXT_PUBLIC_VOICE_DIAGNOSTICS === "1";
   /**
@@ -121,6 +126,25 @@ export default function VoiceOperatorDock() {
           ) : null}
           <OperatorCommandClarifyCard />
           <OperatorActionStatus />
+
+          {vo.liveAssistantNarration ? (
+            <section className="rounded-xl border border-teal-500/30 bg-teal-950/20 p-3" data-cbai-live-process="">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-teal-300">Live work forming on screen</p>
+                <span className="h-2 w-2 rounded-full bg-teal-300" aria-label="Live" />
+              </div>
+              <ol className="mt-2 space-y-1.5">
+                {vo.liveProcessItems.map((item, index) => (
+                  <li key={item.id} className="flex gap-2 text-xs text-[var(--cbai-text-primary)]">
+                    <span className={item.kind === "question" ? "text-sky-300" : item.kind === "caution" ? "text-amber-300" : "text-teal-300"}>{index + 1}.</span>
+                    <span>{item.text}</span>
+                  </li>
+                ))}
+              </ol>
+              <p className="mt-2 line-clamp-3 text-[11px] text-[var(--cbai-text-muted)]">{vo.liveAssistantNarration}</p>
+              <p className="mt-1 text-[10px] text-[var(--cbai-text-muted)]">Live narration is a draft until evidence and human review confirm it.</p>
+            </section>
+          ) : null}
 
           <div className="cbai-voice-dock-panel">
             <div className="mb-2 flex items-center justify-between gap-2">

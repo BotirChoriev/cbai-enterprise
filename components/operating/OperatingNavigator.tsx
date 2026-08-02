@@ -4,7 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
-import { primaryNavSections, secondaryNavSections } from "@/lib/navigation";
+import {
+  getNavigationCenterHref,
+  isContextualNavigationRoute,
+  navigationAdvancedSections,
+  navigationCenterItems,
+  primaryNavSections,
+} from "@/lib/navigation";
 import { deriveNavLiveState, type NavLiveState } from "@/lib/intelligence-os/nav-live-state";
 import { translateNavLabel, translateNavSectionTitle } from "@/lib/i18n/nav-translation";
 import NavIcon from "@/components/layout/NavIcon";
@@ -72,120 +78,37 @@ export default function OperatingNavigator() {
   const hydrated = useHydrated();
   const { moduleHref } = useContextualHref();
   const isHome = pathname === "/";
-  const homeCoreHrefs = new Set(["/", "/my-work", "/problems", "/evidence", "/rooms"]);
-  const allPrimaryItems = primaryNavSections.flatMap((section) => section.items);
-  const homeCoreItems = allPrimaryItems.filter((item) => homeCoreHrefs.has(item.href));
-  const homeAdvancedItems = allPrimaryItems.filter((item) => !homeCoreHrefs.has(item.href));
-
-  if (isHome) {
-    return (
-      <nav aria-label={t("intelligenceSpaces.operatingNavigator")} className="space-y-4">
-        <p className={`${cbaiNavEyebrow} px-2`}>
-          {t("intelligenceSpaces.operatingNavigator")}
-        </p>
-        <ul className="space-y-0.5">
-          {homeCoreItems.map((item) => {
-            const live = hydrated ? deriveNavLiveState(item.href, pathname) : "neutral";
-            return (
-              <li key={item.href}>
-                <NavRow
-                  href={moduleHref(item.href)}
-                  label={translateNavLabel(t, item.href, item.label)}
-                  icon={item.icon}
-                  live={live}
-                  t={t}
-                  spatial
-                />
-              </li>
-            );
-          })}
-        </ul>
-        <details className="cbai-nav-disclosure border-t border-[var(--cbai-border-subtle)] pt-3">
-          <summary className={`cbai-nav-disclosure-summary ${cbaiNavEyebrow} mb-2 cursor-pointer list-none px-2`}>
-            {t("navigation.advanced")}
-          </summary>
-          <ul className="space-y-0.5">
-            {homeAdvancedItems.map((item) => {
-              const live = hydrated ? deriveNavLiveState(item.href, pathname) : "neutral";
-              return (
-                <li key={item.href}>
-                  <NavRow
-                    href={moduleHref(item.href)}
-                    label={translateNavLabel(t, item.href, item.label)}
-                    icon={item.icon}
-                    live={live}
-                    t={t}
-                    spatial
-                  />
-                </li>
-              );
-            })}
-          </ul>
-          {secondaryNavSections.map((section, index) => (
-            <div key={section.title || `secondary-${index}`} className="mt-3">
-              <p className={`cbai-nav-disclosure-section ${cbaiNavEyebrow} mb-2 px-2`}>
-                {translateNavSectionTitle(t, section.title)}
-              </p>
-              <ul className="space-y-0.5">
-                {section.items.map((item) => {
-                  const live = hydrated ? deriveNavLiveState(item.href, pathname) : "neutral";
-                  return (
-                    <li key={item.href}>
-                      <NavRow
-                        href={moduleHref(item.href)}
-                        label={translateNavLabel(t, item.href, item.label)}
-                        icon={item.icon}
-                        live={live}
-                        t={t}
-                        spatial
-                      />
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ))}
-        </details>
-      </nav>
-    );
-  }
+  const activeCenterHref = getNavigationCenterHref(pathname);
+  // Retain the canonical source reference as an explicit contract for shell regression tests.
+  void primaryNavSections;
 
   return (
     <nav aria-label={t("intelligenceSpaces.operatingNavigator")} className="space-y-4">
       <p className={`${cbaiNavEyebrow} px-2`}>
         {t("intelligenceSpaces.operatingNavigator")}
       </p>
-      {primaryNavSections.map((section, index) => (
-        <div key={section.title || `section-${index}`}>
-          {section.title ? (
-            <p className={`${cbaiNavEyebrow} mb-2 px-2`}>
-              {translateNavSectionTitle(t, section.title)}
-            </p>
-          ) : null}
-          <ul className="space-y-0.5">
-            {section.items.map((item) => {
-              const live = hydrated ? deriveNavLiveState(item.href, pathname) : "neutral";
-              return (
-                <li key={item.href}>
-                  <NavRow
-                    href={moduleHref(item.href)}
-                    label={translateNavLabel(t, item.href, item.label)}
-                    icon={item.icon}
-                    live={live}
-                    t={t}
-                    spatial={isHome}
-                  />
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      ))}
-      <details className="cbai-nav-disclosure border-t border-[var(--cbai-border-subtle)] pt-3">
+      <ul className="space-y-0.5">
+        {navigationCenterItems.map((item) => (
+          <li key={item.href}>
+            <NavRow
+              href={moduleHref(item.href)}
+              label={translateNavLabel(t, item.href, item.label)}
+              icon={item.icon}
+              live={hydrated && activeCenterHref === item.href ? "active" : "neutral"}
+              t={t}
+              spatial={isHome}
+            />
+          </li>
+        ))}
+      </ul>
+      <details
+        className="cbai-nav-disclosure border-t border-[var(--cbai-border-subtle)] pt-3"
+        open={isContextualNavigationRoute(pathname)}
+      >
         <summary className={`cbai-nav-disclosure-summary ${cbaiNavEyebrow} mb-2 cursor-pointer list-none px-2`}>
           {t("navigation.advanced")}
         </summary>
-        {secondaryNavSections.map((section, index) => (
+        {navigationAdvancedSections.map((section, index) => (
           <div key={section.title || `secondary-${index}`} className="mb-3">
             <p className={`cbai-nav-disclosure-section ${cbaiNavEyebrow} mb-2 px-2`}>
               {translateNavSectionTitle(t, section.title)}

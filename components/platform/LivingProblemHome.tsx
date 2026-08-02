@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import { useVoiceOperator } from "@/components/voice-operator/VoiceOperatorProvider";
 import { useOperationalObjects } from "@/components/operational-objects/OperationalObjectProvider";
 import { useTranslation } from "@/lib/i18n/use-translation";
@@ -55,6 +55,28 @@ const copy = {
     noAction: "No consequential action taken",
     waiting: "Waiting for human purpose",
     structured: "Context structured locally",
+    liveTitle: "Situation intelligence is active",
+    liveBody: "The canvas now reacts to this problem. Select a path to prepare the human decision checkpoint.",
+    domainLabel: "Detected context",
+    signalsLabel: "Signals structured",
+    gapsLabel: "Open evidence gaps",
+    pathsLabel: "Paths ready to compare",
+    selectPath: "Select this path",
+    selectedPath: "Selected for review",
+    noPath: "Select a path before the human review step",
+    heightenedReview: "Heightened human review",
+    workflowAria: "CBAI decision workflow",
+    workflow: ["Sense", "Structure", "Verify", "Compare", "Human Decide", "Act", "Monitor", "Learn"],
+    askTitle: "Ask about this situation",
+    askBody: "CBAI answers from the structured context without inventing missing evidence.",
+    askPlaceholder: "Ask a follow-up question…",
+    askAction: "Ask",
+    askEvidence: "What evidence is missing?",
+    askWhy: "Why this approach?",
+    askFirst: "What should I do first?",
+    answerLabel: "Contextual answer",
+    evidenceAnswer: "Evidence still required",
+    firstAnswer: "Start here",
     control: "Human control",
     controlBody: "You review every consequential step.",
     guides: "Contextual guides",
@@ -102,6 +124,28 @@ const copy = {
     noAction: "Muhim amal bajarilmadi",
     waiting: "Inson maqsadi kutilmoqda",
     structured: "Kontekst lokal tizimlashtirildi",
+    liveTitle: "Vaziyat intellekti faollashdi",
+    liveBody: "Canvas endi shu muammoga javob bermoqda. Inson qarori bosqichini tayyorlash uchun yo‘lni tanlang.",
+    domainLabel: "Aniqlangan kontekst",
+    signalsLabel: "Tizimlangan signallar",
+    gapsLabel: "Ochiq dalil bo‘shliqlari",
+    pathsLabel: "Taqqoslashga tayyor yo‘llar",
+    selectPath: "Shu yo‘lni tanlash",
+    selectedPath: "Ko‘rib chiqish uchun tanlandi",
+    noPath: "Inson ko‘rib chiqishidan oldin yo‘lni tanlang",
+    heightenedReview: "Kuchaytirilgan inson nazorati",
+    workflowAria: "CBAI qaror jarayoni",
+    workflow: ["Sezish", "Tizimlash", "Tekshirish", "Taqqoslash", "Inson qarori", "Amal", "Monitoring", "O‘rganish"],
+    askTitle: "Shu vaziyat haqida savol bering",
+    askBody: "CBAI yetishmagan dalilni o‘ylab topmasdan, tizimlangan kontekst asosida javob beradi.",
+    askPlaceholder: "Qo‘shimcha savol yozing…",
+    askAction: "So‘rash",
+    askEvidence: "Qaysi dalil yetishmaydi?",
+    askWhy: "Nega shu yondashuv?",
+    askFirst: "Avval nima qilish kerak?",
+    answerLabel: "Kontekstual javob",
+    evidenceAnswer: "Hali talab qilinadigan dalil",
+    firstAnswer: "Shu yerdan boshlang",
     control: "Inson nazorati",
     controlBody: "Har bir muhim qadamni siz ko‘rib chiqasiz.",
     guides: "Kontekstual yo‘lboshchilar",
@@ -134,9 +178,17 @@ export default function LivingProblemHome() {
   const [statement, setStatement] = useState("");
   const [file, setFile] = useState<{ name: string; type: string } | null>(null);
   const [structured, setStructured] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [followUpQuestion, setFollowUpQuestion] = useState("");
+  const [followUpAnswer, setFollowUpAnswer] = useState<string | null>(null);
   const assistance = useMemo(
-    () => deriveContextualAssistance({ text: statement, fileName: file?.name, fileType: file?.type }),
-    [file, statement],
+    () => deriveContextualAssistance({
+      text: statement,
+      fileName: file?.name,
+      fileType: file?.type,
+      locale: language === "uz" ? "uz" : "en",
+    }),
+    [file, language, statement],
   );
   const [engineOverrides, setEngineOverrides] = useState<
     Partial<Record<ContextualEngineId, boolean>>
@@ -148,10 +200,30 @@ export default function LivingProblemHome() {
   function structureSituation() {
     if (!statement.trim() && !file) return;
     setStructured(true);
+    setSelectedOption(null);
+    setFollowUpQuestion("");
+    setFollowUpAnswer(null);
     setEngineOverrides({});
   }
 
+  function answerFollowUp(question: string) {
+    const normalized = question.trim().toLocaleLowerCase(language === "uz" ? "uz" : "en");
+    if (!normalized) return;
+
+    if (/evidence|missing|source|proof|dalil|manba|yetish|isbot/.test(normalized)) {
+      setFollowUpAnswer(`${c.evidenceAnswer}: ${assistance.evidenceGaps.join("; ")}.`);
+    } else if (/why|reason|nega|nima uchun/.test(normalized)) {
+      setFollowUpAnswer(`${assistance.intent}. ${assistance.humanBoundary}`);
+    } else if (/first|start|begin|avval|birinchi|boshl/.test(normalized)) {
+      setFollowUpAnswer(`${c.firstAnswer}: ${assistance.options[0]}. ${assistance.evidenceGaps[0]}.`);
+    } else {
+      setFollowUpAnswer(`${assistance.intent}. ${assistance.humanBoundary}`);
+    }
+    setFollowUpQuestion(question.trim());
+  }
+
   function openHumanReview() {
+    if (!selectedOption) return;
     const selected = engineOrder.filter(engineActive);
     const objective = statement.trim() || `Review attached material: ${file?.name ?? "material"}`;
     operationalObjects.openComposer(
@@ -165,15 +237,19 @@ export default function LivingProblemHome() {
         domain:
           assistance.domain === "business"
             ? "companies"
-            : assistance.domain === "general"
-              ? "general"
-              : "research",
+            : assistance.domain === "research"
+              ? "research"
+              : assistance.domain === "evidence"
+                ? "evidence"
+                : assistance.domain === "public_policy" || assistance.domain === "public_safety"
+                  ? "governance"
+                  : "general",
         status: "draft",
         priority: "normal",
         requiredInputs: file ? [file.name] : [],
         evidenceRequirements: [...assistance.evidenceGaps],
-        nextAction: assistance.options[0] ?? "Review the structured Problem",
-        humanDecision: "Confirm the objective, supporting engines, and next step.",
+        nextAction: selectedOption,
+        humanDecision: assistance.humanBoundary,
         knownInformation: [...assistance.signals],
         missingInformation: [...assistance.evidenceGaps],
         assumptions: [],
@@ -198,9 +274,41 @@ export default function LivingProblemHome() {
         assistance.signals,
         assistance.evidenceGaps,
         assistance.options,
-        [c.humanReviewBody],
+        [assistance.humanBoundary],
       ]
     : [];
+  const domainLabel =
+    language === "uz"
+      ? ({
+          research: "Tadqiqot",
+          education: "Ta’lim",
+          healthcare: "Sog‘liqni saqlash",
+          public_policy: "Davlat siyosati",
+          public_safety: "Jamoat xavfsizligi",
+          creative: "Ijod",
+          operations: "Operatsiyalar",
+          evidence: "Dalil va tekshiruv",
+          public_interest: "Jamoat manfaati",
+          engineering: "Muhandislik",
+          agriculture: "Qishloq xo‘jaligi",
+          business: "Biznes",
+          general: "Umumiy",
+        } as const)[assistance.domain]
+      : ({
+          research: "Research",
+          education: "Education",
+          healthcare: "Healthcare",
+          public_policy: "Public policy",
+          public_safety: "Public safety",
+          creative: "Creative work",
+          operations: "Operations",
+          evidence: "Evidence and verification",
+          public_interest: "Public interest",
+          engineering: "Engineering",
+          agriculture: "Agriculture",
+          business: "Business",
+          general: "General",
+        } as const)[assistance.domain];
 
   return (
     <section className={styles.home} data-living-problem-home="true">
@@ -224,6 +332,8 @@ export default function LivingProblemHome() {
               onChange={(event) => {
                 setStatement(event.target.value);
                 setStructured(false);
+                setSelectedOption(null);
+                setFollowUpAnswer(null);
               }}
               placeholder={c.placeholder}
               aria-label={c.placeholder}
@@ -242,6 +352,8 @@ export default function LivingProblemHome() {
                       const selected = event.target.files?.[0];
                       setFile(selected ? { name: selected.name, type: selected.type } : null);
                       setStructured(false);
+                      setSelectedOption(null);
+                      setFollowUpAnswer(null);
                     }}
                   />
                 </label>
@@ -268,17 +380,93 @@ export default function LivingProblemHome() {
 
           {structured ? (
             <>
-              <section className={styles.canvas} aria-label="Living Problem Canvas">
+              <section className={styles.livePulse} aria-live="polite" data-state="active">
+                <div className={styles.liveSignal} aria-hidden="true"><span /></div>
+                <div className={styles.liveCopy}>
+                  <strong>{c.liveTitle}</strong>
+                  <span>{c.liveBody}</span>
+                </div>
+                <dl className={styles.liveMetrics}>
+                  <div><dt>{c.domainLabel}</dt><dd>{domainLabel}</dd></div>
+                  <div><dt>{c.signalsLabel}</dt><dd>{assistance.signals.length}</dd></div>
+                  <div><dt>{c.gapsLabel}</dt><dd>{assistance.evidenceGaps.length}</dd></div>
+                  <div><dt>{c.pathsLabel}</dt><dd>{assistance.options.length}</dd></div>
+                </dl>
+                {assistance.riskLevel === "heightened" ? (
+                  <div className={styles.riskBanner}>
+                    <strong>{c.heightenedReview}</strong>
+                    <span>{assistance.humanBoundary}</span>
+                  </div>
+                ) : null}
+              </section>
+
+              <section className={styles.followUp} aria-labelledby="living-problem-follow-up-title">
+                <div className={styles.followUpIntro}>
+                  <h2 id="living-problem-follow-up-title">{c.askTitle}</h2>
+                  <p>{c.askBody}</p>
+                </div>
+                <div className={styles.quickQuestions}>
+                  {[c.askEvidence, c.askWhy, c.askFirst].map((question) => (
+                    <button type="button" onClick={() => answerFollowUp(question)} key={question}>
+                      {question}
+                    </button>
+                  ))}
+                </div>
+                <form
+                  className={styles.followUpForm}
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    answerFollowUp(followUpQuestion);
+                  }}
+                >
+                  <input
+                    value={followUpQuestion}
+                    onChange={(event) => setFollowUpQuestion(event.target.value)}
+                    placeholder={c.askPlaceholder}
+                    aria-label={c.askPlaceholder}
+                  />
+                  <button type="submit" disabled={!followUpQuestion.trim()}>{c.askAction}</button>
+                </form>
+                {followUpAnswer ? (
+                  <div className={styles.followUpAnswer} aria-live="polite">
+                    <strong>{c.answerLabel}</strong>
+                    <p>{followUpAnswer}</p>
+                  </div>
+                ) : null}
+              </section>
+
+              <section className={styles.canvas} aria-label="Living Problem Canvas" data-active="true">
                 {c.steps.map(([title, prompt], index) => (
-                  <article className={styles.canvasStep} key={title}>
+                  <article className={styles.canvasStep} style={{ "--step-delay": `${index * 90}ms` } as CSSProperties} key={title}>
                     <span className={styles.stepIndex}>0{index + 1}</span>
                     <h2>{title}</h2>
                     <p>{prompt}</p>
-                    <ul>
-                      {stepItems[index].map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
+                    {index === 3 ? (
+                      <div className={styles.pathList}>
+                        {stepItems[index].map((item) => {
+                          const selected = selectedOption === item;
+                          return (
+                            <button
+                              type="button"
+                              className={styles.pathOption}
+                              data-selected={selected}
+                              aria-pressed={selected}
+                              onClick={() => setSelectedOption(item)}
+                              key={item}
+                            >
+                              <span>{item}</span>
+                              <small>{selected ? c.selectedPath : c.selectPath}</small>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <ul>
+                        {stepItems[index].map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    )}
                   </article>
                 ))}
               </section>
@@ -310,8 +498,8 @@ export default function LivingProblemHome() {
                 </div>
                 <aside className={styles.humanGate}>
                   <strong>{c.humanReview}</strong>
-                  <p>{c.humanReviewBody}</p>
-                  <button type="button" className={styles.reviewButton} onClick={openHumanReview}>
+                  <p>{selectedOption ? `${c.selectedPath}: ${selectedOption}` : c.noPath}</p>
+                  <button type="button" className={styles.reviewButton} disabled={!selectedOption} onClick={openHumanReview}>
                     {c.review} →
                   </button>
                 </aside>
@@ -340,6 +528,7 @@ export default function LivingProblemHome() {
             <h2>{c.doing}</h2>
             <ul className={styles.statusList}>
               <li>{structured ? c.structured : c.waiting}</li>
+              {structured ? <li>{selectedOption ?? c.noPath}</li> : null}
               <li>{c.noAction}</li>
               <li>{c.controlBody}</li>
             </ul>
@@ -369,14 +558,14 @@ export default function LivingProblemHome() {
           </section>
         </aside>
 
-        <nav className={styles.workflow} aria-label="CBAI decision workflow">
-          {["Sense", "Structure", "Verify", "Compare", "Human Decide", "Act", "Monitor", "Learn"].map(
+        <nav className={styles.workflow} aria-label={c.workflowAria}>
+          {c.workflow.map(
             (stage, index) => (
               <span
                 className={
-                  stage === "Human Decide"
-                    ? styles.human
-                    : index < (structured ? 2 : 1)
+                  index === 4
+                    ? `${styles.human} ${selectedOption ? styles.humanReady : ""}`
+                    : index < (structured ? 4 : 1)
                       ? styles.active
                       : undefined
                 }

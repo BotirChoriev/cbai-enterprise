@@ -3,11 +3,17 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { primaryNavSections, secondaryNavSections } from "@/lib/navigation";
+import {
+  getNavigationCenterHref,
+  isContextualNavigationRoute,
+  navigationAdvancedSections,
+  navigationCenterItems,
+} from "@/lib/navigation";
 import NavIcon from "@/components/layout/NavIcon";
 import CBAILogo from "@/components/brand/CBAILogo";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { translateNavLabel, translateNavSectionTitle } from "@/lib/i18n/nav-translation";
+import { useContextualHref } from "@/lib/context/use-contextual-href";
 
 function isNavItemActive(pathname: string, href: string): boolean {
   if (href === "/") return pathname === "/";
@@ -26,6 +32,8 @@ type MobileNavDrawerProps = {
 export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps) {
   const pathname = usePathname();
   const { t } = useTranslation();
+  const { moduleHref } = useContextualHref();
+  const activeCenterHref = getNavigationCenterHref(pathname);
   const dialogRef = useRef<HTMLElement | null>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
@@ -90,36 +98,30 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
           </button>
         </div>
 
-        {primaryNavSections.map((section, index) => (
-          <div key={section.title || `primary-${index}`} className="mb-4">
-            {section.title ? (
-              <p className="cbai-nav-eyebrow mb-1.5 px-2">
-                {translateNavSectionTitle(t, section.title)}
-              </p>
-            ) : null}
-            <div className="space-y-0.5">
-              {section.items.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={onClose}
-                  className={`cbai-nav-row ${
-                    isNavItemActive(pathname, item.href) ? "cbai-nav-row-active" : "cbai-nav-row-idle"
-                  }`}
-                >
-                  <NavIcon name={item.icon} />
-                  {translateNavLabel(t, item.href, item.label)}
-                </Link>
-              ))}
-            </div>
-          </div>
-        ))}
+        <div className="mb-4 space-y-0.5">
+          {navigationCenterItems.map((item) => (
+            <Link
+              key={item.href}
+              href={moduleHref(item.href)}
+              onClick={onClose}
+              className={`cbai-nav-row ${
+                activeCenterHref === item.href ? "cbai-nav-row-active" : "cbai-nav-row-idle"
+              }`}
+            >
+              <NavIcon name={item.icon} />
+              {translateNavLabel(t, item.href, item.label)}
+            </Link>
+          ))}
+        </div>
 
-        <details className="mt-2 border-t border-[var(--cbai-border-subtle)] pt-3">
+        <details
+          className="mt-2 border-t border-[var(--cbai-border-subtle)] pt-3"
+          open={isContextualNavigationRoute(pathname)}
+        >
           <summary className="cbai-nav-eyebrow cursor-pointer px-2 pb-2">
             {t("navigation.advanced")}
           </summary>
-          {secondaryNavSections.map((section, index) => (
+          {navigationAdvancedSections.map((section, index) => (
             <div key={section.title || `secondary-${index}`} className="mb-3">
               <p className="cbai-nav-eyebrow mb-1.5 px-2">
                 {translateNavSectionTitle(t, section.title)}
@@ -128,7 +130,7 @@ export default function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps)
                 {section.items.map((item) => (
                   <Link
                     key={item.href}
-                    href={item.href}
+                    href={moduleHref(item.href)}
                     onClick={onClose}
                     className={`cbai-nav-row ${
                       isNavItemActive(pathname, item.href) ? "cbai-nav-row-active" : "cbai-nav-row-idle"

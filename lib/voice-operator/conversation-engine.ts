@@ -15,6 +15,16 @@ import {
   type VoiceToolContext,
 } from "@/lib/voice-operator/tools/voice-tools";
 import { evaluateVoiceBrokerStatus } from "@/lib/voice-operator/session-broker/client";
+import { createAgentRunFromConversation, isAgenticBuildRequest } from "@/lib/agentic-workspace/agent-run-store";
+import { getAgentRun } from "@/lib/agentic-workspace/agent-run-store";
+import { getCurrentUserId } from "@/lib/auth/auth-store";
+import { getSyncedCloudUserId } from "@/lib/supabase/cloud-session-sync";
+import { buildOperationalHumanContext } from "@/lib/human-centered-workspace/operational-context-adapter";
+import { OPERATIONAL_REFERENCE_CAPABILITIES } from "@/lib/human-centered-workspace/operational-capabilities";
+import { createOrResumePersonalWorkspace } from "@/lib/human-centered-workspace/personal-workspace-lifecycle";
+import { deviceLocalWorkspaceLifecycleRepository } from "@/lib/human-centered-workspace/device-local-workspace-lifecycle-repository";
+import { generateExecutionBlueprint } from "@/lib/human-centered-workspace/execution-blueprint";
+import { patchVoiceSessionMemory } from "@/lib/voice-operator/session-memory";
 
 export type ConversationEngineResponse = {
   readonly assistantText: string;
@@ -22,6 +32,7 @@ export type ConversationEngineResponse = {
   readonly evidenceResults?: EvidenceResultsPayload;
   readonly openEvidencePanel?: boolean;
   readonly navigateHref?: string;
+  readonly navigationAnnouncement?: string;
   readonly awaitingConsent?: boolean;
 };
 
@@ -87,6 +98,83 @@ export async function processConversationInput(
   const trimmed = userText.trim();
   if (!trimmed) {
     return { assistantText: uzResponse("clarify", ctx.language), dockState: "ready" };
+  }
+
+  if (isAgenticBuildRequest(trimmed)) {
+    const run = createAgentRunFromConversation(trimmed);
+    patchVoiceSessionMemory({ pendingDraftId: run.id });
+    const text = ctx.language === "uz"
+      ? `So‘rovingizdan real draft agent workspace yaratdim. ${run.knownFacts.length} ta ma’lum fakt va ${run.missingInformation.length} ta yetishmayotgan ma’lumot ajratildi. Birinchi savol: ${run.nextQuestion}`
+      : `I created a real draft agent workspace with ${run.knownFacts.length} known facts and ${run.missingInformation.length} missing inputs. First question: ${run.nextQuestion}`;
+    appendConversationTurn({ role: "assistant", text, toolActivity: "create_agent_run" });
+    return {
+      assistantText: text,
+      dockState: "responding",
+      navigateHref: `/my-work?agentRun=${encodeURIComponent(run.id)}`,
+      navigationAnnouncement: ctx.language === "uz" ? "Agent workspace ekranda ochildi." : "The agent workspace is open.",
+    };
+  }
+
+  if (session.pendingDraftId && isAffirmativeReply(trimmed)) {
+    const agentRun = getAgentRun(session.pendingDraftId);
+    if (!agentRun) {
+      patchVoiceSessionMemory({ pendingDraftId: null });
+      const text = ctx.language === "uz"
+        ? "Tasdiqlangan draft topilmadi. Oldingi ma’lumotni taxmin qilmayman; ish rejasini qayta oching."
+        : "The confirmed draft could not be found. I will not guess the missing context; reopen the work plan.";
+      appendConversationTurn({ role: "assistant", text });
+      return { assistantText: text, dockState: "ready" };
+    }
+
+    const ownerId = getSyncedCloudUserId() ?? getCurrentUserId() ?? "device-guest";
+    const humanContext = buildOperationalHumanContext({
+      contextId: `agent-context:${agentRun.id}`,
+      workspaceId: `agent-discovery:${agentRun.id}`,
+      outcome: agentRun.goal,
+      knownFacts: agentRun.knownFacts,
+      missingInformation: agentRun.missingInformation,
+    });
+    const processItems = agentRun.artifacts.find((artifact) => artifact.type === "process_map")?.items ?? [];
+    const executionBlueprint = generateExecutionBlueprint({
+      goal: agentRun.goal,
+      processItems,
+      originalRequest: agentRun.originalRequest,
+      unresolvedInputs: agentRun.missingInformation,
+    });
+    const creation = createOrResumePersonalWorkspace(
+      {
+        ownerId,
+        context: humanContext,
+        capabilities: OPERATIONAL_REFERENCE_CAPABILITIES,
+        title: agentRun.goal,
+        idempotencyKey: `${agentRun.id}:human-confirmed-v1`,
+        executionBlueprint,
+      },
+      deviceLocalWorkspaceLifecycleRepository,
+    );
+
+    if (!creation.ok) {
+      const text = ctx.language === "uz"
+        ? `Workspace yaratish ${creation.run.lastSuccessfulCheckpoint} bosqichidan keyin to‘xtadi: ${creation.run.errorCode}. Ma’lumotlar saqlandi; qayta “davom et” desangiz shu joydan davom etadi.`
+        : `Workspace creation stopped after ${creation.run.lastSuccessfulCheckpoint}: ${creation.run.errorCode}. Your information is preserved; say “continue” to resume here.`;
+      appendConversationTurn({ role: "assistant", text });
+      return { assistantText: text, dockState: "ready" };
+    }
+
+    patchVoiceSessionMemory({ pendingDraftId: null });
+    const href = `/workspace?workspace=${encodeURIComponent(creation.workspace.workspaceId)}&run=${encodeURIComponent(creation.run.runId)}`;
+    const text = ctx.language === "uz"
+      ? "Tasdiq qabul qilindi. Personal Workspace saqlandi; ekranda ochyapman."
+      : "Confirmation received. The Personal Workspace is saved; opening it now.";
+    appendConversationTurn({ role: "assistant", text, toolActivity: "create_personal_workspace" });
+    return {
+      assistantText: text,
+      dockState: "responding",
+      navigateHref: href,
+      navigationAnnouncement: ctx.language === "uz"
+        ? "Personal Workspace ekranda muvaffaqiyatli ochildi."
+        : "The Personal Workspace opened successfully.",
+    };
   }
 
   if (pendingSearchQuery && isAffirmativeReply(trimmed)) {

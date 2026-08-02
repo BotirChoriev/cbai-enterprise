@@ -43,6 +43,8 @@ export default function AddToMissionButton({
 
   const alreadyLinked = useMemo(() => {
     void linkedRevision;
+    void mission?.id;
+    void mission?.projectId;
     return isEntityLinkedToActiveMission(entity);
   }, [entity, linkedRevision, mission?.id, mission?.projectId]);
 

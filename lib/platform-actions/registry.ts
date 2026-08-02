@@ -347,7 +347,15 @@ export const PLATFORM_ACTION_REGISTRY: Record<PlatformActionId, PlatformActionDe
     "problem_read_summary",
   ),
   "operational_object.confirm_create": mutationDef("operational_object.confirm_create", [], "platformAction.successDraftConfirm", "oo_confirm"),
-  "project.compose": mutationDef("project.compose", ["create project", "new project", "yangi loyiha"], "platformAction.successProjectDraft", "project_compose"),
+  "project.compose": mutationDef(
+    "project.compose",
+    [
+      "create project", "new project", "project card", "open project card", "project template",
+      "yangi loyiha", "loyiha kartasi", "loyiha kartasini och", "loyiha shabloni", "loyiha ochamiz",
+    ],
+    "platformAction.successProjectDraft",
+    "project_compose",
+  ),
   "mission.compose": mutationDef("mission.compose", ["start mission", "new mission", "yangi missiya"], "platformAction.successMissionDraft", "mission_compose"),
   "report.compose": mutationDef(
     "report.compose",

@@ -40,6 +40,7 @@ import {
   ASSISTANT_LANGUAGES,
   resolveOperatorName,
 } from "@/lib/assistant/assistant-profile";
+import AgentRunWorkspace from "@/components/my-work/AgentRunWorkspace";
 
 function MyWorkContent() {
   const searchParams = useSearchParams();
@@ -159,6 +160,7 @@ function MyWorkContent() {
 
   return (
     <div className={cbaiPageStack}>
+      <AgentRunWorkspace />
       <details className={`${cbaiGlassCard} group px-4 py-3`}>
         <summary className="cursor-pointer list-none text-xs text-zinc-500 marker:content-none [&::-webkit-details-marker]:hidden">
           <span className="text-teal-400/90">{t("myWorkExt.advancedEngineSummary")}</span>

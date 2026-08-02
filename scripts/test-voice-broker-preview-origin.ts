@@ -47,9 +47,9 @@ test("resolveVoiceBrokerUrl defaults to same-origin on deployed HTTPS when unset
   assert.equal(resolveVoiceBrokerUrl(null, "https://checkbalanceai.global"), "https://checkbalanceai.global/api/voice");
 });
 
-test("resolveVoiceBrokerUrl stays unset on localhost without explicit config", () => {
-  assert.equal(resolveVoiceBrokerUrl(null, "http://localhost:3000"), null);
-  assert.equal(resolveVoiceBrokerUrl("", "http://127.0.0.1:3000"), null);
+test("resolveVoiceBrokerUrl uses the standard local broker on localhost", () => {
+  assert.equal(resolveVoiceBrokerUrl(null, "http://localhost:3000"), "http://127.0.0.1:8788/api/voice");
+  assert.equal(resolveVoiceBrokerUrl("", "http://127.0.0.1:3000"), "http://127.0.0.1:8788/api/voice");
   assert.equal(resolveVoiceBrokerUrl(null, null), null);
 });
 

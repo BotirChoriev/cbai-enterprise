@@ -234,14 +234,14 @@ test("14. session broker blocks disallowed origin", async () => {
   if (!blocked.ok) assert.equal(blocked.code, "ORIGIN_BLOCKED");
 });
 
-test("15. missing broker returns BACKEND_REQUIRED on loopback without env", async () => {
+test("15. loopback uses the standard local broker without a baked env URL", () => {
   const prev = process.env.NEXT_PUBLIC_VOICE_BROKER_URL;
   delete process.env.NEXT_PUBLIC_VOICE_BROKER_URL;
   const status = evaluateVoiceBrokerStatus("http://localhost:3000");
-  assert.equal(status.kind, "backend_required");
-  const res = await requestRealtimeSessionCredential({ language: "uz", origin: "http://localhost:3000" });
-  assert.equal(res.ok, false);
-  if (!res.ok) assert.equal(res.code, "BACKEND_REQUIRED");
+  assert.equal(status.kind, "available");
+  if (status.kind === "available") {
+    assert.equal(status.brokerUrl, "http://127.0.0.1:8788/api/voice");
+  }
   if (prev) process.env.NEXT_PUBLIC_VOICE_BROKER_URL = prev;
 });
 
@@ -576,6 +576,12 @@ test("48. voice dock shows local capability notice and integrated CTA styling", 
   assert.match(dock, /localCapabilityNotice/);
   assert.match(dock, /cbai-spatial-voice-cta/);
   assert.match(dock, /localVoiceUnavailable/);
+  assert.match(dock, /const micDisabled = showBrokerError/);
+  assert.doesNotMatch(
+    dock,
+    /micDisabled\s*=\s*[\s\S]{0,160}localVoiceUnavailable\s*\|\|/,
+    "browser transcription fallback must remain clickable when Realtime is not configured",
+  );
   assert.doesNotMatch(dock, /rounded-full border border-teal-500\/30 bg-slate-950\/95/);
 });
 

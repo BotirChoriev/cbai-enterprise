@@ -71,7 +71,7 @@ async function main() {
 
   if (!dualOrigins.localhostOk || !dualOrigins.loopbackOk) {
     fail(
-      "VOICE_ALLOWED_ORIGINS must include both http://localhost:3000 and http://127.0.0.1:3000 (comma-separated).",
+      `VOICE_ALLOWED_ORIGINS must include both http://localhost:${DEFAULT_APP_PORT} and http://127.0.0.1:${DEFAULT_APP_PORT} (comma-separated).`,
     );
   }
 
@@ -200,15 +200,15 @@ async function main() {
           : !brokerListening
             ? "run npm run dev:voice (reuses a healthy broker; will not duplicate)."
             : !dualOrigins.localhostOk || !dualOrigins.loopbackOk
-              ? "add both http://localhost:3000 and http://127.0.0.1:3000 to VOICE_ALLOWED_ORIGINS."
-              : "open http://localhost:3000 in Safari and use Voice Operator mic."
+              ? `add both http://localhost:${DEFAULT_APP_PORT} and http://127.0.0.1:${DEFAULT_APP_PORT} to VOICE_ALLOWED_ORIGINS.`
+              : `open http://localhost:${DEFAULT_APP_PORT} in Safari and use Voice Operator mic.`
       }`,
     );
     process.exit(1);
   }
 
   console.log("\nVoice doctor: PASS");
-  console.log("  Next action: open http://localhost:3000 — Voice Operator mic should reach Connecting → Listening.");
+  console.log(`  Next action: open http://localhost:${DEFAULT_APP_PORT} — Voice Operator mic should reach Connecting → Listening.`);
   if (!keyConfigured) {
     console.log("  Audible Realtime cannot be verified without a real server-side OPENAI_API_KEY.");
   }

@@ -5,11 +5,16 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  DEFAULT_APP_PORT,
   localAppOriginsAllowed,
   originAllowed,
   parseAllowedOriginsList,
   probeHealthyCbaiBroker,
 } from "./voice-dev-utils.mjs";
+
+test("canonical voice development port is 3001", () => {
+  assert.equal(DEFAULT_APP_PORT, 3001);
+});
 
 test("parseAllowedOriginsList trims and drops empties", () => {
   assert.deepEqual(parseAllowedOriginsList(" http://a.test , ,http://b.test "), [

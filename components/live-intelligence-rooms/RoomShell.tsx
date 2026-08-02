@@ -146,6 +146,7 @@ export default function RoomShell() {
   }
 
   function leaveRoom() {
+    // Leaving the room session must not leave the mic running.
     releaseAllLocalMedia();
     router.push("/rooms");
   }

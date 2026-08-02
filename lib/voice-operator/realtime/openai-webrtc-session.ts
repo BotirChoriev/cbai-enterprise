@@ -14,6 +14,34 @@ import {
 } from "@/lib/voice-operator/voice-session-lifecycle";
 
 export const OPENAI_REALTIME_CALLS_URL = "https://api.openai.com/v1/realtime/calls";
+export const REALTIME_SDP_TIMEOUT_MS = 15_000;
+
+export async function fetchRealtimeSdp(
+  fetchImpl: typeof fetch,
+  init: RequestInit,
+  upstreamSignal?: AbortSignal | null,
+  timeoutMs = REALTIME_SDP_TIMEOUT_MS,
+): Promise<Response> {
+  const controller = new AbortController();
+  let timedOut = false;
+  const forwardAbort = () => controller.abort();
+  if (upstreamSignal?.aborted) controller.abort();
+  else upstreamSignal?.addEventListener("abort", forwardAbort, { once: true });
+  const timeoutId = setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, timeoutMs);
+
+  try {
+    return await fetchImpl(OPENAI_REALTIME_CALLS_URL, { ...init, signal: controller.signal });
+  } catch (error) {
+    if (timedOut) throw new Error("realtime_sdp_timeout");
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+    upstreamSignal?.removeEventListener("abort", forwardAbort);
+  }
+}
 
 export class RealtimeMicrophoneError extends Error {
   readonly issue: VoicePermissionIssue;
@@ -66,7 +94,11 @@ type MutableSession = {
   assistantPartial: string;
   connectGeneration: number;
   disconnected: boolean;
+  responseTimeoutId: ReturnType<typeof setTimeout> | null;
 };
+
+/** Emergency guard only; normal long-form narration remains available when visualized live. */
+export const MAX_ASSISTANT_RESPONSE_MS = 120_000;
 
 const TERMINAL_FAILURE_STATES = new Set<RealtimeConnectionState>([
   "authentication_failed",
@@ -194,6 +226,8 @@ export function cleanupWebRtcSessionResources(session: MutableSession): void {
   disposeAudioElement(session.audioEl);
   session.audioEl = null;
   session.assistantPartial = "";
+  if (session.responseTimeoutId) clearTimeout(session.responseTimeoutId);
+  session.responseTimeoutId = null;
 }
 
 export function verifyWebRtcSessionTracksEnded(session: Pick<MutableSession, "localStream" | "remoteStream">): boolean {
@@ -256,6 +290,7 @@ export async function connectOpenAiWebRtcSession(options: {
     assistantPartial: "",
     connectGeneration: 0,
     disconnected: false,
+    responseTimeoutId: null,
   };
 
   const stateEmitter = createStateEmitter(session);
@@ -284,10 +319,28 @@ export async function connectOpenAiWebRtcSession(options: {
     if (session.disconnected) return;
     const parsed = parseRealtimeServerEvent(raw);
     if (!parsed) return;
-    if (parsed.state) stateEmitter.set(parsed.state);
+    if (parsed.state) {
+      if (session.responseTimeoutId) clearTimeout(session.responseTimeoutId);
+      session.responseTimeoutId = null;
+      if (parsed.state === "responding") {
+        session.responseTimeoutId = setTimeout(() => {
+          session.responseTimeoutId = null;
+          if (session.disconnected || session.state !== "responding") return;
+          if (session.dataChannel?.readyState === "open") {
+            session.dataChannel.send(JSON.stringify({ type: "response.cancel" }));
+          }
+          session.audioEl?.pause();
+          stateEmitter.set("listening");
+        }, MAX_ASSISTANT_RESPONSE_MS);
+      }
+      stateEmitter.set(parsed.state);
+    }
     if (parsed.transcript) {
       if (parsed.transcript.role === "assistant" && !parsed.transcript.final) {
         session.assistantPartial += parsed.transcript.text;
+        if (session.assistantPartial.trim()) {
+          transcriptEmitter.emit({ role: "assistant", text: session.assistantPartial.trim(), final: false });
+        }
         return;
       }
       if (parsed.transcript.role === "assistant" && parsed.transcript.final) {
@@ -317,6 +370,8 @@ export async function connectOpenAiWebRtcSession(options: {
         session.dataChannel.send(JSON.stringify({ type: "response.cancel" }));
       }
       session.audioEl?.pause();
+      if (session.responseTimeoutId) clearTimeout(session.responseTimeoutId);
+      session.responseTimeoutId = null;
       if (session.state === "responding") stateEmitter.set("listening");
     },
     setMuted(muted: boolean) {
@@ -395,15 +450,14 @@ export async function connectOpenAiWebRtcSession(options: {
     await peer.setLocalDescription(offer);
     if (generation !== session.connectGeneration || session.disconnected) return handle;
 
-    const sdpResponse = await fetch(OPENAI_REALTIME_CALLS_URL, {
+    const sdpResponse = await fetchRealtimeSdp(fetch, {
       method: "POST",
       body: offer.sdp ?? "",
-      signal: session.abortController?.signal,
       headers: {
         Authorization: `Bearer ${options.credential.clientSecret}`,
         "Content-Type": "application/sdp",
       },
-    });
+    }, session.abortController?.signal);
 
     if (generation !== session.connectGeneration || session.disconnected) return handle;
 

@@ -80,6 +80,19 @@ import {
   cbaiMineralSurface,
   cbaiSectionEyebrow,
 } from "@/components/brand/brand-classes";
+import { universities } from "@/lib/universities";
+import { UNIT_REGISTRY } from "@/lib/research-canvas/unit-registry";
+import {
+  readScientistWorkflowContext,
+  writeScientistWorkflowContext,
+} from "@/lib/voice-operator/scientist-workflow";
+import {
+  buildScientistHumanContext,
+  readScientistHumanContext,
+  scientistInputFromHumanContext,
+} from "@/lib/human-centered-workspace/scientist-context-adapter";
+import { SCIENTIST_REFERENCE_CAPABILITIES } from "@/lib/human-centered-workspace/scientist-capabilities";
+import { composeWorkspace } from "@/lib/human-centered-workspace/workspace-composer";
 
 function defaultTaskDeadlineIso(daysFromNow: number): string {
   return new Date(Date.now() + daysFromNow * 86400000).toISOString().slice(0, 10);
@@ -115,7 +128,14 @@ export default function ResearchCanvasClient() {
   const [interpretFocus, setInterpretFocus] = useState<"upload" | "manual" | null>(null);
 
   const urlSmartIdeaId = searchParams.get("smartIdea");
-  const resolvedActiveId = activeId ?? urlSmartIdeaId;
+  const scientistMode = searchParams.get("scientist") === "1";
+  const scientistUniversity = universities.find((item) => item.id === searchParams.get("university")) ?? null;
+  const scientistUnit = UNIT_REGISTRY.find((item) => item.id === searchParams.get("unit")) ?? null;
+  const scientistStoredContext = hydrated && scientistMode ? readScientistHumanContext() : null;
+  const scientistStoredInput = scientistStoredContext
+    ? scientistInputFromHumanContext(scientistStoredContext)
+    : null;
+  const resolvedActiveId = activeId ?? urlSmartIdeaId ?? scientistStoredInput?.smartIdeaId ?? null;
 
   useEffect(() => {
     const onChange = () => bump();
@@ -147,6 +167,39 @@ export default function ResearchCanvasClient() {
   const persistenceNote = rc(persistenceCopyKey(resolvePersistenceMode()));
   const linkedMission = useMemo(() => (idea?.missionId ? loadMission(idea.missionId) : null), [idea]);
   const ideaModelGate = idea ? canBuildIdeaModel(idea) : null;
+
+  const scientistWorkspaceManifest = useMemo(() => {
+    void tick;
+    if (!hydrated || !scientistMode) return null;
+    const previousContext = scientistStoredContext;
+    const previousInput = scientistStoredInput;
+    const context = buildScientistHumanContext({
+      universityId: scientistUniversity?.id ?? previousInput?.universityId ?? null,
+      universityName: scientistUniversity?.name ?? previousInput?.universityName ?? null,
+      unitId: scientistUnit?.id ?? previousInput?.unitId ?? null,
+      unitSymbol: scientistUnit?.symbol ?? previousInput?.unitSymbol ?? null,
+      projectStatement: previousInput?.projectStatement ?? idea?.problem ?? idea?.title ?? null,
+      smartIdeaId: idea?.id ?? previousInput?.smartIdeaId ?? null,
+    }, previousContext);
+    return composeWorkspace(context, SCIENTIST_REFERENCE_CAPABILITIES, {
+      workspaceId: "research-reference",
+      title: "Research operating environment",
+    });
+  }, [hydrated, idea?.id, idea?.problem, idea?.title, scientistMode, scientistStoredContext, scientistStoredInput, scientistUnit, scientistUniversity, tick]);
+
+  useEffect(() => {
+    if (!scientistMode) return;
+    const previous = readScientistWorkflowContext();
+    writeScientistWorkflowContext({
+      role: "scientist",
+      universityId: scientistUniversity?.id ?? previous?.universityId ?? null,
+      universityName: scientistUniversity?.name ?? previous?.universityName ?? null,
+      unitId: scientistUnit?.id ?? previous?.unitId ?? null,
+      unitSymbol: scientistUnit?.symbol ?? previous?.unitSymbol ?? null,
+      projectStatement: previous?.projectStatement ?? idea?.problem ?? idea?.title ?? null,
+      smartIdeaId: idea?.id ?? previous?.smartIdeaId ?? null,
+    });
+  }, [idea?.id, idea?.problem, idea?.title, scientistMode, scientistUnit, scientistUniversity]);
 
   useEffect(() => {
     if (!idea?.id) return;
@@ -528,6 +581,68 @@ export default function ResearchCanvasClient() {
             <p className="mt-2 text-xs text-zinc-500">{t("researchCanvas.noMissionBanner")}</p>
           )}
         </div>
+      ) : null}
+
+      {scientistMode ? (
+        <section aria-labelledby="scientist-measurement-title" className={`${cbaiGlassCard} space-y-4 p-6`}>
+          <div>
+            <p className={cbaiSectionEyebrow}>Scientist workspace</p>
+            <h2 id="scientist-measurement-title" className="text-base font-semibold text-zinc-100">Measurement setup</h2>
+            <p className="mt-1 text-xs text-zinc-500">No scientific conclusion is generated here. A human must confirm the project, methods, evidence, and interpretation.</p>
+          </div>
+          <dl className="grid gap-3 text-sm sm:grid-cols-3">
+            <div><dt className="text-xs text-zinc-500">University</dt><dd className={scientistUniversity ? "text-zinc-200" : "text-amber-300"}>{scientistUniversity?.name ?? "Unknown — required"}</dd></div>
+            <div><dt className="text-xs text-zinc-500">Measurement unit</dt><dd className={scientistUnit ? "text-zinc-200" : "text-amber-300"}>{scientistUnit ? `${scientistUnit.name} (${scientistUnit.symbol})` : "Unknown — required"}</dd></div>
+            <div><dt className="text-xs text-zinc-500">Research project</dt><dd className={idea ? "text-zinc-200" : "text-amber-300"}>{idea?.title ?? "Not selected — required"}</dd></div>
+          </dl>
+          <div className="flex flex-wrap gap-2">
+            <Link className={cbaiBtnPrimary} href={scientistUniversity ? `/universities?university=${encodeURIComponent(scientistUniversity.id)}` : "/universities"}>
+              {scientistUniversity ? "Open university context" : "Select university"}
+            </Link>
+            <Link className={`${cbaiFocusRing} rounded-md border border-zinc-700 px-3 py-2 text-xs text-zinc-200`} href="/knowledge">Evidence</Link>
+            <button type="button" disabled={!idea} onClick={() => selectStage("COMPARE")} className={`${cbaiFocusRing} rounded-md border border-zinc-700 px-3 py-2 text-xs text-zinc-200 disabled:cursor-not-allowed disabled:opacity-50`}>Compare</button>
+          </div>
+          {scientistWorkspaceManifest ? (
+            <div className="space-y-3 border-t border-zinc-800 pt-4">
+              <div>
+                <p className={cbaiSectionEyebrow}>Live workspace composition</p>
+                <p className="mt-1 text-xs text-zinc-500">
+                  Context version {scientistWorkspaceManifest.contextVersion}. Modules are activated from confirmed context, not a fixed persona page.
+                </p>
+              </div>
+              <ul className="grid gap-2 sm:grid-cols-2" aria-label="Composed research capabilities">
+                {scientistWorkspaceManifest.modules.map((module) => {
+                  const reason = scientistWorkspaceManifest.compositionReasons.find(
+                    (item) => item.capabilityId === module.capabilityId,
+                  );
+                  const active = module.state === "active";
+                  return (
+                    <li key={module.moduleId} className="rounded-md border border-zinc-800 bg-zinc-950/40 p-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <span className="text-xs font-semibold text-zinc-200">{module.capabilityId}</span>
+                        <span className={active ? "text-xs text-teal-300" : "text-xs text-amber-300"}>
+                          {active ? "Active" : "Waiting for context"}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs text-zinc-500">{reason?.statement}</p>
+                    </li>
+                  );
+                })}
+              </ul>
+              {scientistWorkspaceManifest.missingItems.length > 0 ? (
+                <div role="status" className="rounded-md border border-amber-500/20 bg-amber-500/5 p-3">
+                  <p className="text-xs font-semibold text-amber-300">Missing information remains visible</p>
+                  <ul className="mt-2 space-y-1 text-xs text-zinc-400">
+                    {scientistWorkspaceManifest.missingItems.map((item) => (
+                      <li key={item.id}>• {item.label}: {item.reason}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+          {!idea ? <p role="status" className="text-xs text-amber-300">Next missing item: select or create the research project. Compare remains unavailable until a project and evidence exist.</p> : null}
+        </section>
       ) : null}
 
       {!resolvedActiveId ? (

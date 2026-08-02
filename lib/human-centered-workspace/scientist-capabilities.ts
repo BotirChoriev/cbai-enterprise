@@ -1,0 +1,81 @@
+import type { CapabilityManifest } from "@/lib/human-centered-workspace/contracts";
+
+const evidencePolicy = {
+  evidenceRequiredForConclusion: true,
+  limitationsMustRemainVisible: true,
+  provenanceRequiredForImports: true,
+} as const;
+
+export const SCIENTIST_REFERENCE_CAPABILITIES: readonly CapabilityManifest[] = [
+  {
+    capabilityId: "research.project-context",
+    version: "1.0.0",
+    purpose: "Connect work to a confirmed research project and institution",
+    requiredContext: [{ key: "currentOutcome", reason: "The work needs a human-stated objective" }],
+    optionalContext: [{ key: "universityId", reason: "Institutional context remains optional and explicit" }],
+    inputs: [{ schemaId: "research.project-context.input", version: 1 }],
+    outputs: [{ schemaId: "research.project-context", version: 1 }],
+    uiBlocks: [{ blockId: "research.project-context-panel", version: 1 }],
+    actions: ["navigate.research", "research.open_topic"],
+    evidencePolicy,
+    permissions: [],
+    integrations: [],
+    lifecycle: { initialState: "draft", states: ["draft", "confirmed"], terminalStates: ["confirmed"] },
+  },
+  {
+    capabilityId: "research.measurement",
+    version: "1.0.0",
+    purpose: "Capture measurements with units, provenance, and limitations",
+    requiredContext: [
+      { key: "smartIdeaId", reason: "Measurements must belong to a research project" },
+      { key: "unitId", reason: "A unit is required before interpretation" },
+    ],
+    optionalContext: [],
+    inputs: [{ schemaId: "measurement.input", version: 1 }],
+    outputs: [{ schemaId: "measurement.passport", version: 1 }],
+    uiBlocks: [{ blockId: "research.measurement-panel", version: 1 }],
+    actions: ["navigate.research", "work.open_object"],
+    evidencePolicy,
+    permissions: [],
+    integrations: [],
+    lifecycle: {
+      initialState: "planning",
+      states: ["planning", "capturing", "reviewed"],
+      terminalStates: ["reviewed"],
+    },
+  },
+  {
+    capabilityId: "evidence.review",
+    version: "1.0.0",
+    purpose: "Inspect evidence, provenance, conflicts, and missing support",
+    requiredContext: [],
+    optionalContext: [{ key: "smartIdeaId", reason: "Evidence can be linked to the active research project" }],
+    inputs: [{ schemaId: "evidence.reference", version: 1 }],
+    outputs: [{ schemaId: "evidence.review", version: 1 }],
+    uiBlocks: [{ blockId: "evidence.review-panel", version: 1 }],
+    actions: ["navigate.evidence", "engine.evidence.start"],
+    evidencePolicy,
+    permissions: [],
+    integrations: [],
+    lifecycle: { initialState: "open", states: ["open", "reviewed"], terminalStates: ["reviewed"] },
+  },
+  {
+    capabilityId: "evidence.compare",
+    version: "1.0.0",
+    purpose: "Compare measurements and evidence without inventing a scientific conclusion",
+    requiredContext: [
+      { key: "smartIdeaId", reason: "Comparison belongs to the active project" },
+      { key: "unitId", reason: "Comparable measurements require an explicit unit" },
+    ],
+    optionalContext: [],
+    inputs: [{ schemaId: "evidence.comparison.input", version: 1 }],
+    outputs: [{ schemaId: "evidence.comparison", version: 1 }],
+    uiBlocks: [{ blockId: "evidence.compare-panel", version: 1 }],
+    actions: ["navigate.evidence", "route.apply_filter"],
+    evidencePolicy,
+    permissions: [],
+    integrations: [],
+    lifecycle: { initialState: "draft", states: ["draft", "reviewed"], terminalStates: ["reviewed"] },
+  },
+];
+

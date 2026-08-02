@@ -52,6 +52,7 @@ function emptyObservation(
 }
 
 function buildThenNowNext(_country: Country): ThenNowNextPanel {
+  void _country;
   return {
     then: {
       baselineYear: null,
