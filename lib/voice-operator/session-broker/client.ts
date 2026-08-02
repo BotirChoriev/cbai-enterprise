@@ -29,6 +29,11 @@ function stripTrailingSlash(url: string): string {
   return url.replace(/\/+$/, "");
 }
 
+/** Accept either a broker base (…/api/voice) or its session endpoint. */
+function normalizeBrokerBaseUrl(url: string): string {
+  return stripTrailingSlash(url).replace(/\/session$/i, "");
+}
+
 function isLoopbackHost(hostname: string): boolean {
   return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]" || hostname === "::1";
 }
@@ -72,7 +77,7 @@ export function resolveVoiceBrokerUrl(
 
   if (configured) {
     if (!origin) {
-      return stripTrailingSlash(configured);
+      return normalizeBrokerBaseUrl(configured);
     }
 
     try {
@@ -87,13 +92,13 @@ export function resolveVoiceBrokerUrl(
         // voice pipeline. Ignore the stray loopback URL and use the colocated
         // same-origin Pages Function instead.
         if (isLoopbackHost(page.hostname)) {
-          return stripTrailingSlash(broker.href);
+          return normalizeBrokerBaseUrl(broker.href);
         }
         return sameOriginVoiceBrokerUrl(page.origin);
       }
 
       if (broker.origin === page.origin) {
-        return stripTrailingSlash(`${broker.origin}${broker.pathname}`);
+        return normalizeBrokerBaseUrl(`${broker.origin}${broker.pathname}`);
       }
 
       // Pages Preview / production Pages: colocated Function — never cross-origin mint.
@@ -106,9 +111,9 @@ export function resolveVoiceBrokerUrl(
         return sameOriginVoiceBrokerUrl(page.origin);
       }
 
-      return stripTrailingSlash(broker.href);
+      return normalizeBrokerBaseUrl(broker.href);
     } catch {
-      return stripTrailingSlash(configured);
+      return normalizeBrokerBaseUrl(configured);
     }
   }
 

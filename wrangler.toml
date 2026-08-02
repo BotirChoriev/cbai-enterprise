@@ -25,5 +25,5 @@ compatibility_date = "2026-07-05"
 [env.production.vars]
 NEXT_PUBLIC_SUPABASE_ANON_KEY = "sb_publishable_JmZuHnkQZ6cojNLAYpo5Ww_HIHacRbE"
 NEXT_PUBLIC_SUPABASE_URL = "https://urzllkxthepkejfcokid.supabase.co"
-NEXT_PUBLIC_VOICE_BROKER_URL = "https://checkbalanceai.global/api/voice/session"
+NEXT_PUBLIC_VOICE_BROKER_URL = "https://checkbalanceai.global/api/voice"
 VOICE_ALLOWED_ORIGINS = "https://checkbalanceai.global"

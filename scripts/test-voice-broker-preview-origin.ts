@@ -40,6 +40,11 @@ test("resolveVoiceBrokerUrl keeps same-origin configured path", () => {
   assert.equal(resolveVoiceBrokerUrl(`${page}/api/voice`, page), `${page}/api/voice`);
 });
 
+test("resolveVoiceBrokerUrl normalizes a configured session endpoint to the broker base", () => {
+  const page = "https://checkbalanceai.global";
+  assert.equal(resolveVoiceBrokerUrl(`${page}/api/voice/session`, page), `${page}/api/voice`);
+});
+
 test("resolveVoiceBrokerUrl defaults to same-origin on deployed HTTPS when unset", () => {
   const preview = "https://preview-spatial-world-intell.cbai-enterprise.pages.dev";
   assert.equal(resolveVoiceBrokerUrl("", preview), `${preview}/api/voice`);
