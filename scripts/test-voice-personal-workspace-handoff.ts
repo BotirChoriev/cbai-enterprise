@@ -35,6 +35,10 @@ test("confirmed voice discovery creates and opens one checkpointed Personal Work
   const pendingDraftId = readVoiceSessionMemory()?.pendingDraftId;
   assert.ok(pendingDraftId);
 
+  for (const answer of ["Toshkent", "Hozircha Excel", "5 kishilik jamoa", "Kuniga 20 buyurtma", "3 oy, 20 ming dollar"]) {
+    await processConversationInput(answer, ctx);
+  }
+
   const confirmed = await processConversationInput("tasdiqlayman", ctx);
   assert.match(confirmed.navigateHref ?? "", /^\/workspace\?workspace=/);
   assert.match(confirmed.assistantText, /saqlandi; ekranda ochyapman/i);
@@ -54,8 +58,30 @@ test("confirmed voice discovery creates and opens one checkpointed Personal Work
 
 test("provider routes pending human confirmation before generic command parsing", () => {
   const source = readFileSync("components/voice-operator/VoiceOperatorProvider.tsx", "utf8");
-  const pendingGate = source.indexOf("readVoiceSessionMemory()?.pendingDraftId && isAffirmativeReply(userText)");
+  const pendingGate = source.indexOf("readVoiceSessionMemory()?.pendingDraftId");
   const genericResolver = source.indexOf("const orchestrated = executeVoiceCommand(");
   assert.ok(pendingGate > 0);
   assert.ok(genericResolver > pendingGate);
+});
+
+test("pending draft context stays in the Agent Run instead of falling into auth-gated mutations", async () => {
+  storage.clear();
+  clearVoiceSessionMemory();
+  const ctx = { sessionId: "voice-context-test", language: "uz", smartIdeaId: null } as const;
+  await processConversationInput("Servis biznesim uchun ish reja yarat", ctx);
+  const response = await processConversationInput("Toshkent", ctx);
+  assert.match(response.navigateHref ?? "", /^\/my-work\?agentRun=/);
+  assert.match(response.assistantText, /Keyingi yetishmayotgan ma’lumot/i);
+  assert.ok(readVoiceSessionMemory()?.pendingDraftId);
+});
+
+test("confirmation never creates a workspace while required context is still missing", async () => {
+  storage.clear();
+  clearVoiceSessionMemory();
+  const ctx = { sessionId: "voice-early-confirmation", language: "uz", smartIdeaId: null } as const;
+  await processConversationInput("Servis biznesim uchun ish reja yarat", ctx);
+  const response = await processConversationInput("Tasdiqlayman", ctx);
+  assert.match(response.navigateHref ?? "", /^\/my-work\?agentRun=/);
+  assert.match(response.assistantText, /zarur ma’lumot ochiq/i);
+  assert.ok(readVoiceSessionMemory()?.pendingDraftId);
 });

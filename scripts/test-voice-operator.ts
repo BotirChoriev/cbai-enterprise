@@ -20,6 +20,7 @@ import {
   resolveOperatorMode,
 } from "@/lib/voice-operator/conversation-engine";
 import {
+  appendConversationTurn,
   clearVoiceSessionMemory,
   createVoiceSessionMemory,
   readVoiceSessionMemory,
@@ -294,6 +295,13 @@ test("18. session memory persists turns within session", async () => {
   const session = readVoiceSessionMemory();
   assert.ok(session);
   assert.ok(session!.turns.length >= 2);
+});
+
+test("18b. adjacent duplicate realtime transcripts execute only once", () => {
+  createVoiceSessionMemory("uz", "realtime");
+  appendConversationTurn({ role: "user", text: "Loyiha kartasini yarat" });
+  appendConversationTurn({ role: "user", text: "Loyiha kartasini yarat" });
+  assert.equal(readVoiceSessionMemory()?.turns.length, 1);
 });
 
 test("19. VAD speech start/stop updates phase", () => {

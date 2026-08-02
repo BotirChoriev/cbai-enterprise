@@ -1,6 +1,18 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createAgentRunFromConversation, isAgenticBuildRequest } from "@/lib/agentic-workspace/agent-run-store";
+import { answerAgentRunNextQuestion, createAgentRunFromConversation, isAgenticBuildRequest } from "@/lib/agentic-workspace/agent-run-store";
+
+const memory = new Map<string, string>();
+Object.defineProperty(globalThis, "window", {
+  configurable: true,
+  value: {
+    localStorage: {
+      getItem: (key: string) => memory.get(key) ?? null,
+      setItem: (key: string, value: string) => memory.set(key, value),
+    },
+    dispatchEvent: () => true,
+  },
+});
 
 test("complex service request creates a real, evidence-honest run", () => {
   const request = "Truck repair servis biznesimni call center, VIN, ustalar va stock bilan tizimlashtirish kerak";
@@ -37,4 +49,14 @@ test("mission and problem-solution language creates a visible co-creation draft"
   assert.match(run.goal, /inson bilan birgalikda/i);
   assert.ok(run.artifacts[0]?.items.includes("Missiyani aniqlash"));
   assert.equal(run.assumptions.length, 0);
+});
+
+test("human answers advance exactly one missing item without inference", () => {
+  const run = createAgentRunFromConversation("Servis biznesim uchun ish reja tuz");
+  const firstMissing = run.missingInformation[0];
+  const updated = answerAgentRunNextQuestion(run.id, "Toshkent");
+  assert.ok(updated);
+  assert.equal(updated!.missingInformation.length, run.missingInformation.length - 1);
+  assert.match(updated!.knownFacts.at(-1) ?? "", new RegExp(firstMissing, "i"));
+  assert.match(updated!.knownFacts.at(-1) ?? "", /Toshkent/);
 });

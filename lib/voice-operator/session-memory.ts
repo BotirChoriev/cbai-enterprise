@@ -61,6 +61,15 @@ function writeSession(session: VoiceSessionMemory): void {
 
 export function appendConversationTurn(turn: Omit<ConversationTurn, "id" | "at">): VoiceSessionMemory {
   const current = readVoiceSessionMemory() ?? createVoiceSessionMemory("uz", "browser_fallback");
+  const previous = current.turns[current.turns.length - 1];
+  if (
+    previous &&
+    previous.role === turn.role &&
+    previous.text.trim() === turn.text.trim() &&
+    Date.now() - Date.parse(previous.at) < 3_000
+  ) {
+    return current;
+  }
   const next: VoiceSessionMemory = {
     ...current,
     turns: [

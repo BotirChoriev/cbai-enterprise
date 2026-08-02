@@ -50,7 +50,6 @@ import {
 import { getVoiceOperatorFirstRunIntro, getVoiceOperatorIntroPhrase } from "@/lib/voice-operator/instructions";
 import {
   clearConversationPendingState,
-  isAffirmativeReply,
   processConversationInput,
   resolveOperatorMode,
 } from "@/lib/voice-operator/conversation-engine";
@@ -543,7 +542,7 @@ export default function VoiceOperatorProvider({ children }: { children: ReactNod
       // A human confirmation for a visible discovery draft must resume that
       // exact draft before generic command parsing. Otherwise words such as
       // "tasdiqlayman" are incorrectly treated as an unknown navigation command.
-      if (readVoiceSessionMemory()?.pendingDraftId && isAffirmativeReply(userText)) {
+      if (readVoiceSessionMemory()?.pendingDraftId) {
         setDockState("thinking");
         const response = await processConversationInput(userText, toolContext);
         if (response.navigateHref) {

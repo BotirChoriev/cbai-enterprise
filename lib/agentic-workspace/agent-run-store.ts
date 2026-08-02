@@ -147,6 +147,44 @@ export function getAgentRun(id: string): AgentRun | null {
   return readRuns().find((run) => run.id === id) ?? null;
 }
 
+/**
+ * Record one human answer against the currently visible missing item.
+ * The answer is preserved verbatim; CBAI does not infer additional fields from it.
+ */
+export function answerAgentRunNextQuestion(id: string, answer: string): AgentRun | null {
+  const trimmed = answer.trim();
+  if (!trimmed) return getAgentRun(id);
+  const runs = readRuns();
+  const current = runs.find((run) => run.id === id);
+  if (!current) return null;
+  const answeredQuestion = current.missingInformation[0];
+  if (!answeredQuestion) return current;
+  const remaining = current.missingInformation.slice(1);
+  const updated: AgentRun = {
+    ...current,
+    knownFacts: unique([
+      ...current.knownFacts,
+      `User answer — ${answeredQuestion}: ${trimmed}`,
+    ]),
+    missingInformation: remaining,
+    nextQuestion: remaining[0] ?? "Human confirmation",
+    status: remaining.length === 0 ? "draft_ready" : "waiting_for_input",
+    steps: current.steps.map((step) =>
+      step.id === "confirm"
+        ? { ...step, status: remaining.length === 0 ? "needs_confirmation" : "ready" }
+        : step,
+    ),
+    artifacts: current.artifacts.map((artifact) =>
+      artifact.type === "requirements"
+        ? { ...artifact, items: remaining }
+        : artifact,
+    ),
+    updatedAt: new Date().toISOString(),
+  };
+  writeRuns([updated, ...runs.filter((run) => run.id !== id)]);
+  return updated;
+}
+
 export function appendNarrationToLatestAgentRun(items: readonly string[]): AgentRun | null {
   if (items.length === 0) return null;
   const runs = readRuns();

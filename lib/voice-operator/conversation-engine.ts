@@ -16,7 +16,7 @@ import {
 } from "@/lib/voice-operator/tools/voice-tools";
 import { evaluateVoiceBrokerStatus } from "@/lib/voice-operator/session-broker/client";
 import { createAgentRunFromConversation, isAgenticBuildRequest } from "@/lib/agentic-workspace/agent-run-store";
-import { getAgentRun } from "@/lib/agentic-workspace/agent-run-store";
+import { answerAgentRunNextQuestion, getAgentRun } from "@/lib/agentic-workspace/agent-run-store";
 import { getCurrentUserId } from "@/lib/auth/auth-store";
 import { getSyncedCloudUserId } from "@/lib/supabase/cloud-session-sync";
 import { buildOperationalHumanContext } from "@/lib/human-centered-workspace/operational-context-adapter";
@@ -115,6 +115,34 @@ export async function processConversationInput(
     };
   }
 
+  if (session.pendingDraftId && !isAffirmativeReply(trimmed)) {
+    const updated = answerAgentRunNextQuestion(session.pendingDraftId, trimmed);
+    if (!updated) {
+      patchVoiceSessionMemory({ pendingDraftId: null });
+      const text = ctx.language === "uz"
+        ? "Draft topilmadi. Oldingi kontekstni taxmin qilmayman; yangi ish maydoni so‘rovini boshlang."
+        : "The draft could not be found. I will not guess prior context; start a new workspace request.";
+      appendConversationTurn({ role: "assistant", text });
+      return { assistantText: text, dockState: "ready" };
+    }
+    const complete = updated.missingInformation.length === 0;
+    const text = complete
+      ? ctx.language === "uz"
+        ? "Minimal kontekst to‘plandi. Workspace yaratishdan oldin inson tasdig‘i kerak. “Tasdiqlayman” deng."
+        : "The minimum context is complete. Human confirmation is required before creating the workspace. Say “confirm”."
+      : ctx.language === "uz"
+        ? `Javob saqlandi. Keyingi yetishmayotgan ma’lumot: ${updated.nextQuestion}`
+        : `Answer saved. Next missing item: ${updated.nextQuestion}`;
+    appendConversationTurn({ role: "assistant", text, toolActivity: "create_agent_run" });
+    return {
+      assistantText: text,
+      dockState: complete ? "action_confirmation" : "responding",
+      awaitingConsent: complete,
+      navigateHref: `/my-work?agentRun=${encodeURIComponent(updated.id)}`,
+      navigationAnnouncement: ctx.language === "uz" ? "Agent workspace yangilandi." : "The agent workspace was updated.",
+    };
+  }
+
   if (session.pendingDraftId && isAffirmativeReply(trimmed)) {
     const agentRun = getAgentRun(session.pendingDraftId);
     if (!agentRun) {
@@ -124,6 +152,19 @@ export async function processConversationInput(
         : "The confirmed draft could not be found. I will not guess the missing context; reopen the work plan.";
       appendConversationTurn({ role: "assistant", text });
       return { assistantText: text, dockState: "ready" };
+    }
+
+    if (agentRun.missingInformation.length > 0) {
+      const text = ctx.language === "uz"
+        ? `Hali ${agentRun.missingInformation.length} ta zarur ma’lumot ochiq. Taxmin qilmayman. Keyingi savol: ${agentRun.nextQuestion}`
+        : `${agentRun.missingInformation.length} required items are still open. I will not guess. Next question: ${agentRun.nextQuestion}`;
+      appendConversationTurn({ role: "assistant", text });
+      return {
+        assistantText: text,
+        dockState: "responding",
+        navigateHref: `/my-work?agentRun=${encodeURIComponent(agentRun.id)}`,
+        navigationAnnouncement: ctx.language === "uz" ? "Yetishmayotgan ma’lumotlar ochiq qoldi." : "Missing information remains open.",
+      };
     }
 
     const ownerId = getSyncedCloudUserId() ?? getCurrentUserId() ?? "device-guest";
