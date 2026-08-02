@@ -120,6 +120,7 @@
     "test:cbai-guide-cycle": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-cbai-guide-cycle.ts",
     "test:human-decision-record": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-human-decision-record.ts",
     "test:personal-workspace": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-personal-workspace.ts",
+    "test:personal-workspace-cloud": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-personal-workspace-cloud.ts",
     "test:artifact-research-room": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-artifact-research-room.ts",
     "test:artifact-storage-migration": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-artifact-storage-migration.ts",
     "test:artifact-cloud-storage": "node --import ./scripts/register-alias-loader.mjs --test scripts/test-artifact-cloud-storage.ts",

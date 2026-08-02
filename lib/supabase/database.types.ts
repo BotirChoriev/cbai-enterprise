@@ -352,6 +352,29 @@ export type HumanContextEventRow = {
   created_at: string;
 };
 
+export type PersonalWorkspaceAggregateRow = {
+  id: string;
+  owner_id: string;
+  workspace_id: string;
+  context_id: string;
+  version: number;
+  payload: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+};
+
+export type WorkspaceCreationRunRow = {
+  id: string;
+  owner_id: string;
+  run_id: string;
+  workspace_id: string;
+  idempotency_key: string;
+  status: "running" | "failed" | "completed";
+  payload: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+};
+
 export type ProblemSnapshotRow = {
   id: string;
   owner_id: string;
@@ -490,6 +513,8 @@ export type Database = {
       >;
       human_context_snapshots: TableDef<HumanContextSnapshotRow, never, never>;
       human_context_events: TableDef<HumanContextEventRow, never, never>;
+      personal_workspace_aggregates: TableDef<PersonalWorkspaceAggregateRow, never, never>;
+      workspace_creation_runs: TableDef<WorkspaceCreationRunRow, never, never>;
     };
     Views: Record<string, never>;
     Functions: {
@@ -541,6 +566,13 @@ export type Database = {
       delete_human_context: {
         Args: { p_context_id: string };
         Returns: boolean;
+      };
+      save_personal_workspace: {
+        Args: {
+          p_workspace: Record<string, unknown>;
+          p_run: Record<string, unknown>;
+        };
+        Returns: Record<string, unknown>;
       };
     };
   };

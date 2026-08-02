@@ -9,4 +9,5 @@ export * from "@/lib/human-centered-workspace/operational-capabilities";
 export * from "@/lib/human-centered-workspace/operational-context-adapter";
 export * from "@/lib/human-centered-workspace/personal-workspace-lifecycle";
 export * from "@/lib/human-centered-workspace/device-local-workspace-lifecycle-repository";
+export * from "@/lib/human-centered-workspace/cloud-workspace-lifecycle-repository";
 export * from "@/lib/human-centered-workspace/execution-blueprint";

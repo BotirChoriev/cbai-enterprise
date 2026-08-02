@@ -1,11 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import OperatingPageShell from "@/components/shared/OperatingPageShell";
 import { useHydrated } from "@/lib/hooks/use-hydrated";
 import { useTranslation } from "@/lib/i18n/use-translation";
 import { deviceLocalWorkspaceLifecycleRepository } from "@/lib/human-centered-workspace/device-local-workspace-lifecycle-repository";
+import { readCloudPersonalWorkspace } from "@/lib/human-centered-workspace/cloud-workspace-lifecycle-repository";
+import type { PersonalWorkspaceAggregate, WorkspaceCreationRun } from "@/lib/human-centered-workspace/personal-workspace-lifecycle";
+import { getSyncedCloudUserId } from "@/lib/supabase/cloud-session-sync";
 
 const FALLBACK_LINKS = [
   { href: "/account", label: "Profile" },
@@ -21,10 +25,45 @@ export default function PersonalWorkspaceHome() {
   const params = useSearchParams();
   const workspaceId = params.get("workspace");
   const runId = params.get("run");
-  const workspace = hydrated && workspaceId
-    ? deviceLocalWorkspaceLifecycleRepository.readWorkspace(workspaceId)
-    : null;
-  const run = hydrated && runId ? deviceLocalWorkspaceLifecycleRepository.readRun(runId) : null;
+  const [workspace, setWorkspace] = useState<PersonalWorkspaceAggregate | null>(null);
+  const [run, setRun] = useState<WorkspaceCreationRun | null>(null);
+  const [loadingWorkspace, setLoadingWorkspace] = useState(true);
+  const [cloudFailure, setCloudFailure] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    let cancelled = false;
+    void Promise.resolve().then(async () => {
+      if (cancelled) return;
+      if (!workspaceId) {
+        setLoadingWorkspace(false);
+        return;
+      }
+      const localWorkspace = deviceLocalWorkspaceLifecycleRepository.readWorkspace(workspaceId);
+      const localRun = runId ? deviceLocalWorkspaceLifecycleRepository.readRun(runId) : null;
+      setWorkspace(localWorkspace);
+      setRun(localRun);
+      if (!getSyncedCloudUserId()) {
+        setLoadingWorkspace(false);
+        return;
+      }
+      const result = await readCloudPersonalWorkspace(workspaceId);
+      if (cancelled) return;
+      if (result.ok) {
+        deviceLocalWorkspaceLifecycleRepository.saveWorkspace(result.value.workspace);
+        if (result.value.run) deviceLocalWorkspaceLifecycleRepository.saveRun(result.value.run);
+        setWorkspace(result.value.workspace);
+        setRun(result.value.run ?? localRun);
+        setCloudFailure(null);
+      } else if (result.error !== "not_found") {
+        setCloudFailure(result.detail ? `${result.error}: ${result.detail}` : result.error);
+      }
+      setLoadingWorkspace(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrated, runId, workspaceId]);
 
   if (workspace) {
     return (
@@ -52,6 +91,14 @@ export default function PersonalWorkspaceHome() {
             </p>
           ) : null}
         </section>
+
+        {cloudFailure ? (
+          <div className="mt-3 rounded-xl border border-amber-400/25 bg-amber-400/[0.05] p-3" role="status">
+            <p className="text-xs text-amber-100">
+              {uz ? "Cloud sinxronlash bajarilmadi; qurilmadagi nusxa saqlandi" : "Cloud sync failed; the device copy is preserved"}: {cloudFailure}
+            </p>
+          </div>
+        ) : null}
 
         <section className="mt-5">
           <h2 className="text-base font-semibold text-white">{uz ? "Workspace modullari" : "Workspace modules"}</h2>
@@ -149,7 +196,7 @@ export default function PersonalWorkspaceHome() {
     );
   }
 
-  if (!hydrated) {
+  if (!hydrated || loadingWorkspace) {
     return (
       <OperatingPageShell title="Personal workspace" description="Loading…">
         <div className="h-20 animate-pulse rounded-xl bg-white/[0.035]" />

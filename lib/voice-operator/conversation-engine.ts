@@ -23,6 +23,7 @@ import { buildOperationalHumanContext } from "@/lib/human-centered-workspace/ope
 import { OPERATIONAL_REFERENCE_CAPABILITIES } from "@/lib/human-centered-workspace/operational-capabilities";
 import { createOrResumePersonalWorkspace } from "@/lib/human-centered-workspace/personal-workspace-lifecycle";
 import { deviceLocalWorkspaceLifecycleRepository } from "@/lib/human-centered-workspace/device-local-workspace-lifecycle-repository";
+import { saveCloudPersonalWorkspace } from "@/lib/human-centered-workspace/cloud-workspace-lifecycle-repository";
 import { generateExecutionBlueprint } from "@/lib/human-centered-workspace/execution-blueprint";
 import { patchVoiceSessionMemory } from "@/lib/voice-operator/session-memory";
 
@@ -200,6 +201,22 @@ export async function processConversationInput(
         : `Workspace creation stopped after ${creation.run.lastSuccessfulCheckpoint}: ${creation.run.errorCode}. Your information is preserved; say “continue” to resume here.`;
       appendConversationTurn({ role: "assistant", text });
       return { assistantText: text, dockState: "ready" };
+    }
+
+    if (getSyncedCloudUserId()) {
+      const cloudSave = await saveCloudPersonalWorkspace(creation.workspace, creation.run);
+      if (!cloudSave.ok) {
+        const text = ctx.language === "uz"
+          ? `Workspace qurilmada saqlandi, lekin cloud checkpoint yozilmadi: ${cloudSave.error}${cloudSave.detail ? ` — ${cloudSave.detail}` : ""}. Ma’lumot yo‘qolmadi; shu run’dan retry qilinadi.`
+          : `The workspace was preserved on this device, but the cloud checkpoint failed: ${cloudSave.error}${cloudSave.detail ? ` — ${cloudSave.detail}` : ""}. No data was discarded; this run can be retried.`;
+        appendConversationTurn({ role: "assistant", text });
+        return {
+          assistantText: text,
+          dockState: "ready",
+          navigateHref: `/workspace?workspace=${encodeURIComponent(creation.workspace.workspaceId)}&run=${encodeURIComponent(creation.run.runId)}`,
+          navigationAnnouncement: ctx.language === "uz" ? "Cloud saqlash xatosi ochiq ko‘rsatildi." : "The cloud persistence failure is visible.",
+        };
+      }
     }
 
     patchVoiceSessionMemory({ pendingDraftId: null });
